@@ -6,6 +6,15 @@ This version of Orbiter 8 is the final manifestration of the original prototype.
 
 There will be no (or few) updates to this repository as production for Demo 4 has since been refactored to use Vue 3, EhtersJS, and Solidity 8.
 
+The official Orbiter 8 website: 
+https://orbiter8.com
+
+Source for a fully built version of the Demo 3 client: 
+https://github.com/Partavate-Studios/orbiter8-demo3-client
+
+A Github hosted instance of the Demo 3 client: 
+https://partavate-studios.github.io/orbiter8-demo3-client/ 
+
 ## This project uses the following:
 
  - Truffle Stack 5: https://github.com/trufflesuite/truffle
