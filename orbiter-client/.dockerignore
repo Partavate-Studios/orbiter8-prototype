@@ -1,0 +1,16 @@
+.git
+.gitignore
+.gitlab*
+# Security: Exclude all .env* from docker COPY
+.env
+*.env
+# Allow .env.example for reference
+!.env.example
+LICENSE
+README.md
+CHANGELOG.md
+docker-compose.yml
+# These will be copied specially in the Dockerfile
+deployment/*
+!deployment/docker.nginx.conf
+!deployment/docker.env

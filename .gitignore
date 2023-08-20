@@ -1,0 +1,5 @@
+node_modules
+dist
+#orbiter-client/src/contract-artifacts/*.json
+.editorconfig
+.env

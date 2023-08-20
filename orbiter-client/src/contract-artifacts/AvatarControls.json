@@ -1,0 +1,4332 @@
+{
+  "contractName": "AvatarControls",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "_name",
+          "type": "string"
+        }
+      ],
+      "name": "New",
+      "type": "event"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "name",
+          "type": "string"
+        }
+      ],
+      "name": "createAvatar",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getAvatarCount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        }
+      ],
+      "name": "getAvatarIdByAddress",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        }
+      ],
+      "name": "getAvatarNameById",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        }
+      ],
+      "name": "getAvatarNameByAddress",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getMyAvatarId",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getMyAvatarName",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getMyAvatarSector",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getMyAvatarShipId",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        }
+      ],
+      "name": "hasAvatar",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "haveAvatar",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.5.16+commit.9c3226ce\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"_name\",\"type\":\"string\"}],\"name\":\"New\",\"type\":\"event\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"}],\"name\":\"createAvatar\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getAvatarCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"getAvatarIdByAddress\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"getAvatarNameByAddress\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"}],\"name\":\"getAvatarNameById\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getMyAvatarId\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getMyAvatarName\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getMyAvatarSector\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"getMyAvatarShipId\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"hasAvatar\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"haveAvatar\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"project:/contracts/Orbiter8/StarSystems/Avatar/AvatarControls.sol\":\"AvatarControls\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"optimizer\":{\"enabled\":true,\"runs\":1000},\"remappings\":[]},\"sources\":{\"project:/contracts/Orbiter8/StarSystems/Avatar/AvatarControls.sol\":{\"keccak256\":\"0x1890d60d18241ebeeb0987fb13da3b88b6b6ae3be32877b98f3674ef3867b1d9\",\"urls\":[\"bzz-raw://0fbb3485750895bdc133a00b3b87b42b1f96ea73c67458fc3ad3d97ef49a1d84\",\"dweb:/ipfs/QmbuhkaBkTPucGYf2YkVYu5yAvbcC42ojMYC5t1y7pRhb3\"]},\"project:/contracts/Orbiter8/StarSystems/Avatar/AvatarLibrary.sol\":{\"keccak256\":\"0x6a8fce5e791310fb9b48eb2a25c54e4da7eadbe750e0cfa4ebaff0b139d69192\",\"urls\":[\"bzz-raw://28841173868afa5a725b6177f50ac2c28b6fbad5cd7b1f6054ccd2f5e06d0525\",\"dweb:/ipfs/QmZDPBtnDLoLvJVXCPUe6N7Ny8f35djor3skVyELD2fSq6\"]}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b50610a88806100206000396000f3fe608060405234801561001057600080fd5b50600436106100c95760003560e01c8063651a9ce611610081578063e715bb951161005b578063e715bb951461027e578063f8cc23d114610286578063fb1b535d146102a2576100c9565b8063651a9ce61461023b578063af7b5039146101ae578063bde847f914610261576100c9565b80634f3af590116100b25780634f3af590146101ae578063614b06aa146101b65780636505b2fd146101be576100c9565b80630b46d277146100ce57806346fd1fd014610106575b600080fd5b6100f4600480360360208110156100e457600080fd5b50356001600160a01b03166102c8565b60408051918252519081900360200190f35b6101ac6004803603602081101561011c57600080fd5b81019060208101813564010000000081111561013757600080fd5b82018360208201111561014957600080fd5b8035906020019184600183028401116401000000008311171561016b57600080fd5b91908080601f01602080910402602001604051908101604052809392919081815260200183838082843760009201919091525092955061035d945050505050565b005b6100f461040a565b6100f4610410565b6101c6610494565b6040805160208082528351818301528351919283929083019185019080838360005b838110156102005781810151838201526020016101e8565b50505050905090810190601f16801561022d5780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b6101c66004803603602081101561025157600080fd5b50356001600160a01b03166105df565b6101c66004803603602081101561027757600080fd5b5035610735565b6100f46107a8565b61028e610802565b604080519115158252519081900360200190f35b61028e600480360360208110156102b857600080fd5b50356001600160a01b031661085c565b60408051633418b41160e21b81526000600482018190526001600160a01b0384166024830152915173__AvatarLibrary_________________________9163d062d044916044808301926020929190829003018186803b15801561032b57600080fd5b505af415801561033f573d6000803e3d6000fd5b505050506040513d602081101561035557600080fd5b505192915050565b61036e60008263ffffffff6108bf16565b7f9fe1d2da7d4b09c87c6fb87d391aa4f1c8f4a387ff0091fb166d0fe2e7606d97816040518080602001828103825283818151815260200191508051906020019080838360005b838110156103cd5781810151838201526020016103b5565b50505050905090810190601f1680156103fa5780820380516001836020036101000a031916815260200191505b509250505060405180910390a150565b60015b90565b60008073__AvatarLibrary_________________________632ff6501b90916040518263ffffffff1660e01b81526004018082815260200191505060206040518083038186803b15801561046357600080fd5b505af4158015610477573d6000803e3d6000fd5b505050506040513d602081101561048d57600080fd5b5051905090565b60408051634bea13ab60e11b8152600060048201819052336024830152915160609273__AvatarLibrary_________________________926397d427569260448083019392829003018186803b1580156104ed57600080fd5b505af4158015610501573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f19168201604052602081101561052a57600080fd5b810190808051604051939291908464010000000082111561054a57600080fd5b90830190602082018581111561055f57600080fd5b825164010000000081118282018810171561057957600080fd5b82525081516020918201929091019080838360005b838110156105a657818101518382015260200161058e565b50505050905090810190601f1680156105d35780820380516001836020036101000a031916815260200191505b50604052505050905090565b60408051634bea13ab60e11b81526000600482018190526001600160a01b0384166024830152915160609273__AvatarLibrary_________________________926397d427569260448083019392829003018186803b15801561064157600080fd5b505af4158015610655573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f19168201604052602081101561067e57600080fd5b810190808051604051939291908464010000000082111561069e57600080fd5b9083019060208201858111156106b357600080fd5b82516401000000008111828201881017156106cd57600080fd5b82525081516020918201929091019080838360005b838110156106fa5781810151838201526020016106e2565b50505050905090810190601f1680156107275780820380516001836020036101000a031916815260200191505b506040525050509050919050565b604080517f1644427000000000000000000000000000000000000000000000000000000000815260006004820181905260248201849052915160609273__AvatarLibrary_________________________9263164442709260448083019392829003018186803b15801561064157600080fd5b60408051633418b41160e21b8152600060048201819052336024830152915173__AvatarLibrary_________________________9163d062d044916044808301926020929190829003018186803b15801561046357600080fd5b604080516352e716f160e11b8152600060048201819052336024830152915173__AvatarLibrary_________________________9163a5ce2de2916044808301926020929190829003018186803b15801561046357600080fd5b604080516352e716f160e11b81526000600482018190526001600160a01b0384166024830152915173__AvatarLibrary_________________________9163a5ce2de2916044808301926020929190829003018186803b15801561032b57600080fd5b33600090815260028301602052604090205460ff161561094057604080517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601b60248201527f596f7520616c7265616479206861766520616e206176617461722e0000000000604482015290519081900360640190fd5b604080516020808201909252828152835460018181018087556000878152858120855180519297949693959394919093019261098292849291909101906109bb565b5050336000908152600180880160209081526040808420969095039095556002909701909352509020805460ff19169093179092555050565b828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f106109fc57805160ff1916838001178555610a29565b82800160010185558215610a29579182015b82811115610a29578251825591602001919060010190610a0e565b50610a35929150610a39565b5090565b61040d91905b80821115610a355760008155600101610a3f56fea265627a7a723158201de9ce76cb88b0fda282629099ba269d26917e05196f3780c288bbb676907dbb64736f6c63430005100032",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100c95760003560e01c8063651a9ce611610081578063e715bb951161005b578063e715bb951461027e578063f8cc23d114610286578063fb1b535d146102a2576100c9565b8063651a9ce61461023b578063af7b5039146101ae578063bde847f914610261576100c9565b80634f3af590116100b25780634f3af590146101ae578063614b06aa146101b65780636505b2fd146101be576100c9565b80630b46d277146100ce57806346fd1fd014610106575b600080fd5b6100f4600480360360208110156100e457600080fd5b50356001600160a01b03166102c8565b60408051918252519081900360200190f35b6101ac6004803603602081101561011c57600080fd5b81019060208101813564010000000081111561013757600080fd5b82018360208201111561014957600080fd5b8035906020019184600183028401116401000000008311171561016b57600080fd5b91908080601f01602080910402602001604051908101604052809392919081815260200183838082843760009201919091525092955061035d945050505050565b005b6100f461040a565b6100f4610410565b6101c6610494565b6040805160208082528351818301528351919283929083019185019080838360005b838110156102005781810151838201526020016101e8565b50505050905090810190601f16801561022d5780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b6101c66004803603602081101561025157600080fd5b50356001600160a01b03166105df565b6101c66004803603602081101561027757600080fd5b5035610735565b6100f46107a8565b61028e610802565b604080519115158252519081900360200190f35b61028e600480360360208110156102b857600080fd5b50356001600160a01b031661085c565b60408051633418b41160e21b81526000600482018190526001600160a01b0384166024830152915173__AvatarLibrary_________________________9163d062d044916044808301926020929190829003018186803b15801561032b57600080fd5b505af415801561033f573d6000803e3d6000fd5b505050506040513d602081101561035557600080fd5b505192915050565b61036e60008263ffffffff6108bf16565b7f9fe1d2da7d4b09c87c6fb87d391aa4f1c8f4a387ff0091fb166d0fe2e7606d97816040518080602001828103825283818151815260200191508051906020019080838360005b838110156103cd5781810151838201526020016103b5565b50505050905090810190601f1680156103fa5780820380516001836020036101000a031916815260200191505b509250505060405180910390a150565b60015b90565b60008073__AvatarLibrary_________________________632ff6501b90916040518263ffffffff1660e01b81526004018082815260200191505060206040518083038186803b15801561046357600080fd5b505af4158015610477573d6000803e3d6000fd5b505050506040513d602081101561048d57600080fd5b5051905090565b60408051634bea13ab60e11b8152600060048201819052336024830152915160609273__AvatarLibrary_________________________926397d427569260448083019392829003018186803b1580156104ed57600080fd5b505af4158015610501573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f19168201604052602081101561052a57600080fd5b810190808051604051939291908464010000000082111561054a57600080fd5b90830190602082018581111561055f57600080fd5b825164010000000081118282018810171561057957600080fd5b82525081516020918201929091019080838360005b838110156105a657818101518382015260200161058e565b50505050905090810190601f1680156105d35780820380516001836020036101000a031916815260200191505b50604052505050905090565b60408051634bea13ab60e11b81526000600482018190526001600160a01b0384166024830152915160609273__AvatarLibrary_________________________926397d427569260448083019392829003018186803b15801561064157600080fd5b505af4158015610655573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f19168201604052602081101561067e57600080fd5b810190808051604051939291908464010000000082111561069e57600080fd5b9083019060208201858111156106b357600080fd5b82516401000000008111828201881017156106cd57600080fd5b82525081516020918201929091019080838360005b838110156106fa5781810151838201526020016106e2565b50505050905090810190601f1680156107275780820380516001836020036101000a031916815260200191505b506040525050509050919050565b604080517f1644427000000000000000000000000000000000000000000000000000000000815260006004820181905260248201849052915160609273__AvatarLibrary_________________________9263164442709260448083019392829003018186803b15801561064157600080fd5b60408051633418b41160e21b8152600060048201819052336024830152915173__AvatarLibrary_________________________9163d062d044916044808301926020929190829003018186803b15801561046357600080fd5b604080516352e716f160e11b8152600060048201819052336024830152915173__AvatarLibrary_________________________9163a5ce2de2916044808301926020929190829003018186803b15801561046357600080fd5b604080516352e716f160e11b81526000600482018190526001600160a01b0384166024830152915173__AvatarLibrary_________________________9163a5ce2de2916044808301926020929190829003018186803b15801561032b57600080fd5b33600090815260028301602052604090205460ff161561094057604080517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601b60248201527f596f7520616c7265616479206861766520616e206176617461722e0000000000604482015290519081900360640190fd5b604080516020808201909252828152835460018181018087556000878152858120855180519297949693959394919093019261098292849291909101906109bb565b5050336000908152600180880160209081526040808420969095039095556002909701909352509020805460ff19169093179092555050565b828054600181600116156101000203166002900490600052602060002090601f016020900481019282601f106109fc57805160ff1916838001178555610a29565b82800160010185558215610a29579182015b82811115610a29578251825591602001919060010190610a0e565b50610a35929150610a39565b5090565b61040d91905b80821115610a355760008155600101610a3f56fea265627a7a723158201de9ce76cb88b0fda282629099ba269d26917e05196f3780c288bbb676907dbb64736f6c63430005100032",
+  "sourceMap": "64:1599:21:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;64:1599:21;;;;;;;",
+  "deployedSourceMap": "64:1599:21:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;64:1599:21;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;453:130;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;-1:-1;453:130:21;-1:-1:-1;;;;;453:130:21;;:::i;:::-;;;;;;;;;;;;;;;;223:116;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;223:116:21;;;;;;;;21:11:-1;5:28;;2:2;;;46:1;43;36:12;2:2;223:116:21;;35:9:-1;28:4;12:14;8:25;5:40;2:2;;;58:1;55;48:12;2:2;223:116:21;;;;;;100:9:-1;95:1;81:12;77:20;67:8;63:35;60:50;39:11;25:12;22:29;11:107;8:2;;;131:1;128;121:12;8:2;223:116:21;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;30:3:-1;22:6;14;1:33;99:1;81:16;;74:27;;;;-1:-1;223:116:21;;-1:-1:-1;223:116:21;;-1:-1:-1;;;;;223:116:21:i;:::-;;1282:157;;;:::i;345:102::-;;;:::i;989:128::-;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;8:100:-1;33:3;30:1;27:10;8:100;;;90:11;;;84:18;71:11;;;64:39;52:2;45:10;8:100;;;12:14;989:128:21;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;719:143;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;-1:-1;719:143:21;-1:-1:-1;;;;;719:143:21;;:::i;589:124::-;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;-1:-1;589:124:21;;:::i;868:115::-;;;:::i;1559:101::-;;;:::i;:::-;;;;;;;;;;;;;;;;;;1445:108;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;-1:-1;1445:108:21;-1:-1:-1;;;;;1445:108:21;;:::i;453:130::-;541:35;;;-1:-1:-1;;;541:35:21;;518:4;541:35;;;;;;-1:-1:-1;;;;;541:35:21;;;;;;;;:28;;;;:35;;;;;;;;;;;;;;:28;:35;;;5:2:-1;;;;30:1;27;20:12;5:2;541:35:21;;;;8:9:-1;5:2;;;45:16;42:1;39;24:38;77:16;74:1;67:27;5:2;541:35:21;;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;-1:-1;541:35:21;;453:130;-1:-1:-1;;453:130:21:o;223:116::-;282:26;:7;303:4;282:26;:20;:26;:::i;:::-;323:9;327:4;323:9;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;23:1:-1;8:100;33:3;30:1;27:10;8:100;;;90:11;;;84:18;71:11;;;64:39;52:2;45:10;8:100;;;12:14;323:9:21;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;223:116;:::o;1282:157::-;1408:1;1282:157;;:::o;345:102::-;393:4;416:7;:22;;;;:24;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;416:24:21;;;;8:9:-1;5:2;;;45:16;42:1;39;24:38;77:16;74:1;67:27;5:2;416:24:21;;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;-1:-1;416:24:21;;-1:-1:-1;345:102:21;:::o;989:128::-;1068:42;;;-1:-1:-1;;;1068:42:21;;:7;:42;;;;;;1099:10;1068:42;;;;;;1036:13;;1068:30;;;;:42;;;;;:7;:42;;;;;:30;:42;;;5:2:-1;;;;30:1;27;20:12;5:2;1068:42:21;;;;8:9:-1;5:2;;;45:16;42:1;39;24:38;77:16;74:1;67:27;5:2;1068:42:21;;;;;;39:16:-1;36:1;17:17;2:54;101:4;1068:42:21;80:15:-1;;;-1:-1;;76:31;65:43;;120:4;113:20;13:2;5:11;;2:2;;;29:1;26;19:12;2:2;1068:42:21;;;;;;;;;;;;;19:11:-1;14:3;11:20;8:2;;;44:1;41;34:12;8:2;62:21;;;;123:4;114:14;;138:31;;;135:2;;;182:1;179;172:12;135:2;213:10;;261:11;244:29;;285:43;;;282:58;-1:-1;233:115;230:2;;;361:1;358;351:12;230:2;372:25;;-1:-1;1068:42:21;;420:4:-1;411:14;;;;1068:42:21;;;;;411:14:-1;1068:42:21;23:1:-1;8:100;33:3;30:1;27:10;8:100;;;90:11;;;84:18;71:11;;;64:39;52:2;45:10;8:100;;;12:14;1068:42:21;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1061:49;;989:128;:::o;719:143::-;818:37;;;-1:-1:-1;;;818:37:21;;:7;:37;;;;;;-1:-1:-1;;;;;818:37:21;;;;;;;;786:13;;818:30;;;;:37;;;;;:7;:37;;;;;:30;:37;;;5:2:-1;;;;30:1;27;20:12;5:2;818:37:21;;;;8:9:-1;5:2;;;45:16;42:1;39;24:38;77:16;74:1;67:27;5:2;818:37:21;;;;;;39:16:-1;36:1;17:17;2:54;101:4;818:37:21;80:15:-1;;;-1:-1;;76:31;65:43;;120:4;113:20;13:2;5:11;;2:2;;;29:1;26;19:12;2:2;818:37:21;;;;;;;;;;;;;19:11:-1;14:3;11:20;8:2;;;44:1;41;34:12;8:2;62:21;;;;123:4;114:14;;138:31;;;135:2;;;182:1;179;172:12;135:2;213:10;;261:11;244:29;;285:43;;;282:58;-1:-1;233:115;230:2;;;361:1;358;351:12;230:2;372:25;;-1:-1;818:37:21;;420:4:-1;411:14;;;;818:37:21;;;;;411:14:-1;818:37:21;23:1:-1;8:100;33:3;30:1;27:10;8:100;;;90:11;;;84:18;71:11;;;64:39;52:2;45:10;8:100;;;12:14;818:37:21;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;811:44;;719:143;;;:::o;589:124::-;677:29;;;;;;:7;:29;;;;;;;;;;;;;;645:13;;677:25;;;;:29;;;;;:7;:29;;;;;:25;:29;;;5:2:-1;;;;30:1;27;20:12;868:115:21;936:40;;;-1:-1:-1;;;936:40:21;;913:4;936:40;;;;;;965:10;936:40;;;;;;:28;;;;:40;;;;;;;;;;;;;;:28;:40;;;5:2:-1;;;;30:1;27;20:12;1559:101:21;1624:29;;;-1:-1:-1;;;1624:29:21;;1601:4;1624:29;;;;;;1642:10;1624:29;;;;;;:17;;;;:29;;;;;;;;;;;;;;:17;:29;;;5:2:-1;;;;30:1;27;20:12;1445:108:21;1522:24;;;-1:-1:-1;;;1522:24:21;;1499:4;1522:24;;;;;;-1:-1:-1;;;;;1522:24:21;;;;;;;;:17;;;;:24;;;;;;;;;;;;;;:17;:24;;;5:2:-1;;;;30:1;27;20:12;267:370:22;380:10;364:27;;;;:15;;;:27;;;;;;;;:36;356:76;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;483:42;;;;;;;;;;;;;27:10:-1;;538:1:22;23:18:-1;;;45:23;;;442:7:22;452:83;;;;;;;;;;442:7;;538:1;;23:18:-1;;483:42:22;;452:83;;;;;;;;;;;;;;;:::i;:::-;-1:-1:-1;;570:10:22;549:32;;;;:20;;;;:32;;;;;;;;452:87;;;;549:37;;;596:15;;;;:27;;;-1:-1:-1;596:27:22;;:34;;-1:-1:-1;;596:34:22;;;;;;;-1:-1:-1;;267:370:22:o;64:1599:21:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;64:1599:21;;;-1:-1:-1;64:1599:21;:::i;:::-;;;:::o;:::-;;;;;;;;;;;;;;;;;",
+  "source": "pragma solidity >=0.5.0 <0.6.0;\n\nimport \"./AvatarLibrary.sol\";\n\ncontract AvatarControls {\n\n    using AvatarLibrary for AvatarLibrary.AvatarStorage;\n    AvatarLibrary.AvatarStorage avatars;\n\n    event New(string _name);\n    function createAvatar(string memory name) public {\n        avatars.createAvatar(name);\n        emit New(name);\n    }\n\n    function getAvatarCount() external view returns(uint) {\n        return avatars.getAvatarCount();\n    }\n\n    function getAvatarIdByAddress(address owner) public view returns(uint) {\n        return avatars.getAvatarIdByAddress(owner);\n    }\n\n    function getAvatarNameById(uint id) public view returns(string memory) {\n        return avatars.getAvatarNameById(id);\n    }\n\n    function getAvatarNameByAddress(address owner) public view returns(string memory) {\n        return avatars.getAvatarNameByAddress(owner);\n    }\n\n    function getMyAvatarId() public view returns(uint) {\n        return avatars.getAvatarIdByAddress(msg.sender);\n    }\n\n    function getMyAvatarName() public view returns(string memory) {\n        return avatars.getAvatarNameByAddress(msg.sender);\n    }\n\n    function getMyAvatarSector() public pure returns(uint) {\n        // todo: has to look at other contract\n        uint test = 1;\n        return test;\n    }\n\n    function getMyAvatarShipId() public pure returns(uint) {\n        // todo: has to look at other contract\n        uint shipid = 1;\n        return shipid;\n    }\n\n    function hasAvatar(address owner) public view returns(bool) {\n        return avatars.hasAvatar(owner);\n    }\n\n    function haveAvatar() public view returns(bool) {\n        return avatars.hasAvatar(msg.sender);\n    }\n\n}",
+  "sourcePath": "/home/koda/projects/orbiter8/prototype/contracts/Orbiter8/StarSystems/Avatar/AvatarControls.sol",
+  "ast": {
+    "absolutePath": "project:/contracts/Orbiter8/StarSystems/Avatar/AvatarControls.sol",
+    "exportedSymbols": {
+      "AvatarControls": [
+        3204
+      ]
+    },
+    "id": 3205,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 3055,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.5",
+          ".0",
+          "<",
+          "0.6",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:31:21"
+      },
+      {
+        "absolutePath": "project:/contracts/Orbiter8/StarSystems/Avatar/AvatarLibrary.sol",
+        "file": "./AvatarLibrary.sol",
+        "id": 3056,
+        "nodeType": "ImportDirective",
+        "scope": 3205,
+        "sourceUnit": 3353,
+        "src": "33:29:21",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 3204,
+        "linearizedBaseContracts": [
+          3204
+        ],
+        "name": "AvatarControls",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "id": 3059,
+            "libraryName": {
+              "contractScope": null,
+              "id": 3057,
+              "name": "AvatarLibrary",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 3352,
+              "src": "101:13:21",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_AvatarLibrary_$3352",
+                "typeString": "library AvatarLibrary"
+              }
+            },
+            "nodeType": "UsingForDirective",
+            "src": "95:52:21",
+            "typeName": {
+              "contractScope": null,
+              "id": 3058,
+              "name": "AvatarLibrary.AvatarStorage",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 3221,
+              "src": "119:27:21",
+              "typeDescriptions": {
+                "typeIdentifier": "t_struct$_AvatarStorage_$3221_storage_ptr",
+                "typeString": "struct AvatarLibrary.AvatarStorage"
+              }
+            }
+          },
+          {
+            "constant": false,
+            "id": 3061,
+            "name": "avatars",
+            "nodeType": "VariableDeclaration",
+            "scope": 3204,
+            "src": "152:35:21",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_struct$_AvatarStorage_$3221_storage",
+              "typeString": "struct AvatarLibrary.AvatarStorage"
+            },
+            "typeName": {
+              "contractScope": null,
+              "id": 3060,
+              "name": "AvatarLibrary.AvatarStorage",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 3221,
+              "src": "152:27:21",
+              "typeDescriptions": {
+                "typeIdentifier": "t_struct$_AvatarStorage_$3221_storage_ptr",
+                "typeString": "struct AvatarLibrary.AvatarStorage"
+              }
+            },
+            "value": null,
+            "visibility": "internal"
+          },
+          {
+            "anonymous": false,
+            "documentation": null,
+            "id": 3065,
+            "name": "New",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 3064,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3063,
+                  "indexed": false,
+                  "name": "_name",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3065,
+                  "src": "204:12:21",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 3062,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "204:6:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "203:14:21"
+            },
+            "src": "194:24:21"
+          },
+          {
+            "body": {
+              "id": 3080,
+              "nodeType": "Block",
+              "src": "272:67:21",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 3073,
+                        "name": "name",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 3067,
+                        "src": "303:4:21",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_string_memory_ptr",
+                          "typeString": "string memory"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_string_memory_ptr",
+                          "typeString": "string memory"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 3070,
+                        "name": "avatars",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 3061,
+                        "src": "282:7:21",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_AvatarStorage_$3221_storage",
+                          "typeString": "struct AvatarLibrary.AvatarStorage storage ref"
+                        }
+                      },
+                      "id": 3072,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "createAvatar",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 3270,
+                      "src": "282:20:21",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_struct$_AvatarStorage_$3221_storage_ptr_$_t_string_memory_ptr_$returns$__$bound_to$_t_struct$_AvatarStorage_$3221_storage_ptr_$",
+                        "typeString": "function (struct AvatarLibrary.AvatarStorage storage pointer,string memory)"
+                      }
+                    },
+                    "id": 3074,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "282:26:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 3075,
+                  "nodeType": "ExpressionStatement",
+                  "src": "282:26:21"
+                },
+                {
+                  "eventCall": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 3077,
+                        "name": "name",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 3067,
+                        "src": "327:4:21",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_string_memory_ptr",
+                          "typeString": "string memory"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_string_memory_ptr",
+                          "typeString": "string memory"
+                        }
+                      ],
+                      "id": 3076,
+                      "name": "New",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 3065,
+                      "src": "323:3:21",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_event_nonpayable$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (string memory)"
+                      }
+                    },
+                    "id": 3078,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "323:9:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 3079,
+                  "nodeType": "EmitStatement",
+                  "src": "318:14:21"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 3081,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "createAvatar",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3068,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3067,
+                  "name": "name",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3081,
+                  "src": "245:18:21",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 3066,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "245:6:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "244:20:21"
+            },
+            "returnParameters": {
+              "id": 3069,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "272:0:21"
+            },
+            "scope": 3204,
+            "src": "223:116:21",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 3090,
+              "nodeType": "Block",
+              "src": "399:48:21",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [],
+                    "expression": {
+                      "argumentTypes": [],
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 3086,
+                        "name": "avatars",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 3061,
+                        "src": "416:7:21",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_AvatarStorage_$3221_storage",
+                          "typeString": "struct AvatarLibrary.AvatarStorage storage ref"
+                        }
+                      },
+                      "id": 3087,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "getAvatarCount",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 3282,
+                      "src": "416:22:21",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_delegatecall_view$_t_struct$_AvatarStorage_$3221_storage_ptr_$returns$_t_uint256_$bound_to$_t_struct$_AvatarStorage_$3221_storage_ptr_$",
+                        "typeString": "function (struct AvatarLibrary.AvatarStorage storage pointer) view returns (uint256)"
+                      }
+                    },
+                    "id": 3088,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "416:24:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "functionReturnParameters": 3085,
+                  "id": 3089,
+                  "nodeType": "Return",
+                  "src": "409:31:21"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 3091,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getAvatarCount",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3082,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "368:2:21"
+            },
+            "returnParameters": {
+              "id": 3085,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3084,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3091,
+                  "src": "393:4:21",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3083,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "393:4:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "392:6:21"
+            },
+            "scope": 3204,
+            "src": "345:102:21",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": {
+              "id": 3103,
+              "nodeType": "Block",
+              "src": "524:59:21",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 3100,
+                        "name": "owner",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 3093,
+                        "src": "570:5:21",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 3098,
+                        "name": "avatars",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 3061,
+                        "src": "541:7:21",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_AvatarStorage_$3221_storage",
+                          "typeString": "struct AvatarLibrary.AvatarStorage storage ref"
+                        }
+                      },
+                      "id": 3099,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "getAvatarIdByAddress",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 3297,
+                      "src": "541:28:21",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_delegatecall_view$_t_struct$_AvatarStorage_$3221_storage_ptr_$_t_address_$returns$_t_uint256_$bound_to$_t_struct$_AvatarStorage_$3221_storage_ptr_$",
+                        "typeString": "function (struct AvatarLibrary.AvatarStorage storage pointer,address) view returns (uint256)"
+                      }
+                    },
+                    "id": 3101,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "541:35:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "functionReturnParameters": 3097,
+                  "id": 3102,
+                  "nodeType": "Return",
+                  "src": "534:42:21"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 3104,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getAvatarIdByAddress",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3094,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3093,
+                  "name": "owner",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3104,
+                  "src": "483:13:21",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3092,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "483:7:21",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "482:15:21"
+            },
+            "returnParameters": {
+              "id": 3097,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3096,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3104,
+                  "src": "518:4:21",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3095,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "518:4:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "517:6:21"
+            },
+            "scope": 3204,
+            "src": "453:130:21",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 3116,
+              "nodeType": "Block",
+              "src": "660:53:21",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 3113,
+                        "name": "id",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 3106,
+                        "src": "703:2:21",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 3111,
+                        "name": "avatars",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 3061,
+                        "src": "677:7:21",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_AvatarStorage_$3221_storage",
+                          "typeString": "struct AvatarLibrary.AvatarStorage storage ref"
+                        }
+                      },
+                      "id": 3112,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "getAvatarNameById",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 3313,
+                      "src": "677:25:21",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_delegatecall_view$_t_struct$_AvatarStorage_$3221_storage_ptr_$_t_uint256_$returns$_t_string_memory_ptr_$bound_to$_t_struct$_AvatarStorage_$3221_storage_ptr_$",
+                        "typeString": "function (struct AvatarLibrary.AvatarStorage storage pointer,uint256) view returns (string memory)"
+                      }
+                    },
+                    "id": 3114,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "677:29:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_memory_ptr",
+                      "typeString": "string memory"
+                    }
+                  },
+                  "functionReturnParameters": 3110,
+                  "id": 3115,
+                  "nodeType": "Return",
+                  "src": "670:36:21"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 3117,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getAvatarNameById",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3107,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3106,
+                  "name": "id",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3117,
+                  "src": "616:7:21",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3105,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "616:4:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "615:9:21"
+            },
+            "returnParameters": {
+              "id": 3110,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3109,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3117,
+                  "src": "645:13:21",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 3108,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "645:6:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "644:15:21"
+            },
+            "scope": 3204,
+            "src": "589:124:21",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 3129,
+              "nodeType": "Block",
+              "src": "801:61:21",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 3126,
+                        "name": "owner",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 3119,
+                        "src": "849:5:21",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 3124,
+                        "name": "avatars",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 3061,
+                        "src": "818:7:21",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_AvatarStorage_$3221_storage",
+                          "typeString": "struct AvatarLibrary.AvatarStorage storage ref"
+                        }
+                      },
+                      "id": 3125,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "getAvatarNameByAddress",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 3336,
+                      "src": "818:30:21",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_delegatecall_view$_t_struct$_AvatarStorage_$3221_storage_ptr_$_t_address_$returns$_t_string_memory_ptr_$bound_to$_t_struct$_AvatarStorage_$3221_storage_ptr_$",
+                        "typeString": "function (struct AvatarLibrary.AvatarStorage storage pointer,address) view returns (string memory)"
+                      }
+                    },
+                    "id": 3127,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "818:37:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_memory_ptr",
+                      "typeString": "string memory"
+                    }
+                  },
+                  "functionReturnParameters": 3123,
+                  "id": 3128,
+                  "nodeType": "Return",
+                  "src": "811:44:21"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 3130,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getAvatarNameByAddress",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3120,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3119,
+                  "name": "owner",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3130,
+                  "src": "751:13:21",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3118,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "751:7:21",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "750:15:21"
+            },
+            "returnParameters": {
+              "id": 3123,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3122,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3130,
+                  "src": "786:13:21",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 3121,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "786:6:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "785:15:21"
+            },
+            "scope": 3204,
+            "src": "719:143:21",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 3141,
+              "nodeType": "Block",
+              "src": "919:64:21",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "expression": {
+                          "argumentTypes": null,
+                          "id": 3137,
+                          "name": "msg",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 9538,
+                          "src": "965:3:21",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_magic_message",
+                            "typeString": "msg"
+                          }
+                        },
+                        "id": 3138,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberName": "sender",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": null,
+                        "src": "965:10:21",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address_payable",
+                          "typeString": "address payable"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address_payable",
+                          "typeString": "address payable"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 3135,
+                        "name": "avatars",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 3061,
+                        "src": "936:7:21",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_AvatarStorage_$3221_storage",
+                          "typeString": "struct AvatarLibrary.AvatarStorage storage ref"
+                        }
+                      },
+                      "id": 3136,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "getAvatarIdByAddress",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 3297,
+                      "src": "936:28:21",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_delegatecall_view$_t_struct$_AvatarStorage_$3221_storage_ptr_$_t_address_$returns$_t_uint256_$bound_to$_t_struct$_AvatarStorage_$3221_storage_ptr_$",
+                        "typeString": "function (struct AvatarLibrary.AvatarStorage storage pointer,address) view returns (uint256)"
+                      }
+                    },
+                    "id": 3139,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "936:40:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "functionReturnParameters": 3134,
+                  "id": 3140,
+                  "nodeType": "Return",
+                  "src": "929:47:21"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 3142,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getMyAvatarId",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3131,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "890:2:21"
+            },
+            "returnParameters": {
+              "id": 3134,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3133,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3142,
+                  "src": "913:4:21",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3132,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "913:4:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "912:6:21"
+            },
+            "scope": 3204,
+            "src": "868:115:21",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 3153,
+              "nodeType": "Block",
+              "src": "1051:66:21",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "expression": {
+                          "argumentTypes": null,
+                          "id": 3149,
+                          "name": "msg",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 9538,
+                          "src": "1099:3:21",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_magic_message",
+                            "typeString": "msg"
+                          }
+                        },
+                        "id": 3150,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberName": "sender",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": null,
+                        "src": "1099:10:21",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address_payable",
+                          "typeString": "address payable"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address_payable",
+                          "typeString": "address payable"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 3147,
+                        "name": "avatars",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 3061,
+                        "src": "1068:7:21",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_AvatarStorage_$3221_storage",
+                          "typeString": "struct AvatarLibrary.AvatarStorage storage ref"
+                        }
+                      },
+                      "id": 3148,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "getAvatarNameByAddress",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 3336,
+                      "src": "1068:30:21",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_delegatecall_view$_t_struct$_AvatarStorage_$3221_storage_ptr_$_t_address_$returns$_t_string_memory_ptr_$bound_to$_t_struct$_AvatarStorage_$3221_storage_ptr_$",
+                        "typeString": "function (struct AvatarLibrary.AvatarStorage storage pointer,address) view returns (string memory)"
+                      }
+                    },
+                    "id": 3151,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1068:42:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_memory_ptr",
+                      "typeString": "string memory"
+                    }
+                  },
+                  "functionReturnParameters": 3146,
+                  "id": 3152,
+                  "nodeType": "Return",
+                  "src": "1061:49:21"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 3154,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getMyAvatarName",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3143,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1013:2:21"
+            },
+            "returnParameters": {
+              "id": 3146,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3145,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3154,
+                  "src": "1036:13:21",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 3144,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1036:6:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1035:15:21"
+            },
+            "scope": 3204,
+            "src": "989:128:21",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 3165,
+              "nodeType": "Block",
+              "src": "1178:98:21",
+              "statements": [
+                {
+                  "assignments": [
+                    3160
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 3160,
+                      "name": "test",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 3165,
+                      "src": "1235:9:21",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      },
+                      "typeName": {
+                        "id": 3159,
+                        "name": "uint",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "1235:4:21",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "value": null,
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 3162,
+                  "initialValue": {
+                    "argumentTypes": null,
+                    "hexValue": "31",
+                    "id": 3161,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "kind": "number",
+                    "lValueRequested": false,
+                    "nodeType": "Literal",
+                    "src": "1247:1:21",
+                    "subdenomination": null,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_rational_1_by_1",
+                      "typeString": "int_const 1"
+                    },
+                    "value": "1"
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "1235:13:21"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 3163,
+                    "name": "test",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 3160,
+                    "src": "1265:4:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "functionReturnParameters": 3158,
+                  "id": 3164,
+                  "nodeType": "Return",
+                  "src": "1258:11:21"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 3166,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getMyAvatarSector",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3155,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1149:2:21"
+            },
+            "returnParameters": {
+              "id": 3158,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3157,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3166,
+                  "src": "1172:4:21",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3156,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1172:4:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1171:6:21"
+            },
+            "scope": 3204,
+            "src": "1123:153:21",
+            "stateMutability": "pure",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 3177,
+              "nodeType": "Block",
+              "src": "1337:102:21",
+              "statements": [
+                {
+                  "assignments": [
+                    3172
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 3172,
+                      "name": "shipid",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 3177,
+                      "src": "1394:11:21",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      },
+                      "typeName": {
+                        "id": 3171,
+                        "name": "uint",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "1394:4:21",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "value": null,
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 3174,
+                  "initialValue": {
+                    "argumentTypes": null,
+                    "hexValue": "31",
+                    "id": 3173,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "kind": "number",
+                    "lValueRequested": false,
+                    "nodeType": "Literal",
+                    "src": "1408:1:21",
+                    "subdenomination": null,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_rational_1_by_1",
+                      "typeString": "int_const 1"
+                    },
+                    "value": "1"
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "1394:15:21"
+                },
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "id": 3175,
+                    "name": "shipid",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 3172,
+                    "src": "1426:6:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "functionReturnParameters": 3170,
+                  "id": 3176,
+                  "nodeType": "Return",
+                  "src": "1419:13:21"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 3178,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getMyAvatarShipId",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3167,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1308:2:21"
+            },
+            "returnParameters": {
+              "id": 3170,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3169,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3178,
+                  "src": "1331:4:21",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 3168,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1331:4:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1330:6:21"
+            },
+            "scope": 3204,
+            "src": "1282:157:21",
+            "stateMutability": "pure",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 3190,
+              "nodeType": "Block",
+              "src": "1505:48:21",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 3187,
+                        "name": "owner",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 3180,
+                        "src": "1540:5:21",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 3185,
+                        "name": "avatars",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 3061,
+                        "src": "1522:7:21",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_AvatarStorage_$3221_storage",
+                          "typeString": "struct AvatarLibrary.AvatarStorage storage ref"
+                        }
+                      },
+                      "id": 3186,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "hasAvatar",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 3351,
+                      "src": "1522:17:21",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_delegatecall_view$_t_struct$_AvatarStorage_$3221_storage_ptr_$_t_address_$returns$_t_bool_$bound_to$_t_struct$_AvatarStorage_$3221_storage_ptr_$",
+                        "typeString": "function (struct AvatarLibrary.AvatarStorage storage pointer,address) view returns (bool)"
+                      }
+                    },
+                    "id": 3188,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1522:24:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "functionReturnParameters": 3184,
+                  "id": 3189,
+                  "nodeType": "Return",
+                  "src": "1515:31:21"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 3191,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "hasAvatar",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3181,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3180,
+                  "name": "owner",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3191,
+                  "src": "1464:13:21",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 3179,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1464:7:21",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1463:15:21"
+            },
+            "returnParameters": {
+              "id": 3184,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3183,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3191,
+                  "src": "1499:4:21",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 3182,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1499:4:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1498:6:21"
+            },
+            "scope": 3204,
+            "src": "1445:108:21",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 3202,
+              "nodeType": "Block",
+              "src": "1607:53:21",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "expression": {
+                          "argumentTypes": null,
+                          "id": 3198,
+                          "name": "msg",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 9538,
+                          "src": "1642:3:21",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_magic_message",
+                            "typeString": "msg"
+                          }
+                        },
+                        "id": 3199,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberName": "sender",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": null,
+                        "src": "1642:10:21",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address_payable",
+                          "typeString": "address payable"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address_payable",
+                          "typeString": "address payable"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "id": 3196,
+                        "name": "avatars",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 3061,
+                        "src": "1624:7:21",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_AvatarStorage_$3221_storage",
+                          "typeString": "struct AvatarLibrary.AvatarStorage storage ref"
+                        }
+                      },
+                      "id": 3197,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "hasAvatar",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 3351,
+                      "src": "1624:17:21",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_delegatecall_view$_t_struct$_AvatarStorage_$3221_storage_ptr_$_t_address_$returns$_t_bool_$bound_to$_t_struct$_AvatarStorage_$3221_storage_ptr_$",
+                        "typeString": "function (struct AvatarLibrary.AvatarStorage storage pointer,address) view returns (bool)"
+                      }
+                    },
+                    "id": 3200,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1624:29:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "functionReturnParameters": 3195,
+                  "id": 3201,
+                  "nodeType": "Return",
+                  "src": "1617:36:21"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 3203,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "haveAvatar",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 3192,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1578:2:21"
+            },
+            "returnParameters": {
+              "id": 3195,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3194,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 3203,
+                  "src": "1601:4:21",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 3193,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1601:4:21",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1600:6:21"
+            },
+            "scope": 3204,
+            "src": "1559:101:21",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "public"
+          }
+        ],
+        "scope": 3205,
+        "src": "64:1599:21"
+      }
+    ],
+    "src": "0:1663:21"
+  },
+  "legacyAST": {
+    "attributes": {
+      "absolutePath": "project:/contracts/Orbiter8/StarSystems/Avatar/AvatarControls.sol",
+      "exportedSymbols": {
+        "AvatarControls": [
+          3204
+        ]
+      }
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            ">=",
+            "0.5",
+            ".0",
+            "<",
+            "0.6",
+            ".0"
+          ]
+        },
+        "id": 3055,
+        "name": "PragmaDirective",
+        "src": "0:31:21"
+      },
+      {
+        "attributes": {
+          "SourceUnit": 3353,
+          "absolutePath": "project:/contracts/Orbiter8/StarSystems/Avatar/AvatarLibrary.sol",
+          "file": "./AvatarLibrary.sol",
+          "scope": 3205,
+          "symbolAliases": [
+            null
+          ],
+          "unitAlias": ""
+        },
+        "id": 3056,
+        "name": "ImportDirective",
+        "src": "33:29:21"
+      },
+      {
+        "attributes": {
+          "baseContracts": [
+            null
+          ],
+          "contractDependencies": [
+            null
+          ],
+          "contractKind": "contract",
+          "documentation": null,
+          "fullyImplemented": true,
+          "linearizedBaseContracts": [
+            3204
+          ],
+          "name": "AvatarControls",
+          "scope": 3205
+        },
+        "children": [
+          {
+            "children": [
+              {
+                "attributes": {
+                  "contractScope": null,
+                  "name": "AvatarLibrary",
+                  "referencedDeclaration": 3352,
+                  "type": "library AvatarLibrary"
+                },
+                "id": 3057,
+                "name": "UserDefinedTypeName",
+                "src": "101:13:21"
+              },
+              {
+                "attributes": {
+                  "contractScope": null,
+                  "name": "AvatarLibrary.AvatarStorage",
+                  "referencedDeclaration": 3221,
+                  "type": "struct AvatarLibrary.AvatarStorage"
+                },
+                "id": 3058,
+                "name": "UserDefinedTypeName",
+                "src": "119:27:21"
+              }
+            ],
+            "id": 3059,
+            "name": "UsingForDirective",
+            "src": "95:52:21"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "name": "avatars",
+              "scope": 3204,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "struct AvatarLibrary.AvatarStorage",
+              "value": null,
+              "visibility": "internal"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "contractScope": null,
+                  "name": "AvatarLibrary.AvatarStorage",
+                  "referencedDeclaration": 3221,
+                  "type": "struct AvatarLibrary.AvatarStorage"
+                },
+                "id": 3060,
+                "name": "UserDefinedTypeName",
+                "src": "152:27:21"
+              }
+            ],
+            "id": 3061,
+            "name": "VariableDeclaration",
+            "src": "152:35:21"
+          },
+          {
+            "attributes": {
+              "anonymous": false,
+              "documentation": null,
+              "name": "New"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "indexed": false,
+                      "name": "_name",
+                      "scope": 3065,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "string",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "string",
+                          "type": "string"
+                        },
+                        "id": 3062,
+                        "name": "ElementaryTypeName",
+                        "src": "204:6:21"
+                      }
+                    ],
+                    "id": 3063,
+                    "name": "VariableDeclaration",
+                    "src": "204:12:21"
+                  }
+                ],
+                "id": 3064,
+                "name": "ParameterList",
+                "src": "203:14:21"
+              }
+            ],
+            "id": 3065,
+            "name": "EventDefinition",
+            "src": "194:24:21"
+          },
+          {
+            "attributes": {
+              "documentation": null,
+              "implemented": true,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "createAvatar",
+              "scope": 3204,
+              "stateMutability": "nonpayable",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "name",
+                      "scope": 3081,
+                      "stateVariable": false,
+                      "storageLocation": "memory",
+                      "type": "string",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "string",
+                          "type": "string"
+                        },
+                        "id": 3066,
+                        "name": "ElementaryTypeName",
+                        "src": "245:6:21"
+                      }
+                    ],
+                    "id": 3067,
+                    "name": "VariableDeclaration",
+                    "src": "245:18:21"
+                  }
+                ],
+                "id": 3068,
+                "name": "ParameterList",
+                "src": "244:20:21"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 3069,
+                "name": "ParameterList",
+                "src": "272:0:21"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "type": "tuple()",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_string_memory_ptr",
+                                  "typeString": "string memory"
+                                }
+                              ],
+                              "isConstant": false,
+                              "isLValue": true,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "member_name": "createAvatar",
+                              "referencedDeclaration": 3270,
+                              "type": "function (struct AvatarLibrary.AvatarStorage storage pointer,string memory)"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 3061,
+                                  "type": "struct AvatarLibrary.AvatarStorage storage ref",
+                                  "value": "avatars"
+                                },
+                                "id": 3070,
+                                "name": "Identifier",
+                                "src": "282:7:21"
+                              }
+                            ],
+                            "id": 3072,
+                            "name": "MemberAccess",
+                            "src": "282:20:21"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 3067,
+                              "type": "string memory",
+                              "value": "name"
+                            },
+                            "id": 3073,
+                            "name": "Identifier",
+                            "src": "303:4:21"
+                          }
+                        ],
+                        "id": 3074,
+                        "name": "FunctionCall",
+                        "src": "282:26:21"
+                      }
+                    ],
+                    "id": 3075,
+                    "name": "ExpressionStatement",
+                    "src": "282:26:21"
+                  },
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "type": "tuple()",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_string_memory_ptr",
+                                  "typeString": "string memory"
+                                }
+                              ],
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 3065,
+                              "type": "function (string memory)",
+                              "value": "New"
+                            },
+                            "id": 3076,
+                            "name": "Identifier",
+                            "src": "323:3:21"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 3067,
+                              "type": "string memory",
+                              "value": "name"
+                            },
+                            "id": 3077,
+                            "name": "Identifier",
+                            "src": "327:4:21"
+                          }
+                        ],
+                        "id": 3078,
+                        "name": "FunctionCall",
+                        "src": "323:9:21"
+                      }
+                    ],
+                    "id": 3079,
+                    "name": "EmitStatement",
+                    "src": "318:14:21"
+                  }
+                ],
+                "id": 3080,
+                "name": "Block",
+                "src": "272:67:21"
+              }
+            ],
+            "id": 3081,
+            "name": "FunctionDefinition",
+            "src": "223:116:21"
+          },
+          {
+            "attributes": {
+              "documentation": null,
+              "implemented": true,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "getAvatarCount",
+              "scope": 3204,
+              "stateMutability": "view",
+              "superFunction": null,
+              "visibility": "external"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 3082,
+                "name": "ParameterList",
+                "src": "368:2:21"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "",
+                      "scope": 3091,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint",
+                          "type": "uint256"
+                        },
+                        "id": 3083,
+                        "name": "ElementaryTypeName",
+                        "src": "393:4:21"
+                      }
+                    ],
+                    "id": 3084,
+                    "name": "VariableDeclaration",
+                    "src": "393:4:21"
+                  }
+                ],
+                "id": 3085,
+                "name": "ParameterList",
+                "src": "392:6:21"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "functionReturnParameters": 3085
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "arguments": [
+                            null
+                          ],
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "type": "uint256",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                null
+                              ],
+                              "isConstant": false,
+                              "isLValue": true,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "member_name": "getAvatarCount",
+                              "referencedDeclaration": 3282,
+                              "type": "function (struct AvatarLibrary.AvatarStorage storage pointer) view returns (uint256)"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 3061,
+                                  "type": "struct AvatarLibrary.AvatarStorage storage ref",
+                                  "value": "avatars"
+                                },
+                                "id": 3086,
+                                "name": "Identifier",
+                                "src": "416:7:21"
+                              }
+                            ],
+                            "id": 3087,
+                            "name": "MemberAccess",
+                            "src": "416:22:21"
+                          }
+                        ],
+                        "id": 3088,
+                        "name": "FunctionCall",
+                        "src": "416:24:21"
+                      }
+                    ],
+                    "id": 3089,
+                    "name": "Return",
+                    "src": "409:31:21"
+                  }
+                ],
+                "id": 3090,
+                "name": "Block",
+                "src": "399:48:21"
+              }
+            ],
+            "id": 3091,
+            "name": "FunctionDefinition",
+            "src": "345:102:21"
+          },
+          {
+            "attributes": {
+              "documentation": null,
+              "implemented": true,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "getAvatarIdByAddress",
+              "scope": 3204,
+              "stateMutability": "view",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "owner",
+                      "scope": 3104,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 3092,
+                        "name": "ElementaryTypeName",
+                        "src": "483:7:21"
+                      }
+                    ],
+                    "id": 3093,
+                    "name": "VariableDeclaration",
+                    "src": "483:13:21"
+                  }
+                ],
+                "id": 3094,
+                "name": "ParameterList",
+                "src": "482:15:21"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "",
+                      "scope": 3104,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint",
+                          "type": "uint256"
+                        },
+                        "id": 3095,
+                        "name": "ElementaryTypeName",
+                        "src": "518:4:21"
+                      }
+                    ],
+                    "id": 3096,
+                    "name": "VariableDeclaration",
+                    "src": "518:4:21"
+                  }
+                ],
+                "id": 3097,
+                "name": "ParameterList",
+                "src": "517:6:21"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "functionReturnParameters": 3097
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "type": "uint256",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_address",
+                                  "typeString": "address"
+                                }
+                              ],
+                              "isConstant": false,
+                              "isLValue": true,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "member_name": "getAvatarIdByAddress",
+                              "referencedDeclaration": 3297,
+                              "type": "function (struct AvatarLibrary.AvatarStorage storage pointer,address) view returns (uint256)"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 3061,
+                                  "type": "struct AvatarLibrary.AvatarStorage storage ref",
+                                  "value": "avatars"
+                                },
+                                "id": 3098,
+                                "name": "Identifier",
+                                "src": "541:7:21"
+                              }
+                            ],
+                            "id": 3099,
+                            "name": "MemberAccess",
+                            "src": "541:28:21"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 3093,
+                              "type": "address",
+                              "value": "owner"
+                            },
+                            "id": 3100,
+                            "name": "Identifier",
+                            "src": "570:5:21"
+                          }
+                        ],
+                        "id": 3101,
+                        "name": "FunctionCall",
+                        "src": "541:35:21"
+                      }
+                    ],
+                    "id": 3102,
+                    "name": "Return",
+                    "src": "534:42:21"
+                  }
+                ],
+                "id": 3103,
+                "name": "Block",
+                "src": "524:59:21"
+              }
+            ],
+            "id": 3104,
+            "name": "FunctionDefinition",
+            "src": "453:130:21"
+          },
+          {
+            "attributes": {
+              "documentation": null,
+              "implemented": true,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "getAvatarNameById",
+              "scope": 3204,
+              "stateMutability": "view",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "id",
+                      "scope": 3117,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint",
+                          "type": "uint256"
+                        },
+                        "id": 3105,
+                        "name": "ElementaryTypeName",
+                        "src": "616:4:21"
+                      }
+                    ],
+                    "id": 3106,
+                    "name": "VariableDeclaration",
+                    "src": "616:7:21"
+                  }
+                ],
+                "id": 3107,
+                "name": "ParameterList",
+                "src": "615:9:21"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "",
+                      "scope": 3117,
+                      "stateVariable": false,
+                      "storageLocation": "memory",
+                      "type": "string",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "string",
+                          "type": "string"
+                        },
+                        "id": 3108,
+                        "name": "ElementaryTypeName",
+                        "src": "645:6:21"
+                      }
+                    ],
+                    "id": 3109,
+                    "name": "VariableDeclaration",
+                    "src": "645:13:21"
+                  }
+                ],
+                "id": 3110,
+                "name": "ParameterList",
+                "src": "644:15:21"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "functionReturnParameters": 3110
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "type": "string memory",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_uint256",
+                                  "typeString": "uint256"
+                                }
+                              ],
+                              "isConstant": false,
+                              "isLValue": true,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "member_name": "getAvatarNameById",
+                              "referencedDeclaration": 3313,
+                              "type": "function (struct AvatarLibrary.AvatarStorage storage pointer,uint256) view returns (string memory)"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 3061,
+                                  "type": "struct AvatarLibrary.AvatarStorage storage ref",
+                                  "value": "avatars"
+                                },
+                                "id": 3111,
+                                "name": "Identifier",
+                                "src": "677:7:21"
+                              }
+                            ],
+                            "id": 3112,
+                            "name": "MemberAccess",
+                            "src": "677:25:21"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 3106,
+                              "type": "uint256",
+                              "value": "id"
+                            },
+                            "id": 3113,
+                            "name": "Identifier",
+                            "src": "703:2:21"
+                          }
+                        ],
+                        "id": 3114,
+                        "name": "FunctionCall",
+                        "src": "677:29:21"
+                      }
+                    ],
+                    "id": 3115,
+                    "name": "Return",
+                    "src": "670:36:21"
+                  }
+                ],
+                "id": 3116,
+                "name": "Block",
+                "src": "660:53:21"
+              }
+            ],
+            "id": 3117,
+            "name": "FunctionDefinition",
+            "src": "589:124:21"
+          },
+          {
+            "attributes": {
+              "documentation": null,
+              "implemented": true,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "getAvatarNameByAddress",
+              "scope": 3204,
+              "stateMutability": "view",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "owner",
+                      "scope": 3130,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 3118,
+                        "name": "ElementaryTypeName",
+                        "src": "751:7:21"
+                      }
+                    ],
+                    "id": 3119,
+                    "name": "VariableDeclaration",
+                    "src": "751:13:21"
+                  }
+                ],
+                "id": 3120,
+                "name": "ParameterList",
+                "src": "750:15:21"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "",
+                      "scope": 3130,
+                      "stateVariable": false,
+                      "storageLocation": "memory",
+                      "type": "string",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "string",
+                          "type": "string"
+                        },
+                        "id": 3121,
+                        "name": "ElementaryTypeName",
+                        "src": "786:6:21"
+                      }
+                    ],
+                    "id": 3122,
+                    "name": "VariableDeclaration",
+                    "src": "786:13:21"
+                  }
+                ],
+                "id": 3123,
+                "name": "ParameterList",
+                "src": "785:15:21"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "functionReturnParameters": 3123
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "type": "string memory",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_address",
+                                  "typeString": "address"
+                                }
+                              ],
+                              "isConstant": false,
+                              "isLValue": true,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "member_name": "getAvatarNameByAddress",
+                              "referencedDeclaration": 3336,
+                              "type": "function (struct AvatarLibrary.AvatarStorage storage pointer,address) view returns (string memory)"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 3061,
+                                  "type": "struct AvatarLibrary.AvatarStorage storage ref",
+                                  "value": "avatars"
+                                },
+                                "id": 3124,
+                                "name": "Identifier",
+                                "src": "818:7:21"
+                              }
+                            ],
+                            "id": 3125,
+                            "name": "MemberAccess",
+                            "src": "818:30:21"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 3119,
+                              "type": "address",
+                              "value": "owner"
+                            },
+                            "id": 3126,
+                            "name": "Identifier",
+                            "src": "849:5:21"
+                          }
+                        ],
+                        "id": 3127,
+                        "name": "FunctionCall",
+                        "src": "818:37:21"
+                      }
+                    ],
+                    "id": 3128,
+                    "name": "Return",
+                    "src": "811:44:21"
+                  }
+                ],
+                "id": 3129,
+                "name": "Block",
+                "src": "801:61:21"
+              }
+            ],
+            "id": 3130,
+            "name": "FunctionDefinition",
+            "src": "719:143:21"
+          },
+          {
+            "attributes": {
+              "documentation": null,
+              "implemented": true,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "getMyAvatarId",
+              "scope": 3204,
+              "stateMutability": "view",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 3131,
+                "name": "ParameterList",
+                "src": "890:2:21"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "",
+                      "scope": 3142,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint",
+                          "type": "uint256"
+                        },
+                        "id": 3132,
+                        "name": "ElementaryTypeName",
+                        "src": "913:4:21"
+                      }
+                    ],
+                    "id": 3133,
+                    "name": "VariableDeclaration",
+                    "src": "913:4:21"
+                  }
+                ],
+                "id": 3134,
+                "name": "ParameterList",
+                "src": "912:6:21"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "functionReturnParameters": 3134
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "type": "uint256",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_address_payable",
+                                  "typeString": "address payable"
+                                }
+                              ],
+                              "isConstant": false,
+                              "isLValue": true,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "member_name": "getAvatarIdByAddress",
+                              "referencedDeclaration": 3297,
+                              "type": "function (struct AvatarLibrary.AvatarStorage storage pointer,address) view returns (uint256)"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 3061,
+                                  "type": "struct AvatarLibrary.AvatarStorage storage ref",
+                                  "value": "avatars"
+                                },
+                                "id": 3135,
+                                "name": "Identifier",
+                                "src": "936:7:21"
+                              }
+                            ],
+                            "id": 3136,
+                            "name": "MemberAccess",
+                            "src": "936:28:21"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "member_name": "sender",
+                              "referencedDeclaration": null,
+                              "type": "address payable"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 9538,
+                                  "type": "msg",
+                                  "value": "msg"
+                                },
+                                "id": 3137,
+                                "name": "Identifier",
+                                "src": "965:3:21"
+                              }
+                            ],
+                            "id": 3138,
+                            "name": "MemberAccess",
+                            "src": "965:10:21"
+                          }
+                        ],
+                        "id": 3139,
+                        "name": "FunctionCall",
+                        "src": "936:40:21"
+                      }
+                    ],
+                    "id": 3140,
+                    "name": "Return",
+                    "src": "929:47:21"
+                  }
+                ],
+                "id": 3141,
+                "name": "Block",
+                "src": "919:64:21"
+              }
+            ],
+            "id": 3142,
+            "name": "FunctionDefinition",
+            "src": "868:115:21"
+          },
+          {
+            "attributes": {
+              "documentation": null,
+              "implemented": true,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "getMyAvatarName",
+              "scope": 3204,
+              "stateMutability": "view",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 3143,
+                "name": "ParameterList",
+                "src": "1013:2:21"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "",
+                      "scope": 3154,
+                      "stateVariable": false,
+                      "storageLocation": "memory",
+                      "type": "string",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "string",
+                          "type": "string"
+                        },
+                        "id": 3144,
+                        "name": "ElementaryTypeName",
+                        "src": "1036:6:21"
+                      }
+                    ],
+                    "id": 3145,
+                    "name": "VariableDeclaration",
+                    "src": "1036:13:21"
+                  }
+                ],
+                "id": 3146,
+                "name": "ParameterList",
+                "src": "1035:15:21"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "functionReturnParameters": 3146
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "type": "string memory",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_address_payable",
+                                  "typeString": "address payable"
+                                }
+                              ],
+                              "isConstant": false,
+                              "isLValue": true,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "member_name": "getAvatarNameByAddress",
+                              "referencedDeclaration": 3336,
+                              "type": "function (struct AvatarLibrary.AvatarStorage storage pointer,address) view returns (string memory)"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 3061,
+                                  "type": "struct AvatarLibrary.AvatarStorage storage ref",
+                                  "value": "avatars"
+                                },
+                                "id": 3147,
+                                "name": "Identifier",
+                                "src": "1068:7:21"
+                              }
+                            ],
+                            "id": 3148,
+                            "name": "MemberAccess",
+                            "src": "1068:30:21"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "member_name": "sender",
+                              "referencedDeclaration": null,
+                              "type": "address payable"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 9538,
+                                  "type": "msg",
+                                  "value": "msg"
+                                },
+                                "id": 3149,
+                                "name": "Identifier",
+                                "src": "1099:3:21"
+                              }
+                            ],
+                            "id": 3150,
+                            "name": "MemberAccess",
+                            "src": "1099:10:21"
+                          }
+                        ],
+                        "id": 3151,
+                        "name": "FunctionCall",
+                        "src": "1068:42:21"
+                      }
+                    ],
+                    "id": 3152,
+                    "name": "Return",
+                    "src": "1061:49:21"
+                  }
+                ],
+                "id": 3153,
+                "name": "Block",
+                "src": "1051:66:21"
+              }
+            ],
+            "id": 3154,
+            "name": "FunctionDefinition",
+            "src": "989:128:21"
+          },
+          {
+            "attributes": {
+              "documentation": null,
+              "implemented": true,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "getMyAvatarSector",
+              "scope": 3204,
+              "stateMutability": "pure",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 3155,
+                "name": "ParameterList",
+                "src": "1149:2:21"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "",
+                      "scope": 3166,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint",
+                          "type": "uint256"
+                        },
+                        "id": 3156,
+                        "name": "ElementaryTypeName",
+                        "src": "1172:4:21"
+                      }
+                    ],
+                    "id": 3157,
+                    "name": "VariableDeclaration",
+                    "src": "1172:4:21"
+                  }
+                ],
+                "id": 3158,
+                "name": "ParameterList",
+                "src": "1171:6:21"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "assignments": [
+                        3160
+                      ]
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "constant": false,
+                          "name": "test",
+                          "scope": 3165,
+                          "stateVariable": false,
+                          "storageLocation": "default",
+                          "type": "uint256",
+                          "value": null,
+                          "visibility": "internal"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "uint",
+                              "type": "uint256"
+                            },
+                            "id": 3159,
+                            "name": "ElementaryTypeName",
+                            "src": "1235:4:21"
+                          }
+                        ],
+                        "id": 3160,
+                        "name": "VariableDeclaration",
+                        "src": "1235:9:21"
+                      },
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "hexvalue": "31",
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "lValueRequested": false,
+                          "subdenomination": null,
+                          "token": "number",
+                          "type": "int_const 1",
+                          "value": "1"
+                        },
+                        "id": 3161,
+                        "name": "Literal",
+                        "src": "1247:1:21"
+                      }
+                    ],
+                    "id": 3162,
+                    "name": "VariableDeclarationStatement",
+                    "src": "1235:13:21"
+                  },
+                  {
+                    "attributes": {
+                      "functionReturnParameters": 3158
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "overloadedDeclarations": [
+                            null
+                          ],
+                          "referencedDeclaration": 3160,
+                          "type": "uint256",
+                          "value": "test"
+                        },
+                        "id": 3163,
+                        "name": "Identifier",
+                        "src": "1265:4:21"
+                      }
+                    ],
+                    "id": 3164,
+                    "name": "Return",
+                    "src": "1258:11:21"
+                  }
+                ],
+                "id": 3165,
+                "name": "Block",
+                "src": "1178:98:21"
+              }
+            ],
+            "id": 3166,
+            "name": "FunctionDefinition",
+            "src": "1123:153:21"
+          },
+          {
+            "attributes": {
+              "documentation": null,
+              "implemented": true,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "getMyAvatarShipId",
+              "scope": 3204,
+              "stateMutability": "pure",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 3167,
+                "name": "ParameterList",
+                "src": "1308:2:21"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "",
+                      "scope": 3178,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint",
+                          "type": "uint256"
+                        },
+                        "id": 3168,
+                        "name": "ElementaryTypeName",
+                        "src": "1331:4:21"
+                      }
+                    ],
+                    "id": 3169,
+                    "name": "VariableDeclaration",
+                    "src": "1331:4:21"
+                  }
+                ],
+                "id": 3170,
+                "name": "ParameterList",
+                "src": "1330:6:21"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "assignments": [
+                        3172
+                      ]
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "constant": false,
+                          "name": "shipid",
+                          "scope": 3177,
+                          "stateVariable": false,
+                          "storageLocation": "default",
+                          "type": "uint256",
+                          "value": null,
+                          "visibility": "internal"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "uint",
+                              "type": "uint256"
+                            },
+                            "id": 3171,
+                            "name": "ElementaryTypeName",
+                            "src": "1394:4:21"
+                          }
+                        ],
+                        "id": 3172,
+                        "name": "VariableDeclaration",
+                        "src": "1394:11:21"
+                      },
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "hexvalue": "31",
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "lValueRequested": false,
+                          "subdenomination": null,
+                          "token": "number",
+                          "type": "int_const 1",
+                          "value": "1"
+                        },
+                        "id": 3173,
+                        "name": "Literal",
+                        "src": "1408:1:21"
+                      }
+                    ],
+                    "id": 3174,
+                    "name": "VariableDeclarationStatement",
+                    "src": "1394:15:21"
+                  },
+                  {
+                    "attributes": {
+                      "functionReturnParameters": 3170
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "overloadedDeclarations": [
+                            null
+                          ],
+                          "referencedDeclaration": 3172,
+                          "type": "uint256",
+                          "value": "shipid"
+                        },
+                        "id": 3175,
+                        "name": "Identifier",
+                        "src": "1426:6:21"
+                      }
+                    ],
+                    "id": 3176,
+                    "name": "Return",
+                    "src": "1419:13:21"
+                  }
+                ],
+                "id": 3177,
+                "name": "Block",
+                "src": "1337:102:21"
+              }
+            ],
+            "id": 3178,
+            "name": "FunctionDefinition",
+            "src": "1282:157:21"
+          },
+          {
+            "attributes": {
+              "documentation": null,
+              "implemented": true,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "hasAvatar",
+              "scope": 3204,
+              "stateMutability": "view",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "owner",
+                      "scope": 3191,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "stateMutability": "nonpayable",
+                          "type": "address"
+                        },
+                        "id": 3179,
+                        "name": "ElementaryTypeName",
+                        "src": "1464:7:21"
+                      }
+                    ],
+                    "id": 3180,
+                    "name": "VariableDeclaration",
+                    "src": "1464:13:21"
+                  }
+                ],
+                "id": 3181,
+                "name": "ParameterList",
+                "src": "1463:15:21"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "",
+                      "scope": 3191,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bool",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bool",
+                          "type": "bool"
+                        },
+                        "id": 3182,
+                        "name": "ElementaryTypeName",
+                        "src": "1499:4:21"
+                      }
+                    ],
+                    "id": 3183,
+                    "name": "VariableDeclaration",
+                    "src": "1499:4:21"
+                  }
+                ],
+                "id": 3184,
+                "name": "ParameterList",
+                "src": "1498:6:21"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "functionReturnParameters": 3184
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "type": "bool",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_address",
+                                  "typeString": "address"
+                                }
+                              ],
+                              "isConstant": false,
+                              "isLValue": true,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "member_name": "hasAvatar",
+                              "referencedDeclaration": 3351,
+                              "type": "function (struct AvatarLibrary.AvatarStorage storage pointer,address) view returns (bool)"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 3061,
+                                  "type": "struct AvatarLibrary.AvatarStorage storage ref",
+                                  "value": "avatars"
+                                },
+                                "id": 3185,
+                                "name": "Identifier",
+                                "src": "1522:7:21"
+                              }
+                            ],
+                            "id": 3186,
+                            "name": "MemberAccess",
+                            "src": "1522:17:21"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 3180,
+                              "type": "address",
+                              "value": "owner"
+                            },
+                            "id": 3187,
+                            "name": "Identifier",
+                            "src": "1540:5:21"
+                          }
+                        ],
+                        "id": 3188,
+                        "name": "FunctionCall",
+                        "src": "1522:24:21"
+                      }
+                    ],
+                    "id": 3189,
+                    "name": "Return",
+                    "src": "1515:31:21"
+                  }
+                ],
+                "id": 3190,
+                "name": "Block",
+                "src": "1505:48:21"
+              }
+            ],
+            "id": 3191,
+            "name": "FunctionDefinition",
+            "src": "1445:108:21"
+          },
+          {
+            "attributes": {
+              "documentation": null,
+              "implemented": true,
+              "isConstructor": false,
+              "kind": "function",
+              "modifiers": [
+                null
+              ],
+              "name": "haveAvatar",
+              "scope": 3204,
+              "stateMutability": "view",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 3192,
+                "name": "ParameterList",
+                "src": "1578:2:21"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "",
+                      "scope": 3203,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bool",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bool",
+                          "type": "bool"
+                        },
+                        "id": 3193,
+                        "name": "ElementaryTypeName",
+                        "src": "1601:4:21"
+                      }
+                    ],
+                    "id": 3194,
+                    "name": "VariableDeclaration",
+                    "src": "1601:4:21"
+                  }
+                ],
+                "id": 3195,
+                "name": "ParameterList",
+                "src": "1600:6:21"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "functionReturnParameters": 3195
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "type": "bool",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_address_payable",
+                                  "typeString": "address payable"
+                                }
+                              ],
+                              "isConstant": false,
+                              "isLValue": true,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "member_name": "hasAvatar",
+                              "referencedDeclaration": 3351,
+                              "type": "function (struct AvatarLibrary.AvatarStorage storage pointer,address) view returns (bool)"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 3061,
+                                  "type": "struct AvatarLibrary.AvatarStorage storage ref",
+                                  "value": "avatars"
+                                },
+                                "id": 3196,
+                                "name": "Identifier",
+                                "src": "1624:7:21"
+                              }
+                            ],
+                            "id": 3197,
+                            "name": "MemberAccess",
+                            "src": "1624:17:21"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "member_name": "sender",
+                              "referencedDeclaration": null,
+                              "type": "address payable"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 9538,
+                                  "type": "msg",
+                                  "value": "msg"
+                                },
+                                "id": 3198,
+                                "name": "Identifier",
+                                "src": "1642:3:21"
+                              }
+                            ],
+                            "id": 3199,
+                            "name": "MemberAccess",
+                            "src": "1642:10:21"
+                          }
+                        ],
+                        "id": 3200,
+                        "name": "FunctionCall",
+                        "src": "1624:29:21"
+                      }
+                    ],
+                    "id": 3201,
+                    "name": "Return",
+                    "src": "1617:36:21"
+                  }
+                ],
+                "id": 3202,
+                "name": "Block",
+                "src": "1607:53:21"
+              }
+            ],
+            "id": 3203,
+            "name": "FunctionDefinition",
+            "src": "1559:101:21"
+          }
+        ],
+        "id": 3204,
+        "name": "ContractDefinition",
+        "src": "64:1599:21"
+      }
+    ],
+    "id": 3205,
+    "name": "SourceUnit",
+    "src": "0:1663:21"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.5.16+commit.9c3226ce.Emscripten.clang"
+  },
+  "networks": {
+    "3": {
+      "events": {},
+      "links": {
+        "AvatarLibrary": "0x461723065CD0439c40681c0F58981A12fdA73Df4"
+      },
+      "address": "0xD4D17A31D6F2aa295D1B3aF91D15A91Bc8CcDF06",
+      "transactionHash": "0xfd693b127654c2b92a1c982278bc33772f5951fcacf0578d27287071c425a52c"
+    },
+    "4": {
+      "events": {
+        "0x9fe1d2da7d4b09c87c6fb87d391aa4f1c8f4a387ff0091fb166d0fe2e7606d97": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "_name",
+              "type": "string"
+            }
+          ],
+          "name": "New",
+          "type": "event"
+        }
+      },
+      "links": {
+        "AvatarLibrary": "0x5cb3A6310BD072D3b088a3945a2e137b5d766572"
+      },
+      "address": "0x8f1dC434E3D13f294B8FDe928B6235156a310239",
+      "transactionHash": "0xf58a35f83fe981ed129fee010ad3564449527d0c6ae6c5e86a2d619d6682a803"
+    },
+    "28": {
+      "events": {},
+      "links": {
+        "AvatarLibrary": "0x6DC21bB6AB94e56AA8f3EE7eef6ABD61013b45d2"
+      },
+      "address": "0x9795e4E1fcD5d81399D6A7Acc404fD9Fd91c5747",
+      "transactionHash": "0x1b7367147f578d1a71570f7902901573d7fc8b170d8dca9f8dae20ffff860860"
+    },
+    "42": {
+      "events": {},
+      "links": {
+        "AvatarLibrary": "0x1C67109Cf6407E3304066d12b24cD10309151456"
+      },
+      "address": "0xc820005F1EEA88EF4541398F3305d620E5F441d0",
+      "transactionHash": "0xf889e27b2efc580c6f9ad9c373ca4740bcbe703800531dac3a48793f7d223295"
+    },
+    "97": {
+      "events": {
+        "0x9fe1d2da7d4b09c87c6fb87d391aa4f1c8f4a387ff0091fb166d0fe2e7606d97": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "_name",
+              "type": "string"
+            }
+          ],
+          "name": "New",
+          "type": "event"
+        }
+      },
+      "links": {
+        "AvatarLibrary": "0x891A64B4B4014c647b4C14016E6020CD406DbEe0"
+      },
+      "address": "0xc48E08D9367CbC7ebFA363A9467b3c9da286C99D",
+      "transactionHash": "0x2a2c7ef7758057d5eff8f06bf4440fff3d18d2ecf821d8963f3381d9da1b533d"
+    },
+    "599": {
+      "events": {
+        "0x9fe1d2da7d4b09c87c6fb87d391aa4f1c8f4a387ff0091fb166d0fe2e7606d97": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "_name",
+              "type": "string"
+            }
+          ],
+          "name": "New",
+          "type": "event"
+        }
+      },
+      "links": {
+        "AvatarLibrary": "0x1bde28Bf4e0224A72EbC309992B0A5b32262b47A"
+      },
+      "address": "0x2460ED133589F70254f18277F42EDF539221C747",
+      "transactionHash": "0xc26d2746a114d8dfc03c382e461d2a33a3048e9b999f6071d1c842e2eca1ffac"
+    },
+    "1285": {
+      "events": {},
+      "links": {
+        "AvatarLibrary": "0x1bde28Bf4e0224A72EbC309992B0A5b32262b47A"
+      },
+      "address": "0x2460ED133589F70254f18277F42EDF539221C747",
+      "transactionHash": "0x3a7a7f41da51e72d7f1a6613732bb756d4ebb4107994e601feb45dc188887c9c"
+    },
+    "1287": {
+      "events": {
+        "0x9fe1d2da7d4b09c87c6fb87d391aa4f1c8f4a387ff0091fb166d0fe2e7606d97": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "_name",
+              "type": "string"
+            }
+          ],
+          "name": "New",
+          "type": "event"
+        }
+      },
+      "links": {
+        "AvatarLibrary": "0xFab77fA380F2694A74C6Aae9dE90DE2426f0F85b"
+      },
+      "address": "0x9ede095a708438E1063776d02a2dc730D029976b",
+      "transactionHash": "0x5e61b5a76f639f604838c797a1f8d1b2ace41305b3721e11b887ce89f2dcf356"
+    },
+    "1297": {
+      "events": {
+        "0x9fe1d2da7d4b09c87c6fb87d391aa4f1c8f4a387ff0091fb166d0fe2e7606d97": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "_name",
+              "type": "string"
+            }
+          ],
+          "name": "New",
+          "type": "event"
+        }
+      },
+      "links": {
+        "AvatarLibrary": "0x327daFE07e66150d10a060bFD57b75996b940911"
+      },
+      "address": "0x3093022a0bfD02cFf56CD5B87809027BF88731cE",
+      "transactionHash": "0x05f3caa6b308b5af4b89a6bfc6f05060a90e5b6d4c7ce41db390920052bc852a"
+    },
+    "1337": {
+      "events": {},
+      "links": {
+        "AvatarLibrary": "0xd492Ea33252077D9F392b881C97aFc9d7aF4576A"
+      },
+      "address": "0x44AE472Ed19bB9b4a972D0e7dC9BbC3ae7C8b94f",
+      "transactionHash": "0x685d886fc26f6dc21b63509e7e769b6c030695c02fe90f5b64dc5ed3c5d6119c"
+    },
+    "5777": {
+      "events": {
+        "0x9fe1d2da7d4b09c87c6fb87d391aa4f1c8f4a387ff0091fb166d0fe2e7606d97": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "_name",
+              "type": "string"
+            }
+          ],
+          "name": "New",
+          "type": "event"
+        }
+      },
+      "links": {
+        "AvatarLibrary": "0xC68e42c6be61C2452391053922455a461D9d8C72"
+      },
+      "address": "0xCe485db2E317062938c6b2B3c101eb08a34f8A44",
+      "transactionHash": "0x9bba7b9fdefcb1cf9e88b625f82d8fddcafd2a38c9002eeb1fb489e1124a8776"
+    },
+    "15555": {
+      "events": {},
+      "links": {
+        "AvatarLibrary": "0x2ef0df805cE61fDc2E22A8ecf68EaE6e94732CcA"
+      },
+      "address": "0x7a8950c192842820e0C12841DD52187896Db6030",
+      "transactionHash": "0xb8f70561fbaa27bade0a912f5cb701ca62447e86d5fd1ecd5c15eb84de336bc6"
+    },
+    "71401": {
+      "events": {
+        "0x9fe1d2da7d4b09c87c6fb87d391aa4f1c8f4a387ff0091fb166d0fe2e7606d97": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "_name",
+              "type": "string"
+            }
+          ],
+          "name": "New",
+          "type": "event"
+        }
+      },
+      "links": {
+        "AvatarLibrary": "0xF58965358B03DB105Cf8B23bDABce49eBE3607AB"
+      },
+      "address": "0x7Aa32471800488b9eC3693c35332CCbAfBb669AC",
+      "transactionHash": "0x58762a29b042b3a14b3477d7676e7b62ff9b250a7b3e527755c5a1158cdba94c"
+    },
+    "80001": {
+      "events": {
+        "0x9fe1d2da7d4b09c87c6fb87d391aa4f1c8f4a387ff0091fb166d0fe2e7606d97": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "_name",
+              "type": "string"
+            }
+          ],
+          "name": "New",
+          "type": "event"
+        }
+      },
+      "links": {
+        "AvatarLibrary": "0xB754A6658C9F7acB9093Bef6Ae80DbAFcaaF6bDb"
+      },
+      "address": "0x137E576D7A22935e0FE33108Af39757a2957938B",
+      "transactionHash": "0x5d6fdbe9032459c32957ea60ed3c8fbe50dc7ec6b097437bd09af99a48d80d50"
+    },
+    "381932": {
+      "events": {
+        "0x9fe1d2da7d4b09c87c6fb87d391aa4f1c8f4a387ff0091fb166d0fe2e7606d97": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "_name",
+              "type": "string"
+            }
+          ],
+          "name": "New",
+          "type": "event"
+        }
+      },
+      "links": {
+        "AvatarLibrary": "0x1bde28Bf4e0224A72EbC309992B0A5b32262b47A"
+      },
+      "address": "0x2460ED133589F70254f18277F42EDF539221C747",
+      "transactionHash": "0x9b3cab7356ae02c9f9acacf076edfecaaf0f39ea54be5cd84a5a43a3728ee7c9"
+    },
+    "421611": {
+      "events": {},
+      "links": {
+        "AvatarLibrary": "0xa26e83966Cf7964eDae237955bc1aF7867B384f7"
+      },
+      "address": "0x1bde28Bf4e0224A72EbC309992B0A5b32262b47A",
+      "transactionHash": "0x5bb3e34b4361d6dd250d4f16f59741e548a0cc4c99e423e6243d54c18c009ed5"
+    },
+    "11155111": {
+      "events": {
+        "0x9fe1d2da7d4b09c87c6fb87d391aa4f1c8f4a387ff0091fb166d0fe2e7606d97": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "_name",
+              "type": "string"
+            }
+          ],
+          "name": "New",
+          "type": "event"
+        }
+      },
+      "links": {
+        "AvatarLibrary": "0xa26e83966Cf7964eDae237955bc1aF7867B384f7"
+      },
+      "address": "0x1bde28Bf4e0224A72EbC309992B0A5b32262b47A",
+      "transactionHash": "0x89e524dc1da9390a7917525ee3d3941173508cb0665bc651fddeaece8c02a5ac"
+    },
+    "1666700000": {
+      "events": {},
+      "links": {
+        "AvatarLibrary": "0x2460ED133589F70254f18277F42EDF539221C747"
+      },
+      "address": "0xFab77fA380F2694A74C6Aae9dE90DE2426f0F85b",
+      "transactionHash": "0x7f62e819661fad03d27d62746d5cddc46997cf26ac1afac02c48784599731e72"
+    }
+  },
+  "schemaVersion": "3.4.3",
+  "updatedAt": "2023-02-28T04:03:36.221Z",
+  "networkType": "ethereum",
+  "devdoc": {
+    "methods": {}
+  },
+  "userdoc": {
+    "methods": {}
+  }
+}

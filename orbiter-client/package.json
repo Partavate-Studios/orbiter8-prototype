@@ -1,0 +1,54 @@
+{
+  "name": "Orbiter8",
+  "version": "0.3.1",
+  "description": "A decentralized space game for EVM.",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/partavate/prototype.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://gitlab.com/partavate/prototype/issues"
+  },
+  "author": {
+    "name": "Partavate",
+    "email": "info@partavate.com",
+    "url": "http://partavate.com"
+  },
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "//": "UPDATE WITH DEMO VERSIONS",
+    "docker-build": "vue-cli-service build --mode=production --dest=./dist  --no-progress"
+  },
+  "dependencies": {
+    "@truffle/contract": "^4.3.43",
+    "js-cookie": "^3.0.1",
+    "latest": "^0.2.0",
+    "npm-check-updates": "^11.5.13",
+    "prettier": "^2.1.2",
+    "vue": "^2.6.14",
+    "vue-router": "^3.5.3",
+    "vuex": "^3.6.2",
+    "web3": "^1.6.1"
+  },
+  "devDependencies": {
+    "@vue/cli": "^4.5.15",
+    "@vue/cli-plugin-babel": "^4.5.15",
+    "@vue/cli-plugin-eslint": "^4.5.15",
+    "@vue/cli-service": "^4.5.15",
+    "eslint": "^6.8.0",
+    "eslint-plugin-vue": "^7.9.0",
+    "joi": "^17.5.0",
+    "sass": "^1.44.0",
+    "sass-loader": "^9.0.3",
+    "vue-template-compiler": "^2.6.14",
+    "webpack": "^4.44.2"
+  }
+}
