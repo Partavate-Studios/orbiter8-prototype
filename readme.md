@@ -2,9 +2,31 @@
 
 Orbiter 8 is a decentralized space game designed for the Ethereum Virtual Machine..
 
+**Awards**
+
+- March 2022: Polygon Studios Grant Winner
+- April 2022: Moonriver Grants Hackathon Winner
+- Arugust 2022: Bobabeam Hackathon Winner
+
+**Version 0.3.0**
+
 This version of Orbiter 8 is the final manifestration of the original prototype. Work in this demo realizes the third of four demos on the roadmap to a beta. Features include an ever-expanding procedurally generated world full of stars, planets, moons, ships, and other players. Gamers can navigate the stars, trade at space ports, claim planets, and build space stations. 
 
 There will be no (or few) updates to this repository as production for Demo 4 has since been refactored to use Vue 3, EhtersJS, and Solidity 8.
+
+**Test Network Deployments**
+- [Sepolia](https://sepolia.dev/) (Ethereum)
+- [Binance](https://www.bnbchain.org/)
+- [Mumbai](https://polygon.technology/) (Polygon)
+- [Arbitrum](https://arbitrum.io/)
+- [Moonriver](https://moonbeam.network/networks/moonriver/)
+- [Moonbase](https://moonbeam.network/networks/moonbeam/)
+- [Bobabase](https://boba.network/)
+- [Godwoken](http://www.godwoken.com/)
+- [Metis](https://www.metis.io/)
+- [Metal](https://metalblockchain.org/)
+
+**More Information**
 
 The official Orbiter 8 website: 
 https://orbiter8.com
@@ -15,7 +37,10 @@ https://github.com/Partavate-Studios/orbiter8-demo3-client
 A Github hosted instance of the Demo 3 client: 
 https://partavate-studios.github.io/orbiter8-demo3-client/ 
 
-## This project uses the following:
+Gameplay tutorial video:
+https://www.youtube.com/watch?v=cL30sFMYi6A
+
+## Technologies Used:
 
  - Truffle Stack 5: https://github.com/trufflesuite/truffle
  - Eth-Vue Truffle Box: https://truffleframework.com/boxes/eth-vue
