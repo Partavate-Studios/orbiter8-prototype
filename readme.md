@@ -1,8 +1,6 @@
-# Orbiter 8
+# ![Orbiter 8](https://partavate.com/orbiter-8-splash.png)
 
-Orbiter 8 is a decentralized space game designed for the Ethereum Virtual Machine.
-
-![Orbiter 8](https://orbiter8.com/img/feature-move-goods.png)
+[Orbiter 8](https://orbiter8.com) is a decentralized space game designed for the Ethereum Virtual Machine.
 
 **Features**
 
@@ -147,3 +145,11 @@ Running smart contracts requires some kind of Ethereum wallet. This project assu
 
 Note: You will also need to configure Metamask to work with your local development
 environment. Truffle provides 10 private keys to accounts with 100 Ethereum to use for development and testing.
+
+--
+
+Lovingly crafted by [Partavate Studios](https://partavate.com)
+
+Shared under the [GNU Affero General Public License](LICENSE)
+
+#LibertaGalactica
