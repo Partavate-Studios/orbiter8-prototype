@@ -1,6 +1,19 @@
 # Orbiter 8
 
-Orbiter 8 is a decentralized space game designed for the Ethereum Virtual Machine..
+Orbiter 8 is a decentralized space game designed for the Ethereum Virtual Machine.
+
+![Orbiter 8](https://orbiter8.com/img/feature-move-goods.png)
+
+**Features**
+
+- EVM Blockchain native gameplay, fully on-chain
+- Lightweight browser-based game client
+- Dynamically generated galaxy
+- _Massively_ multiplayer
+- Ownable ship and planet assets as ERC721 NFTs
+- In game current as ERC20 tokens
+- Intergalactic tading system
+- Temporal chat, uses "broadcasts"
 
 **Awards**
 
