@@ -21,9 +21,7 @@
 
 **Version 0.3.0**
 
-This version of Orbiter 8 is the final manifestration of the original prototype. Work in this demo realizes the third of four demos on the roadmap to a beta. Features include an ever-expanding procedurally generated world full of stars, planets, moons, ships, and other players. Gamers can navigate the stars, trade at space ports, claim planets, and build space stations. 
-
-There will be no (or few) updates to this repository as production for Demo 4 has since been refactored to use Vue 3, EhtersJS, and Solidity 8.
+This version of Orbiter 8 is the final manifestration of the original prototype. Work in this demo realizes the final alpha demo on the roadmap to a beta. There will be few (or no) updates to this repository as we focus on beta production using a refresh stack including Vue 3, EhtersJS, and Solidity 8.
 
 **Test Network Deployments**
 - [Sepolia](https://sepolia.dev/) (Ethereum)
