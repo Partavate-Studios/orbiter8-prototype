@@ -5,7 +5,7 @@ import globals from 'globals'
 export default [
   { ignores: ['dist/', 'src/contract-artifacts/'] },
   js.configs.recommended,
-  ...pluginVue.configs['flat/vue2-essential'],
+  ...pluginVue.configs['flat/essential'],
   {
     languageOptions: {
       ecmaVersion: 'latest',

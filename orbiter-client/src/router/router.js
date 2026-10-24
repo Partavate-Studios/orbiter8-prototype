@@ -1,12 +1,10 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import Game from '@/components/playgame'
 import HowToWeb3 from '@/components/screens/HowToWeb3'
 import TitleScreen from '@/components/screens/TitleScreen'
 
-Vue.use(Router)
-
-export default new Router({
+export default createRouter({
+  history: createWebHashHistory(),
   routes: [
     {
       path: '/',

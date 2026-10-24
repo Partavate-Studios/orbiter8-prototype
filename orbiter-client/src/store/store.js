@@ -1,6 +1,5 @@
 /* eslint-disable */
-import Vue from 'vue'
-import Vuex from 'vuex'
+import { createStore } from 'vuex'
 
 
 import actions from './actions'
@@ -12,7 +11,6 @@ import Config from './config'
 import UI from './ui'
 import StarMap from './starmap'
 
-Vue.use(Vuex);
 
 const state = {
   web3Loaded: false,
@@ -348,7 +346,7 @@ const state = {
   }
 }
 
-export default new Vuex.Store({
+export default createStore({
   modules: {
     GameState,
     Config,

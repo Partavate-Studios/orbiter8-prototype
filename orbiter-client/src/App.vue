@@ -30,7 +30,7 @@ export default {
   },
   created: function () {
     this.initWeb3()
-    if (router.currentRoute.path != '/') {
+    if (router.currentRoute.value.path != '/') {
       router.push('/')
     }
   },

@@ -167,7 +167,7 @@ export default {
   },
   beforeCreate () {
   },
-  destroyed () {
+  unmounted () {
     window.removeEventListener('keyup', this.handleKeyPress)
     window.removeEventListener('wheel', this.onWheel)
   },
