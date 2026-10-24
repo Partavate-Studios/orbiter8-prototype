@@ -38,7 +38,7 @@
             </g>
         </g>
 
-        <g v-for="x in 6" :key="ship-x">
+        <g v-for="x in 6" :key="'ship-' + x">
             <g :transform="'translate(' + (x * 18 - 25) + ' 1) scale(0.75)'" opacity="0.1">
             <ship />
             </g>
