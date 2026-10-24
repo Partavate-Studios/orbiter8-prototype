@@ -68,10 +68,6 @@ export default {
   mounted: function () {
   },
   computed: {
-    ...mapGetters('Avatar', [
-      'avatarName',
-      'avatarCount'
-    ]),
     ...mapGetters('StarMap', [
       'currentStarSystemId',
       'currentStarSystemName',
