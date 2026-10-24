@@ -1,0 +1,23 @@
+{
+  "traceSeconds": 11.11,
+  "script": {
+    "ms": 1498,
+    "events": 2954
+  },
+  "styleLayout": {
+    "ms": 328,
+    "events": 2089
+  },
+  "paint": {
+    "ms": 443,
+    "events": 702
+  },
+  "layerize": {
+    "ms": 4662,
+    "events": 1440
+  },
+  "raster": {
+    "ms": 28168,
+    "events": 7341
+  }
+}

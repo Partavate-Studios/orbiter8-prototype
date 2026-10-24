@@ -1,0 +1,400 @@
+[log] Seeking Web 3 interface...
+[log] did not enable
+[log] attempting to set default account
+[log] selectedAddress: 0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0
+[log] ...web 3 connected
+[log] Accounts found JSHandle@array
+[log] init avatar interface...
+[log] ... got avatar interface
+[log] init galaxy interface...
+[log] ... got galaxy interface
+[log] Loading game state...
+[log] Avatar count success: "3"
+[log] credit check 100
+[log] Name:  Tester
+[log] Ship:  1
+[log] Credits:  100
+[log] loading my own ship 
+[log] loaded my own ship 1
+[log] Block increase from 0 to 23
+[log] Loading game state...
+[log] Loading star map...
+[log] Avatar count success: "3"
+[log] Discovered by  0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1
+[log] JSHandle@error
+[pageerror] Method eth_getLogs is not supported
+[log] credit check 100
+[log] Name:  Tester
+[log] Ship:  1
+[log] Credits:  100
+[log] loading my own ship 
+[log] loaded my own ship 1
+[log] importing star map data
+[log] discovered: 0xffcf8fdee72ac11b5c542428b35eef5769c409f0 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1
+[log] isMine false from 0xffcf8fdee72ac11b5c542428b35eef5769c409f0 and 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1
+[log] isMine false from 0xffcf8fdee72ac11b5c542428b35eef5769c409f0 and 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1
+[log] isMine false from 0xffcf8fdee72ac11b5c542428b35eef5769c409f0 and 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1
+[log] isMine false from 0xffcf8fdee72ac11b5c542428b35eef5769c409f0 and 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1
+[log] isMine false from 0xffcf8fdee72ac11b5c542428b35eef5769c409f0 and 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1
+[log] isMine false from 0xffcf8fdee72ac11b5c542428b35eef5769c409f0 and 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1
+[log] isMine false from 0xffcf8fdee72ac11b5c542428b35eef5769c409f0 and 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1
+[log] isMine false from 0xffcf8fdee72ac11b5c542428b35eef5769c409f0 and 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1
+[log] isMine false from 0xffcf8fdee72ac11b5c542428b35eef5769c409f0 and 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1
+[log] jump animation off
+[log] new block loaded
+[log] checking for avatar
+[log] selecting sprite  42
+[log] level 2
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[log] load  3
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[log] new size: 1440 x 900
+[log] selecting sprite  5
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[log] Planet belongs to 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1
+[log] selecting sprite  6
+[log] creating menu
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[log] creating menu
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[log] creating menu
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[log] jump animation on
+[log] jump animation off
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[log] selecting sprite  0
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[error] Error: <circle> attribute cy: Unexpected end of attribute. Expected length, "".
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[log] unselecting sprites
+[panzoom] {"frames":545,"avgFps":50.5,"p50ms":16.7,"p95ms":33.4,"maxMs":33.4,"over50ms":0}
