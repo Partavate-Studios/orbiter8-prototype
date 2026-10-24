@@ -40,9 +40,6 @@ export default {
       'haveShip',
       'gameState'
     ]),
-    ...mapGetters('Map', [
-      'systemId'
-    ]),
     ...mapGetters('Config', [
       'blockCheckDelay'
     ]),
@@ -70,7 +67,7 @@ export default {
     this.checkBlockLoop()
     this.o8audio.playMusic('title')
   },
-  beforeDestroy () {
+  beforeUnmount () {
     this.o8audio.stopMusic()
   }
 }
