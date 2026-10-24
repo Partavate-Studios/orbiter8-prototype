@@ -27,6 +27,8 @@
 <script>
 
 import { mapGetters } from 'vuex'
+import { mapState } from 'pinia'
+import { useUIStore } from '@/stores/ui'
 
 export default {
   name: 'ConnectionStatus',
@@ -41,7 +43,7 @@ export default {
     ...mapGetters('GameState', [
       'gameDataLoading'
     ]),
-    ...mapGetters('UI', [
+    ...mapState(useUIStore, [
       'leftMostX',
       'rightMostX',
       'topMostY',

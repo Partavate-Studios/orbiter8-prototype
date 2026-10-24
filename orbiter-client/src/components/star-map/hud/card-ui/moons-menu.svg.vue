@@ -15,7 +15,9 @@
 
 <script>
 
-import { mapGetters, mapActions, mapMutations } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
+import { mapActions as mapPiniaActions } from 'pinia'
+import { useUIStore } from '@/stores/ui'
 import CardBackground from './card-background.svg'
 import CardButton from './card-button.svg'
 
@@ -32,7 +34,7 @@ export default {
     ...mapActions('GameState', [
       'renameAsset'
     ]),
-    ...mapMutations('UI', [
+    ...mapPiniaActions(useUIStore, [
       'selectSprite'
     ])
   },

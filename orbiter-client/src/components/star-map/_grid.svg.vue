@@ -73,7 +73,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { useUIStore } from '@/stores/ui'
 import { mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 
@@ -88,7 +88,7 @@ export default {
     ...mapState(useConfigStore, [
       'graphicsQuality'
     ]),
-    ...mapGetters('UI', [
+    ...mapState(useUIStore, [
       'viewport'
     ])
   }

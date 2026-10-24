@@ -26,7 +26,9 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters } from 'vuex'
+import { mapActions } from 'pinia'
+import { useUIStore } from '@/stores/ui'
 
 export default {
   name: 'Sprites',
@@ -48,7 +50,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('UI', [
+    ...mapActions(useUIStore, [
       'selectSprite'
     ]),
     selectObject: function (index) {

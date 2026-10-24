@@ -59,8 +59,9 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'pinia'
 
-import { mapGetters, mapMutations } from 'vuex'
+import { useUIStore } from '@/stores/ui'
 
 export default {
   name: 'ZoomSlider',
@@ -69,12 +70,12 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('UI', [
+    ...mapState(useUIStore, [
       'viewport'
     ])
   },
   methods: {
-    ...mapMutations('UI', [
+    ...mapActions(useUIStore, [
       'scaleAnimateBy'
     ]),
     zoomLine1 () {

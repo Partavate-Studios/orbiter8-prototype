@@ -64,7 +64,7 @@
 
 <script>
 
-import { mapGetters, mapMutations } from 'vuex'
+import { useUIStore } from '@/stores/ui'
 import { mapActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 import CompassArrow from '../scope/compass-arrow.svg'
@@ -85,7 +85,7 @@ export default {
     ...mapState(useConfigStore, [
       'showScope'
     ]),
-    ...mapGetters('UI', [
+    ...mapState(useUIStore, [
       'spriteToDisplay'
     ]),
   },
@@ -93,7 +93,7 @@ export default {
     ...mapActions(useConfigStore, [
       'toggleScope'
     ]),
-    ...mapMutations('UI', [
+    ...mapActions(useUIStore, [
       'setSpriteToDisplay'
     ]),
     scopeButtonScale () {

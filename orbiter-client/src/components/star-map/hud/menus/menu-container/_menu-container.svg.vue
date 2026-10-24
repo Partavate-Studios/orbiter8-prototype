@@ -26,7 +26,9 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters } from 'vuex'
+import { mapActions, mapState } from 'pinia'
+import { useUIStore } from '@/stores/ui'
 import CloseButton from './close-button.svg'
 import MenuBackground from './menu-background.svg'
 import Rubber from '@/libs/rubber'
@@ -47,7 +49,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('UI', [
+    ...mapState(useUIStore, [
       'leftMostX',
       'rightMostX',
       'topMostY',
@@ -85,7 +87,7 @@ export default {
     )
   },
   methods: {
-    ...mapMutations('UI', [
+    ...mapActions(useUIStore, [
       'closeMenu'
     ]),
     setMenuToClose() {

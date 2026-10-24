@@ -84,6 +84,8 @@
 <script>
 
 import { mapGetters } from 'vuex'
+import { mapState } from 'pinia'
+import { useUIStore } from '@/stores/ui'
 import MenuSlotContainer from './menu-container/menu-slot-container.svg'
 import Planet from '@/components/star-map/sprites/planet.svg'
 import Ship from '@/components/star-map/sprites/ship.svg'
@@ -127,7 +129,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('UI', [
+    ...mapState(useUIStore, [
       'viewport'
     ]),
     ...mapGetters('StarMap', [

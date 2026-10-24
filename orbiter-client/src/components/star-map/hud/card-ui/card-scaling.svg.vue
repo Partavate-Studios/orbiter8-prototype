@@ -8,6 +8,8 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { mapState } from 'pinia'
+import { useUIStore } from '@/stores/ui'
 
 export default {
   name: 'CardScaling',
@@ -27,7 +29,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('UI', [
+    ...mapState(useUIStore, [
       'viewport',
       'viewportTotalRubber'
     ]),

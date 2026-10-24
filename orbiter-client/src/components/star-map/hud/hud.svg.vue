@@ -159,8 +159,9 @@
 
 <script>
 
-import { mapGetters, mapMutations } from 'vuex'
-import { mapState } from 'pinia'
+import { mapGetters } from 'vuex'
+import { useUIStore } from '@/stores/ui'
+import { mapActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 import CurrentSystem from './current-system/system.svg'
 
@@ -217,7 +218,7 @@ export default {
     ZoomSlider,
   },
   computed: {
-    ...mapGetters('UI', [
+    ...mapState(useUIStore, [
       'viewport',
       'selected',
       'leftMostX',
@@ -274,7 +275,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('UI', [
+    ...mapActions(useUIStore, [
       'selectSprite',
       'scaleAnimateTo',
       'jumpMenuOn',

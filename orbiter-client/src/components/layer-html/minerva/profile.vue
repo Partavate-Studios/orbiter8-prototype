@@ -35,8 +35,9 @@
 </template>
 
 <script>
-import { mapGetters, mapActions, mapMutations } from 'vuex'
-import { mapState } from 'pinia'
+import { mapGetters, mapActions } from 'vuex'
+import { useUIStore } from '@/stores/ui'
+import { mapActions as mapPiniaActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 
 export default {
@@ -49,7 +50,7 @@ export default {
     ...mapGetters([
       'account'
     ]),
-    ...mapGetters('UI', [
+    ...mapState(useUIStore, [
       'viewport',
       'selected',
       'viewRatio'
@@ -72,7 +73,7 @@ export default {
     ]),
   },
   methods: {
-    ...mapMutations('UI', [
+    ...mapPiniaActions(useUIStore, [
       'viewTo',
       'scaleTo'
     ]),

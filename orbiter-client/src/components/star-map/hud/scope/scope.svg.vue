@@ -85,8 +85,9 @@
 
 <script>
 
-import { mapGetters, mapMutations } from 'vuex'
-import { mapState } from 'pinia'
+import { mapGetters } from 'vuex'
+import { useUIStore } from '@/stores/ui'
+import { mapActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 import Compass from './compass.svg'
 import CompassArrow from './compass-arrow.svg'
@@ -112,7 +113,7 @@ export default {
     ...mapGetters('GameState', [
       'myShipId'
     ]),
-    ...mapGetters('UI', [
+    ...mapState(useUIStore, [
       'viewport',
       'spriteToDisplay',
       'selected'
@@ -128,7 +129,7 @@ export default {
     selectSprite (spriteKey) {
       this.selectSprite(spriteKey)
     },
-    ...mapMutations('UI', [
+    ...mapActions(useUIStore, [
       'selectSprite',
       'setSpriteToDisplay'
     ]),

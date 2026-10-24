@@ -1,5 +1,6 @@
 import GalaxyContract from '@/contract-interfaces/galaxy'
 import AvatarContract from '@/contract-interfaces/avatar'
+import { useUIStore } from '@/stores/ui'
 
 export default {
 
@@ -168,7 +169,7 @@ export default {
       commit('importStarMapBlockData', {blockData: starMapBlockData, playerAccount: String(rootState.account).toLowerCase()} )
       commit('setProp', {key: 'mapLoadedPercentage', value: 100})
       if (isNewSystem) {
-        commit('UI/jumpAnimationOff', null, {root: true})
+        useUIStore().jumpAnimationOff()
       }
     } catch (error) {
       console.log('oops:' + error.message, error)

@@ -33,7 +33,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapState } from 'pinia'
+import { useUIStore } from '@/stores/ui'
 
 export default {
   name: 'MenuBackground',
@@ -44,7 +45,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('UI', [
+    ...mapState(useUIStore, [
       'leftMostX',
       'rightMostX',
       'topMostY',

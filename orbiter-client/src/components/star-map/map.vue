@@ -68,8 +68,9 @@
 
 <script>
 
-import { mapGetters, mapMutations } from 'vuex'
-import { mapState } from 'pinia'
+import { mapGetters } from 'vuex'
+import { useUIStore } from '@/stores/ui'
+import { mapActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 import _ from 'lodash'
 import svgfilters from './_svg-filters'
@@ -125,7 +126,7 @@ export default {
     ...mapGetters('GameState', [
       'starMap',
     ]),
-    ...mapGetters('UI', [
+    ...mapState(useUIStore, [
       'viewportActual',
       'viewport',
       'menuState',
@@ -185,7 +186,7 @@ export default {
     },
   },
   methods: {
-    ...mapMutations('UI', [
+    ...mapActions(useUIStore, [
       'setMouse',
       'viewTo',
       'selectNone',

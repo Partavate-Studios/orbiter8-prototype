@@ -94,7 +94,9 @@
 
 <script>
 
-import {  mapGetters, mapMutations, mapActions } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
+import { mapActions as mapPiniaActions } from 'pinia'
+import { useUIStore } from '@/stores/ui'
 import MenuContainer from './menu-container/_menu-container.svg'
 import MenuButton from './menu-button.svg'
 import Arrow from './widgets/arrow.svg'
@@ -121,7 +123,7 @@ export default {
     ...mapActions('GameState', [
       'addHoldsToShip',
     ]),
-    ...mapMutations('UI', [
+    ...mapPiniaActions(useUIStore, [
       'closeMenu'
     ]),
     applyUpgrades() {

@@ -31,7 +31,9 @@
 
 <script>
 
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters } from 'vuex'
+import { mapActions } from 'pinia'
+import { useUIStore } from '@/stores/ui'
 import MenuContainer from './menu-container/_menu-container.svg'
 import ShipSlot from './menu-slot-ship'
 
@@ -48,7 +50,7 @@ export default {
     ShipSlot
   },
   methods: {
-    ...mapMutations('UI', [
+    ...mapActions(useUIStore, [
       'selectSprite',
       'closeMenu'
     ]),

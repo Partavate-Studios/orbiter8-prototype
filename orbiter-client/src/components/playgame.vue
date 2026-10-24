@@ -7,6 +7,7 @@
 
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
+import { useUIStore } from '@/stores/ui'
 import { mapActions as mapPiniaActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 import starMap from '@/components/star-map/map'
@@ -35,7 +36,7 @@ export default {
       'haveAvatar',
       'haveShip'
     ]),
-    ...mapGetters('UI', [
+    ...mapState(useUIStore, [
       'viewport',
       'container',
       'selected',
@@ -92,7 +93,7 @@ export default {
       'toggleMinerva',
       'toggleGraphicsQuality'
     ]),
-    ...mapMutations('UI', [
+    ...mapPiniaActions(useUIStore, [
       'viewportToTime',
       'moveUp',
       'moveDown',

@@ -6,8 +6,9 @@
 </template>
 
 <script>
+import { mapState } from 'pinia'
 
-import { mapGetters } from 'vuex'
+import { useUIStore } from '@/stores/ui'
 
 export default {
   name: 'Compass',
@@ -17,7 +18,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('UI', [
+    ...mapState(useUIStore, [
       'viewport'
     ])
   },

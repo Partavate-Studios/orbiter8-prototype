@@ -42,7 +42,8 @@
 
 <script>
 
-import { mapMutations, mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
+import { useUIStore } from '@/stores/ui'
 import { mapActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
  import Star from './star.svg'
@@ -106,7 +107,7 @@ export default {
       'systemObjects',
       'gameTime',
     ]),
-    ...mapGetters('UI', [
+    ...mapState(useUIStore, [
       'selected',
       'showLabels',
       'isMenuOn',
@@ -173,7 +174,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('UI', [
+    ...mapActions(useUIStore, [
       'setSelectedTelemetry',
       'selectSprite',
       'scaleAnimateTo'

@@ -1,5 +1,6 @@
 import GalaxyContract from '@/contract-interfaces/galaxy'
 import AvatarContract from '@/contract-interfaces/avatar'
+import { useUIStore } from '@/stores/ui'
 
 export default {
   /** Loads general state information: avatar count, star system acount, player avatar data */
@@ -110,11 +111,11 @@ export default {
     }
     commit('setProp', {key: 'launchingShip', value: false})
   },
-  async moveToSystem ({ rootState, commit }, system) {
+  async moveToSystem ({ rootState }, system) {
     try {
       console.log('moving to system ' + system)
-      commit('UI/jumpAnimationOn', null, {root: true})
-      commit('UI/jumpMenuOff', null, {root: true})
+      useUIStore().jumpAnimationOn()
+      useUIStore().jumpMenuOff()
       await GalaxyContract.moveToSystem(system, rootState.account)
       console.log('moved ' + system)
     } catch (error) {

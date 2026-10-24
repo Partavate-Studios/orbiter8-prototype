@@ -50,6 +50,7 @@ import Profile from '@/components/layer-html/minerva/profile'
 import Debug from '@/components/layer-html/minerva/debug'
 import Sprites from '@/components/layer-html/minerva/sprites'
 import { mapGetters } from 'vuex'
+import { useUIStore } from '@/stores/ui'
 import { mapActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 
@@ -77,7 +78,7 @@ export default {
     ...mapState(useConfigStore, {
       show: 'minerva'
     }),
-    ...mapGetters('UI', [
+    ...mapState(useUIStore, [
       'viewport'
     ])
   },

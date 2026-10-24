@@ -14,7 +14,9 @@
 </template>
 
 <script>
-import { mapActions, mapMutations, mapGetters } from 'vuex'
+import { mapActions } from 'vuex'
+import { mapActions as mapPiniaActions, mapState } from 'pinia'
+import { useUIStore } from '@/stores/ui'
 
 export default {
   name: 'Terminal',
@@ -28,7 +30,7 @@ export default {
   beforeMount: function () {
   },
   computed: {
-    ...mapGetters('UI', [
+    ...mapState(useUIStore, [
       'minervaHistory'
     ])
   },
@@ -47,7 +49,7 @@ export default {
       'moveToSystem',
       'genesis'
     ]),
-    ...mapMutations('UI', [
+    ...mapPiniaActions(useUIStore, [
       'scaleTo',
       'rotateTo',
       'addToHistory',

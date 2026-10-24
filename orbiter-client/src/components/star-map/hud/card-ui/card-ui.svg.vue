@@ -114,8 +114,9 @@
 
 <script>
 
-import { mapGetters, mapMutations } from 'vuex'
-import { mapActions } from 'pinia'
+import { mapGetters } from 'vuex'
+import { useUIStore } from '@/stores/ui'
+import { mapActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 
 import IconContainer from '../icons/_icon-container.svg'
@@ -157,7 +158,7 @@ export default {
     ...mapGetters('StarMap', [
       'systemObjects'
     ]),
-    ...mapGetters('UI', [
+    ...mapState(useUIStore, [
       'viewRatio'
     ]),
     menuShouldDisplay() {
@@ -177,7 +178,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('UI', [
+    ...mapActions(useUIStore, [
       'selectSprite'
     ]),
     ...mapActions(useConfigStore, [

@@ -164,7 +164,9 @@
 
 <script>
 
-import { mapGetters, mapMutations, mapActions } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
+import { mapActions as mapPiniaActions, mapState } from 'pinia'
+import { useUIStore } from '@/stores/ui'
 import MenuButton from './menu-button.svg'
 import MenuContainer from './menu-container/_menu-container.svg'
 import InventoryDial from './_trade-menu/inventory-dial.svg'
@@ -199,7 +201,7 @@ export default {
     ...mapActions('GameState', [
       'tradeAtPort',
     ]),
-    ...mapMutations('UI', [
+    ...mapPiniaActions(useUIStore, [
       'closeMenu'
     ]),
     doTrade() {
@@ -276,7 +278,7 @@ export default {
     ...mapGetters('GameState', [
       'avatar'
     ]),
-    ...mapGetters('UI', [
+    ...mapState(useUIStore, [
       'viewport'
     ]),
     portInventory () {
