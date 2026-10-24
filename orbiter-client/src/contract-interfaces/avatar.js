@@ -1,4 +1,5 @@
 import contract from '@truffle/contract'
+import { withLocalDeployment } from '@/dev/local-deployment'
 import AvatarContract from '../contract-artifacts/AvatarControls.json'
 
 const Avatars = {
@@ -9,15 +10,17 @@ const Avatars = {
     let self = this
     console.log('init avatar interface...')
     return new Promise(function (resolve) {
-      self.contract = contract(AvatarContract)
-      self.contract.setProvider(window.web3.currentProvider)
-      self.contract.deployed().then(instance => {
-        console.log('... got avatar interface')
-        self.instance = instance
-        resolve()
-      }).catch(err => {
-        console.log('!!! no avatar instance', err.message)
-        //reject(err)
+      withLocalDeployment(AvatarContract).then(artifact => {
+        self.contract = contract(artifact)
+        self.contract.setProvider(window.web3.currentProvider)
+        self.contract.deployed().then(instance => {
+          console.log('... got avatar interface')
+          self.instance = instance
+          resolve()
+        }).catch(err => {
+          console.log('!!! no avatar instance', err.message)
+          //reject(err)
+        })
       })
     })
   },

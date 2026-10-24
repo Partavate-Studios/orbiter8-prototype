@@ -65,8 +65,20 @@ https://www.youtube.com/watch?v=cL30sFMYi6A
   > git clone git@gitlab.com:partavate/prototype.git
 2. To setup the truffle stack stuff, from /prototype
   > npm install
-3. To setup the client stuff, from /prototype/orbter-client
+3. To setup the client stuff, from /prototype/orbiter-client (Node 24, see `.nvmrc`)
   > npm install
+
+### Play locally (no wallet extension or testnet needed)
+
+From `orbiter-client/`:
+
+``` bash
+npm run local
+```
+
+This starts a fresh local chain, deploys the contracts to it, and opens the dev server at http://localhost:8080 with a built-in dev wallet. Add `?account=2`, `?account=3` … to the URL to play as other pilots (account 0 deployed the contracts). Stopping it resets the chain.
+
+Other client scripts: `npm run dev` (dev server, uses your browser wallet), `npm run build`, `npm run preview`, `npm run lint`.
 
 
 ## Design Goals

@@ -1,14 +1,11 @@
 # Orbiter 8 Game Client: Demo3 (/demo3)
 #
-# Build Stage 1: NPM Install to generate assets
-# Latest Node.js LTS version as of 2022.03.22: 16.14.2
-FROM node:16-alpine AS builder
+# Build Stage 1: install and build with Vite on the current Node LTS
+FROM node:24-alpine AS builder
 WORKDIR /app
 COPY . /app
-RUN npm config set depth 0 \
-    && npm install \
-    && npm i caniuse-lite browserslist \
-    && npm run docker-build \
+RUN npm ci \
+    && npm run build \
     && rm -rf node_modules
 
 # 2022.06.09: We don't need PHP, so just use the nginx base image

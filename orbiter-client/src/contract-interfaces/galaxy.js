@@ -1,4 +1,5 @@
 import contract from '@truffle/contract'
+import { withLocalDeployment } from '@/dev/local-deployment'
 import StarSystemContract from '../contract-artifacts/Orbiter8.json'
 
 const Galaxy = {
@@ -9,15 +10,17 @@ const Galaxy = {
     let self = this
     console.log('init galaxy interface...')
     return new Promise(function (resolve) {
-      self.contract = contract(StarSystemContract)
-      self.contract.setProvider(window.web3.currentProvider)
-      self.contract.deployed().then(instance => {
-        console.log('... got galaxy interface')
-        self.instance = instance
-        resolve()
-      }).catch(err => {
-        console.log('!!! no galaxy instance', err.message)
-        //reject(err)
+      withLocalDeployment(StarSystemContract).then(artifact => {
+        self.contract = contract(artifact)
+        self.contract.setProvider(window.web3.currentProvider)
+        self.contract.deployed().then(instance => {
+          console.log('... got galaxy interface')
+          self.instance = instance
+          resolve()
+        }).catch(err => {
+          console.log('!!! no galaxy instance', err.message)
+          //reject(err)
+        })
       })
     })
   },

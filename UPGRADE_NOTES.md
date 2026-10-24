@@ -100,9 +100,55 @@ Every removed network and its Orbiter8/AvatarControls addresses will be recorded
 - `truffle-config.js` is out of scope for this iteration, so both stay there for now. Koda said they're fine either way.
 - No private keys or mnemonics are committed anywhere in history. `PRIVATEKEY` comes from `.env`, which has never been committed.
 
+## Phase 1: Build tooling
+
+- **Vue CLI 4 / webpack 4 → Vite 7** on Node 24. The build no longer needs `--openssl-legacy-provider`. Build time is about 13 s.
+  - Vite 7, not 8: `@vitejs/plugin-vue2` supports up to Vite 7. Phase 2 moves to Vite 8 together with Vue 3.
+- **Vue 2.6.14 → 2.7.16.** This is a drop-in minor release, needed by the Vite Vue 2 plugin. `vue-template-compiler` is gone, since 2.7 ships its own SFC compiler.
+- **web3 and Truffle run from their prebuilt browser bundles** (`web3/dist/web3.min.js`, `@truffle/contract/dist/truffle-contract.min.js`), so no Node polyfills are needed.
+  - The Truffle bundle only sets `window.TruffleContract`, so `src/libs/truffle-contract.js` re-exports it.
+  - Both go away in Phase 3.
+- **Imports and aliases.** The `@` alias is kept. Imports without a suffix (e.g. `./hud/hud.svg` → `hud.svg.vue`) still resolve, because `.vue` is in `resolve.extensions`. SVG components remain Vue components.
+- **`index.html` moved to the client root**, as Vite expects. `base: './'` keeps relative asset paths, which deploying under `/demo3` needs.
+- **Scripts:** `dev`, `build`, `preview`, `lint`, plus `local`, `chain`, `deploy:local` (below).
+- **ESLint 9 flat config** with `eslint-plugin-vue` (Vue 2 essential rules), no reformatting.
+  - `vue/multi-word-component-names` is off, because single-word names are this project's convention.
+  - 7 errors remain, all small and pre-existing. They're listed under Bugs and get cleaned up in Phase 6.
+  - ESLint 9, not 10: `eslint-plugin-vue` 9 still has the Vue 2 rule set. Both get bumped in Phase 2.
+- **Dependencies:**
+  - `lodash` was imported but never declared. It's declared now.
+  - Removed accidental runtime dependencies: `latest`, `npm-check-updates`, `prettier`, `joi`.
+  - Removed `postcss.config.js` (autoprefixer). It wasn't adding anything the target browsers need.
+- **Dockerfile:** `node:16` → `node:24-alpine`, `npm ci && npm run build`.
+- **Bundle:** one 8.5 MB chunk (2.38 MB gzipped), the same size as before. Shrinking it is Phase 3's job.
+
+### Local play (`npm run local`)
+
+- `npm run local` starts a fresh Hardhat chain (chain 1337), runs `dev/deploy-local.js`, and starts Vite with the dev wallet.
+  - The deploy script mirrors `migrations/` using the precompiled artifacts.
+  - The dev wallet is `src/dev/dev-wallet.js`, an EIP-1193 + EIP-6963 provider backed by the chain's unlocked test accounts.
+  - `?account=N` picks a pilot. The default is 1, because account 0 deployed the contracts and already owns "The Federation".
+- Dev builds read `dev/local-deployment.json` (gitignored) for chain 1337.
+  - Both the dev wallet and that lookup are behind `import.meta.env.DEV`. I checked that the production bundle contains neither.
+- `npm run chain` / `npm run deploy:local` run the two halves separately. Use them when you want your own wallet pointed at `localhost:8545`.
+
+### Verification
+
+- **The full scripted flow passes on the Vite dev server against the local chain:** register, name ship, take off, star map, cards, menus, jump.
+- **Static screens are pixel-identical to the baseline** (preflight, registration, ship creation, launch, star map).
+  - Map screens differ by 0.1–2.7 % of pixels. Those are orbit positions at slightly different times.
+- **Pan/zoom run (dev server):** 52.1 fps on average, p95 frame time 33.3 ms. Same as before, as expected, since rendering hasn't changed yet.
+
 ## Bugs
 
 ### Found, to fix in the phase that rewrites that code
+
+- **`_ship-scene.vue` renders an undefined `ship` and duplicate `NaN` keys.** The Vite dev server shows Vue warnings that the old production build hid. On the ship-creation and launch screens: "Property or method `ship` is not defined", and "Duplicate keys detected: 'NaN'" from a `v-for`.
+- **Lint findings:**
+  - `moons-icon.svg.vue` registers a `Ship` component that is never imported, and imports `Moon` without using it.
+  - `space-dock-icon.svg.vue` registers `Station` without using it.
+  - `card-button.svg.vue` is named `Button`, a reserved HTML element name.
+  - Plus unused variables in `NetworkSelect.vue` and `store/actions.js`.
 
 - **Contract wrappers swallow errors and never settle.** Almost every method in `contract-interfaces/galaxy.js` and `avatar.js` catches the error, logs it, and never resolves or rejects. If any call fails, the UI hangs forever. For example, the preflight check stuck at "Game: ...loading" while the RPC was slow. Fix in Phase 3, when these wrappers are replaced.
 - **Timer loops never stop.** `playgame.vue` `tick()` and `TitleScreen.vue` `checkBlockLoop()` reschedule `setTimeout` forever, and nothing cancels them on unmount. Leaving and re-entering a screen stacks more loops. The block poller keeps polling after you leave the title screen. Fix in Phase 4/5.
@@ -129,9 +175,9 @@ Each phase goes on `modernize` with its own commits. Bug fixes get separate comm
 
 Tests (Koda's call was "only where they catch important things"): Vitest unit tests for `game/` math and `chain/` bigint conversions, plus the Puppeteer harness as a smoke test of the full flow against the local chain. No coverage chasing.
 
-## Decisions for Koda (needed before Phase 1)
+## Decisions (Koda, 2026-10-24)
 
-1. **Network list.** Approve the Keep/Remove column above. In particular: keep Moonriver, a real-money network?
-2. **Local dev chain in the repo.** Add the harness as `orbiter-client/dev/` with Hardhat as a devDependency and scripts like `npm run chain` / `npm run deploy:local` / `npm run smoke`. Then the game runs end to end with no wallet extension and no testnet funds.
-3. **TypeScript?** The brief says only with your OK. Otherwise I'll use JSDoc types on `chain/` and `game/`. My recommendation is JSDoc for now. TS is easier to adopt when your rebuild gets integrated.
-4. **Node version.** The client will target the current Node LTS (24). Your machine has Node 23.5. It may work, but I'd suggest installing 24 via nvm. I'll add `.nvmrc`.
+1. **Network list:** approved as proposed for now. Moonriver stays, flagged as an odd one: a production network labeled "Alpha". Revisit later.
+2. **Local play:** yes. Make it easy to run the whole game locally (`orbiter-client/dev/`).
+3. **Types:** JSDoc for now. No TypeScript.
+4. **Node:** target the current LTS (24) via `.nvmrc`.
