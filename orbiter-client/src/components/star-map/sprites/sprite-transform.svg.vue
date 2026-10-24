@@ -43,6 +43,8 @@
 <script>
 
 import { mapMutations, mapGetters } from 'vuex'
+import { mapActions, mapState } from 'pinia'
+import { useConfigStore } from '@/stores/config'
  import Star from './star.svg'
  import Ship from './ship.svg'
  import Station from './station.svg'
@@ -110,7 +112,7 @@ export default {
       'isMenuOn',
       'viewport'
     ]),
-    ...mapGetters('Config', [
+    ...mapState(useConfigStore, [
       'showScope', // todo: this should be in UI
       'graphicsQuality'
     ]),
@@ -176,7 +178,7 @@ export default {
       'selectSprite',
       'scaleAnimateTo'
     ]),
-    ...mapMutations('Config', [
+    ...mapActions(useConfigStore, [
       'toggleScope'
     ]),
     spriteAction: function () {

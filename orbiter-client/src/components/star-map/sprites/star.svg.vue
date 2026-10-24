@@ -9,7 +9,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapState } from 'pinia'
+import { useConfigStore } from '@/stores/config'
 
 export default {
   name: 'star',
@@ -31,7 +32,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('Config', [
+    ...mapState(useConfigStore, [
       'graphicsQuality'
     ]),
   }

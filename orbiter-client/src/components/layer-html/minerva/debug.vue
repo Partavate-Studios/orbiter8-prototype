@@ -45,7 +45,9 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters } from 'vuex'
+import { mapActions, mapState } from 'pinia'
+import { useConfigStore } from '@/stores/config'
 
 export default {
   name: 'Debug',
@@ -59,12 +61,12 @@ export default {
       'container',
       'selected'
     ]),
-    ...mapGetters('Config', [
+    ...mapState(useConfigStore, [
       'graphicsQuality'
     ])
   },
   methods: {
-    ...mapMutations('Config', [
+    ...mapActions(useConfigStore, [
       'toggleGraphicsQuality'
     ])
   },

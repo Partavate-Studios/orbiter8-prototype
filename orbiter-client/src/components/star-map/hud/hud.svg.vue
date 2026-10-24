@@ -160,6 +160,8 @@
 <script>
 
 import { mapGetters, mapMutations } from 'vuex'
+import { mapState } from 'pinia'
+import { useConfigStore } from '@/stores/config'
 import CurrentSystem from './current-system/system.svg'
 
 import ScopeToggle from './toggles/scope-toggle.svg'
@@ -232,7 +234,7 @@ export default {
       'gameTime',
       'spriteIds'
     ]),
-    ...mapGetters('Config', [
+    ...mapState(useConfigStore, [
       'showScope'
     ]),
     ...mapGetters('GameState', [

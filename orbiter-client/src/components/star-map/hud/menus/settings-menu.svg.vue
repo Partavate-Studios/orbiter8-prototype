@@ -84,8 +84,9 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'pinia'
 
-import { mapGetters, mapMutations } from 'vuex'
+import { useConfigStore } from '@/stores/config'
 import MenuContainer from './menu-container/_menu-container.svg'
 import MenuCheckbox from './menu-checkbox.svg'
 
@@ -100,7 +101,7 @@ export default {
     MenuCheckbox,
   },
   methods: {
-    ...mapMutations('Config', [
+    ...mapActions(useConfigStore, [
       'setGraphicsQuality',
     ]),
     setMusicVolume(volume) {
@@ -121,7 +122,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('Config', [
+    ...mapState(useConfigStore, [
       'graphicsQuality'
     ])
   }

@@ -18,6 +18,8 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
+import { mapState } from 'pinia'
+import { useConfigStore } from '@/stores/config'
 import AvatarCreate from '@/components/screens/AvatarCreate'
 import ShipCreate from '@/components/screens/ShipCreate'
 import ShipSelect from '@/components/screens/ShipSelect'
@@ -40,7 +42,7 @@ export default {
       'haveShip',
       'gameState'
     ]),
-    ...mapGetters('Config', [
+    ...mapState(useConfigStore, [
       'blockCheckDelay'
     ]),
   },

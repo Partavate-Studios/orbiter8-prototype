@@ -26,7 +26,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapState } from 'pinia'
+import { useConfigStore } from '@/stores/config'
 
 export default {
   name: 'IconContainer',
@@ -42,7 +43,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('Config', [
+    ...mapState(useConfigStore, [
       'graphicsQuality'
     ]),
     fillColor: function() {

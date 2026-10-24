@@ -49,7 +49,9 @@ import Terminal from '@/components/layer-html/minerva/terminal'
 import Profile from '@/components/layer-html/minerva/profile'
 import Debug from '@/components/layer-html/minerva/debug'
 import Sprites from '@/components/layer-html/minerva/sprites'
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters } from 'vuex'
+import { mapActions, mapState } from 'pinia'
+import { useConfigStore } from '@/stores/config'
 
 export default {
   name: 'MinervaAI',
@@ -72,7 +74,7 @@ export default {
       'currentStarSystemId',
       'currentStarSystemName',
     ]),
-    ...mapGetters('Config', {
+    ...mapState(useConfigStore, {
       show: 'minerva'
     }),
     ...mapGetters('UI', [
@@ -80,7 +82,7 @@ export default {
     ])
   },
   methods: {
-    ...mapMutations('Config', [
+    ...mapActions(useConfigStore, [
       'toggleMinerva'
     ])
   },

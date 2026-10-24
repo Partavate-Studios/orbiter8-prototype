@@ -7,7 +7,6 @@ import mutations from './mutations'
 import getters from './getters'
 
 import GameState from './gamestate'
-import Config from './config'
 import UI from './ui'
 import StarMap from './starmap'
 
@@ -349,7 +348,6 @@ const state = {
 export default createStore({
   modules: {
     GameState,
-    Config,
     StarMap,
     UI, //Engine?
   },

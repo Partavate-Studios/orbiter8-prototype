@@ -69,6 +69,8 @@
 <script>
 
 import { mapGetters, mapMutations } from 'vuex'
+import { mapState } from 'pinia'
+import { useConfigStore } from '@/stores/config'
 import _ from 'lodash'
 import svgfilters from './_svg-filters'
 import Grid from './_grid.svg'
@@ -130,7 +132,7 @@ export default {
       'isMenuOn',
       'jumpAnimationState'
     ]),
-    ...mapGetters('Config', [
+    ...mapState(useConfigStore, [
       'graphicsQuality',
       'showScope'
     ]),

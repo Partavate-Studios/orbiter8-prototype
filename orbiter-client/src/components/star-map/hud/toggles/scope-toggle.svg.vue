@@ -65,6 +65,8 @@
 <script>
 
 import { mapGetters, mapMutations } from 'vuex'
+import { mapActions, mapState } from 'pinia'
+import { useConfigStore } from '@/stores/config'
 import CompassArrow from '../scope/compass-arrow.svg'
 
 export default {
@@ -80,7 +82,7 @@ export default {
     CompassArrow,
   },
   computed: {
-    ...mapGetters('Config', [
+    ...mapState(useConfigStore, [
       'showScope'
     ]),
     ...mapGetters('UI', [
@@ -88,7 +90,7 @@ export default {
     ]),
   },
   methods: {
-    ...mapMutations('Config', [
+    ...mapActions(useConfigStore, [
       'toggleScope'
     ]),
     ...mapMutations('UI', [

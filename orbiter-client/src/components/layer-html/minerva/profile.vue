@@ -36,6 +36,8 @@
 
 <script>
 import { mapGetters, mapActions, mapMutations } from 'vuex'
+import { mapState } from 'pinia'
+import { useConfigStore } from '@/stores/config'
 
 export default {
   name: 'profile',
@@ -52,7 +54,7 @@ export default {
       'selected',
       'viewRatio'
     ]),
-    ...mapGetters('Config', [
+    ...mapState(useConfigStore, [
       'tickDelay'
     ]),
     ...mapGetters('GameState', [

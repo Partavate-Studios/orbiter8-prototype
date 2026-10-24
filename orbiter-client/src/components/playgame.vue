@@ -7,6 +7,8 @@
 
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
+import { mapActions as mapPiniaActions, mapState } from 'pinia'
+import { useConfigStore } from '@/stores/config'
 import starMap from '@/components/star-map/map'
 import layerHtml from '@/components/layer-html/container-html'
 import router from '@/router/router'
@@ -43,7 +45,7 @@ export default {
       'mapDataLoaded',
       'gameTime'
     ]),
-    ...mapGetters('Config', [
+    ...mapState(useConfigStore, [
       'tickDelay'
     ]),
   },
@@ -86,7 +88,7 @@ export default {
     ...mapMutations('StarMap', [
       'incrementGameTime'
     ]),
-    ...mapMutations('Config', [
+    ...mapPiniaActions(useConfigStore, [
       'toggleMinerva',
       'toggleGraphicsQuality'
     ]),

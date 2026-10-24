@@ -246,6 +246,8 @@
 
 <script>
 import { mapGetters, mapActions, mapMutations } from 'vuex'
+import { mapActions as mapPiniaActions, mapState } from 'pinia'
+import { useConfigStore } from '@/stores/config'
 
 export default {
   components: {
@@ -269,7 +271,7 @@ export default {
     ...mapMutations([
       'setPlayerReady'
     ]),
-    ...mapMutations('Config', [
+    ...mapPiniaActions(useConfigStore, [
       'setGraphicsQuality',
     ]),
     async connectNetwork(chainId) {
@@ -374,7 +376,7 @@ export default {
       'haveShip',
       'avatar',
     ]),
-    ...mapGetters('Config', [
+    ...mapState(useConfigStore, [
       'graphicsQuality'
     ]),
     isSupportedNetwork() {

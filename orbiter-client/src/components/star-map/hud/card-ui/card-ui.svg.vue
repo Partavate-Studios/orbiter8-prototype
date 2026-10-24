@@ -115,6 +115,8 @@
 <script>
 
 import { mapGetters, mapMutations } from 'vuex'
+import { mapActions } from 'pinia'
+import { useConfigStore } from '@/stores/config'
 
 import IconContainer from '../icons/_icon-container.svg'
 import Info from './info.svg'
@@ -178,7 +180,7 @@ export default {
     ...mapMutations('UI', [
       'selectSprite'
     ]),
-    ...mapMutations('Config', [
+    ...mapActions(useConfigStore, [
       'toggleScope'
     ]),
     getInfoCardTranslate() {

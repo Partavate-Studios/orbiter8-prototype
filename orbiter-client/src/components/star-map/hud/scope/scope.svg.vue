@@ -86,6 +86,8 @@
 <script>
 
 import { mapGetters, mapMutations } from 'vuex'
+import { mapState } from 'pinia'
+import { useConfigStore } from '@/stores/config'
 import Compass from './compass.svg'
 import CompassArrow from './compass-arrow.svg'
 import CompassPlanet from './compass-planet.svg'
@@ -115,7 +117,7 @@ export default {
       'spriteToDisplay',
       'selected'
     ]),
-    ...mapGetters('Config', [
+    ...mapState(useConfigStore, [
       'showScope'
     ]),
     ...mapGetters('StarMap', [

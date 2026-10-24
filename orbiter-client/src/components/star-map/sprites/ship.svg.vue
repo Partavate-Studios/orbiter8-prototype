@@ -13,7 +13,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapState } from 'pinia'
+import { useConfigStore } from '@/stores/config'
 import ShipEngines from './animations/ship-engines.svg'
 
 export default {
@@ -27,7 +28,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('Config', [
+    ...mapState(useConfigStore, [
       'graphicsQuality'
     ]),
   },
