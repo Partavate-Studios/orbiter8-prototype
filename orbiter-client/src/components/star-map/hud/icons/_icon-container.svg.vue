@@ -4,7 +4,7 @@
         <clipPath id="icon-clip">
           <circle
             cx="0"
-            cy=""
+            cy="0"
             r="30"
             stroke-width="1" />
         </clipPath>
@@ -13,7 +13,7 @@
       <g  clip-path="url(#icon-clip)">
         <circle
           cx="0"
-          cy=""
+          cy="0"
           r="30"
           stroke="#ffffff22"
           stroke-width="1"
