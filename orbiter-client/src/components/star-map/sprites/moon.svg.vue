@@ -21,8 +21,6 @@ import { useConfigStore } from '@/stores/config'
 
 export default {
   name: 'moon',
-  components: {
-  },
   props: {
     moon: {
       type: Object,

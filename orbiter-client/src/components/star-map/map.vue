@@ -65,11 +65,9 @@
 
 <script>
 
-import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
 import { mapActions, mapState } from 'pinia'
-import { useConfigStore } from '@/stores/config'
 import _ from 'lodash'
 import Grid from './_grid.svg'
 import Hud from './hud/hud.svg'
@@ -101,8 +99,6 @@ export default {
     LoadingBar
   },
   name: 'StarMap',
-  props: {
-  },
   data () {
     return {
       //these should be in UI store
@@ -131,9 +127,6 @@ export default {
     this.stopFrames()
   },
   computed: {
-    ...mapState(useGameStateStore, [
-      'starMap',
-    ]),
     ...mapState(useUIStore, [
       'viewport',
       'container',
@@ -144,13 +137,8 @@ export default {
       'isMenuOn',
       'jumpAnimationState'
     ]),
-    ...mapState(useConfigStore, [
-      'graphicsQuality',
-      'showScope'
-    ]),
     ...mapState(useStarMapStore, [
       'currentStarSystemId',
-      'currentStarSystemName',
       'mapDataLoaded',
       'myShipId'
     ]),

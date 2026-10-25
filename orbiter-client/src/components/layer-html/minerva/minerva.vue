@@ -64,11 +64,8 @@ export default {
   },
   data () {
     return {
-      showBox: '',
       showTab: 'profile'
     }
-  },
-  mounted: function () {
   },
   computed: {
     ...mapState(useStarMapStore, [

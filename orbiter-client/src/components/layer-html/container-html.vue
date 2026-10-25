@@ -11,7 +11,7 @@ export default {
   name: 'uilayer',
   components: {
     Minerva,
-  },
+  }
 }
 </script>
 

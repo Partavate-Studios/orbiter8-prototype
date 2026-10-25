@@ -38,7 +38,6 @@
 <script>
 import { mapState } from 'pinia'
 
-import PlanetTypes from '@/libs/planet-types.js'
 import CardBackground from './card-background.svg'
 import CardText from './card-text.svg'
 import Sprite from './sprite.svg'
@@ -54,13 +53,6 @@ export default {
   },
   props: {
     objectId: null,
-  },
-  data () {
-    return {
-      planetType: new PlanetTypes()
-    }
-  },
-  methods: {
   },
   computed: {
     ...mapState(useStarMapStore, [

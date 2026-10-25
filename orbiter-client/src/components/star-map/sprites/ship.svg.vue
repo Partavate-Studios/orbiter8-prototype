@@ -31,6 +31,6 @@ export default {
     ...mapState(useConfigStore, [
       'graphicsQuality'
     ]),
-  },
+  }
 }
 </script>

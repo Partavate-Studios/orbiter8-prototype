@@ -40,12 +40,6 @@ import ChatSlotContainer from './menu-container/chat-slot-container.svg'
 
 export default {
   name: 'ChatMenu',
-  data () {
-    return {
-      holdsToBuy: 0,
-      pending: false
-    }
-  },
   props: {
     objectId: null
   },
@@ -87,8 +81,6 @@ export default {
       // Newest first. Copy before reversing: reverse() works in place and would flip the store's array on every re-render.
       return [...(this.events.chatEvents ?? [])].reverse()
     }
-  },
-  watch: {
   }
 }
 </script>

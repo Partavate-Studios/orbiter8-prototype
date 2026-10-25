@@ -150,8 +150,7 @@ export default {
   data () {
     return {
       menuShowing: false,
-      currentMenu: 'main',
-      hover: false
+      currentMenu: 'main'
     }
   },
   computed: {

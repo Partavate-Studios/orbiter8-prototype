@@ -20,10 +20,6 @@ export default {
   name: 'AvatarIcon',
   components: {
       Icon
-  },
-  data () {
-    return {
-    }
   }
 }
 </script>

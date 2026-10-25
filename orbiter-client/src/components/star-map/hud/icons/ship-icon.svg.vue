@@ -15,10 +15,6 @@ export default {
   components: {
     Ship,
     Icon
-  },
-  data () {
-    return {
-    }
   }
 }
 </script>

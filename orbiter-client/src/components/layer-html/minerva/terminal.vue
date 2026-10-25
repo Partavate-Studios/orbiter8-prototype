@@ -26,10 +26,6 @@ export default {
       terminalInput: ''
     }
   },
-  mounted: function () {
-  },
-  beforeMount: function () {
-  },
   computed: {
     ...mapState(useUIStore, [
       'minervaHistory'

@@ -22,10 +22,6 @@ import PlanetSlot from './menu-slot-planet'
 
 export default {
   name: 'PlanetsMenu',
-  data () {
-    return {
-    }
-  },
   components: {
     MenuContainer,
     PlanetSlot
@@ -43,7 +39,6 @@ export default {
   },
   computed: {
     ...mapState(useStarMapStore, [
-      'systemObjects',
       'spriteIds'
     ])
   }

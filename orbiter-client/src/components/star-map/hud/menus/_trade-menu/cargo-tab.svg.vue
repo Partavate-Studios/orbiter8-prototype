@@ -28,10 +28,6 @@ export default {
       type: String,
       default: ''
     }
-  },
-  methods: {
-  },
-  computed: {
   }
 }
 </script>

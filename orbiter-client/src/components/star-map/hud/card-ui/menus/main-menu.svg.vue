@@ -34,11 +34,6 @@ export default {
     objectId: null,
     menuShowing: null
   },
-  data () {
-    return {
-      currentItem: null
-    }
-  },
   methods: {
     buttonAction (option) {
       console.log('button pressed')
@@ -138,16 +133,14 @@ export default {
     ]),
     ...mapActions(useUIStore, [
       'jumpMenuOn',
-      'scaleTo',
       'openMenu',
       'selectSprite'
     ])
   },
   computed: {
     ...mapState(useChainStore, [
-      'account',
       'chainId',
-      'planetTokenAddress',
+      'planetTokenAddress'
     ]),
     ...mapState(useStarMapStore, [
       'systemObjects'

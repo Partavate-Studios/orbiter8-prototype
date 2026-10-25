@@ -18,10 +18,8 @@
 </template>
 
 <script>
-import { mapState } from 'pinia'
 import uniqueId from 'lodash/uniqueId'
 
-import { useUIStore } from '@/stores/ui'
 export default {
   name: 'MenuCheckbox',
   props: {
@@ -38,9 +36,6 @@ export default {
     }
   },
   computed: {
-    ...mapState(useUIStore, [
-      'viewport'
-    ]),
     checkboxBackground() {
       if (this.checked) {
           return '#ffffff'

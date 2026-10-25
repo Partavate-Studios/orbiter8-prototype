@@ -31,10 +31,6 @@ export default {
   name: 'XIcon',
   components: {
     Icon
-  },
-  data () {
-    return {
-    }
   }
 }
 </script>

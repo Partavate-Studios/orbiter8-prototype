@@ -17,10 +17,6 @@ export default {
   name: 'HamburgerIcon',
   components: {
     Icon
-  },
-  data () {
-    return {
-    }
   }
 }
 </script>

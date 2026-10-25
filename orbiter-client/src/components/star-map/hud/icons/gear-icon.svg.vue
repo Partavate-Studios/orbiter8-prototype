@@ -15,10 +15,6 @@ export default {
   name: 'GearIcon',
   components: {
     Icon
-  },
-  data () {
-    return {
-    }
   }
 }
 </script>

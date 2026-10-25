@@ -31,8 +31,6 @@ export default {
   props: {
     objectId: null,
   },
-  methods: {
-  },
   computed: {
     ...mapState(useStarMapStore, [
       'systemObjects'

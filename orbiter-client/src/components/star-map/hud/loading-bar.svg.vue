@@ -25,10 +25,6 @@ import { useStarMapStore } from '@/stores/starmap'
 
 export default {
   name: 'loading-bar',
-  data () {
-    return {
-    }
-  },
   computed: {
     ...mapState(useStarMapStore, [
       'mapLoadedPercentage',

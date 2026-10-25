@@ -19,11 +19,7 @@
 <script>
 
 export default {
-  name: 'orbiter8logo',
-  data () {
-    return {
-    }
-  }
+  name: 'orbiter8logo'
 }
 </script>
 

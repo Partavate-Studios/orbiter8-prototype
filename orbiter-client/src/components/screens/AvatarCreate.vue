@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'pinia'
+import { mapActions } from 'pinia'
 import { useGameStateStore } from '@/stores/gamestate'
 import PilotIdCard from './_pilot-id-card'
 import ShipIcon from '../star-map/hud/icons/ship-icon.svg'
@@ -70,7 +70,6 @@ export default {
   data () {
     return {
       newAvatarName: '',
-      done: false,
       step: 1
     }
   },
@@ -97,11 +96,6 @@ export default {
         this.signup()
       }
     }
-  },
-  computed: {
-    ...mapState(useGameStateStore, [
-      'gameState'
-    ])
   }
 }
 </script>

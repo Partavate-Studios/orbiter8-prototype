@@ -44,12 +44,6 @@ import { useStarMapStore } from '@/stores/starmap'
 
 export default {
   name: 'CurrentSystem',
-  data () {
-    return {
-    }
-  },
-  components: {
-  },
   computed: {
     ...mapState(useStarMapStore, [
       'currentStarSystemId',

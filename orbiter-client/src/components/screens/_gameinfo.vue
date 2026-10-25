@@ -14,16 +14,7 @@ import { mapState } from 'pinia'
 import { useGameStateStore } from '@/stores/gamestate'
 
 export default {
-  components: {
-  },
   name: 'GameInfo',
-  data () {
-    return {
-      newAvatarName: ''
-    }
-  },
-  methods: {
-  },
   computed: {
     ...mapState(useGameStateStore, [
       'gameState'

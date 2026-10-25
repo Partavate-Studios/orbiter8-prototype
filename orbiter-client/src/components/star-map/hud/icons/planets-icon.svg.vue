@@ -15,10 +15,6 @@ export default {
   name: 'PlanetsIcon',
   components: {
     Icon
-  },
-  data () {
-    return {
-    }
   }
 }
 </script>

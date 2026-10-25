@@ -85,7 +85,6 @@
 
 <script>
 
-import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
 import { mapActions, mapState } from 'pinia'
@@ -111,9 +110,6 @@ export default {
     Ship
   },
   computed: {
-    ...mapState(useGameStateStore, [
-      'myShipId'
-    ]),
     ...mapState(useUIStore, [
       'viewport',
       'spriteToDisplay',

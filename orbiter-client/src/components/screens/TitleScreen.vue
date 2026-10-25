@@ -31,16 +31,10 @@ export default {
     ShipSelect
   },
   name: 'TitleScreen',
-  data () {
-    return {
-      audio: null
-    }
-  },
   computed: {
     ...mapState(useGameStateStore, [
       'haveAvatar',
-      'haveShip',
-      'gameState'
+      'haveShip'
     ]),
   },
   methods: {

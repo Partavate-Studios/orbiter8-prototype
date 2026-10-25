@@ -54,10 +54,6 @@ import Ship from '@/components/star-map/sprites/ship.svg'
 
 export default {
   name: 'ShipsMenu',
-  data () {
-    return {
-    }
-  },
   props: {
     shipId: {
       type: String,
@@ -67,8 +63,6 @@ export default {
   components: {
     MenuSlotContainer,
     Ship
-  },
-  methods: {
   },
   computed: {
     ...mapState(useUIStore, [

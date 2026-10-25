@@ -21,17 +21,7 @@
 <script>
 
 export default {
-  components: {
-  },
-  name: 'HowToWeb3',
-  data () {
-    return {
-    }
-  },
-  methods: {
-  },
-  computed: {
-  }
+  name: 'HowToWeb3'
 }
 </script>
 

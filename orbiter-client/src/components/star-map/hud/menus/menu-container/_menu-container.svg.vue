@@ -41,7 +41,6 @@ export default {
   },
   data () {
     return {
-      padding: 25,
       timeToAnimate: 200,
       offset: 0,
       rubberIn: null,
@@ -51,7 +50,6 @@ export default {
   computed: {
     ...mapState(useUIStore, [
       'leftMostX',
-      'rightMostX',
       'topMostY',
       'bottomMostY',
       'viewport'

@@ -47,9 +47,7 @@ export default {
   computed: {
     ...mapState(useUIStore, [
       'leftMostX',
-      'rightMostX',
       'topMostY',
-      'bottomMostY',
       'viewport'
     ]),
     menuLeft () {

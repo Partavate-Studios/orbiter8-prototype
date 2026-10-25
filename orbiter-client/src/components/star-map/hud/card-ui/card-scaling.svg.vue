@@ -13,8 +13,6 @@ import { useUIStore } from '@/stores/ui'
 
 export default {
   name: 'CardScaling',
-  components: {
-  },
   props: {
     sprite: {
       type: Object,
@@ -24,18 +22,13 @@ export default {
       }
     },
   },
-  data () {
-    return {
-    }
-  },
   computed: {
     ...mapState(useUIStore, [
       'viewport',
       'viewportTotalRubber'
     ]),
     ...mapState(useStarMapStore, [
-      'gameTime',
-      'systemObjects',
+      'gameTime'
     ]),
     cardUiTranslate () {
       // Sprites are raw objects updated in place each frame; reading gameTime makes this re-evaluate per frame.
@@ -52,6 +45,6 @@ export default {
       let scale = 1 - ((this.viewportTotalRubber - 5) * this.viewport.scale) / 15
       return Math.max(Math.min((scale), cap), 0)
     }
-  },
+  }
 }
 </script>

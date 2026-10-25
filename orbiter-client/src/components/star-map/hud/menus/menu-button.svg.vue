@@ -54,8 +54,6 @@
 
 export default {
   name: 'MenuButton',
-  components: {
-  },
   props: {
     text: {
       type: String,

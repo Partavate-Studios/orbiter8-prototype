@@ -44,18 +44,13 @@ import { useConfigStore } from '@/stores/config'
 
 export default {
   name: 'profile',
-  data () {
-    return {
-    }
-  },
   computed: {
     ...mapState(useChainStore, [
       'account'
     ]),
     ...mapState(useUIStore, [
       'viewport',
-      'selected',
-      'viewRatio'
+      'selected'
     ]),
     ...mapState(useConfigStore, [
       'tickDelay'
@@ -67,7 +62,6 @@ export default {
     ]),
     ...mapState(useStarMapStore, [
       'currentStarSystemId',
-      'gameTime',
       'timeDelta',
       'neighbors',
       'myShipId',
@@ -95,8 +89,6 @@ export default {
       this.scaleTo(400)
       this.viewTo({x: 0, y: 0})
     }
-  },
-  watch: {
   }
 }
 </script>

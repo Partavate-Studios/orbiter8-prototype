@@ -40,10 +40,6 @@ export default {
   name: 'VIcon',
   components: {
     Icon
-  },
-  data () {
-    return {
-    }
   }
 }
 </script>

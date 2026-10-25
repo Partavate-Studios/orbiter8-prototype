@@ -53,8 +53,6 @@
 
 export default {
   name: 'Button',
-  components: {
-  },
   props: {
     text: {
       type: String,
@@ -66,8 +64,6 @@ export default {
       hover: false,
       enabled: true
     }
-  },
-  methods: {
   },
   computed: {
     getButtonFill () {

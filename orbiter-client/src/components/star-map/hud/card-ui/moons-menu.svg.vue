@@ -15,9 +15,7 @@
 
 <script>
 
-import { useGameStateStore } from '@/stores/gamestate'
-import { useStarMapStore } from '@/stores/starmap'
-import { mapActions, mapState } from 'pinia'
+import { mapActions } from 'pinia'
 import { useUIStore } from '@/stores/ui'
 import CardBackground from './card-background.svg'
 import CardButton from './card-button.svg'
@@ -32,17 +30,9 @@ export default {
     objectId: null
   },
   methods: {
-    ...mapActions(useGameStateStore, [
-      'renameAsset'
-    ]),
     ...mapActions(useUIStore, [
       'selectSprite'
     ])
-  },
-  computed: {
-    ...mapState(useStarMapStore, [
-      'systemObjects'
-    ]),
   }
 }
 </script>

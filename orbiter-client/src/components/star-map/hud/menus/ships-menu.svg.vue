@@ -68,8 +68,7 @@ export default {
   },
   computed: {
     ...mapState(useStarMapStore, [
-      'systemObjects',
-      'spriteIds',
+      'spriteIds'
     ]),
     totalPages() {
       return parseInt((this.spriteIds.ships.length + this.shipsPerPage - 1)/ this.shipsPerPage)

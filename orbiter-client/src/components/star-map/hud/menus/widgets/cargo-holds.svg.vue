@@ -19,8 +19,6 @@
 
 export default {
   name: 'CargoHolds',
-  components: {
-  },
   props: {
     cargoHolds: {
       type: Number,

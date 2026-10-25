@@ -176,13 +176,7 @@ import { walletRequest } from '@/chain/wallet'
 import { networks } from '@/chain/networks'
 
 export default {
-  components: {
-  },
   name: 'howtoweb3',
-  data () {
-    return {
-    }
-  },
   methods: {
     ...mapActions(useChainStore, [
       'chooseWallet',

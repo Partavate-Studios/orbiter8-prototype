@@ -31,13 +31,7 @@
 <script>
 
 export default {
-  name: 'Arrow',
-  components: {
-  },
-  data () {
-    return {
-    }
-  },
+  name: 'Arrow'
 
 }
 </script>

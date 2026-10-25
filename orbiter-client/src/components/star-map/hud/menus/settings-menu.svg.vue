@@ -92,10 +92,6 @@ import MenuCheckbox from './menu-checkbox.svg'
 
 export default {
   name: 'SettingsMenu',
-  data () {
-    return {
-    }
-  },
   components: {
     MenuContainer,
     MenuCheckbox,

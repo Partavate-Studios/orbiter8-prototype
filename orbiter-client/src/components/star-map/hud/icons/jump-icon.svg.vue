@@ -32,10 +32,6 @@ export default {
   components: {
     Icon
   },
-  data () {
-    return {
-    }
-  },
   computed: {
     ...mapState(useStarMapStore, [
       'neighbors'

@@ -15,7 +15,6 @@ import { useConfigStore } from '@/stores/config'
 import starMap from '@/components/star-map/map'
 import layerHtml from '@/components/layer-html/container-html'
 import router from '@/router/router'
-import Eases from '@/libs/eases.js'
 import { onFrame } from '@/libs/frame-loop'
 
 export default {
@@ -24,29 +23,16 @@ export default {
     starMap,
     layerHtml
   },
-  data () {
-    return {
-      sectorLastUsedForSprites: -1,
-      sun: 0,
-      pb: 1,
-      sprites: [],
-      eases: new Eases()
-    }
-  },
   computed: {
     ...mapState(useGameStateStore, [
-      'gameState',
       'haveAvatar',
       'haveShip'
     ]),
     ...mapState(useUIStore, [
-      'viewport',
-      'container',
       'selected',
       'jumpAnimationState'
     ]),
     ...mapState(useStarMapStore, [
-      'mapDataLoaded',
       'gameTime',
       'systemObjects'
     ]),
@@ -85,11 +71,7 @@ export default {
       document.body.removeChild(downloadLink)
     },
     ...mapActions(useChainStore, [
-      'checkForNewBlock',
       'startBlockPolling'
-    ]),
-    ...mapActions(useStarMapStore, [
-      'loadStarMap'
     ]),
     ...mapActions(useStarMapStore, [
       'incrementGameTime',
@@ -107,9 +89,7 @@ export default {
       'moveLeft',
       'moveRight',
       'scaleBy',
-      'mousewheelAnimateTo',
-      'scaleTo',
-      'rotateTo'
+      'mousewheelAnimateTo'
     ]),
     onWheel (event) {
       let scale = 1

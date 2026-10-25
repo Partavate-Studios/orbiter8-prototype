@@ -53,10 +53,6 @@ import { useConfigStore } from '@/stores/config'
 
 export default {
   name: 'Debug',
-  data () {
-    return {
-    }
-  },
   computed: {
     ...mapState(useUIStore, [
       'viewport',

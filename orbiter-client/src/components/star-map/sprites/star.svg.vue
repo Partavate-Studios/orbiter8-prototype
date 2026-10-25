@@ -27,10 +27,6 @@ export default {
       }
     },
   },
-  data () {
-    return {
-    }
-  },
   computed: {
     ...mapState(useConfigStore, [
       'graphicsQuality'

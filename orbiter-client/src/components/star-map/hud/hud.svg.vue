@@ -193,11 +193,6 @@ import SettingsMenu from './menus/settings-menu.svg'
 
 export default {
   name: 'Hud',
-  data () {
-    return {
-      scale: 1.25
-    }
-  },
   components: {
     AvatarIcon,
     CardUi,
@@ -221,7 +216,6 @@ export default {
   },
   computed: {
     ...mapState(useUIStore, [
-      'viewport',
       'selected',
       'leftMostX',
       'rightMostX',
@@ -233,15 +227,12 @@ export default {
     ]),
     ...mapState(useStarMapStore, [
       'myShipId',
-      'systemObjects',
-      'gameTime',
       'spriteIds'
     ]),
     ...mapState(useConfigStore, [
       'showScope'
     ]),
     ...mapState(useGameStateStore, [
-      'starMap',
       'avatar',
       'events'
     ]),

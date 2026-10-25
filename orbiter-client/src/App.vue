@@ -23,7 +23,6 @@
 import { useChainStore } from '@/stores/chain'
 import { useGameStateStore } from '@/stores/gamestate'
 import { mapActions, mapState } from 'pinia'
-import { useConfigStore } from '@/stores/config'
 import NetworkSelect from '@/components/screens/NetworkSelect'
 import SvgDefs from '@/components/svg-defs.vue'
 import router from '@/router/router'
@@ -56,9 +55,6 @@ export default {
     ...mapActions(useChainStore, [
       'initWeb3',
     ]),
-    ...mapActions(useConfigStore, [
-      'setGraphicsQuality'
-    ])
   }
 }
 </script>

@@ -65,10 +65,6 @@ import { useUIStore } from '@/stores/ui'
 
 export default {
   name: 'ZoomSlider',
-  data () {
-    return {
-    }
-  },
   computed: {
     ...mapState(useUIStore, [
       'viewport'

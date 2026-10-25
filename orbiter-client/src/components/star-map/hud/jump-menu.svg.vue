@@ -92,9 +92,6 @@ export default {
   name: 'JumpMenu',
   data () {
     return {
-      menuWidth: 0,
-      menuHeight: 0,
-      buttons: [],
       hover: null,
       hide: false
     }
@@ -104,8 +101,6 @@ export default {
   },
   props: {
     menudata: {}
-  },
-  mounted: function () {
   },
   computed: {
     ...mapState(useStarMapStore, [

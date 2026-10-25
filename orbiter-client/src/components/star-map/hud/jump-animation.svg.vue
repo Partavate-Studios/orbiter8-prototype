@@ -83,8 +83,6 @@ export default {
   components: {
     Ship
   },
-  props: {
-  },
   mounted: function () {
     this.know = this.getRandomDidYouKnow()
   },
@@ -115,8 +113,6 @@ export default {
       ]
       return knows[parseInt(Math.random() * knows.length)]
     }
-  },
-  watch: {
   }
 }
 </script>

@@ -35,7 +35,6 @@ export default {
   data () {
     return {
       newShipName: '',
-      done: false,
       step: 1
     }
   },

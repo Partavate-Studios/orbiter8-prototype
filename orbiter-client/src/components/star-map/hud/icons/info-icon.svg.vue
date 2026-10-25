@@ -14,10 +14,6 @@ export default {
   name: 'InfoIcon',
   components: {
     Icon
-  },
-  data () {
-    return {
-    }
   }
 }
 </script>

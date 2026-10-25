@@ -36,14 +36,6 @@ import { useUIStore } from '@/stores/ui'
 
 export default {
   name: 'Sprites',
-  data () {
-    return {
-    }
-  },
-  mounted: function () {
-  },
-  beforeMount: function () {
-  },
   computed: {
     ...mapState(useStarMapStore, [
       'systemObjects'

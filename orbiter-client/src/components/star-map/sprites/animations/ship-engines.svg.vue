@@ -33,15 +33,8 @@
 </template>
 
 <script>
-import { mapState } from 'pinia'
-import { useStarMapStore } from '@/stores/starmap'
 
 export default {
-  name: 'ship-engines',
-  computed: {
-    ...mapState(useStarMapStore, [
-      'gameTime',
-    ])
-  },
+  name: 'ship-engines'
 }
 </script>

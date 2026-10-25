@@ -39,18 +39,13 @@ export default {
       'blockId'
     ]),
     ...mapState(useStarMapStore, [
-      'isLoading',
-      'currentStarSystemId',
+      'isLoading'
     ]),
     ...mapState(useGameStateStore, [
       'gameDataLoading'
     ]),
     ...mapState(useUIStore, [
-      'leftMostX',
-      'rightMostX',
-      'topMostY',
-      'bottomMostY',
-      'jumpAnimationState'
+      'bottomMostY'
     ])
   }
 }

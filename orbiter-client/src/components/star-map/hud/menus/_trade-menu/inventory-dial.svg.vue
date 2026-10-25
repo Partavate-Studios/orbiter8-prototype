@@ -31,10 +31,6 @@ import Slider from './slider.svg'
 
 export default {
   name: 'TradeMenuInventory',
-  data () {
-    return {
-    }
-  },
   methods: {
     calculatedReturnValue ($event) {
       return Math.min(parseInt(Math.round($event * this.maxHolds)), this.maxAllowed) * Math.sign(this.portInventory)

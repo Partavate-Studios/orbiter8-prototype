@@ -37,13 +37,9 @@
 
 export default {
   name: 'CardBackground',
-  props: {
-  },
   methods: {
     handleMouseDown () {
     },
-  },
-  computed: {
-  },
+  }
 }
 </script>
