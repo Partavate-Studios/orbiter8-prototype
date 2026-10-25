@@ -164,7 +164,6 @@ import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
 import { mapActions, mapState } from 'pinia'
-import { useConfigStore } from '@/stores/config'
 import CurrentSystem from './current-system/system.svg'
 
 import ScopeToggle from './toggles/scope-toggle.svg'
@@ -216,6 +215,7 @@ export default {
   },
   computed: {
     ...mapState(useUIStore, [
+      'showScope',
       'selected',
       'leftMostX',
       'rightMostX',
@@ -228,9 +228,6 @@ export default {
     ...mapState(useStarMapStore, [
       'myShipId',
       'spriteIds'
-    ]),
-    ...mapState(useConfigStore, [
-      'showScope'
     ]),
     ...mapState(useGameStateStore, [
       'avatar',

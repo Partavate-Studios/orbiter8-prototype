@@ -53,7 +53,6 @@ import Sprites from '@/components/layer-html/minerva/sprites'
 import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
 import { mapActions, mapState } from 'pinia'
-import { useConfigStore } from '@/stores/config'
 
 // The debug tab is for development only; production builds don't include it.
 const Debug = import.meta.env.DEV ? defineAsyncComponent(() => import('@/components/layer-html/minerva/debug.vue')) : null
@@ -75,17 +74,15 @@ export default {
   computed: {
     ...mapState(useStarMapStore, [
       'currentStarSystemId',
-      'currentStarSystemName',
+      'currentStarSystemName'
     ]),
-    ...mapState(useConfigStore, {
-      show: 'minerva'
-    }),
-    ...mapState(useUIStore, [
-      'viewport'
-    ])
+    ...mapState(useUIStore, {
+      show: 'showMinerva',
+      viewport: 'viewport'
+    })
   },
   methods: {
-    ...mapActions(useConfigStore, [
+    ...mapActions(useUIStore, [
       'toggleMinerva'
     ])
   },

@@ -117,7 +117,6 @@
 import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
 import { mapActions, mapState } from 'pinia'
-import { useConfigStore } from '@/stores/config'
 
 import IconContainer from '../icons/_icon-container.svg'
 import Info from './info.svg'
@@ -178,10 +177,8 @@ export default {
   },
   methods: {
     ...mapActions(useUIStore, [
+      'toggleScope',
       'selectSprite'
-    ]),
-    ...mapActions(useConfigStore, [
-      'toggleScope'
     ]),
     getInfoCardTranslate() {
       if (this.viewRatio > 1) {

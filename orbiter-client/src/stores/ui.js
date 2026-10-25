@@ -26,8 +26,8 @@ export const useUIStore = defineStore('UI', {
       width: MAP_RESOLUTION,
       height: MAP_RESOLUTION
     },
-    //todo: this needs a more verbose name
-    container: {
+    // The browser window's size in pixels, and where the mouse is in it.
+    screenSize: {
       width: MAP_RESOLUTION,
       height: MAP_RESOLUTION,
       mouse: {
@@ -61,11 +61,15 @@ export const useUIStore = defineStore('UI', {
         history: []
       }
     },
-    showLabels: false
+    showLabels: false,
+    // Whether the scope (the ring of arrows to planets and ships) is shown instead of the info cards.
+    showScope: true,
+    // Whether the Minerva panel (backtick) is open.
+    showMinerva: false
   }),
   getters: {
     /** Screen pixels per map-group unit, before the camera's zoom. */
-    groupPixels: state => state.baseScale * state.container.height / state.viewport.resolution,
+    groupPixels: state => state.baseScale * state.screenSize.height / state.viewport.resolution,
     /** Screen pixels per world unit as the world layer is drawn (changes only on a redraw). */
     drawnPixelsPerUnit () {
       return this.groupPixels / this.drawnView.scale
@@ -80,8 +84,8 @@ export const useUIStore = defineStore('UI', {
      */
     isOnScreen () {
       const pixels = this.livePixelsPerUnit
-      const halfWidth = this.container.width / 2 + OFFSCREEN_MARGIN_PX
-      const halfHeight = this.container.height / 2 + OFFSCREEN_MARGIN_PX
+      const halfWidth = this.screenSize.width / 2 + OFFSCREEN_MARGIN_PX
+      const halfHeight = this.screenSize.height / 2 + OFFSCREEN_MARGIN_PX
       const offsetY = WORLD_OFFSET_Y * this.groupPixels
       return (x, y, radius = 0) => {
         const dx = Math.abs((x + this.viewport.x) * pixels)
@@ -152,8 +156,14 @@ export const useUIStore = defineStore('UI', {
       let ratio = this.viewport.resolution / y
       this.viewport.width = parseInt(x * ratio * 0.8)
       this.viewport.height = parseInt(this.viewport.resolution * .8)
-      this.container.width = parseInt(x)
-      this.container.height = parseInt(y)
+      this.screenSize.width = parseInt(x)
+      this.screenSize.height = parseInt(y)
+    },
+    toggleScope () {
+      this.showScope = !this.showScope
+    },
+    toggleMinerva () {
+      this.showMinerva = !this.showMinerva
     },
     toggleShowLabels () {
       this.showLabels = !this.showLabels
@@ -358,10 +368,10 @@ export const useUIStore = defineStore('UI', {
     },
 
     setMouse (payload) {
-      this.container.mouse.x = payload.x
-      this.container.mouse.y = payload.y
-      this.container.mouse.xPercent = payload.x / this.container.width
-      this.container.mouse.yPercent = payload.y / this.container.height
+      this.screenSize.mouse.x = payload.x
+      this.screenSize.mouse.y = payload.y
+      this.screenSize.mouse.xPercent = payload.x / this.screenSize.width
+      this.screenSize.mouse.yPercent = payload.y / this.screenSize.height
     },
     addToHistory (payload) {
       this.minerva.terminal.history.push(payload)

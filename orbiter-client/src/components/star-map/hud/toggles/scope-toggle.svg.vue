@@ -24,7 +24,6 @@
 
 import { useUIStore } from '@/stores/ui'
 import { mapActions, mapState } from 'pinia'
-import { useConfigStore } from '@/stores/config'
 
 export default {
   name: 'ScopeToggle',
@@ -34,15 +33,13 @@ export default {
     }
   },
   computed: {
-    ...mapState(useConfigStore, [
+    ...mapState(useUIStore, [
       'showScope'
-    ]),
+    ])
   },
   methods: {
-    ...mapActions(useConfigStore, [
-      'toggleScope'
-    ]),
     ...mapActions(useUIStore, [
+      'toggleScope',
       'setSpriteToDisplay'
     ]),
     scopeButtonScale () {

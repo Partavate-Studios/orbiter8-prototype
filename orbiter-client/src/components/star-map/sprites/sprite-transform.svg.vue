@@ -117,17 +117,17 @@ export default {
   computed: {
     ...mapState(useStarMapStore, [
       'systemObjects',
-      'gameTime',
+      'gameTime'
     ]),
     ...mapState(useUIStore, [
       'selected',
       'showLabels',
       'isMenuOn',
       'drawnPixelsPerUnit',
-      'isOnScreen'
+      'isOnScreen',
+      'showScope'
     ]),
     ...mapState(useConfigStore, [
-      'showScope', // todo: this should be in UI
       'graphicsQuality'
     ]),
     /**
@@ -216,10 +216,8 @@ export default {
   },
   methods: {
     ...mapActions(useUIStore, [
+      'toggleScope',
       'selectSprite'
-    ]),
-    ...mapActions(useConfigStore, [
-      'toggleScope'
     ]),
     spriteAction: function () {
       if (this.isSelected) {

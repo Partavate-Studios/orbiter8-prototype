@@ -21,12 +21,12 @@
         </tr>
         <tr>
             <th style="text-align:right">Mouse Actual:</th>
-            <td>x: {{ container.mouse.x }}<br>y: {{ container.mouse.y }}<br></td>
+            <td>x: {{ screenSize.mouse.x }}<br>y: {{ screenSize.mouse.y }}<br></td>
         </tr>
         <tr>
             <th style="text-align:right">Mouse From Center</th>
-            <td>x: {{ parseInt(container.xFromCenter) }}<br>
-                y: {{ parseInt(container.yFromCenter) }}</td>
+            <td>x: {{ parseInt(screenSize.xFromCenter) }}<br>
+                y: {{ parseInt(screenSize.yFromCenter) }}</td>
         </tr>
         <tr>
             <th style="text-align:right">scale:</th>
@@ -56,7 +56,7 @@ export default {
   computed: {
     ...mapState(useUIStore, [
       'viewport',
-      'container',
+      'screenSize',
       'selected'
     ]),
     ...mapState(useConfigStore, [

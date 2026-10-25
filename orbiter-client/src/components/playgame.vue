@@ -79,10 +79,10 @@ export default {
       'updateAllTelemtry'
     ]),
     ...mapActions(useConfigStore, [
-      'toggleMinerva',
       'toggleGraphicsQuality'
     ]),
     ...mapActions(useUIStore, [
+      'toggleMinerva',
       'viewportToTime',
       'setSelectedTelemetry',
       'moveUp',

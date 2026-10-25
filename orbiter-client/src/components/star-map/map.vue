@@ -34,8 +34,8 @@
         v-if="mapDataLoaded && !jumpAnimationState"
         :drawn-view="drawnView"
         :unit="worldUnit"
-        :origin-x="container.width / 2 + worldMargin"
-        :origin-y="container.height / 2 + worldMargin + worldUnit * worldOffsetY" />
+        :origin-x="screenSize.width / 2 + worldMargin"
+        :origin-y="screenSize.height / 2 + worldMargin + worldUnit * worldOffsetY" />
     </div>
 
     <svg
@@ -128,7 +128,7 @@ export default {
   computed: {
     ...mapState(useUIStore, [
       'viewport',
-      'container',
+      'screenSize',
       'baseScale',
       'drawnView',
       'groupPixels',
@@ -142,7 +142,7 @@ export default {
       'myShipId'
     ]),
     /**
-     * Every layer maps 1200 units to the container's height, centered on the origin (this is
+     * Every layer maps 1200 units to the screen's height, centered on the origin (this is
      * what the original single SVG did at any aspect ratio), so the layers line up exactly.
      */
     /** Pixels per world-group unit (before the camera's zoom). */
@@ -157,18 +157,18 @@ export default {
       return {
         left: -WORLD_MARGIN + 'px',
         top: -WORLD_MARGIN + 'px',
-        width: this.container.width + 2 * WORLD_MARGIN + 'px',
-        height: this.container.height + 2 * WORLD_MARGIN + 'px'
+        width: this.screenSize.width + 2 * WORLD_MARGIN + 'px',
+        height: this.screenSize.height + 2 * WORLD_MARGIN + 'px'
       }
     },
     worldViewBox () {
-      const unitsPerPixel = this.viewport.resolution / this.container.height
-      const width = (this.container.width + 2 * WORLD_MARGIN) * unitsPerPixel
-      const height = (this.container.height + 2 * WORLD_MARGIN) * unitsPerPixel
+      const unitsPerPixel = this.viewport.resolution / this.screenSize.height
+      const width = (this.screenSize.width + 2 * WORLD_MARGIN) * unitsPerPixel
+      const height = (this.screenSize.height + 2 * WORLD_MARGIN) * unitsPerPixel
       return (-width / 2) + ' ' + (-height / 2) + ' ' + width + ' ' + height
     },
     layerViewBox () {
-      const width = this.viewport.resolution * this.container.width / this.container.height
+      const width = this.viewport.resolution * this.screenSize.width / this.screenSize.height
       const height = this.viewport.resolution
       return (-width / 2) + ' ' + (-height / 2) + ' ' + width + ' ' + height
     },
@@ -221,8 +221,8 @@ export default {
         scale: drawn.scale / live.scale,
         x: unit * (live.x - drawn.x) / live.scale,
         y: unit * (live.y - drawn.y) / live.scale,
-        originX: this.container.width / 2 + WORLD_MARGIN,
-        originY: this.container.height / 2 + WORLD_MARGIN + unit * WORLD_OFFSET_Y
+        originX: this.screenSize.width / 2 + WORLD_MARGIN,
+        originY: this.screenSize.height / 2 + WORLD_MARGIN + unit * WORLD_OFFSET_Y
       }
       if (this.worldLayer.update(delta)) this.drawWorld()
     },

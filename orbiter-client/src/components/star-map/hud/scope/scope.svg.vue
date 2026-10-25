@@ -89,7 +89,6 @@ import { bearingDegrees, scopeOpacity } from '@/game/bearing'
 import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
 import { mapActions, mapState } from 'pinia'
-import { useConfigStore } from '@/stores/config'
 import Compass from './compass.svg'
 import CompassArrow from './compass-arrow.svg'
 import CompassPlanet from './compass-planet.svg'
@@ -112,12 +111,10 @@ export default {
   },
   computed: {
     ...mapState(useUIStore, [
+      'showScope',
       'viewport',
       'spriteToDisplay',
       'selected'
-    ]),
-    ...mapState(useConfigStore, [
-      'showScope'
     ]),
     ...mapState(useStarMapStore, [
       'gameTime',

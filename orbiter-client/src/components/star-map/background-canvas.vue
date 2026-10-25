@@ -57,7 +57,7 @@ export default {
   computed: {
     ...mapState(useUIStore, [
       'viewport',
-      'container',
+      'screenSize',
       'jumpAnimationState'
     ]),
     ...mapState(useConfigStore, [
@@ -73,13 +73,13 @@ export default {
       return {
         left: -MARGIN + 'px',
         top: -MARGIN + 'px',
-        width: this.container.width + 2 * MARGIN + 'px',
-        height: this.container.height + 2 * MARGIN + 'px'
+        width: this.screenSize.width + 2 * MARGIN + 'px',
+        height: this.screenSize.height + 2 * MARGIN + 'px'
       }
     }
   },
   watch: {
-    container: {
+    screenSize: {
       handler () {
         this.$nextTick(this.resize)
       },
@@ -109,19 +109,19 @@ export default {
       // Frozen: positions never change, so Vue doesn't need to track them.
       this.stars = Object.freeze(randomStars(this.graphicsQuality > 2 ? 3200 : 800))
     },
-    /** Pixels per map unit: the map fits 1200 units (viewport.resolution) into the container height. */
+    /** Pixels per map unit: the map fits 1200 units (viewport.resolution) into the screenSize height. */
     unit () {
-      return this.container.height / this.viewport.resolution
+      return this.screenSize.height / this.viewport.resolution
     },
     resize () {
       const dpr = window.devicePixelRatio || 1
       for (const ref of ['backdrop', 'stars']) {
         const canvas = this.$refs[ref]
-        canvas.width = Math.round((this.container.width + 2 * MARGIN) * dpr)
-        canvas.height = Math.round((this.container.height + 2 * MARGIN) * dpr)
+        canvas.width = Math.round((this.screenSize.width + 2 * MARGIN) * dpr)
+        canvas.height = Math.round((this.screenSize.height + 2 * MARGIN) * dpr)
       }
-      this.$refs.jump.width = Math.round(this.container.width * dpr)
-      this.$refs.jump.height = Math.round(this.container.height * dpr)
+      this.$refs.jump.width = Math.round(this.screenSize.width * dpr)
+      this.$refs.jump.height = Math.round(this.screenSize.height * dpr)
       this.drawBackdrop()
       this.drawStars()
     },
@@ -131,7 +131,7 @@ export default {
       const ctx = canvas.getContext('2d')
       ctx.setTransform(1, 0, 0, 1, 0, 0)
       ctx.clearRect(0, 0, canvas.width, canvas.height)
-      ctx.setTransform(dpr, 0, 0, dpr, dpr * (this.container.width / 2 + margin), dpr * (this.container.height / 2 + margin))
+      ctx.setTransform(dpr, 0, 0, dpr, dpr * (this.screenSize.width / 2 + margin), dpr * (this.screenSize.height / 2 + margin))
       return ctx
     },
     drawBackdrop () {
@@ -182,8 +182,8 @@ export default {
         return
       }
       const unit = this.unit()
-      const centerX = this.container.width / 2 + MARGIN
-      const centerY = this.container.height / 2 + MARGIN
+      const centerX = this.screenSize.width / 2 + MARGIN
+      const centerY = this.screenSize.height / 2 + MARGIN
 
       const backdropDelta = {
         scale: backdropScaleFor(this.viewport.scale) / this.drawnBackdrop.scale,
@@ -210,7 +210,7 @@ export default {
       const canvas = this.$refs.jump
       const ctx = this.centeredContext(canvas, 0)
       ctx.fillStyle = JUMP_BACKGROUND
-      ctx.fillRect(-this.container.width / 2, -this.container.height / 2, this.container.width, this.container.height)
+      ctx.fillRect(-this.screenSize.width / 2, -this.screenSize.height / 2, this.screenSize.width, this.screenSize.height)
 
       // Map units inside the HUD's 1.25x group, as the SVG version used.
       const unit = this.unit() * 1.25
