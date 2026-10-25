@@ -50,6 +50,7 @@ import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
 import { mapActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
+import { spriteScale } from '@/game/sprite-types'
  import Star from './star.svg'
  import Ship from './ship.svg'
  import Station from './station.svg'
@@ -173,7 +174,7 @@ export default {
     },
     /** The sprite's group scale (world units per sprite unit). */
     spriteScale () {
-      return this.sprite.size * 0.02 + 0.1
+      return spriteScale(this.sprite.size)
     },
     /** Roughly how far the sprite reaches from its center, in world units. */
     visualRadius () {
@@ -189,9 +190,8 @@ export default {
       const onePixel = 1 / (this.drawnPixelsPerUnit * this.spriteScale)
       return Math.max(this.sprite.selectorSize / 2, onePixel)
     },
-    // todo: this should probably come from sprite.js
     getScaleTransform () {
-      return 'scale(' + (this.sprite.size * 0.02 + 0.1) + ')'
+      return 'scale(' + this.spriteScale + ')'
     },
     isSelected () {
       if (this.objectIndex === this.selected) {

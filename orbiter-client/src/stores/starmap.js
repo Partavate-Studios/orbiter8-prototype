@@ -131,8 +131,7 @@ export const useStarMapStore = defineStore('StarMap', {
         this.setProp({key: 'loadProgress', value: 80})
 
         /** Add details for all the planets */
-        // todo: ensure this key is accurately tracking orbit distance
-        // todo: these keys should probably be consts
+        // A planet's index in planetIds is its orbital position (the contract's systems[id].planets[orbitalId]).
         for (const [key, planetId] of Object.entries(starMapBlockData.planetIds)) {
           if (planetId > 0) {
             const planetBase = await galaxy.getPlanet(String(planetId))

@@ -91,7 +91,7 @@ export default class Sprite {
     return this.key === sprite.key
   }
 
-  //todo: this can be created in the constructor and just passed as a var
+  /** The actions offered in this sprite's card menu. */
   getMenu () {
     let menu = []
     switch (this.type) {
@@ -184,9 +184,6 @@ export default class Sprite {
         break
 
       case 'station':
-        if (this.isMine) {
-          //todo: more
-        }
         menu.push({
           text: 'Trade at Port',
           enabled: false,

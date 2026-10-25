@@ -21,3 +21,8 @@ export const SHIP_SIZE = 10
 
 /** Stations start a little turned, so they don't all line up with their planet. */
 export const STATION_START_ROTATION = -15
+
+/** How much a sprite of this size is scaled up from its artwork (world units per sprite unit). */
+export function spriteScale (size) {
+  return size * 0.02 + 0.1
+}

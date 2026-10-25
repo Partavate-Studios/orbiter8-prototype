@@ -27,7 +27,6 @@
         stroke-width="0.5" />
 
     <card-text v-if="objectId != null" :objectId="objectId" />
-    <!-- todo: should I use a sprite-transform here? -->
     <g :transform="'translate(0 0) rotate(' + spriteRotation + ')'">
         <sprite :objectId="objectId" />
     </g>
