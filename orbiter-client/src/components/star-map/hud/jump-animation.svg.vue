@@ -62,7 +62,7 @@
         fill="#ffffffaa"
         stroke-width="0"
         text-anchor="middle"
-        alignment-baseline="central"> {{ know }}
+        alignment-baseline="central"> {{ loreTip }}
     </text>
   </g>
 </template>
@@ -76,7 +76,7 @@ export default {
   name: 'JumpAnimation',
   data () {
     return {
-      know: '',
+      loreTip: '',
       starSpeed: 25
     }
   },
@@ -84,7 +84,7 @@ export default {
     Ship
   },
   mounted: function () {
-    this.know = this.getRandomDidYouKnow()
+    this.loreTip = this.randomLoreTip()
   },
   computed: {
     ...mapState(useStarMapStore, [
@@ -99,8 +99,8 @@ export default {
     getShipTranslate () {
       return 'scale(' + (2 + (Math.sin(this.rightSlideX / 1000) / 50)) + ') translate(' + Math.sin(this.rightSlideX / 300)  + ' ' + Math.sin(this.rightSlideX / 200 + 0.5) + ')'
     },
-    getRandomDidYouKnow () {
-      let knows = [
+    randomLoreTip () {
+      let tips = [
         'It is the year 2140, just a little more than a century after humans began off-world colonization.',
         'The Orbiter 8 is the first line of orbiter ships capable of interstellar travel, making it a true "Star Ship"',
         'As the initial surge of planetary colonization stalled into decades of vicious trade wars, a time known as The Great Regrettion began.',
@@ -111,7 +111,7 @@ export default {
         'Not all stars offer the same gravity assist. Just because you can jump from one star to another does not mean you will be able to jump back the same way.',
         'Once claimed, you can rename a planet. Likewise, you can rename new stars you visit first.'
       ]
-      return knows[parseInt(Math.random() * knows.length)]
+      return tips[parseInt(Math.random() * tips.length)]
     }
   }
 }

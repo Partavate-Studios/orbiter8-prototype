@@ -5,7 +5,7 @@
         <planet :planet="systemObjects[planetId]" />
       </g>
       <g v-if="avatar.ship.orbit == systemObjects[planetId].id" :transform="'translate(' + 20 + ' 20) rotate(15) scale(1.5)' ">
-        <ship :show-engines="true" />
+        <ship :should-show-engines="true" />
       </g>
       <g v-if="slotWidth > 450">
         <text :x="slotWidth * 0.325 + 3" y="33" font-size="1.25em" text-anchor="end" font-style="bold" fill="#00000088" stroke-width="2" stroke="#00000044">

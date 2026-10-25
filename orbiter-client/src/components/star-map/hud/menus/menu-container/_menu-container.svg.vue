@@ -31,7 +31,7 @@ import { mapActions, mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
 import CloseButton from './close-button.svg'
 import MenuBackground from './menu-background.svg'
-import Rubber from '@/libs/rubber'
+import Tween from '@/libs/tween'
 
 export default {
   name: 'MenuContainer',
@@ -43,8 +43,8 @@ export default {
     return {
       timeToAnimate: 200,
       offset: 0,
-      rubberIn: null,
-      rubberOut: null
+      slideIn: null,
+      slideOut: null
     }
   },
   computed: {
@@ -60,16 +60,16 @@ export default {
   },
   watch: {
     gameTime: function (newTime) {
-      if (this.rubberIn != null) {
-        this.offset = this.rubberIn.getRubber(newTime)
-        if (this.rubberIn.rubberComplete(newTime)) {
-          this.rubberIn = null
+      if (this.slideIn != null) {
+        this.offset = this.slideIn.valueAt(newTime)
+        if (this.slideIn.isDone(newTime)) {
+          this.slideIn = null
         }
       }
-      if (this.rubberOut != null) {
-        this.offset = this.rubberOut.getRubber(newTime)
-        if (this.rubberOut.rubberComplete(newTime)) {
-          this.rubberOut = null
+      if (this.slideOut != null) {
+        this.offset = this.slideOut.valueAt(newTime)
+        if (this.slideOut.isDone(newTime)) {
+          this.slideOut = null
           this.closeMenu()
         }
       }
@@ -77,7 +77,7 @@ export default {
   },
   created () {
     this.offset = this.viewport.height
-    this.rubberIn = new Rubber(
+    this.slideIn = new Tween(
       this.viewport.height,
       0,
       this.timeToAnimate
@@ -89,7 +89,7 @@ export default {
     ]),
     setMenuToClose() {
       this.o8audio.playEffect('click')
-      this.rubberOut =  new Rubber(
+      this.slideOut =  new Tween(
         0,
         this.viewport.height,
         this.timeToAnimate

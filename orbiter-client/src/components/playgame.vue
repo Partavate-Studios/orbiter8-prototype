@@ -134,7 +134,7 @@ export default {
       }
     },
     /** One game tick: advance time, the camera's animations, every orbit, then keep the camera on the selected sprite. */
-    tickWork () {
+    advanceGame () {
       this.incrementGameTime()
       this.viewportToTime(this.gameTime)
       this.updateAllTelemtry()
@@ -153,7 +153,7 @@ export default {
       // Low graphics tier ticks at ~30 fps (tickDelay); the others tick every frame.
       if (now - this.lastTick < this.tickDelay) return
       this.lastTick = now
-      this.tickWork()
+      this.advanceGame()
     }
   },
   mounted () {

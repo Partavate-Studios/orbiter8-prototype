@@ -2,7 +2,7 @@
   <g>
     <g transform="scale(0.0025)">
       <circle cx="0" cy="0" r="4000" stroke-width="0" fill="#c3b3da00" />
-      <g v-if="showEngines && (graphicsQuality > 1)">
+      <g v-if="shouldShowEngines && (graphicsQuality > 1)">
         <ship-engines />
       </g>
       <g transform="translate(-2300,-2300)">
@@ -23,7 +23,7 @@ export default {
     ShipEngines,
   },
   props: {
-    showEngines: {
+    shouldShowEngines: {
       default: false
     }
   },

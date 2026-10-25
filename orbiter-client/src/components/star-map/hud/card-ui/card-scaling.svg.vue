@@ -25,7 +25,7 @@ export default {
   computed: {
     ...mapState(useUIStore, [
       'viewport',
-      'viewportTotalRubber'
+      'cameraMotionRemaining'
     ]),
     ...mapState(useStarMapStore, [
       'gameTime'
@@ -42,7 +42,7 @@ export default {
     },
     cardUiScale () {
       let cap = Math.min(1, Math.max(0, 1.5 - this.viewport.scale))
-      let scale = 1 - ((this.viewportTotalRubber - 5) * this.viewport.scale) / 15
+      let scale = 1 - ((this.cameraMotionRemaining - 5) * this.viewport.scale) / 15
       return Math.max(Math.min((scale), cap), 0)
     }
   }

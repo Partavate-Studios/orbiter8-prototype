@@ -1,6 +1,10 @@
 import { markRaw } from 'vue'
 
-export default class Rubber {
+/**
+ * A value moving from `origin` to `target` over `duration` ms, starting now: eased out (quintic) by
+ * default, or linear. The camera and the menus use these for their animated moves.
+ */
+export default class Tween {
   constructor (origin, target, duration) {
     this.origin = origin
     this.target = target
@@ -12,39 +16,37 @@ export default class Rubber {
     return markRaw(this)
   }
 
-  getRubber (time) {
+  valueAt (time) {
     if (this.method == 'ease') {
-      return this.getRubberEase(time)
+      return this.easedValueAt(time)
     } else {
-      return this.getRubberLinear(time)
+      return this.linearValueAt(time)
     }
   }
 
-  setRubberMovementLinear () {
+  useLinear () {
     this.method = 'linear'
   }
 
-  setRubberMovementEase () {
+  useEase () {
     this.method = 'ease'
   }
 
-  getRubberEase (time) {
-    if (this.rubberComplete(time)) {
+  easedValueAt (time) {
+    if (this.isDone(time)) {
       return this.target
     }
     let timeDelta = (time - this.start)
     let timeRatio = (timeDelta / this.duration)
 
-     timeRatio = 1 - Math.pow(1 - timeRatio, 5)
-    // timeRatio = Math.sin((timeRatio * Math.PI) / 2)
-    // timeRatio = Math.sqrt(1 - Math.pow(timeRatio - 1, 2))
+    timeRatio = 1 - Math.pow(1 - timeRatio, 5)
 
     let progress = (timeRatio * this.delta)
     return (this.origin + progress)
   }
 
-  getRubberLinear (time) {
-    if (this.rubberComplete(time)) {
+  linearValueAt (time) {
+    if (this.isDone(time)) {
       return this.target
     }
     let timeDelta = (time - this.start)
@@ -53,7 +55,7 @@ export default class Rubber {
     return (this.origin + progress)
   }
 
-  rubberComplete (time) {
+  isDone (time) {
     if ((time - this.start) >= this.duration) {
       return true;
     }

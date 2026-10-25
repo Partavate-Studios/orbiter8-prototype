@@ -1,7 +1,7 @@
 <template>
   <g>
-    <orbit-ring v-if="frameOf !== 'self' && (amISelected || showOrbit)"
-      :cx="placement.ringX" :cy="placement.ringY" :r="sprite.distance" :selected="amISelected" />
+    <orbit-ring v-if="frameOf !== 'self' && (isSelected || hasOrbitRing)"
+      :cx="placement.ringX" :cy="placement.ringY" :r="sprite.distance" :selected="isSelected" />
     <g :transform="getOrbitalTransform" v-if="shouldDisplay">
       <g>
         <slot />
@@ -13,7 +13,7 @@
           <planet v-if="type === 'planet'" :planet="sprite" />
           <moon v-if="type === 'moon'" />
           <station v-if="type === 'station'" />
-          <g transform="rotate(180)"><ship v-if="type === 'ship'" :ship="sprite" :show-engines="true" /></g>
+          <g transform="rotate(180)"><ship v-if="type === 'ship'" :ship="sprite" :should-show-engines="true" /></g>
           <star v-if="type === 'star'" />
         </template>
         <a
@@ -30,7 +30,7 @@
           </a>
       </g>
       <g>
-        <text v-if="(amISelected && !showScope) || showLabels || (hover && !amISelected)"
+        <text v-if="(isSelected && !showScope) || showLabels || (hover && !isSelected)"
           x="0" :y="(sprite.size / 4) + 4"
           font-size="0.1em"
           fill="#ffffff66"
@@ -145,7 +145,7 @@ export default {
         parentY: parent ? parent.telemetry.translatey : 0
       }
     },
-    showOrbit () {
+    hasOrbitRing () {
       if (this.sprite.type != 'star') {
         return true
       }
@@ -193,15 +193,15 @@ export default {
     getScaleTransform () {
       return 'scale(' + (this.sprite.size * 0.02 + 0.1) + ')'
     },
-    amISelected () {
+    isSelected () {
       if (this.objectIndex === this.selected) {
         return true;
       }
       return false;
     },
     selectionStroke: function () {
-      if ((!this.amISelected && this.hover) ||
-         (this.amISelected && !this.showScope)) {
+      if ((!this.isSelected && this.hover) ||
+         (this.isSelected && !this.showScope)) {
         return '#ffffffff'
       }
       return 'none'
@@ -211,7 +211,7 @@ export default {
         return false
       }
       // Off screen: don't draw it, so it costs nothing per frame. (The label hangs below the sprite.)
-      return this.amISelected || this.isOnScreen(this.frame.x, this.frame.y, this.visualRadius + 10)
+      return this.isSelected || this.isOnScreen(this.frame.x, this.frame.y, this.visualRadius + 10)
     }
   },
   methods: {
@@ -222,7 +222,7 @@ export default {
       'toggleScope'
     ]),
     spriteAction: function () {
-      if (this.amISelected) {
+      if (this.isSelected) {
         this.toggleScope()
       } else {
         this.selectSprite(this.objectIndex)

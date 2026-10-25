@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import Rubber from '@/libs/rubber'
+import Tween from '@/libs/tween'
 import { STAR_KEY } from '@/libs/sprite'
 
 export const useUIStore = defineStore('UI', {
@@ -12,13 +12,13 @@ export const useUIStore = defineStore('UI', {
     viewport: {
       resolution: 1200,
       scale: 400,
-      scaleRubber: null,
+      scaleTween: null,
       rotation: 0.0,
-      rotationRubber: null,
+      rotationTween: null,
       x: 0.0,
-      xRubber: null,
+      xTween: null,
       y: 0.0,
-      yRubber: null,
+      yTween: null,
       width: 1200,
       height: 1200
     },
@@ -112,18 +112,18 @@ export const useUIStore = defineStore('UI', {
       }
       return false
     },
-    viewportTotalRubber: state => {
+    cameraMotionRemaining: state => {
       let x = 0
       let y = 0
       let z = 0
-      if ((state.viewport.xRubber != null)) {
-        x = Math.abs(state.viewport.x - state.viewport.xRubber.target)
+      if ((state.viewport.xTween != null)) {
+        x = Math.abs(state.viewport.x - state.viewport.xTween.target)
       }
-      if ((state.viewport.yRubber != null)) {
-        y = Math.abs(state.viewport.y - state.viewport.yRubber.target)
+      if ((state.viewport.yTween != null)) {
+        y = Math.abs(state.viewport.y - state.viewport.yTween.target)
       }
-      if ((state.viewport.scaleRubber != null)) {
-        z = Math.abs(state.viewport.scale - state.viewport.scaleRubber.target)
+      if ((state.viewport.scaleTween != null)) {
+        z = Math.abs(state.viewport.scale - state.viewport.scaleTween.target)
       }
       return x+y+z
     },
@@ -162,74 +162,73 @@ export const useUIStore = defineStore('UI', {
         // close old menu
         this.selectedSprite = spriteId;
 
-        this.viewport.xRubber = new Rubber(
+        this.viewport.xTween = new Tween(
           this.viewport.x,
           this.viewport.x,
           2000
         )
-        this.viewport.yRubber = new Rubber(
+        this.viewport.yTween = new Tween(
           this.viewport.y,
           this.viewport.y,
           2000
         )
-        this.viewport.scaleRubber = new Rubber(
+        this.viewport.scaleTween = new Tween(
           this.viewport.scale,
           this.viewport.scale,
           2000
         )
       }
-      //todo: rubber for scale should be here
     },
     selectNone () {
       this.selectedSprite = null
-      this.viewport.xRubber = null
-      this.viewport.yRubber = null
+      this.viewport.xTween = null
+      this.viewport.yTween = null
     },
     setSelectedTelemetry (telemetry) {
       let newX = telemetry.translatex * -1
       let newY = telemetry.translatey * -1
-      if (this.viewport.xRubber != null) {
-        this.viewport.xRubber.updateTarget(newX)
+      if (this.viewport.xTween != null) {
+        this.viewport.xTween.updateTarget(newX)
       } else {
         this.viewport.x = newX
       }
-      if (this.viewport.yRubber != null) {
-        this.viewport.yRubber.updateTarget(newY)
+      if (this.viewport.yTween != null) {
+        this.viewport.yTween.updateTarget(newY)
       } else {
         this.viewport.y = newY
       }
-      //look for active rubber with no delta left
-      if (this.viewport.scaleRubber != null &&
-          this.viewport.scaleRubber.delta == 0 ) {
-        this.viewport.scaleRubber.updateTarget(telemetry.scale)
+      // a zoom tween that has nothing left to do takes on the selected sprite's zoom
+      if (this.viewport.scaleTween != null &&
+          this.viewport.scaleTween.delta == 0 ) {
+        this.viewport.scaleTween.updateTarget(telemetry.scale)
       }
     },
     viewportToTime (time) {
-      if (this.viewport.scaleRubber != null) {
-        this.viewport.scale = this.viewport.scaleRubber.getRubber(time)
-        if (this.viewport.scaleRubber.rubberComplete(time)) {
-          this.viewport.scaleRubber = null
+      if (this.viewport.scaleTween != null) {
+        this.viewport.scale = this.viewport.scaleTween.valueAt(time)
+        if (this.viewport.scaleTween.isDone(time)) {
+          this.viewport.scaleTween = null
         }
       }
 
-      if (this.viewport.rotationRubber != null) {
-        this.viewport.rotation = this.viewport.rotationRubber.getRubber(time)
-        if (this.viewport.rotationRubber.rubberComplete(time)) {
-          this.viewport.rotationRubber = null
+      if (this.viewport.rotationTween != null) {
+        this.viewport.rotation = this.viewport.rotationTween.valueAt(time)
+        if (this.viewport.rotationTween.isDone(time)) {
+          this.viewport.rotationTween = null
         }
       }
 
-      if (this.viewport.xRubber != null) {
-        this.viewport.x = this.viewport.xRubber.getRubber(time)
-        if (this.viewport.xRubber.rubberComplete(time)) {
-          this.viewport.xRubber = null
+      if (this.viewport.xTween != null) {
+        this.viewport.x = this.viewport.xTween.valueAt(time)
+        if (this.viewport.xTween.isDone(time)) {
+          this.viewport.xTween = null
         }
       }
 
-      if (this.viewport.yRubber != null) {
-        this.viewport.y = this.viewport.yRubber.getRubber(time)
-        if (this.viewport.yRubber.rubberComplete(time)) {
-          this.viewport.yRubber = null
+      if (this.viewport.yTween != null) {
+        this.viewport.y = this.viewport.yTween.valueAt(time)
+        if (this.viewport.yTween.isDone(time)) {
+          this.viewport.yTween = null
         }
       }
 
@@ -251,28 +250,28 @@ export const useUIStore = defineStore('UI', {
       }
     },
     moveUp (distance) {
-      this.viewport.yRubber = new Rubber(
+      this.viewport.yTween = new Tween(
         this.viewport.y,
         this.viewport.y + (distance * this.viewport.scale),
         100
       )
     },
     moveDown (distance) {
-      this.viewport.yRubber = new Rubber(
+      this.viewport.yTween = new Tween(
         this.viewport.y,
         this.viewport.y - (distance * this.viewport.scale),
         100
       )
     },
     moveLeft (distance) {
-      this.viewport.xRubber = new Rubber(
+      this.viewport.xTween = new Tween(
         this.viewport.x,
         this.viewport.x + (distance * this.viewport.scale),
         100
       )
     },
     moveRight (distance) {
-      this.viewport.xRubber = new Rubber(
+      this.viewport.xTween = new Tween(
         this.viewport.x,
         this.viewport.x - (distance * this.viewport.scale),
         100
@@ -282,16 +281,16 @@ export const useUIStore = defineStore('UI', {
       this.viewport.scale =  Math.min(2000, scaler * this.viewport.scale)
     },
     scaleAnimateBy ({scaler, time}) {
-      if (this.viewport.scaleRubber == null) {
-        this.viewport.scaleRubber = new Rubber(
+      if (this.viewport.scaleTween == null) {
+        this.viewport.scaleTween = new Tween(
           this.viewport.scale,
           Math.min(2000, scaler * this.viewport.scale),
           time
         )
-        this.viewport.scaleRubber.setRubberMovementLinear()
+        this.viewport.scaleTween.useLinear()
       } else {
-        this.viewport.scaleRubber.updateTarget(
-          Math.min(2000, scaler * this.viewport.scaleRubber.target)
+        this.viewport.scaleTween.updateTarget(
+          Math.min(2000, scaler * this.viewport.scaleTween.target)
         )
       }
     },
@@ -299,14 +298,14 @@ export const useUIStore = defineStore('UI', {
       this.viewport.scale = scale
     },
     scaleAnimateTo ({scale, time}) {
-      this.viewport.scaleRubber = new Rubber(
+      this.viewport.scaleTween = new Tween(
         this.viewport.scale,
         scale,
         time
       )
     },
     rotateTo (rotation) {
-      this.viewport.rotationRubber = new Rubber(
+      this.viewport.rotationTween = new Tween(
         this.viewport.rotation,
         rotation,
         100
@@ -317,39 +316,39 @@ export const useUIStore = defineStore('UI', {
       this.viewport.y = location.y
     },
     viewAnimateMoveTo (location) {
-      if (this.viewport.xRubber == null) {
-        this.viewport.xRubber = new Rubber(
+      if (this.viewport.xTween == null) {
+        this.viewport.xTween = new Tween(
           this.viewport.x,
           location.x,
           location.time
         )
-        this.viewport.xRubber.setRubberMovementLinear()
+        this.viewport.xTween.useLinear()
       } else {
-        this.viewport.xRubber.updateTarget(location.x)
+        this.viewport.xTween.updateTarget(location.x)
       }
 
-      if (this.viewport.yRubber == null) {
-        this.viewport.yRubber = new Rubber(
+      if (this.viewport.yTween == null) {
+        this.viewport.yTween = new Tween(
           this.viewport.y,
           location.y,
           location.time
         )
-        this.viewport.yRubber.setRubberMovementLinear()
+        this.viewport.yTween.useLinear()
       } else {
-        this.viewport.yRubber.updateTarget(location.y)
+        this.viewport.yTween.updateTarget(location.y)
       }
     },
     mousewheelAnimateTo ({scale, time}) {
-      if (this.viewport.scaleRubber == null) {
-        this.viewport.scaleRubber = new Rubber(
+      if (this.viewport.scaleTween == null) {
+        this.viewport.scaleTween = new Tween(
           this.viewport.scale,
           Math.min(2000, scale * this.viewport.scale),
           time
         )
-        this.viewport.scaleRubber.setRubberMovementLinear()
+        this.viewport.scaleTween.useLinear()
       } else {
-        this.viewport.scaleRubber.updateTarget(
-          Math.min(2000, scale * this.viewport.scaleRubber.target),
+        this.viewport.scaleTween.updateTarget(
+          Math.min(2000, scale * this.viewport.scaleTween.target),
         )
       }
     },
@@ -370,7 +369,7 @@ export const useUIStore = defineStore('UI', {
     },
     jumpMenuOn () {
       this.selectedSprite = STAR_KEY
-      this.viewport.scaleRubber = new Rubber(
+      this.viewport.scaleTween = new Tween(
         this.viewport.scale,
         2,
         1500
@@ -379,7 +378,7 @@ export const useUIStore = defineStore('UI', {
     },
     jumpMenuOff () {
       if (this.hud.menuState.jumpMenu) {
-        this.viewport.scaleRubber = new Rubber(
+        this.viewport.scaleTween = new Tween(
           this.viewport.scale,
           1,
           1500
@@ -435,7 +434,7 @@ export const useUIStore = defineStore('UI', {
     },
     jumpAnimationOff () {
       if (this.hud.jumpAnimationState) {
-        // this.viewport.scaleRubber = new Rubber(
+        // this.viewport.scaleTween = new Tween(
         //   this.viewport.scale,
         //   1,
         //   5000
