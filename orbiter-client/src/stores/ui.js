@@ -62,7 +62,8 @@ export const useUIStore = defineStore('UI', {
       }
     },
     showLabels: false,
-    // Whether the scope (the ring of arrows to planets and ships) is shown instead of the info cards.
+    // Whether the selected sprite's info card (or, with nothing selected, the scope) is shown.
+    // Clicking the selected sprite toggles it.
     showScope: true,
     // Whether the Minerva panel (backtick) is open.
     showMinerva: false
