@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { useChainStore } from '@/stores/chain'
 import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
@@ -49,7 +49,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
+    ...mapState(useChainStore, [
       'account'
     ]),
     ...mapState(useUIStore, [

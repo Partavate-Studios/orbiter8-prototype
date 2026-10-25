@@ -17,9 +17,9 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { useChainStore } from '@/stores/chain'
 import { useGameStateStore } from '@/stores/gamestate'
-import { mapState } from 'pinia'
+import { mapActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 import AvatarCreate from '@/components/screens/AvatarCreate'
 import ShipCreate from '@/components/screens/ShipCreate'
@@ -48,7 +48,7 @@ export default {
     ]),
   },
   methods: {
-    ...mapActions([
+    ...mapActions(useChainStore, [
       'checkForNewBlock'
     ]),
     async checkBlockWork () {

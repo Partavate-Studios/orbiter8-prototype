@@ -14,9 +14,9 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { useChainStore } from '@/stores/chain'
 import { useStarMapStore } from '@/stores/starmap'
-import { mapActions as mapPiniaActions, mapState } from 'pinia'
+import { mapActions, mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
 
 export default {
@@ -43,14 +43,14 @@ export default {
     }
   },
   methods: {
-    ...mapActions([
+    ...mapActions(useChainStore, [
       'checkForNewBlock'
     ]),
-    ...mapPiniaActions(useStarMapStore, [
+    ...mapActions(useStarMapStore, [
       'moveToSystem',
       'genesis'
     ]),
-    ...mapPiniaActions(useUIStore, [
+    ...mapActions(useUIStore, [
       'scaleTo',
       'rotateTo',
       'addToHistory',

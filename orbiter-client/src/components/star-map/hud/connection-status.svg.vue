@@ -26,7 +26,7 @@
 
 <script>
 
-import { mapGetters } from 'vuex'
+import { useChainStore } from '@/stores/chain'
 import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
 import { mapState } from 'pinia'
@@ -35,7 +35,7 @@ import { useUIStore } from '@/stores/ui'
 export default {
   name: 'ConnectionStatus',
   computed: {
-    ...mapGetters([
+    ...mapState(useChainStore, [
       'blockId'
     ]),
     ...mapState(useStarMapStore, [

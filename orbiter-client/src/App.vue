@@ -19,9 +19,9 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { useChainStore } from '@/stores/chain'
 import { useGameStateStore } from '@/stores/gamestate'
-import { mapActions as mapPiniaActions, mapState } from 'pinia'
+import { mapActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 import NetworkSelect from '@/components/screens/NetworkSelect'
 import router from '@/router/router'
@@ -38,7 +38,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
+    ...mapState(useChainStore, [
       'playerReady',
     ]),
     ...mapState(useGameStateStore, [
@@ -46,10 +46,10 @@ export default {
     ])
   },
   methods: {
-    ...mapActions([
+    ...mapActions(useChainStore, [
       'initWeb3',
     ]),
-    ...mapPiniaActions(useConfigStore, [
+    ...mapActions(useConfigStore, [
       'setGraphicsQuality'
     ])
   }

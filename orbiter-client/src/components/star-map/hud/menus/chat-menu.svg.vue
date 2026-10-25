@@ -30,7 +30,7 @@
 
 <script>
 
-import { mapGetters } from 'vuex'
+import { useChainStore } from '@/stores/chain'
 import { useGameStateStore } from '@/stores/gamestate'
 import { mapActions, mapState } from 'pinia'
 import { useStarMapStore } from '@/stores/starmap'
@@ -74,7 +74,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
+    ...mapState(useChainStore, [
       'blockId'
     ]),
     ...mapState(useGameStateStore, [

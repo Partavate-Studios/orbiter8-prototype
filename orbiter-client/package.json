@@ -32,7 +32,6 @@
     "pinia": "^3.0.4",
     "vue": "^3.5.44",
     "vue-router": "^4.6.4",
-    "vuex": "^4.1.0",
     "web3": "^1.6.1"
   },
   "devDependencies": {

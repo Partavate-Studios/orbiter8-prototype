@@ -3,7 +3,7 @@ import GalaxyContract from '@/contract-interfaces/galaxy'
 import AvatarContract from '@/contract-interfaces/avatar'
 import { useUIStore } from '@/stores/ui'
 import Sprite from '@/libs/sprite.js'
-import store from '@/store/store'
+import { useChainStore } from '@/stores/chain'
 
 export const useStarMapStore = defineStore('StarMap', {
   state: () => ({
@@ -69,7 +69,7 @@ export const useStarMapStore = defineStore('StarMap', {
 
       try {
         /** Grab the current system and go from there */
-        const systemBase = await GalaxyContract.getPlayerSystemData(store.state.account)
+        const systemBase = await GalaxyContract.getPlayerSystemData(useChainStore().account)
 
         this.setProp({key: 'loadProgress', value: 2})
 
@@ -98,13 +98,13 @@ export const useStarMapStore = defineStore('StarMap', {
         //Add pioneer to first visit sun to name index
         console.log('Discovered by ', starMapBlockData.discoveredBy)
         if ((starMapBlockData.discoveredBy > 0) && (typeof starMapBlockData.avatarNames[starMapBlockData.discoveredBy] === 'undefined')) {
-          starMapBlockData.avatarNames[starMapBlockData.discoveredBy] = await AvatarContract.getAvatarNameByAddress(starMapBlockData.discoveredBy, store.state.account)
+          starMapBlockData.avatarNames[starMapBlockData.discoveredBy] = await AvatarContract.getAvatarNameByAddress(starMapBlockData.discoveredBy, useChainStore().account)
         }
         this.setProp({key: 'loadProgress', value: 5})
 
         /** Add the names for neighboring stars */
         for (const [key, neighborId] of Object.entries(starMapBlockData.neighborIds)) {
-          const starName = await GalaxyContract.getSystemName(String(neighborId), store.state.account)
+          const starName = await GalaxyContract.getSystemName(String(neighborId), useChainStore().account)
           starMapBlockData.neighbors[key] = {
             id: neighborId,
             name: starName
@@ -119,7 +119,7 @@ export const useStarMapStore = defineStore('StarMap', {
           let shipId = starMapBlockData.shipIds[key]
           if ((shipId > 0) && !(shipId in starMapBlockData.ships)) {
             //console.log('Adding ship ', shipId)
-            const shipBase = await GalaxyContract.getShip(String(shipId), store.state.account)
+            const shipBase = await GalaxyContract.getShip(String(shipId), useChainStore().account)
             const ship = {
               id: shipId,
               name: shipBase[0],
@@ -133,7 +133,7 @@ export const useStarMapStore = defineStore('StarMap', {
 
             //Add ship owner name to name index
             if ((ship.owner !== '0x0') && (typeof starMapBlockData.avatarNames[ship.owner] === 'undefined')) {
-              starMapBlockData.avatarNames[ship.owner] = await AvatarContract.getAvatarNameByAddress(ship.owner, store.state.account)
+              starMapBlockData.avatarNames[ship.owner] = await AvatarContract.getAvatarNameByAddress(ship.owner, useChainStore().account)
             }
           }
           this.setProp({key: 'loadProgress', value: Math.min(75, 25 + key)})
@@ -147,7 +147,7 @@ export const useStarMapStore = defineStore('StarMap', {
         // todo: these keys should probably be consts
         for (const [key, planetId] of Object.entries(starMapBlockData.planetIds)) {
           if (planetId > 0) {
-            const planetBase = await GalaxyContract.getPlanet(String(planetId), store.state.account)
+            const planetBase = await GalaxyContract.getPlanet(String(planetId), useChainStore().account)
             const planet = {
               id: String(planetId),
               name: planetBase[0],
@@ -165,12 +165,12 @@ export const useStarMapStore = defineStore('StarMap', {
             //Add planet owner name to name index (need to deal with unknwon)
             //console.log('Planet Owner: ' + planet.owner )
             if ((planet.owner > 0) && (typeof starMapBlockData.avatarNames[planet.owner] === 'undefined')) {
-              starMapBlockData.avatarNames[planet.owner] = await AvatarContract.getAvatarNameByAddress(planet.owner, store.state.account)
+              starMapBlockData.avatarNames[planet.owner] = await AvatarContract.getAvatarNameByAddress(planet.owner, useChainStore().account)
             }
 
             /** If there's a station, add the details to the planet */
             if (planet.hasStation) {
-              const station = await GalaxyContract.getStation(String(planet.id), store.state.account)
+              const station = await GalaxyContract.getStation(String(planet.id), useChainStore().account)
               //console.log(JSON.stringify(station))
               planet.station = {
                 id: planet.id,
@@ -196,7 +196,7 @@ export const useStarMapStore = defineStore('StarMap', {
             /** Add details for all the moons to the planet */
             for (const [moonkey, hasMoon] of Object.entries(planet.hasMoons)) {
               if (hasMoon) {
-                const moonBase = await GalaxyContract.getMoon(String(planetId), String(moonkey), store.state.account)
+                const moonBase = await GalaxyContract.getMoon(String(planetId), String(moonkey), useChainStore().account)
                 const moon = {
                   id: String(moonkey),
                   name: String(moonBase[0]),
@@ -209,7 +209,7 @@ export const useStarMapStore = defineStore('StarMap', {
                 planet.moons[moonkey] = moon
                 //Add moon owner name to name index
                 if ((moon.owner > 0) && (typeof starMapBlockData.avatarNames[moon.owner] === 'undefined')) {
-                  starMapBlockData.avatarNames[moon.owner] = await AvatarContract.getAvatarNameByAddress(moon.owner, store.state.account)
+                  starMapBlockData.avatarNames[moon.owner] = await AvatarContract.getAvatarNameByAddress(moon.owner, useChainStore().account)
                 }
               }
             }
@@ -218,7 +218,7 @@ export const useStarMapStore = defineStore('StarMap', {
           }
         }
         this.setProp({key: 'loadProgress', value: 99})
-        this.importStarMapBlockData({blockData: starMapBlockData, playerAccount: String(store.state.account).toLowerCase()} )
+        this.importStarMapBlockData({blockData: starMapBlockData, playerAccount: String(useChainStore().account).toLowerCase()} )
         this.setProp({key: 'loadProgress', value: 100})
         if (isNewSystem) {
           useUIStore().jumpAnimationOff()

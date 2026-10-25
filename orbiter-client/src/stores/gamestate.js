@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import GalaxyContract from '@/contract-interfaces/galaxy'
 import AvatarContract from '@/contract-interfaces/avatar'
 import { useUIStore } from '@/stores/ui'
-import store from '@/store/store'
+import { useChainStore } from '@/stores/chain'
 
 export const useGameStateStore = defineStore('GameState', {
   state: () => ({
@@ -67,15 +67,15 @@ export const useGameStateStore = defineStore('GameState', {
             credits: 0,
           }
         }
-        gameState.avatarCount = await AvatarContract.getAvatarCount(store.state.account)
-        gameState.starSystemCount = await GalaxyContract.getSystemCount(store.state.account)
-        gameState.avatar.registered = await AvatarContract.haveAvatar(store.state.account)
+        gameState.avatarCount = await AvatarContract.getAvatarCount(useChainStore().account)
+        gameState.starSystemCount = await GalaxyContract.getSystemCount(useChainStore().account)
+        gameState.avatar.registered = await AvatarContract.haveAvatar(useChainStore().account)
 
         /** We have an avatar, but do we have a ship? */
         if (gameState.avatar.registered) {
-          gameState.avatar.name = await AvatarContract.getMyAvatarName(store.state.account)
-          gameState.avatar.shipId = await GalaxyContract.getMyShipId(store.state.account)
-          gameState.avatar.credits = parseInt(await GalaxyContract.myBalance(store.state.account))
+          gameState.avatar.name = await AvatarContract.getMyAvatarName(useChainStore().account)
+          gameState.avatar.shipId = await GalaxyContract.getMyShipId(useChainStore().account)
+          gameState.avatar.credits = parseInt(await GalaxyContract.myBalance(useChainStore().account))
           console.log('Name: ', gameState.avatar.name)
           console.log('Ship: ', parseInt(gameState.avatar.shipId))
           console.log('Credits: ', parseInt(gameState.avatar.credits))
@@ -85,7 +85,7 @@ export const useGameStateStore = defineStore('GameState', {
         if (gameState.avatar.shipId > 0) {
           /** We have a ship */
           console.log('loading my own ship ')
-          const ship = await GalaxyContract.getMyShip(store.state.account)
+          const ship = await GalaxyContract.getMyShip(useChainStore().account)
           console.log('loaded my own ship ' + parseInt(ship[4]))
           gameState.avatar.ship = {
             name: ship[0],
@@ -95,7 +95,7 @@ export const useGameStateStore = defineStore('GameState', {
             equipment: parseInt(ship[4]),
             fuel: parseInt(ship[5]),
             organics: parseInt(ship[6]),
-            owner: store.state.account
+            owner: useChainStore().account
           }
           //console.log(JSON.stringify(gameState.avatar.ship))
           this.setProp({key: 'haveShip', value: true})
@@ -113,7 +113,7 @@ export const useGameStateStore = defineStore('GameState', {
         tradeEvents: null,
         chatEvents: null
       }
-      let block = store.state.currentBlockId
+      let block = useChainStore().currentBlockId
       if (block > 0) {
         events.avatarEvents = await AvatarContract.getEvents()
         events.shipEvents = await GalaxyContract.getEvents('ShipLaunch', block - 10)
@@ -129,7 +129,7 @@ export const useGameStateStore = defineStore('GameState', {
       try {
         await AvatarContract.createAvatar(
           name,
-          store.state.account
+          useChainStore().account
         )
   //      await dispatch('loadGameState')
       } catch (error) {
@@ -142,7 +142,7 @@ export const useGameStateStore = defineStore('GameState', {
       try {
         await GalaxyContract.launchShip(
           name,
-          store.state.account
+          useChainStore().account
         )
   //      await dispatch('loadGameState')
       } catch (error) {
@@ -155,7 +155,7 @@ export const useGameStateStore = defineStore('GameState', {
         console.log('moving to system ' + system)
         useUIStore().jumpAnimationOn()
         useUIStore().jumpMenuOff()
-        await GalaxyContract.moveToSystem(system, store.state.account)
+        await GalaxyContract.moveToSystem(system, useChainStore().account)
         console.log('moved ' + system)
       } catch (error) {
         console.log('oops' + error.message)
@@ -163,7 +163,7 @@ export const useGameStateStore = defineStore('GameState', {
     },
     async sendChat (message) {
       try {
-        await GalaxyContract.sendChat(message, store.state.account)
+        await GalaxyContract.sendChat(message, useChainStore().account)
         console.log('sent chat ' + message)
       } catch (error) {
         console.log('oops' + error.message)
@@ -172,8 +172,8 @@ export const useGameStateStore = defineStore('GameState', {
     async claimPlanet ({planetId, name}) {
       try {
         console.log('Claiming planet: ' + planetId)
-        await GalaxyContract.claimPlanet(String(planetId), String(name), store.state.account)
-        //const shipId = await GalaxyContract.getMyShipId(store.state.account)
+        await GalaxyContract.claimPlanet(String(planetId), String(name), useChainStore().account)
+        //const shipId = await GalaxyContract.getMyShipId(useChainStore().account)
         //console.log('Updated planet ' + planetId + ' and ship ' + shipId)
       } catch (error) {
         console.log('Didn\'t claim planet  ' + error.message)
@@ -182,8 +182,8 @@ export const useGameStateStore = defineStore('GameState', {
     async buildStation ({planetId, name}) {
       try {
         console.log('Build space station: ' + planetId)
-        await GalaxyContract.buildStation(String(planetId), String(name), store.state.account)
-        //const shipId = await GalaxyContract.getMyShipId(store.state.account)
+        await GalaxyContract.buildStation(String(planetId), String(name), useChainStore().account)
+        //const shipId = await GalaxyContract.getMyShipId(useChainStore().account)
         //console.log('Updated planet ' + planetId + ' and ship ' + shipId)
       } catch (error) {
         console.log('Didn\'t build station  ' + error.message)
@@ -192,7 +192,7 @@ export const useGameStateStore = defineStore('GameState', {
     async tradeAtPort ({planetId, equipment, fuel, organics}) {
       try {
         console.log('trading at: ' + planetId+ ' ' + equipment + ' ' + fuel + ' ' + organics)
-        await GalaxyContract.tradeAtPort(String(planetId), equipment, fuel, organics, store.state.account)
+        await GalaxyContract.tradeAtPort(String(planetId), equipment, fuel, organics, useChainStore().account)
       } catch (error) {
         console.log('Trade failed.' + error.message)
       }
@@ -200,7 +200,7 @@ export const useGameStateStore = defineStore('GameState', {
     async addHoldsToShip ({planetId, amount}) {
       try {
         console.log('get holds: ' + amount)
-        await GalaxyContract.addHoldsToShip(planetId, amount, store.state.account)
+        await GalaxyContract.addHoldsToShip(planetId, amount, useChainStore().account)
       } catch (error) {
         console.log('hold upgrade.' + error.message)
       }
@@ -211,19 +211,19 @@ export const useGameStateStore = defineStore('GameState', {
       try {
         switch(type) {
           case "star":
-            await GalaxyContract.renameStar(name, store.state.account)
+            await GalaxyContract.renameStar(name, useChainStore().account)
             break;
           case "planet":
-            await GalaxyContract.renamePlanet(objectId, name, store.state.account)
+            await GalaxyContract.renamePlanet(objectId, name, useChainStore().account)
             break;
           case "moon":
-            await GalaxyContract.renameMoon(parentId, objectId, name, store.state.account)
+            await GalaxyContract.renameMoon(parentId, objectId, name, useChainStore().account)
             break;
           case "station":
-            await GalaxyContract.renameStation(objectId, name, store.state.account)
+            await GalaxyContract.renameStation(objectId, name, useChainStore().account)
             break;
           case "ship":
-            await GalaxyContract.renameMyShip(name, store.state.account)
+            await GalaxyContract.renameMyShip(name, useChainStore().account)
             break;
         }
       } catch (error) {

@@ -245,9 +245,9 @@
 </template>
 
 <script>
-import { mapGetters, mapActions, mapMutations } from 'vuex'
+import { useChainStore } from '@/stores/chain'
 import { useGameStateStore } from '@/stores/gamestate'
-import { mapActions as mapPiniaActions, mapState } from 'pinia'
+import { mapActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 
 export default {
@@ -262,17 +262,17 @@ export default {
     this.setDefaultAccount()
   },
   methods: {
-    ...mapActions([
+    ...mapActions(useChainStore, [
       'setDefaultAccount',
       'initContracts'
     ]),
-    ...mapPiniaActions(useGameStateStore, [
+    ...mapActions(useGameStateStore, [
       'loadGameState',
     ]),
-    ...mapMutations([
+    ...mapActions(useChainStore, [
       'setPlayerReady'
     ]),
-    ...mapPiniaActions(useConfigStore, [
+    ...mapActions(useConfigStore, [
       'setGraphicsQuality',
     ]),
     async connectNetwork(chainId) {
@@ -357,7 +357,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters([
+    ...mapState(useChainStore, [
       'web3Loaded',
       'contractsLoaded',
       'account',

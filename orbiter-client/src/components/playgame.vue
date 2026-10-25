@@ -6,11 +6,11 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { useChainStore } from '@/stores/chain'
 import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
-import { mapActions as mapPiniaActions, mapState } from 'pinia'
+import { mapActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 import starMap from '@/components/star-map/map'
 import layerHtml from '@/components/layer-html/container-html'
@@ -82,20 +82,20 @@ export default {
       downloadLink.click()
       document.body.removeChild(downloadLink)
     },
-    ...mapActions([
+    ...mapActions(useChainStore, [
       'checkForNewBlock'
     ]),
-    ...mapPiniaActions(useStarMapStore, [
+    ...mapActions(useStarMapStore, [
       'loadStarMap'
     ]),
-    ...mapPiniaActions(useStarMapStore, [
+    ...mapActions(useStarMapStore, [
       'incrementGameTime'
     ]),
-    ...mapPiniaActions(useConfigStore, [
+    ...mapActions(useConfigStore, [
       'toggleMinerva',
       'toggleGraphicsQuality'
     ]),
-    ...mapPiniaActions(useUIStore, [
+    ...mapActions(useUIStore, [
       'viewportToTime',
       'moveUp',
       'moveDown',
