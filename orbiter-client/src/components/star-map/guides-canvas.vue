@@ -1,9 +1,10 @@
 <template>
   <!-- Everything centered on the star that's far bigger than the screen: the glow, the heliopause
-       circle, the grid, and the orbit rings of whatever circles the star. Drawn on canvas for the
-       live camera, so unlike the world layer (which is briefly stretched by CSS while the camera
-       moves) it never shows an edge, and only what's on screen gets drawn. -->
-  <canvas v-show="mapDataLoaded && !jumpAnimationState" ref="canvas" class="guides-canvas" />
+       circle, the grid, and the orbit rings of whatever circles the star. Drawn on canvas, slightly
+       larger than the screen: a camera move just shifts it (a whole-pixel CSS translate, which costs
+       nothing to composite), and anything else (zoom, selection) redraws it for the live camera.
+       It's never stretched, so unlike the world layer it never shows an edge. -->
+  <canvas v-show="mapDataLoaded && !jumpAnimationState" ref="canvas" class="guides-canvas" :style="oversizedBox" />
 </template>
 
 <script>
@@ -13,6 +14,7 @@ import { useStarMapStore } from '@/stores/starmap'
 import { useConfigStore } from '@/stores/config'
 import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
 import { WORLD_OFFSET_Y } from '@/constants'
+import { writeStyle } from '@/libs/dom-writes'
 import { ringOpacity } from '@/libs/sprite-types'
 
 const GUIDE_COLOR = '#c3b3da'
@@ -28,13 +30,23 @@ const HELIOPAUSE_WIDTH = 10
 const DOT_ON = 0.5
 const DOT_OFF = 1
 const MIN_DOT_PERIOD_PX = 3
+// Pixels drawn beyond each screen edge, so the camera can move this far before a redraw.
+const MARGIN = 128
 
 export default {
   name: 'GuidesCanvas',
   computed: {
     ...mapState(useUIStore, ['viewport', 'screenSize', 'groupPixels', 'selected', 'jumpAnimationState']),
     ...mapState(useStarMapStore, ['systemObjects', 'mapDataLoaded']),
-    ...mapState(useConfigStore, ['graphicsQuality'])
+    ...mapState(useConfigStore, ['graphicsQuality']),
+    oversizedBox() {
+      return {
+        left: -MARGIN + 'px',
+        top: -MARGIN + 'px',
+        width: this.screenSize.width + 2 * MARGIN + 'px',
+        height: this.screenSize.height + 2 * MARGIN + 'px'
+      }
+    }
   },
   watch: {
     screenSize: {
@@ -45,9 +57,9 @@ export default {
     }
   },
   mounted() {
-    this.lastDrawn = ''
+    this.drawn = null
     this.resize()
-    this.stopFrames = onFrame(this.draw, FRAME_ORDER.render)
+    this.stopFrames = onFrame(this.followCamera, FRAME_ORDER.render)
   },
   unmounted() {
     this.stopFrames()
@@ -56,35 +68,61 @@ export default {
     resize() {
       const dpr = window.devicePixelRatio || 1
       const canvas = this.$refs.canvas
-      canvas.width = Math.round(this.screenSize.width * dpr)
-      canvas.height = Math.round(this.screenSize.height * dpr)
-      this.lastDrawn = ''
+      canvas.width = Math.round((this.screenSize.width + 2 * MARGIN) * dpr)
+      canvas.height = Math.round((this.screenSize.height + 2 * MARGIN) * dpr)
+      this.drawn = null
     },
-    /** Draws for the live camera, unless nothing that affects the picture has changed. */
-    draw() {
+    /** Each frame: shift the drawn canvas to the live camera, or redraw it if a shift won't do. */
+    followCamera() {
       if (!this.mapDataLoaded || this.jumpAnimationState) return
       const { x, y, scale } = this.viewport
-      const signature = [x, y, scale, this.selected, this.graphicsQuality, this.systemObjects].join()
-      // systemObjects is replaced on every load, so its identity covers new or changed rings.
-      if (signature === this.lastDrawn && this.lastObjects === this.systemObjects) return
-      this.lastDrawn = signature
-      this.lastObjects = this.systemObjects
-
+      const drawn = this.drawn
+      // What the picture depends on besides the camera's position. systemObjects is replaced on
+      // every load, so its identity covers new or changed rings.
+      const sameScene =
+        drawn &&
+        drawn.scale === scale &&
+        drawn.selected === this.selected &&
+        drawn.quality === this.graphicsQuality &&
+        drawn.objects === this.systemObjects
+      if (sameScene) {
+        const dpr = window.devicePixelRatio || 1
+        const pixels = this.groupPixels / scale
+        const shiftX = Math.round((x - drawn.x) * pixels * dpr) / dpr
+        const shiftY = Math.round((y - drawn.y) * pixels * dpr) / dpr
+        if (Math.abs(shiftX) < MARGIN * 0.8 && Math.abs(shiftY) < MARGIN * 0.8) {
+          writeStyle(this.$refs.canvas, 'transform', `translate(${shiftX}px, ${shiftY}px)`)
+          return
+        }
+      }
+      this.draw()
+      writeStyle(this.$refs.canvas, 'transform', 'translate(0px, 0px)')
+    },
+    /**
+     * Draws everything for the live camera, rounded onto the device-pixel grid as the world layer
+     * is (ui store drawWorldAt), so the guides and the sprites round the same way.
+     */
+    draw() {
+      const { scale } = this.viewport
       const dpr = window.devicePixelRatio || 1
       const pixels = this.groupPixels / scale // per world unit
+      const x = Math.round(this.viewport.x * pixels * dpr) / (pixels * dpr)
+      const y = Math.round(this.viewport.y * pixels * dpr) / (pixels * dpr)
+      this.drawn = { x, y, scale, selected: this.selected, quality: this.graphicsQuality, objects: this.systemObjects }
       const ctx = this.$refs.canvas.getContext('2d')
       ctx.setTransform(1, 0, 0, 1, 0, 0)
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-      // World coordinates, centered on the star as the camera sees it.
-      const originX = this.screenSize.width / 2 + x * pixels
-      const originY = this.screenSize.height / 2 + WORLD_OFFSET_Y * this.groupPixels + y * pixels
+      // World coordinates, centered on the star as the camera sees it (the canvas starts MARGIN
+      // pixels beyond the screen's top left).
+      const originX = MARGIN + this.screenSize.width / 2 + x * pixels
+      const originY = MARGIN + this.screenSize.height / 2 + WORLD_OFFSET_Y * this.groupPixels + y * pixels
       ctx.setTransform(dpr * pixels, 0, 0, dpr * pixels, dpr * originX, dpr * originY)
-      // The world rectangle on screen, for skipping lines that can't be seen.
+      // The world rectangle the canvas covers, for skipping lines that can't be seen.
       const view = {
         left: -originX / pixels,
-        right: (this.screenSize.width - originX) / pixels,
+        right: (this.screenSize.width + 2 * MARGIN - originX) / pixels,
         top: -originY / pixels,
-        bottom: (this.screenSize.height - originY) / pixels
+        bottom: (this.screenSize.height + 2 * MARGIN - originY) / pixels
       }
 
       if (this.graphicsQuality > 1) this.drawGlow(ctx)
@@ -186,10 +224,6 @@ export default {
 <style scoped>
 .guides-canvas {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
   pointer-events: none;
 }
 </style>
