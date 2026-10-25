@@ -12,6 +12,8 @@
  * @property {string[]} explorer   Block explorer base URLs, without a trailing slash.
  * @property {{ Orbiter8: string, AvatarControls: string }} contracts
  * @property {{ text: string, url?: string }[]} [funding]  How to get gas money, shown on the preflight screen.
+ * @property {{ name: string, tokenUrl: string }} [nftMarket]  Where the game's NFTs can be viewed and traded;
+ *   `tokenUrl` has {contract} and {id} placeholders. Networks without one show no market link.
  */
 
 /** @type {Network[]} */
@@ -27,7 +29,9 @@ const deployed = [
       Orbiter8: '0xdd86445C07e140f284eE10A4c39dF7C568d88865',
       AvatarControls: '0x1bde28Bf4e0224A72EbC309992B0A5b32262b47A'
     },
-    funding: [{ text: 'Get test ETH from Sepolia Faucet ↗', url: 'https://sepolia-faucet.com/' }]
+    funding: [{ text: 'Get test ETH from Sepolia Faucet ↗', url: 'https://sepolia-faucet.com/' }],
+    // OpenSea closed its testnets in 2025; Rarible's testnet indexes Sepolia.
+    nftMarket: { name: 'Rarible', tokenUrl: 'https://testnet.rarible.com/token/{contract}:{id}' }
   },
   {
     chainId: 97,
@@ -125,4 +129,16 @@ const otherNetworkNames = {
 /** A display name for any chain id. */
 export function chainName(chainId) {
   return networkFor(chainId)?.name ?? otherNetworkNames[Number(chainId)] ?? 'chain ' + chainId
+}
+
+/**
+ * The NFT market's page for one token on this network, or null if the network has no market.
+ * @param {number} chainId
+ * @param {string} contract  the token contract's address
+ * @param {number | string} id  the token id
+ */
+export function marketTokenUrl(chainId, contract, id) {
+  const market = networkFor(chainId)?.nftMarket
+  if (!market || !contract) return null
+  return market.tokenUrl.replace('{contract}', contract).replace('{id}', String(id))
 }

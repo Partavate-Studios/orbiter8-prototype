@@ -2,9 +2,10 @@
 
 /**
  * @param {import('@/sdk/system').GameObject} object
+ * @param {{ marketName?: string }} [options]  the network's NFT market, if it has one (planets and ships are NFTs)
  * @returns {{ text: string, enabled: boolean, command: string, value?: number }[]}
  */
-export function cardMenu(object) {
+export function cardMenu(object, { marketName } = {}) {
   let menu = []
   switch (object.type) {
     case 'star':
@@ -71,12 +72,7 @@ export function cardMenu(object) {
           value: object.objectId
         })
       }
-      menu.push({
-        text: 'View on OpenSea',
-        enabled: true,
-        command: 'opensea',
-        value: object.objectId
-      })
+      if (marketName) menu.push(marketItem(marketName))
       break
 
     case 'ship':
@@ -93,6 +89,7 @@ export function cardMenu(object) {
           command: 'attack'
         })
       }
+      if (marketName) menu.push(marketItem(marketName))
       break
 
     case 'station':
@@ -132,4 +129,9 @@ export function cardMenu(object) {
   }
 
   return menu
+}
+
+/** Opens the object's NFT on the network's market (planets and ships are tokens). */
+function marketItem(marketName) {
+  return { text: 'View on ' + marketName, enabled: true, command: 'market' }
 }

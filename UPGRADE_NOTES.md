@@ -639,18 +639,14 @@ Checked against the contracts and the local chain:
 
 **Open questions for Koda:** which columns (planets, credits, ports, ships), and where it lives (a HUD button, the title screen, or both).
 
-### 4. "View on OpenSea" (needs Koda's call)
+### 4. NFT market links (done, 2026-10-25)
 
-OpenSea shut down every testnet with its OS2 launch ([support article, 2025-07-23](https://support.opensea.io/en/articles/11833955-farewell-testnets)). Every `testnets.opensea.io` link now redirects there, so the button can't work on Sepolia.
+OpenSea shut down every testnet with its OS2 launch ([support article, 2025-07-23](https://support.opensea.io/en/articles/11833955-farewell-testnets)), so the old "View on OpenSea" links (Rinkeby, Mumbai, BSC testnet) all went nowhere.
 
-The current handler only knows Rinkeby, Mumbai and BSC testnet. Rinkeby and Mumbai are dead, and OpenSea's BSC testnet went with the rest, so the button works on none of our networks.
-
-**Replacement options:**
-- **A block explorer's NFT page.**
-  - Blockscout works and was checked with a real Sepolia planet: `https://eth-sepolia.blockscout.com/token/<planet token>/instance/<id>` shows the token and its owner.
-  - Etherscan's `https://sepolia.etherscan.io/nft/<planet token>/<id>` is the more familiar choice. It couldn't be checked here, because its bot protection blocks scripts.
-  - Each network in `networks.js` would get its explorer's NFT URL pattern, and the button would read "View on Etherscan", "View on Blockscout" and so on.
-- **Hide the button** where there's no NFT page.
+Koda chose Rarible. Each network in `networks.js` can now name an `nftMarket`; Sepolia's is Rarible's testnet.
+- Planet and ship cards show "View on Rarible", which opens the token on the planet or ship contract.
+- Networks without a market show no button.
+- Checked on Rarible: Sepolia planet 3 and ship 0 both have pages. The ship page is complete (name, image, owner).
 
 **A working market on Sepolia: Rarible's testnet.** It has already indexed the planets (31 items, 6 owners) and shows owners, bids and "not for sale". Link format: `https://testnet.rarible.com/token/<planet token>:<id>`. Checked 2026-10-25.
 

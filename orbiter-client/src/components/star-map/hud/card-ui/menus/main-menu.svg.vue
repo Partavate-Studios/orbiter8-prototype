@@ -18,6 +18,7 @@ import { useStarMapStore } from '@/stores/starmap'
 import { mapActions, mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
 import { cardMenu } from './card-menu'
+import { marketTokenUrl, networkFor } from '@/sdk/chain/networks'
 import CardBackground from '../card-background.svg'
 import CardButton from '../card-button.svg'
 
@@ -33,11 +34,11 @@ export default {
   },
   emits: ['moon-menu'],
   computed: {
-    ...mapState(useChainStore, ['chainId', 'planetTokenAddress']),
+    ...mapState(useChainStore, ['chainId', 'planetTokenAddress', 'shipTokenAddress']),
     ...mapState(useStarMapStore, ['systemObjects']),
     ...mapState(useGameStateStore, ['avatar']),
     menuData: function () {
-      return cardMenu(this.systemObjects[this.objectId])
+      return cardMenu(this.systemObjects[this.objectId], { marketName: networkFor(this.chainId)?.nftMarket?.name })
     }
   },
   methods: {
@@ -73,32 +74,13 @@ export default {
         case 'jump':
           this.jumpMenuOn()
           break
-        case 'opensea':
-          if (this.chainId == 4) {
-            window.open(
-              'https://testnets.opensea.io/assets/' +
-                this.planetTokenAddress +
-                '/' +
-                this.systemObjects[this.objectId].id
-            )
-          } else if (this.chainId == 80001) {
-            window.open(
-              'https://testnets.opensea.io/assets/mumbai/' +
-                this.planetTokenAddress +
-                '/' +
-                this.systemObjects[this.objectId].id
-            )
-          } else if (this.chainId == 97) {
-            window.open(
-              'https://testnets.opensea.io/assets/bsctestnet/' +
-                this.planetTokenAddress +
-                '/' +
-                this.systemObjects[this.objectId].id
-            )
-          } else {
-            alert('openSea not supported for this network')
-          }
+        case 'market': {
+          const object = this.systemObjects[this.objectId]
+          const contract = object.type === 'ship' ? this.shipTokenAddress : this.planetTokenAddress
+          const url = marketTokenUrl(this.chainId, contract, object.id)
+          if (url) window.open(url, '_blank', 'noopener')
           break
+        }
         case 'claim':
           if (confirm('Claim planet #' + option.value + ' as your own?')) {
             let name = prompt('What will you name your planet:', '')
