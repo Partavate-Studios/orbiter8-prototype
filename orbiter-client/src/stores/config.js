@@ -4,42 +4,22 @@ import Cookies from 'js-cookie'
 
 export const useConfigStore = defineStore('Config', {
   state: () => ({
-    // Minimum ms between game ticks per graphics tier (0 = every animation frame).
-    tickDelayHigh: 0,
-    tickDelayNormal: 0,
-    tickDelayLow: TIMING.LOW_TIER_TICK_MS,
-    tickDelay: 0,
     blockCheckDelay: TIMING.BLOCK_POLL_MS,
+    // 1 = low, 2 = normal, 3 = high. Saved in a cookie.
     graphicsQuality: Number(Cookies.get('graphicsQuality')) || 2
   }),
+  getters: {
+    /** Minimum ms between game ticks: the low tier ticks at ~30 fps, the others every animation frame. */
+    tickDelay: state => state.graphicsQuality === 1 ? TIMING.LOW_TIER_TICK_MS : 0
+  },
   actions: {
-    setTickDelay (delay) {
-      this.tickDelay = delay
-    },
+    /** Steps down through the tiers (3 → 2 → 1 → 3); bound to the ~ key. */
     toggleGraphicsQuality () {
-      this.graphicsQuality = ((this.graphicsQuality + 1 ) % 3) + 1
-      if (this.graphicsQuality < 2) {
-        this.tickDelay = this.tickDelayLow
-      } else if (this.graphicsQuality > 2) {
-        this.tickDelay = this.tickDelayHigh
-      } else {
-        this.tickDelay = this.tickDelayNormal
-      }
+      this.setGraphicsQuality(((this.graphicsQuality + 1) % 3) + 1)
     },
     setGraphicsQuality (value) {
       this.graphicsQuality = Math.min(3, Math.max(1, value))
       Cookies.set('graphicsQuality', this.graphicsQuality, { expires: 30 })
-
-      //adjust render speed:
-      if (this.graphicsQuality == 1) {
-        this.tickDelay = this.tickDelayLow
-      } else if (this.graphicsQuality == 2) {
-        this.tickDelay = this.tickDelayNormal
-      } else if (this.graphicsQuality == 3) {
-        this.tickDelay = this.tickDelayHigh
-      } else { // should never
-        this.tickDelay = this.tickDelayLow
-      }
     }
   }
 })
