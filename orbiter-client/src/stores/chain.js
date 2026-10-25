@@ -64,6 +64,7 @@ export const useChainStore = defineStore('Chain', {
       if (wallet) return this.chooseWallet(wallet)
       this.walletStatus = 'choose'
     },
+    /** Connects to the given EIP-6963 wallet; walletStatus tracks how it goes. */
     async chooseWallet (wallet) {
       this.walletError = null
       this.walletName = wallet.info.name
@@ -84,6 +85,7 @@ export const useChainStore = defineStore('Chain', {
         this.walletStatus = 'error'
       }
     },
+    /** Binds the game contracts on the connected network and looks up the token contracts. */
     async initContracts () {
       if (!(await bindContracts())) return
       const addresses = contractAddresses()

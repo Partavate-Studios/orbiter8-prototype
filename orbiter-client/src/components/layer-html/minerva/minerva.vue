@@ -41,7 +41,6 @@
     </small>
   </div>
   <div v-else class="icon">
-      <!-- <span class="owlcon" v-on:click="toggleMinerva">&#129417;</span> -->
   </div>
 </template>
 

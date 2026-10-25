@@ -218,15 +218,18 @@ export const useStarMapStore = defineStore('StarMap', {
       this[key] = value
     },
 
+    /** Advances gameTime to now, once per tick. Orbits are computed from it. */
     incrementGameTime () {
       const newTime = Date.now()
       this.timeDelta = newTime - this.gameTime
       this.gameTime = newTime
-      //touch sprites?
     },
 
+    /**
+     * Builds the system's sprites from freshly loaded chain data. Each sprite's key comes from what it
+     * is ('planet:3'), so a sprite keeps its key, and its selection, when others appear or disappear.
+     */
     importStarMapBlockData ({blockData, playerAccount}) {
-
       // Keyed by stable sprite key; insertion order is drawing order.
       const objects = {}
       const ids = {

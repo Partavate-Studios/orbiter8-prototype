@@ -36,9 +36,6 @@ export default {
   methods: {
     buttonAction (option) {
       this.o8audio.playEffect('click')
-      if ((this.systemObjects[this.objectId].type !== 'ship')) {
-      //  this.changeMyShipOrbit(this.objectId)
-      }
       switch (option.command) {
         case 'build':
           switch (this.systemObjects[this.objectId].type) {

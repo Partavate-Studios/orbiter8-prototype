@@ -100,6 +100,7 @@ export const useGameStateStore = defineStore('GameState', {
         console.error('Loading game state failed:', error)
       }
     },
+    /** Recent avatar sign-ups, ship launches, trades and chat, for the HUD counters and the chat menu. */
     async loadEvents () {
       let events = {
         avatarEvents: null,
@@ -121,7 +122,6 @@ export const useGameStateStore = defineStore('GameState', {
       this.setProp({key: 'creatingAvatar', value: true})
       try {
         await avatars.createAvatar(name)
-  //      await dispatch('loadGameState')
       } catch (error) {
         console.error('Avatar creation failed:', error.shortMessage ?? error.message)
       }
@@ -131,12 +131,12 @@ export const useGameStateStore = defineStore('GameState', {
       this.setProp({key: 'launchingShip', value: true})
       try {
         await galaxy.launchShip(name)
-  //      await dispatch('loadGameState')
       } catch (error) {
         console.error('Ship launch failed:', error.shortMessage ?? error.message)
       }
       this.setProp({key: 'launchingShip', value: false})
     },
+    /** Jumps the player's ship to a neighboring system, playing the jump animation until the new system loads. */
     async moveToSystem (system) {
       try {
         useUIStore().jumpAnimationOn()
@@ -158,7 +158,6 @@ export const useGameStateStore = defineStore('GameState', {
     async claimPlanet ({planetId, name}) {
       try {
         await galaxy.claimPlanet(String(planetId), String(name))
-        //const shipId = await galaxy.getMyShipId()
       } catch (error) {
         console.error('Claiming the planet failed:', error.shortMessage ?? error.message)
       }
@@ -166,7 +165,6 @@ export const useGameStateStore = defineStore('GameState', {
     async buildStation ({planetId, name}) {
       try {
         await galaxy.buildStation(String(planetId), String(name))
-        //const shipId = await galaxy.getMyShipId()
       } catch (error) {
         console.error('Building the station failed:', error.shortMessage ?? error.message)
       }
@@ -186,6 +184,7 @@ export const useGameStateStore = defineStore('GameState', {
       }
 
     },
+    /** Renames a star, planet, moon, station or the player's ship. `parentId` is a moon's planet. */
     async renameAsset ({name, type, objectId, parentId}) {
       try {
         switch(type) {
