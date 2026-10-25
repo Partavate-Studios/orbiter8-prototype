@@ -7,11 +7,15 @@
         <slot />
       </g>
       <g :transform="getScaleTransform + ' ' + getRotationalTransform">
-        <planet v-if="type === 'planet'" :planet="sprite" />
-        <moon v-if="type === 'moon'" :moon="sprite" />
-        <station v-if="type === 'station'" :port="sprite" />
-        <g transform="rotate(180)"><ship v-if="type === 'ship'" :ship="sprite" :show-engines="true" /></g>
-        <star v-if="type === 'star'" :star="sprite" />
+        <!-- Only a few pixels across: a plain dot looks the same and costs far less to draw. -->
+        <circle v-if="isTiny" cx="0" cy="0" :r="dotRadius" fill="#e5cfff" />
+        <template v-else>
+          <planet v-if="type === 'planet'" :planet="sprite" />
+          <moon v-if="type === 'moon'" :moon="sprite" />
+          <station v-if="type === 'station'" :port="sprite" />
+          <g transform="rotate(180)"><ship v-if="type === 'ship'" :ship="sprite" :show-engines="true" /></g>
+          <star v-if="type === 'star'" :star="sprite" />
+        </template>
         <a
           @mouseover="hover = true"
           @mouseleave="hover = false"
@@ -52,6 +56,13 @@ import { useConfigStore } from '@/stores/config'
  import Moon from './moon.svg'
  import Planet from './planet.svg'
  import OrbitRing from './orbit-ring.svg.vue'
+
+// Rotations change in steps this size (degrees), and positions in whole device pixels, so a slowly
+// moving sprite only touches the DOM (and makes the browser repaint) when it visibly moves.
+const ROTATION_STEP = 0.25
+// Ships, moons and stations smaller than this many pixels across are drawn as a dot.
+const TINY_DIAMETER = 6
+const DETAILED_WHEN_TINY = ['planet', 'star']
 
 export default {
   name: 'sprite-transform',
@@ -113,7 +124,9 @@ export default {
       'selected',
       'showLabels',
       'isMenuOn',
-      'viewport'
+      'drawnPixelsPerUnit',
+      'livePixelsPerUnit',
+      'isOnScreen'
     ]),
     ...mapState(useConfigStore, [
       'showScope', // todo: this should be in UI
@@ -151,10 +164,31 @@ export default {
       return { ringX: this.frame.parentX, ringY: this.frame.parentY, x: this.frame.x, y: this.frame.y }
     },
     getOrbitalTransform () {
-      return 'translate(' + this.placement.x + ',' + this.placement.y + ')'
+      // Snap to the device-pixel grid of the drawn world.
+      const step = 1 / (this.drawnPixelsPerUnit * (window.devicePixelRatio || 1))
+      const x = Math.round(this.placement.x / step) * step
+      const y = Math.round(this.placement.y / step) * step
+      return 'translate(' + x + ',' + y + ')'
     },
     getRotationalTransform () {
-      return 'rotate(' + this.frame.rotation + ')'
+      return 'rotate(' + Math.round(this.frame.rotation / ROTATION_STEP) * ROTATION_STEP + ')'
+    },
+    /** The sprite's group scale (world units per sprite unit). */
+    spriteScale () {
+      return this.sprite.size * 0.02 + 0.1
+    },
+    /** Roughly how far the sprite reaches from its center, in world units. */
+    visualRadius () {
+      return this.sprite.selectorSize * this.spriteScale
+    },
+    isTiny () {
+      if (DETAILED_WHEN_TINY.includes(this.type)) return false
+      return 2 * this.visualRadius * this.livePixelsPerUnit < TINY_DIAMETER
+    },
+    /** Half the sprite's size, but never under one pixel (in sprite units). */
+    dotRadius () {
+      const onePixel = 1 / (this.livePixelsPerUnit * this.spriteScale)
+      return Math.max(this.sprite.selectorSize / 2, onePixel)
     },
     // todo: this should probably come from sprite.js
     getScaleTransform () {
@@ -173,24 +207,12 @@ export default {
       }
       return 'none'
     },
-    /** Distance from the view, in screen-ish units: sprites far off screen are not drawn. */
-    range () {
-      if (this.amISelected) {
-        return 0
-      }
-      // The larger of the x or y offset from the camera (kept exactly as before, signed).
-      const x = this.frame.x + this.viewport.x
-      const y = this.frame.y + this.viewport.y
-      return (x > y ? x : y) / this.viewport.scale
-    },
     shouldDisplay () {
       if (this.isMenuOn && (this.graphicsQuality < 2)){
         return false
       }
-      if (this.range > 1500) {
-        return false
-      }
-      return true
+      // Off screen: don't draw it, so it costs nothing per frame. (The label hangs below the sprite.)
+      return this.amISelected || this.isOnScreen(this.frame.x, this.frame.y, this.visualRadius + 10)
     }
   },
   methods: {

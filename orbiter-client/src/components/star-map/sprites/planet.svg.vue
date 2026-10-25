@@ -159,7 +159,8 @@ export default {
     surfaceRotation () {
       // Sprites are raw objects updated in place each frame; reading gameTime makes this re-evaluate per frame.
       void this.gameTime
-      return 0 - this.planet.telemetry.rotation
+      // Same 0.25° steps as the sprite's own rotation (sprite-transform), so they cancel exactly.
+      return 0 - Math.round(this.planet.telemetry.rotation / 0.25) * 0.25
     }
   }
 }

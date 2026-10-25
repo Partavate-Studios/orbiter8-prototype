@@ -111,17 +111,20 @@ export default {
       prevMouseY: 0,
       mouseXThreshold: 0,
       mouseYThreshold: 0,
-      //todo: do I need basescale???
-      baseScale: 1.25,
-      // The camera the world layer is currently drawn for.
-      drawnView: { x: 0, y: 0, scale: 1 },
       worldMargin: WORLD_MARGIN,
       worldOffsetY: WORLD_OFFSET_Y
     }
   },
   mounted () {
     this.drawWorld()
-    this.worldLayer = new CompositedLayer(this.$refs.world, { margin: WORLD_MARGIN })
+    this.worldLayer = new CompositedLayer(this.$refs.world, {
+      margin: WORLD_MARGIN,
+      // Shrinking the drawn world (zooming out) is fine until its edges would come on screen.
+      minScale: () => Math.max(
+        (this.container.width / 2) / (this.container.width / 2 + WORLD_MARGIN),
+        (this.container.height / 2) / (this.container.height / 2 + WORLD_MARGIN)
+      )
+    })
     this.stopFrames = onFrame(this.followCamera, FRAME_ORDER.render)
     this.$nextTick(function() {
       this.resizeHandler() //set initial ratio
@@ -139,6 +142,9 @@ export default {
     ...mapState(useUIStore, [
       'viewport',
       'container',
+      'baseScale',
+      'drawnView',
+      'groupPixels',
       'menuState',
       'isMenuOn',
       'jumpAnimationState'
@@ -159,7 +165,7 @@ export default {
      */
     /** Pixels per world-group unit (before the camera's zoom). */
     worldUnit () {
-      return this.baseScale * this.container.height / this.viewport.resolution
+      return this.groupPixels
     },
     worldTransform () {
       return 'scale(' + (1 / this.drawnView.scale) + ') translate(' + this.drawnView.x + ' ' + this.drawnView.y + ')'
@@ -211,6 +217,7 @@ export default {
       'scaleAnimateTo',
       'jumpMenuOff',
       'calculateViewableArea',
+      'drawWorldAt',
       'closeMenu'
     ]),
     resizeHandler () {
@@ -219,7 +226,7 @@ export default {
     },
     /** Redraw the world for the live camera (sharp at the current zoom). */
     drawWorld () {
-      this.drawnView = { x: this.viewport.x, y: this.viewport.y, scale: this.viewport.scale }
+      this.drawWorldAt(this.viewport)
     },
     /** Each frame: show the drawn world at the live camera's position and zoom, redrawing when needed. */
     followCamera () {

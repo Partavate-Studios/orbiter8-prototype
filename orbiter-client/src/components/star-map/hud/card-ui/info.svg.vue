@@ -70,7 +70,8 @@ export default {
     spriteRotation () {
       // Sprites are raw objects updated in place each frame; reading gameTime makes this re-evaluate per frame.
       void this.gameTime
-      return this.systemObjects[this.objectId].telemetry.rotation
+      // 0.25° steps: only touch the DOM when the rotation visibly changes.
+      return Math.round(this.systemObjects[this.objectId].telemetry.rotation / 0.25) * 0.25
     }
   }
 }

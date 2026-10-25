@@ -141,7 +141,9 @@ export default {
       if (x === 0 && y === 0) {
         return 0
       }
-      return (Math.atan2(y, x) * 180 / Math.PI + 270) % 360
+      const degrees = (Math.atan2(y, x) * 180 / Math.PI + 270) % 360
+      // 0.25° steps: the arrows only touch the DOM when they visibly turn.
+      return Math.round(degrees / 0.25) * 0.25
     },
     getDegreesFromSprite (sprite) {
       // Sprites are raw objects updated in place each frame; reading gameTime makes this re-evaluate per frame.
@@ -161,7 +163,8 @@ export default {
       }
       let opacity = (length - 250) / 1000
       opacity = Math.max(Math.min(opacity + 0.1, 1), 0)
-      return opacity
+      // Steps of 0.02: only touch the DOM when the fade visibly changes.
+      return Math.round(opacity * 50) / 50
     },
     getMenuScaleFromSprite (sprite) {
       let x = (sprite.telemetry.translatex + this.viewport.x + this.viewport.rubberx)

@@ -179,7 +179,8 @@ export default {
     planetRotation () {
       // Sprites are raw objects updated in place each frame; reading gameTime makes this re-evaluate per frame.
       void this.gameTime
-      return this.planet.telemetry.rotation
+      // 0.25° steps: only touch the DOM when the rotation visibly changes.
+      return Math.round(this.planet.telemetry.rotation / 0.25) * 0.25
     },
     ownerName() {
       let address = this.planet.owner;

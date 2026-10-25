@@ -3,6 +3,10 @@ import Rubber from '@/libs/rubber'
 
 export const useUIStore = defineStore('UI', {
   state: () => ({
+    // The map's HUD and world sit in a group scaled by this much (inside 1200 units per screen height).
+    baseScale: 1.25,
+    // The camera the world layer is currently drawn for (it lags the live viewport between redraws).
+    drawnView: { x: 0, y: 0, scale: 1 },
     /* Approved */
     viewport: {
       resolution: 1200,
@@ -55,6 +59,32 @@ export const useUIStore = defineStore('UI', {
     showLabels: false
   }),
   getters: {
+    /** Screen pixels per map-group unit, before the camera's zoom. */
+    groupPixels: state => state.baseScale * state.container.height / state.viewport.resolution,
+    /** Screen pixels per world unit as the world layer is drawn (changes only on a redraw). */
+    drawnPixelsPerUnit () {
+      return this.groupPixels / this.drawnView.scale
+    },
+    /** Screen pixels per world unit for the live camera. */
+    livePixelsPerUnit () {
+      return this.groupPixels / this.viewport.scale
+    },
+    /**
+     * Whether a circle at world (x, y) with the given world radius is on screen (with a margin),
+     * for the live camera. The world sits 100 group units above the screen center.
+     */
+    isOnScreen () {
+      const pixels = this.livePixelsPerUnit
+      const halfWidth = this.container.width / 2 + 100
+      const halfHeight = this.container.height / 2 + 100
+      const offsetY = -100 * this.groupPixels
+      return (x, y, radius = 0) => {
+        const dx = Math.abs((x + this.viewport.x) * pixels)
+        const dy = Math.abs((y + this.viewport.y) * pixels + offsetY)
+        const r = radius * pixels
+        return dx - r < halfWidth && dy - r < halfHeight
+      }
+    },
     minervaHistory: state => state.minerva.terminal.history,
     spriteToDisplay: state => state.hud.spriteToDisplay,
     jumpAnimationState: state => state.hud.jumpAnimationState,
@@ -123,6 +153,9 @@ export const useUIStore = defineStore('UI', {
     toggleShowLabels () {
       console.log('toggling labels')
       this.showLabels = !this.showLabels
+    },
+    drawWorldAt (view) {
+      this.drawnView = { x: view.x, y: view.y, scale: view.scale }
     },
     selectSprite (spriteId) {
       console.log('selecting sprite ', spriteId)
