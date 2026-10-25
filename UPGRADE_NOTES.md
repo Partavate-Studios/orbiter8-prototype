@@ -311,6 +311,28 @@ Paint flashing at idle confirms the split:
 - At star zoom, only a few small boxes for distant moving bodies repaint.
 - Zooming at DPR 2 stays sharp, because the world re-renders as soon as the CSS scale drifts.
 
+## After Phase 5: Koda's testing round (Firefox, Chrome, all three tiers)
+
+- **Preflight freeze on an unsupported network** (`85b59de`). The screen now tracks the wallet's state, says what it is waiting for, and names the wrong network.
+- **Only touch the DOM when something visibly changes** (`0a2792e`, `ede0941`):
+  - Positions snap to device pixels, and rotations to 0.25° steps.
+  - Off-screen sprites aren't drawn.
+  - Ships, moons and stations under ~6 px draw as dots.
+  - Orbit rings fade out below ~24 px radius. That was Koda's choice over constant thickness.
+  - Zoom gestures stretch the drawn world 0.5–2× before redrawing it.
+  - Chrome pan/zoom raster went from 11.5 to 7.7 s. All three tiers hold ~57–59 fps in Chrome.
+  - Headless Firefox at 2000×1100 @1.6: 60 fps idle on every tier, and ~46 while wheeling out hard (it was ~41).
+- **Reload only when a block touches the game** (`743262b`). New blocks are checked for transactions to the game, avatar or token contracts. On Sepolia that skips nearly every 12 s block.
+  - Contract events would be the cleaner signal, but they cover only chat, trades, ship launches and avatars. Events for every action are planned for the next contracts iteration.
+- **Stable sprite keys** (`e89f225`). Sprites are keyed `star`, `planet:3`, `station:3`, `moon:3:1`, `ship:42` instead of by array position. That fixes the "station built while you're in the sector shifts everything" glitch, and the selection survives reloads.
+- **Tests:** Vitest is set up (`npm test`), covering the star map import and the chain conversions.
+
+### For Koda to check by hand
+
+- **Firefox on your machine** (GPU, devtools closed). If zooming out still dips noticeably, please record a profile at profiler.firefox.com while zooming and share it.
+- **The tiny-object dots and ring fade-out** at a few zoom levels, to judge the look.
+- **Building a station while another player watches the sector.** It was verified by tests and a claim on the local chain, but not with real credits.
+
 ## Bugs
 
 ### Fixed
