@@ -53,17 +53,37 @@ export function createGameClient() {
     notify('loading')
   }
 
+  // Some changes leave no trace the block check can see (a smart-account player jumping or renaming
+  // emits no event and sends nothing to the game directly), so reload at least this often anyway.
+  const MAX_TIME_BETWEEN_RELOADS_MS = 2 * 60 * 1000
+  let lastReload = 0
+
   const watcher = createBlockWatcher({
     watchedAddresses: () => (state.contracts ? Object.values(state.contracts) : []),
     onBlock: (blockNumber, gameChanged) => {
       state.blockNumber = blockNumber
       notify('block')
-      if (gameChanged) {
-        console.debug('Game changed by block ' + blockNumber + '; reloading')
+      if (gameChanged || Date.now() - lastReload > MAX_TIME_BETWEEN_RELOADS_MS) {
+        console.debug('Reloading the game at block ' + blockNumber + (gameChanged ? ' (it changed)' : ' (periodic)'))
         client.refresh()
       }
     }
   })
+
+  /**
+   * The player's actions, each followed by a reload once its transaction is mined, so the player sees
+   * the result right away (whatever kind of wallet sent it). Rejections pass through unchanged.
+   */
+  const actionsThenReload = Object.fromEntries(
+    Object.entries(actions).map(([name, action]) => [
+      name,
+      async (...args) => {
+        const receipt = await action(...args)
+        client.refresh()
+        return receipt
+      }
+    ])
+  )
 
   /** Runs a refresh; a failure is reported to subscribers instead of thrown. */
   const attempt = async (what, refresh) => {
@@ -76,7 +96,7 @@ export function createGameClient() {
 
   const client = {
     state,
-    actions,
+    actions: actionsThenReload,
 
     /** Calls `listener(change, state)` after every change. Returns a function that unsubscribes. */
     subscribe(listener) {
@@ -128,6 +148,7 @@ export function createGameClient() {
 
     /** Reloads the player, recent events and the current system. */
     refresh() {
+      lastReload = Date.now()
       return Promise.all([client.refreshPlayer(), client.refreshEvents(), client.refreshSystem()])
     },
 

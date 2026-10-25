@@ -3,10 +3,19 @@
 import { describe, expect, it, vi } from 'vitest'
 
 const blocks = vi.hoisted(() => ({}))
+// Logs by block number: [{ address }]
+const logs = vi.hoisted(() => ({}))
 vi.mock('./wallet', () => ({
   getSession: () => ({
     provider: {
-      getBlock: async (number) => (number in blocks ? { prefetchedTransactions: blocks[number] } : null)
+      getBlock: async (number) => (number in blocks ? { prefetchedTransactions: blocks[number] } : null),
+      getLogs: async ({ address, fromBlock, toBlock }) => {
+        const watched = address.map((a) => a.toLowerCase())
+        return Object.entries(logs)
+          .filter(([number]) => number >= fromBlock && number <= toBlock)
+          .flatMap(([, entries]) => entries)
+          .filter((log) => watched.includes(log.address.toLowerCase()))
+      }
     }
   })
 }))
@@ -29,6 +38,14 @@ describe('gameChangedBetween', () => {
   it("doesn't look at the block it already accounted for", async () => {
     Object.assign(blocks, { 10: [tx(GAME)], 11: [] })
     expect(await gameChangedBetween(10, 11, [GAME])).toBe(false)
+  })
+
+  it('is true when a watched contract emitted an event, even with no transaction sent to it (smart accounts)', async () => {
+    // An EIP-7702 or Safe account sends its transaction to a wallet contract, which then calls the game.
+    Object.assign(blocks, { 21: [tx('0x0000000000000000000000000000000000000Bb')] })
+    Object.assign(logs, { 21: [{ address: GAME }] })
+    expect(await gameChangedBetween(20, 21, [GAME])).toBe(true)
+    expect(await gameChangedBetween(20, 21, ['0x00000000000000000000000000000000000000Cc'])).toBe(false)
   })
 
   it('assumes a change when a block is missing or too many blocks went by', async () => {

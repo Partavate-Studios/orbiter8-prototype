@@ -77,17 +77,26 @@ export async function getBlockNumber() {
 const MAX_BLOCKS_TO_SCAN = 30
 
 /**
- * Whether any block after `fromBlock` up to `toBlock` has a transaction sent to one of the given
- * contracts. Every game action is such a transaction, but the contracts only emit events for a few
- * of them, so this is how we tell "something in the game changed" without re-reading everything.
+ * Whether anything in the game changed in the blocks after `fromBlock` up to `toBlock`, without
+ * re-reading everything. Two signs:
+ * - any event from the game, avatar or token contracts (chat, trades, launches, and every claim,
+ *   purchase or reward, since those move tokens or credits). This also catches actions sent from
+ *   smart accounts (EIP-7702, Safe…), whose transactions go to a wallet contract that then calls
+ *   the game, so the game never appears as a transaction's recipient;
+ * - a transaction sent straight to one of those contracts, for the actions that emit no event
+ *   (jumps, renames) from ordinary accounts.
+ * Silent actions from smart accounts are still missed; the game client's periodic reload catches those.
  * @param {number} fromBlock  last block already accounted for
  * @param {number} toBlock
  * @param {string[]} addresses  contracts that matter (game, avatars, tokens)
  */
 export async function gameChangedBetween(fromBlock, toBlock, addresses) {
   if (toBlock - fromBlock > MAX_BLOCKS_TO_SCAN) return true
-  const watched = new Set(addresses.filter(Boolean).map((address) => address.toLowerCase()))
+  const contracts = addresses.filter(Boolean)
+  const watched = new Set(contracts.map((address) => address.toLowerCase()))
   const { provider } = getSession()
+  const logs = await provider.getLogs({ address: contracts, fromBlock: fromBlock + 1, toBlock })
+  if (logs.length > 0) return true
   for (let number = fromBlock + 1; number <= toBlock; number++) {
     const block = await provider.getBlock(number, true)
     if (!block) return true

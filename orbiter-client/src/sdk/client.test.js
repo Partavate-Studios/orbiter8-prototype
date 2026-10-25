@@ -30,6 +30,10 @@ vi.mock('@/sdk/load', () => ({
   }
 }))
 
+vi.mock('@/sdk/actions', () => ({
+  sendChat: async (message) => ({ status: 1, message })
+}))
+
 const { createGameClient } = await import('./client')
 
 let game, changes
@@ -110,5 +114,16 @@ describe('contracts', () => {
     expect(await game.bindContracts()).toBe(true)
     expect(Object.values(game.state.contracts)).toEqual(['0xgame', '0xavatars', '0xplanets', '0xships', '0xcredits'])
     expect(changes).toContain('contracts')
+  })
+})
+
+describe("the player's own actions", () => {
+  it('reload the game once mined, whatever kind of wallet sent them', async () => {
+    // Smart-account transactions don't go to the game directly, so the block check can't be relied on.
+    const receipt = await game.actions.sendChat('hello')
+    expect(receipt.message).toBe('hello')
+    await vi.waitFor(() => expect(loads.system).toBe(1))
+    expect(loads.player).toBe(1)
+    expect(loads.events).toBe(1)
   })
 })

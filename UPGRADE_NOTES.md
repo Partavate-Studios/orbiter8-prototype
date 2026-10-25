@@ -609,6 +609,12 @@ Phase 6:
 - **A darker rectangle appeared during zoom-outs (Phase 5), found by Koda.** The star's glow, the grid, the heliopause and the planets' orbit rings were drawn in the world layer, which is briefly shrunk by CSS while zooming out, so its edge showed. They're now drawn on a canvas (`guides-canvas.vue`) for the live camera.
   - They look the same at every zoom level (under 0.2% of pixels differ, all from moving bodies).
   - Pan/zoom raster time dropped from 7.5 s to 0.4 s, because the SVG grid had thousands of lines. (`98e3014`)
+- **Smart-account players' actions weren't noticed, found by Koda on Sepolia** (his chat didn't appear until a reload).
+  - Koda's account is an EIP-7702 smart account (MetaMask). Its transactions go to a wallet contract that then calls the game, so the game is never a transaction's recipient, and the Phase 5 block check only looked at recipients.
+  - **Fix, part 1:** the player's own actions now reload the game as soon as they're mined, whatever wallet sent them.
+  - **Fix, part 2:** the block check also counts any event from the game, avatar or token contracts, in one `getLogs` request. That covers smart accounts for chat, trades, launches, claims and anything that moves credits or tokens.
+  - **Fix, part 3:** a full reload at least every 2 minutes catches the rest (a smart-account player's jump or rename emits no event).
+  - Events for every action, on the contract wish list, would make part 3 unnecessary. Checked against the real Sepolia block holding Koda's chat.
 - **The lint findings** listed below for "the phase that rewrites that code" are fixed. (`215d2c1`)
 
 ### Found, to fix in the phase that rewrites that code (all fixed in Phase 6)
