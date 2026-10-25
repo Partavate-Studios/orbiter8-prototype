@@ -484,6 +484,10 @@ Phase 6:
   - Minerva's Profile tab logged a Vue warning every frame.
 
   My unused-mapping check missed templates that read `this.x`. A scan of every template finds no others, and the smoke test now opens the moons menu. (`206a308`)
+- **Regression from the Phase 5 stable keys: the planets menu lost each planet's port** (its name and what it buys and sells, e.g. `[SBB] Icarus`), found by Koda. The menu checked `portForPlanet(planet) > 0`, which is false for a key like `'station:3'`. Arriving in a system checked `myShipId != 0` the same way. The smoke test now checks for the port line. (`3f2edfc`)
+- **A darker rectangle appeared during zoom-outs (Phase 5), found by Koda.** The star's glow, the grid, the heliopause and the planets' orbit rings were drawn in the world layer, which is briefly shrunk by CSS while zooming out, so its edge showed. They're now drawn on a canvas (`guides-canvas.vue`) for the live camera.
+  - They look the same at every zoom level (under 0.2% of pixels differ, all from moving bodies).
+  - Pan/zoom raster time dropped from 7.5 s to 0.4 s, because the SVG grid had thousands of lines. (`98e3014`)
 - **The lint findings** listed below for "the phase that rewrites that code" are fixed. (`215d2c1`)
 
 ### Found, to fix in the phase that rewrites that code (all fixed in Phase 6)
@@ -581,6 +585,21 @@ Checked against the contracts and the local chain:
 - **Not possible without scanning everything:** "most systems discovered". It needs `getSystemData` to be public, or events.
 
 **Open questions for Koda:** which columns (planets, credits, ports, ships), and where it lives (a HUD button, the title screen, or both).
+
+### 4. "View on OpenSea" (needs Koda's call)
+
+OpenSea shut down every testnet with its OS2 launch ([support article, 2025-07-23](https://support.opensea.io/en/articles/11833955-farewell-testnets)). Every `testnets.opensea.io` link now redirects there, so the button can't work on Sepolia.
+
+The current handler only knows Rinkeby, Mumbai and BSC testnet. Rinkeby and Mumbai are dead, and OpenSea's BSC testnet went with the rest, so the button works on none of our networks.
+
+**Replacement options:**
+- **A block explorer's NFT page.**
+  - Blockscout works and was checked with a real Sepolia planet: `https://eth-sepolia.blockscout.com/token/<planet token>/instance/<id>` shows the token and its owner.
+  - Etherscan's `https://sepolia.etherscan.io/nft/<planet token>/<id>` is the more familiar choice. It couldn't be checked here, because its bot protection blocks scripts.
+  - Each network in `networks.js` would get its explorer's NFT URL pattern, and the button would read "View on Etherscan", "View on Blockscout" and so on.
+- **Hide the button** where there's no NFT page.
+
+**Also:** the tokens' metadata URL (`https://orbiter8.com/tokens/planet/<id>`) doesn't respond, so any NFT page shows no name or image. Restoring that endpoint, even as static JSON, would fix that everywhere.
 
 ## Contract wish list (next contracts iteration)
 
