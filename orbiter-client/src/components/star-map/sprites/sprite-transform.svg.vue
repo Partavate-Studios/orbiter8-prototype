@@ -1,7 +1,7 @@
 <template>
   <g>
-    <circle v-if="amISelected" :cx="frame.parentX" :cy="frame.parentY" :r="sprite.distance" stroke="#c3b3da" stroke-dasharray="0.5 1" stroke-width="0.05" fill="none" />
-    <circle v-else-if="showOrbit" :cx="frame.parentX" :cy="frame.parentY" :r="sprite.distance" stroke="#c3b3da" stroke-dasharray="0.5 1" stroke-width="0.01" fill="none" />
+    <orbit-ring v-if="frameOf !== 'self' && (amISelected || showOrbit)"
+      :cx="placement.ringX" :cy="placement.ringY" :r="sprite.distance" :selected="amISelected" />
     <g :transform="getOrbitalTransform" v-if="shouldDisplay">
       <g>
         <slot />
@@ -51,6 +51,7 @@ import { useConfigStore } from '@/stores/config'
  import Station from './station.svg'
  import Moon from './moon.svg'
  import Planet from './planet.svg'
+ import OrbitRing from './orbit-ring.svg.vue'
 
 export default {
   name: 'sprite-transform',
@@ -59,7 +60,8 @@ export default {
     Station,
     Moon,
     Planet,
-    Star
+    Star,
+    OrbitRing
   },
   data () {
     return {
@@ -90,6 +92,16 @@ export default {
       default () {
         return ''
       }
+    },
+    /**
+     * Which coordinate system this sprite is drawn in:
+     * 'world'  - the star system (orbit ring around the parent's position),
+     * 'parent' - a layer centered on the parent planet (orbit ring around the layer's origin),
+     * 'self'   - a layer centered on this sprite (no orbit ring; the world draws it).
+     */
+    frameOf: {
+      type: String,
+      default: 'world'
     }
   },
   computed: {
@@ -128,8 +140,18 @@ export default {
       }
       return false
     },
+    /** Where the orbit ring's center and the sprite go, in this sprite's coordinate system. */
+    placement () {
+      if (this.frameOf === 'self') {
+        return { ringX: 0, ringY: 0, x: 0, y: 0 }
+      }
+      if (this.frameOf === 'parent') {
+        return { ringX: 0, ringY: 0, x: this.frame.x - this.frame.parentX, y: this.frame.y - this.frame.parentY }
+      }
+      return { ringX: this.frame.parentX, ringY: this.frame.parentY, x: this.frame.x, y: this.frame.y }
+    },
     getOrbitalTransform () {
-      return 'translate(' + this.frame.x + ',' + this.frame.y + ')'
+      return 'translate(' + this.placement.x + ',' + this.placement.y + ')'
     },
     getRotationalTransform () {
       return 'rotate(' + this.frame.rotation + ')'

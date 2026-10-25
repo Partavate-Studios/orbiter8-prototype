@@ -4,29 +4,39 @@
   <div class="layer star-map" ref="gamelayerContainer">
     <background-canvas />
 
-    <svg
-      class="map-layer"
-      :viewBox="layerViewBox"
-      :class="{ 'is-dragging': mouseHold }"
-      id="gamelayer"
-      ref="gamelayer"
-      xmlns="http://www.w3.org/2000/svg">
-      <g font-family="Ubuntu, sans-serif" :transform="'scale(' + baseScale + ')'">
-        <g v-if="mapDataLoaded && !jumpAnimationState" transform="translate(0 -100)">
-          <g :transform="getTransform()">
-            <grid></grid>
-          </g>
-          <rect x="-2000" y="-1000" width="4000" height="2000" fill="#ffffff00"
-          @mousedown="handleMouseDown"
-          @mouseup="handleMouseUp"
-          @mousemove="handleMouseMove"
-          @mouseleave="handleMouseLeave"/>
-          <g :transform="getTransform()">
-            <solar-system />
+    <!-- The world is drawn for the camera in drawnView and slightly larger than the screen;
+         between redraws a CSS transform (composited, no repaint) follows the live camera. -->
+    <div class="world-layer" :style="worldBox" ref="world">
+      <svg
+        class="map-layer"
+        :viewBox="worldViewBox"
+        :class="{ 'is-dragging': mouseHold }"
+        id="gamelayer"
+        ref="gamelayer"
+        xmlns="http://www.w3.org/2000/svg">
+        <g font-family="Ubuntu, sans-serif" :transform="'scale(' + baseScale + ')'">
+          <g v-if="mapDataLoaded && !jumpAnimationState" transform="translate(0 -100)">
+            <g :transform="worldTransform">
+              <grid :scale="drawnView.scale"></grid>
+            </g>
+            <rect x="-2000" y="-1000" width="4000" height="2000" fill="#ffffff00"
+            @mousedown="handleMouseDown"
+            @mouseup="handleMouseUp"
+            @mousemove="handleMouseMove"
+            @mouseleave="handleMouseLeave"/>
+            <g :transform="worldTransform">
+              <solar-system />
+            </g>
           </g>
         </g>
-      </g>
-    </svg>
+      </svg>
+      <planet-layers
+        v-if="mapDataLoaded && !jumpAnimationState"
+        :drawn-view="drawnView"
+        :unit="worldUnit"
+        :origin-x="container.width / 2 + worldMargin"
+        :origin-y="container.height / 2 + worldMargin + worldUnit * worldOffsetY" />
+    </div>
 
     <svg
       class="map-layer hud-layer"
@@ -67,8 +77,16 @@ import JumpMenu from './hud/jump-menu.svg'
 import JumpAnimation from './hud/jump-animation.svg'
 import BackgroundCanvas from './background-canvas.vue'
 import SolarSystem from './_solarsystem.svg'
+import PlanetLayers from './planet-layers.vue'
 import ConnectionStatus from './hud/connection-status.svg'
 import LoadingBar from './hud/loading-bar.svg'
+import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
+import { CompositedLayer } from '@/libs/composited-layer'
+
+// Pixels of world drawn beyond each screen edge, so the camera can pan a little before a redraw.
+const WORLD_MARGIN = 256
+// The world sits 100 units above center inside the HUD's scaled group (see the template).
+const WORLD_OFFSET_Y = -100
 
 export default {
   components: {
@@ -78,6 +96,7 @@ export default {
     Grid,
     BackgroundCanvas,
     SolarSystem,
+    PlanetLayers,
     ConnectionStatus,
     LoadingBar
   },
@@ -93,11 +112,17 @@ export default {
       mouseXThreshold: 0,
       mouseYThreshold: 0,
       //todo: do I need basescale???
-      baseScale: 1.25
-      //todo: viewbox should be ratio aware
+      baseScale: 1.25,
+      // The camera the world layer is currently drawn for.
+      drawnView: { x: 0, y: 0, scale: 1 },
+      worldMargin: WORLD_MARGIN,
+      worldOffsetY: WORLD_OFFSET_Y
     }
   },
   mounted () {
+    this.drawWorld()
+    this.worldLayer = new CompositedLayer(this.$refs.world, { margin: WORLD_MARGIN })
+    this.stopFrames = onFrame(this.followCamera, FRAME_ORDER.render)
     this.$nextTick(function() {
       this.resizeHandler() //set initial ratio
       window.addEventListener('resize', this.resizeHandler)
@@ -105,6 +130,7 @@ export default {
   },
   beforeUnmount() {
     window.removeEventListener('resize', this.resizeHandler);
+    this.stopFrames()
   },
   computed: {
     ...mapState(useGameStateStore, [
@@ -131,6 +157,28 @@ export default {
      * Every layer maps 1200 units to the container's height, centered on the origin (this is
      * what the original single SVG did at any aspect ratio), so the layers line up exactly.
      */
+    /** Pixels per world-group unit (before the camera's zoom). */
+    worldUnit () {
+      return this.baseScale * this.container.height / this.viewport.resolution
+    },
+    worldTransform () {
+      return 'scale(' + (1 / this.drawnView.scale) + ') translate(' + this.drawnView.x + ' ' + this.drawnView.y + ')'
+    },
+    /** The world layer covers the screen plus WORLD_MARGIN on every side, at the same scale as the other layers. */
+    worldBox () {
+      return {
+        left: -WORLD_MARGIN + 'px',
+        top: -WORLD_MARGIN + 'px',
+        width: this.container.width + 2 * WORLD_MARGIN + 'px',
+        height: this.container.height + 2 * WORLD_MARGIN + 'px'
+      }
+    },
+    worldViewBox () {
+      const unitsPerPixel = this.viewport.resolution / this.container.height
+      const width = (this.container.width + 2 * WORLD_MARGIN) * unitsPerPixel
+      const height = (this.container.height + 2 * WORLD_MARGIN) * unitsPerPixel
+      return (-width / 2) + ' ' + (-height / 2) + ' ' + width + ' ' + height
+    },
     layerViewBox () {
       const width = this.viewport.resolution * this.container.width / this.container.height
       const height = this.viewport.resolution
@@ -167,14 +215,27 @@ export default {
     ]),
     resizeHandler () {
       this.calculateViewableArea({x: window.innerWidth, y: window.innerHeight})
-      console.log('new size: ' + window.innerWidth + ' x ' + window.innerHeight )
+      this.drawWorld()
     },
-    getTransform () {
-      return 'scale(' +
-        (1 / parseFloat(this.viewport.scale)) +
-        ') translate(' +
-        (this.viewport.x) + ' ' +
-        (this.viewport.y) + ')' //rubber should be in store
+    /** Redraw the world for the live camera (sharp at the current zoom). */
+    drawWorld () {
+      this.drawnView = { x: this.viewport.x, y: this.viewport.y, scale: this.viewport.scale }
+    },
+    /** Each frame: show the drawn world at the live camera's position and zoom, redrawing when needed. */
+    followCamera () {
+      if (!this.worldLayer) return
+      const drawn = this.drawnView
+      const live = this.viewport
+      // Where the group origin sits in the (oversized) world element.
+      const unit = this.worldUnit
+      const delta = {
+        scale: drawn.scale / live.scale,
+        x: unit * (live.x - drawn.x) / live.scale,
+        y: unit * (live.y - drawn.y) / live.scale,
+        originX: this.container.width / 2 + WORLD_MARGIN,
+        originY: this.container.height / 2 + WORLD_MARGIN + unit * WORLD_OFFSET_Y
+      }
+      if (this.worldLayer.update(delta)) this.drawWorld()
     },
     handleMouseDown () {
       this.selectNone()
@@ -266,6 +327,9 @@ export default {
     > g {
       pointer-events: auto;
     }
+  }
+  .world-layer {
+    position: absolute;
   }
   .is-dragging {
     cursor: grabbing;
