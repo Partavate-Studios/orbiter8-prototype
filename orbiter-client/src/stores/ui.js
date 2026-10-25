@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import Tween from '@/libs/tween'
-import { STAR_KEY } from '@/libs/sprite'
+import { STAR_KEY } from '@/sdk/system'
 import { CAMERA, MAP_GROUP_SCALE, MAP_RESOLUTION, WORLD_OFFSET_Y } from '@/constants'
 
 // Sprites this far past the screen edge still count as on screen (labels, glows).

@@ -23,19 +23,14 @@
           <orbit-ring
             v-for="childIndex in childrenOf(planetIndex)"
             :key="'ring-' + childIndex"
-            :r="systemObjects[childIndex].distance"
+            :r="systemObjects[childIndex].orbit.radius"
             :selected="childIndex === selected"
           />
-          <sprite-transform
-            :sprite="systemObjects[planetIndex]"
-            :objectIndex="planetIndex"
-            type="planet"
-            frame-of="self"
-          />
+          <sprite-transform :sprite="sprites[planetIndex]" :objectIndex="planetIndex" type="planet" frame-of="self" />
           <sprite-transform
             v-for="childIndex in childrenOf(planetIndex)"
             :key="'sprite-' + childIndex"
-            :sprite="systemObjects[childIndex]"
+            :sprite="sprites[childIndex]"
             :objectIndex="childIndex"
             :type="systemObjects[childIndex].type"
             frame-of="parent"
@@ -72,7 +67,7 @@ export default {
     originY: { type: Number, required: true }
   },
   computed: {
-    ...mapState(useStarMapStore, ['systemObjects', 'spriteIds', 'gameTime']),
+    ...mapState(useStarMapStore, ['systemObjects', 'sprites', 'spriteIds', 'gameTime']),
     ...mapState(useUIStore, ['selected']),
     /** Pixels per world unit at the drawn zoom. */
     pixelsPerUnit() {
@@ -80,9 +75,9 @@ export default {
     },
     childIndexes() {
       const children = {}
-      for (const [key, sprite] of Object.entries(this.systemObjects)) {
-        if (sprite.type !== 'planet' && this.systemObjects[sprite.orbiting]?.type === 'planet') {
-          ;(children[sprite.orbiting] ??= []).push(key)
+      for (const [key, object] of Object.entries(this.systemObjects)) {
+        if (object.type !== 'planet' && this.systemObjects[object.orbiting]?.type === 'planet') {
+          ;(children[object.orbiting] ??= []).push(key)
         }
       }
       return children
@@ -92,7 +87,7 @@ export default {
       const radius = {}
       for (const planetIndex of this.spriteIds.planets) {
         const children = this.childIndexes[planetIndex] ?? []
-        const outermost = Math.max(0, ...children.map((index) => this.systemObjects[index].distance))
+        const outermost = Math.max(0, ...children.map((index) => this.systemObjects[index].orbit.radius))
         radius[planetIndex] = outermost + LAYER_PADDING
       }
       return radius
@@ -117,7 +112,7 @@ export default {
     layerTranslate(planetIndex) {
       // Sprites are raw objects updated in place each frame; reading gameTime makes this re-evaluate per frame.
       void this.gameTime
-      const planet = this.systemObjects[planetIndex]
+      const planet = this.sprites[planetIndex]
       const dpr = window.devicePixelRatio || 1
       const x = Math.round((planet.position.x + this.drawnView.x) * this.pixelsPerUnit * dpr) / dpr
       const y = Math.round((planet.position.y + this.drawnView.y) * this.pixelsPerUnit * dpr) / dpr

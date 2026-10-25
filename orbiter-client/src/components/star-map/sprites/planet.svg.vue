@@ -136,16 +136,13 @@ import { useStarMapStore } from '@/stores/starmap'
 export default {
   name: 'planet',
   props: {
-    planet: {
-      type: Object,
-      default() {
-        return {
-          rings: 0
-        }
-      }
-    }
+    /** The planet's sprite (libs/sprite.js): its game data, and its rotation this frame. */
+    sprite: { type: Object, required: true }
   },
   computed: {
+    planet() {
+      return this.sprite.object
+    },
     ...mapState(useConfigStore, ['graphicsQuality']),
     ...mapState(useStarMapStore, ['gameTime']),
     // The surface turns against the sprite's rotation, so it appears to spin under the clip.
@@ -153,7 +150,7 @@ export default {
       // Sprites are raw objects updated in place each frame; reading gameTime makes this re-evaluate per frame.
       void this.gameTime
       // Same 0.25° steps as the sprite's own rotation (sprite-transform), so they cancel exactly.
-      return 0 - Math.round(this.planet.telemetry.rotation / 0.25) * 0.25
+      return 0 - Math.round(this.sprite.telemetry.rotation / 0.25) * 0.25
     }
   }
 }

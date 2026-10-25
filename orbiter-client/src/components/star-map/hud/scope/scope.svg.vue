@@ -91,7 +91,7 @@ export default {
   },
   computed: {
     ...mapState(useUIStore, ['showScope', 'viewport', 'spriteToDisplay', 'selected']),
-    ...mapState(useStarMapStore, ['gameTime', 'systemObjects']),
+    ...mapState(useStarMapStore, ['gameTime', 'systemObjects', 'sprites']),
     /** The sprite whose scope marker is hovered, unless it's already selected (or has left the system). */
     hoveredSprite() {
       if (this.spriteToDisplay == null || this.spriteToDisplay === this.selected) return null
@@ -100,12 +100,13 @@ export default {
   },
   methods: {
     /** Where the sprite is relative to the view center, in world units. */
-    offsetFromView(sprite) {
+    offsetFromView(object) {
       // Sprites are raw objects updated in place each frame; reading gameTime makes this re-evaluate per frame.
       void this.gameTime
+      const position = this.sprites[object.key].position
       return {
-        x: sprite.position.x + this.viewport.x,
-        y: sprite.position.y + this.viewport.y
+        x: position.x + this.viewport.x,
+        y: position.y + this.viewport.y
       }
     },
     bearingToSprite(sprite) {

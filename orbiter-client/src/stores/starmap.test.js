@@ -18,7 +18,7 @@ describe('importStarMapBlockData', () => {
     starMap.importStarMapBlockData({ blockData: blockData({ withStation: true }), playerAccount: '0xabc' })
     const objects = starMap.systemObjects
     expect(Object.keys(objects)).toEqual(['star', 'planet:1', 'station:1', 'planet:2', 'moon:2:0', 'ship:5'])
-    expect(objects['planet:1'].stationSprite).toBe('station:1')
+    expect(objects['planet:1'].stationKey).toBe('station:1')
     expect(objects['station:1'].orbiting).toBe('planet:1')
     expect(objects['planet:2'].moons).toEqual([{ moonId: 'moon:2:0', moonName: 'Moonie' }])
     expect(objects['ship:5'].orbiting).toBe('planet:2')
@@ -30,14 +30,14 @@ describe('importStarMapBlockData', () => {
   it('a station appearing mid-system moves nothing else and keeps the selection', () => {
     starMap.importStarMapBlockData({ blockData: blockData(), playerAccount: '0xabc' })
     ui.selectSprite('ship:5')
-    const shipTelemetry = starMap.systemObjects['ship:5'].telemetry // animation state that carries over
+    const shipTelemetry = starMap.sprites['ship:5'].telemetry // animation state that carries over
 
     starMap.importStarMapBlockData({ blockData: blockData({ withStation: true }), playerAccount: '0xabc' })
 
     expect(ui.selectedSprite).toBe('ship:5')
     expect(starMap.systemObjects['ship:5'].name).toBe('Wanderer')
     expect(starMap.systemObjects['ship:5'].orbiting).toBe('planet:2')
-    expect(starMap.systemObjects['ship:5'].telemetry).toBe(shipTelemetry)
+    expect(starMap.sprites['ship:5'].telemetry).toBe(shipTelemetry)
     expect(starMap.systemObjects['moon:2:0'].orbiting).toBe('planet:2')
     expect(starMap.spriteIds.stations).toEqual(['station:1'])
   })

@@ -4,15 +4,15 @@
        orbiting them are drawn in their own layers (planet-layers.vue).
        All rings come first, so no ring is ever drawn across a body. -->
   <g v-if="currentStarSystemId > 0">
-    <template v-for="(sprite, index) in systemObjects" v-bind:key="'ring-' + index">
-      <orbit-ring v-if="orbitsStar(sprite)" :r="sprite.distance" :selected="index === selected" />
+    <template v-for="(object, key) in systemObjects" v-bind:key="'ring-' + key">
+      <orbit-ring v-if="orbitsStar(object)" :r="object.orbit.radius" :selected="key === selected" />
     </template>
-    <template v-for="(sprite, index) in systemObjects" v-bind:key="'sprite-' + index">
+    <template v-for="(object, key) in systemObjects" v-bind:key="'sprite-' + key">
       <sprite-transform
-        v-if="sprite.type !== 'planet' && !orbitsPlanet(sprite)"
-        :sprite="sprite"
-        :objectIndex="index"
-        :type="sprite.type"
+        v-if="object.type !== 'planet' && !orbitsPlanet(object)"
+        :sprite="sprites[key]"
+        :objectIndex="key"
+        :type="object.type"
       >
       </sprite-transform>
     </template>
@@ -34,15 +34,15 @@ export default {
     OrbitRing
   },
   computed: {
-    ...mapState(useStarMapStore, ['currentStarSystemId', 'systemObjects']),
+    ...mapState(useStarMapStore, ['currentStarSystemId', 'systemObjects', 'sprites']),
     ...mapState(useUIStore, ['selected'])
   },
   methods: {
-    orbitsStar(sprite) {
-      return sprite.type !== 'star' && !this.orbitsPlanet(sprite)
+    orbitsStar(object) {
+      return object.type !== 'star' && !this.orbitsPlanet(object)
     },
-    orbitsPlanet(sprite) {
-      return Boolean(sprite.orbiting) && this.systemObjects[sprite.orbiting]?.type === 'planet'
+    orbitsPlanet(object) {
+      return Boolean(object.orbiting) && this.systemObjects[object.orbiting]?.type === 'planet'
     }
   }
 }

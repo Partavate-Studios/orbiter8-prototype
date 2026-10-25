@@ -17,6 +17,7 @@ import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
 import { mapActions, mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
+import { cardMenu } from './card-menu'
 import CardBackground from '../card-background.svg'
 import CardButton from '../card-button.svg'
 
@@ -116,7 +117,7 @@ export default {
           }
           break
         case 'visitStation':
-          this.selectSprite(this.systemObjects[this.objectId].stationSprite)
+          this.selectSprite(this.systemObjects[this.objectId].stationKey)
           break
         case 'visitPlanet':
           this.selectSprite(this.systemObjects[this.objectId].orbiting)
@@ -153,8 +154,7 @@ export default {
     ...mapState(useStarMapStore, ['systemObjects']),
     ...mapState(useGameStateStore, ['avatar']),
     menuData: function () {
-      let menu = this.systemObjects[this.objectId].getMenu()
-      return menu
+      return cardMenu(this.systemObjects[this.objectId])
     }
   }
 }

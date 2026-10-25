@@ -8,10 +8,10 @@
         <!-- Only a few pixels across: a plain dot looks the same and costs far less to draw. -->
         <circle v-if="isTiny" cx="0" cy="0" :r="dotRadius" fill="#e5cfff" />
         <template v-else>
-          <planet v-if="type === 'planet'" :planet="sprite" />
+          <planet v-if="type === 'planet'" :sprite="sprite" />
           <moon v-if="type === 'moon'" />
           <station v-if="type === 'station'" />
-          <g transform="rotate(180)"><ship v-if="type === 'ship'" :ship="sprite" :should-show-engines="true" /></g>
+          <g transform="rotate(180)"><ship v-if="type === 'ship'" :should-show-engines="true" /></g>
           <star v-if="type === 'star'" />
         </template>
         <a @mouseover="hover = true" @mouseleave="hover = false" v-on:click.prevent="spriteAction()" cursor="pointer">
@@ -37,7 +37,7 @@
           stroke-width="4"
           text-anchor="middle"
           alignment-baseline="central"
-          >{{ sprite.name }}</text
+          >{{ sprite.object.name }}</text
         >
       </g>
     </g>
@@ -78,19 +78,9 @@ export default {
     }
   },
   props: {
-    sprite: {
-      type: Object,
-      default() {
-        return {
-          name: '...',
-          speed: 0,
-          size: 0,
-          distance: 0,
-          rotation: 0
-        }
-      }
-    },
-    /** The sprite's key in systemObjects (see libs/sprite.js spriteKey). */
+    /** How the object is drawn (libs/sprite.js); its game data is sprite.object. */
+    sprite: { type: Object, required: true },
+    /** The object's key (see sdk/system.js objectKey). */
     objectIndex: {
       type: String,
       required: true
@@ -113,7 +103,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(useStarMapStore, ['systemObjects', 'gameTime']),
+    ...mapState(useStarMapStore, ['sprites', 'gameTime']),
     ...mapState(useUIStore, ['selected', 'showLabels', 'isMenuOn', 'drawnPixelsPerUnit', 'isOnScreen', 'showScope']),
     ...mapState(useConfigStore, ['graphicsQuality']),
     /**
@@ -122,7 +112,7 @@ export default {
      */
     frame() {
       void this.gameTime
-      const parent = this.sprite.orbiting ? this.systemObjects[this.sprite.orbiting] : null
+      const parent = this.sprite.orbiting ? this.sprites[this.sprite.orbiting] : null
       return {
         x: this.sprite.position.x,
         y: this.sprite.position.y,

@@ -27,7 +27,7 @@ export default {
   computed: {
     ...mapState(useGameStateStore, ['haveAvatar', 'haveShip']),
     ...mapState(useUIStore, ['selected', 'jumpAnimationState']),
-    ...mapState(useStarMapStore, ['gameTime', 'systemObjects']),
+    ...mapState(useStarMapStore, ['gameTime', 'systemObjects', 'sprites']),
     ...mapState(useConfigStore, ['tickDelay'])
   },
   watch: {
@@ -124,7 +124,7 @@ export default {
       this.followSelectedSprite()
     },
     followSelectedSprite() {
-      const sprite = this.selected != null ? this.systemObjects[this.selected] : null
+      const sprite = this.selected != null ? this.sprites[this.selected] : null
       if (!sprite) return
       this.setSelectedTelemetry({
         translatex: sprite.position.x,

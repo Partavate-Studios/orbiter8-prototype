@@ -178,7 +178,7 @@
 </template>
 
 <script>
-import { STAR_KEY } from '@/libs/sprite'
+import { STAR_KEY } from '@/sdk/system'
 
 import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'

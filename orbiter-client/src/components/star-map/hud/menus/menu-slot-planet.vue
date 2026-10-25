@@ -12,7 +12,7 @@
           ')'
         "
       >
-        <planet :planet="systemObjects[planetId]" />
+        <planet :sprite="sprites[planetId]" />
       </g>
       <g
         v-if="avatar.ship.orbit == systemObjects[planetId].id"
@@ -154,7 +154,14 @@ export default {
   },
   computed: {
     ...mapState(useUIStore, ['viewport']),
-    ...mapState(useStarMapStore, ['gameTime', 'systemObjects', 'portForPlanet', 'moonsForPlanet', 'players']),
+    ...mapState(useStarMapStore, [
+      'gameTime',
+      'systemObjects',
+      'sprites',
+      'portForPlanet',
+      'moonsForPlanet',
+      'players'
+    ]),
     ...mapState(useGameStateStore, ['avatar']),
     slotWidth() {
       return Math.min(this.viewport.width - 100, 700)
@@ -193,7 +200,7 @@ export default {
       // Sprites are raw objects updated in place each frame; reading gameTime makes this re-evaluate per frame.
       void this.gameTime
       // 0.25° steps: only touch the DOM when the rotation visibly changes.
-      return Math.round(this.planet.telemetry.rotation / 0.25) * 0.25
+      return Math.round(this.sprites[this.planetId].telemetry.rotation / 0.25) * 0.25
     },
     ownerName() {
       let address = this.planet.owner

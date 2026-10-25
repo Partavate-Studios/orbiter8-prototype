@@ -1,6 +1,6 @@
 <template>
   <g>
-    <card-scaling :sprite="systemObjects[objectId]">
+    <card-scaling :sprite="sprites[objectId]">
       <g v-if="viewRatio > 1" stroke="#c3b3da88" stroke-width="2" stroke-dasharray="3 3">
         <line x1="-70" y1="70" x2="-120" y2="120" />
         <line x1="-150" y1="120" x2="-120" y2="120" />
@@ -25,10 +25,10 @@
 
         <g v-if="systemObjects[objectId].type == 'planet'">
           <g v-if="systemObjects[objectId].hasStation" transform="translate(15 120) scale(0.4)">
-            <a v-on:click.prevent="selectSprite(systemObjects[objectId].stationSprite)" cursor="pointer">
+            <a v-on:click.prevent="selectSprite(systemObjects[objectId].stationKey)" cursor="pointer">
               <icon-container>
                 <g transform="scale(0.5)">
-                  <sprite :objectId="systemObjects[objectId].stationSprite" />
+                  <sprite :objectId="systemObjects[objectId].stationKey" />
                 </g>
               </icon-container>
             </a>
@@ -133,7 +133,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(useStarMapStore, ['systemObjects']),
+    ...mapState(useStarMapStore, ['systemObjects', 'sprites']),
     ...mapState(useUIStore, ['viewRatio']),
     menuShouldDisplay() {
       if (this.menuShowing || this.viewRatio > 1) {

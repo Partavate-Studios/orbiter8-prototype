@@ -1,10 +1,6 @@
 <template>
   <g>
-    <planet
-      v-if="systemObjects[objectId].type == 'planet'"
-      transform="scale(2)"
-      :planet="systemObjects[objectId]"
-    ></planet>
+    <planet v-if="systemObjects[objectId].type == 'planet'" transform="scale(2)" :sprite="sprites[objectId]"></planet>
     <star v-if="systemObjects[objectId].type == 'star'" transform="scale(0.2)"></star>
     <ship v-if="systemObjects[objectId].type == 'ship'" transform="rotate(180) scale(4)" :should-show-engines="false" />
     <station v-if="systemObjects[objectId].type == 'station'" transform="scale(0.075)" />
@@ -36,7 +32,7 @@ export default {
     objectId: null
   },
   computed: {
-    ...mapState(useStarMapStore, ['systemObjects'])
+    ...mapState(useStarMapStore, ['systemObjects', 'sprites'])
   }
 }
 </script>
