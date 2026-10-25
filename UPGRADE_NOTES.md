@@ -304,7 +304,7 @@ Also found:
 | Layerize | 4.4 s | **2.6 s** |
 | Game ticks per second | ~20 | **60** |
 
-The baseline is the production build. The new build was measured on the **dev server** (unminified Vue with dev checks), which handicaps it, and it still wins. Phase 7 will re-measure a production build.
+The baseline is the production build. The new build was measured on the **dev server** (unminified Vue with dev checks), which handicaps it, and it still wins. Phase 7 re-measured the production build; see the Phase 7 section.
 
 Paint flashing at idle confirms the split:
 - At ship zoom, only the moving ship, the rotating planet body, the station and the card's mini ship repaint.
