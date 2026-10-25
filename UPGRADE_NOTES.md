@@ -230,6 +230,32 @@ The committed Infura key only appeared in the RPC URLs of chains 3, 4 and 42, so
 - **Faucet links.** These are carried over and I haven't checked them: `sepolia-faucet.com`, `testnet.binance.org/faucet-smart`, and the Moonbeam docs link.
 - **"Moonriver Alpha".** Moonriver is a production network with real MOVR, but the label is unchanged, as you decided.
 
+## Phase 4: Known bugs
+
+All four bugs from the brief are fixed, one commit each:
+
+1. **Empty starfield** (`50e1cc4`). `generateStars()` replaced the stars with an empty array.
+   - The stars now render: 800, or 3,200 on the high tier, each with its glare circle.
+   - The array is frozen so Vue doesn't track every star.
+   - **Side effect until Phase 5:** those 1,600–6,400 extra SVG circles are re-rasterized on every tick. One pan/zoom run measured 39 fps against about 51. Phase 5 moves the starfield to canvas.
+2. **Compass bearing** (`bbed8a4`). `getDegreesFromXY` is now `atan2`-based. It was checked against the old function on 10^6 random points and is identical apart from the bug (x = 0, y < 0 now gives 180, not 1).
+   - At the exact origin (the selected sprite) it returns 0, where the old code gave 1°, so the arrow points the same way.
+3. **Duplicate SVG IDs** (`680e10f`).
+   - Identical gradients, clips and masks now live in one hidden `<svg>` (`components/svg-defs.vue`) mounted once from `App.vue`. That covers planet, ring, engine, card, cargo-hold, tab, icon-clip and planet-clip, plus the old shared filters.
+   - The three different `menu-slot-clip` shapes get a unique ID per instance.
+   - The trade panels' generic `Mask` is now `tradeTabMask`.
+   - Every screen still matches the baseline.
+4. **Timer loops** (`94ead02`):
+   - One `requestAnimationFrame` loop (`libs/frame-loop.js`); components subscribe and unsubscribe on unmount.
+   - The game tick keeps its per-quality rate for now.
+   - Block polling moved from `TitleScreen` into the Chain store as a single session poller. `TitleScreen`'s leaked loop had been the *only* block poller during play, so cancelling it on unmount would have frozen the game. It now pauses while the tab is hidden.
+
+Also found:
+
+- **`url(#cardGradient45)` is referenced, but nothing defines it**, so that element renders without its gradient. It isn't fixed: I don't know what it was meant to look like.
+- **`scope-toggle.svg.vue` has an unfinished branch** that reads `sprites` and calls two methods it doesn't define. `sprites` is always empty, so it never runs. It goes in the Phase 6 dead-code pass.
+- **Headless fps varies a lot between identical runs** (39–52 fps). Phase 5/7 comparisons will average several runs.
+
 ## Bugs
 
 ### Fixed
@@ -256,8 +282,6 @@ The committed Infura key only appeared in the RPC URLs of chains 3, 4 and 42, so
   - `space-dock-icon.svg.vue` registers `Station` without using it.
   - `card-button.svg.vue` is named `Button`, a reserved HTML element name.
   - Plus an unused variable in `NetworkSelect.vue` and a useless assignment in `playgame.vue` `onWheel`.
-- **Timer loops never stop.** `playgame.vue` `tick()` and `TitleScreen.vue` `checkBlockLoop()` reschedule `setTimeout` forever, and nothing cancels them on unmount. Leaving and re-entering a screen stacks more loops. The block poller keeps polling after you leave the title screen. Fix in Phase 4/5.
-- The brief's Phase 4 bugs are all present as described: the starfield never renders because the local array overwrites `this.stars`, the compass `getDegreesFromXY` returns `1` instead of `180`, there are duplicate `planetGradient` / `ringGradient` / `engineGradient` IDs, and the `setTimeout` animation loops.
 
 ### Found, not fixed (contracts; out of scope this iteration)
 
