@@ -13,62 +13,33 @@
         <div class="item">
           <span class="name">Web3:</span>
           <span v-if="web3Loaded"><b>Loaded</b> we found your wallet</span>
+          <span v-else-if="wallets.length">Choose a wallet:
+            <button v-for="wallet in wallets"
+              :key="wallet.info.uuid"
+              class="littlebutton"
+              @click="chooseWallet(wallet)"><img v-if="wallet.info.icon" :src="wallet.info.icon" alt="" class="walleticon">{{ wallet.info.name }}</button>
+          </span>
           <span v-else>...</span>
+        </div>
+        <div class="item" v-if="walletError">
+          <span class="name"></span>
+          <span class="warning">{{ walletError }}</span>
         </div>
 
         <div class="sectionhead">Choose Your Favorite Place To Play</div>
 
         <div class="item">
-          <span class="name">EVM Testnets:</span>
+          <span class="name">EVM Networks:</span>
           <span>
-            <a v-for="i in ['11155111', '97', '80001', '421611']"
-              v-bind:key="'net-'+i"
-              v-bind:class="{selectednetwork: chainId == i}"
-              :title="'Connect your wallet to ' + networkData[i].name"
+            <a v-for="network in networkList"
+              v-bind:key="'net-' + network.chainId"
+              v-bind:class="{selectednetwork: chainId == network.chainId}"
+              :title="'Connect your wallet to ' + network.name"
               class="littlebutton"
-              v-on:click.prevent="connectNetwork(i)
-              "><span v-if="i == chainId">&#128377;</span>{{ networkData[i].shortName }}</a>
+              v-on:click.prevent="connectNetwork(network.chainId)
+              "><span v-if="network.chainId == chainId">&#128377;</span>{{ network.shortName }}</a>
           </span>
         </div>
-
-        <div class="item">
-          <span class="name"></span>
-          <span>
-            <a v-for="i in ['1285', '1287', '1297']"
-              v-bind:key="'net-'+i"
-              v-bind:class="{selectednetwork: chainId == i}"
-              :title="'Connect your wallet to ' + networkData[i].name"
-              class="littlebutton"
-              v-on:click.prevent="connectNetwork(i)
-              "><span v-if="i == chainId">&#128377;</span>{{ networkData[i].shortName }}</a>
-          </span>
-        </div>
-        <div class="item">
-          <span class="name"></span>
-          <span>
-            <a v-for="i in ['71401', '599', '381932']"
-              v-bind:key="'net-'+i"
-              v-bind:class="{selectednetwork: chainId == i}"
-              :title="'Connect your wallet to ' + networkData[i].name"
-              class="littlebutton"
-              v-on:click.prevent="connectNetwork(i)
-              "><span v-if="i == chainId">&#128377;</span>{{ networkData[i].shortName }}</a>
-          </span>
-        </div>
-
-        <div class="item">
-          <span class="name">Deprecated:</span>
-          <span>
-            <a v-for="i in ['4', '3', '42', '1666700000']"
-              v-bind:key="'net-'+i"
-              v-bind:class="{selectednetwork: chainId == i}"
-              :title="'Connect your wallet to ' + networkData[i].name"
-              class="littlebutton deadnetwork"
-              v-on:click.prevent="connectNetwork(i)
-              "><span v-if="i == chainId">&#128377;</span>{{ networkData[i].shortName }}</a>
-          </span>
-        </div>
-
 
         <div class="item" v-if="!isSupportedNetwork">
           <span class="name">Foreign Network:</span>
@@ -94,63 +65,11 @@
         </div>
         <div class="item">
           <span class="name">Get Currency:</span>
-          <span v-if="chainId == 4">
-            Get test Rinkeby ETH from <a class="faucetlink" target="_blank" href="https://faucets.chain.link/rinkeby">Chainlink's Faucet &#8599;</a>
-            or <a class="faucetlink" target="_blank" href="https://fauceth.komputing.org/">Komputing's Faucet &#8599;</a>
-          </span>
-          <span v-if="chainId == 3">
-            <a class="faucetlink" target="_blank" href="https://faucet.egorfine.com/">Get test Ropsten ETH from Egor Egorov's Facuet &#8599;</a>
-          </span>
-          <span v-if="chainId == 28">
-            Get Rinkeby ETH from <a class="faucetlink" target="_blank" href="https://faucets.chain.link/rinkeby">Chainlink &#8599;</a>
-            or <a class="faucetlink" target="_blank" href="https://fauceth.komputing.org/">Komputing &#8599;</a> then use
-            <a class="faucetlink" target="_blank" href="https://gateway.rinkeby.boba.network/">Boba Gateway</a>
-          </span>
-          <span v-if="chainId == 42">
-            Get test Kavan ETH from <a class="faucetlink" target="_blank" href="https://faucets.chain.link/kovan">Chainlink's Facuet &#8599;</a>
-          </span>
-          <span v-if="chainId == 69">
-            Get test ETH from a <a class="faucetlink" target="_blank" href="https://kovan.optifaucet.com/">OptiFacuet &#8599;</a>
-             or <a class="faucetlink" target="_blank" href="https://optimismfaucet.xyz/">OptimismFaucet &#8599;</a>
-          </span>
-          <span v-if="chainId == 97">
-            <a class="faucetlink" target="_blank" href="https://testnet.binance.org/faucet-smart/">Get test BNB from a Binance's Faucet &#8599;</a>
-          </span>
-          <span v-if="chainId == 599">
-            Get Metis tokens with the <a class="faucetlink" target="_blank" href="https://goerli.faucet.metisdevops.link/">Goerli Facuet &#8599;</a>
-          </span>
-          <span v-if="chainId == 1285">
-            Trade for MORV tokens with the <a class="faucetlink" target="_blank" href="https://moonbeam.network/networks/moonriver/">Moonbeam App &#8599;</a>
-          </span>
-          <span v-if="chainId == 1287">
-            Get DEV tokens by
-            <a class="faucetlink" target="_blank" href="https://docs.moonbeam.network/builders/get-started/networks/moonbase/">following this documentation &#8599;</a>.
-          </span>
-          <span v-if="chainId == 71401">
-            Get CKB from the
-            <a class="faucetlink" target="_blank" href="https://faucet.nervos.org/">Nervos faucet &#8599;</a>
-            then use the
-            <a class="faucetlink" target="_blank" href="https://testnet.bridge.godwoken.io">Godwoken Bridge &#8599;</a> .
-          </span>
-          <span v-if="chainId == 381932">
-            Get METAL tokens from the
-            <a class="faucetlink" target="_blank" href="https://t.me/protonxpr/">Proton Developers Telegram</a>
-          </span>
-          <span v-if="chainId == 11155111">
-            <a class="faucetlink" target="_blank" href="https://sepolia-faucet.com/">Get test ETH from Sepolia Faucet &#8599;</a>
-          </span>
-          <span v-if="chainId == 15555">
-            <a class="faucetlink" target="_blank" href="https://faucet.testnet-dev.trust.one/">Get test TrustEVM from Faucet &#8599;</a>
-          </span>
-          <span v-if="chainId == 80001">
-            <a class="faucetlink" target="_blank" href="https://faucet.polygon.technology/">Get test MATIC from a Polygon's Faucet &#8599;</a>
-          </span>
-          <span v-if="chainId == 421611">
-            <a class="faucetlink" target="_blank" href="https://rinkebyfaucet.com/">Get test ETH from a Faucet &#8599;</a> then transfer using
-            <a target="_blank" href="https://bridge.arbitrum.io/">Arbitrum's Bridge &#8599;</a>
-          </span>
-          <span v-if="chainId == 1666700000">
-            <a class="faucetlink" target="_blank" href="https://faucet.pops.one/">Get test ONE from a Harmony's Faucet &#8599;</a>
+          <span v-if="networkData[chainId]">
+            <template v-for="(part, index) in networkData[chainId].funding" :key="index">
+              <a v-if="part.url" class="faucetlink" target="_blank" :href="part.url">{{ part.text }}</a>
+              <template v-else>{{ part.text }}</template>
+            </template>
           </span>
         </div>
 
@@ -161,7 +80,7 @@
         </div>
         <div class="item">
           <span class="name">Credits Token:</span>
-          <span class="tracker"> <a class="tracker" v-if="networkData[chainId]" :href="networkData[chainId].explorer[0] + '/address/' + creditTokenAddress" target="_blank">{{ creditTokenAddress }}</a></span>
+          <span class="tracker"> <a class="tracker" v-if="networkData[chainId]" :href="explorerLink(creditTokenAddress)" target="_blank">{{ creditTokenAddress }}</a></span>
           <span>
             <a v-if="creditTokenAddress" title="Import tokens to your wallet." class="littlebutton" v-on:click.prevent="addCreditsToken()">import 	&#65291;</a>
             <a v-if="creditTokenAddress" title="Swap tokens on Sushi" class="littlebutton" :href="'https://app.sushi.com/swap?inputCurrency=&outputCurrency=' + creditTokenAddress" target="_blank">swap 	&#8644;</a>
@@ -169,19 +88,19 @@
         </div>
         <div class="item">
           <span class="name">Planet NFTs:</span>
-          <span class="tracker"> <a class="tracker" v-if="networkData[chainId]" :href="networkData[chainId].explorer[0] + '/address/' + planetTokenAddress" target="_blank">{{ planetTokenAddress }}</a></span>
+          <span class="tracker"> <a class="tracker" v-if="networkData[chainId]" :href="explorerLink(planetTokenAddress)" target="_blank">{{ planetTokenAddress }}</a></span>
         </div>
         <div class="item">
           <span class="name">Ship NFTs:</span>
-          <span class="tracker"> <a class="tracker" v-if="networkData[chainId]" :href="networkData[chainId].explorer[0] + '/address/' + shipTokenAddress" target="_blank">{{ shipTokenAddress }}</a></span>
+          <span class="tracker"> <a class="tracker" v-if="networkData[chainId]" :href="explorerLink(shipTokenAddress)" target="_blank">{{ shipTokenAddress }}</a></span>
         </div>
         <div class="item">
           <span class="name">Avatars:</span>
-          <span class="tracker"> <a class="tracker" v-if="networkData[chainId]" :href="networkData[chainId].explorer[0] + '/address/'  + avatarAddress" target="_blank">{{ avatarAddress }}</a></span>
+          <span class="tracker"> <a class="tracker" v-if="networkData[chainId]" :href="explorerLink(avatarAddress)" target="_blank">{{ avatarAddress }}</a></span>
         </div>
         <div class="item">
           <span class="name">Galaxy:</span>
-          <span class="tracker"> <a class="tracker" v-if="networkData[chainId]" :href="networkData[chainId].explorer[0] + '/address/' + galaxyAddress" target="_blank">{{ galaxyAddress }}</a></span>
+          <span class="tracker"> <a class="tracker" v-if="networkData[chainId]" :href="explorerLink(galaxyAddress)" target="_blank">{{ galaxyAddress }}</a></span>
         </div>
         <div class="item">
           <span class="name">Game:</span>
@@ -249,6 +168,8 @@ import { useChainStore } from '@/stores/chain'
 import { useGameStateStore } from '@/stores/gamestate'
 import { mapActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
+import { walletRequest } from '@/chain/wallet'
+import { networks } from '@/chain/networks'
 
 export default {
   components: {
@@ -258,12 +179,9 @@ export default {
     return {
     }
   },
-  created: function () {
-    this.setDefaultAccount()
-  },
   methods: {
     ...mapActions(useChainStore, [
-      'setDefaultAccount',
+      'chooseWallet',
       'initContracts'
     ]),
     ...mapActions(useGameStateStore, [
@@ -281,10 +199,7 @@ export default {
         return
       }
       try {
-        await window.ethereum.currentProvider.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: this.networkData[chainId].hexId }]
-        });
+        await walletRequest('wallet_switchEthereumChain', [{ chainId: this.networkData[chainId].hexId }])
       } catch (error) {
         console.log('Error', error.message)
         if (confirm('Chain not found in your wallet. Would you like us to try to add it?')) {
@@ -294,13 +209,10 @@ export default {
             chainName: this.networkData[chainId].name,
             nativeCurrency: this.networkData[chainId].currency,
             rpcUrls: this.networkData[chainId].rpc,
-            blockExplorerUrls: this.networkData[chainId].explorer
+            blockExplorerUrls: this.networkData[chainId].explorer.length ? this.networkData[chainId].explorer : undefined
           }]
           try {
-            await window.ethereum.currentProvider.request({
-              method: 'wallet_addEthereumChain',
-              params: data
-            });
+            await walletRequest('wallet_addEthereumChain', data)
           } catch (error) {
             alert('We were unable to add the network.')
           }
@@ -310,18 +222,15 @@ export default {
     },
     async addCreditsToken() {
       try {
-        await window.ethereum.currentProvider.request({
-          method: 'wallet_watchAsset',
-          params: {
-            type: 'ERC20', // Initially only supports ERC20, but eventually more!
-            options: {
-              address: this.creditTokenAddress,
-              symbol: 'OBTR8',
-              decimals: 0,
-              image: 'https://orbiter8.com/tokens/orbiter-8-credits.png'
-            },
+        await walletRequest('wallet_watchAsset', {
+          type: 'ERC20', // Initially only supports ERC20, but eventually more!
+          options: {
+            address: this.creditTokenAddress,
+            symbol: 'OBTR8',
+            decimals: 0,
+            image: 'https://orbiter8.com/tokens/orbiter-8-credits.png'
           },
-        });
+        })
 
       } catch (error) {
         console.log(error);
@@ -342,6 +251,10 @@ export default {
     },
     getEffectsVolume() {
       return parseInt(this.o8audio.getEffectsVolume() * 3)
+    },
+    explorerLink(address) {
+      const explorer = this.networkData[this.chainId]?.explorer[0]
+      return explorer ? explorer + '/address/' + address : undefined
     }
   },
   watch: {
@@ -369,7 +282,10 @@ export default {
       'shipTokenAddress',
       'avatarAddress',
       'galaxyAddress',
-      'balance'
+      'balance',
+      'wallets',
+      'walletError',
+      'isSupportedNetwork'
     ]),
     ...mapState(useGameStateStore, [
       'gameDataLoaded',
@@ -380,20 +296,8 @@ export default {
     ...mapState(useConfigStore, [
       'graphicsQuality'
     ]),
-    isSupportedNetwork() {
-      let supportedNetworks = [
-        '4', '3', '28', '42', '97',
-        '1287', '1297', '1285', '71401', '80001',
-        '599', '421611', '1666700000',
-        '11155111', '381932'
-      ]
-      let supported = false
-      supportedNetworks.forEach(element => {
-        if (this.chainId == element) {
-          supported = true
-        }
-      })
-      return supported
+    networkList() {
+      return networks
     },
     percentageLoaded() {
       if (this.gameDataLoaded) {
@@ -510,7 +414,8 @@ export default {
   a.addtoken:hover {
     cursor: pointer;
   }
-  a.littlebutton {
+  a.littlebutton, button.littlebutton {
+    font-family: inherit;
     margin: 0px 0.2em 0 0.2em;
     padding: 1px 10px;
     text-decoration: none;
@@ -520,19 +425,21 @@ export default {
     color: #aaa;
     background: #222;
   }
-  a.littlebutton:hover {
+  a.littlebutton:hover, button.littlebutton:hover {
     cursor: pointer;
     border: 1px solid #888;
     color: #fff;
     background: #000;
   }
+  img.walleticon {
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.15em;
+    margin-right: 0.3em;
+  }
   a.selectednetwork {
     border: 1px solid #f8f;
     color: #fff;
-  }
-  a.deadnetwork {
-    border: 1px solid #444;
-    color: #444;
   }
   .faucetlink {
     font-size: 0.9em;

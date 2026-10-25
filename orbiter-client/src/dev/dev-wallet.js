@@ -41,17 +41,6 @@ const provider = {
   isDevWallet: true,
   selectedAddress: account,
   request,
-  // Legacy callback API, still used by web3 1.x.
-  send (payload, callback) {
-    if (typeof payload === 'string') return request({ method: payload, params: callback })
-    return this.sendAsync(payload, callback)
-  },
-  sendAsync (payload, callback) {
-    request(payload).then(
-      result => callback(null, { jsonrpc: '2.0', id: payload.id, result }),
-      error => callback(error, { jsonrpc: '2.0', id: payload.id, error: { code: error.code, message: error.message, data: error.data } })
-    )
-  },
   on () {},
   removeListener () {}
 }

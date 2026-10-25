@@ -1,4 +1,4 @@
-// The dev wallet has to exist before web3 loads, because web3 captures window.ethereum at import time.
+// Dev builds: install the dev wallet before the app starts looking for wallets.
 if (import.meta.env.DEV && import.meta.env.VITE_DEV_WALLET) {
   await import('./dev/dev-wallet.js')
 }

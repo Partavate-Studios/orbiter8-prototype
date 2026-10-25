@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
-import GalaxyContract from '@/contract-interfaces/galaxy'
-import AvatarContract from '@/contract-interfaces/avatar'
+import { galaxy, avatars } from '@/chain/contracts'
 import { useUIStore } from '@/stores/ui'
 import Sprite from '@/libs/sprite.js'
 import { useChainStore } from '@/stores/chain'
@@ -69,7 +68,7 @@ export const useStarMapStore = defineStore('StarMap', {
 
       try {
         /** Grab the current system and go from there */
-        const systemBase = await GalaxyContract.getPlayerSystemData(useChainStore().account)
+        const systemBase = await galaxy.getPlayerSystemData()
 
         this.setProp({key: 'loadProgress', value: 2})
 
@@ -98,13 +97,13 @@ export const useStarMapStore = defineStore('StarMap', {
         //Add pioneer to first visit sun to name index
         console.log('Discovered by ', starMapBlockData.discoveredBy)
         if ((starMapBlockData.discoveredBy > 0) && (typeof starMapBlockData.avatarNames[starMapBlockData.discoveredBy] === 'undefined')) {
-          starMapBlockData.avatarNames[starMapBlockData.discoveredBy] = await AvatarContract.getAvatarNameByAddress(starMapBlockData.discoveredBy, useChainStore().account)
+          starMapBlockData.avatarNames[starMapBlockData.discoveredBy] = await avatars.getAvatarNameByAddress(starMapBlockData.discoveredBy)
         }
         this.setProp({key: 'loadProgress', value: 5})
 
         /** Add the names for neighboring stars */
         for (const [key, neighborId] of Object.entries(starMapBlockData.neighborIds)) {
-          const starName = await GalaxyContract.getSystemName(String(neighborId), useChainStore().account)
+          const starName = await galaxy.getSystemName(String(neighborId))
           starMapBlockData.neighbors[key] = {
             id: neighborId,
             name: starName
@@ -119,7 +118,7 @@ export const useStarMapStore = defineStore('StarMap', {
           let shipId = starMapBlockData.shipIds[key]
           if ((shipId > 0) && !(shipId in starMapBlockData.ships)) {
             //console.log('Adding ship ', shipId)
-            const shipBase = await GalaxyContract.getShip(String(shipId), useChainStore().account)
+            const shipBase = await galaxy.getShip(String(shipId))
             const ship = {
               id: shipId,
               name: shipBase[0],
@@ -133,7 +132,7 @@ export const useStarMapStore = defineStore('StarMap', {
 
             //Add ship owner name to name index
             if ((ship.owner !== '0x0') && (typeof starMapBlockData.avatarNames[ship.owner] === 'undefined')) {
-              starMapBlockData.avatarNames[ship.owner] = await AvatarContract.getAvatarNameByAddress(ship.owner, useChainStore().account)
+              starMapBlockData.avatarNames[ship.owner] = await avatars.getAvatarNameByAddress(ship.owner)
             }
           }
           this.setProp({key: 'loadProgress', value: Math.min(75, 25 + key)})
@@ -147,7 +146,7 @@ export const useStarMapStore = defineStore('StarMap', {
         // todo: these keys should probably be consts
         for (const [key, planetId] of Object.entries(starMapBlockData.planetIds)) {
           if (planetId > 0) {
-            const planetBase = await GalaxyContract.getPlanet(String(planetId), useChainStore().account)
+            const planetBase = await galaxy.getPlanet(String(planetId))
             const planet = {
               id: String(planetId),
               name: planetBase[0],
@@ -165,12 +164,12 @@ export const useStarMapStore = defineStore('StarMap', {
             //Add planet owner name to name index (need to deal with unknwon)
             //console.log('Planet Owner: ' + planet.owner )
             if ((planet.owner > 0) && (typeof starMapBlockData.avatarNames[planet.owner] === 'undefined')) {
-              starMapBlockData.avatarNames[planet.owner] = await AvatarContract.getAvatarNameByAddress(planet.owner, useChainStore().account)
+              starMapBlockData.avatarNames[planet.owner] = await avatars.getAvatarNameByAddress(planet.owner)
             }
 
             /** If there's a station, add the details to the planet */
             if (planet.hasStation) {
-              const station = await GalaxyContract.getStation(String(planet.id), useChainStore().account)
+              const station = await galaxy.getStation(String(planet.id))
               //console.log(JSON.stringify(station))
               planet.station = {
                 id: planet.id,
@@ -196,7 +195,7 @@ export const useStarMapStore = defineStore('StarMap', {
             /** Add details for all the moons to the planet */
             for (const [moonkey, hasMoon] of Object.entries(planet.hasMoons)) {
               if (hasMoon) {
-                const moonBase = await GalaxyContract.getMoon(String(planetId), String(moonkey), useChainStore().account)
+                const moonBase = await galaxy.getMoon(String(planetId), String(moonkey))
                 const moon = {
                   id: String(moonkey),
                   name: String(moonBase[0]),
@@ -209,7 +208,7 @@ export const useStarMapStore = defineStore('StarMap', {
                 planet.moons[moonkey] = moon
                 //Add moon owner name to name index
                 if ((moon.owner > 0) && (typeof starMapBlockData.avatarNames[moon.owner] === 'undefined')) {
-                  starMapBlockData.avatarNames[moon.owner] = await AvatarContract.getAvatarNameByAddress(moon.owner, useChainStore().account)
+                  starMapBlockData.avatarNames[moon.owner] = await avatars.getAvatarNameByAddress(moon.owner)
                 }
               }
             }

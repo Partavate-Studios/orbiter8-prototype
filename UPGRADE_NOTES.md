@@ -160,9 +160,82 @@ Every removed network and its Orbiter8/AvatarControls addresses will be recorded
 - **SVG `<a>` click handling** (HUD icons) was checked with real mouse clicks on both the baseline and the Vue 3 build. The behavior is identical, including the quirk where, with a menu open, the first click on another icon only closes it.
 - **Verification:** after each store port, the full flow passed, the static screens were pixel-identical to the baseline, and the console was clean apart from the known `eth_getLogs` error. Pan/zoom held at about 51 fps on average with a p95 of 33.4 ms, unchanged as expected.
 
+## Phase 3: Chain layer (ethers 6)
+
+- **web3 1.6 and `@truffle/contract` are gone.** The client talks to the contracts through **ethers 6** only.
+  - The repo has no other web3 packages. `truffle-config.js` and `migrations/` still use Truffle at the repo root, which is out of scope.
+- **New `src/chain/` module.** This is the only code that touches ethers:
+  - `abi/Orbiter8.json`, `abi/AvatarControls.json`. These are the `abi` arrays extracted from `src/contract-artifacts/Orbiter8.json` and `AvatarControls.json`, last compiled 2023-02-28 with solc 0.5.16. They're the only two contracts the client calls, and they match the deployed bytecode the artifacts describe.
+  - `networks.js`: the approved networks (name, currency, wallet RPC suggestions, explorer, funding hint), with the Orbiter8/AvatarControls addresses for each.
+    - Dev builds add the local chain from `dev/local-deployment.json`.
+  - `wallet.js`: **EIP-6963** wallet discovery, falling back to `window.ethereum` for older wallets.
+    - With several wallets installed, the preflight screen shows a **"Choose a wallet"** picker. The choice is remembered in `localStorage` (`o8.wallet`).
+    - The session (BrowserProvider, signer) lives outside Vue reactivity.
+    - Account, network or disconnect changes reload the page, as before.
+  - `contracts.js`: every read, write and event query the client makes. The method names match the old wrappers. The `account` parameter is gone, because the signer sets `msg.sender`, including for views like `getMyShip`.
+    - **Writes wait for the transaction to be mined**, as Truffle did.
+    - **Failures now reject**, with the revert reason, instead of hanging forever.
+    - Before binding, it checks that the addresses actually hold code, which catches reset testnets.
+  - `convert.js`: `bigint` → `Number`, and ethers `Result` → plain arrays, at the boundary.
+    - Every game value (ids, sizes, positions, credits at 0 decimals) is far below 2^53. The conversion throws rather than lose precision if one ever isn't.
+    - This keeps the stores' `parseInt`/comparison code correct, and `JSON.stringify` can't hit a `bigint`.
+    - Events keep web3's `returnValues` shape, so the chat menu is unchanged.
+- **Preflight screen changes:**
+  - One data-driven network row replaces the hard-coded chain-ID lists and the "Deprecated" row.
+  - The per-network faucet hints come from config, kept for live networks only.
+  - Explorer links are hidden when a network has no explorer.
+- **Network fixes along the way:**
+  - The Sepolia entry claimed `id: 421611` (Arbitrum Rinkeby) and "Arbitrum Ether" as its currency, both copy-paste errors.
+  - Explorer URLs had trailing slashes, which produced `//address/` links.
+  - Dead RPC suggestions were replaced: Sepolia uses publicnode/dRPC, and Moonbase/Moonriver get a working fallback after the official RPC.
+- **Bundle:** **679 KB (218 KB gzipped)**, down from 8.5 MB (2.36 MB gzipped). That's about 11× smaller. Build time is 0.6 s.
+- **Verification on the local chain:**
+  - The full flow passes, and the console is now completely clean.
+  - Static screens match the baseline, except the preflight screen, which changed as intended.
+  - The wallet picker was tested with two announced wallets: it lists both, connects the choice, and skips the picker after reload.
+  - Real transactions were tested: register, launch ship, chat (event read back), and a **jump to a neighboring system** (animation, then arrival in Star System 2).
+  - A trade with invalid amounts reverted, and the contract's reason ("Equipment clash") reached the log instead of a silent hang.
+
+### Removed networks
+
+The client's config no longer lists these chains. The addresses are what the Truffle artifacts recorded for each.
+
+| Chain ID | Network (client label) | Orbiter8 | AvatarControls |
+| --- | --- | --- | --- |
+| 1 | Ethereum Main Net | — | — |
+| 2 | Deprecated Morden Testnet | — | — |
+| 3 | Ethereum Ropsten Testnet | `0x73668aF7cC654634cc4EE81da6938416Eb45F4f6` | `0xD4D17A31D6F2aa295D1B3aF91D15A91Bc8CcDF06` |
+| 4 | Ethereum Rinkeby Testnet | `0x08d4e18F80fC910a46EF730130B32cE062AC4129` | `0x8f1dC434E3D13f294B8FDe928B6235156a310239` |
+| 28 | Boba Rinkeby Testnet | — | `0x9795e4E1fcD5d81399D6A7Acc404fD9Fd91c5747` |
+| 42 | Ethereum Kovan Testnet | `0x6cECb50F52c52E746EE9Aba3fa17b9606f3b6D65` | `0xc820005F1EEA88EF4541398F3305d620E5F441d0` |
+| 61 | Ethereum Classic | — | — |
+| 69 | Optimism Kovan Testnet | — | — |
+| 599 | Goerli Metis Testnet | `0xdd86445C07e140f284eE10A4c39dF7C568d88865` | `0x2460ED133589F70254f18277F42EDF539221C747` |
+| 1284 | Moonbeam | — | — |
+| 1297 | Bobabase Test Network | `0x2fceAd2954C53Cdc35a2E2D3C8d9d11a847D2842` | `0x3093022a0bfD02cFf56CD5B87809027BF88731cE` |
+| 1337 | Truffle (old dev deployment; dev builds now use `npm run local`) | `0x58e60385A8883B3AA1539a0b969eC2EAd537589E` | `0x44AE472Ed19bB9b4a972D0e7dC9BbC3ae7C8b94f` |
+| 4447 | Truffle Development Network | — | — |
+| 5777 | Ganache Development Network | `0x1B99b6D2134DB585f47DAdbb99c4F6a61DBDE3f8` | `0xCe485db2E317062938c6b2B3c101eb08a34f8A44` |
+| 15555 | Trust EVM Testnet | `0x26CB0C0FDed260684FE9E885ADf5563be1C550Bd` | `0x7a8950c192842820e0C12841DD52187896Db6030` |
+| 71401 | Godwoken Testnet | `0xcA364F2EFE7c87f58A9988F7512A86b4b474D419` | `0x7Aa32471800488b9eC3693c35332CCbAfBb669AC` |
+| 80001 | Polygon Mumbai Testnet | `0x8a782b354248b5F2C0F515536c98d47a6148Ac1D` | `0x137E576D7A22935e0FE33108Af39757a2957938B` |
+| 381932 | Metal Tahoe C-Chain | `0x0f93785633fc437fDFcC707cc8c222F753486Ebc` | `0x2460ED133589F70254f18277F42EDF539221C747` |
+| 421611 | Arbitrum Testnet (Rinkeby) | `0x911873281d209bD8b8C06282aB25b3b953267471` | `0x1bde28Bf4e0224A72EbC309992B0A5b32262b47A` |
+| 1666700000 | Harmony One Testnet | `0xd63D3C8d6833359Fc093e9D3C769BD13108AD946` | `0xFab77fA380F2694A74C6Aae9dE90DE2426f0F85b` |
+
+The committed Infura key only appeared in the RPC URLs of chains 3, 4 and 42, so it's gone from the client.
+
+### For Koda to check by hand
+
+- **Faucet links.** These are carried over and I haven't checked them: `sepolia-faucet.com`, `testnet.binance.org/faucet-smart`, and the Moonbeam docs link.
+- **"Moonriver Alpha".** Moonriver is a production network with real MOVR, but the label is unchanged, as you decided.
+
 ## Bugs
 
 ### Fixed
+
+- **Contract calls that failed never settled**, so the UI hung (e.g. "Game: ...loading" forever). The Phase 3 rewrite makes failures reject, with the revert reason.
+- **Event queries went below block 0 on young chains** (`fromBlock: block - 950`). The node then rejected them with "Method eth_getLogs is not supported". The query now clamps at 0 (Phase 3).
 
 - **Empty `cy=""` on HUD icon circles** (`_icon-container.svg.vue`). The browser logged an error on every icon render. It's now `cy="0"`, which looks the same. (`d6c2514`)
 - **`NaN` keys in the ship-creation fleet animation** (`_ship-scene.vue`). `:key="ship-x"` evaluated as the expression `ship - x`. (`fb0954a`)
@@ -182,10 +255,8 @@ Every removed network and its Orbiter8/AvatarControls addresses will be recorded
   - `card-button.svg.vue` is named `Button`, a reserved HTML element name.
   - Plus unused variables in `NetworkSelect.vue` and `store/actions.js`.
 
-- **Contract wrappers swallow errors and never settle.** Almost every method in `contract-interfaces/galaxy.js` and `avatar.js` catches the error, logs it, and never resolves or rejects. If any call fails, the UI hangs forever. For example, the preflight check stuck at "Game: ...loading" while the RPC was slow. Fix in Phase 3, when these wrappers are replaced.
 - **Timer loops never stop.** `playgame.vue` `tick()` and `TitleScreen.vue` `checkBlockLoop()` reschedule `setTimeout` forever, and nothing cancels them on unmount. Leaving and re-entering a screen stacks more loops. The block poller keeps polling after you leave the title screen. Fix in Phase 4/5.
 - **`openMenu` doesn't clear `tradeMenu`.** In `store/ui/mutations.js`, switching from the trade menu to another menu leaves both open.
-- **`Method eth_getLogs is not supported`** is thrown as an uncaught page error during the event polling (`loadEvents`, `getPastEvents` with `fromBlock: block - 10`). Under investigation.
 - The brief's Phase 4 bugs are all present as described: the starfield never renders because the local array overwrites `this.stars`, the compass `getDegreesFromXY` returns `1` instead of `180`, there are duplicate `planetGradient` / `ringGradient` / `engineGradient` IDs, and the `setTimeout` animation loops.
 
 ### Found, not fixed (contracts; out of scope this iteration)
