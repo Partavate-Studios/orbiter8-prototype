@@ -1,10 +1,13 @@
 <template>
     <table class="sprites">
+      <thead>
         <tr>
           <th align="center" colspan="2">ID</th>
           <th align="center">Name</th>
           <th align="center">Mine</th>
         </tr>
+      </thead>
+      <tbody>
         <tr
           v-for="(sprite, index) in systemObjects"
           class="line"
@@ -22,6 +25,7 @@
             <div v-if="sprite.isMine">*</div>
           </td>
         </tr>
+      </tbody>
     </table>
 </template>
 

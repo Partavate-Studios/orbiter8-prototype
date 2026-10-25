@@ -4,6 +4,7 @@
     <hr>
     <div style="">
         <table>
+        <tbody>
         <tr>
             <th style="cursor: pointer; text-align:right" v-on:click="toggleGraphicsQuality">Graphics:</th>
             <td v-if="graphicsQuality == 1">Efficiency</td>
@@ -39,6 +40,7 @@
             <th style="text-align:right">selected:</th>
             <td >{{ selected }}</td>
         </tr>
+        </tbody>
         </table>
     </div>
     </div>
