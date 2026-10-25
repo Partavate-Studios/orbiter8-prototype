@@ -5,6 +5,7 @@ import { initContracts, contractAddresses, galaxy, getNativeBalance } from '@/sd
 import { loadPlayer, loadRecentEvents, loadSystem } from '@/sdk/load'
 import { createBlockWatcher } from '@/sdk/sync'
 import * as actions from '@/sdk/actions'
+import { loadLeaderboard } from '@/sdk/leaderboard'
 
 /**
  * @typedef {object} GameState
@@ -44,6 +45,9 @@ export function createGameClient() {
   }
   const listeners = new Set()
   const notify = (change) => listeners.forEach((listener) => listener(change, state))
+  // The leaderboard reads every player's holdings, so it's cached for a minute.
+  const LEADERBOARD_MAX_AGE_MS = 60 * 1000
+  let leaderboard = null
   const setLoading = (what, isLoading) => {
     state.loading[what] = isLoading
     notify('loading')
@@ -107,6 +111,19 @@ export function createGameClient() {
     /** Looks for a new block; if it changed the game, reloads everything. Rejects if the node fails. */
     checkForNewBlock() {
       return watcher.check()
+    },
+
+    /**
+     * Every player's planets, ports and credits (see sdk/leaderboard.js), at most a minute old.
+     * Rejects if the contracts aren't bound or the node fails.
+     */
+    async getLeaderboard({ refresh = false } = {}) {
+      if (!state.contracts) throw new Error('Not connected to the game')
+      const isFresh = leaderboard && Date.now() - leaderboard.loadedAt < LEADERBOARD_MAX_AGE_MS
+      if (!isFresh || refresh) {
+        leaderboard = { players: await loadLeaderboard(state.contracts), loadedAt: Date.now() }
+      }
+      return leaderboard
     },
 
     /** Reloads the player, recent events and the current system. */

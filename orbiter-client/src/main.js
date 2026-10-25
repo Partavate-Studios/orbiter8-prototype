@@ -15,5 +15,5 @@ app.use(router)
 app.mount('#game')
 
 if (import.meta.env.DEV) {
-  import('./dev/store-hook.js').then(({ installStoreHook }) => installStoreHook(pinia))
+  import('./dev/store-hook.js').then(({ installStoreHook }) => installStoreHook(pinia, game))
 }
