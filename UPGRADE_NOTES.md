@@ -455,6 +455,12 @@ Phase 6:
 - **Hovering the sun's scope marker threw** instead of labeling the sun. I introduced this with the Phase 5 sprite keys. (`ad11592`)
 - **A saved low graphics tier ran at full frame rate after a reload.** The tick delay only updated when a tier was picked, and the original had the same problem. The `~` key's tier toggle now also saves its choice. (`78f561e`)
 - **The map loading bar jumped in big steps.** Object keys are strings, so `6 + key` concatenated (`"60"`) and each stage went straight to its cap. Found while moving the loaders into the SDK. (`1489b25`)
+- **Regression I introduced in Phase 5, found by Koda:** a selected ship, moon or station jiggled in place. (`dc3d055`)
+  - Its screen position was the sum of separately rounded pixel offsets (world layer, drawn camera, planet layer, offset from the planet), and the rounding errors didn't cancel.
+  - Measured with a followed object over 120 frames: it moved 1–2 px on 15–70% of frames in Chrome and Firefox.
+  - The world is now drawn for a camera on the device-pixel grid, and sprites in a planet's layer are placed by rounding their absolute position. A followed object now moves 0 px in both browsers, at DPR 1 and 2.
+  - The measurement script is `jitter.js` in the test harness.
+- **Regression from Phase 5: the world could stay soft after selecting something at a different zoom.** It only redrew sharply once the camera held still, and a camera following a moving object never does. Now only the zoom has to settle. (`51b24ee`)
 - **The lint findings** listed below for "the phase that rewrites that code" are fixed. (`215d2c1`)
 
 ### Found, to fix in the phase that rewrites that code (all fixed in Phase 6)
