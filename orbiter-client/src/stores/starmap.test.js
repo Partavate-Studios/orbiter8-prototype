@@ -42,6 +42,16 @@ describe('importStarMapBlockData', () => {
     expect(starMap.spriteIds.stations).toEqual(['station:1'])
   })
 
+  it('names owners and the star from the load itself, not the previous one', () => {
+    starMap.importStarMapBlockData({
+      blockData: { ...blockData(), avatarNames: { '0xabc': 'Ann' } },
+      playerAccount: '0xabc'
+    })
+    expect(starMap.systemObjects['ship:5'].ownerName).toBe('Ann')
+    expect(starMap.systemObjects.star.ownerName).toBe('Ann')
+    expect(starMap.systemObjects.star.objectId).toBe(7)
+  })
+
   it('clears the selection when the selected sprite leaves the system', () => {
     starMap.importStarMapBlockData({ blockData: blockData(), playerAccount: '0xabc' })
     ui.selectSprite('ship:5')

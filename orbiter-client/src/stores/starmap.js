@@ -95,8 +95,7 @@ export const useStarMapStore = defineStore('StarMap', {
      * animation state and its selection when others appear or disappear.
      */
     importStarMapBlockData({ blockData, playerAccount }) {
-      // As before this change: the star's id and the owner names come from the previous load.
-      const { objects, keys } = buildSystem({ ...blockData, id: this.starId, avatarNames: this.players }, playerAccount)
+      const { objects, keys } = buildSystem(blockData, playerAccount)
 
       const sprites = {}
       for (const object of Object.values(objects)) {
