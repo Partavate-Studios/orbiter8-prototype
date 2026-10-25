@@ -1,8 +1,17 @@
 import { defineStore } from 'pinia'
 import { loadPlayer, loadRecentEvents } from '@/sdk/load'
-import { galaxy, avatars } from '@/sdk/chain/contracts'
+import * as game from '@/sdk/actions'
 import { useUIStore } from '@/stores/ui'
 import { useChainStore } from '@/stores/chain'
+
+/** Waits for a player action; if it fails, logs why (the revert reason when there is one). */
+async function logFailure(what, action) {
+  try {
+    await action
+  } catch (error) {
+    console.error(what + ' failed:', error.shortMessage ?? error.message)
+  }
+}
 
 export const useGameStateStore = defineStore('GameState', {
   state: () => ({
@@ -62,29 +71,29 @@ export const useGameStateStore = defineStore('GameState', {
     },
     /** player actions */
     async createAvatar(name) {
-      this.setProp({ key: 'creatingAvatar', value: true })
+      this.creatingAvatar = true
       try {
-        await avatars.createAvatar(name)
+        await game.createAvatar(name)
       } catch (error) {
         console.error('Avatar creation failed:', error.shortMessage ?? error.message)
       }
-      this.setProp({ key: 'creatingAvatar', value: false })
+      this.creatingAvatar = false
     },
     async launchShip(name) {
-      this.setProp({ key: 'launchingShip', value: true })
+      this.launchingShip = true
       try {
-        await galaxy.launchShip(name)
+        await game.launchShip(name)
       } catch (error) {
         console.error('Ship launch failed:', error.shortMessage ?? error.message)
       }
-      this.setProp({ key: 'launchingShip', value: false })
+      this.launchingShip = false
     },
     /** Jumps the player's ship to a neighboring system, playing the jump animation until the new system loads. */
     async moveToSystem(system) {
       try {
         useUIStore().jumpAnimationOn()
         useUIStore().jumpMenuOff()
-        await galaxy.moveToSystem(system)
+        await game.moveTo(system)
       } catch (error) {
         console.error('Jump failed:', error.shortMessage ?? error.message)
         // Otherwise the "traveling" animation never ends (it stops when the new system loads).
@@ -92,63 +101,23 @@ export const useGameStateStore = defineStore('GameState', {
       }
     },
     async sendChat(message) {
-      try {
-        await galaxy.sendChat(message)
-      } catch (error) {
-        console.error('Sending chat failed:', error.shortMessage ?? error.message)
-      }
+      await logFailure('Sending chat', game.sendChat(message))
     },
     async claimPlanet({ planetId, name }) {
-      try {
-        await galaxy.claimPlanet(String(planetId), String(name))
-      } catch (error) {
-        console.error('Claiming the planet failed:', error.shortMessage ?? error.message)
-      }
+      await logFailure('Claiming the planet', game.claimPlanet(planetId, name))
     },
     async buildStation({ planetId, name }) {
-      try {
-        await galaxy.buildStation(String(planetId), String(name))
-      } catch (error) {
-        console.error('Building the station failed:', error.shortMessage ?? error.message)
-      }
+      await logFailure('Building the station', game.buildStation(planetId, name))
     },
     async tradeAtPort({ planetId, equipment, fuel, organics }) {
-      try {
-        await galaxy.tradeAtPort(String(planetId), equipment, fuel, organics)
-      } catch (error) {
-        console.error('Trade failed:', error.shortMessage ?? error.message)
-      }
+      await logFailure('Trade', game.trade(planetId, { equipment, fuel, organics }))
     },
     async addHoldsToShip({ planetId, amount }) {
-      try {
-        await galaxy.addHoldsToShip(planetId, amount)
-      } catch (error) {
-        console.error('Buying cargo holds failed:', error.shortMessage ?? error.message)
-      }
+      await logFailure('Buying cargo holds', game.buyHolds(planetId, amount))
     },
     /** Renames a star, planet, moon, station or the player's ship. `parentId` is a moon's planet. */
     async renameAsset({ name, type, objectId, parentId }) {
-      try {
-        switch (type) {
-          case 'star':
-            await galaxy.renameStar(name)
-            break
-          case 'planet':
-            await galaxy.renamePlanet(objectId, name)
-            break
-          case 'moon':
-            await galaxy.renameMoon(parentId, objectId, name)
-            break
-          case 'station':
-            await galaxy.renameStation(objectId, name)
-            break
-          case 'ship':
-            await galaxy.renameMyShip(name)
-            break
-        }
-      } catch (error) {
-        console.error('Renaming failed:', error.shortMessage ?? error.message)
-      }
+      await logFailure('Renaming', game.rename({ type, objectId, parentId, name }))
     },
     setProp({ key, value }) {
       this[key] = value
