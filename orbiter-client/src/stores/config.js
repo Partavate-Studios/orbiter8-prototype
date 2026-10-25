@@ -9,7 +9,7 @@ export const useConfigStore = defineStore('Config', {
     tickDelayLow: 64,
     tickDelay: 48,
     blockCheckDelay: 2000,
-    graphicsQuality: Cookies.get('graphicsQuality') || 2,
+    graphicsQuality: Number(Cookies.get('graphicsQuality')) || 2,
     showScope: true
   }),
   getters: {
