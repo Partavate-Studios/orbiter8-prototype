@@ -50,13 +50,14 @@ export default {
       }
       let stars = []
       for (let i = 0; i < starCount; i++) {
-        this.stars.push({
+        stars.push({
           x: (Math.random() * 1500 - 750),
           y: (Math.random() * 1500 - 750),
           size: Math.random() * Math.random() * 1.5 + 0.1
         })
       }
-      this.stars = stars
+      // Frozen: positions never change, so Vue doesn't need to track thousands of star objects.
+      this.stars = Object.freeze(stars)
       this.loaded = true
     }
   },
