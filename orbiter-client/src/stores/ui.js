@@ -362,7 +362,7 @@ export const useUIStore = defineStore('UI', {
       this.hud.menuState.shipsMenu = false
       this.hud.menuState.planetsMenu = false
       this.hud.menuState.settingsMenu = false
-      this.hud.menuState.portMenu = false
+      this.hud.menuState.tradeMenu = false
       this.hud.menuState.shipyardMenu = false
       this.hud.menuState.chatMenu = false
       switch(menu) {
