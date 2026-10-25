@@ -615,6 +615,10 @@ Phase 6:
   - **Fix, part 2:** the block check also counts any event from the game, avatar or token contracts, in one `getLogs` request. That covers smart accounts for chat, trades, launches, claims and anything that moves credits or tokens.
   - **Fix, part 3:** a full reload at least every 2 minutes catches the rest (a smart-account player's jump or rename emits no event).
   - Events for every action, on the contract wish list, would make part 3 unnecessary. Checked against the real Sepolia block holding Koda's chat.
+- **The backdrop showed its edges during zoom-outs (Phase 5), found by Koda.** The nebula backdrop is opaque and could be CSS-shrunk to half size before redrawing.
+  - The backdrop and the starfield now redraw as soon as shrinking them would uncover any of the screen (the `mustCover` option in `libs/composited-layer.js`).
+  - Over 25 wheel steps out at 2000×840, the backdrop's edge was visible in 113 of 243 frames (gaps up to 372 px) before the fix, and in none after.
+  - Firefox still holds 60 fps while wheeling out.
 - **The lint findings** listed below for "the phase that rewrites that code" are fixed. (`215d2c1`)
 
 ### Found, to fix in the phase that rewrites that code (all fixed in Phase 6)

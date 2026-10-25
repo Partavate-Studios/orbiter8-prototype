@@ -88,8 +88,11 @@ export default {
       x: Math.random() * 5000,
       y: Math.random() * 3000 - 1500
     }))
-    this.backdropLayer = new CompositedLayer(this.$refs.backdrop, { margin: MARGIN })
-    this.starsLayer = new CompositedLayer(this.$refs.stars, { margin: MARGIN })
+    // The backdrop is opaque and the stars thin out at the edges, so neither may show its edge:
+    // they redraw whenever shrinking them would uncover part of the screen.
+    const screen = () => this.screenSize
+    this.backdropLayer = new CompositedLayer(this.$refs.backdrop, { margin: MARGIN, mustCover: screen })
+    this.starsLayer = new CompositedLayer(this.$refs.stars, { margin: MARGIN, mustCover: screen })
     this.resize()
     this.stopFrames = onFrame(this.onFrame, FRAME_ORDER.render)
   },

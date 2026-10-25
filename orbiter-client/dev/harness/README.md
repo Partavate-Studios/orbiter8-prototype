@@ -9,6 +9,7 @@ the upgrade fixed. Use them to check that a change looks the same and isn't slow
 - `npm run local` running (the local chain on :8545, the dev server on :8080).
 - Google Chrome at `/usr/bin/google-chrome`, or set `CHROME_PATH`. Firefox scripts use `FIREFOX_PATH`.
 - Python 3 with Pillow, for `diff.py`.
+- Firefox installed as a snap can only use a profile folder inside `~/snap/firefox/common/`; pass one there to `ffps.mjs` and `ffjitter.mjs`.
 
 Every script takes the game URL. With the dev server, use `?account=N` and `INJECT=0` (the app's own
 dev wallet). For a production build, leave `INJECT` unset: `provider.js` injects a test wallet for
