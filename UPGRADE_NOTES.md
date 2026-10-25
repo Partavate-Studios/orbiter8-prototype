@@ -244,19 +244,19 @@ The committed Infura key only appeared in the RPC URLs of chains 3, 4 and 42, so
   - `Avatar` in `minerva.vue` (`d479497`).
   - The unused `radial-menu.vue` mapped `Map`/`Avatar` actions and has been deleted (`87889db`).
 
-### Found, to fix in the phase that rewrites that code
+- **A failed star map load left `isLoading` stuck**, so the map never refreshed again in that session. (`dddd969`)
+- **Chat messages flipped order on every re-render.** The menu reversed the store's array in place. Opening the chat before events had loaded also threw. (`7711bf6`)
+- **The graphics quality cookie was read back as a string**, so toggling did `"3" + 1`. (`d9d75ca`)
+- **`openMenu` reset a nonexistent `portMenu` flag instead of `tradeMenu`**, leaving the trade menu open under other menus. (`ea31e02`)
 
-- **A failed star map load leaves `isLoading` stuck at `true`**, so the map never reloads after one RPC error (`loadStarMap`). Fix in Phase 3.
-- **The graphics quality cookie is read back as a string.** `toggleGraphicsQuality` then does string arithmetic: `"3" + 1` → `"31"`.
+### Found, to fix in the phase that rewrites that code
 
 - **Lint findings:**
   - `moons-icon.svg.vue` registers a `Ship` component that is never imported, and imports `Moon` without using it.
   - `space-dock-icon.svg.vue` registers `Station` without using it.
   - `card-button.svg.vue` is named `Button`, a reserved HTML element name.
-  - Plus unused variables in `NetworkSelect.vue` and `store/actions.js`.
-
+  - Plus an unused variable in `NetworkSelect.vue` and a useless assignment in `playgame.vue` `onWheel`.
 - **Timer loops never stop.** `playgame.vue` `tick()` and `TitleScreen.vue` `checkBlockLoop()` reschedule `setTimeout` forever, and nothing cancels them on unmount. Leaving and re-entering a screen stacks more loops. The block poller keeps polling after you leave the title screen. Fix in Phase 4/5.
-- **`openMenu` doesn't clear `tradeMenu`.** In `store/ui/mutations.js`, switching from the trade menu to another menu leaves both open.
 - The brief's Phase 4 bugs are all present as described: the starfield never renders because the local array overwrites `this.stars`, the compass `getDegreesFromXY` returns `1` instead of `180`, there are duplicate `planetGradient` / `ringGradient` / `engineGradient` IDs, and the `setTimeout` animation loops.
 
 ### Found, not fixed (contracts; out of scope this iteration)
