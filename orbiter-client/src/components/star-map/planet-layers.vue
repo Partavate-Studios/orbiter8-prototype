@@ -19,6 +19,13 @@
         xmlns="http://www.w3.org/2000/svg"
       >
         <g>
+          <!-- Rings first, so a ring never crosses a body. Ships at a planet all share one orbit. -->
+          <orbit-ring
+            v-for="childIndex in childrenOf(planetIndex)"
+            :key="'ring-' + childIndex"
+            :r="systemObjects[childIndex].distance"
+            :selected="childIndex === selected"
+          />
           <sprite-transform
             :sprite="systemObjects[planetIndex]"
             :objectIndex="planetIndex"
@@ -43,6 +50,8 @@
 import { mapState } from 'pinia'
 import { useStarMapStore } from '@/stores/starmap'
 import SpriteTransform from './sprites/sprite-transform.svg'
+import OrbitRing from './sprites/orbit-ring.svg.vue'
+import { useUIStore } from '@/stores/ui'
 
 // Room around a planet's outermost orbit for the orbiting bodies and their labels, in world units.
 const LAYER_PADDING = 30
@@ -50,7 +59,8 @@ const LAYER_PADDING = 30
 export default {
   name: 'PlanetLayers',
   components: {
-    SpriteTransform
+    SpriteTransform,
+    OrbitRing
   },
   props: {
     /** The camera the world is drawn for ({ x, y, scale }). */
@@ -63,6 +73,7 @@ export default {
   },
   computed: {
     ...mapState(useStarMapStore, ['systemObjects', 'spriteIds', 'gameTime']),
+    ...mapState(useUIStore, ['selected']),
     /** Pixels per world unit at the drawn zoom. */
     pixelsPerUnit() {
       return this.unit / this.drawnView.scale

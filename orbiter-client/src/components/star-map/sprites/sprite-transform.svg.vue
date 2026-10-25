@@ -1,12 +1,5 @@
 <template>
   <g>
-    <orbit-ring
-      v-if="frameOf !== 'self' && (isSelected || hasOrbitRing)"
-      :cx="placement.ringX"
-      :cy="placement.ringY"
-      :r="sprite.distance"
-      :selected="isSelected"
-    />
     <g :transform="getOrbitalTransform" v-if="shouldDisplay">
       <g>
         <slot />
@@ -62,7 +55,6 @@ import Ship from './ship.svg'
 import Station from './station.svg'
 import Moon from './moon.svg'
 import Planet from './planet.svg'
-import OrbitRing from './orbit-ring.svg.vue'
 
 // Rotations change in steps this size (degrees), and positions in whole device pixels, so a slowly
 // moving sprite only touches the DOM (and makes the browser repaint) when it visibly moves.
@@ -78,8 +70,7 @@ export default {
     Station,
     Moon,
     Planet,
-    Star,
-    OrbitRing
+    Star
   },
   data() {
     return {
@@ -140,22 +131,6 @@ export default {
         parentY: parent ? parent.telemetry.translatey : 0
       }
     },
-    hasOrbitRing() {
-      if (this.sprite.type != 'star') {
-        return true
-      }
-      return false
-    },
-    /** Where the orbit ring's center and the sprite go, in this sprite's coordinate system. */
-    placement() {
-      if (this.frameOf === 'self') {
-        return { ringX: 0, ringY: 0, x: 0, y: 0 }
-      }
-      if (this.frameOf === 'parent') {
-        return { ringX: 0, ringY: 0, x: this.frame.x - this.frame.parentX, y: this.frame.y - this.frame.parentY }
-      }
-      return { ringX: this.frame.parentX, ringY: this.frame.parentY, x: this.frame.x, y: this.frame.y }
-    },
     getOrbitalTransform() {
       // Snap to the device-pixel grid of the drawn world.
       const step = 1 / (this.drawnPixelsPerUnit * (window.devicePixelRatio || 1))
@@ -169,7 +144,8 @@ export default {
         const y = snap(this.frame.y) - snap(this.frame.parentY)
         return 'translate(' + x + ',' + y + ')'
       }
-      return 'translate(' + snap(this.placement.x) + ',' + snap(this.placement.y) + ')'
+      if (this.frameOf === 'self') return 'translate(0,0)'
+      return 'translate(' + snap(this.frame.x) + ',' + snap(this.frame.y) + ')'
     },
     getRotationalTransform() {
       return 'rotate(' + Math.round(this.frame.rotation / ROTATION_STEP) * ROTATION_STEP + ')'
