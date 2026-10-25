@@ -19,8 +19,6 @@ export const CAMERA = {
   MIN_SCALE: 0.001,
   /** Below this the camera snaps to MIN_SCALE. */
   MIN_SCALE_SNAP: 0.0015,
-  /** Upper bound on requested zooms (wheel, keys, buttons) before MAX_SCALE applies. */
-  ZOOM_REQUEST_CAP: 2000,
   /** How far (world units) the camera can pan from the star. */
   MAX_PAN: 5200,
   /** Easing toward a newly selected sprite. */

@@ -282,19 +282,19 @@ export const useUIStore = defineStore('UI', {
       )
     },
     scaleBy (scaler) {
-      this.viewport.scale =  Math.min(CAMERA.ZOOM_REQUEST_CAP, scaler * this.viewport.scale)
+      this.viewport.scale =  Math.min(CAMERA.MAX_SCALE, scaler * this.viewport.scale)
     },
     scaleAnimateBy ({scaler, time}) {
       if (this.viewport.scaleTween == null) {
         this.viewport.scaleTween = new Tween(
           this.viewport.scale,
-          Math.min(CAMERA.ZOOM_REQUEST_CAP, scaler * this.viewport.scale),
+          Math.min(CAMERA.MAX_SCALE, scaler * this.viewport.scale),
           time
         )
         this.viewport.scaleTween.useLinear()
       } else {
         this.viewport.scaleTween.updateTarget(
-          Math.min(CAMERA.ZOOM_REQUEST_CAP, scaler * this.viewport.scaleTween.target)
+          Math.min(CAMERA.MAX_SCALE, scaler * this.viewport.scaleTween.target)
         )
       }
     },
@@ -346,13 +346,13 @@ export const useUIStore = defineStore('UI', {
       if (this.viewport.scaleTween == null) {
         this.viewport.scaleTween = new Tween(
           this.viewport.scale,
-          Math.min(CAMERA.ZOOM_REQUEST_CAP, scale * this.viewport.scale),
+          Math.min(CAMERA.MAX_SCALE, scale * this.viewport.scale),
           time
         )
         this.viewport.scaleTween.useLinear()
       } else {
         this.viewport.scaleTween.updateTarget(
-          Math.min(CAMERA.ZOOM_REQUEST_CAP, scale * this.viewport.scaleTween.target),
+          Math.min(CAMERA.MAX_SCALE, scale * this.viewport.scaleTween.target),
         )
       }
     },
