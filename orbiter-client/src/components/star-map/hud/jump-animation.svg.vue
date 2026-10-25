@@ -1,61 +1,7 @@
 
 <template>
   <g>
-    <rect x="-10000" y="-10000" width="20000" height="20000" fill="#280b4b" />
-    <g :transform="getLeftTranslate()">
-        <rect
-        v-for="(star, key) in stars"
-        :key="'star-' + key"
-        :x="star.x"
-        :y="star.y"
-        width="500"
-        height="8"
-        ry="8"
-        rx="8"
-        stroke-width="0"
-        fill="url(#starStreak)" />
-    </g>
-    <g :transform="getRightTranslate()">
-        <rect
-        v-for="(star, key) in stars"
-        :key="'star-' + key"
-        :x="star.x"
-        :y="star.y"
-        width="500"
-        height="8"
-        ry="8"
-        rx="8"
-        stroke-width="0"
-        fill="url(#starStreak)" />
-    </g>
-    <g transform="scale(0.65)">
-        <g :transform="getLeftTranslate()">
-            <rect
-            v-for="(star, key) in stars"
-            :key="'star-' + key"
-            :x="5000 - star.x"
-            :y="star.y"
-            width="500"
-            height="8"
-            ry="8"
-            rx="8"
-            stroke-width="0"
-            fill="url(#starStreak)" />
-        </g>
-        <g :transform="getRightTranslate()">
-            <rect
-            v-for="(star, key) in stars"
-            :key="'star-' + key"
-            :x="5000 - star.x"
-            :y="star.y"
-            width="500"
-            height="8"
-            ry="8"
-            rx="8"
-            stroke-width="0"
-            fill="url(#starStreak)" />
-        </g>
-    </g>
+    <!-- The background and star streaks are drawn on canvas (background-canvas.vue). -->
     <g transform="translate(0 -100)">
       <g :transform="getShipTranslate()">
         <g transform="scale(15) rotate(90)">
@@ -125,16 +71,11 @@
 import { mapState } from 'pinia'
 import { useStarMapStore } from '@/stores/starmap'
 import Ship from '../sprites/ship.svg'
-import { onFrame } from '@/libs/frame-loop'
 
 export default {
   name: 'JumpAnimation',
   data () {
     return {
-      starCount: 50,
-      leftSlideX: 5000,
-      rightSlideX: 0,
-      stars: [],
       know: '',
       starSpeed: 25
     }
@@ -146,34 +87,17 @@ export default {
   },
   mounted: function () {
     this.know = this.getRandomDidYouKnow()
-    for (let i = 0; i < this.starCount; i++) {
-      this.stars.push({
-        x: Math.random() * 5000,
-        y: Math.random() * 3000 - 1500
-      })
-      // console.log('added ' + JSON.stringify(this.stars[i]))
-    }
-    this.stopFrames = onFrame(this.tickWork)
-  },
-  unmounted () {
-    this.stopFrames()
   },
   computed: {
     ...mapState(useStarMapStore, [
       'gameTime'
     ]),
+    // Where the streak cycle is; the ship bobs in time with it.
+    rightSlideX () {
+      return (this.starSpeed * this.gameTime / 10 + 5000) % 10000
+    }
   },
   methods: {
-    tickWork () {
-      this.leftSlideX = (this.starSpeed * this.gameTime / 10) % 10000
-      this.rightSlideX = (this.starSpeed * this.gameTime / 10 + 5000) % 10000
-    },
-    getLeftTranslate () {
-      return 'translate(' + (2500 - this.leftSlideX) + ' 0)'
-    },
-    getRightTranslate () {
-      return 'translate(' + (2500 - this.rightSlideX) + ' 0)'
-    },
     getShipTranslate () {
       return 'scale(' + (2 + (Math.sin(this.rightSlideX / 1000) / 50)) + ') translate(' + Math.sin(this.rightSlideX / 300)  + ' ' + Math.sin(this.rightSlideX / 200 + 0.5) + ')'
     },

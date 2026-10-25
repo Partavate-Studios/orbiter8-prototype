@@ -2,20 +2,7 @@
   <!-- Back to front: background, world (the star system) and HUD are separate elements,
        so changes in one layer never make the browser repaint the others. -->
   <div class="layer star-map" ref="gamelayerContainer">
-    <svg
-      class="map-layer"
-      :viewBox="layerViewBox"
-      xmlns="http://www.w3.org/2000/svg">
-      <backdrop
-        id="backdrop"
-        :transform="backdropTransform"></backdrop>
-
-      <g :transform="getFractionalTranslate" v-if="graphicsQuality > 1">
-        <starfield
-          id="stars"
-        :transform="starfieldTransform"></starfield>
-      </g>
-    </svg>
+    <background-canvas />
 
     <svg
       class="map-layer"
@@ -78,8 +65,7 @@ import Grid from './_grid.svg'
 import Hud from './hud/hud.svg'
 import JumpMenu from './hud/jump-menu.svg'
 import JumpAnimation from './hud/jump-animation.svg'
-import backdrop from './assets/backdrop.svg'
-import starfield from './assets/starfield.svg'
+import BackgroundCanvas from './background-canvas.vue'
 import SolarSystem from './_solarsystem.svg'
 import ConnectionStatus from './hud/connection-status.svg'
 import LoadingBar from './hud/loading-bar.svg'
@@ -90,8 +76,7 @@ export default {
     JumpMenu,
     JumpAnimation,
     Grid,
-    backdrop,
-    starfield,
+    BackgroundCanvas,
     SolarSystem,
     ConnectionStatus,
     LoadingBar
@@ -150,18 +135,6 @@ export default {
       const width = this.viewport.resolution * this.container.width / this.container.height
       const height = this.viewport.resolution
       return (-width / 2) + ' ' + (-height / 2) + ' ' + width + ' ' + height
-    },
-    backdropTransform () {
-      return 'scale(' + ((Math.sqrt(10 / parseFloat(this.viewport.scale)) + 10) / 4) + ')'
-    },
-    starfieldTransform () {
-      return 'scale(' + ((Math.sqrt(12 / parseFloat(this.viewport.scale)) + 10) / 4) + ')'
-    },
-    getFractionalTranslate () {
-      const div = 20
-      return 'translate(' +
-        (this.viewport.x / div) + ' ' +
-        (this.viewport.y / div) + ')' //rubber should be in store
     },
 
 
