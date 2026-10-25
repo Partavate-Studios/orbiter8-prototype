@@ -139,11 +139,43 @@ Every removed network and its Orbiter8/AvatarControls addresses will be recorded
   - Map screens differ by 0.1–2.7 % of pixels. Those are orbit positions at slightly different times.
 - **Pan/zoom run (dev server):** 52.1 fps on average, p95 frame time 33.3 ms. Same as before, as expected, since rendering hasn't changed yet.
 
+## Phase 2: Vue 3
+
+- **Vue 2.7 → 3.5** through the `@vue/compat` migration build (MODE 2).
+  - The full scripted flow (registration, ship launch, star map, every card and menu, the jump) produced **no compat deprecation warnings**, so compat was removed in the same step.
+  - The code used almost none of the removed APIs: no filters, event buses, `.sync`, `$listeners` or `xlink:href`.
+- **Router:** vue-router 3 → 4, with hash history as before.
+- **Lifecycle hooks:** `beforeDestroy`/`destroyed` → `beforeUnmount`/`unmounted`.
+- **Mount point:** Vue 3 mounts *inside* its container instead of replacing it. The app now mounts on `#game`, so `App.vue`'s own `#app` root and its styles behave exactly as before.
+- **Vite 7 → 8 with `@vitejs/plugin-vue`.** Production build time dropped from 13 s to 1.9 s.
+- **ESLint 10** with the Vue 3 rule set. It reports no Vue 3 deprecations.
+- **Vuex → Pinia** (the brief's first choice), one store per commit, in this order:
+  - `Config`, then `UI`, `StarMap`, `GameState`, and finally the root store as `Chain`.
+  - **Same names.** State and action names are unchanged; former mutations are now actions. Components use `mapState`/`mapActions` with the same names.
+  - **Identity getters are dropped.** Getters that only returned a state field are gone, because Pinia exposes state directly.
+  - **One state field renamed.** `mapLoadedPercentage` kept its getter name, but its backing state field is now `loadProgress`, since Pinia can't hold a state field and a getter under one name.
+  - **Undeclared fields are now declared.** `creatingAvatar`, `launchingShip` and `lastBlockNumber` used to be created on the fly by `setProp`. Pinia only tracks declared state, so they're declared now.
+  - **Mechanical conversion.** Each store's logic was converted mechanically (`state.x` → `this.x`), so behavior is unchanged. Phase 5/6 restructure them properly.
+- **Dev hook:** dev builds expose `window.__o8commit('UI/openMenu', 'planets')` to drive any store action by name. The smoke tests use it.
+- **SVG `<a>` click handling** (HUD icons) was checked with real mouse clicks on both the baseline and the Vue 3 build. The behavior is identical, including the quirk where, with a menu open, the first click on another icon only closes it.
+- **Verification:** after each store port, the full flow passed, the static screens were pixel-identical to the baseline, and the console was clean apart from the known `eth_getLogs` error. Pan/zoom held at about 51 fps on average with a p95 of 33.4 ms, unchanged as expected.
+
 ## Bugs
+
+### Fixed
+
+- **Empty `cy=""` on HUD icon circles** (`_icon-container.svg.vue`). The browser logged an error on every icon render. It's now `cy="0"`, which looks the same. (`d6c2514`)
+- **`NaN` keys in the ship-creation fleet animation** (`_ship-scene.vue`). `:key="ship-x"` evaluated as the expression `ship - x`. (`fb0954a`)
+- **Getter mappings to store modules that don't exist:**
+  - `Map` in `TitleScreen.vue` (`ce64930`).
+  - `Avatar` in `minerva.vue` (`d479497`).
+  - The unused `radial-menu.vue` mapped `Map`/`Avatar` actions and has been deleted (`87889db`).
 
 ### Found, to fix in the phase that rewrites that code
 
-- **`_ship-scene.vue` renders an undefined `ship` and duplicate `NaN` keys.** The Vite dev server shows Vue warnings that the old production build hid. On the ship-creation and launch screens: "Property or method `ship` is not defined", and "Duplicate keys detected: 'NaN'" from a `v-for`.
+- **A failed star map load leaves `isLoading` stuck at `true`**, so the map never reloads after one RPC error (`loadStarMap`). Fix in Phase 3.
+- **The graphics quality cookie is read back as a string.** `toggleGraphicsQuality` then does string arithmetic: `"3" + 1` → `"31"`.
+
 - **Lint findings:**
   - `moons-icon.svg.vue` registers a `Ship` component that is never imported, and imports `Moon` without using it.
   - `space-dock-icon.svg.vue` registers `Station` without using it.
@@ -153,7 +185,6 @@ Every removed network and its Orbiter8/AvatarControls addresses will be recorded
 - **Contract wrappers swallow errors and never settle.** Almost every method in `contract-interfaces/galaxy.js` and `avatar.js` catches the error, logs it, and never resolves or rejects. If any call fails, the UI hangs forever. For example, the preflight check stuck at "Game: ...loading" while the RPC was slow. Fix in Phase 3, when these wrappers are replaced.
 - **Timer loops never stop.** `playgame.vue` `tick()` and `TitleScreen.vue` `checkBlockLoop()` reschedule `setTimeout` forever, and nothing cancels them on unmount. Leaving and re-entering a screen stacks more loops. The block poller keeps polling after you leave the title screen. Fix in Phase 4/5.
 - **`openMenu` doesn't clear `tradeMenu`.** In `store/ui/mutations.js`, switching from the trade menu to another menu leaves both open.
-- **`<circle>` with empty `cy`.** The browser logs "attribute cy: Unexpected end of attribute" on every map load. Source not located yet.
 - **`Method eth_getLogs is not supported`** is thrown as an uncaught page error during the event polling (`loadEvents`, `getPastEvents` with `fromBlock: block - 10`). Under investigation.
 - The brief's Phase 4 bugs are all present as described: the starfield never renders because the local array overwrites `this.stars`, the compass `getDegreesFromXY` returns `1` instead of `180`, there are duplicate `planetGradient` / `ringGradient` / `engineGradient` IDs, and the `setTimeout` animation loops.
 
