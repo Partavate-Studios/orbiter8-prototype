@@ -16,6 +16,7 @@
           >Profile
         </span>
         <span
+          v-if="isDev"
           class="tab"
           :class="{ 'selected' : showTab == 'debug'}"
           v-on:click="showTab = 'debug'">Debug
@@ -33,7 +34,7 @@
       </div>
       <div class="tabContent">
         <profile v-if="showTab == 'profile'"></profile>
-        <debug v-if="showTab == 'debug'"></debug>
+        <debug v-if="isDev && showTab == 'debug'"></debug>
         <terminal v-if="showTab == 'terminal'"></terminal>
         <sprites v-if="showTab == 'sprites'"></sprites>
       </div>
@@ -47,24 +48,28 @@
 <script>
 import Terminal from '@/components/layer-html/minerva/terminal'
 import Profile from '@/components/layer-html/minerva/profile'
-import Debug from '@/components/layer-html/minerva/debug'
+import { defineAsyncComponent } from 'vue'
 import Sprites from '@/components/layer-html/minerva/sprites'
 import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
 import { mapActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 
+// The debug tab is for development only; production builds don't include it.
+const Debug = import.meta.env.DEV ? defineAsyncComponent(() => import('@/components/layer-html/minerva/debug.vue')) : null
+
 export default {
   name: 'MinervaAI',
   components: {
     Terminal,
     Profile,
-    Debug,
+    ...(Debug ? { Debug } : {}),
     Sprites
   },
   data () {
     return {
-      showTab: 'profile'
+      showTab: 'profile',
+      isDev: import.meta.env.DEV
     }
   },
   computed: {
