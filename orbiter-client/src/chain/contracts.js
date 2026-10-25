@@ -30,19 +30,37 @@ export async function initContracts () {
   return true
 }
 
+/** Addresses of the bound game and avatar contracts. */
 export function contractAddresses () {
   return { game: contracts.game.target, avatars: contracts.avatars.target }
 }
 
+/**
+ * Calls a view function and converts the result to plain JS values (bigints become numbers).
+ * @param {'game' | 'avatars'} contract
+ * @param {string} method  the ABI function name
+ */
 async function read (contract, method, ...args) {
   return toPlain(await contracts[contract][method](...args))
 }
 
+/**
+ * Sends a transaction and waits for it to be mined. Rejects with the revert reason if it fails.
+ * @param {'game' | 'avatars'} contract
+ * @param {string} method  the ABI function name
+ */
 async function write (contract, method, ...args) {
   const tx = await contracts[contract][method](...args)
   return tx.wait()
 }
 
+/**
+ * Past events, shaped like web3's (`returnValues`, `blockNumber`) so the stores didn't need to change.
+ * @param {'game' | 'avatars'} contract
+ * @param {string} eventName
+ * @param {number | 'latest'} fromBlock
+ * @param {number | 'latest'} [toBlock]
+ */
 async function events (contract, eventName, fromBlock, toBlock = 'latest') {
   // Clamp: "the last N blocks" goes negative on a young chain (e.g. the local dev chain).
   const from = typeof fromBlock === 'number' ? Math.max(0, fromBlock) : fromBlock
@@ -50,6 +68,7 @@ async function events (contract, eventName, fromBlock, toBlock = 'latest') {
   return logs.map(toPlainEvent)
 }
 
+/** The chain's latest block number. */
 export async function getBlockNumber () {
   return getSession().provider.getBlockNumber()
 }
@@ -83,6 +102,7 @@ export async function getNativeBalance () {
   return formatEther(await provider.getBalance(account))
 }
 
+/** The AvatarControls contract: player names. Method names match the ABI. */
 export const avatars = {
   getEvents: () => events('avatars', 'New', 'latest'),
   createAvatar: name => write('avatars', 'createAvatar', name),
@@ -92,6 +112,7 @@ export const avatars = {
   getAvatarCount: () => read('avatars', 'getAvatarCount')
 }
 
+/** The Orbiter8 game contract. Method names match the ABI, except the three token getters. */
 export const galaxy = {
   getEvents: (name, fromBlock) => events('game', name, fromBlock),
   getPlanetToken: () => read('game', 'getPlanetTokenizer'),

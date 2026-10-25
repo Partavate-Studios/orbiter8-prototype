@@ -41,6 +41,7 @@ export function preferredWallet (wallets) {
   return wallets.find(wallet => wallet.info.rdns === remembered) ?? (wallets.length === 1 ? wallets[0] : null)
 }
 
+/** Remembers the chosen wallet so the next visit connects to it without asking. */
 export function rememberWallet (wallet) {
   try {
     localStorage.setItem(PREFERRED_WALLET_KEY, wallet.info.rdns)
