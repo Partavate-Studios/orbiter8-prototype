@@ -5,6 +5,9 @@ import { initContracts as bindContracts, contractAddresses, galaxy, getBlockNumb
 import { networks, networkFor } from '@/chain/networks'
 import { useStarMapStore } from '@/stores/starmap'
 import { useGameStateStore } from '@/stores/gamestate'
+import { useConfigStore } from '@/stores/config'
+
+let blockPoller = null
 
 export const useChainStore = defineStore('Chain', {
   state: () => ({
@@ -79,6 +82,15 @@ export const useChainStore = defineStore('Chain', {
       this.shipTokenAddress = shipToken
       this.creditTokenAddress = creditToken
       this.contractsLoaded = true
+    },
+    /** Polls for new blocks for the rest of the session. Safe to call again: only one poller ever runs. */
+    startBlockPolling () {
+      if (blockPoller) return
+      // Paused while the tab is hidden; checks right away when the player comes back.
+      const poll = () => { if (!document.hidden) this.checkForNewBlock() }
+      poll()
+      blockPoller = setInterval(poll, useConfigStore().blockCheckDelay)
+      document.addEventListener('visibilitychange', poll)
     },
     /** game state only changes when a block completes */
     async checkForNewBlock () {

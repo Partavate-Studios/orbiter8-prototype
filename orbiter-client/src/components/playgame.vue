@@ -16,6 +16,7 @@ import starMap from '@/components/star-map/map'
 import layerHtml from '@/components/layer-html/container-html'
 import router from '@/router/router'
 import Eases from '@/libs/eases.js'
+import { onFrame } from '@/libs/frame-loop'
 
 export default {
   name: 'Play',
@@ -162,9 +163,11 @@ export default {
       this.incrementGameTime()
       this.viewportToTime(this.gameTime)
     },
-    tick () {
+    onFrame (now) {
+      // Keep the per-quality tick rate (tickDelay) for now: every tick still re-renders the whole map SVG.
+      if (now - this.lastTick < this.tickDelay) return
+      this.lastTick = now
       this.tickWork()
-      setTimeout(this.tick, this.tickDelay)
     }
   },
   mounted () {
@@ -175,6 +178,7 @@ export default {
   unmounted () {
     window.removeEventListener('keyup', this.handleKeyPress)
     window.removeEventListener('wheel', this.onWheel)
+    this.stopFrames()
   },
   created () {
     window.addEventListener('keyup', this.handleKeyPress)
@@ -183,7 +187,8 @@ export default {
     if (!this.haveAvatar || !this.haveShip) {
       router.push('/')
     }
-    this.tick()
+    this.lastTick = 0
+    this.stopFrames = onFrame(this.onFrame)
   }
 }
 </script>

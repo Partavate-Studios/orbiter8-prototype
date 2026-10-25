@@ -20,7 +20,6 @@
 import { useChainStore } from '@/stores/chain'
 import { useGameStateStore } from '@/stores/gamestate'
 import { mapActions, mapState } from 'pinia'
-import { useConfigStore } from '@/stores/config'
 import AvatarCreate from '@/components/screens/AvatarCreate'
 import ShipCreate from '@/components/screens/ShipCreate'
 import ShipSelect from '@/components/screens/ShipSelect'
@@ -43,21 +42,11 @@ export default {
       'haveShip',
       'gameState'
     ]),
-    ...mapState(useConfigStore, [
-      'blockCheckDelay'
-    ]),
   },
   methods: {
     ...mapActions(useChainStore, [
-      'checkForNewBlock'
-    ]),
-    async checkBlockWork () {
-      this.checkForNewBlock()
-    },
-    checkBlockLoop () {
-      this.checkBlockWork()
-      setTimeout(this.checkBlockLoop, this.blockCheckDelay)
-    }
+      'startBlockPolling'
+    ])
   },
   watch: {
     haveAvatar: {
@@ -67,7 +56,7 @@ export default {
     }
   },
   created () {
-    this.checkBlockLoop()
+    this.startBlockPolling()
     this.o8audio.playMusic('title')
   },
   beforeUnmount () {

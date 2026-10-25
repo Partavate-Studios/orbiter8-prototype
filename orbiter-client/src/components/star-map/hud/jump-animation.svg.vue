@@ -125,6 +125,7 @@
 import { mapState } from 'pinia'
 import { useStarMapStore } from '@/stores/starmap'
 import Ship from '../sprites/ship.svg'
+import { onFrame } from '@/libs/frame-loop'
 
 export default {
   name: 'JumpAnimation',
@@ -152,7 +153,10 @@ export default {
       })
       // console.log('added ' + JSON.stringify(this.stars[i]))
     }
-    this.tick()
+    this.stopFrames = onFrame(this.tickWork)
+  },
+  unmounted () {
+    this.stopFrames()
   },
   computed: {
     ...mapState(useStarMapStore, [
@@ -163,10 +167,6 @@ export default {
     tickWork () {
       this.leftSlideX = (this.starSpeed * this.gameTime / 10) % 10000
       this.rightSlideX = (this.starSpeed * this.gameTime / 10 + 5000) % 10000
-    },
-    tick () {
-      this.tickWork()
-      setTimeout(this.tick, 16)
     },
     getLeftTranslate () {
       return 'translate(' + (2500 - this.leftSlideX) + ' 0)'
