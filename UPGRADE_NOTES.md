@@ -652,7 +652,13 @@ The current handler only knows Rinkeby, Mumbai and BSC testnet. Rinkeby and Mumb
   - Each network in `networks.js` would get its explorer's NFT URL pattern, and the button would read "View on Etherscan", "View on Blockscout" and so on.
 - **Hide the button** where there's no NFT page.
 
-**Also:** the tokens' metadata URL (`https://orbiter8.com/tokens/planet/<id>`) doesn't respond, so any NFT page shows no name or image. Restoring that endpoint, even as static JSON, would fix that everywhere.
+**A working market on Sepolia: Rarible's testnet.** It has already indexed the planets (31 items, 6 owners) and shows owners, bids and "not for sale". Link format: `https://testnet.rarible.com/token/<planet token>:<id>`. Checked 2026-10-25.
+
+**Metadata (checked 2026-10-25):** the contracts' `tokenURI`s point to a Laravel app on `orbiter8.com`. The server code isn't in this repo.
+- `tokens/credits` and `tokens/ship/<id>` work.
+- **`tokens/planet/<id>` hangs** until the request times out, and `tokens/planet/<id>.json` returns a Laravel 500.
+- The likely cause is that the planet endpoint reads the chain through an RPC that no longer answers; the ship endpoint doesn't need the chain. That's a guess until Koda checks the server's code.
+- Until it's fixed, every market and explorer shows planets as "Untitled" with no image.
 
 ## Contract wish list (next contracts iteration)
 
