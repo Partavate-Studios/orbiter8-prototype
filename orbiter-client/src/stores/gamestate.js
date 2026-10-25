@@ -143,6 +143,8 @@ export const useGameStateStore = defineStore('GameState', {
         await galaxy.moveToSystem(system)
       } catch (error) {
         console.error('Jump failed:', error.shortMessage ?? error.message)
+        // Otherwise the "traveling" animation never ends (it stops when the new system loads).
+        useUIStore().jumpAnimationOff()
       }
     },
     async sendChat (message) {
