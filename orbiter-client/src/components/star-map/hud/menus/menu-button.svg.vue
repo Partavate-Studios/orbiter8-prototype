@@ -50,6 +50,7 @@
 <script>
 export default {
   name: 'MenuButton',
+  emits: ['buttonclick'],
   props: {
     text: {
       type: String,

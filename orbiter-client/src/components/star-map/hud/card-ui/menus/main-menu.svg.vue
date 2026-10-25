@@ -27,8 +27,10 @@ export default {
     CardBackground,
     CardButton
   },
+  emits: ['moon-menu'],
   props: {
-    objectId: null
+    /** The selected object's key (see sdk/system.js objectKey). */
+    objectId: { type: String, default: null }
   },
   methods: {
     buttonAction(option) {
@@ -127,9 +129,6 @@ export default {
           break
         case 'attack':
           alert("Attacking: You won't be able to attack anything until demo 4.")
-          break
-        case 'close':
-          this.$emit('closeMenu')
           break
         case 'rename': {
           let name = prompt('New ' + this.systemObjects[this.objectId].type + ' name:', '')

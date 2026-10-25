@@ -15,7 +15,9 @@ import { mapActions } from 'pinia'
 // A clickable scope marker: clicking selects its sprite, hovering labels it in the scope.
 export default {
   name: 'ScopeMarker',
-  props: ['spriteKey'],
+  props: {
+    spriteKey: { type: String, required: true }
+  },
   methods: {
     ...mapActions(useUIStore, ['selectSprite', 'setSpriteToDisplay']),
     select() {

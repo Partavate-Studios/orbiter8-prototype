@@ -12,7 +12,7 @@
       <g v-else>
         <g :transform="'translate(0 -400) scale(' + slotScale + ')'">
           <text x="0" y="5" text-anchor="middle" fill="#ffffff88" font-size="1.5em">{{
-            systemObjects[this.objectId].name
+            systemObjects[objectId].name
           }}</text>
 
           <g transform="translate(0 35)">
@@ -219,7 +219,7 @@
               v-on:update:inventoryToTrade="updateEquipmentToTrade($event)"
               :inventoryToTrade="Math.abs(equipmentToTrade)"
               :maxAllowed="equipmentAllowed"
-              :maxHolds="this.avatar.ship.holds"
+              :maxHolds="avatar.ship.holds"
             />
           </g>
 
@@ -230,7 +230,7 @@
               v-on:update:inventoryToTrade="updateFuelToTrade($event)"
               :inventoryToTrade="Math.abs(fuelToTrade)"
               :maxAllowed="fuelAllowed"
-              :maxHolds="this.avatar.ship.holds"
+              :maxHolds="avatar.ship.holds"
             />
           </g>
 
@@ -241,7 +241,7 @@
               v-on:update:inventoryToTrade="updateOrganicsToTrade($event)"
               :inventoryToTrade="Math.abs(organicsToTrade)"
               :maxAllowed="organicsAllowed"
-              :maxHolds="this.avatar.ship.holds"
+              :maxHolds="avatar.ship.holds"
             />
           </g>
         </g>
@@ -288,7 +288,8 @@ export default {
     }
   },
   props: {
-    objectId: null
+    /** The selected object's key (see sdk/system.js objectKey). */
+    objectId: { type: String, default: null }
   },
   components: {
     MenuButton,

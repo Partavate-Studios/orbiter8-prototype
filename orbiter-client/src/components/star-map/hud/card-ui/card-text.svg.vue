@@ -162,7 +162,8 @@ import { planetTypeName } from '@/sdk/game/planet-types'
 export default {
   name: 'SpriteInfo',
   props: {
-    objectId: null
+    /** The selected object's key (see sdk/system.js objectKey). */
+    objectId: { type: String, default: null }
   },
   methods: {
     planetTypeName

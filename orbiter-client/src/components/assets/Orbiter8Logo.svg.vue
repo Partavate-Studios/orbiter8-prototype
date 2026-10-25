@@ -34,7 +34,7 @@
 
 <script>
 export default {
-  name: 'orbiter8logo'
+  name: 'Orbiter8Logo'
 }
 </script>
 

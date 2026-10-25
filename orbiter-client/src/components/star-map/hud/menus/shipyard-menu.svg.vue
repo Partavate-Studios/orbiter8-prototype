@@ -12,7 +12,7 @@
       <g v-else>
         <g transform="translate(0 -400)" dominant-baseline="middle" text-anchor="middle">
           <g>
-            <text x="0" y="5" fill="#ffffff88" font-size="1.5em">{{ systemObjects[this.objectId].name }}</text>
+            <text x="0" y="5" fill="#ffffff88" font-size="1.5em">{{ systemObjects[objectId].name }}</text>
           </g>
 
           <g transform="translate(0 200)">
@@ -24,10 +24,10 @@
           </g>
 
           <text transform="translate(0 300)" fill="#ffffff88" font-size="0.9em"
-            >Credit Balance: {{ this.avatar.credits.toLocaleString('en-US') }}&cent;</text
+            >Credit Balance: {{ avatar.credits.toLocaleString('en-US') }}&cent;</text
           >
           <text transform="translate(0 320)" fill="#ffffff88" font-size="0.9em"
-            >Current Cargo Holds: {{ this.avatar.ship.holds }}</text
+            >Current Cargo Holds: {{ avatar.ship.holds }}</text
           >
 
           <g transform="translate(0 400)" fill="#ffffff">
@@ -115,7 +115,8 @@ export default {
     }
   },
   props: {
-    objectId: null
+    /** The selected object's key (see sdk/system.js objectKey). */
+    objectId: { type: String, default: null }
   },
   components: {
     MenuContainer,

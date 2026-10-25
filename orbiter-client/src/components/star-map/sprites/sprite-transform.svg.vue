@@ -64,7 +64,7 @@ const TINY_DIAMETER = 6
 const DETAILED_WHEN_TINY = ['planet', 'star']
 
 export default {
-  name: 'sprite-transform',
+  name: 'SpriteTransform',
   components: {
     Ship,
     Station,

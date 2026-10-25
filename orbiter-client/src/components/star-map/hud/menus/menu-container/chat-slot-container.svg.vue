@@ -45,15 +45,10 @@ export default {
     }
   },
   props: {
-    name: {
-      default: ''
-    },
-    blockId: {
-      default: ''
-    },
-    message: {
-      default: ''
-    }
+    name: { type: String, default: '' },
+    /** How many blocks ago the message was sent. */
+    blockId: { type: Number, default: 0 },
+    message: { type: String, default: '' }
   },
   computed: {
     ...mapState(useUIStore, ['viewport']),

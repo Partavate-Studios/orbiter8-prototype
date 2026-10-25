@@ -29,9 +29,7 @@ export default {
     ShipEngines
   },
   props: {
-    shouldShowEngines: {
-      default: false
-    }
+    shouldShowEngines: { type: Boolean, default: false }
   },
   computed: {
     ...mapState(useConfigStore, ['graphicsQuality'])

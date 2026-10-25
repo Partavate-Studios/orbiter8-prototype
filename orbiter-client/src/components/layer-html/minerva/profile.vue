@@ -21,8 +21,8 @@
     Time Delta: {{ timeDelta }}<br />
     Tick Delay: {{ tickDelay }}<br />
     FPS: {{ (1000 / timeDelta).toFixed(3) }}<br />
-    View: <span v-if="this.viewRatio <= 1">Portrait</span><span v-else>Landscape</span> ({{ this.viewport.width }} x
-    {{ this.viewport.height }} @ {{ this.viewRatio }})
+    View: <span v-if="viewRatio <= 1">Portrait</span><span v-else>Landscape</span> ({{ viewport.width }} x
+    {{ viewport.height }} @ {{ viewRatio }})
     <hr />
     Neighbors:
     <div v-for="(neighbor, index) in neighbors" v-bind:key="index" class="jump">
@@ -45,7 +45,7 @@ import { mapActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 
 export default {
-  name: 'profile',
+  name: 'Profile',
   computed: {
     ...mapState(useChainStore, ['account']),
     ...mapState(useUIStore, ['viewport', 'selected', 'viewRatio']),

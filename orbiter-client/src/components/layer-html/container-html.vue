@@ -8,7 +8,7 @@
 import Minerva from './minerva/minerva.vue'
 
 export default {
-  name: 'uilayer',
+  name: 'UiLayer',
   components: {
     Minerva
   }

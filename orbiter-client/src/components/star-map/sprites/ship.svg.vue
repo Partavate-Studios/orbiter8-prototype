@@ -22,14 +22,12 @@ import { useConfigStore } from '@/stores/config'
 import ShipEngines from './animations/ship-engines.svg'
 
 export default {
-  name: 'ship',
+  name: 'Ship',
   components: {
     ShipEngines
   },
   props: {
-    shouldShowEngines: {
-      default: false
-    }
+    shouldShowEngines: { type: Boolean, default: false }
   },
   computed: {
     ...mapState(useConfigStore, ['graphicsQuality'])

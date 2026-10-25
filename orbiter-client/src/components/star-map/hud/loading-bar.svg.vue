@@ -36,7 +36,7 @@ import { mapState } from 'pinia'
 import { useStarMapStore } from '@/stores/starmap'
 
 export default {
-  name: 'loading-bar',
+  name: 'LoadingBar',
   computed: {
     ...mapState(useStarMapStore, ['mapLoadedPercentage'])
   }

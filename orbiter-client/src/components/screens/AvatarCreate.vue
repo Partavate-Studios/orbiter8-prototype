@@ -59,7 +59,7 @@ export default {
     PilotIdCard,
     ShipIcon
   },
-  name: 'signup',
+  name: 'AvatarCreate',
   data() {
     return {
       newAvatarName: '',

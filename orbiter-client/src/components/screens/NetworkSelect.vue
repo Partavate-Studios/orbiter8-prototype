@@ -239,7 +239,7 @@ import { walletRequest } from '@/sdk/chain/wallet'
 import { networks } from '@/sdk/chain/networks'
 
 export default {
-  name: 'howtoweb3',
+  name: 'NetworkSelect',
   methods: {
     ...mapActions(useChainStore, ['chooseWallet', 'initContracts']),
     ...mapActions(useGameStateStore, ['loadGameState']),

@@ -135,6 +135,7 @@ export default {
   components: {
     SliderArrow
   },
+  emits: ['update:percentage', 'update:increment', 'update:decrement'],
   props: {
     lowestValue: {
       type: Number,

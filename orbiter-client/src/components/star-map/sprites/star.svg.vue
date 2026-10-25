@@ -20,7 +20,7 @@ import { mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 
 export default {
-  name: 'star',
+  name: 'Star',
   props: {},
   computed: {
     ...mapState(useConfigStore, ['graphicsQuality'])

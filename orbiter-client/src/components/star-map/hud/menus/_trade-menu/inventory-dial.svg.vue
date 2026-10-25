@@ -50,6 +50,7 @@ export default {
   components: {
     Slider
   },
+  emits: ['update:inventoryToTrade'],
   props: {
     portInventory: {
       type: Number,

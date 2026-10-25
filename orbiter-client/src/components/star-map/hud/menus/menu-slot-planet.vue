@@ -49,7 +49,7 @@
           <text x="12" y="0" fill="#ffffff" font-size="0.5em" text-anchor="end"> owner: {{ ownerName }} </text>
         </g>
         <g v-if="getMoonCount(planetId) > 0" :transform="'translate(' + slotWidth * 0.39 + ' 40)'">
-          <g v-for="(moon, index) in this.moonsForPlanet(planetId)" v-bind:key="'moon' + moon">
+          <g v-for="(moon, index) in moonsForPlanet(planetId)" v-bind:key="'moon' + moon">
             <g :transform="'translate(' + (index * slotWidth) / 10 + ' 0)'">
               <g :transform="'scale(' + (systemObjects[moon].size / 10 + 1) + ')'">
                 <moon />

@@ -10,6 +10,6 @@
 
 <script>
 export default {
-  name: 'ship-engines'
+  name: 'ShipEngines'
 }
 </script>

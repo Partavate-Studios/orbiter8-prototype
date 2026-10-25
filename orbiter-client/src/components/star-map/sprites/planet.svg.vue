@@ -134,7 +134,7 @@ import { useConfigStore } from '@/stores/config'
 import { useStarMapStore } from '@/stores/starmap'
 
 export default {
-  name: 'planet',
+  name: 'Planet',
   props: {
     /** The planet's sprite (libs/sprite.js): its game data, and its rotation this frame. */
     sprite: { type: Object, required: true }

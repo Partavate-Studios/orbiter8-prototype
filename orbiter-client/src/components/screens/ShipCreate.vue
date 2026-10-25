@@ -36,7 +36,7 @@ export default {
   components: {
     ShipScene
   },
-  name: 'launch',
+  name: 'ShipCreate',
   data() {
     return {
       newShipName: '',

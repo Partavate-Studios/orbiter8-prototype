@@ -23,7 +23,7 @@
 import AvatarIcon from '../star-map/hud/icons/avatar-icon.svg'
 
 export default {
-  name: 'pilot-id-card',
+  name: 'PilotIdCard',
   components: {
     AvatarIcon
   },

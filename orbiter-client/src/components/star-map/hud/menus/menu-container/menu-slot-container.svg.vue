@@ -41,9 +41,7 @@ export default {
     }
   },
   props: {
-    highlight: {
-      default: false
-    }
+    highlight: { type: Boolean, default: false }
   },
   computed: {
     ...mapState(useUIStore, ['viewport']),

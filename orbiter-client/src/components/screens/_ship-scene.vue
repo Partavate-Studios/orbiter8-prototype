@@ -77,9 +77,7 @@ export default {
   },
   name: 'ShipScene',
   props: {
-    warmingUp: {
-      default: false
-    }
+    warmingUp: { type: Boolean, default: false }
   }
 }
 </script>

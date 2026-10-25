@@ -9,7 +9,7 @@
 
 <script>
 export default {
-  name: 'orbiter8text'
+  name: 'Orbiter8Text'
 }
 </script>
 

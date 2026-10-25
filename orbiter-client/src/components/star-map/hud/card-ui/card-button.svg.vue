@@ -44,6 +44,7 @@
 <script>
 export default {
   name: 'CardButton',
+  emits: ['buttonclick'],
   props: {
     text: {
       type: String,
