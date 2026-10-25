@@ -34,9 +34,12 @@ export default {
       'viewportTotalRubber'
     ]),
     ...mapState(useStarMapStore, [
+      'gameTime',
       'systemObjects',
     ]),
     cardUiTranslate () {
+      // Sprites are raw objects updated in place each frame; reading gameTime makes this re-evaluate per frame.
+      void this.gameTime
       let x = this.sprite.telemetry.translatex + this.viewport.x
       let y = this.sprite.telemetry.translatey + this.viewport.y
       if (this.sprite.orbiting > 0) {

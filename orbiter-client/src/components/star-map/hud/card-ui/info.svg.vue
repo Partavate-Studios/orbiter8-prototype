@@ -28,7 +28,7 @@
 
     <card-text v-if="objectId != null" :objectId="objectId" />
     <!-- todo: should I use a sprite-transform here? -->
-    <g :transform="'translate(0 0) rotate(' + systemObjects[objectId].telemetry.rotation + ')'">
+    <g :transform="'translate(0 0) rotate(' + spriteRotation + ')'">
         <sprite :objectId="objectId" />
     </g>
 
@@ -64,8 +64,14 @@ export default {
   },
   computed: {
     ...mapState(useStarMapStore, [
+      'gameTime',
       'systemObjects'
     ]),
+    spriteRotation () {
+      // Sprites are raw objects updated in place each frame; reading gameTime makes this re-evaluate per frame.
+      void this.gameTime
+      return this.systemObjects[this.objectId].telemetry.rotation
+    }
   }
 }
 </script>

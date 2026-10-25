@@ -1,3 +1,5 @@
+import { markRaw } from 'vue'
+
 export default class Rubber {
   constructor (origin, target, duration) {
     this.origin = origin
@@ -6,6 +8,8 @@ export default class Rubber {
     this.duration = duration
     this.start = Date.now()
     this.method = 'ease'
+    // Animation state: changes every frame, so keep it out of Vue's reactivity.
+    return markRaw(this)
   }
 
   getRubber (time) {

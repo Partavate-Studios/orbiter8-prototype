@@ -123,6 +123,7 @@ export default {
       'showScope'
     ]),
     ...mapState(useStarMapStore, [
+      'gameTime',
       'systemObjects'
     ]),
   },
@@ -143,12 +144,15 @@ export default {
       return (Math.atan2(y, x) * 180 / Math.PI + 270) % 360
     },
     getDegreesFromSprite (sprite) {
+      // Sprites are raw objects updated in place each frame; reading gameTime makes this re-evaluate per frame.
+      void this.gameTime
       let x = sprite.telemetry.translatex + this.viewport.x
       let y = sprite.telemetry.translatey + this.viewport.y
 
       return this.getDegreesFromXY(x, y)
     },
     getOpacityFromSprite (sprite) {
+      void this.gameTime
       let x = (sprite.telemetry.translatex + this.viewport.x)
       let y = (sprite.telemetry.translatey + this.viewport.y)
       let length = Math.sqrt(x * x + y * y) / this.viewport.scale

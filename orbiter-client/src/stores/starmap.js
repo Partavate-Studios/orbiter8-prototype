@@ -405,9 +405,17 @@ export const useStarMapStore = defineStore('StarMap', {
       this.isLoading = false
       this.mapDataLoaded = true
     },
+    /** Advances every orbit to the current game time. Sprites are raw objects, so this triggers no re-renders by itself. */
     updateAllTelemtry () {
-      for (const systemObject in this.systemObjects) {
-        this.systemObjects[systemObject].updateTelemetry(this.gameTime)
+      const objects = this.systemObjects
+      for (const sprite of objects) {
+        sprite.updateTelemetry(this.gameTime)
+      }
+      // One level of nesting: moons, stations and ships orbit a planet; planets orbit the star at the origin.
+      for (const sprite of objects) {
+        const parent = sprite.orbiting ? objects[sprite.orbiting] : null
+        sprite.position.x = sprite.telemetry.translatex + (parent ? parent.telemetry.translatex : 0)
+        sprite.position.y = sprite.telemetry.translatey + (parent ? parent.telemetry.translatey : 0)
       }
     }
   }

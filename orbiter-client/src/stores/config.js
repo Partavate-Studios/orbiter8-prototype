@@ -4,10 +4,11 @@ import Cookies from 'js-cookie'
 export const useConfigStore = defineStore('Config', {
   state: () => ({
     showMinerva: false, // todo: move this to UI
-    tickDelayHigh: 32,
-    tickDelayNormal: 48,
-    tickDelayLow: 64,
-    tickDelay: 48,
+    // Minimum ms between game ticks per graphics tier (0 = every animation frame).
+    tickDelayHigh: 0,
+    tickDelayNormal: 0,
+    tickDelayLow: 32,
+    tickDelay: 0,
     blockCheckDelay: 2000,
     graphicsQuality: Number(Cookies.get('graphicsQuality')) || 2,
     showScope: true

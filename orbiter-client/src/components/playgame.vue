@@ -47,7 +47,8 @@ export default {
     ]),
     ...mapState(useStarMapStore, [
       'mapDataLoaded',
-      'gameTime'
+      'gameTime',
+      'systemObjects'
     ]),
     ...mapState(useConfigStore, [
       'tickDelay'
@@ -90,7 +91,8 @@ export default {
       'loadStarMap'
     ]),
     ...mapActions(useStarMapStore, [
-      'incrementGameTime'
+      'incrementGameTime',
+      'updateAllTelemtry'
     ]),
     ...mapActions(useConfigStore, [
       'toggleMinerva',
@@ -98,6 +100,7 @@ export default {
     ]),
     ...mapActions(useUIStore, [
       'viewportToTime',
+      'setSelectedTelemetry',
       'moveUp',
       'moveDown',
       'moveLeft',
@@ -159,12 +162,24 @@ export default {
           break
       }
     },
-    async tickWork () {
+    /** One game tick: advance time, the camera's animations, every orbit, then keep the camera on the selected sprite. */
+    tickWork () {
       this.incrementGameTime()
       this.viewportToTime(this.gameTime)
+      this.updateAllTelemtry()
+      this.followSelectedSprite()
+    },
+    followSelectedSprite () {
+      const sprite = this.selected != null ? this.systemObjects[this.selected] : null
+      if (!sprite) return
+      this.setSelectedTelemetry({
+        translatex: sprite.position.x,
+        translatey: sprite.position.y,
+        scale: sprite.targetScale
+      })
     },
     onFrame (now) {
-      // Keep the per-quality tick rate (tickDelay) for now: every tick still re-renders the whole map SVG.
+      // Low graphics tier ticks at ~30 fps (tickDelay); the others tick every frame.
       if (now - this.lastTick < this.tickDelay) return
       this.lastTick = now
       this.tickWork()

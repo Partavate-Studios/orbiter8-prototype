@@ -1,7 +1,7 @@
 <template>
   <g>
-    <circle v-if="amISelected" :cx="originOffset.x" :cy="originOffset.y" :r="sprite.distance" stroke="#c3b3da" stroke-dasharray="0.5 1" stroke-width="0.05" fill="none" />
-    <circle v-else-if="showOrbit" :cx="originOffset.x" :cy="originOffset.y" :r="sprite.distance" stroke="#c3b3da" stroke-dasharray="0.5 1" stroke-width="0.01" fill="none" />
+    <circle v-if="amISelected" :cx="frame.parentX" :cy="frame.parentY" :r="sprite.distance" stroke="#c3b3da" stroke-dasharray="0.5 1" stroke-width="0.05" fill="none" />
+    <circle v-else-if="showOrbit" :cx="frame.parentX" :cy="frame.parentY" :r="sprite.distance" stroke="#c3b3da" stroke-dasharray="0.5 1" stroke-width="0.01" fill="none" />
     <g :transform="getOrbitalTransform" v-if="shouldDisplay">
       <g>
         <slot />
@@ -63,17 +63,7 @@ export default {
   },
   data () {
     return {
-      telemetry: {
-        translatex: 0,
-        translatey: 0,
-        rotation: 0
-      },
-      hover: false,
-      originOffset: {
-        x: 0,
-        y: 0
-      },
-      range: 0
+      hover: false
     }
   },
   props: {
@@ -117,26 +107,32 @@ export default {
       'showScope', // todo: this should be in UI
       'graphicsQuality'
     ]),
+    /**
+     * This frame's position data. Sprites are raw (non-reactive) objects that the frame loop
+     * updates in place, so reading gameTime here is what makes this re-evaluate every frame.
+     */
+    frame () {
+      void this.gameTime
+      const parent = this.sprite.orbiting ? this.systemObjects[this.sprite.orbiting] : null
+      return {
+        x: this.sprite.position.x,
+        y: this.sprite.position.y,
+        rotation: this.sprite.telemetry.rotation,
+        parentX: parent ? parent.telemetry.translatex : 0,
+        parentY: parent ? parent.telemetry.translatey : 0
+      }
+    },
     showOrbit () {
       if (this.sprite.type != 'star') {
         return true
       }
-      /*
-      if (this.sprite.type != 'ship' && this.sprite.type != 'star') {
-        return true
-      }
-      */
       return false
     },
     getOrbitalTransform () {
-      return 'translate(' +
-        parseFloat(this.telemetry.translatex + this.originOffset.x) +
-        ',' +
-        parseFloat(this.telemetry.translatey + this.originOffset.y) +
-        ')'
+      return 'translate(' + this.frame.x + ',' + this.frame.y + ')'
     },
     getRotationalTransform () {
-      return 'rotate(' + this.telemetry.rotation + ')'
+      return 'rotate(' + this.frame.rotation + ')'
     },
     // todo: this should probably come from sprite.js
     getScaleTransform () {
@@ -148,20 +144,22 @@ export default {
       }
       return false;
     },
-    isMyChildSelected () {
-      if (typeof this.systemObjects[this.selected] === 'undefined') return false
-      let parentOfSelected = this.systemObjects[this.selected].orbiting
-      if (parentOfSelected === this.objectIndex) {
-        return true
-      }
-      return false
-    },
     selectionStroke: function () {
       if ((!this.amISelected && this.hover) ||
          (this.amISelected && !this.showScope)) {
         return '#ffffffff'
       }
       return 'none'
+    },
+    /** Distance from the view, in screen-ish units: sprites far off screen are not drawn. */
+    range () {
+      if (this.amISelected) {
+        return 0
+      }
+      // The larger of the x or y offset from the camera (kept exactly as before, signed).
+      const x = this.frame.x + this.viewport.x
+      const y = this.frame.y + this.viewport.y
+      return (x > y ? x : y) / this.viewport.scale
     },
     shouldDisplay () {
       if (this.isMenuOn && (this.graphicsQuality < 2)){
@@ -175,9 +173,7 @@ export default {
   },
   methods: {
     ...mapActions(useUIStore, [
-      'setSelectedTelemetry',
-      'selectSprite',
-      'scaleAnimateTo'
+      'selectSprite'
     ]),
     ...mapActions(useConfigStore, [
       'toggleScope'
@@ -188,70 +184,7 @@ export default {
       } else {
         this.selectSprite(this.objectIndex)
       }
-    },
-    // todo: this may not be the best place to fire this off
-    updateSpriteTelemetry: function () {
-      this.telemetry = this.sprite.telemetry
-      if ((this.sprite.orbiting) && (this.systemObjects[this.sprite.orbiting] != 'undefined')) {
-        let parentTelemetry = this.systemObjects[this.sprite.orbiting].telemetry
-        this.originOffset.x = parseFloat(parentTelemetry.translatex)
-        this.originOffset.y = parseFloat(parentTelemetry.translatey)
-      } else {
-        this.originOffset.x = 0
-        this.originOffset.y = 0
-      }
-      let absoluteX = this.originOffset.x + this.telemetry.translatex
-      let absoluteY = this.originOffset.y + this.telemetry.translatey
-      if (this.amISelected) {
-        this.range = 0
-      } else {
-        //get the scaled distance from the viewbox on either the x or y plane, whichever is greater
-        if (absoluteX+this.viewport.x > absoluteY+this.viewport.y) {
-          this.range = (absoluteX+this.viewport.x)  / this.viewport.scale
-        } else {
-          this.range = (absoluteY+this.viewport.y) / this.viewport.scale
-        }
-      }
-    },
-
-    // todo: this may not be the best place to fire this off
-    updateViewportTelemetry: function () {
-      let absoluteX = this.originOffset.x + this.telemetry.translatex
-      let absoluteY = this.originOffset.y + this.telemetry.translatey
-      if (this.amISelected) {
-        if (!this.sprite.menu.showing) {
-          this.sprite.openMenu()
-        }
-        let cameraTelemetry = {
-          translatex: absoluteX,
-          translatey: absoluteY,
-          scale: this.sprite.targetScale
-        }
-        this.setSelectedTelemetry(cameraTelemetry)
-      } else {
-        if (this.sprite.menu.showing) {
-          this.sprite.closeMenu()
-        }
-      }
-
-
-
-
     }
-  },
-  watch: {
-    gameTime: {
-      handler () {
-        this.updateViewportTelemetry()
-      }
-    },
-    sprite: {
-      handler () {
-        this.updateSpriteTelemetry()
-      },
-      deep: true
-    }
-
   }
 }
 </script>

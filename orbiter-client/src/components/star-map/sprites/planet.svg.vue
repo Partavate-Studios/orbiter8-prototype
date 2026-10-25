@@ -4,7 +4,7 @@
 
     <circle cx="0" cy="0" r="10" stroke="#c3b3da" stroke-width="0.25" fill="url(#planetGradient)" />
 
-    <g v-if="graphicsQuality > 2" clip-path="url(#just-the-planet)" :transform="'rotate(' + (0 - planet.telemetry.rotation) + ')'">
+    <g v-if="graphicsQuality > 2" clip-path="url(#just-the-planet)" :transform="'rotate(' + surfaceRotation + ')'">
       <g v-if="planet.class == 0"  stroke-width="0.5" stroke="#ffffff11" fill="#ffffff22" >
       <!-- Earth Like -->
         <rect x="-2" y="-8" width="12" height="2" rx="1" ry="1" />
@@ -134,6 +134,7 @@
 <script>
 import { mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
+import { useStarMapStore } from '@/stores/starmap'
 
 export default {
   name: 'planet',
@@ -151,6 +152,15 @@ export default {
     ...mapState(useConfigStore, [
       'graphicsQuality'
     ]),
+    ...mapState(useStarMapStore, [
+      'gameTime'
+    ]),
+    // The surface turns against the sprite's rotation, so it appears to spin under the clip.
+    surfaceRotation () {
+      // Sprites are raw objects updated in place each frame; reading gameTime makes this re-evaluate per frame.
+      void this.gameTime
+      return 0 - this.planet.telemetry.rotation
+    }
   }
 }
 </script>

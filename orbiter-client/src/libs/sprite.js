@@ -1,3 +1,5 @@
+import { markRaw } from 'vue'
+
 export default class Sprite {
   constructor (type, autoFillValues) {
     //set defaults
@@ -15,6 +17,8 @@ export default class Sprite {
       translatey: 0,
       rotation: 0
     }
+    // Absolute position in the star system (telemetry is relative to the parent it orbits).
+    this.position = { x: 0, y: 0 }
     this.menu = {
       showing: false
     }
@@ -58,6 +62,8 @@ export default class Sprite {
         this.targetScale = 0.06
         break;
     }
+    // Telemetry changes every frame; the frame loop updates it and components read it per frame.
+    return markRaw(this)
   }
 
   updateTelemetry (gameTime) {

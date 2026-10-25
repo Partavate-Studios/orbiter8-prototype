@@ -1,7 +1,7 @@
 <template>
   <g>
     <menu-slot-container :highlight="avatar.ship.orbit == systemObjects[planetId].id">
-      <g :transform="'translate(' + slotWidth * 0.1 + ' 35) rotate(' + planet.telemetry.rotation + ') scale(' + (planet.size / 15 + 0.15) +  ')' ">
+      <g :transform="'translate(' + slotWidth * 0.1 + ' 35) rotate(' + planetRotation + ') scale(' + (planet.size / 15 + 0.15) +  ')' ">
         <planet :planet="systemObjects[planetId]" />
       </g>
       <g v-if="avatar.ship.orbit == systemObjects[planetId].id" :transform="'translate(' + 20 + ' 20) rotate(15) scale(1.5)' ">
@@ -134,6 +134,7 @@ export default {
       'viewport'
     ]),
     ...mapState(useStarMapStore, [
+      'gameTime',
       'systemObjects',
       'portForPlanet',
       'moonsForPlanet',
@@ -174,6 +175,11 @@ export default {
     },
     planet() {
       return this.systemObjects[this.planetId];
+    },
+    planetRotation () {
+      // Sprites are raw objects updated in place each frame; reading gameTime makes this re-evaluate per frame.
+      void this.gameTime
+      return this.planet.telemetry.rotation
     },
     ownerName() {
       let address = this.planet.owner;

@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'pinia'
+import { mapState } from 'pinia'
 
 import { useStarMapStore } from '@/stores/starmap'
 import SpriteTransform from './sprites/sprite-transform.svg'
@@ -27,28 +27,10 @@ export default {
     return {
     }
   },
-  watch: {
-    gameTime: {
-      handler () {
-        this.updateTelemetry()
-      }
-    }
-  },
-  beforeMount() {
-    this.updateTelemetry()
-  },
-  methods: {
-    ...mapActions(useStarMapStore, [
-      'updateAllTelemtry'
-    ]),
-    updateTelemetry: function () {
-      this.updateAllTelemtry()
-    }
-  },
+
   computed: {
     ...mapState(useStarMapStore, [
       'currentStarSystemId',
-      'gameTime',
       'systemObjects'
     ]),
   },
