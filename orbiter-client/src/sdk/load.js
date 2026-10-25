@@ -104,7 +104,7 @@ export async function loadSystem(onProgress = () => {}) {
 
   for (const [key, neighborId] of Object.entries(data.neighborIds)) {
     data.neighbors[key] = { id: neighborId, name: await galaxy.getSystemName(String(neighborId)) }
-    onProgress(Math.min(24, 6 + key))
+    onProgress(Math.min(24, 6 + Number(key)))
   }
   onProgress(25)
 
@@ -117,7 +117,7 @@ export async function loadSystem(onProgress = () => {}) {
       }
       if (ship.owner !== '0x0') await addOwnerName(ship.owner)
     }
-    onProgress(Math.min(75, 25 + key))
+    onProgress(Math.min(75, 25 + Number(key)))
   }
   onProgress(80)
 
@@ -139,7 +139,7 @@ export async function loadSystem(onProgress = () => {}) {
         }
       }
       data.planets[key] = planet
-      onProgress(Math.min(98, 80 + key))
+      onProgress(Math.min(98, 80 + Number(key)))
     }
   }
   return data
