@@ -135,23 +135,12 @@ export default {
       'setSpriteToDisplay'
     ]),
     getDegreesFromXY (x, y) {
-      if (x === 0) {
-        if (y > 0) {
-          return 0
-        } else {
-          return 1
-        }
-      } else if (x > 0) {
-        return 270 +
-          Math.atan(
-            y / x
-          ) * 180 / Math.PI
-      } else {
-        return 90 +
-          Math.atan(
-            y / x
-          ) * 180 / Math.PI
+      // Compass bearing in degrees, clockwise with 0 at +y (straight down in SVG), as the arrows expect.
+      // An object exactly at the view center (e.g. the selected sprite) has no bearing; point straight down.
+      if (x === 0 && y === 0) {
+        return 0
       }
+      return (Math.atan2(y, x) * 180 / Math.PI + 270) % 360
     },
     getDegreesFromSprite (sprite) {
       let x = sprite.telemetry.translatex + this.viewport.x
