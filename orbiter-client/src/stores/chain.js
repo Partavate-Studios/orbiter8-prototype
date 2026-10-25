@@ -1,13 +1,14 @@
 import { defineStore } from 'pinia'
 import { markRaw } from 'vue'
 import { discoverWallets, preferredWallet, rememberWallet, connectWallet } from '@/chain/wallet'
-import { initContracts as bindContracts, contractAddresses, galaxy, getBlockNumber, getNativeBalance } from '@/chain/contracts'
+import { initContracts as bindContracts, contractAddresses, galaxy, getBlockNumber, getNativeBalance, gameChangedBetween } from '@/chain/contracts'
 import { networks, networkFor, chainName } from '@/chain/networks'
 import { useStarMapStore } from '@/stores/starmap'
 import { useGameStateStore } from '@/stores/gamestate'
 import { useConfigStore } from '@/stores/config'
 
 let blockPoller = null
+let checkingBlocks = false
 
 export const useChainStore = defineStore('Chain', {
   state: () => ({
@@ -107,21 +108,34 @@ export const useChainStore = defineStore('Chain', {
       blockPoller = setInterval(poll, useConfigStore().blockCheckDelay)
       document.addEventListener('visibilitychange', poll)
     },
-    /** game state only changes when a block completes */
+    /**
+     * Game state only changes when a block completes. Reload it when a new block contains a
+     * transaction to one of the game's contracts (or on the first check); skip blocks that don't.
+     */
     async checkForNewBlock () {
-      let blockNumber
+      if (checkingBlocks) return
+      checkingBlocks = true
       try {
-        blockNumber = await getBlockNumber()
-      } catch (error) {
-        console.log('Block check failed:', error.message)
-        return
-      }
-      if (this.currentBlockId < blockNumber) {
-        console.log('Block increase from ' + this.currentBlockId + ' to ' + blockNumber)
+        const blockNumber = await getBlockNumber()
+        if (blockNumber <= this.currentBlockId) return
+        const isFirstLoad = this.currentBlockId === 0
+        const changed = isFirstLoad || await gameChangedBetween(this.currentBlockId, blockNumber, [
+          this.galaxyAddress,
+          this.avatarAddress,
+          this.planetTokenAddress,
+          this.shipTokenAddress,
+          this.creditTokenAddress
+        ])
         this.currentBlockId = blockNumber
+        if (!changed) return
+        console.log('Game changed by block ' + blockNumber + '; reloading')
         useGameStateStore().loadGameState()
         useGameStateStore().loadEvents()
         useStarMapStore().loadStarMap()
+      } catch (error) {
+        console.log('Block check failed:', error.message)
+      } finally {
+        checkingBlocks = false
       }
     },
     setProp ({ key, value }) {

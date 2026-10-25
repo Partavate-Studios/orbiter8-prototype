@@ -54,6 +54,29 @@ export async function getBlockNumber () {
   return getSession().provider.getBlockNumber()
 }
 
+// Past this many unseen blocks, checking each one costs more than just reloading.
+const MAX_BLOCKS_TO_SCAN = 30
+
+/**
+ * Whether any block after `fromBlock` up to `toBlock` has a transaction sent to one of the given
+ * contracts. Every game action is such a transaction, but the contracts only emit events for a few
+ * of them, so this is how we tell "something in the game changed" without re-reading everything.
+ * @param {number} fromBlock  last block already accounted for
+ * @param {number} toBlock
+ * @param {string[]} addresses  contracts that matter (game, avatars, tokens)
+ */
+export async function gameChangedBetween (fromBlock, toBlock, addresses) {
+  if (toBlock - fromBlock > MAX_BLOCKS_TO_SCAN) return true
+  const watched = new Set(addresses.filter(Boolean).map(address => address.toLowerCase()))
+  const { provider } = getSession()
+  for (let number = fromBlock + 1; number <= toBlock; number++) {
+    const block = await provider.getBlock(number, true)
+    if (!block) return true
+    if (block.prefetchedTransactions.some(tx => tx.to && watched.has(tx.to.toLowerCase()))) return true
+  }
+  return false
+}
+
 /** Native currency balance of the connected account, as a decimal string (e.g. "0.25"). */
 export async function getNativeBalance () {
   const { provider, account } = getSession()
