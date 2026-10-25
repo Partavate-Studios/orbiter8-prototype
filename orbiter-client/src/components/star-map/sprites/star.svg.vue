@@ -15,22 +15,11 @@ import { useConfigStore } from '@/stores/config'
 export default {
   name: 'star',
   props: {
-    star: {
-      type: Object,
-      default () {
-        return {
-          name: '...',
-          attributes: {
-            size: 0
-          }
-        }
-      }
-    },
   },
   computed: {
     ...mapState(useConfigStore, [
       'graphicsQuality'
-    ]),
+    ])
   }
 }
 </script>

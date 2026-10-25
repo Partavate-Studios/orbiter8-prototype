@@ -31,8 +31,7 @@ export default {
       CardButton
   },
   props: {
-    objectId: null,
-    menuShowing: null
+    objectId: null
   },
   methods: {
     buttonAction (option) {

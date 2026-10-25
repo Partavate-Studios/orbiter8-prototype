@@ -253,23 +253,6 @@ export default {
       }
       //can buy what fits
       return Math.min(this.predictedEmptyHolds + currentlyTrading, portGoods)
-    },
-    buyingOrSelling (value) {
-      if (value > 0) {
-        return 'Selling'
-      } else if (value < 0) {
-        return 'Buying'
-      }
-      return ''
-    },
-    buyingOrSellingArrow (value) {
-      if (value > 0) {
-        return "&#8594;"
-      } else if (value < 0) {
-        return '&#8596;'
-      }
-      return ''
-
     }
   },
   computed: {
@@ -292,9 +275,6 @@ export default {
       return ((this.equipmentToTrade * this.portPrices.equipment) +
               (this.fuelToTrade * this.portPrices.fuel) +
               (this.organicsToTrade * this.portPrices.organics)) * -1
-    },
-    shipDate () {
-      return this.avatar.ship
     },
     fullHolds () {
       return this.avatar.ship.equipment + this.avatar.ship.fuel + this.avatar.ship.organics

@@ -12,20 +12,6 @@
 export default {
   name: 'SpaceStation',
   props: {
-    port: {
-      type: Object,
-      default () {
-        return {
-          name: '...',
-          attributes: {
-            speed: 0,
-            size: 0,
-            distance: 0,
-            rotation: 0
-          }
-        }
-      }
-    },
   }
 }
 </script>

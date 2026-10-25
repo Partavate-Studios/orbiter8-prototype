@@ -105,7 +105,7 @@ export default {
     planetId: {
       type: String,
       default: null
-    },
+    }
   },
   components: {
     MenuSlotContainer,
@@ -115,15 +115,6 @@ export default {
     Ship
   },
   methods: {
-    getMoonNames(planetId) {
-      let moonNames = ''
-      let moons = this.moonsForPlanet(planetId)
-      for(var i = 0; i < moons.length; i++) {
-        //moonNames += moons[i] + ' '
-        moonNames += this.systemObjects[moons[i]].name + ' '
-      }
-      return moonNames
-    },
     getMoonCount(planetId) {
       let moons = this.moonsForPlanet(planetId)
       return moons.length;

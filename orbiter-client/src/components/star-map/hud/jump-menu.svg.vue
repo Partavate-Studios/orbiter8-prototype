@@ -100,18 +100,11 @@ export default {
     Ship
   },
   props: {
-    menudata: {}
   },
   computed: {
     ...mapState(useStarMapStore, [
       'neighbors'
-    ]),
-    starName () {
-      if ((this.systemNeighborNames[this.hover]) && (this.systemNeighborNames[this.hover].length > 0)) {
-        return this.systemNeighborNames[this.hover]
-      }
-      return 'Star System #' + this.hover
-    }
+    ])
   },
   methods: {
     ...mapActions(useGameStateStore, [

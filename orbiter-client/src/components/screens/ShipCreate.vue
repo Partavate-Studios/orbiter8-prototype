@@ -50,9 +50,6 @@ export default {
         await this.launchShip(this.newShipName)
       }
     },
-    next () {
-      this.step++
-    },
     keydown_check (event) {
       if (event.which === 13) {
         this.launch()

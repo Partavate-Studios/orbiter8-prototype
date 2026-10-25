@@ -11,10 +11,10 @@
         <circle v-if="isTiny" cx="0" cy="0" :r="dotRadius" fill="#e5cfff" />
         <template v-else>
           <planet v-if="type === 'planet'" :planet="sprite" />
-          <moon v-if="type === 'moon'" :moon="sprite" />
-          <station v-if="type === 'station'" :port="sprite" />
+          <moon v-if="type === 'moon'" />
+          <station v-if="type === 'station'" />
           <g transform="rotate(180)"><ship v-if="type === 'ship'" :ship="sprite" :show-engines="true" /></g>
-          <star v-if="type === 'star'" :star="sprite" />
+          <star v-if="type === 'star'" />
         </template>
         <a
           @mouseover="hover = true"

@@ -121,7 +121,7 @@ export default {
     ...mapState(useStarMapStore, [
       'gameTime',
       'systemObjects'
-    ]),
+    ])
   },
   methods: {
     selectSprite (spriteKey) {
@@ -161,12 +161,6 @@ export default {
       opacity = Math.max(Math.min(opacity + 0.1, 1), 0)
       // Steps of 0.02: only touch the DOM when the fade visibly changes.
       return Math.round(opacity * 50) / 50
-    },
-    getMenuScaleFromSprite (sprite) {
-      let x = (sprite.telemetry.translatex + this.viewport.x + this.viewport.rubberx)
-      let y = (sprite.telemetry.translatey + this.viewport.y + this.viewport.rubbery)
-      let opacity = (Math.sqrt(x * x + y * y) - 100 * this.viewport.scale) / 10
-      return Math.max(Math.min((1 - opacity), 1), 0)
     },
     isMyShip (sprite) {
       return ((sprite.type === 'ship') && (sprite.isMine))

@@ -22,26 +22,11 @@ import { useConfigStore } from '@/stores/config'
 export default {
   name: 'moon',
   props: {
-    moon: {
-      type: Object,
-      default () {
-        return {
-          name: '...',
-          attributes: {
-            speed: 0,
-            size: 0,
-            distance: 0,
-            rotation: 0
-          },
-          planet: 0
-        }
-      }
-    }
   },
   computed: {
     ...mapState(useConfigStore, [
       'graphicsQuality'
-    ]),
+    ])
   }
 }
 </script>

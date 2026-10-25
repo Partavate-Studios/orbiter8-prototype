@@ -41,7 +41,6 @@ import ChatSlotContainer from './menu-container/chat-slot-container.svg'
 export default {
   name: 'ChatMenu',
   props: {
-    objectId: null
   },
   components: {
     MenuContainer,

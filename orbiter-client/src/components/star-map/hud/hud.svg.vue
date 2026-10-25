@@ -212,7 +212,7 @@ export default {
     ScopeToggle,
     TradeMenu,
     ShipyardMenu,
-    ZoomSlider,
+    ZoomSlider
   },
   computed: {
     ...mapState(useUIStore, [
@@ -303,12 +303,6 @@ export default {
       } else {
         this.jumpMenuOn()
       }
-    },
-    isHorizontal: function () {
-      if (this.container.y > this.container.x) {
-        return true
-      }
-      return false
     }
   }
 }

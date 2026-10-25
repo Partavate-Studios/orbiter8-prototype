@@ -139,7 +139,7 @@ export default {
     },
     incrementHolds () {
       this.holdsToBuy = Math.min(this.maxHoldsAvailable, this.holdsToBuy + 1)
-    },
+    }
   },
   computed: {
     ...mapState(useStarMapStore, [
@@ -148,12 +148,6 @@ export default {
     ...mapState(useGameStateStore, [
       'avatar'
     ]),
-    fullHolds () {
-      return this.avatar.ship.equipment + this.avatar.ship.fuel + this.avatar.ship.organics
-    },
-    emptyHolds () {
-      return (this.avatar.ship.holds - this.fullHolds)
-    },
     maxHoldsAvailable () {
       return Math.min(this.shipMax, parseInt(this.avatar.credits / this.holdPrice))
     },

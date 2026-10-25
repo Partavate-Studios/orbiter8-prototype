@@ -198,11 +198,7 @@ import PlanetTypes from '@/libs/planet-types.js'
 export default {
   name: 'SpriteInfo',
   props: {
-    objectId: null,
-    size: {
-      type: Number,
-      default: 1.3
-    }
+    objectId: null
   },
   data () {
     return {

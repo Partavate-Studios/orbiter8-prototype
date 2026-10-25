@@ -71,21 +71,8 @@ export default {
     }
   },
   methods: {
-    fillPatternFor (n) {
-
-      if (n <= (this.predictedLoad / this.cargoHolds * this.maxCargoHolds)) {
-        return "url('#fullBlockGradient')"
-      } else if (n <= (this.existingLoad / this.cargoHolds * this.maxCargoHolds)) {
-        return "url('#soldBlockGradient')"
-      }
-      return "url('#emptyBlockGradient')"
-
-    }
   },
   computed: {
-    maxCargoHolds () {
-      return Math.min(this.cargoHolds, 24)
-    }
   }
 }
 </script>
