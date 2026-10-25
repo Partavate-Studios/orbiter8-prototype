@@ -202,7 +202,13 @@ export default {
       try {
         await walletRequest('wallet_switchEthereumChain', [{ chainId: this.networkData[chainId].hexId }])
       } catch (error) {
-        console.error('Switching networks failed:', error.shortMessage ?? error.message)
+        // 4902: the wallet doesn't know this network (some wallets nest the code). Anything else,
+        // such as the player declining the switch, isn't a reason to offer adding the network.
+        const unknownChain = error.code === 4902 || error.data?.originalError?.code === 4902
+        if (!unknownChain) {
+          console.error('Switching networks failed:', error.shortMessage ?? error.message)
+          return
+        }
         if (confirm('Chain not found in your wallet. Would you like us to try to add it?')) {
 
           let data = [{
