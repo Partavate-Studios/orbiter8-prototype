@@ -1,6 +1,6 @@
 <template>
   <a
-    v-on:click.prevent="o8audio.playEffect('click'); selectSprite(spriteKey)"
+    v-on:click.prevent="select"
     v-on:mouseover="setSpriteToDisplay(spriteKey)"
     v-on:mouseout="setSpriteToDisplay(null)"
     cursor="pointer"><slot></slot></a>
@@ -18,7 +18,11 @@ export default {
     ...mapActions(useUIStore, [
       'selectSprite',
       'setSpriteToDisplay'
-    ])
+    ]),
+    select () {
+      this.o8audio.playEffect('click')
+      this.selectSprite(this.spriteKey)
+    }
   }
 }
 </script>

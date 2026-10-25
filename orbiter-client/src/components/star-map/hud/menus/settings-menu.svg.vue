@@ -22,7 +22,7 @@
 
         <g v-for="index in 3" :key="'grapahics' + index" :transform="'translate(' + (index * 40 - 80) + ' -270)'">
             <a
-                v-on:click.prevent="o8audio.playEffect('click'); setGraphicsQuality(index)"
+                v-on:click.prevent="chooseGraphicsQuality(index)"
                 cursor="pointer">
                 <menu-checkbox :checked="graphicsQuality == index" />
             </a>
@@ -100,6 +100,10 @@ export default {
     ...mapActions(useConfigStore, [
       'setGraphicsQuality',
     ]),
+    chooseGraphicsQuality (quality) {
+      this.o8audio.playEffect('click')
+      this.setGraphicsQuality(quality)
+    },
     setMusicVolume(volume) {
       this.o8audio.setMusicVolume(volume / 3)
       this.o8audio.playEffect('click')

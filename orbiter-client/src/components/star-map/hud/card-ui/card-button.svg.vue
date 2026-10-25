@@ -33,7 +33,7 @@
           {{ text }}
       </text>
       <a
-        v-on:click.prevent="o8audio.playEffect('click');$emit('buttonclick')"
+        v-on:click.prevent="click"
         v-on:mouseover="hover = true"
         v-on:mouseout="hover = false"
         cursor="pointer">
@@ -84,6 +84,12 @@ export default {
       }
       return ('#ffffff66')
     },
+  },
+  methods: {
+    click () {
+      this.o8audio.playEffect('click')
+      this.$emit('buttonclick')
+    }
   }
 }
 </script>

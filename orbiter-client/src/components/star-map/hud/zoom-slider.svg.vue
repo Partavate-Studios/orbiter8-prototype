@@ -47,11 +47,11 @@
             text-anchor="middle">+</text>
 
       <a
-        v-on:click.prevent="o8audio.playEffect('click'); scaleAnimateBy({scaler: 2, time: 200})"
+        v-on:click.prevent="zoomBy(2)"
         cursor="pointer">
         <circle cx="-64" cy="0" r="10" stroke="#ffffff00" fill="#c3b3da00"></circle></a>
       <a
-        v-on:click.prevent="o8audio.playEffect('click'); scaleAnimateBy({scaler: 0.5, time: 200})"
+        v-on:click.prevent="zoomBy(0.5)"
         cursor="pointer">
         <circle cx="64" cy="0" r="10" stroke="#ffffff00" fill="#c3b3da00"></circle></a>
       </g>
@@ -74,6 +74,10 @@ export default {
     ...mapActions(useUIStore, [
       'scaleAnimateBy'
     ]),
+    zoomBy (scaler) {
+      this.o8audio.playEffect('click')
+      this.scaleAnimateBy({ scaler, time: 200 })
+    },
     zoomLine1 () {
       return Math.min(64, Math.max(-64, 64 - (Math.log(this.viewport.scale * 100 + 0.75) * 12).toFixed(2)))
     }

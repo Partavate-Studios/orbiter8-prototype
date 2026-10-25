@@ -6,7 +6,7 @@
         <g :transform="'translate(-65 ' + (-65 + (17 * key)) + ')'">
           <card-button
             :text="option.moonName"
-            v-on:buttonclick="o8audio.playEffect('click');selectSprite(option.moonId)" />
+            v-on:buttonclick="selectMoon(option.moonId)" />
         </g>
       </g>
     </g>
@@ -32,7 +32,11 @@ export default {
   methods: {
     ...mapActions(useUIStore, [
       'selectSprite'
-    ])
+    ]),
+    selectMoon (moonId) {
+      this.o8audio.playEffect('click')
+      this.selectSprite(moonId)
+    }
   }
 }
 </script>
