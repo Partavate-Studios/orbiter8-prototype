@@ -48,7 +48,7 @@ export default {
   name: 'profile',
   computed: {
     ...mapState(useChainStore, ['account']),
-    ...mapState(useUIStore, ['viewport', 'selected']),
+    ...mapState(useUIStore, ['viewport', 'selected', 'viewRatio']),
     ...mapState(useConfigStore, ['tickDelay']),
     ...mapState(useGameStateStore, ['haveAvatar', 'gameState', 'avatar']),
     ...mapState(useStarMapStore, ['currentStarSystemId', 'timeDelta', 'neighbors', 'myShipId', 'currentStarSystemName'])

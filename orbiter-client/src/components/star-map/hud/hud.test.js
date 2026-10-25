@@ -22,7 +22,7 @@ const silentAudio = {
   setEffectsVolume() {}
 }
 
-let app, problems, ui
+let app, root, problems, ui
 
 beforeEach(() => {
   problems = []
@@ -47,7 +47,8 @@ beforeEach(() => {
   gameState.events = { avatarEvents: [], shipEvents: [], tradeEvents: [], chatEvents: [] }
   ui = useUIStore(pinia)
 
-  app.mount(document.createElement('div'))
+  root = document.createElement('div')
+  app.mount(root)
 })
 
 afterEach(() => app.unmount())
@@ -88,6 +89,18 @@ describe('HUD', () => {
       expect(problems).toEqual([])
     })
   }
+
+  it("opens a planet's moons menu from its card", async () => {
+    ui.calculateViewableArea({ x: 1440, y: 900 }) // the card menu shows beside the card on a landscape screen
+    ui.selectSprite('planet:2')
+    await settle()
+    const visitMoon = [...root.querySelectorAll('text')].find((text) => text.textContent.trim() === 'Visit Moon')
+    // A card button's text sits beside its transparent click target, an <a> in the same group.
+    visitMoon.parentNode.querySelector('a').dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+    await settle()
+    expect([...root.querySelectorAll('text')].some((text) => text.textContent.trim() === 'Moonie')).toBe(true)
+    expect(problems).toEqual([])
+  })
 
   it('opens the jump menu', async () => {
     ui.jumpMenuOn()
