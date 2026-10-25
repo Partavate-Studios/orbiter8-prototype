@@ -461,6 +461,7 @@ Phase 6:
   - The world is now drawn for a camera on the device-pixel grid, and sprites in a planet's layer are placed by rounding their absolute position. A followed object now moves 0 px in both browsers, at DPR 1 and 2.
   - The measurement script is `jitter.js` in the test harness.
 - **Regression from Phase 5: the world could stay soft after selecting something at a different zoom.** It only redrew sharply once the camera held still, and a camera following a moving object never does. Now only the zoom has to settle. (`51b24ee`)
+- **Orbit rings were drawn across ships, found by Koda on Sepolia.** Each sprite drew its own ring just before itself, and all ships at a planet share one orbit, so each ship's ring cut across the ships drawn before it. The original had the same order. The world and each planet layer now draw every ring first, then the bodies. Reproduced and checked locally with two ships at Earth.
 - **The lint findings** listed below for "the phase that rewrites that code" are fixed. (`215d2c1`)
 
 ### Found, to fix in the phase that rewrites that code (all fixed in Phase 6)
