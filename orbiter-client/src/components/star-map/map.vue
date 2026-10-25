@@ -1,13 +1,11 @@
 <template>
-  <div class="layer" ref="gamelayerContainer">
+  <!-- Back to front: background, world (the star system) and HUD are separate elements,
+       so changes in one layer never make the browser repaint the others. -->
+  <div class="layer star-map" ref="gamelayerContainer">
     <svg
-      :viewBox="viewBoxSize"
-      :class="{ 'is-dragging': mouseHold }"
-      id="gamelayer"
-      ref="gamelayer"
-      xmlns="http://www.w3.org/2000/svg"
-      xmlns:xlink="http://www.w3.org/1999/xlink" >
-
+      class="map-layer"
+      :viewBox="layerViewBox"
+      xmlns="http://www.w3.org/2000/svg">
       <backdrop
         id="backdrop"
         :transform="backdropTransform"></backdrop>
@@ -17,51 +15,55 @@
           id="stars"
         :transform="starfieldTransform"></starfield>
       </g>
+    </svg>
 
-      <g font-family="Ubuntu, sans-serif">
-        <g :transform="'scale(' + baseScale + ')'">
-          <g v-if="mapDataLoaded">
-
-            <g v-if="jumpAnimationState">
-              <jumpAnimation></jumpAnimation>
-            </g>
-            <g v-else>
-              <g transform="translate(0 -100)">
-                <g :transform="getTransform()">
-                  <grid></grid>
-                </g>
-                <rect x="-2000" y="-1000" width="4000" height="2000" fill="#ffffff00"
-                @mousedown="handleMouseDown"
-                @mouseup="handleMouseUp"
-                @mousemove="handleMouseMove"
-                @mouseleave="handleMouseLeave"/>
-                <g :transform="getTransform()">
-                  <solar-system />
-                </g>
-
-              </g>
-              <g v-if="menuState.jumpMenu">
-                <g transform="translate(0 -100)">
-                  <jumpMenu></jumpMenu>
-                </g>
-              </g>
-              <g v-else>
-                <hud></hud>
-              </g>
-            </g>
-
+    <svg
+      class="map-layer"
+      :viewBox="layerViewBox"
+      :class="{ 'is-dragging': mouseHold }"
+      id="gamelayer"
+      ref="gamelayer"
+      xmlns="http://www.w3.org/2000/svg">
+      <g font-family="Ubuntu, sans-serif" :transform="'scale(' + baseScale + ')'">
+        <g v-if="mapDataLoaded && !jumpAnimationState" transform="translate(0 -100)">
+          <g :transform="getTransform()">
+            <grid></grid>
           </g>
+          <rect x="-2000" y="-1000" width="4000" height="2000" fill="#ffffff00"
+          @mousedown="handleMouseDown"
+          @mouseup="handleMouseUp"
+          @mousemove="handleMouseMove"
+          @mouseleave="handleMouseLeave"/>
+          <g :transform="getTransform()">
+            <solar-system />
+          </g>
+        </g>
+      </g>
+    </svg>
+
+    <svg
+      class="map-layer hud-layer"
+      :viewBox="layerViewBox"
+      xmlns="http://www.w3.org/2000/svg">
+      <g font-family="Ubuntu, sans-serif" :transform="'scale(' + baseScale + ')'">
+        <g v-if="mapDataLoaded">
+          <g v-if="jumpAnimationState">
+            <jumpAnimation></jumpAnimation>
+          </g>
+          <g v-else-if="menuState.jumpMenu" transform="translate(0 -100)">
+            <jumpMenu></jumpMenu>
+          </g>
+          <g v-else>
+            <hud></hud>
+          </g>
+        </g>
         <g v-else>
           <loading-bar />
         </g>
         <connection-status />
       </g>
-
-      </g>
     </svg>
-
   </div>
-
 </template>
 
 <script>
@@ -124,8 +126,8 @@ export default {
       'starMap',
     ]),
     ...mapState(useUIStore, [
-      'viewportActual',
       'viewport',
+      'container',
       'menuState',
       'isMenuOn',
       'jumpAnimationState'
@@ -140,17 +142,14 @@ export default {
       'mapDataLoaded',
       'myShipId'
     ]),
-    viewBoxSize () {
-      var topLeft = (0 - this.viewport.resolution / 2)
-      return (
-        topLeft +
-        ' ' +
-        topLeft +
-        ' ' +
-        this.viewport.resolution +
-        ' ' +
-        this.viewport.resolution
-      )
+    /**
+     * Every layer maps 1200 units to the container's height, centered on the origin (this is
+     * what the original single SVG did at any aspect ratio), so the layers line up exactly.
+     */
+    layerViewBox () {
+      const width = this.viewport.resolution * this.container.width / this.container.height
+      const height = this.viewport.resolution
+      return (-width / 2) + ' ' + (-height / 2) + ' ' + width + ' ' + height
     },
     backdropTransform () {
       return 'scale(' + ((Math.sqrt(10 / parseFloat(this.viewport.scale)) + 10) / 4) + ')'
@@ -274,18 +273,28 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-  .is-dragging {
-    cursor: grabbing;
+  .star-map {
+    display: block;
   }
-  .gamelayer {
-    z-index: 1000;
-  }
-  svg {
-    min-width: 100%;
-    min-height: 100%;
-    //shape-rendering: optimizeSpeed
-    //shape-rendering: crispEdges;
+  .map-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
     shape-rendering: geometricPrecision;
     text-rendering: geometricPrecision;
+  }
+  // The HUD covers the whole screen, but only its painted parts take the mouse; the rest
+  // passes through to the world layer underneath (panning, clicking sprites).
+  .hud-layer {
+    pointer-events: none;
+    > g {
+      pointer-events: auto;
+    }
+  }
+  .is-dragging {
+    cursor: grabbing;
   }
 </style>
