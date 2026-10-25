@@ -118,7 +118,7 @@ export default {
           this.scaleBy(1.25)
           break
         case 'ArrowRight':
-          this.moveRight(CAMERA.KEY_PAN * 10)
+          this.moveRight(CAMERA.KEY_PAN)
           break
         case 'ArrowLeft':
           this.moveLeft(CAMERA.KEY_PAN)
