@@ -385,6 +385,38 @@ The app looks and behaves the same apart from the bug fixes listed under Bugs. T
 - **Star map import**: stable keys, a station appearing mid-system, and the selection surviving a reload.
 - **HUD smoke test**: mounts the HUD over a loaded star system, selects each kind of sprite, and opens every menu. It fails on any Vue error or warning. I checked that it catches a template reading a field that doesn't exist.
 
+## Phase 6b: Data layer
+
+Plan and reasoning: "Architecture: data flow" and "Plan" below. Every step is checked with lint, the tests, a full screenshot capture against the previous one (matching apart from orbital motion) and live checks on the local chain.
+
+### Step 1: sync and actions in `src/sdk/` (done)
+
+```
+src/sdk/
+  chain/      wallet, networks, contracts (unchanged; moved from src/chain)
+  chain/decode.js   the contract's unnamed return tuples → named objects. The only code that knows their layouts.
+  load.js     loadPlayer(), loadRecentEvents(block), loadSystem(onProgress) → plain objects
+  actions.js  createAvatar, launchShip, moveTo, sendChat, claimPlanet, buildStation, trade, buyHolds, rename
+  sync.js     createBlockWatcher({ watchedAddresses, onBlock }): new block? did it touch the game?
+  game/       orbits, bearings, trade rules, planet types (moved from src/game)
+```
+
+- Nothing in `src/sdk/` imports Vue or Pinia. Wallet discovery uses `window`, since EIP-6963 is a browser standard; a non-browser client would pass in its own provider.
+- **The stores now call the SDK** and keep only their own concerns:
+  - **GameState:** busy flags, error logging, and the jump animation around `moveTo`.
+  - **StarMap:** turning loaded data into sprites.
+  - **Chain:** the poll timer, pausing while the tab is hidden, and what to reload.
+- `sprite-types.js` moved to `libs/`. It's drawing data (click radius, camera zoom, sprite scale), not game data.
+- **Still outside the SDK, for step 3:**
+  - The Chain store binds the contracts and reads the token addresses itself.
+  - The stores still hold the state. The SDK doesn't yet keep a state object of its own with `subscribe()`.
+- **Tests:** a decoder test per tuple layout (42 tests in all).
+- **Live checks on the local chain:**
+  - an empty block is skipped;
+  - a chat transaction triggers a reload, and the message appears;
+  - a trade updates credits and cargo;
+  - a rejected hold purchase logs the contract's reason ("insufficient credits").
+
 ## Bugs
 
 ### Fixed
@@ -422,6 +454,7 @@ Phase 6:
 - **Zooming back in after zooming far out took extra wheel steps.** Zoom requests aimed past the camera's limit. (`caddba3`)
 - **Hovering the sun's scope marker threw** instead of labeling the sun. I introduced this with the Phase 5 sprite keys. (`ad11592`)
 - **A saved low graphics tier ran at full frame rate after a reload.** The tick delay only updated when a tier was picked, and the original had the same problem. The `~` key's tier toggle now also saves its choice. (`78f561e`)
+- **The map loading bar jumped in big steps.** Object keys are strings, so `6 + key` concatenated (`"60"`) and each stage went straight to its cap. Found while moving the loaders into the SDK. (`1489b25`)
 - **The lint findings** listed below for "the phase that rewrites that code" are fixed. (`215d2c1`)
 
 ### Found, to fix in the phase that rewrites that code (all fixed in Phase 6)
@@ -451,7 +484,7 @@ Phase 6:
 
 ## Architecture: data flow
 
-### Now (after Phase 6)
+### Before Phase 6b (step 1 has since moved loading, actions and block watching into `src/sdk/`; see Phase 6b)
 
 ```
 wallet ─ chain/wallet.js ─┐
@@ -503,7 +536,7 @@ Each phase goes on `modernize` with its own commits. Bug fixes get separate comm
 5. **Phase 5, rendering.** Shared rAF loop. HUD and menus to HTML. Canvas backdrop, starfield and jump streaks. Wrapper pan/zoom with crisp commit on settle. Sprite split only if the profile says so.
 6. **Phase 6, architecture and cleanup.** `chain/`, `game/`, stores, components. Naming, constants, dead code, Prettier in its own commit, Vitest for `game/` and `chain/` conversions.
 7. **Phase 6b, data layer** (agreed with Koda 2026-10-25; see "Architecture: data flow" below). Behavior-preserving: the contracts don't change, and the captures and tests must match.
-   1. Move sync and actions into `src/sdk/`, with no Vue imports. Decode contract tuples into named game objects there.
+   1. ~~Move sync and actions into `src/sdk/`, with no Vue imports. Decode contract tuples into named game objects there.~~ Done; see the Phase 6b section.
    2. Split game data from drawing data in `Sprite`.
    3. Make the stores thin subscribers. At the same time:
       - remove `setProp`;
