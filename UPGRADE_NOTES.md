@@ -417,6 +417,22 @@ src/sdk/
   - a trade updates credits and cargo;
   - a rejected hold purchase logs the contract's reason ("insufficient credits").
 
+### Step 2: game objects separate from sprites (done)
+
+- **`sdk/system.js` `buildSystem(loaded, player)`** returns plain game objects keyed `'planet:3'`.
+  - Each object has its game fields, owner names and `isMine`, and what it orbits (a key).
+  - Each object also has its `orbit: { radius, speed }`. The radius and speed formulas are game rules, so they live here.
+  - `objectKey()` and `STAR_KEY` moved here from `libs/sprite.js`.
+- **`Sprite` (`libs/sprite.js`) is now drawing state only.** It holds the click radius, camera zoom, telemetry and position, plus a reference to its game data (`sprite.object`).
+- **The StarMap store holds both, under the same keys:** `systemObjects` for game objects and `sprites` for drawing.
+  - The HUD reads `systemObjects`.
+  - The world, the scope and the camera read `sprites` for positions.
+- **The card menu's actions** moved from `Sprite.getMenu()` to `card-ui/menus/card-menu.js`, built from the game object.
+- **Rename:** `stationSprite` → `stationKey`.
+- **Found and fixed along the way** (each in its own commit; see Bugs):
+  - Owner names and the star's id on first load were stale.
+  - Two store mappings I removed in Phase 6 were still in use.
+
 ## Bugs
 
 ### Fixed
@@ -462,6 +478,12 @@ Phase 6:
   - The measurement script is `jitter.js` in the test harness.
 - **Regression from Phase 5: the world could stay soft after selecting something at a different zoom.** It only redrew sharply once the camera held still, and a camera following a moving object never does. Now only the zoom has to settle. (`51b24ee`)
 - **Orbit rings were drawn across ships, found by Koda on Sepolia.** Each sprite drew its own ring just before itself, and all ships at a planet share one orbit, so each ship's ring cut across the ships drawn before it. The original had the same order. The world and each planet layer now draw every ring first, then the bodies. Reproduced and checked locally with two ships at Earth.
+- **Owner names were missing on the first load of a system, and the star showed as #0.** The import read them from the store before updating it, so they came from the previous load. After a jump, they belonged to the previous system. Found while moving the import into `sdk/system.js`. (`8d3b043`)
+- **Regression from my Phase 6 cleanup (`4c4945d`):**
+  - The planet card's moons menu ("Visit Moon") threw an error.
+  - Minerva's Profile tab logged a Vue warning every frame.
+
+  My unused-mapping check missed templates that read `this.x`. A scan of every template finds no others, and the smoke test now opens the moons menu. (`206a308`)
 - **The lint findings** listed below for "the phase that rewrites that code" are fixed. (`215d2c1`)
 
 ### Found, to fix in the phase that rewrites that code (all fixed in Phase 6)
@@ -475,6 +497,97 @@ Phase 6:
 ### Found, not fixed (contracts; out of scope this iteration)
 
 - **No access control on Orbiter8 admin setters.** `setShipTokenizer`, `setPlanetTokenizer`, `setCreditTokenizer`, `setAvatarControls`, `genesis` and `makeSolarSystem` are `public` with no owner check. Anyone can repoint the live game's token contracts, which would break minting and credits for every player. Fixing this needs a contract change and a redeploy.
+
+## Feature to-dos (Koda, 2026-10-25; next up after Phase 6b and 7)
+
+### 1. Gamepad support
+
+Koda's mapping, with suggestions marked *(suggested)*. Buttons are named by position, because the browser's standard gamepad mapping numbers them that way. Xbox A/B/X/Y and PlayStation ✕/○/□/△ land in the same places; Nintendo's letters are swapped.
+
+| Input | Action |
+|---|---|
+| L2 / R2 | Zoom out / in. The triggers are analog, so pressure sets the zoom speed *(suggested)*. |
+| Left stick | Pan, like dragging. |
+| D-pad | Move focus between the HUD buttons in the current context (HUD, open menu, card). |
+| Bottom (A / ✕) | Select / confirm. |
+| Right (B / ○) | Cancel / back: close the open menu first, then deselect. |
+| Top (Y / △) | Planets menu. |
+| Left (X / □) | Jump interface (the neighbor-star view; see to-do 2). |
+| L1 / R1 | Previous / next planet *(suggested; Koda proposed R1/R2, but R2 zooms)*. |
+| Start / Menu | Go to my ship. |
+| Select / View *(suggested)* | Settings menu. |
+| Right stick *(suggested)* | A free cursor for anything the D-pad can't reach, such as ships and moons in the world, with Select to click. This is the safety net that makes everything reachable. |
+| L3 / R3 *(suggested)* | Toggle labels / toggle the scope. |
+
+Other suggestions:
+- Show button glyphs (Ⓐ Select, Ⓑ Back) while a controller is in use, and switch back to mouse hints when the mouse moves.
+- Rumble on a jump or a purchase. Chrome supports it; Firefox mostly doesn't.
+
+**Reachability check.** Every part of the interface, and how a controller gets there:
+- **Star map, all reachable:**
+  - HUD buttons (profile → my ship, system → star, mute, chat, settings, ships, planets, labels, scope toggle, zoom +/−): D-pad focus.
+  - The card's actions (jump, visit station/planet/moon, trade, shipyard, rename, claim, build station, OpenSea) and the moons menu: D-pad.
+  - The trade sliders (left/right on the focused slider) and Make Trade: D-pad.
+  - Shipyard holds and Buy: D-pad.
+  - Settings radio buttons: D-pad.
+  - The jump menu's neighbor list: D-pad.
+  - Ships and moons in the world: L1/R1 for planets, the right-stick cursor for everything else, or the planets menu, which lists moons and ports.
+- **Pre-game screens, reachable:** Play, wallet and network choice, graphics quality, Take Command: D-pad.
+- **Not reachable without more work:**
+  - **Typing.** Avatar name, ship name, claiming or naming a planet, building a station, renames and chat all use text fields or `prompt()`. Options:
+    - rely on the OS keyboard (the Steam Deck has one);
+    - a "suggest a name" button using generated names;
+    - canned chat messages;
+    - an on-screen keyboard (the most work).
+  - **Wallet confirmations.** Every action opens the wallet extension's popup, which a gamepad can't operate. This is the real blocker for controller-only play. Fixing it means a different signing model, such as an embedded wallet or session keys, which is beyond the client alone. Until then, the controller covers looking around and navigating, and a mouse confirms transactions.
+- **Minerva** (dev only): skip.
+
+Notes: the browser only reveals a gamepad after a button is pressed on the page. Firefox reports the standard mapping for fewer controllers than Chrome, so test with Koda's controllers early.
+
+### 2. Heliopause → neighbor-star view
+
+Zooming out past the system's outermost circle (the heliopause) turns the system smoothly into a single star. The camera keeps pulling back, and the neighboring stars appear around it. Click a neighbor to choose it and jump. This replaces or absorbs the current jump menu.
+
+**What the contracts allow today:**
+- The current system's neighbors (up to 12, from `getPlayerSystemData`) and their names (`getSystemName`).
+- Not the neighbors' own neighbors: `getSystemData(id)` is `internal`. Contract wish: make it public, or add `getSystemNeighbors(id)`.
+- No positions in space, only adjacency. Every neighbor is exactly one jump away.
+
+**Ideas:**
+- **Remember what the player has seen.** Each visit reveals that system's neighbor list, so the client can store it (per network, in localStorage) and build a personal map of the explored region over time. That gives neighbors-of-neighbors for any neighbor the player has visited, with no contract change, and doubles as fog of war.
+- **Consistent directions.** Place each star at an angle derived from a hash of its id, then spread out any that overlap. A star then always appears in roughly the same direction, whichever neighbor you view it from, which makes the map feel stable. Distance stays uniform, since every neighbor is one jump away.
+- **Show what's known:**
+  - visited or unexplored (unexplored systems have default names);
+  - whether your ship has been there;
+  - outer-ring stars dim, small, unlabeled and not clickable, as Koda suggested.
+- **Make the jump continuous:** the jump animation flies toward the chosen star's direction, and the new system grows out of it.
+
+**Open questions for Koda:**
+- Does zooming out past the heliopause always enter this view, or only on a deliberate extra scroll?
+- Should "jump" from the star's card (and X on the controller) open this view too?
+
+### 3. Leaderboard (feasible with the current contracts)
+
+Checked against the contracts and the local chain:
+- **Players:** every player who has launched a ship owns a ship NFT. `ShipTokens` is `ERC721Full` (OpenZeppelin 2.x), which includes Enumerable, so `totalSupply()`, then `tokenByIndex(i)` and `ownerOf(token)`, lists them all. Players without a ship have no planets or credits.
+- **Planets owned:** `PlanetTokens.balanceOf(player)`. In-game ownership *is* the NFT (`getPlanet` and the claim checks use `ownerOf`), so this is exact.
+  - Unclaimed planets sit with the game. On the local chain the deployer, "The Federation", holds them, so leave the game contract and the token owner off the board.
+- **Credits:** `Credits.balanceOf(player)`. That's the current balance; lifetime earnings would need event scanning, which isn't practical.
+- **Optional "ports" column:** `tokenOfOwnerByIndex` for each owned planet, then `getPlanet().hasStation`. That's one more read per planet.
+- **Cost:** about 4 reads per player, plus names.
+  - With Multicall3 (deployed at the same address on most public networks, but not on the local chain; check at runtime and fall back to plain calls), it's one or a few requests for hundreds of players.
+  - Without it, still seconds.
+  - Load when the leaderboard opens, and refresh at most every minute or so.
+- **Not possible without scanning everything:** "most systems discovered". It needs `getSystemData` to be public, or events.
+
+**Open questions for Koda:** which columns (planets, credits, ports, ships), and where it lives (a HUD button, the title screen, or both).
+
+## Contract wish list (next contracts iteration)
+
+- Events for every game action (claim, build station, jump, rename, trade…), so the client can update from events instead of reloading.
+- Access control on the admin setters (see Bugs, "Found, not fixed").
+- A public `getSystemData(id)` (or `getSystemNeighbors(id)`), for the neighbor-star view's outer ring and a "systems discovered" leaderboard column.
+- Named return values in the ABI, so tuples decode by name. The client's `sdk/chain/decode.js` is the only place that would change.
 
 ## Proposed refactors (bigger than a day; not started)
 
@@ -544,7 +657,7 @@ Each phase goes on `modernize` with its own commits. Bug fixes get separate comm
 6. **Phase 6, architecture and cleanup.** `chain/`, `game/`, stores, components. Naming, constants, dead code, Prettier in its own commit, Vitest for `game/` and `chain/` conversions.
 7. **Phase 6b, data layer** (agreed with Koda 2026-10-25; see "Architecture: data flow" below). Behavior-preserving: the contracts don't change, and the captures and tests must match.
    1. ~~Move sync and actions into `src/sdk/`, with no Vue imports. Decode contract tuples into named game objects there.~~ Done; see the Phase 6b section.
-   2. Split game data from drawing data in `Sprite`.
+   2. ~~Split game data from drawing data in `Sprite`.~~ Done; see the Phase 6b section.
    3. Make the stores thin subscribers. At the same time:
       - remove `setProp`;
       - declare props (with types) and emits;
