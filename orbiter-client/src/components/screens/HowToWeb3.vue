@@ -8,12 +8,12 @@
     </p>
     <p>
       If you have a Meta Mask or another compatable wallet installed, be sure to:
-      <ul>
-        <li>give this page permission to access Meta Mask,</li>
-        <li>switch to the Ropsten test network, and </li>
-        <li>grab an ETH from a faucet like <a href="https://faucet.metamask.io/" target="_blank">this one from MetaMask.</a></li>
-      </ul>
     </p>
+    <ul>
+      <li>give this page permission to access Meta Mask,</li>
+      <li>switch to the Ropsten test network, and </li>
+      <li>grab an ETH from a faucet like <a href="https://faucet.metamask.io/" target="_blank">this one from MetaMask.</a></li>
+    </ul>
     <p>Once done, head back to the <a href="#/">Title Screen</a></p>
   </div>
 </template>
