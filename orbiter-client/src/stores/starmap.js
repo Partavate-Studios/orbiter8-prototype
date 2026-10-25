@@ -1,10 +1,9 @@
 import { defineStore } from 'pinia'
-import { loadSystem } from '@/sdk/load'
+import { game } from '@/sdk/client'
 import { useUIStore } from '@/stores/ui'
 import { markRaw } from 'vue'
 import Sprite from '@/libs/sprite.js'
 import { buildSystem, STAR_KEY } from '@/sdk/system'
-import { useChainStore } from '@/stores/chain'
 
 export const useStarMapStore = defineStore('StarMap', {
   state: () => ({
@@ -52,29 +51,19 @@ export const useStarMapStore = defineStore('StarMap', {
     }
   },
   actions: {
-    /** Loads the star map for the player's current star system */
-    async loadStarMap() {
-      if (this.isLoading) {
-        return
-      }
+    /** Reloads the player's current star system; the result arrives through importSystem (stores/game-bindings.js). */
+    loadStarMap() {
       console.debug('Loading star map...')
-      this.isLoading = true
-      this.loadProgress = 1
-      try {
-        const blockData = await loadSystem((percent) => {
-          this.loadProgress = percent
-        })
-        const isNewSystem = blockData.id != this.starId
-        this.loadProgress = 99
-        this.importStarMapBlockData({ blockData, playerAccount: String(useChainStore().account).toLowerCase() })
-        this.loadProgress = 100
-        if (isNewSystem) {
-          useUIStore().jumpAnimationOff()
-        }
-      } catch (error) {
-        console.error('Loading the star map failed:', error)
-        // Let the next block retry; otherwise one failed RPC call froze the map for the session.
-        this.isLoading = false
+      return game.refreshSystem()
+    },
+    /** Takes in a freshly loaded star system (sdk/load.js loadSystem) from the game client. */
+    importSystem(system, playerAccount) {
+      const isNewSystem = system.id != this.starId
+      this.loadProgress = 99
+      this.importStarMapBlockData({ blockData: system, playerAccount })
+      this.loadProgress = 100
+      if (isNewSystem) {
+        useUIStore().jumpAnimationOff()
       }
     },
     //generic setter

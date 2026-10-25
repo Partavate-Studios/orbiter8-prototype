@@ -1,8 +1,6 @@
 import { defineStore } from 'pinia'
-import { loadPlayer, loadRecentEvents } from '@/sdk/load'
-import * as game from '@/sdk/actions'
+import { game } from '@/sdk/client'
 import { useUIStore } from '@/stores/ui'
-import { useChainStore } from '@/stores/chain'
 
 /** Waits for a player action; if it fails, logs why (the revert reason when there is one). */
 async function logFailure(what, action) {
@@ -51,29 +49,27 @@ export const useGameStateStore = defineStore('GameState', {
     avatar: (state) => state.gameState.avatar
   },
   actions: {
-    /** Loads general state information: avatar count, star system count, player avatar data */
-    async loadGameState() {
+    /** Reloads the player's avatar, ship and credits; the result arrives through importPlayer. */
+    loadGameState() {
       console.debug('Loading game state...')
-      this.setGameDataLoading()
-      try {
-        const gameState = await loadPlayer()
-        if (gameState.avatar.registered) this.haveAvatar = true
-        if (gameState.avatar.shipId > 0) this.haveShip = true
-        this.gameState = gameState
-        this.setGameDataLoaded()
-      } catch (error) {
-        console.error('Loading game state failed:', error)
-      }
+      return game.refreshPlayer()
+    },
+    /** Takes in freshly loaded player data (sdk/load.js loadPlayer) from the game client. */
+    importPlayer(player) {
+      if (player.avatar.registered) this.haveAvatar = true
+      if (player.avatar.shipId > 0) this.haveShip = true
+      this.gameState = player
+      this.gameDataLoaded = true
     },
     /** Recent avatar sign-ups, ship launches, trades and chat, for the HUD counters and the chat menu. */
-    async loadEvents() {
-      this.events = await loadRecentEvents(useChainStore().currentBlockId)
+    loadEvents() {
+      return game.refreshEvents()
     },
     /** player actions */
     async createAvatar(name) {
       this.creatingAvatar = true
       try {
-        await game.createAvatar(name)
+        await game.actions.createAvatar(name)
       } catch (error) {
         console.error('Avatar creation failed:', error.shortMessage ?? error.message)
       }
@@ -82,7 +78,7 @@ export const useGameStateStore = defineStore('GameState', {
     async launchShip(name) {
       this.launchingShip = true
       try {
-        await game.launchShip(name)
+        await game.actions.launchShip(name)
       } catch (error) {
         console.error('Ship launch failed:', error.shortMessage ?? error.message)
       }
@@ -93,7 +89,7 @@ export const useGameStateStore = defineStore('GameState', {
       try {
         useUIStore().jumpAnimationOn()
         useUIStore().jumpMenuOff()
-        await game.moveTo(system)
+        await game.actions.moveTo(system)
       } catch (error) {
         console.error('Jump failed:', error.shortMessage ?? error.message)
         // Otherwise the "traveling" animation never ends (it stops when the new system loads).
@@ -101,23 +97,23 @@ export const useGameStateStore = defineStore('GameState', {
       }
     },
     async sendChat(message) {
-      await logFailure('Sending chat', game.sendChat(message))
+      await logFailure('Sending chat', game.actions.sendChat(message))
     },
     async claimPlanet({ planetId, name }) {
-      await logFailure('Claiming the planet', game.claimPlanet(planetId, name))
+      await logFailure('Claiming the planet', game.actions.claimPlanet(planetId, name))
     },
     async buildStation({ planetId, name }) {
-      await logFailure('Building the station', game.buildStation(planetId, name))
+      await logFailure('Building the station', game.actions.buildStation(planetId, name))
     },
     async tradeAtPort({ planetId, equipment, fuel, organics }) {
-      await logFailure('Trade', game.trade(planetId, { equipment, fuel, organics }))
+      await logFailure('Trade', game.actions.trade(planetId, { equipment, fuel, organics }))
     },
     async addHoldsToShip({ planetId, amount }) {
-      await logFailure('Buying cargo holds', game.buyHolds(planetId, amount))
+      await logFailure('Buying cargo holds', game.actions.buyHolds(planetId, amount))
     },
     /** Renames a star, planet, moon, station or the player's ship. `parentId` is a moon's planet. */
     async renameAsset({ name, type, objectId, parentId }) {
-      await logFailure('Renaming', game.rename({ type, objectId, parentId, name }))
+      await logFailure('Renaming', game.actions.rename({ type, objectId, parentId, name }))
     },
     setProp({ key, value }) {
       this[key] = value

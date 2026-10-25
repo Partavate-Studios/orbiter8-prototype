@@ -1,15 +1,11 @@
 import { defineStore } from 'pinia'
 import { markRaw } from 'vue'
-import { discoverWallets, preferredWallet, rememberWallet, connectWallet } from '@/sdk/chain/wallet'
-import { initContracts as bindContracts, contractAddresses, galaxy, getNativeBalance } from '@/sdk/chain/contracts'
+import { discoverWallets, preferredWallet, rememberWallet } from '@/sdk/chain/wallet'
 import { networks, networkFor, chainName } from '@/sdk/chain/networks'
-import { createBlockWatcher } from '@/sdk/sync'
-import { useStarMapStore } from '@/stores/starmap'
-import { useGameStateStore } from '@/stores/gamestate'
+import { game } from '@/sdk/client'
 import { useConfigStore } from '@/stores/config'
 
 let blockPoller = null
-let blockWatcher = null
 
 export const useChainStore = defineStore('Chain', {
   state: () => ({
@@ -74,55 +70,23 @@ export const useChainStore = defineStore('Chain', {
       // The wallet usually shows a popup now; until the player approves it, we wait here.
       this.walletStatus = 'connecting'
       try {
-        const session = await connectWallet(wallet)
+        await game.connect(wallet)
         rememberWallet(wallet)
-        this.chainId = session.chainId
-        this.account = session.account
         this.web3Loaded = true
         this.walletStatus = 'connected'
-        this.balance = await getNativeBalance()
       } catch (error) {
         console.error('Wallet connection failed:', error)
         this.walletError = error.shortMessage ?? error.message
         this.walletStatus = 'error'
       }
     },
-    /** Binds the game contracts on the connected network and looks up the token contracts. */
+    /** Binds the game contracts on the connected network (addresses arrive through stores/game-bindings.js). */
     async initContracts() {
-      if (!(await bindContracts())) return
-      const addresses = contractAddresses()
-      this.avatarAddress = addresses.avatars
-      this.galaxyAddress = addresses.game
-      const [planetToken, shipToken, creditToken] = await Promise.all([
-        galaxy.getPlanetToken(),
-        galaxy.getShipToken(),
-        galaxy.getCreditToken()
-      ])
-      this.planetTokenAddress = planetToken
-      this.shipTokenAddress = shipToken
-      this.creditTokenAddress = creditToken
-      this.contractsLoaded = true
+      if (await game.bindContracts()) this.contractsLoaded = true
     },
     /** Polls for new blocks for the rest of the session. Safe to call again: only one poller ever runs. */
     startBlockPolling() {
       if (blockPoller) return
-      blockWatcher = createBlockWatcher({
-        watchedAddresses: () => [
-          this.galaxyAddress,
-          this.avatarAddress,
-          this.planetTokenAddress,
-          this.shipTokenAddress,
-          this.creditTokenAddress
-        ],
-        onBlock: (blockNumber, gameChanged) => {
-          this.currentBlockId = blockNumber
-          if (!gameChanged) return
-          console.debug('Game changed by block ' + blockNumber + '; reloading')
-          useGameStateStore().loadGameState()
-          useGameStateStore().loadEvents()
-          useStarMapStore().loadStarMap()
-        }
-      })
       // Paused while the tab is hidden; checks right away when the player comes back.
       const poll = () => {
         if (!document.hidden) this.checkForNewBlock()
@@ -131,11 +95,10 @@ export const useChainStore = defineStore('Chain', {
       blockPoller = setInterval(poll, useConfigStore().blockCheckDelay)
       document.addEventListener('visibilitychange', poll)
     },
-    /** Checks for a new block now; reloads the game if it changed. Needs startBlockPolling() first. */
+    /** Checks for a new block now; the game client reloads the game if it changed. */
     async checkForNewBlock() {
-      if (!blockWatcher) return
       try {
-        await blockWatcher.check()
+        await game.checkForNewBlock()
       } catch (error) {
         console.error('Block check failed:', error.message)
       }
