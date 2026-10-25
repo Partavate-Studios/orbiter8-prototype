@@ -330,6 +330,13 @@ Paint flashing at idle confirms the split:
 - **The graphics quality cookie was read back as a string**, so toggling did `"3" + 1`. (`d9d75ca`)
 - **`openMenu` reset a nonexistent `portMenu` flag instead of `tradeMenu`**, leaving the trade menu open under other menus. (`ea31e02`)
 
+- **Regression I introduced in Phase 2, found by Koda in Firefox:** after a reload on `#/play`, the map stayed at 0% forever. (`783b947`)
+  - Under Vue Router 4, `App.vue`'s "always start at the title screen" redirect checked the route before it was resolved, so it never fired.
+  - The title screen is what starts block polling, and the map only loads when a block is seen.
+  - Fixed by waiting for `router.isReady()`. The game screen now also starts the poller, which is idempotent.
+  - My scripted runs always started at `/`, so they missed it. The smoke tests will cover a reload on `#/play`.
+- **Invalid table and list markup** (Vue 3 compiler warnings) in the debug panel and the How-to-Web3 page. (`79ebfee`, `6eac1a6`)
+
 ### Found, to fix in the phase that rewrites that code
 
 - **Lint findings:**
