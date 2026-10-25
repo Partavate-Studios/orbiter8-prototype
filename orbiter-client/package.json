@@ -24,7 +24,8 @@
     "test": "vitest run",
     "local": "node dev/local.js",
     "chain": "hardhat --config dev/hardhat.config.cjs node",
-    "deploy:local": "node dev/deploy-local.js"
+    "deploy:local": "node dev/deploy-local.js",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "ethers": "^6.17.0",
@@ -42,6 +43,7 @@
     "globals": "^17.13.0",
     "happy-dom": "^21.0.4",
     "hardhat": "^2.22.17",
+    "prettier": "3.9.10",
     "puppeteer-core": "^23.11.1",
     "sass": "^1.106.1",
     "vite": "^8.3.5",
