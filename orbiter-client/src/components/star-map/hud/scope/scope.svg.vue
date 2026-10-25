@@ -134,8 +134,8 @@ export default {
       // Sprites are raw objects updated in place each frame; reading gameTime makes this re-evaluate per frame.
       void this.gameTime
       return {
-        x: sprite.telemetry.translatex + this.viewport.x,
-        y: sprite.telemetry.translatey + this.viewport.y
+        x: sprite.position.x + this.viewport.x,
+        y: sprite.position.y + this.viewport.y
       }
     },
     bearingToSprite (sprite) {
