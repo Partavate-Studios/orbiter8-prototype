@@ -30,12 +30,6 @@ export const useChainStore = defineStore('Chain', {
     walletError: null
   }),
   getters: {
-    readyToPlay: (state) => {
-      if (state.web3Loaded && state.contractsLoaded && state.account > 0) {
-        return true
-      }
-      return false
-    },
     networkName: (state) => (state.chainId ? chainName(state.chainId) : ''),
     /** Network metadata keyed by chain id, plus the hex chain id wallets expect. */
     networkData: () =>
@@ -102,9 +96,6 @@ export const useChainStore = defineStore('Chain', {
       } catch (error) {
         console.error('Block check failed:', error.message)
       }
-    },
-    setProp({ key, value }) {
-      this[key] = value
     },
     setPlayerReady() {
       this.playerReady = true

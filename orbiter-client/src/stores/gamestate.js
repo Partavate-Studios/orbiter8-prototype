@@ -36,8 +36,6 @@ export const useGameStateStore = defineStore('GameState', {
       }
     },
     haveAvatar: false,
-    creatingAvatar: false,
-    launchingShip: false,
     haveShip: false,
     events: {
       avatarEvents: null,
@@ -67,22 +65,10 @@ export const useGameStateStore = defineStore('GameState', {
     },
     /** player actions */
     async createAvatar(name) {
-      this.creatingAvatar = true
-      try {
-        await game.actions.createAvatar(name)
-      } catch (error) {
-        console.error('Avatar creation failed:', error.shortMessage ?? error.message)
-      }
-      this.creatingAvatar = false
+      await logFailure('Avatar creation', game.actions.createAvatar(name))
     },
     async launchShip(name) {
-      this.launchingShip = true
-      try {
-        await game.actions.launchShip(name)
-      } catch (error) {
-        console.error('Ship launch failed:', error.shortMessage ?? error.message)
-      }
-      this.launchingShip = false
+      await logFailure('Ship launch', game.actions.launchShip(name))
     },
     /** Jumps the player's ship to a neighboring system, playing the jump animation until the new system loads. */
     async moveToSystem(system) {
@@ -114,16 +100,6 @@ export const useGameStateStore = defineStore('GameState', {
     /** Renames a star, planet, moon, station or the player's ship. `parentId` is a moon's planet. */
     async renameAsset({ name, type, objectId, parentId }) {
       await logFailure('Renaming', game.actions.rename({ type, objectId, parentId, name }))
-    },
-    setProp({ key, value }) {
-      this[key] = value
-    },
-    setGameDataLoaded() {
-      this.gameDataLoaded = true
-      this.gameDataLoading = false
-    },
-    setGameDataLoading() {
-      this.gameDataLoading = true
     }
   }
 })

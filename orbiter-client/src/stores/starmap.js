@@ -66,11 +66,6 @@ export const useStarMapStore = defineStore('StarMap', {
         useUIStore().jumpAnimationOff()
       }
     },
-    //generic setter
-    setProp({ key, value }) {
-      this[key] = value
-    },
-
     /** Advances gameTime to now, once per tick. Orbits are computed from it. */
     incrementGameTime() {
       const newTime = Date.now()
