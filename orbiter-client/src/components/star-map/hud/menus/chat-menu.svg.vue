@@ -84,9 +84,8 @@ export default {
       'players'
     ]),
     chatEvents () {
-      let chatEvents = this.events.chatEvents
-      chatEvents.reverse()
-      return chatEvents
+      // Newest first. Copy before reversing: reverse() works in place and would flip the store's array on every re-render.
+      return [...(this.events.chatEvents ?? [])].reverse()
     }
   },
   watch: {
