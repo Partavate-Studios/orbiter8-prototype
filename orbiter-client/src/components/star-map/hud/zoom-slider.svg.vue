@@ -6,18 +6,18 @@
       <line
         stroke-linecap="round"
         stroke="#000000aa"
-        :x1="zoomLine1()"
+        :x1="zoomMarkerX"
         y1="-4"
-        :x2="zoomLine1()"
+        :x2="zoomMarkerX"
         stroke-width="5"
         y2="4"
       ></line>
       <line
         stroke-linecap="round"
         stroke="#c3b3daaa"
-        :x1="zoomLine1()"
+        :x1="zoomMarkerX"
         y1="-4"
-        :x2="zoomLine1()"
+        :x2="zoomMarkerX"
         stroke-width="4"
         y2="4"
       ></line>
@@ -44,16 +44,16 @@ import { useUIStore } from '@/stores/ui'
 export default {
   name: 'ZoomSlider',
   computed: {
-    ...mapState(useUIStore, ['viewport'])
+    ...mapState(useUIStore, ['viewport']),
+    zoomMarkerX() {
+      return Math.min(64, Math.max(-64, 64 - (Math.log(this.viewport.scale * 100 + 0.75) * 12).toFixed(2)))
+    }
   },
   methods: {
     ...mapActions(useUIStore, ['scaleAnimateBy']),
     zoomBy(scaler) {
       this.o8audio.playEffect('click')
       this.scaleAnimateBy({ scaler, time: 200 })
-    },
-    zoomLine1() {
-      return Math.min(64, Math.max(-64, 64 - (Math.log(this.viewport.scale * 100 + 0.75) * 12).toFixed(2)))
     }
   }
 }

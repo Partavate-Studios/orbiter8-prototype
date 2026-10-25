@@ -10,7 +10,7 @@
         </g>
         <circle cx="0" cy="0" r="95" fill="none" />
       </g>
-      <g :transform="getInfoCardTranslate()">
+      <g :transform="infoCardTransform">
         <info :object-id="objectId" />
 
         <g transform="translate(45 120) scale(0.4)">
@@ -71,7 +71,7 @@
         </g>
       </g>
 
-      <g :transform="getMenuTranslate()">
+      <g :transform="menuTransform">
         <g v-if="menuShouldDisplay">
           <g v-if="currentMenu == 'main'">
             <main-menu :object-id="objectId" @moon-menu="selectMenu('moons')" />
@@ -141,6 +141,18 @@ export default {
         return true
       }
       return false
+    },
+    infoCardTransform() {
+      if (this.viewRatio > 1) {
+        return 'translate(-260 -35) scale(1.75)'
+      }
+      return 'scale(2.5)'
+    },
+    menuTransform() {
+      if (this.viewRatio > 1) {
+        return 'translate(260 -35) scale(1.75)'
+      }
+      return 'scale(2.5)'
     }
   },
   watch: {
@@ -154,18 +166,6 @@ export default {
   },
   methods: {
     ...mapActions(useUIStore, ['toggleScope', 'selectSprite']),
-    getInfoCardTranslate() {
-      if (this.viewRatio > 1) {
-        return 'translate(-260 -35) scale(1.75)'
-      }
-      return 'scale(2.5)'
-    },
-    getMenuTranslate() {
-      if (this.viewRatio > 1) {
-        return 'translate(260 -35) scale(1.75)'
-      }
-      return 'scale(2.5)'
-    },
     closeMenu() {
       this.menuShowing = false
       this.currentMenu = 'main'

@@ -2,7 +2,7 @@
   <g>
     <!-- The background and star streaks are drawn on canvas (background-canvas.vue). -->
     <g transform="translate(0 -100)">
-      <g :transform="getShipTranslate()">
+      <g :transform="shipTransform">
         <g transform="scale(15) rotate(90)">
           <ship />
         </g>
@@ -70,13 +70,8 @@ export default {
     // Where the streak cycle is; the ship bobs in time with it.
     rightSlideX() {
       return ((this.starSpeed * this.gameTime) / 10 + 5000) % 10000
-    }
-  },
-  mounted: function () {
-    this.loreTip = this.randomLoreTip()
-  },
-  methods: {
-    getShipTranslate() {
+    },
+    shipTransform() {
       return (
         'scale(' +
         (2 + Math.sin(this.rightSlideX / 1000) / 50) +
@@ -86,7 +81,12 @@ export default {
         Math.sin(this.rightSlideX / 200 + 0.5) +
         ')'
       )
-    },
+    }
+  },
+  mounted: function () {
+    this.loreTip = this.randomLoreTip()
+  },
+  methods: {
     randomLoreTip() {
       let tips = [
         'It is the year 2140, just a little more than a century after humans began off-world colonization.',

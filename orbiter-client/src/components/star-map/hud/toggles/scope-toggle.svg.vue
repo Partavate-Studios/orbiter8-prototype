@@ -1,6 +1,6 @@
 <template>
   <g>
-    <g :transform="'scale(' + scopeButtonScale() + ')'">
+    <g :transform="'scale(' + buttonScale + ')'">
       <a cursor="pointer" @click.prevent="toggleScope()" @mouseout="setSpriteToDisplay(null)">
         <g v-if="showScope">
           <text x="0" y="12" font-size="2.5em" fill="#ffffff" text-anchor="middle" alignment-baseline="central">-</text>
@@ -24,16 +24,16 @@ export default {
     }
   },
   computed: {
-    ...mapState(useUIStore, ['showScope'])
-  },
-  methods: {
-    ...mapActions(useUIStore, ['toggleScope', 'setSpriteToDisplay']),
-    scopeButtonScale() {
+    ...mapState(useUIStore, ['showScope']),
+    buttonScale() {
       if (this.showScope) {
         return 0.75 * this.scale
       }
       return this.scale
     }
+  },
+  methods: {
+    ...mapActions(useUIStore, ['toggleScope', 'setSpriteToDisplay'])
   }
 }
 </script>
