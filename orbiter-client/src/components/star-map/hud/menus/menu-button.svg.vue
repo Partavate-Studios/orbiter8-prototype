@@ -71,7 +71,7 @@ export default {
   },
   methods: {
     doClick() {
-      this.o8audio.playEffect['click']
+      this.o8audio.playEffect('click')
       this.$emit('buttonclick')
     }
   },
