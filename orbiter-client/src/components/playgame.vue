@@ -179,7 +179,6 @@ export default {
   created () {
     window.addEventListener('keyup', this.handleKeyPress)
     window.addEventListener('wheel', this.onWheel)
-    console.log('checking for avatar')
     if (!this.haveAvatar || !this.haveShip) {
       router.push('/')
     }

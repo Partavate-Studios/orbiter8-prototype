@@ -207,7 +207,6 @@ export default {
     ]),
     doTrade() {
       this.o8audio.playEffect('click')
-      console.log('doing trade', this.systemObjects[this.objectId].orbiting)
       this.pending = true
       let planet = this.systemObjects[this.objectId].orbiting
       let planetId = this.systemObjects[planet].id
@@ -337,7 +336,6 @@ export default {
         ) {
           this.closeMenu()
         }
-        console.log('I know the avatar was updated ' + this.avatar.ship.equipment)
       },
       deep: true
     }

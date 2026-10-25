@@ -38,7 +38,6 @@ export default class Sound {
     } else {
       this.resumeMusic()
     }
-    console.log('music ' + this.musicVolume)
   }
 
   setEffectsVolume(effectsVolume) {

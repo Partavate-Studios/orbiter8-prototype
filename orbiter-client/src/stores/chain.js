@@ -79,7 +79,7 @@ export const useChainStore = defineStore('Chain', {
         this.walletStatus = 'connected'
         this.balance = await getNativeBalance()
       } catch (error) {
-        console.log('Wallet connection failed:', error)
+        console.error('Wallet connection failed:', error)
         this.walletError = error.shortMessage ?? error.message
         this.walletStatus = 'error'
       }
@@ -128,12 +128,12 @@ export const useChainStore = defineStore('Chain', {
         ])
         this.currentBlockId = blockNumber
         if (!changed) return
-        console.log('Game changed by block ' + blockNumber + '; reloading')
+        console.debug('Game changed by block ' + blockNumber + '; reloading')
         useGameStateStore().loadGameState()
         useGameStateStore().loadEvents()
         useStarMapStore().loadStarMap()
       } catch (error) {
-        console.log('Block check failed:', error.message)
+        console.error('Block check failed:', error.message)
       } finally {
         checkingBlocks = false
       }

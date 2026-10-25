@@ -157,7 +157,6 @@ export default class Sprite {
         break
 
       case 'planet':
-        console.log('Planet belongs to', this.owner)
         if (parseInt(this.owner) === 0) {
           menu.push({
             text: 'Claim Planet',

@@ -165,7 +165,6 @@ export default {
 
   methods: {
     handleMouseDown (event) {
-      console.log('attempting to handle mouse down')
       this.mouseHold = true
       this.updateSlider(event)
     },

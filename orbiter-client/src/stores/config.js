@@ -22,7 +22,6 @@ export const useConfigStore = defineStore('Config', {
     },
     toggleMinerva () {
       this.showMinerva = !this.showMinerva
-      console.log('Minerva set to:' + this.showMinerva)
     },
     toggleGraphicsQuality () {
       this.graphicsQuality = ((this.graphicsQuality + 1 ) % 3) + 1
@@ -33,10 +32,8 @@ export const useConfigStore = defineStore('Config', {
       } else {
         this.tickDelay = this.tickDelayNormal
       }
-      console.log('High quality graphics set to:' + this.graphicsQuality)
     },
     setGraphicsQuality (value) {
-      console.log('Graphics set to:', value)
       this.graphicsQuality = Math.min(3, Math.max(1, value))
       Cookies.set('graphicsQuality', this.graphicsQuality, { expires: 30 })
 
@@ -53,7 +50,6 @@ export const useConfigStore = defineStore('Config', {
     },
     toggleScope () {
       this.showScope = !this.showScope
-      console.log('showScope set to:' + this.showScope)
     }
   }
 })

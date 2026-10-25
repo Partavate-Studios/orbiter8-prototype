@@ -230,7 +230,6 @@ export default {
     },
     emptyHolds () {
       let load = (this.avatar.ship.equipment + this.avatar.ship.fuel + this.avatar.ship.organics)
-      console.log('load ', load)
       return (this.avatar.ship.holds - load)
     },
     ownerName() {
@@ -244,14 +243,6 @@ export default {
         name = this.players[address] + ' ' + name
       }
       return name
-    }
-  },
-  watch: {
-    avatar: {
-      handler: function () {
-        console.log('I know the avatar was updated ' + this.avatar.ship.equipment)
-      },
-      deep: true
     }
   }
 }

@@ -152,14 +152,12 @@ export const useUIStore = defineStore('UI', {
       this.container.height = parseInt(y)
     },
     toggleShowLabels () {
-      console.log('toggling labels')
       this.showLabels = !this.showLabels
     },
     drawWorldAt (view) {
       this.drawnView = { x: view.x, y: view.y, scale: view.scale }
     },
     selectSprite (spriteId) {
-      console.log('selecting sprite ', spriteId)
       if (this.selectedSprite != spriteId) {
         // close old menu
         this.selectedSprite = spriteId;
@@ -183,7 +181,6 @@ export const useUIStore = defineStore('UI', {
       //todo: rubber for scale should be here
     },
     selectNone () {
-      console.log('unselecting sprites')
       this.selectedSprite = null
       this.viewport.xRubber = null
       this.viewport.yRubber = null
@@ -285,7 +282,6 @@ export const useUIStore = defineStore('UI', {
       this.viewport.scale =  Math.min(2000, scaler * this.viewport.scale)
     },
     scaleAnimateBy ({scaler, time}) {
-      console.log('scale', scaler)
       if (this.viewport.scaleRubber == null) {
         this.viewport.scaleRubber = new Rubber(
           this.viewport.scale,
@@ -367,7 +363,6 @@ export const useUIStore = defineStore('UI', {
       this.container.mouse.yPercent = payload.y / this.container.height
     },
     addToHistory (payload) {
-      console.log(payload)
       this.minerva.terminal.history.push(payload)
     },
     clearHistory () {
@@ -439,7 +434,6 @@ export const useUIStore = defineStore('UI', {
       this.hud.spriteToDisplay = payload
     },
     jumpAnimationOff () {
-      console.log('jump animation off')
       if (this.hud.jumpAnimationState) {
         // this.viewport.scaleRubber = new Rubber(
         //   this.viewport.scale,
@@ -450,7 +444,6 @@ export const useUIStore = defineStore('UI', {
       }
     },
     jumpAnimationOn () {
-      console.log('jump animation on')
       this.selectedSprite = null,
       this.viewport.x = 0,
       this.viewport.y = 0,

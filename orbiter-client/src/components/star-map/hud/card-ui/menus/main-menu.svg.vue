@@ -35,7 +35,6 @@ export default {
   },
   methods: {
     buttonAction (option) {
-      console.log('button pressed')
       this.o8audio.playEffect('click')
       if ((this.systemObjects[this.objectId].type !== 'ship')) {
       //  this.changeMyShipOrbit(this.objectId)

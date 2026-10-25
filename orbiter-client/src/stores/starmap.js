@@ -49,10 +49,9 @@ export const useStarMapStore = defineStore('StarMap', {
     /** Loads the star map for the player's current star system */
     async loadStarMap () {
       if (this.isLoading) {
-        console.log('Skipping load, already loading...')
         return
       }
-      console.log('Loading star map...')
+      console.debug('Loading star map...')
 
       this.setProp({key: 'isLoading', value: true})
       this.setProp({key: 'loadProgress', value: 1})
@@ -86,7 +85,6 @@ export const useStarMapStore = defineStore('StarMap', {
         this.setProp({key: 'loadProgress', value: 4})
 
         //Add pioneer to first visit sun to name index
-        console.log('Discovered by ', starMapBlockData.discoveredBy)
         if ((starMapBlockData.discoveredBy > 0) && (typeof starMapBlockData.avatarNames[starMapBlockData.discoveredBy] === 'undefined')) {
           starMapBlockData.avatarNames[starMapBlockData.discoveredBy] = await avatars.getAvatarNameByAddress(starMapBlockData.discoveredBy)
         }
@@ -108,7 +106,6 @@ export const useStarMapStore = defineStore('StarMap', {
         for (const key of Object.keys(starMapBlockData.shipIds)) {
           let shipId = starMapBlockData.shipIds[key]
           if ((shipId > 0) && !(shipId in starMapBlockData.ships)) {
-            //console.log('Adding ship ', shipId)
             const shipBase = await galaxy.getShip(String(shipId))
             const ship = {
               id: shipId,
@@ -153,7 +150,6 @@ export const useStarMapStore = defineStore('StarMap', {
               station: {}
             }
             //Add planet owner name to name index (need to deal with unknwon)
-            //console.log('Planet Owner: ' + planet.owner )
             if ((planet.owner > 0) && (typeof starMapBlockData.avatarNames[planet.owner] === 'undefined')) {
               starMapBlockData.avatarNames[planet.owner] = await avatars.getAvatarNameByAddress(planet.owner)
             }
@@ -161,7 +157,6 @@ export const useStarMapStore = defineStore('StarMap', {
             /** If there's a station, add the details to the planet */
             if (planet.hasStation) {
               const station = await galaxy.getStation(String(planet.id))
-              //console.log(JSON.stringify(station))
               planet.station = {
                 id: planet.id,
                 name: String(station[0]),
@@ -181,7 +176,6 @@ export const useStarMapStore = defineStore('StarMap', {
                 owner: planet.owner,
               }
             }
-            //console.log(JSON.stringify(planet.station))
 
             /** Add details for all the moons to the planet */
             for (const [moonkey, hasMoon] of Object.entries(planet.hasMoons)) {
@@ -214,15 +208,13 @@ export const useStarMapStore = defineStore('StarMap', {
           useUIStore().jumpAnimationOff()
         }
       } catch (error) {
-        console.log('oops:' + error.message, error)
+        console.error('Loading the star map failed:', error)
         // Let the next block retry; otherwise one failed RPC call froze the map for the session.
         this.isLoading = false
       }
-      console.log('new block loaded')
     },
     //generic setter
     setProp ({ key, value }) {
-      //console.log('setting props', [key, value])
       this[key] = value
     },
 
@@ -234,7 +226,6 @@ export const useStarMapStore = defineStore('StarMap', {
     },
 
     importStarMapBlockData ({blockData, playerAccount}) {
-      console.log('importing star map data')
 
       // Keyed by stable sprite key; insertion order is drawing order.
       const objects = {}

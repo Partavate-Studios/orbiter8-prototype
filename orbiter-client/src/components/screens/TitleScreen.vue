@@ -42,13 +42,6 @@ export default {
       'startBlockPolling'
     ])
   },
-  watch: {
-    haveAvatar: {
-      handler: function (val) {
-        console.log('Avatar Changed: ', val)
-      }
-    }
-  },
   created () {
     this.startBlockPolling()
     this.o8audio.playMusic('title')

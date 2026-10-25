@@ -76,7 +76,6 @@ export default {
     }
   },
   created () {
-    console.log('creating menu')
     this.offset = this.viewport.height
     this.rubberIn = new Rubber(
       this.viewport.height,

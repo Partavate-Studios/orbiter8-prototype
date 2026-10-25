@@ -193,7 +193,6 @@ export default {
     ]),
     async connectNetwork(chainId) {
       if (!this.networkData[chainId]) {
-        console.log('no chain! ' + chainId)
         return
       }
       if (this.walletStatus !== 'connected') {
@@ -203,7 +202,7 @@ export default {
       try {
         await walletRequest('wallet_switchEthereumChain', [{ chainId: this.networkData[chainId].hexId }])
       } catch (error) {
-        console.log('Error', error.message)
+        console.error('Switching networks failed:', error.shortMessage ?? error.message)
         if (confirm('Chain not found in your wallet. Would you like us to try to add it?')) {
 
           let data = [{
@@ -235,7 +234,7 @@ export default {
         })
 
       } catch (error) {
-        console.log(error);
+        console.error('Importing the credits token failed:', error)
       }
     },
     setMusicVolume(volume) {

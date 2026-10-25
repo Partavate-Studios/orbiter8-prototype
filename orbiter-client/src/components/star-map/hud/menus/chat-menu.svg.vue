@@ -58,7 +58,6 @@ export default {
       }
     },
     getName(address) {
-      console.log('lila ' + JSON.stringify(this.players))
       let name = address.substr(0, 6) + '...' + address.substr(address.length - 5)
       if (typeof this.players[address.toLowerCase()] !== 'undefined') {
         name = this.players[address.toLowerCase()]

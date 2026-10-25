@@ -71,7 +71,6 @@ export default {
   },
   methods: {
     doClick() {
-      console.log('clickage')
       this.o8audio.playEffect['click']
       this.$emit('buttonclick')
     }

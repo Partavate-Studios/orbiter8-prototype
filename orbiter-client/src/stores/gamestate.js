@@ -43,7 +43,7 @@ export const useGameStateStore = defineStore('GameState', {
   actions: {
     /** Loads general state information: avatar count, star system acount, player avatar data */
     async loadGameState () {
-      console.log('Loading game state...')
+      console.debug('Loading game state...')
       this.setGameDataLoading()
       try {
         const gameState = {
@@ -75,17 +75,12 @@ export const useGameStateStore = defineStore('GameState', {
           gameState.avatar.name = await avatars.getMyAvatarName()
           gameState.avatar.shipId = await galaxy.getMyShipId()
           gameState.avatar.credits = parseInt(await galaxy.myBalance())
-          console.log('Name: ', gameState.avatar.name)
-          console.log('Ship: ', parseInt(gameState.avatar.shipId))
-          console.log('Credits: ', parseInt(gameState.avatar.credits))
           this.setProp({key: 'haveAvatar', value: true})
         }
 
         if (gameState.avatar.shipId > 0) {
           /** We have a ship */
-          console.log('loading my own ship ')
           const ship = await galaxy.getMyShip()
-          console.log('loaded my own ship ' + parseInt(ship[4]))
           gameState.avatar.ship = {
             name: ship[0],
             location: ship[1],
@@ -96,13 +91,12 @@ export const useGameStateStore = defineStore('GameState', {
             organics: parseInt(ship[6]),
             owner: useChainStore().account
           }
-          //console.log(JSON.stringify(gameState.avatar.ship))
           this.setProp({key: 'haveShip', value: true})
         }
         this.setProp({key: 'gameState', value: gameState})
         this.setGameDataLoaded()
       } catch (error) {
-        console.log('oops:' + error.message, error)
+        console.error('Loading game state failed:', error)
       }
     },
     async loadEvents () {
@@ -120,7 +114,6 @@ export const useGameStateStore = defineStore('GameState', {
         events.chatEvents = await galaxy.getEvents('ChatLog', block - 950)
       }
       this.setProp({key: 'events', value: events})
-      console.log('Events: ' + JSON.stringify(events))
     },
     /** player actions */
     async createAvatar (name) {
@@ -129,7 +122,7 @@ export const useGameStateStore = defineStore('GameState', {
         await avatars.createAvatar(name)
   //      await dispatch('loadGameState')
       } catch (error) {
-        console.log(`Avatar creation failed: ${JSON.stringify(error)}`)
+        console.error('Avatar creation failed:', error.shortMessage ?? error.message)
       }
       this.setProp({key: 'creatingAvatar', value: false})
     },
@@ -139,68 +132,58 @@ export const useGameStateStore = defineStore('GameState', {
         await galaxy.launchShip(name)
   //      await dispatch('loadGameState')
       } catch (error) {
-        console.log(`Avatar creation failed: ${JSON.stringify(error)}`)
+        console.error('Ship launch failed:', error.shortMessage ?? error.message)
       }
       this.setProp({key: 'launchingShip', value: false})
     },
     async moveToSystem (system) {
       try {
-        console.log('moving to system ' + system)
         useUIStore().jumpAnimationOn()
         useUIStore().jumpMenuOff()
         await galaxy.moveToSystem(system)
-        console.log('moved ' + system)
       } catch (error) {
-        console.log('oops' + error.message)
+        console.error('Jump failed:', error.shortMessage ?? error.message)
       }
     },
     async sendChat (message) {
       try {
         await galaxy.sendChat(message)
-        console.log('sent chat ' + message)
       } catch (error) {
-        console.log('oops' + error.message)
+        console.error('Sending chat failed:', error.shortMessage ?? error.message)
       }
     },
     async claimPlanet ({planetId, name}) {
       try {
-        console.log('Claiming planet: ' + planetId)
         await galaxy.claimPlanet(String(planetId), String(name))
         //const shipId = await galaxy.getMyShipId()
-        //console.log('Updated planet ' + planetId + ' and ship ' + shipId)
       } catch (error) {
-        console.log('Didn\'t claim planet  ' + error.message)
+        console.error('Claiming the planet failed:', error.shortMessage ?? error.message)
       }
     },
     async buildStation ({planetId, name}) {
       try {
-        console.log('Build space station: ' + planetId)
         await galaxy.buildStation(String(planetId), String(name))
         //const shipId = await galaxy.getMyShipId()
-        //console.log('Updated planet ' + planetId + ' and ship ' + shipId)
       } catch (error) {
-        console.log('Didn\'t build station  ' + error.message)
+        console.error('Building the station failed:', error.shortMessage ?? error.message)
       }
     },
     async tradeAtPort ({planetId, equipment, fuel, organics}) {
       try {
-        console.log('trading at: ' + planetId+ ' ' + equipment + ' ' + fuel + ' ' + organics)
         await galaxy.tradeAtPort(String(planetId), equipment, fuel, organics)
       } catch (error) {
-        console.log('Trade failed.' + error.message)
+        console.error('Trade failed:', error.shortMessage ?? error.message)
       }
     },
     async addHoldsToShip ({planetId, amount}) {
       try {
-        console.log('get holds: ' + amount)
         await galaxy.addHoldsToShip(planetId, amount)
       } catch (error) {
-        console.log('hold upgrade.' + error.message)
+        console.error('Buying cargo holds failed:', error.shortMessage ?? error.message)
       }
 
     },
     async renameAsset ({name, type, objectId, parentId}) {
-      console.log('renaming ' + type + ' to ' + name)
       try {
         switch(type) {
           case "star":
@@ -220,11 +203,10 @@ export const useGameStateStore = defineStore('GameState', {
             break;
         }
       } catch (error) {
-        console.log('rename star error ' + error.message)
+        console.error('Renaming failed:', error.shortMessage ?? error.message)
       }
     },
     setProp ({ key, value }) {
-      //console.log('setting props', [key, value])
       this[key] = value
     },
     setGameDataLoaded () {
