@@ -1,15 +1,5 @@
 <template>
   <g @mouseover="hover = true" @mouseleave="hover = false">
-     <defs>
-        <clipPath id="icon-clip">
-          <circle
-            cx="0"
-            cy="0"
-            r="30"
-            stroke-width="1" />
-        </clipPath>
-      </defs>
-
       <g  clip-path="url(#icon-clip)">
         <circle
           cx="0"

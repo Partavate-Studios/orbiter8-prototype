@@ -1,12 +1,6 @@
 <template>
   <g transform="scale(4)">
-    <defs>
-      <mask id="Mask">
-        <rect x="-40" y="-20" width="80" height="40" fill="#ffffff"  />
-      </mask>
-
-    </defs>
-    <g mask="url(#Mask)" >
+    <g mask="url(#tradeTabMask)" >
 
       <line x1="-20" y1="-19" x2="28" y2="-19" stroke="#ffffff88" stroke-width="1" stroke-dasharray="0.75 0.25" />
 

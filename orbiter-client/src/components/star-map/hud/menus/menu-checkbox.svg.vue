@@ -2,14 +2,14 @@
   <g>
     <g @mouseover="hover = true" @mouseleave="hover = false" >
       <defs>
-        <clipPath id="menu-slot-clip">
+        <clipPath :id="clipId">
           <circle cx="0" cy="0" r="10" stroke-width="2"  />
         </clipPath>
       </defs>
 
       <circle cx="0" cy="0" r="10" :fill="checkboxBackground" stroke-width="2" :stroke="checkboxBorder" />
 
-      <g  clip-path="url(#menu-slot-clip)" v-if="checked">
+      <g  :clip-path="'url(#' + clipId + ')'" v-if="checked">
 
 
       </g>
@@ -19,6 +19,7 @@
 
 <script>
 import { mapState } from 'pinia'
+import uniqueId from 'lodash/uniqueId'
 
 import { useUIStore } from '@/stores/ui'
 export default {
@@ -31,7 +32,9 @@ export default {
   },
   data () {
     return {
-      hover: false
+      hover: false,
+      // Unique per instance: the clip's shape depends on this component's size.
+      clipId: uniqueId('menu-slot-clip-')
     }
   },
   computed: {

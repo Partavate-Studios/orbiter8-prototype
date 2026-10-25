@@ -1,13 +1,5 @@
 <template>
   <g>
-      <defs>
-      <linearGradient id="tabGradient"
-        x1="0%" y1="0%" x2="100%" y2="0%" gradientTransform="rotate(0)">
-          <stop offset="0%" stop-color="#290C4C" stop-opacity="1"/>
-          <stop offset="40%" stop-color="#310F5Ddd" stop-opacity="1"/>
-          <stop offset="100%" stop-color="#5D1EB0" stop-opacity="1"/>
-        </linearGradient>
-      </defs>
     <g font-size="0.8em">
       <rect x="-5" y="-5" width="55" height="30" rx="5" ry="5" fill="url(#tabGradient)" stroke="#ffffff88" stroke-width="0.5" />
       <g v-if="quantity > 0">

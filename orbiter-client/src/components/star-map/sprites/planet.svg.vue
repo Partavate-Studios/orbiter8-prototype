@@ -1,42 +1,5 @@
 <template>
   <g>
-    <defs>
-      <radialGradient  v-if="graphicsQuality > 1" id="planetGradient" cx="10%" cy="50%" r="180%" fx="0%" fy="50%">
-        <stop offset="0%" style="stop-color:#e5cfff;stop-opacity:1" />
-        <stop offset="10%" style="stop-color:#e5cfff;stop-opacity:1" />
-        <stop offset="20%" style="stop-color:#c3b3da;stop-opacity:1" />
-        <stop offset="30%" style="stop-color:rgb(140,120,180);stop-opacity:1" />
-        <stop offset="40%" style="stop-color:rgb(60,40,90);stop-opacity:1" />
-        <stop offset="100%" style="stop-color:rgb(60,40,90);stop-opacity:1" />
-      </radialGradient>
-      <linearGradient  v-else id="planetGradient">
-        <stop offset="0%" style="stop-color:#e5cfff;stop-opacity:1" />
-        <stop offset="100%" style="stop-color:#230b41;stop-opacity:1" />
-      </linearGradient>
-
-      <linearGradient v-if="graphicsQuality > 2" id="ringGradient"
-        x1="100%" y1="100%" x2="-100%" y2="-100%" gradientTransform="rotate(135)">
-          <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
-          <stop offset="10%" stop-color="#ffffff" stop-opacity="1"/>
-          <stop offset="20%" stop-color="#ffffff" stop-opacity="0.5"/>
-          <stop offset="70%" stop-color="#ffffff" stop-opacity="0.1"/>
-          <stop offset="90%" stop-color="#000000" stop-opacity="0.1"/>
-        </linearGradient>
-      <linearGradient v-else id="ringGradient"
-        x1="100%" y1="100%" x2="-100%" y2="-100%" gradientTransform="rotate(135)">
-        <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
-        <stop offset="50%" stop-color="#ffffff" stop-opacity="1"/>
-        <stop offset="70%" stop-color="#6735a3" stop-opacity="1"/>
-        <stop offset="90%" stop-color="#230b41" stop-opacity="1"/>
-      </linearGradient>
-
-    </defs>
-    <defs>
-      <clipPath id="just-the-planet">
-        <circle cx="0" cy="0" r="10" />
-      </clipPath>
-    </defs>
-
     <circle cx="0" cy="0" r="12" stroke="none" fill="#ffffff00" />
 
     <circle cx="0" cy="0" r="10" stroke="#c3b3da" stroke-width="0.25" fill="url(#planetGradient)" />

@@ -8,8 +8,6 @@
       xmlns="http://www.w3.org/2000/svg"
       xmlns:xlink="http://www.w3.org/1999/xlink" >
 
-      <svgfilters></svgfilters>
-
       <backdrop
         id="backdrop"
         :transform="backdropTransform"></backdrop>
@@ -74,7 +72,6 @@ import { useUIStore } from '@/stores/ui'
 import { mapActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 import _ from 'lodash'
-import svgfilters from './_svg-filters'
 import Grid from './_grid.svg'
 import Hud from './hud/hud.svg'
 import JumpMenu from './hud/jump-menu.svg'
@@ -91,7 +88,6 @@ export default {
     JumpMenu,
     JumpAnimation,
     Grid,
-    svgfilters,
     backdrop,
     starfield,
     SolarSystem,

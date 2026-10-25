@@ -1,13 +1,5 @@
 <template>
   <g dominant-baseline="middle">
-      <defs>
-      <linearGradient id="cargoTabGradient"
-        x1="0%" y1="0%" x2="100%" y2="0%" gradientTransform="rotate(0)">
-          <stop offset="0%" stop-color="#5D1EB0" stop-opacity="1"/>
-          <stop offset="60%" stop-color="#310F5Ddd" stop-opacity="1"/>
-          <stop offset="100%" stop-color="#290C4C" stop-opacity="1"/>
-        </linearGradient>
-      </defs>
     <g>
       <rect x="-4" y="-4" width="48" height="25" rx="4" ry="4" fill="#310F5Ddd" stroke="#ffffff88" stroke-width="0.5" />
       <g>

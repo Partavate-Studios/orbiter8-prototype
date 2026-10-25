@@ -1,22 +1,5 @@
 <template>
   <g transform="">
-    <defs>
-      <linearGradient id="emptyBlockGradient"
-        x1="0%" y1="0%" x2="0%" y2="100%" gradientTransform="rotate(0)">
-          <stop offset="0%" stop-color="#c3b3da00" stop-opacity="1"/>
-          <stop offset="100%" stop-color="#ffffff00" stop-opacity="1"/>
-        </linearGradient>
-      <linearGradient id="fullBlockGradient"
-        x1="0%" y1="0%" x2="0%" y2="100%" gradientTransform="rotate(0)">
-          <stop offset="0%" stop-color="#c3b3da" stop-opacity="1"/>
-          <stop offset="100%" stop-color="#ffffff" stop-opacity="1"/>
-      </linearGradient>
-      <linearGradient id="soldBlockGradient"
-        x1="0%" y1="0%" x2="0%" y2="100%" gradientTransform="rotate(0)">
-          <stop offset="0%" stop-color="#c3b3da" stop-opacity="1"/>
-          <stop offset="100%" stop-color="#5c1aae" stop-opacity="1"/>
-      </linearGradient>
-    </defs>
       <rect
         v-for="n in maxCargoHolds"
         :key="'hold-' + n"

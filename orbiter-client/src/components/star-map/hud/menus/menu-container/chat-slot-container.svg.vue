@@ -2,14 +2,14 @@
   <g>
     <g :transform="'translate(' + (1 - slotWidth / 2) + ' 0)'" @mouseover="hover = true" @mouseleave="hover = false" >
       <defs>
-        <clipPath id="menu-slot-clip">
+        <clipPath :id="clipId">
           <rect x="5" y="5" :width="slotWidth -10" rx="10" ry="10" height="35" />
         </clipPath>
       </defs>
 
       <rect x="5" y="5" :width="slotWidth - 10" rx="10" ry="10" height="35" :fill="slotBackground" stroke-width="1" :stroke="slotBorder" />
 
-      <g  clip-path="url(#menu-slot-clip)">
+      <g  :clip-path="'url(#' + clipId + ')'">
 
         <text :x="slotWidth - 15" y="20" fill="#ffffff88" text-anchor="end"
             font-size="0.75em">-{{ name }} </text>
@@ -24,13 +24,16 @@
 
 <script>
 import { mapState } from 'pinia'
+import uniqueId from 'lodash/uniqueId'
 
 import { useUIStore } from '@/stores/ui'
 export default {
   name: 'ChatSlotContainer',
   data () {
     return {
-      hover: false
+      hover: false,
+      // Unique per instance: the clip's shape depends on this component's size.
+      clipId: uniqueId('menu-slot-clip-')
     }
   },
   props: {

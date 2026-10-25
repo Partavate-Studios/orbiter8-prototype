@@ -1,4 +1,5 @@
 <template>
+  <svg-defs />
 
   <div v-if="playerReady" id="app">
 
@@ -24,12 +25,14 @@ import { useGameStateStore } from '@/stores/gamestate'
 import { mapActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 import NetworkSelect from '@/components/screens/NetworkSelect'
+import SvgDefs from '@/components/svg-defs.vue'
 import router from '@/router/router'
 
 export default {
   name: 'Orbiter8Game',
   components: {
-    NetworkSelect
+    NetworkSelect,
+    SvgDefs
   },
   created: function () {
     this.initWeb3()

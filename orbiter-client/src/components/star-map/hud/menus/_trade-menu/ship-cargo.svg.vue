@@ -1,12 +1,6 @@
 <template>
   <g transform="scale(4)">
-    <defs>
-      <mask id="Mask">
-        <rect x="-40" y="-20" width="80" height="40" fill="#ffffff"  />
-      </mask>
-
-    </defs>
-    <g mask="url(#Mask)" >
+    <g mask="url(#tradeTabMask)" >
       <g transform="rotate(0) translate(24 4) scale(3.5)" opacity="0.1"><ship /></g>
       <g transform="rotate(0) translate(-24 -8) scale(3.5)" opacity="0.5"><station /></g>
 
