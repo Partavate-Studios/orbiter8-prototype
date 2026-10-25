@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { galaxy, avatars } from '@/sdk/chain/contracts'
+import { loadSystem } from '@/sdk/load'
 import { useUIStore } from '@/stores/ui'
 import Sprite, { STAR_KEY } from '@/libs/sprite.js'
 import { moonOrbitRadius, stationOrbitRadius, shipOrbitRadius, SHIP_ORBIT_RADIUS_AROUND_STAR } from '@/sdk/game/orbits'
@@ -55,164 +55,16 @@ export const useStarMapStore = defineStore('StarMap', {
         return
       }
       console.debug('Loading star map...')
-
-      this.setProp({ key: 'isLoading', value: true })
-      this.setProp({ key: 'loadProgress', value: 1 })
-
+      this.isLoading = true
+      this.loadProgress = 1
       try {
-        /** Grab the current system and go from there */
-        const systemBase = await galaxy.getPlayerSystemData()
-
-        this.setProp({ key: 'loadProgress', value: 2 })
-
-        let isNewSystem = false
-        if (parseInt(systemBase[0]) != this.starId) {
-          isNewSystem = true
-        }
-        //map the results to an structured object
-        const starMapBlockData = {
-          id: parseInt(systemBase[0]),
-          starName: systemBase[1],
-          starSize: systemBase[2],
-          birthTime: systemBase[3],
-          discoveredBy: String(systemBase[4]).toLowerCase(),
-          neighborIds: systemBase[5],
-          neighbors: {},
-          planetIds: systemBase[6],
-          planets: {},
-          shipIds: systemBase[7],
-          ships: {},
-          avatarNames: {}
-        }
-
-        this.setProp({ key: 'loadProgress', value: 4 })
-
-        //Add pioneer to first visit sun to name index
-        if (
-          starMapBlockData.discoveredBy > 0 &&
-          typeof starMapBlockData.avatarNames[starMapBlockData.discoveredBy] === 'undefined'
-        ) {
-          starMapBlockData.avatarNames[starMapBlockData.discoveredBy] = await avatars.getAvatarNameByAddress(
-            starMapBlockData.discoveredBy
-          )
-        }
-        this.setProp({ key: 'loadProgress', value: 5 })
-
-        /** Add the names for neighboring stars */
-        for (const [key, neighborId] of Object.entries(starMapBlockData.neighborIds)) {
-          const starName = await galaxy.getSystemName(String(neighborId))
-          starMapBlockData.neighbors[key] = {
-            id: neighborId,
-            name: starName
-          }
-          this.setProp({ key: 'loadProgress', value: Math.min(24, 6 + key) })
-        }
-
-        this.setProp({ key: 'loadProgress', value: 25 })
-
-        /** Add each ship known to be in this system */
-        for (const key of Object.keys(starMapBlockData.shipIds)) {
-          let shipId = starMapBlockData.shipIds[key]
-          if (shipId > 0 && !(shipId in starMapBlockData.ships)) {
-            const shipBase = await galaxy.getShip(String(shipId))
-            const ship = {
-              id: shipId,
-              name: shipBase[0],
-              location: shipBase[1],
-              orbit: shipBase[2],
-              owner: String(shipBase[3]).toLowerCase()
-            }
-            if (ship.location == starMapBlockData.id) {
-              starMapBlockData.ships[shipId] = ship
-            }
-
-            //Add ship owner name to name index
-            if (ship.owner !== '0x0' && typeof starMapBlockData.avatarNames[ship.owner] === 'undefined') {
-              starMapBlockData.avatarNames[ship.owner] = await avatars.getAvatarNameByAddress(ship.owner)
-            }
-          }
-          this.setProp({ key: 'loadProgress', value: Math.min(75, 25 + key) })
-        }
-
-        this.setProp({ key: 'loadProgress', value: 80 })
-
-        /** Add details for all the planets */
-        // A planet's index in planetIds is its orbital position (the contract's systems[id].planets[orbitalId]).
-        for (const [key, planetId] of Object.entries(starMapBlockData.planetIds)) {
-          if (planetId > 0) {
-            const planetBase = await galaxy.getPlanet(String(planetId))
-            const planet = {
-              id: String(planetId),
-              name: planetBase[0],
-              star: planetBase[1],
-              size: parseInt(planetBase[2][0]),
-              class: parseInt(planetBase[2][1]),
-              rings: parseInt(planetBase[2][2]),
-              orbitSpeed: parseInt(planetBase[2][3]),
-              owner: String(planetBase[3]).toLowerCase(),
-              hasMoons: planetBase[4],
-              moons: {},
-              hasStation: planetBase[5],
-              station: {}
-            }
-            //Add planet owner name to name index (need to deal with unknwon)
-            if (planet.owner > 0 && typeof starMapBlockData.avatarNames[planet.owner] === 'undefined') {
-              starMapBlockData.avatarNames[planet.owner] = await avatars.getAvatarNameByAddress(planet.owner)
-            }
-
-            /** If there's a station, add the details to the planet */
-            if (planet.hasStation) {
-              const station = await galaxy.getStation(String(planet.id))
-              planet.station = {
-                id: planet.id,
-                name: String(station[0]),
-                size: parseInt(station[1]),
-                inventory: {
-                  equipment: parseInt(station[2][0]),
-                  fuel: parseInt(station[2][1]),
-                  organics: parseInt(station[2][2])
-                },
-                prices: {
-                  equipment: parseInt(station[3][0]),
-                  fuel: parseInt(station[3][1]),
-                  organics: parseInt(station[3][2]),
-                  holds: parseInt(station[3][3])
-                },
-                orbitSpeed: 1,
-                owner: planet.owner
-              }
-            }
-
-            /** Add details for all the moons to the planet */
-            for (const [moonkey, hasMoon] of Object.entries(planet.hasMoons)) {
-              if (hasMoon) {
-                const moonBase = await galaxy.getMoon(String(planetId), String(moonkey))
-                const moon = {
-                  id: String(moonkey),
-                  name: String(moonBase[0]),
-                  planet: planetId,
-                  size: parseInt(moonBase[1]),
-                  class: parseInt(moonBase[2]),
-                  orbitSpeed: parseInt(moonBase[3]),
-                  owner: planet.owner
-                }
-                planet.moons[moonkey] = moon
-                //Add moon owner name to name index
-                if (moon.owner > 0 && typeof starMapBlockData.avatarNames[moon.owner] === 'undefined') {
-                  starMapBlockData.avatarNames[moon.owner] = await avatars.getAvatarNameByAddress(moon.owner)
-                }
-              }
-            }
-            starMapBlockData.planets[key] = planet
-            this.setProp({ key: 'loadProgress', value: Math.min(98, 80 + key) })
-          }
-        }
-        this.setProp({ key: 'loadProgress', value: 99 })
-        this.importStarMapBlockData({
-          blockData: starMapBlockData,
-          playerAccount: String(useChainStore().account).toLowerCase()
+        const blockData = await loadSystem((percent) => {
+          this.loadProgress = percent
         })
-        this.setProp({ key: 'loadProgress', value: 100 })
+        const isNewSystem = blockData.id != this.starId
+        this.loadProgress = 99
+        this.importStarMapBlockData({ blockData, playerAccount: String(useChainStore().account).toLowerCase() })
+        this.loadProgress = 100
         if (isNewSystem) {
           useUIStore().jumpAnimationOff()
         }

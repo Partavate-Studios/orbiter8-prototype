@@ -1,5 +1,5 @@
-import { TIMING } from '@/constants'
 import { defineStore } from 'pinia'
+import { loadPlayer, loadRecentEvents } from '@/sdk/load'
 import { galaxy, avatars } from '@/sdk/chain/contracts'
 import { useUIStore } from '@/stores/ui'
 import { useChainStore } from '@/stores/chain'
@@ -42,59 +42,15 @@ export const useGameStateStore = defineStore('GameState', {
     avatar: (state) => state.gameState.avatar
   },
   actions: {
-    /** Loads general state information: avatar count, star system acount, player avatar data */
+    /** Loads general state information: avatar count, star system count, player avatar data */
     async loadGameState() {
       console.debug('Loading game state...')
       this.setGameDataLoading()
       try {
-        const gameState = {
-          avatarCount: null,
-          starSystemCount: null,
-          avatar: {
-            registered: false,
-            name: '',
-            shipId: 0,
-            ship: {
-              name: null,
-              location: null,
-              orbit: null,
-              holds: null,
-              equipment: null,
-              fuel: null,
-              organics: null,
-              owner: null
-            },
-            credits: 0
-          }
-        }
-        gameState.avatarCount = await avatars.getAvatarCount()
-        gameState.starSystemCount = await galaxy.getSystemCount()
-        gameState.avatar.registered = await avatars.haveAvatar()
-
-        /** We have an avatar, but do we have a ship? */
-        if (gameState.avatar.registered) {
-          gameState.avatar.name = await avatars.getMyAvatarName()
-          gameState.avatar.shipId = await galaxy.getMyShipId()
-          gameState.avatar.credits = parseInt(await galaxy.myBalance())
-          this.setProp({ key: 'haveAvatar', value: true })
-        }
-
-        if (gameState.avatar.shipId > 0) {
-          /** We have a ship */
-          const ship = await galaxy.getMyShip()
-          gameState.avatar.ship = {
-            name: ship[0],
-            location: ship[1],
-            orbit: ship[2],
-            holds: parseInt(ship[3]),
-            equipment: parseInt(ship[4]),
-            fuel: parseInt(ship[5]),
-            organics: parseInt(ship[6]),
-            owner: useChainStore().account
-          }
-          this.setProp({ key: 'haveShip', value: true })
-        }
-        this.setProp({ key: 'gameState', value: gameState })
+        const gameState = await loadPlayer()
+        if (gameState.avatar.registered) this.haveAvatar = true
+        if (gameState.avatar.shipId > 0) this.haveShip = true
+        this.gameState = gameState
         this.setGameDataLoaded()
       } catch (error) {
         console.error('Loading game state failed:', error)
@@ -102,20 +58,7 @@ export const useGameStateStore = defineStore('GameState', {
     },
     /** Recent avatar sign-ups, ship launches, trades and chat, for the HUD counters and the chat menu. */
     async loadEvents() {
-      let events = {
-        avatarEvents: null,
-        shipEvents: null,
-        tradeEvents: null,
-        chatEvents: null
-      }
-      let block = useChainStore().currentBlockId
-      if (block > 0) {
-        events.avatarEvents = await avatars.getEvents()
-        events.shipEvents = await galaxy.getEvents('ShipLaunch', block - TIMING.EVENT_LOOKBACK_BLOCKS)
-        events.tradeEvents = await galaxy.getEvents('PortTrade', block - TIMING.EVENT_LOOKBACK_BLOCKS)
-        events.chatEvents = await galaxy.getEvents('ChatLog', block - TIMING.CHAT_LOOKBACK_BLOCKS)
-      }
-      this.setProp({ key: 'events', value: events })
+      this.events = await loadRecentEvents(useChainStore().currentBlockId)
     },
     /** player actions */
     async createAvatar(name) {
