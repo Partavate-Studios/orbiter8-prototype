@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { markRaw } from 'vue'
-import { discoverWallets, preferredWallet, rememberWallet, connectWallet } from '@/chain/wallet'
+import { discoverWallets, preferredWallet, rememberWallet, connectWallet } from '@/sdk/chain/wallet'
 import {
   initContracts as bindContracts,
   contractAddresses,
@@ -8,8 +8,8 @@ import {
   getBlockNumber,
   getNativeBalance,
   gameChangedBetween
-} from '@/chain/contracts'
-import { networks, networkFor, chainName } from '@/chain/networks'
+} from '@/sdk/chain/contracts'
+import { networks, networkFor, chainName } from '@/sdk/chain/networks'
 import { useStarMapStore } from '@/stores/starmap'
 import { useGameStateStore } from '@/stores/gamestate'
 import { useConfigStore } from '@/stores/config'

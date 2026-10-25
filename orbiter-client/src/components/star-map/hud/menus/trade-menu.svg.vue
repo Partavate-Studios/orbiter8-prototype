@@ -263,7 +263,7 @@ import {
   maxTradable,
   tradeBalance,
   usedHolds
-} from '@/game/trade'
+} from '@/sdk/game/trade'
 
 import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'

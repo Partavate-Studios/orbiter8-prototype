@@ -1,6 +1,6 @@
 import { TIMING } from '@/constants'
 import { defineStore } from 'pinia'
-import { galaxy, avatars } from '@/chain/contracts'
+import { galaxy, avatars } from '@/sdk/chain/contracts'
 import { useUIStore } from '@/stores/ui'
 import { useChainStore } from '@/stores/chain'
 

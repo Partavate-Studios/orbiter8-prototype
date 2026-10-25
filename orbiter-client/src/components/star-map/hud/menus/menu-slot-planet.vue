@@ -128,7 +128,7 @@ import Planet from '@/components/star-map/sprites/planet.svg'
 import Ship from '@/components/star-map/sprites/ship.svg'
 import Station from '@/components/star-map/sprites/station.svg'
 import Moon from '@/components/star-map/sprites/moon.svg'
-import { planetTypeName } from '@/game/planet-types'
+import { planetTypeName } from '@/sdk/game/planet-types'
 
 export default {
   name: 'PlanetsMenu',

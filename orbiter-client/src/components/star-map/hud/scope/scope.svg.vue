@@ -62,7 +62,7 @@
 </template>
 
 <script>
-import { bearingDegrees, scopeOpacity } from '@/game/bearing'
+import { bearingDegrees, scopeOpacity } from '@/sdk/game/bearing'
 
 import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'

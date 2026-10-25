@@ -95,7 +95,7 @@
 </template>
 
 <script>
-import { canAfford, maxHoldsToBuy, MAX_CARGO_HOLDS } from '@/game/trade'
+import { canAfford, maxHoldsToBuy, MAX_CARGO_HOLDS } from '@/sdk/game/trade'
 
 import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'

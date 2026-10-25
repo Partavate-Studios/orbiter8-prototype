@@ -157,7 +157,7 @@ import { useGameStateStore } from '@/stores/gamestate'
 import { mapState } from 'pinia'
 import { useStarMapStore } from '@/stores/starmap'
 
-import { planetTypeName } from '@/game/planet-types'
+import { planetTypeName } from '@/sdk/game/planet-types'
 
 export default {
   name: 'SpriteInfo',

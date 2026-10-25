@@ -235,8 +235,8 @@ import { useChainStore } from '@/stores/chain'
 import { useGameStateStore } from '@/stores/gamestate'
 import { mapActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
-import { walletRequest } from '@/chain/wallet'
-import { networks } from '@/chain/networks'
+import { walletRequest } from '@/sdk/chain/wallet'
+import { networks } from '@/sdk/chain/networks'
 
 export default {
   name: 'howtoweb3',

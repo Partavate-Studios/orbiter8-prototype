@@ -1,6 +1,6 @@
 import { markRaw } from 'vue'
-import { orbitAt, planetOrbitRadius, shipOrbitSpeed, STATION_ORBIT_SPEED } from '@/game/orbits'
-import { SPRITE_TYPES, SHIP_SIZE, STATION_START_ROTATION } from '@/game/sprite-types'
+import { orbitAt, planetOrbitRadius, shipOrbitSpeed, STATION_ORBIT_SPEED } from '@/sdk/game/orbits'
+import { SPRITE_TYPES, SHIP_SIZE, STATION_START_ROTATION } from '@/libs/sprite-types'
 
 /** The star at the center of every system has a fixed key. */
 export const STAR_KEY = 'star'

@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
-import { galaxy, avatars } from '@/chain/contracts'
+import { galaxy, avatars } from '@/sdk/chain/contracts'
 import { useUIStore } from '@/stores/ui'
 import Sprite, { STAR_KEY } from '@/libs/sprite.js'
-import { moonOrbitRadius, stationOrbitRadius, shipOrbitRadius, SHIP_ORBIT_RADIUS_AROUND_STAR } from '@/game/orbits'
+import { moonOrbitRadius, stationOrbitRadius, shipOrbitRadius, SHIP_ORBIT_RADIUS_AROUND_STAR } from '@/sdk/game/orbits'
 import { useChainStore } from '@/stores/chain'
 
 export const useStarMapStore = defineStore('StarMap', {
