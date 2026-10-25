@@ -333,6 +333,58 @@ Paint flashing at idle confirms the split:
 - **The tiny-object dots and ring fade-out** at a few zoom levels, to judge the look.
 - **Building a station while another player watches the sector.** It was verified by tests and a claim on the local chain, but not with real credits.
 
+## Phase 6: Code quality and architecture
+
+The app looks and behaves the same apart from the bug fixes listed under Bugs. The source went from 107 to 94 `.vue` files. Before Prettier, the phase removed about 750 lines net.
+
+### Where things live now
+
+- **`src/chain/`**: every contract call, plus wallet discovery and the network list. Nothing else imports ethers.
+- **`src/game/`**: plain functions for the game's math, with JSDoc and unit tests. No Vue, DOM or ethers.
+  - `orbits.js`: orbit positions and the orbit radius formulas for planets, moons, stations and ships.
+  - `bearing.js`: scope bearings and marker fade.
+  - `trade.js`: cargo, port trades and shipyard limits.
+  - `sprite-types.js`: per-type click radius, camera zoom and sprite scale.
+  - `planet-types.js`: planet class names.
+- **`src/constants.js`**: the camera, timing and map tuning numbers, each named and commented.
+- **Stores** hold state and call `chain/` and `game/`. View state, such as whether the scope or Minerva is showing, moved from the Config store to the UI store. Config now holds only saved settings.
+- **Components** read stores and draw. Two-statement click handlers moved out of templates into methods.
+
+### Cleanup
+
+- **Dead code removed:**
+  - 17 unused component and library files.
+  - Unused data, store mappings, methods, computed properties and props.
+  - 43 debug `console.log` calls.
+  - Commented-out code.
+  - No-op transforms (`translate(0 0)`, `scale(1)` and the like).
+  - The How-to-Web3 page. Nothing linked to it, and its advice (Ropsten, the MetaMask faucet) was out of date. It's in git history if you want it back.
+- **Errors** caught in stores now log what failed, with the revert reason, instead of `oops`.
+- **The Minerva Debug tab** loads only in dev builds.
+- **Renames** (`d8ca4bf`, `c9d3953`). Contract-bound names and the lore text are untouched.
+  - `rubber` → `Tween`
+  - `tickWork` → `advanceGame`
+  - `getDegreesFromSprite` → `bearingToSprite`
+  - `know` → `loreTip`
+  - `amISelected` → `isSelected`
+  - `showOrbit` → `hasOrbitRing`
+  - `showEngines` → `shouldShowEngines`
+  - The UI store's `container` → `screenSize`
+- **Duplication:** the scope's three clickable markers share a `scope-marker` component, and the orbit and trade formulas exist once, in `game/`.
+  - The planet surface art is left as hand-written SVG per class. Making it data-driven would make the art harder to edit and save little.
+  - The menus already share `menu-container`.
+- **Every TODO comment** is resolved or removed.
+- **Prettier** (`npm run format`) was added in `eace115` and run in `630e9df`. That commit contains only formatting, so `git blame --ignore-rev 630e9df` skips it.
+  - `semi: false` needed one prerequisite: Prettier splits `a(); b()` handlers onto separate lines without semicolons, which Vue's template compiler can't parse. Those handlers became methods first (`ca746c9`).
+  - Screenshots before and after the format run match, apart from orbital motion.
+
+### Tests (`npm test`, 38 tests, under 2 s)
+
+- **`game/`**: orbits, bearings (checked against the original function on 2,000 points), trades and shipyard limits, and planet names.
+- **`chain/convert`**: bigint handling.
+- **Star map import**: stable keys, a station appearing mid-system, and the selection surviving a reload.
+- **HUD smoke test**: mounts the HUD over a loaded star system, selects each kind of sprite, and opens every menu. It fails on any Vue error or warning. I checked that it catches a template reading a field that doesn't exist.
+
 ## Bugs
 
 ### Fixed
@@ -359,7 +411,20 @@ Paint flashing at idle confirms the split:
   - My scripted runs always started at `/`, so they missed it. The smoke tests will cover a reload on `#/play`.
 - **Invalid table and list markup** (Vue 3 compiler warnings) in the debug panel and the How-to-Web3 page. (`79ebfee`, `6eac1a6`)
 
-### Found, to fix in the phase that rewrites that code
+Phase 6:
+
+- **The jump animation never ended when a jump failed** (rejected in the wallet, or reverted). The game sat on "traveling" until a reload. (`e8b34e1`)
+- **Menu buttons were silent.** `menu-button` read `playEffect['click']` instead of calling it. (`f2d91b6`)
+- **Declining a network switch offered to add the network anyway.** That offer now appears only for EIP-1193 error 4902 (unknown chain). (`2a33c32`)
+- **The scope's arrow to the player's ship pointed the wrong way.** It used the ship's offset from its planet rather than its position. (`ee33aca`)
+- **The shipyard needed one more credit than the price.** It required credits > cost, while the contract accepts credits = cost. (`9350822`)
+- **The right arrow key panned 10× farther than the other arrows.** (`5b43e7e`)
+- **Zooming back in after zooming far out took extra wheel steps.** Zoom requests aimed past the camera's limit. (`caddba3`)
+- **Hovering the sun's scope marker threw** instead of labeling the sun. I introduced this with the Phase 5 sprite keys. (`ad11592`)
+- **A saved low graphics tier ran at full frame rate after a reload.** The tick delay only updated when a tier was picked, and the original had the same problem. The `~` key's tier toggle now also saves its choice. (`78f561e`)
+- **The lint findings** listed below for "the phase that rewrites that code" are fixed. (`215d2c1`)
+
+### Found, to fix in the phase that rewrites that code (all fixed in Phase 6)
 
 - **Lint findings:**
   - `moons-icon.svg.vue` registers a `Ship` component that is never imported, and imports `Moon` without using it.
@@ -370,6 +435,19 @@ Paint flashing at idle confirms the split:
 ### Found, not fixed (contracts; out of scope this iteration)
 
 - **No access control on Orbiter8 admin setters.** `setShipTokenizer`, `setPlanetTokenizer`, `setCreditTokenizer`, `setAvatarControls`, `genesis` and `makeSolarSystem` are `public` with no owner check. Anyone can repoint the live game's token contracts, which would break minting and credits for every player. Fixing this needs a contract change and a redeploy.
+
+## Proposed refactors (bigger than a day; not started)
+
+1. **HUD and menus to HTML/CSS.** This was deferred in Phase 5 (option A) and should be folded into Koda's UI rebuild.
+   - Its colors should become CSS variables. The palette (`#c3b3da`, `#280b4b`, `#5c1aae`…) appears about 300 times in the SVG art, mostly with a per-use alpha, so binding it to JS constants in SVG wasn't worth the churn.
+2. **Event-driven updates once the contracts emit events for every action.**
+   - Today the client checks each new block for transactions to the game's contracts, then reloads the whole system.
+   - With events it could apply just the change: a planet claimed, a station built, a ship moved.
+   - `chain/contracts.js` `gameChangedBetween` and `stores/starmap.js` `loadStarMap` are the two places to change.
+3. **Load the star map in parallel.** `loadStarMap` reads planets, moons, stations and ships one call at a time. Batching them (`Promise.all`, or a multicall) would cut load time on remote networks a lot.
+4. **Store restructuring.**
+   - The UI store (about 420 lines) mixes camera motion, menus, selection and the jump sequence. A camera store or composable, separate from menu state, would make each easier to follow.
+   - The stores' generic `setProp({ key, value })` setters could become plain assignments.
 
 ## Plan
 
