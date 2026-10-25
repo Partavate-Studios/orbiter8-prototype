@@ -85,7 +85,8 @@ export default {
       document.body.removeChild(downloadLink)
     },
     ...mapActions(useChainStore, [
-      'checkForNewBlock'
+      'checkForNewBlock',
+      'startBlockPolling'
     ]),
     ...mapActions(useStarMapStore, [
       'loadStarMap'
@@ -204,6 +205,8 @@ export default {
     }
     this.lastTick = 0
     this.stopFrames = onFrame(this.onFrame)
+    // The map only loads when a new block is seen; make sure the (single) poller runs however we got here.
+    this.startBlockPolling()
   }
 }
 </script>

@@ -36,9 +36,13 @@ export default {
   },
   created: function () {
     this.initWeb3()
-    if (router.currentRoute.value.path != '/') {
-      router.push('/')
-    }
+    // Always start at the title screen. Vue Router 4 resolves the URL asynchronously,
+    // so wait for it; checking right away always saw '/' and skipped the redirect.
+    router.isReady().then(() => {
+      if (router.currentRoute.value.path != '/') {
+        router.push('/')
+      }
+    })
   },
   computed: {
     ...mapState(useChainStore, [
