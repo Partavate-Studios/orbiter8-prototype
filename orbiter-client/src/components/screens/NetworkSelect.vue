@@ -12,7 +12,9 @@
       <div class="checklist">
         <div class="item">
           <span class="name">Web3:</span>
-          <span v-if="web3Loaded"><b>Loaded</b> we found your wallet</span>
+          <span v-if="walletStatus === 'connected'"><b>Loaded</b> we found your wallet</span>
+          <span v-else-if="walletStatus === 'connecting'">Waiting for <b>{{ walletName }}</b>: approve the connection in its popup.</span>
+          <span v-else-if="walletStatus === 'none'" class="warning">No wallet found</span>
           <span v-else-if="wallets.length">Choose a wallet:
             <button v-for="wallet in wallets"
               :key="wallet.info.uuid"
@@ -20,10 +22,6 @@
               @click="chooseWallet(wallet)"><img v-if="wallet.info.icon" :src="wallet.info.icon" alt="" class="walleticon">{{ wallet.info.name }}</button>
           </span>
           <span v-else>...</span>
-        </div>
-        <div class="item" v-if="walletError">
-          <span class="name"></span>
-          <span class="warning">{{ walletError }}</span>
         </div>
 
         <div class="sectionhead">Choose Your Favorite Place To Play</div>
@@ -41,16 +39,16 @@
           </span>
         </div>
 
-        <div class="item" v-if="!isSupportedNetwork">
+        <div class="item" v-if="walletStatus === 'connected' && !isSupportedNetwork">
           <span class="name">Foreign Network:</span>
-          <span class="warning">Please select a supported network.</span>
+          <span class="warning">Your wallet is on {{ networkName }}. Pick one of the networks above to switch.</span>
         </div>
 
         <div class="sectionhead">{{networkName}} Status Report</div>
 
         <div class="item">
           <span class="name">Current Network:</span>
-          <span v-if="chainId != null">{{ networkName || 'Network ChainID: '+chainId }}
+          <span v-if="chainId">{{ networkName }}
             <span v-if="!isSupportedNetwork" class="warning">Unsupported</span>
           </span>
           <span v-else>...not found</span>
@@ -58,7 +56,7 @@
         <div class="item">
           <span class="name">Account Status:</span>
           <span v-if="account > 0">Connected
-            with {{ balance }} {{ networkData[chainId].currency.symbol }}
+            with {{ balance }} {{ currencySymbol }}
             <span class="warning" v-if="balance < 0.001">(low balance warning)</span>
           </span>
           <span v-else>...not found</span>
@@ -156,9 +154,15 @@
       <button v-on:click="setPlayerReady">Play</button>
     </div>
     <div v-else>
-      <div class="errormessage" v-if="!web3Loaded">Unable to load Web3 Library</div>
-      <div class="errormessage" v-else-if="!(account > 0)">No account found, do you have a wallet provider?</div>
-      <div class="errormessage" v-else-if="!contractsLoaded">Contracts not found. You may be on an unsupported network or the network may be unreachable.</div>
+      <!-- What's holding things up, in the order the player has to deal with it. -->
+      <div class="errormessage" v-if="walletStatus === 'none'">No wallet found. Orbiter 8 needs a browser wallet such as MetaMask: install one, then reload this page.</div>
+      <div class="errormessage" v-else-if="walletStatus === 'choose'">Choose which wallet to play with (above).</div>
+      <div class="errormessage" v-else-if="walletStatus === 'connecting'">Waiting for {{ walletName }}. Approve the connection in its popup; if you don't see one, open the wallet from your browser's toolbar.</div>
+      <div class="errormessage" v-else-if="walletStatus === 'error'">Couldn't connect to {{ walletName }}: {{ walletError }}. Choose a wallet above to try again.</div>
+      <div class="errormessage" v-else-if="!web3Loaded">Looking for your wallet...</div>
+      <div class="errormessage" v-else-if="!(account > 0)">No account found. Unlock your wallet or create an account in it.</div>
+      <div class="errormessage" v-else-if="!isSupportedNetwork">Your wallet is on {{ networkName }}, where Orbiter 8 isn't deployed. Pick Sepolia, Binance, Moonriver or Moonbase above to switch.</div>
+      <div class="errormessage" v-else-if="!contractsLoaded">Contracts not found. The network may be unreachable right now; try reloading.</div>
     </div>
   </div>
 </template>
@@ -196,6 +200,10 @@ export default {
     async connectNetwork(chainId) {
       if (!this.networkData[chainId]) {
         console.log('no chain! ' + chainId)
+        return
+      }
+      if (this.walletStatus !== 'connected') {
+        alert('Connect a wallet first, then pick a network.')
         return
       }
       try {
@@ -285,8 +293,13 @@ export default {
       'balance',
       'wallets',
       'walletError',
+      'walletStatus',
+      'walletName',
       'isSupportedNetwork'
     ]),
+    currencySymbol() {
+      return this.networkData[this.chainId]?.currency.symbol ?? ''
+    },
     ...mapState(useGameStateStore, [
       'gameDataLoaded',
       'haveAvatar',

@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { markRaw } from 'vue'
 import { discoverWallets, preferredWallet, rememberWallet, connectWallet } from '@/chain/wallet'
 import { initContracts as bindContracts, contractAddresses, galaxy, getBlockNumber, getNativeBalance } from '@/chain/contracts'
-import { networks, networkFor } from '@/chain/networks'
+import { networks, networkFor, chainName } from '@/chain/networks'
 import { useStarMapStore } from '@/stores/starmap'
 import { useGameStateStore } from '@/stores/gamestate'
 import { useConfigStore } from '@/stores/config'
@@ -26,6 +26,10 @@ export const useChainStore = defineStore('Chain', {
     balance: 0,
     /** Wallets found via EIP-6963, when the player has to pick one. Raw: they hold provider objects. */
     wallets: markRaw([]),
+    /** 'searching' | 'none' | 'choose' | 'connecting' | 'connected' | 'error' */
+    walletStatus: 'searching',
+    /** The wallet being connected or connected to, for messages. */
+    walletName: null,
     walletError: null
   }),
   getters: {
@@ -35,7 +39,7 @@ export const useChainStore = defineStore('Chain', {
       }
       return false
     },
-    networkName: state => networkFor(state.chainId)?.name ?? state.chainId,
+    networkName: state => state.chainId ? chainName(state.chainId) : '',
     /** Network metadata keyed by chain id, plus the hex chain id wallets expect. */
     networkData: () => Object.fromEntries(networks.map(network => [
       network.chainId,
@@ -47,25 +51,36 @@ export const useChainStore = defineStore('Chain', {
   actions: {
     /** Finds the player's wallet and connects to it, unless they need to choose between several. */
     async initWeb3 () {
+      this.walletStatus = 'searching'
       const wallets = await discoverWallets()
+      if (wallets.length === 0) {
+        this.walletStatus = 'none'
+        return
+      }
+      // Kept even when we connect automatically, so the player can pick again if connecting fails.
+      this.wallets = markRaw(wallets)
       const wallet = preferredWallet(wallets)
       if (wallet) return this.chooseWallet(wallet)
-      this.wallets = markRaw(wallets)
+      this.walletStatus = 'choose'
     },
     async chooseWallet (wallet) {
       this.walletError = null
+      this.walletName = wallet.info.name
+      // The wallet usually shows a popup now; until the player approves it, we wait here.
+      this.walletStatus = 'connecting'
       try {
         const session = await connectWallet(wallet)
         rememberWallet(wallet)
-        this.wallets = markRaw([])
         this.chainId = session.chainId
         this.account = session.account
         this.lastBlockNumber = await getBlockNumber()
         this.web3Loaded = true
+        this.walletStatus = 'connected'
         this.balance = await getNativeBalance()
       } catch (error) {
         console.log('Wallet connection failed:', error)
         this.walletError = error.shortMessage ?? error.message
+        this.walletStatus = 'error'
       }
     },
     async initContracts () {

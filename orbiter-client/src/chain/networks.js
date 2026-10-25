@@ -105,3 +105,20 @@ export const networks = localDeployment
 export function networkFor (chainId) {
   return networks.find(network => network.chainId === Number(chainId))
 }
+
+// Names for common networks the game isn't on, so "wrong network" messages can say which one.
+const otherNetworkNames = {
+  1: 'Ethereum Mainnet',
+  10: 'OP Mainnet',
+  56: 'BNB Smart Chain',
+  137: 'Polygon',
+  8453: 'Base',
+  17000: 'Holesky',
+  42161: 'Arbitrum One',
+  59144: 'Linea'
+}
+
+/** A display name for any chain id. */
+export function chainName (chainId) {
+  return networkFor(chainId)?.name ?? otherNetworkNames[Number(chainId)] ?? 'chain ' + chainId
+}
