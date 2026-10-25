@@ -26,3 +26,13 @@ export const STATION_START_ROTATION = -15
 export function spriteScale(size) {
   return size * 0.02 + 0.1
 }
+
+// On-screen radius (pixels) below which an orbit ring is hidden, and above which it's fully shown.
+const RING_HIDDEN_BELOW = 6
+const RING_SHOWN_ABOVE = 24
+
+/** How visible an orbit ring is at this on-screen radius: tiny rings fade out instead of piling up. */
+export function ringOpacity(radiusPixels) {
+  const fade = (radiusPixels - RING_HIDDEN_BELOW) / (RING_SHOWN_ABOVE - RING_HIDDEN_BELOW)
+  return Math.min(1, Math.max(0, fade))
+}

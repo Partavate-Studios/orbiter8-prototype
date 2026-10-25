@@ -17,10 +17,7 @@
 <script>
 import { mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
-
-// On-screen radius (pixels) below which a ring is hidden, and above which it's fully shown.
-const HIDDEN_BELOW = 6
-const SHOWN_ABOVE = 24
+import { ringOpacity } from '@/libs/sprite-types'
 
 export default {
   name: 'OrbitRing',
@@ -33,9 +30,7 @@ export default {
   computed: {
     ...mapState(useUIStore, ['drawnPixelsPerUnit']),
     opacity() {
-      const radius = this.r * this.drawnPixelsPerUnit
-      const fade = (radius - HIDDEN_BELOW) / (SHOWN_ABOVE - HIDDEN_BELOW)
-      return Math.min(1, Math.max(0, fade))
+      return ringOpacity(this.r * this.drawnPixelsPerUnit)
     }
   }
 }

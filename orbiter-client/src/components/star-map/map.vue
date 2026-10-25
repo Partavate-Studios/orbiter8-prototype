@@ -3,6 +3,7 @@
        so changes in one layer never make the browser repaint the others. -->
   <div class="layer star-map" ref="gamelayerContainer">
     <background-canvas />
+    <guides-canvas />
 
     <!-- The world is drawn for the camera in drawnView and slightly larger than the screen;
          between redraws a CSS transform (composited, no repaint) follows the live camera. -->
@@ -17,9 +18,6 @@
       >
         <g font-family="Ubuntu, sans-serif" :transform="'scale(' + baseScale + ')'">
           <g v-if="mapDataLoaded && !jumpAnimationState" transform="translate(0 -100)">
-            <g :transform="worldTransform">
-              <grid :scale="drawnView.scale"></grid>
-            </g>
             <rect
               x="-2000"
               y="-1000"
@@ -75,11 +73,11 @@ import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
 import { mapActions, mapState } from 'pinia'
 import _ from 'lodash'
-import Grid from './_grid.svg'
 import Hud from './hud/hud.svg'
 import JumpMenu from './hud/jump-menu.svg'
 import JumpAnimation from './hud/jump-animation.svg'
 import BackgroundCanvas from './background-canvas.vue'
+import GuidesCanvas from './guides-canvas.vue'
 import SolarSystem from './_solarsystem.svg'
 import PlanetLayers from './planet-layers.vue'
 import ConnectionStatus from './hud/connection-status.svg'
@@ -95,8 +93,8 @@ export default {
     Hud,
     JumpMenu,
     JumpAnimation,
-    Grid,
     BackgroundCanvas,
+    GuidesCanvas,
     SolarSystem,
     PlanetLayers,
     ConnectionStatus,
@@ -117,8 +115,8 @@ export default {
   },
   mounted() {
     this.drawWorld()
-    // While zooming out, the shrinking world may briefly leave its faint grid lines short of the
-    // screen edges (the background stays put behind it); that beats redrawing at every wheel step.
+    // While zooming out, the shrinking world may briefly show nothing near the screen edges until
+    // it redraws (the background and the guides stay put); that beats redrawing at every wheel step.
     this.worldLayer = new CompositedLayer(this.$refs.world, { margin: WORLD_MARGIN })
     this.stopFrames = onFrame(this.followCamera, FRAME_ORDER.render)
     this.$nextTick(function () {
