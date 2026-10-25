@@ -1,4 +1,6 @@
 import { markRaw } from 'vue'
+import { orbitAt, planetOrbitRadius, shipOrbitSpeed, STATION_ORBIT_SPEED } from '@/game/orbits'
+import { SPRITE_TYPES, SHIP_SIZE, STATION_START_ROTATION } from '@/game/sprite-types'
 
 /** The star at the center of every system has a fixed key. */
 export const STAR_KEY = 'star'
@@ -18,16 +20,14 @@ export function spriteKey (type, { id, planet }) {
 
 export default class Sprite {
   constructor (type, autoFillValues) {
-    //set defaults
+    // defaults, overridden by the values from the chain
     this.objectId = parseInt(autoFillValues.id)
     this.orbiting = 0
     this.distance = 0
     this.speed = 100
-    this.rotation = 45
-    this.selectorSize = 1
     this.isMine = false
-    this.owner = 0,
-    this.ownerName = '',
+    this.owner = 0
+    this.ownerName = ''
     this.telemetry = {
       translatex: 0,
       translatey: 0,
@@ -35,92 +35,55 @@ export default class Sprite {
     }
     // Absolute position in the star system (telemetry is relative to the parent it orbits).
     this.position = { x: 0, y: 0 }
-    this.menu = {
-      showing: false
+
+    for (const [key, value] of Object.entries(autoFillValues)) {
+      this[key] = value
     }
 
-    //fill in imported values
-    for (let [key, value] of Object.entries(autoFillValues)) {
-      if (key != 'gametime') {
-        this[key] = value
-      }
-    }
-
-    //type specific transforms
+    // type-specific settings
     this.type = type
     this.key = spriteKey(type, autoFillValues)
+    this.selectorSize = SPRITE_TYPES[type].selectorSize
+    this.cameraScale = SPRITE_TYPES[type].cameraScale
     switch (type) {
       case 'star':
-        this.selectorSize = this.size * 40,
-        this.targetScale = 0.6
-        break;
+        this.selectorSize *= this.size
+        break
       case 'planet':
-        this.distance = 150 + (this.orbitalPosition * 50) + (this.orbitalPosition * this.orbitalPosition * 15)
-        this.selectorSize = 14
-        this.targetScale = 0.3
-        break;
+        this.distance = planetOrbitRadius(this.orbitalPosition)
+        break
       case 'station':
-        this.speed = 3000
+        this.speed = STATION_ORBIT_SPEED
         this.orbitalPosition = 0
-        this.selectorSize = 12
-        this.targetScale = 0.1
-        this.telemetry.rotation = -15
-        break;
+        this.telemetry.rotation = STATION_START_ROTATION
+        break
       case 'moon':
+        // The contract's moon speed is per unit of distance.
         this.speed = this.speed * this.distance
-        this.selectorSize = 6
-        this.targetScale = 0.05
-        break;
+        break
       case 'ship':
-        this.speed = ((this.id * 25.25) % 10) * 100 + 2000
-        //this.distance = 50
-        this.size = 10
-        this.selectorSize = 10
-        this.targetScale = 0.06
-        break;
+        this.speed = shipOrbitSpeed(this.id)
+        this.size = SHIP_SIZE
+        break
     }
     // Telemetry changes every frame; the frame loop updates it and components read it per frame.
     return markRaw(this)
   }
 
   updateTelemetry (gameTime) {
-    let throttle = 0.000000005
-    let theta = gameTime * this.speed * throttle % (Math.PI * 2)
-    let translatex = this.distance * Math.cos(theta)
-    let translatey = this.distance * Math.sin(theta)
-
-
-    let rad = Math.atan2(translatey, translatex)
-    let rotation  = rad * (180 / Math.PI)
-
-    this.telemetry.translatex = translatex
-    this.telemetry.translatey = translatey
-    if (this.type == 'station') {
-      this.telemetry.rotation = -rotation * 4
-    } else {
-      this.telemetry.rotation = rotation
-    }
-
-
+    const orbit = orbitAt(this.distance, this.speed, gameTime)
+    this.telemetry.translatex = orbit.x
+    this.telemetry.translatey = orbit.y
+    // Sprites face along their orbit's radius; stations spin four times as fast, the other way.
+    this.telemetry.rotation = this.type == 'station' ? -orbit.angle * 4 : orbit.angle
     return this.telemetry
   }
 
-  openMenu () {
-    if (!this.menu.showing) {
-      this.menu.showing = true
-    }
-  }
-  closeMenu () {
-    if (this.menu.showing) {
-      this.menu.showing = false
-    }
-  }
 
   //carry over non-chain data from an old sprite
   consumeSpriteData(oldSprite) {
     if (this.matchesSprite(oldSprite)) {
       this.telemetry = oldSprite.telemetry
-      this.menu = oldSprite.menu
     }
   }
 

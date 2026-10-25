@@ -15,7 +15,7 @@
             {{ planet.name }}
         </text>
         <text :x="slotWidth * 0.325" y="50" font-size="0.75em" text-anchor="end" fill="#ffffff">
-            {{ types.getName(planet.class) }}
+            {{ planetTypeName(planet.class) }}
         </text>
         <g v-if="portForPlanet(planetId) > 0" :transform="'translate(' + slotWidth * 0.37 + ' 22)'">
           <g transform="scale(0.9)"><station /></g>
@@ -49,7 +49,7 @@
             {{ planet.name }}
         </text>
         <text :x="slotWidth * 0.475" y="50" font-size="0.75em" text-anchor="end" fill="#ffffff">
-            {{ types.getName(planet.class) }}
+            {{ planetTypeName(planet.class) }}
         </text>
         <text :x="slotWidth * 0.5" y="30" font-size="0.75em" text-anchor="left" fill="#ffffff">
             Moons: {{ getMoonCount(planetId) }}
@@ -92,15 +92,10 @@ import Planet from '@/components/star-map/sprites/planet.svg'
 import Ship from '@/components/star-map/sprites/ship.svg'
 import Station from '@/components/star-map/sprites/station.svg'
 import Moon from '@/components/star-map/sprites/moon.svg'
-import PlanetTypes from '@/libs/planet-types.js'
+import { planetTypeName } from '@/game/planet-types'
 
 export default {
   name: 'PlanetsMenu',
-  data () {
-    return {
-      types: new PlanetTypes()
-    }
-  },
   props: {
     planetId: {
       type: String,
@@ -115,6 +110,7 @@ export default {
     Ship
   },
   methods: {
+    planetTypeName,
     getMoonCount(planetId) {
       let moons = this.moonsForPlanet(planetId)
       return moons.length;

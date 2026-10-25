@@ -11,8 +11,8 @@
 
         <g
           v-if="sprite.type === 'planet'"
-          :opacity = "getOpacityFromSprite(sprite)"
-          :transform="'rotate(' + getDegreesFromSprite(sprite) + ')'">
+          :opacity = "markerOpacity(sprite)"
+          :transform="'rotate(' + bearingToSprite(sprite) + ')'">
           <a
             v-on:click.prevent="o8audio.playEffect('click'); selectSprite(key)"
             v-on:mouseover="setSpriteToDisplay(key)"
@@ -23,8 +23,8 @@
 
         <g
           v-if="isMyShip(sprite)"
-          :opacity = "getOpacityFromSprite(sprite)"
-          :transform="'rotate(' + getDegreesFromSprite(sprite) + ')'">
+          :opacity = "markerOpacity(sprite)"
+          :transform="'rotate(' + bearingToSprite(sprite) + ')'">
           <g transform="translate(0 140) rotate(180)">
             <a
               v-on:click.prevent="o8audio.playEffect('click'); selectSprite(key)"
@@ -59,11 +59,11 @@
         </g>
       </g>
       <g
-        v-if="(systemObjects.star && getOpacityFromSprite(systemObjects.star))"
-        :transform="'rotate(' + getDegreesFromSprite(systemObjects.star) + ')'"
+        v-if="(systemObjects.star && markerOpacity(systemObjects.star))"
+        :transform="'rotate(' + bearingToSprite(systemObjects.star) + ')'"
         stroke-width="4"
         stroke-color="#ffffff"
-        :stroke-opacity="getOpacityFromSprite(systemObjects.star)"
+        :stroke-opacity="markerOpacity(systemObjects.star)"
       >
         <compass-arrow></compass-arrow>
           <text
@@ -75,7 +75,7 @@
           v-on:click.prevent="o8audio.playEffect('click'); selectSprite('star')"
           v-on:mouseover="setSpriteToDisplay(0)"
           v-on:mouseout="setSpriteToDisplay(null)"
-          cursor="pointer"><compass-sun :opacity="getOpacityFromSprite(systemObjects.star)"></compass-sun></a>
+          cursor="pointer"><compass-sun :opacity="markerOpacity(systemObjects.star)"></compass-sun></a>
       </g>
 
       <compass></compass>
@@ -84,6 +84,7 @@
 </template>
 
 <script>
+import { bearingDegrees, scopeOpacity } from '@/game/bearing'
 
 import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
@@ -124,43 +125,28 @@ export default {
     ])
   },
   methods: {
-    selectSprite (spriteKey) {
-      this.selectSprite(spriteKey)
-    },
     ...mapActions(useUIStore, [
       'selectSprite',
       'setSpriteToDisplay'
     ]),
-    getDegreesFromXY (x, y) {
-      // Compass bearing in degrees, clockwise with 0 at +y (straight down in SVG), as the arrows expect.
-      // An object exactly at the view center (e.g. the selected sprite) has no bearing; point straight down.
-      if (x === 0 && y === 0) {
-        return 0
-      }
-      const degrees = (Math.atan2(y, x) * 180 / Math.PI + 270) % 360
-      // 0.25° steps: the arrows only touch the DOM when they visibly turn.
-      return Math.round(degrees / 0.25) * 0.25
-    },
-    getDegreesFromSprite (sprite) {
+    /** Where the sprite is relative to the view center, in world units. */
+    offsetFromView (sprite) {
       // Sprites are raw objects updated in place each frame; reading gameTime makes this re-evaluate per frame.
       void this.gameTime
-      let x = sprite.telemetry.translatex + this.viewport.x
-      let y = sprite.telemetry.translatey + this.viewport.y
-
-      return this.getDegreesFromXY(x, y)
-    },
-    getOpacityFromSprite (sprite) {
-      void this.gameTime
-      let x = (sprite.telemetry.translatex + this.viewport.x)
-      let y = (sprite.telemetry.translatey + this.viewport.y)
-      let length = Math.sqrt(x * x + y * y) / this.viewport.scale
-      if (sprite.type === 'star') {
-        length = length / 2
+      return {
+        x: sprite.telemetry.translatex + this.viewport.x,
+        y: sprite.telemetry.translatey + this.viewport.y
       }
-      let opacity = (length - 250) / 1000
-      opacity = Math.max(Math.min(opacity + 0.1, 1), 0)
+    },
+    bearingToSprite (sprite) {
+      const { x, y } = this.offsetFromView(sprite)
+      // 0.25° steps: the arrows only touch the DOM when they visibly turn.
+      return Math.round(bearingDegrees(x, y) / 0.25) * 0.25
+    },
+    markerOpacity (sprite) {
+      const { x, y } = this.offsetFromView(sprite)
       // Steps of 0.02: only touch the DOM when the fade visibly changes.
-      return Math.round(opacity * 50) / 50
+      return Math.round(scopeOpacity(x, y, this.viewport.scale, sprite.type === 'star') * 50) / 50
     },
     isMyShip (sprite) {
       return ((sprite.type === 'ship') && (sprite.isMine))

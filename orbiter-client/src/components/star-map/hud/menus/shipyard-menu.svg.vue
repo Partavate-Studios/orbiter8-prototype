@@ -93,6 +93,7 @@
 </template>
 
 <script>
+import { canAfford, maxHoldsToBuy, MAX_CARGO_HOLDS } from '@/game/trade'
 
 import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
@@ -149,17 +150,17 @@ export default {
       'avatar'
     ]),
     maxHoldsAvailable () {
-      return Math.min(this.shipMax, parseInt(this.avatar.credits / this.holdPrice))
+      return maxHoldsToBuy(this.avatar.credits, this.avatar.ship.holds, this.holdPrice)
     },
+    /** Holds this ship can still add before reaching the contract's maximum. */
     shipMax () {
-      //250 is a magic number, it's hard coded into contract, should be read from contract
-      return 250 - this.avatar.ship.holds
+      return MAX_CARGO_HOLDS - this.avatar.ship.holds
     },
     holdPrice () {
       return this.systemObjects[this.objectId].prices.holds
     },
     canAfford () {
-      return this.avatar.credits > (this.holdPrice * this.holdsToBuy)
+      return canAfford(this.avatar.credits, this.holdPrice * this.holdsToBuy)
     },
     canUpgrade() {
       if (this.canAfford && this.holdsToBuy > 0) {

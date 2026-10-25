@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { galaxy, avatars } from '@/chain/contracts'
 import { useUIStore } from '@/stores/ui'
 import Sprite, { STAR_KEY } from '@/libs/sprite.js'
+import { moonOrbitRadius, stationOrbitRadius, shipOrbitRadius, SHIP_ORBIT_RADIUS_AROUND_STAR } from '@/game/orbits'
 import { useChainStore } from '@/stores/chain'
 
 export const useStarMapStore = defineStore('StarMap', {
@@ -284,8 +285,7 @@ export const useStarMapStore = defineStore('StarMap', {
             id: planet.id,
             name: planet.station.name,
             size: planet.station.size,
-            distance: (planet.size * 0.6) + 12,
-            speed: 100,
+            distance: stationOrbitRadius(planet.size),
             orbiting: planetSprite.key,
             owner: planet.owner,
             ownerName: planetOwnerName,
@@ -307,8 +307,7 @@ export const useStarMapStore = defineStore('StarMap', {
             class:  planet.moons[orbitalMoonPosition].class,
             orbitalPosition: orbitalMoonPosition,
             planet: planet.id,
-            //todo: this should be done somewhere else, just track position here
-            distance: (planet.size * 0.7) + 14 + (orbitalMoonPosition * orbitalMoonPosition * 0.4) + (orbitalMoonPosition * 4),
+            distance: moonOrbitRadius(planet.size, orbitalMoonPosition),
             speed:  planet.moons[orbitalMoonPosition].orbitSpeed,
             orbiting: planetSprite.key,
             owner: planet.owner,
@@ -327,7 +326,7 @@ export const useStarMapStore = defineStore('StarMap', {
         let ship = blockData.ships[shipId]
         // Ships orbit the planet they're at, or the star if they aren't at one.
         let parent = STAR_KEY
-        let distance = 50
+        let distance = SHIP_ORBIT_RADIUS_AROUND_STAR
         let shipOwnerName = 'Unknown'
         if (ship.owner > 0) {
           shipOwnerName = this.players[ship.owner]
@@ -335,7 +334,7 @@ export const useStarMapStore = defineStore('StarMap', {
         for (const object of Object.values(objects)) {
           if ((object.id == ship.orbit) && (object.type == 'planet')) {
             parent = object.key
-            distance = (object.size * 0.5) + 6
+            distance = shipOrbitRadius(object.size)
           }
         }
         const shipSprite = add('ship', {

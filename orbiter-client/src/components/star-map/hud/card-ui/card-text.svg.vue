@@ -83,7 +83,7 @@
         <text x="35" y="25" text-anchor="end" font-size="0.9em">
           Class:</text>
         <text x="38" y="25" text-anchor="start" font-weight="bold">
-          {{ planetType.getName(systemObjects[objectId].class) }}</text>
+          {{ planetTypeName(systemObjects[objectId].class) }}</text>
         <text x="35" y="35" text-anchor="end" font-size="0.9em">
           Size:</text>
         <text x="38" y="35" text-anchor="start" font-weight="bold">
@@ -193,17 +193,15 @@ import { useGameStateStore } from '@/stores/gamestate'
 import { mapState } from 'pinia'
 import { useStarMapStore } from '@/stores/starmap'
 
-import PlanetTypes from '@/libs/planet-types.js'
+import { planetTypeName } from '@/game/planet-types'
 
 export default {
   name: 'SpriteInfo',
   props: {
     objectId: null
   },
-  data () {
-    return {
-      planetType: new PlanetTypes()
-    }
+  methods: {
+    planetTypeName
   },
   computed: {
     ...mapState(useStarMapStore, [

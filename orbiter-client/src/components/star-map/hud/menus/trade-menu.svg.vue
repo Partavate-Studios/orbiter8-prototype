@@ -163,6 +163,7 @@
 </template>
 
 <script>
+import { clampTradeAmount, emptyHoldsAfterTrade, isEmptyTrade, isValidTrade, maxTradable, tradeBalance, usedHolds } from '@/game/trade'
 
 import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
@@ -219,40 +220,15 @@ export default {
       )
     },
     updateEquipmentToTrade(value) {
-      this.equipmentToTrade = this.updateGoodsToTrade(value, this.equipmentToTrade)
+      this.equipmentToTrade = clampTradeAmount(value, this.equipmentToTrade, this.predictedEmptyHolds)
     },
     updateFuelToTrade(value) {
-      this.fuelToTrade = this.updateGoodsToTrade(value, this.fuelToTrade)
+      this.fuelToTrade = clampTradeAmount(value, this.fuelToTrade, this.predictedEmptyHolds)
     },
     updateOrganicsToTrade(value) {
-      this.organicsToTrade = this.updateGoodsToTrade(value, this.organicsToTrade)
-    },
-    //prevents overflowing or underflowing cargo capacity
-    updateGoodsToTrade(value, goodsToTrade) {
-      //selling goods to port
-      if (value <= 0) {
-        if (value > goodsToTrade) { //reduction in # to sell
-          let diff = Math.abs(value - goodsToTrade)
-          let max = Math.min(this.predictedEmptyHolds, diff)
-          return Math.min(goodsToTrade + max, this.avatar.ship.organics)
-        } else { //increse in # to sell, can only sell what you have
-          return Math.min(value, this.avatar.ship.organics)
-        }
-      //buying goods from port
-      } else if (value > 0) {
-        let diff = value - goodsToTrade
-        let max = Math.min(this.predictedEmptyHolds, diff)
-        return goodsToTrade + max
-      }
-    },
-    goodsAllowed (portGoods, shipGoods, currentlyTrading) {
-      if (portGoods < 0) {
-        //can sell what you have
-        return Math.min(Math.abs(shipGoods), Math.abs(portGoods))
-      }
-      //can buy what fits
-      return Math.min(this.predictedEmptyHolds + currentlyTrading, portGoods)
+      this.organicsToTrade = clampTradeAmount(value, this.organicsToTrade, this.predictedEmptyHolds)
     }
+
   },
   computed: {
     ...mapState(useStarMapStore, [
@@ -270,46 +246,34 @@ export default {
     portPrices () {
       return this.systemObjects[this.objectId].prices
     },
+    /** What the player is trading, per good (negative sells). */
+    amounts () {
+      return { equipment: this.equipmentToTrade, fuel: this.fuelToTrade, organics: this.organicsToTrade }
+    },
+    /** Credits gained by the trade (negative = paid). */
     currentBalance () {
-      return ((this.equipmentToTrade * this.portPrices.equipment) +
-              (this.fuelToTrade * this.portPrices.fuel) +
-              (this.organicsToTrade * this.portPrices.organics)) * -1
+      return tradeBalance(this.amounts, this.portPrices)
     },
     fullHolds () {
-      return this.avatar.ship.equipment + this.avatar.ship.fuel + this.avatar.ship.organics
+      return usedHolds(this.avatar.ship)
     },
     predictedEmptyHolds () {
-      return this.emptyHolds -
-        this.equipmentToTrade -
-        this.fuelToTrade -
-        this.organicsToTrade
+      return emptyHoldsAfterTrade(this.avatar.ship, this.amounts)
     },
     predictedHolds () {
       return this.avatar.ship.holds - this.predictedEmptyHolds
     },
-    emptyHolds () {
-      return (this.avatar.ship.holds - this.fullHolds)
-    },
     isValidTrade () {
-      if ((this.avatar.credits + this.currentBalance) < 0) {
-        return false
-      }
-      if (this.equipmentToTrade == 0 && this.fuelToTrade == 0 && this.organicsToTrade == 0) {
-        return false
-      }
-      if (this.predictedEmptyHolds < 0) {
-        return false
-      }
-      return true
+      return isValidTrade({ credits: this.avatar.credits, ship: this.avatar.ship, amounts: this.amounts, prices: this.portPrices })
     },
     equipmentAllowed () {
-      return(this.goodsAllowed(this.portInventory.equipment, this.avatar.ship.equipment, this.equipmentToTrade));
+      return maxTradable(this.portInventory.equipment, this.avatar.ship.equipment, this.predictedEmptyHolds + this.equipmentToTrade)
     },
     fuelAllowed () {
-      return(this.goodsAllowed(this.portInventory.fuel, this.avatar.ship.fuel, this.fuelToTrade));
+      return maxTradable(this.portInventory.fuel, this.avatar.ship.fuel, this.predictedEmptyHolds + this.fuelToTrade)
     },
     organicsAllowed() {
-      return(this.goodsAllowed(this.portInventory.organics, this.avatar.ship.organics, this.organicsToTrade));
+      return maxTradable(this.portInventory.organics, this.avatar.ship.organics, this.predictedEmptyHolds + this.organicsToTrade)
     },
     slotScale() {
       if (this.slotWidth > 450) {
@@ -321,10 +285,7 @@ export default {
       return Math.min(this.viewport.width - 100, 700);
     },
     nothingToTrade() {
-      if ((this.equipmentToTrade == 0) && (this.fuelToTrade == 0) && (this.organicsToTrade == 0)) {
-        return true
-      }
-      return false
+      return isEmptyTrade(this.amounts)
     }
   },
   watch: {

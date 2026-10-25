@@ -146,7 +146,7 @@ export default {
       this.setSelectedTelemetry({
         translatex: sprite.position.x,
         translatey: sprite.position.y,
-        scale: sprite.targetScale
+        scale: sprite.cameraScale
       })
     },
     onFrame (now) {
