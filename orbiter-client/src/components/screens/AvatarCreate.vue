@@ -56,7 +56,8 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapState } from 'pinia'
+import { useGameStateStore } from '@/stores/gamestate'
 import PilotIdCard from './_pilot-id-card'
 import ShipIcon from '../star-map/hud/icons/ship-icon.svg'
 
@@ -74,7 +75,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('GameState', [
+    ...mapActions(useGameStateStore, [
       'createAvatar'
     ]),
     async signup () {
@@ -98,7 +99,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('GameState', [
+    ...mapState(useGameStateStore, [
       'gameState'
     ])
   }

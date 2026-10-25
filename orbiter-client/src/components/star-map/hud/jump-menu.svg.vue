@@ -82,9 +82,9 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
-import { mapActions as mapPiniaActions, mapState } from 'pinia'
+import { mapActions, mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
 import Ship from '../sprites/ship.svg'
 
@@ -119,10 +119,10 @@ export default {
     }
   },
   methods: {
-    ...mapActions('GameState', [
+    ...mapActions(useGameStateStore, [
       'moveToSystem',
     ]),
-    ...mapPiniaActions(useUIStore, [
+    ...mapActions(useUIStore, [
       'scaleAnimateTo',
       'jumpMenuOff'
     ]),

@@ -30,8 +30,9 @@
 
 <script>
 
-import { mapGetters, mapActions } from 'vuex'
-import { mapState } from 'pinia'
+import { mapGetters } from 'vuex'
+import { useGameStateStore } from '@/stores/gamestate'
+import { mapActions, mapState } from 'pinia'
 import { useStarMapStore } from '@/stores/starmap'
 import MenuContainer from './menu-container/_menu-container.svg'
 import MenuButton from './menu-button.svg'
@@ -54,7 +55,7 @@ export default {
     ChatSlotContainer
   },
   methods: {
-    ...mapActions('GameState', [
+    ...mapActions(useGameStateStore, [
       'sendChat'
     ]),
     broadcast() {
@@ -76,7 +77,7 @@ export default {
     ...mapGetters([
       'blockId'
     ]),
-    ...mapGetters('GameState', [
+    ...mapState(useGameStateStore, [
       'events'
     ]),
     ...mapState(useStarMapStore, [

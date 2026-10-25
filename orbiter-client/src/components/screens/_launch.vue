@@ -22,7 +22,8 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapState } from 'pinia'
+import { useGameStateStore } from '@/stores/gamestate'
 
 export default {
   components: {
@@ -36,7 +37,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('GameState', [
+    ...mapActions(useGameStateStore, [
       'launchShip'
     ]),
     async launch () {
@@ -57,7 +58,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('GameState', [
+    ...mapState(useGameStateStore, [
       'gameState'
     ])
   }

@@ -23,8 +23,9 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'pinia'
 import ShipScene from './_ship-scene.vue'
-import { mapActions, mapGetters } from 'vuex'
+import { useGameStateStore } from '@/stores/gamestate'
 
 export default {
   components: {
@@ -39,7 +40,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('GameState', [
+    ...mapActions(useGameStateStore, [
       'launchShip'
     ]),
     async launch () {
@@ -60,7 +61,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('GameState', [
+    ...mapState(useGameStateStore, [
       'gameState'
     ]),
     warmingUp () {

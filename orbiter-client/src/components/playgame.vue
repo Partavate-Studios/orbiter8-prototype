@@ -6,7 +6,8 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapActions } from 'vuex'
+import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
 import { mapActions as mapPiniaActions, mapState } from 'pinia'
@@ -32,7 +33,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('GameState', [
+    ...mapState(useGameStateStore, [
       'gameState',
       'haveAvatar',
       'haveShip'

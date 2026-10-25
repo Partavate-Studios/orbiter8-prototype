@@ -2,6 +2,7 @@ import Web3 from 'web3'
 import AvatarContract from '@/contract-interfaces/avatar'
 import GalaxyContract from '@/contract-interfaces/galaxy'
 import { useStarMapStore } from '@/stores/starmap'
+import { useGameStateStore } from '@/stores/gamestate'
 
 export default {
   /** Init all the things */
@@ -105,14 +106,14 @@ export default {
   },
   /** game state only changes when a block completes */
   //todo: check into "isSyncing"
-  async checkForNewBlock ({ state, commit, dispatch }) {
+  async checkForNewBlock ({ state, commit }) {
     window.ethereum.eth.getBlockNumber((err, blockNumber) => {
       if(!err) {
         if (state.currentBlockId < blockNumber) {
           console.log('Block increase from ' + state.currentBlockId + ' to ' + blockNumber)
           commit('setProp', {key: 'currentBlockId', value: blockNumber })
-          dispatch('GameState/loadGameState', null, {root:true})
-          dispatch('GameState/loadEvents', null, {root:true})
+          useGameStateStore().loadGameState()
+          useGameStateStore().loadEvents()
           useStarMapStore().loadStarMap()
         }
       }

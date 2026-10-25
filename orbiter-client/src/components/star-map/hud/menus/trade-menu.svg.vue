@@ -164,9 +164,9 @@
 
 <script>
 
-import { mapGetters, mapActions } from 'vuex'
+import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
-import { mapActions as mapPiniaActions, mapState } from 'pinia'
+import { mapActions, mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
 import MenuButton from './menu-button.svg'
 import MenuContainer from './menu-container/_menu-container.svg'
@@ -199,10 +199,10 @@ export default {
     ShipCargo
   },
   methods: {
-    ...mapActions('GameState', [
+    ...mapActions(useGameStateStore, [
       'tradeAtPort',
     ]),
-    ...mapPiniaActions(useUIStore, [
+    ...mapActions(useUIStore, [
       'closeMenu'
     ]),
     doTrade() {
@@ -276,7 +276,7 @@ export default {
     ...mapState(useStarMapStore, [
       'systemObjects'
     ]),
-    ...mapGetters('GameState', [
+    ...mapState(useGameStateStore, [
       'avatar'
     ]),
     ...mapState(useUIStore, [

@@ -17,7 +17,8 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapActions } from 'vuex'
+import { useGameStateStore } from '@/stores/gamestate'
 import { mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 import AvatarCreate from '@/components/screens/AvatarCreate'
@@ -37,7 +38,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('GameState', [
+    ...mapState(useGameStateStore, [
       'haveAvatar',
       'haveShip',
       'gameState'

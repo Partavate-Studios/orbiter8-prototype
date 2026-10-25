@@ -35,10 +35,11 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters } from 'vuex'
+import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
-import { mapActions as mapPiniaActions, mapState } from 'pinia'
+import { mapActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 
 export default {
@@ -59,7 +60,7 @@ export default {
     ...mapState(useConfigStore, [
       'tickDelay'
     ]),
-    ...mapGetters('GameState', [
+    ...mapState(useGameStateStore, [
       'haveAvatar',
       'gameState',
       'avatar'
@@ -74,15 +75,15 @@ export default {
     ]),
   },
   methods: {
-    ...mapPiniaActions(useUIStore, [
+    ...mapActions(useUIStore, [
       'viewTo',
       'scaleTo'
     ]),
-    ...mapActions('GameState', [
+    ...mapActions(useGameStateStore, [
       'loadGameState',
       'moveToSystem',
     ]),
-    ...mapPiniaActions(useStarMapStore, [
+    ...mapActions(useStarMapStore, [
       'loadStarMap'
     ]),
     refreshData () {

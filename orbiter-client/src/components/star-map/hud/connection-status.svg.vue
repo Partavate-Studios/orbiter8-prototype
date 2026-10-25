@@ -27,6 +27,7 @@
 <script>
 
 import { mapGetters } from 'vuex'
+import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
 import { mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
@@ -41,7 +42,7 @@ export default {
       'isLoading',
       'currentStarSystemId',
     ]),
-    ...mapGetters('GameState', [
+    ...mapState(useGameStateStore, [
       'gameDataLoading'
     ]),
     ...mapState(useUIStore, [

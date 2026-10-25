@@ -189,7 +189,7 @@
 
 <script>
 
-import { mapGetters } from 'vuex'
+import { useGameStateStore } from '@/stores/gamestate'
 import { mapState } from 'pinia'
 import { useStarMapStore } from '@/stores/starmap'
 
@@ -216,7 +216,7 @@ export default {
       'systemObjects',
       'players'
     ]),
-    ...mapGetters('GameState', [
+    ...mapState(useGameStateStore, [
       'avatar'
     ]),
     typeName () {

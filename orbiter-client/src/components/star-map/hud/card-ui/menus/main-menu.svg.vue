@@ -16,9 +16,10 @@
 
 <script>
 
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters } from 'vuex'
+import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
-import { mapActions as mapPiniaActions, mapState } from 'pinia'
+import { mapActions, mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
 import CardBackground from '../card-background.svg'
 import CardButton from '../card-button.svg'
@@ -130,12 +131,12 @@ export default {
         }
       }
     },
-    ...mapActions('GameState', [
+    ...mapActions(useGameStateStore, [
       'claimPlanet',
       'buildStation',
       'renameAsset'
     ]),
-    ...mapPiniaActions(useUIStore, [
+    ...mapActions(useUIStore, [
       'jumpMenuOn',
       'scaleTo',
       'openMenu',
@@ -151,7 +152,7 @@ export default {
     ...mapState(useStarMapStore, [
       'systemObjects'
     ]),
-    ...mapGetters('GameState', [
+    ...mapState(useGameStateStore, [
       'avatar'
     ]),
     menuData: function () {

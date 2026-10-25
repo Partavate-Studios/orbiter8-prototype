@@ -9,8 +9,9 @@
 </template>
 
 <script>
+import { mapState } from 'pinia'
 
-import { mapGetters } from 'vuex'
+import { useGameStateStore } from '@/stores/gamestate'
 
 export default {
   components: {
@@ -24,7 +25,7 @@ export default {
   methods: {
   },
   computed: {
-    ...mapGetters('GameState', [
+    ...mapState(useGameStateStore, [
       'gameState'
     ])
   },

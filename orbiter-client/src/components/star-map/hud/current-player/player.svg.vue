@@ -22,8 +22,9 @@
 </template>
 
 <script>
+import { mapState } from 'pinia'
 
-import { mapGetters } from 'vuex'
+import { useGameStateStore } from '@/stores/gamestate'
 
 export default {
   name: 'CurrentPlayer',
@@ -34,7 +35,7 @@ export default {
   components: {
   },
   computed: {
-    ...mapGetters('GameState', [
+    ...mapState(useGameStateStore, [
       'avatar'
     ]),
   }

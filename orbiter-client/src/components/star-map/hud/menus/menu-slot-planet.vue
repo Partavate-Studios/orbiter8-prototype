@@ -83,7 +83,7 @@
 
 <script>
 
-import { mapGetters } from 'vuex'
+import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
 import { mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
@@ -139,7 +139,7 @@ export default {
       'moonsForPlanet',
       'players'
     ]),
-    ...mapGetters('GameState', [
+    ...mapState(useGameStateStore, [
       'avatar'
     ]),
     slotWidth() {

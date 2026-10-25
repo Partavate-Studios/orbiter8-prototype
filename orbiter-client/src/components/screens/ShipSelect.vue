@@ -17,7 +17,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapState } from 'pinia'
+import { useGameStateStore } from '@/stores/gamestate'
 import orbiter8logo from '@/components/assets/Orbiter8Logo.svg'
 import gameinfo from '@/components/screens/_gameinfo'
 
@@ -28,7 +29,7 @@ export default {
   },
   name: 'ShipSelect',
   computed: {
-    ...mapGetters('GameState', [
+    ...mapState(useGameStateStore, [
       'gameState'
     ]),
   }

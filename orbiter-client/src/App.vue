@@ -20,7 +20,8 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
-import { mapActions as mapPiniaActions } from 'pinia'
+import { useGameStateStore } from '@/stores/gamestate'
+import { mapActions as mapPiniaActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 import NetworkSelect from '@/components/screens/NetworkSelect'
 import router from '@/router/router'
@@ -40,7 +41,7 @@ export default {
     ...mapGetters([
       'playerReady',
     ]),
-    ...mapGetters('GameState', [
+    ...mapState(useGameStateStore, [
       'gameDataLoaded',
     ])
   },

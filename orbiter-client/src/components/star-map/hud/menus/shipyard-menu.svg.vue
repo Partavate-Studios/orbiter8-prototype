@@ -94,9 +94,9 @@
 
 <script>
 
-import { mapGetters, mapActions } from 'vuex'
+import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
-import { mapActions as mapPiniaActions, mapState } from 'pinia'
+import { mapActions, mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
 import MenuContainer from './menu-container/_menu-container.svg'
 import MenuButton from './menu-button.svg'
@@ -121,10 +121,10 @@ export default {
     ShipUpgrade
   },
   methods: {
-    ...mapActions('GameState', [
+    ...mapActions(useGameStateStore, [
       'addHoldsToShip',
     ]),
-    ...mapPiniaActions(useUIStore, [
+    ...mapActions(useUIStore, [
       'closeMenu'
     ]),
     applyUpgrades() {
@@ -145,7 +145,7 @@ export default {
     ...mapState(useStarMapStore, [
       'systemObjects'
     ]),
-    ...mapGetters('GameState', [
+    ...mapState(useGameStateStore, [
       'avatar'
     ]),
     fullHolds () {

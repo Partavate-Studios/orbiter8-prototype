@@ -246,6 +246,7 @@
 
 <script>
 import { mapGetters, mapActions, mapMutations } from 'vuex'
+import { useGameStateStore } from '@/stores/gamestate'
 import { mapActions as mapPiniaActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 
@@ -265,7 +266,7 @@ export default {
       'setDefaultAccount',
       'initContracts'
     ]),
-    ...mapActions('GameState', [
+    ...mapPiniaActions(useGameStateStore, [
       'loadGameState',
     ]),
     ...mapMutations([
@@ -370,7 +371,7 @@ export default {
       'galaxyAddress',
       'balance'
     ]),
-    ...mapGetters('GameState', [
+    ...mapState(useGameStateStore, [
       'gameDataLoaded',
       'haveAvatar',
       'haveShip',

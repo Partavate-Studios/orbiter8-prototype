@@ -15,9 +15,9 @@
 
 <script>
 
-import { mapActions } from 'vuex'
+import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
-import { mapActions as mapPiniaActions, mapState } from 'pinia'
+import { mapActions, mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
 import CardBackground from './card-background.svg'
 import CardButton from './card-button.svg'
@@ -32,10 +32,10 @@ export default {
     objectId: null
   },
   methods: {
-    ...mapActions('GameState', [
+    ...mapActions(useGameStateStore, [
       'renameAsset'
     ]),
-    ...mapPiniaActions(useUIStore, [
+    ...mapActions(useUIStore, [
       'selectSprite'
     ])
   },
