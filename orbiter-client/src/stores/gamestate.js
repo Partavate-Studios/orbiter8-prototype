@@ -1,3 +1,4 @@
+import { TIMING } from '@/constants'
 import { defineStore } from 'pinia'
 import { galaxy, avatars } from '@/chain/contracts'
 import { useUIStore } from '@/stores/ui'
@@ -109,9 +110,9 @@ export const useGameStateStore = defineStore('GameState', {
       let block = useChainStore().currentBlockId
       if (block > 0) {
         events.avatarEvents = await avatars.getEvents()
-        events.shipEvents = await galaxy.getEvents('ShipLaunch', block - 10)
-        events.tradeEvents = await galaxy.getEvents('PortTrade', block - 10)
-        events.chatEvents = await galaxy.getEvents('ChatLog', block - 950)
+        events.shipEvents = await galaxy.getEvents('ShipLaunch', block - TIMING.EVENT_LOOKBACK_BLOCKS)
+        events.tradeEvents = await galaxy.getEvents('PortTrade', block - TIMING.EVENT_LOOKBACK_BLOCKS)
+        events.chatEvents = await galaxy.getEvents('ChatLog', block - TIMING.CHAT_LOOKBACK_BLOCKS)
       }
       this.setProp({key: 'events', value: events})
     },

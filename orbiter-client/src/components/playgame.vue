@@ -6,6 +6,7 @@
 </template>
 
 <script>
+import { CAMERA } from '@/constants'
 import { useChainStore } from '@/stores/chain'
 import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
@@ -92,9 +93,9 @@ export default {
       'mousewheelAnimateTo'
     ]),
     onWheel (event) {
-      // Wheel up zooms in (smaller scale = closer), each step over 100 ms.
-      const scale = event.deltaY < 0 ? 0.8 : 1.25
-      this.mousewheelAnimateTo({ scale, time: 100 })
+      // Wheel up zooms in (smaller scale = closer).
+      const scale = event.deltaY < 0 ? CAMERA.WHEEL_ZOOM_IN : CAMERA.WHEEL_ZOOM_OUT
+      this.mousewheelAnimateTo({ scale, time: CAMERA.WHEEL_TWEEN_MS })
     },
     handleKeyPress (event) {
       switch (event.key) {
@@ -117,16 +118,16 @@ export default {
           this.scaleBy(1.25)
           break
         case 'ArrowRight':
-          this.moveRight(1000)
+          this.moveRight(CAMERA.KEY_PAN * 10)
           break
         case 'ArrowLeft':
-          this.moveLeft(100)
+          this.moveLeft(CAMERA.KEY_PAN)
           break
         case 'ArrowDown':
-          this.moveDown(100)
+          this.moveDown(CAMERA.KEY_PAN)
           break
         case 'ArrowUp':
-          this.moveUp(100)
+          this.moveUp(CAMERA.KEY_PAN)
           break
         case 'S':
           this.screenshot()

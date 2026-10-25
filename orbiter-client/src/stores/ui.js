@@ -1,17 +1,21 @@
 import { defineStore } from 'pinia'
 import Tween from '@/libs/tween'
 import { STAR_KEY } from '@/libs/sprite'
+import { CAMERA, MAP_GROUP_SCALE, MAP_RESOLUTION, WORLD_OFFSET_Y } from '@/constants'
+
+// Sprites this far past the screen edge still count as on screen (labels, glows).
+const OFFSCREEN_MARGIN_PX = 100
 
 export const useUIStore = defineStore('UI', {
   state: () => ({
     // The map's HUD and world sit in a group scaled by this much (inside 1200 units per screen height).
-    baseScale: 1.25,
+    baseScale: MAP_GROUP_SCALE,
     // The camera the world layer is currently drawn for (it lags the live viewport between redraws).
     drawnView: { x: 0, y: 0, scale: 1 },
     /* Approved */
     viewport: {
-      resolution: 1200,
-      scale: 400,
+      resolution: MAP_RESOLUTION,
+      scale: CAMERA.START_SCALE,
       scaleTween: null,
       rotation: 0.0,
       rotationTween: null,
@@ -19,13 +23,13 @@ export const useUIStore = defineStore('UI', {
       xTween: null,
       y: 0.0,
       yTween: null,
-      width: 1200,
-      height: 1200
+      width: MAP_RESOLUTION,
+      height: MAP_RESOLUTION
     },
     //todo: this needs a more verbose name
     container: {
-      width: 1200,
-      height: 1200,
+      width: MAP_RESOLUTION,
+      height: MAP_RESOLUTION,
       mouse: {
         x: 0,
         y: 0,
@@ -76,9 +80,9 @@ export const useUIStore = defineStore('UI', {
      */
     isOnScreen () {
       const pixels = this.livePixelsPerUnit
-      const halfWidth = this.container.width / 2 + 100
-      const halfHeight = this.container.height / 2 + 100
-      const offsetY = -100 * this.groupPixels
+      const halfWidth = this.container.width / 2 + OFFSCREEN_MARGIN_PX
+      const halfHeight = this.container.height / 2 + OFFSCREEN_MARGIN_PX
+      const offsetY = WORLD_OFFSET_Y * this.groupPixels
       return (x, y, radius = 0) => {
         const dx = Math.abs((x + this.viewport.x) * pixels)
         const dy = Math.abs((y + this.viewport.y) * pixels + offsetY)
@@ -165,17 +169,17 @@ export const useUIStore = defineStore('UI', {
         this.viewport.xTween = new Tween(
           this.viewport.x,
           this.viewport.x,
-          2000
+          CAMERA.SELECT_TWEEN_MS
         )
         this.viewport.yTween = new Tween(
           this.viewport.y,
           this.viewport.y,
-          2000
+          CAMERA.SELECT_TWEEN_MS
         )
         this.viewport.scaleTween = new Tween(
           this.viewport.scale,
           this.viewport.scale,
-          2000
+          CAMERA.SELECT_TWEEN_MS
         )
       }
     },
@@ -233,64 +237,64 @@ export const useUIStore = defineStore('UI', {
       }
 
       // confine scale
-      if (this.viewport.scale > 420) {
-        this.viewport.scale = 420
+      if (this.viewport.scale > CAMERA.MAX_SCALE) {
+        this.viewport.scale = CAMERA.MAX_SCALE
       }
-      if (this.viewport.scale < 0.0015) {
-        this.viewport.scale = 0.001
+      if (this.viewport.scale < CAMERA.MIN_SCALE_SNAP) {
+        this.viewport.scale = CAMERA.MIN_SCALE
       }
 
       // confine x
-      if (Math.abs(this.viewport.x) > 5200) {
-        this.viewport.x = 5200 * Math.sign(this.viewport.x)
+      if (Math.abs(this.viewport.x) > CAMERA.MAX_PAN) {
+        this.viewport.x = CAMERA.MAX_PAN * Math.sign(this.viewport.x)
       }
       // confine y
-      if (Math.abs(this.viewport.y) > 5200) {
-        this.viewport.y = 5200 * Math.sign(this.viewport.y)
+      if (Math.abs(this.viewport.y) > CAMERA.MAX_PAN) {
+        this.viewport.y = CAMERA.MAX_PAN * Math.sign(this.viewport.y)
       }
     },
     moveUp (distance) {
       this.viewport.yTween = new Tween(
         this.viewport.y,
         this.viewport.y + (distance * this.viewport.scale),
-        100
+        CAMERA.NUDGE_TWEEN_MS
       )
     },
     moveDown (distance) {
       this.viewport.yTween = new Tween(
         this.viewport.y,
         this.viewport.y - (distance * this.viewport.scale),
-        100
+        CAMERA.NUDGE_TWEEN_MS
       )
     },
     moveLeft (distance) {
       this.viewport.xTween = new Tween(
         this.viewport.x,
         this.viewport.x + (distance * this.viewport.scale),
-        100
+        CAMERA.NUDGE_TWEEN_MS
       )
     },
     moveRight (distance) {
       this.viewport.xTween = new Tween(
         this.viewport.x,
         this.viewport.x - (distance * this.viewport.scale),
-        100
+        CAMERA.NUDGE_TWEEN_MS
       )
     },
     scaleBy (scaler) {
-      this.viewport.scale =  Math.min(2000, scaler * this.viewport.scale)
+      this.viewport.scale =  Math.min(CAMERA.ZOOM_REQUEST_CAP, scaler * this.viewport.scale)
     },
     scaleAnimateBy ({scaler, time}) {
       if (this.viewport.scaleTween == null) {
         this.viewport.scaleTween = new Tween(
           this.viewport.scale,
-          Math.min(2000, scaler * this.viewport.scale),
+          Math.min(CAMERA.ZOOM_REQUEST_CAP, scaler * this.viewport.scale),
           time
         )
         this.viewport.scaleTween.useLinear()
       } else {
         this.viewport.scaleTween.updateTarget(
-          Math.min(2000, scaler * this.viewport.scaleTween.target)
+          Math.min(CAMERA.ZOOM_REQUEST_CAP, scaler * this.viewport.scaleTween.target)
         )
       }
     },
@@ -308,7 +312,7 @@ export const useUIStore = defineStore('UI', {
       this.viewport.rotationTween = new Tween(
         this.viewport.rotation,
         rotation,
-        100
+        CAMERA.NUDGE_TWEEN_MS
       )
     },
     viewTo (location) {
@@ -342,13 +346,13 @@ export const useUIStore = defineStore('UI', {
       if (this.viewport.scaleTween == null) {
         this.viewport.scaleTween = new Tween(
           this.viewport.scale,
-          Math.min(2000, scale * this.viewport.scale),
+          Math.min(CAMERA.ZOOM_REQUEST_CAP, scale * this.viewport.scale),
           time
         )
         this.viewport.scaleTween.useLinear()
       } else {
         this.viewport.scaleTween.updateTarget(
-          Math.min(2000, scale * this.viewport.scaleTween.target),
+          Math.min(CAMERA.ZOOM_REQUEST_CAP, scale * this.viewport.scaleTween.target),
         )
       }
     },
@@ -356,8 +360,6 @@ export const useUIStore = defineStore('UI', {
     setMouse (payload) {
       this.container.mouse.x = payload.x
       this.container.mouse.y = payload.y
-      // this.container.mouse.xFromCenter = (payload.x - (this.container.width / 2))
-      // this.container.mouse.yFromCenter = (payload.y - (this.container.height / 2))
       this.container.mouse.xPercent = payload.x / this.container.width
       this.container.mouse.yPercent = payload.y / this.container.height
     },
@@ -371,8 +373,8 @@ export const useUIStore = defineStore('UI', {
       this.selectedSprite = STAR_KEY
       this.viewport.scaleTween = new Tween(
         this.viewport.scale,
-        2,
-        1500
+        CAMERA.JUMP_MENU_SCALE,
+        CAMERA.JUMP_MENU_TWEEN_MS
       )
       this.hud.menuState.jumpMenu = true
     },
@@ -380,8 +382,8 @@ export const useUIStore = defineStore('UI', {
       if (this.hud.menuState.jumpMenu) {
         this.viewport.scaleTween = new Tween(
           this.viewport.scale,
-          1,
-          1500
+          CAMERA.JUMP_MENU_CLOSE_SCALE,
+          CAMERA.JUMP_MENU_TWEEN_MS
         )
         this.hud.menuState.jumpMenu = false
       }
@@ -434,19 +436,14 @@ export const useUIStore = defineStore('UI', {
     },
     jumpAnimationOff () {
       if (this.hud.jumpAnimationState) {
-        // this.viewport.scaleTween = new Tween(
-        //   this.viewport.scale,
-        //   1,
-        //   5000
-        // )
         this.hud.jumpAnimationState = false
       }
     },
     jumpAnimationOn () {
-      this.selectedSprite = null,
-      this.viewport.x = 0,
-      this.viewport.y = 0,
-      this.viewport.scale = 1500,
+      this.selectedSprite = null
+      this.viewport.x = 0
+      this.viewport.y = 0
+      this.viewport.scale = CAMERA.JUMP_ANIMATION_SCALE
       this.hud.jumpAnimationState = true
     },
   }

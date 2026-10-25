@@ -64,6 +64,7 @@
 </template>
 
 <script>
+import { CAMERA, WORLD_OFFSET_Y } from '@/constants'
 
 import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
@@ -83,8 +84,6 @@ import { CompositedLayer } from '@/libs/composited-layer'
 
 // Pixels of world drawn beyond each screen edge, so the camera can pan a little before a redraw.
 const WORLD_MARGIN = 256
-// The world sits 100 units above center inside the HUD's scaled group (see the template).
-const WORLD_OFFSET_Y = -100
 
 export default {
   components: {
@@ -184,9 +183,9 @@ export default {
       if (val != oldVal) {
         if (this.myShipId != 0) {
           this.selectSprite(this.myShipId)
-          this.scaleAnimateTo({scale: 0.05, time: 5000})
+          this.scaleAnimateTo({scale: CAMERA.ARRIVAL_SHIP_SCALE, time: CAMERA.ARRIVAL_TWEEN_MS})
         } else {
-          this.scaleAnimateTo({scale: 0.5, time: 5000})
+          this.scaleAnimateTo({scale: CAMERA.ARRIVAL_SYSTEM_SCALE, time: CAMERA.ARRIVAL_TWEEN_MS})
         }
       }
     },
@@ -257,7 +256,7 @@ export default {
          Math.abs(screenY - this.mouseYThreshold)
       )
 
-      if (this.mouseHold && (minDistance > 20)) {
+      if (this.mouseHold && (minDistance > CAMERA.DRAG_THRESHOLD_PX)) {
         this.selectNone()
         this.jumpMenuOff()
         this.closeMenu()

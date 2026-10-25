@@ -1,3 +1,4 @@
+import { TIMING } from '@/constants'
 import { defineStore } from 'pinia'
 import Cookies from 'js-cookie'
 
@@ -7,9 +8,9 @@ export const useConfigStore = defineStore('Config', {
     // Minimum ms between game ticks per graphics tier (0 = every animation frame).
     tickDelayHigh: 0,
     tickDelayNormal: 0,
-    tickDelayLow: 32,
+    tickDelayLow: TIMING.LOW_TIER_TICK_MS,
     tickDelay: 0,
-    blockCheckDelay: 2000,
+    blockCheckDelay: TIMING.BLOCK_POLL_MS,
     graphicsQuality: Number(Cookies.get('graphicsQuality')) || 2,
     showScope: true
   }),
