@@ -158,6 +158,7 @@
 </template>
 
 <script>
+import { STAR_KEY } from '@/libs/sprite'
 
 import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
@@ -306,8 +307,8 @@ export default {
     },
     selectStar() {
       this.o8audio.playEffect('click');
-      if (this.selected != 0) {
-        this.selectSprite(0)
+      if (this.selected != STAR_KEY) {
+        this.selectSprite(STAR_KEY)
       } else {
         this.jumpMenuOn()
       }

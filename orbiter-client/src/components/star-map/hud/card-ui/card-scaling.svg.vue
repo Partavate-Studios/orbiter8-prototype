@@ -40,13 +40,9 @@ export default {
     cardUiTranslate () {
       // Sprites are raw objects updated in place each frame; reading gameTime makes this re-evaluate per frame.
       void this.gameTime
-      let x = this.sprite.telemetry.translatex + this.viewport.x
-      let y = this.sprite.telemetry.translatey + this.viewport.y
-      if (this.sprite.orbiting > 0) {
-        let parentTelemetry = this.systemObjects[this.sprite.orbiting].telemetry
-        x += parentTelemetry.translatex
-        y += parentTelemetry.translatey
-      }
+      // position is the sprite's absolute place in the system (orbit + its parent's orbit).
+      let x = this.sprite.position.x + this.viewport.x
+      let y = this.sprite.position.y + this.viewport.y
       x = Math.round((x / this.viewport.scale) * 1000) / 1000
       y = Math.round((y / this.viewport.scale) * 1000) / 1000
       return  x + ' ' + y

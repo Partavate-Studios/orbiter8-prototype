@@ -69,11 +69,11 @@ export default {
     },
     childIndexes () {
       const children = {}
-      this.systemObjects.forEach((sprite, index) => {
-        if (sprite.type !== 'planet' && sprite.orbiting && this.systemObjects[sprite.orbiting]?.type === 'planet') {
-          (children[sprite.orbiting] ??= []).push(index)
+      for (const [key, sprite] of Object.entries(this.systemObjects)) {
+        if (sprite.type !== 'planet' && this.systemObjects[sprite.orbiting]?.type === 'planet') {
+          (children[sprite.orbiting] ??= []).push(key)
         }
-      })
+      }
       return children
     },
     /** Half the width of each planet's layer, in world units. */

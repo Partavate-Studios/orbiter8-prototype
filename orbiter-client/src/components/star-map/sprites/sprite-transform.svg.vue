@@ -92,11 +92,10 @@ export default {
         }
       }
     },
+    /** The sprite's key in systemObjects (see libs/sprite.js spriteKey). */
     objectIndex: {
-      type: Number,
-      default () {
-        return 0
-      }
+      type: String,
+      required: true
     },
     type: {
       type: String,

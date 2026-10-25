@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { galaxy, avatars } from '@/chain/contracts'
 import { useUIStore } from '@/stores/ui'
-import Sprite from '@/libs/sprite.js'
+import Sprite, { STAR_KEY } from '@/libs/sprite.js'
 import { useChainStore } from '@/stores/chain'
 
 export const useStarMapStore = defineStore('StarMap', {
@@ -9,7 +9,8 @@ export const useStarMapStore = defineStore('StarMap', {
     starId: 0,
     starName: '...',
     neighbors: [],
-    systemObjects: [],
+    // Sprites by stable key (see libs/sprite.js spriteKey), in drawing order.
+    systemObjects: {},
     spriteIds: {
       planets: [],
       moons: [],
@@ -28,30 +29,20 @@ export const useStarMapStore = defineStore('StarMap', {
     currentStarSystemId: state => state.starId,
     currentStarSystemName: state => state.starName,
     mapLoadedPercentage: state => Math.min(100, Math.max(0, state.loadProgress)),
+    /** Key of the player's ship in this system (falls back to the star, as before). */
     myShipId: state => {
-      for (var i = 0; i < state.systemObjects.length; i++) {
-        if ((state.systemObjects[i].type == 'ship') && (state.systemObjects[i].isMine)) {
-          return i
-        }
-      }
-      return 0
+      const ship = Object.values(state.systemObjects).find(sprite => sprite.type === 'ship' && sprite.isMine)
+      return ship ? ship.key : STAR_KEY
     },
-    portForPlanet: state => (planetId) => {
-      for (var i = 0; i < state.systemObjects.length; i++) {
-        if ((state.systemObjects[i].type == 'station') && (state.systemObjects[i].orbiting == planetId)) {
-          return i
-        }
-      }
-      return 0
+    /** Key of the space station orbiting a planet (by planet key), or null. */
+    portForPlanet: state => (planetKey) => {
+      const station = Object.values(state.systemObjects).find(sprite => sprite.type === 'station' && sprite.orbiting === planetKey)
+      return station ? station.key : null
     },
-    moonsForPlanet: state => (planetId) => {
-      let moons = []
-      for (var i = 0; i < state.systemObjects.length; i++) {
-        if ((state.systemObjects[i].type == 'moon') && (state.systemObjects[i].orbiting == planetId)) {
-          moons.push(i)
-        }
-      }
-      return moons
+    moonsForPlanet: state => (planetKey) => {
+      return Object.values(state.systemObjects)
+        .filter(sprite => sprite.type === 'moon' && sprite.orbiting === planetKey)
+        .map(sprite => sprite.key)
     }
   },
   actions: {
@@ -245,28 +236,31 @@ export const useStarMapStore = defineStore('StarMap', {
     importStarMapBlockData ({blockData, playerAccount}) {
       console.log('importing star map data')
 
-      let newSystemObjects = []
-      let newSpriteIds = {
+      // Keyed by stable sprite key; insertion order is drawing order.
+      const objects = {}
+      const ids = {
         planets: [],
         moons: [],
         stations: [],
         ships: []
       }
+      const add = (type, values) => {
+        const sprite = new Sprite(type, values)
+        objects[sprite.key] = sprite
+        return sprite
+      }
 
       //add star
-      newSystemObjects.push(new Sprite(
-        'star', {
-          id: this.starId,
-          name: blockData.starName,
-          size: blockData.starSize,
-          birth: blockData.birthTime,
-          owner: blockData.discoveredBy,
-          ownerName: this.players[blockData.discoveredBy],
-          orbiting: null,
-          isMine: Boolean(String(playerAccount) == String(blockData.discoveredBy))
-        }
-      ))
-      console.log('discovered: '+ String(playerAccount) + ' ' + String(blockData.discoveredBy))
+      add('star', {
+        id: this.starId,
+        name: blockData.starName,
+        size: blockData.starSize,
+        birth: blockData.birthTime,
+        owner: blockData.discoveredBy,
+        ownerName: this.players[blockData.discoveredBy],
+        orbiting: null,
+        isMine: Boolean(String(playerAccount) == String(blockData.discoveredBy))
+      })
 
       //add planets
       for (const orbitalPosition in blockData.planets) {
@@ -276,131 +270,120 @@ export const useStarMapStore = defineStore('StarMap', {
           planetOwnerName = this.players[planet.owner]
         }
         let isMine = Boolean(String(playerAccount) == String(planet.owner))
-        console.log('isMine ' + isMine + ' from ' + playerAccount + ' and ' + planet.owner)
-        newSystemObjects.push(new Sprite(
-          'planet', {
-            name: planet.name,
-            id: planet.id,
-            speed: planet.orbitSpeed,
-            size: planet.size,
-            orbitalPosition: orbitalPosition,
-            class:  planet.class,
-            rings: planet.rings,
-            owner: planet.owner,
-            ownerName: planetOwnerName,
-            orbiting: 0,
-            hasStation: planet.hasStation,
-            moons: [],
-            isMine: isMine
-          }
-        ))
-        let planetObjectId = newSystemObjects.length - 1
-        newSpriteIds.planets.push(planetObjectId)
+        const planetSprite = add('planet', {
+          name: planet.name,
+          id: planet.id,
+          speed: planet.orbitSpeed,
+          size: planet.size,
+          orbitalPosition: orbitalPosition,
+          class:  planet.class,
+          rings: planet.rings,
+          owner: planet.owner,
+          ownerName: planetOwnerName,
+          orbiting: STAR_KEY,
+          hasStation: planet.hasStation,
+          moons: [],
+          isMine: isMine
+        })
+        ids.planets.push(planetSprite.key)
 
         //add planet's station
         if (planet.hasStation) {
-          newSystemObjects.push(new Sprite(
-            'station', {
-              id: planet.id,
-              name: planet.station.name,
-              size: planet.station.size,
-              distance: (planet.size * 0.6) + 12,
-              speed: 100,
-              orbiting: planetObjectId,
-              owner: planet.owner,
-              ownerName: planetOwnerName,
-              isMine: isMine,
-              inventory: planet.station.inventory,
-              prices: planet.station.prices
-            }
-          ))
-          newSpriteIds.stations.push(newSystemObjects.length - 1)
-          newSystemObjects[planetObjectId].stationSprite = newSystemObjects.length - 1
-          newSystemObjects[planetObjectId].stationName = planet.station.name
+          const station = add('station', {
+            id: planet.id,
+            name: planet.station.name,
+            size: planet.station.size,
+            distance: (planet.size * 0.6) + 12,
+            speed: 100,
+            orbiting: planetSprite.key,
+            owner: planet.owner,
+            ownerName: planetOwnerName,
+            isMine: isMine,
+            inventory: planet.station.inventory,
+            prices: planet.station.prices
+          })
+          ids.stations.push(station.key)
+          planetSprite.stationSprite = station.key
+          planetSprite.stationName = planet.station.name
         }
 
         //add planet's moons
         for (const orbitalMoonPosition in planet.moons) {
-          newSystemObjects.push(new Sprite(
-            'moon', {
-              id: orbitalMoonPosition,
-              name: planet.moons[orbitalMoonPosition].name,
-              size:  planet.moons[orbitalMoonPosition].size,
-              class:  planet.moons[orbitalMoonPosition].class,
-              orbitalPosition: orbitalMoonPosition,
-              planet: planet.id,
-              //todo: this should be done somewhere else, just track position here
-              distance: (planet.size * 0.7) + 14 + (orbitalMoonPosition * orbitalMoonPosition * 0.4) + (orbitalMoonPosition * 4),
-              speed:  planet.moons[orbitalMoonPosition].orbitSpeed,
-              orbiting: planetObjectId,
-              owner: planet.owner,
-              ownerName: planetOwnerName,
-              isMine: isMine
-            }
-          ))
-          newSpriteIds.moons.push(newSystemObjects.length - 1)
-            newSystemObjects[planetObjectId].moons.push({
-              moonId: newSystemObjects.length - 1,
-              moonName: planet.moons[orbitalMoonPosition].name
-            }
-          )
+          const moon = add('moon', {
+            id: orbitalMoonPosition,
+            name: planet.moons[orbitalMoonPosition].name,
+            size:  planet.moons[orbitalMoonPosition].size,
+            class:  planet.moons[orbitalMoonPosition].class,
+            orbitalPosition: orbitalMoonPosition,
+            planet: planet.id,
+            //todo: this should be done somewhere else, just track position here
+            distance: (planet.size * 0.7) + 14 + (orbitalMoonPosition * orbitalMoonPosition * 0.4) + (orbitalMoonPosition * 4),
+            speed:  planet.moons[orbitalMoonPosition].orbitSpeed,
+            orbiting: planetSprite.key,
+            owner: planet.owner,
+            ownerName: planetOwnerName,
+            isMine: isMine
+          })
+          ids.moons.push(moon.key)
+          planetSprite.moons.push({
+            moonId: moon.key,
+            moonName: planet.moons[orbitalMoonPosition].name
+          })
         }
       }
 
       for (const shipId in blockData.ships) {
         let ship = blockData.ships[shipId]
-        let parent = 0
+        // Ships orbit the planet they're at, or the star if they aren't at one.
+        let parent = STAR_KEY
         let distance = 50
         let shipOwnerName = 'Unknown'
         if (ship.owner > 0) {
           shipOwnerName = this.players[ship.owner]
         }
-        for (let i = 0; i < newSystemObjects.length; i++) {
-          let object = newSystemObjects[i]
-          //console.log('index ' + i + ' orbit ' + ship.orbit + ' object ' + newSystemObjects[i].id + ' type ' + object.size)
+        for (const object of Object.values(objects)) {
           if ((object.id == ship.orbit) && (object.type == 'planet')) {
-            //console.log('match! '+ i)
-            parent = i
-            distance = (newSystemObjects[i].size * 0.5) + 6
+            parent = object.key
+            distance = (object.size * 0.5) + 6
           }
         }
-        //console.log('parent:',ship)
-        newSystemObjects.push(new Sprite(
-          'ship', {
-            id: ship.id,
-            name: ship.name,
-            orbiting: parent,
-            distance: distance,
-            location: ship.location,
-            owner: ship.owner,
-            ownerName: shipOwnerName,
-            isMine: Boolean(String(ship.owner) == String(playerAccount))
-          }
-        ))
-        newSpriteIds.ships.push(newSystemObjects.length - 1)
+        const shipSprite = add('ship', {
+          id: ship.id,
+          name: ship.name,
+          orbiting: parent,
+          distance: distance,
+          location: ship.location,
+          owner: ship.owner,
+          ownerName: shipOwnerName,
+          isMine: Boolean(String(ship.owner) == String(playerAccount))
+        })
+        ids.ships.push(shipSprite.key)
       }
 
-      //integrate old sprites if same sector
+      //carry over animation state when reloading the same system
       if (this.starId == blockData.id) {
-        for (const newSystemObject of newSystemObjects) {
-          for (const oldSystemObject of this.systemObjects) {
-            if (newSystemObject.matchesSprite(oldSystemObject)) {
-              newSystemObject.consumeSpriteData(oldSystemObject)
-            }
-          }
+        for (const sprite of Object.values(objects)) {
+          const previous = this.systemObjects[sprite.key]
+          if (previous) sprite.consumeSpriteData(previous)
         }
       }
       if (this.gameTime > 0) {
-        for (const systemObjectId in newSystemObjects) {
-          newSystemObjects[systemObjectId].updateTelemetry(this.gameTime)
+        for (const sprite of Object.values(objects)) {
+          sprite.updateTelemetry(this.gameTime)
         }
       }
       this.starId = blockData.id
       this.starName = blockData.starName
       this.neighbors = blockData.neighbors
       this.players = blockData.avatarNames
-      this.systemObjects = newSystemObjects
-      this.spriteIds = newSpriteIds
+      this.systemObjects = objects
+      this.spriteIds = ids
+
+      // A selection that no longer exists (e.g. a ship that left) is cleared rather than left dangling.
+      const ui = useUIStore()
+      if (ui.selectedSprite != null && !objects[ui.selectedSprite]) {
+        ui.selectNone()
+      }
 
       this.isLoading = false
       this.mapDataLoaded = true
@@ -408,11 +391,12 @@ export const useStarMapStore = defineStore('StarMap', {
     /** Advances every orbit to the current game time. Sprites are raw objects, so this triggers no re-renders by itself. */
     updateAllTelemtry () {
       const objects = this.systemObjects
-      for (const sprite of objects) {
+      const sprites = Object.values(objects)
+      for (const sprite of sprites) {
         sprite.updateTelemetry(this.gameTime)
       }
       // One level of nesting: moons, stations and ships orbit a planet; planets orbit the star at the origin.
-      for (const sprite of objects) {
+      for (const sprite of sprites) {
         const parent = sprite.orbiting ? objects[sprite.orbiting] : null
         sprite.position.x = sprite.telemetry.translatex + (parent ? parent.telemetry.translatex : 0)
         sprite.position.y = sprite.telemetry.translatey + (parent ? parent.telemetry.translatey : 0)

@@ -103,7 +103,7 @@ export default {
   },
   props: {
     planetId: {
-      type: Number,
+      type: String,
       default: null
     },
   },

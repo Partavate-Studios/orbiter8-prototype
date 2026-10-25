@@ -15,5 +15,8 @@ export default defineConfig({
   },
   server: {
     port: 8080
+  },
+  test: {
+    environment: 'happy-dom'
   }
 })

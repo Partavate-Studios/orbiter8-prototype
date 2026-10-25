@@ -60,7 +60,7 @@ export default {
   },
   props: {
     shipId: {
-      type: Number,
+      type: String,
       default: null
     },
   },

@@ -59,11 +59,11 @@
         </g>
       </g>
       <g
-        v-if="(systemObjects.length && getOpacityFromSprite(systemObjects[0]))"
-        :transform="'rotate(' + getDegreesFromSprite(systemObjects[0]) + ')'"
+        v-if="(systemObjects.star && getOpacityFromSprite(systemObjects.star))"
+        :transform="'rotate(' + getDegreesFromSprite(systemObjects.star) + ')'"
         stroke-width="4"
         stroke-color="#ffffff"
-        :stroke-opacity="getOpacityFromSprite(systemObjects[0])"
+        :stroke-opacity="getOpacityFromSprite(systemObjects.star)"
       >
         <compass-arrow></compass-arrow>
           <text
@@ -72,10 +72,10 @@
             text-anchor="middle"
             alignment-baseline="central"></text>
         <a
-          v-on:click.prevent="o8audio.playEffect('click'); selectSprite(0)"
+          v-on:click.prevent="o8audio.playEffect('click'); selectSprite('star')"
           v-on:mouseover="setSpriteToDisplay(0)"
           v-on:mouseout="setSpriteToDisplay(null)"
-          cursor="pointer"><compass-sun :opacity="getOpacityFromSprite(systemObjects[0])"></compass-sun></a>
+          cursor="pointer"><compass-sun :opacity="getOpacityFromSprite(systemObjects.star)"></compass-sun></a>
       </g>
 
       <compass></compass>

@@ -1,5 +1,21 @@
 import { markRaw } from 'vue'
 
+/** The star at the center of every system has a fixed key. */
+export const STAR_KEY = 'star'
+
+/**
+ * A stable identity for a sprite, built from contract ids, so it stays the same across reloads even
+ * when other objects appear or disappear (a new station no longer shifts every sprite after it).
+ * Moons are numbered per planet, so their key includes the planet.
+ */
+export function spriteKey (type, { id, planet }) {
+  switch (type) {
+    case 'star': return STAR_KEY
+    case 'moon': return `moon:${planet}:${id}`
+    default: return `${type}:${id}`
+  }
+}
+
 export default class Sprite {
   constructor (type, autoFillValues) {
     //set defaults
@@ -32,6 +48,7 @@ export default class Sprite {
 
     //type specific transforms
     this.type = type
+    this.key = spriteKey(type, autoFillValues)
     switch (type) {
       case 'star':
         this.selectorSize = this.size * 40,
@@ -108,13 +125,7 @@ export default class Sprite {
   }
 
   matchesSprite(sprite) {
-    if ((this.type == sprite.type) && (this.objectId == sprite.objectId)) {
-      if ((this.type == 'moon') && (this.planet != sprite.planet)) {
-        return false
-      }
-      return true
-    }
-    return false
+    return this.key === sprite.key
   }
 
   //todo: this can be created in the constructor and just passed as a var

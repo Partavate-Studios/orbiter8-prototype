@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import Rubber from '@/libs/rubber'
+import { STAR_KEY } from '@/libs/sprite'
 
 export const useUIStore = defineStore('UI', {
   state: () => ({
@@ -373,7 +374,7 @@ export const useUIStore = defineStore('UI', {
       this.minerva.terminal.history = []
     },
     jumpMenuOn () {
-      this.selectedSprite = 0;
+      this.selectedSprite = STAR_KEY
       this.viewport.scaleRubber = new Rubber(
         this.viewport.scale,
         2,
