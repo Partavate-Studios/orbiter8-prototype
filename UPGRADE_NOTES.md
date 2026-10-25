@@ -449,6 +449,49 @@ Phase 6:
    - The UI store (about 420 lines) mixes camera motion, menus, selection and the jump sequence. A camera store or composable, separate from menu state, would make each easier to follow.
    - The stores' generic `setProp({ key, value })` setters could become plain assignments.
 
+## Architecture: data flow
+
+### Now (after Phase 6)
+
+```
+wallet ─ chain/wallet.js ─┐
+                          chain/contracts.js   every contract call; bigint → number; gameChangedBetween()
+                               ▲
+stores/chain.js      polls blocks every 2 s; if a block touched the game contracts, triggers all three loads:
+  ├─ stores/gamestate.js  loadGameState(): player, ship, credits   loadEvents(): chat, trades, launches
+  │                       actions: moveToSystem, tradeAtPort, claimPlanet… (some also drive UI state, e.g. the jump animation)
+  └─ stores/starmap.js    loadStarMap(): reads system → planets → moons → stations → ships one call at a time,
+                          decodes contract tuples by position (planetBase[2][0] …) → importStarMapBlockData()
+                          → Sprite objects (game data + drawing data mixed) keyed 'planet:3' etc.
+stores/ui.js         camera, selection, menus, jump sequence
+components           read the stores directly; sprites re-render whenever the per-frame gameTime ticks
+game/                pure math used by the stores and components
+```
+
+Problems this leaves:
+- Contract data shapes leak into the stores.
+- Sync is spread over three stores and tied to Vue.
+- Actions reach into UI state.
+- A contract redesign would touch the stores and the components.
+
+### Target (Phase 6b)
+
+```
+src/sdk/                  no Vue; could become its own package later
+  contracts adapter       the only code that knows ABIs and tuple layouts → named objects (planet.size, …)
+  sync                    block watching (events once the contracts emit them) → one plain state object + subscribe()
+  actions                 moveTo, trade, claimPlanet, buildStation, rename…; send the tx and report status, no UI
+  rules                   today's src/game/
+stores                    thin: subscribe to sdk state, expose it to components, hold UI-only state
+renderer                  builds sprites (drawing data only) from sdk state; the frame loop moves them directly
+```
+
+Why (Koda and Claude, 2026-10-25):
+- A contract redesign then changes only the adapter. Old and new deployments can run behind one interface during a migration.
+- Sync becomes testable without a browser.
+- Koda's rebuild can plug into the same layer.
+- Doing it now, while the contracts are fixed, means the refactor can be checked against unchanged behavior.
+
 ## Plan
 
 Each phase goes on `modernize` with its own commits. Bug fixes get separate commits.
@@ -459,7 +502,22 @@ Each phase goes on `modernize` with its own commits. Bug fixes get separate comm
 4. **Phase 4, known bugs.** One commit each.
 5. **Phase 5, rendering.** Shared rAF loop. HUD and menus to HTML. Canvas backdrop, starfield and jump streaks. Wrapper pan/zoom with crisp commit on settle. Sprite split only if the profile says so.
 6. **Phase 6, architecture and cleanup.** `chain/`, `game/`, stores, components. Naming, constants, dead code, Prettier in its own commit, Vitest for `game/` and `chain/` conversions.
-7. **Phase 7, verification.** Same harness: `docs/after/`, the trace comparison, paint flashing, and a manual checklist for Koda.
+7. **Phase 6b, data layer** (agreed with Koda 2026-10-25; see "Architecture: data flow" below). Behavior-preserving: the contracts don't change, and the captures and tests must match.
+   1. Move sync and actions into `src/sdk/`, with no Vue imports. Decode contract tuples into named game objects there.
+   2. Split game data from drawing data in `Sprite`.
+   3. Make the stores thin subscribers. At the same time:
+      - remove `setProp`;
+      - declare props (with types) and emits;
+      - turn template-called methods into computed values;
+      - switch ESLint to `flat/recommended`.
+   4. Add tests for the sync logic, against fixture chain data.
+   5. Frame loop: the loop writes sprite transforms directly, and Vue renders only on rarer changes (selection, labels, menus). This removes the `void this.gameTime` per-frame re-render. Measure it with the same trace.
+8. **Phase 7, verification.** Same harness: `docs/after/`, the trace comparison, paint flashing, a manual checklist for Koda, and the code review.
+
+Not on this branch:
+- Options API → `<script setup>`. Koda's rebuild should start in that style instead.
+- Publishing the SDK as a package. Wait until the contracts settle and someone wants to build on them.
+- Any contract change.
 
 Tests (Koda's call was "only where they catch important things"): Vitest unit tests for `game/` math and `chain/` bigint conversions, plus the Puppeteer harness as a smoke test of the full flow against the local chain. No coverage chasing.
 
