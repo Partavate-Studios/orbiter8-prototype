@@ -224,6 +224,8 @@ export const useStarMapStore = defineStore('StarMap', {
         }
       } catch (error) {
         console.log('oops:' + error.message, error)
+        // Let the next block retry; otherwise one failed RPC call froze the map for the session.
+        this.isLoading = false
       }
       console.log('new block loaded')
     },
