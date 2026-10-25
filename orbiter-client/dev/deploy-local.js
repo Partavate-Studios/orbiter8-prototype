@@ -10,12 +10,12 @@ const outFile = new URL('./local-deployment.json', import.meta.url)
 
 const provider = new JsonRpcProvider(RPC)
 const owner = await provider.getSigner(0)
-const load = name => JSON.parse(fs.readFileSync(new URL(name + '.json', artifactDir), 'utf8'))
+const load = (name) => JSON.parse(fs.readFileSync(new URL(name + '.json', artifactDir), 'utf8'))
 const deployed = {}
 const instances = {}
 
 // Truffle placeholders are "__LibraryName___…" padded to 40 characters.
-function link (bytecode) {
+function link(bytecode) {
   return bytecode.replace(/__([A-Za-z0-9_$]+?)_+/g, (match, name) => {
     if (match.length !== 40) return match
     if (!deployed[name]) throw new Error('missing library ' + name)
@@ -23,7 +23,7 @@ function link (bytecode) {
   })
 }
 
-async function deploy (name) {
+async function deploy(name) {
   const artifact = load(name)
   const contract = await new ContractFactory(artifact.abi, link(artifact.bytecode), owner).deploy()
   await contract.waitForDeployment()
@@ -32,14 +32,19 @@ async function deploy (name) {
   return contract
 }
 
-const send = async tx => (await tx).wait()
+const send = async (tx) => (await tx).wait()
 
 await deploy('AvatarLibrary')
 await deploy('AvatarControls')
-for (const lib of ['ShipLibrary', 'PlanetLibrary', 'MoonLibrary', 'PresetLibrary', 'StarSystemLibrary']) await deploy(lib)
+for (const lib of ['ShipLibrary', 'PlanetLibrary', 'MoonLibrary', 'PresetLibrary', 'StarSystemLibrary'])
+  await deploy(lib)
 const game = await deploy('Orbiter8')
 
-for (const [token, setter] of [['ShipTokens', 'setShipTokenizer'], ['PlanetTokens', 'setPlanetTokenizer'], ['Credits', 'setCreditTokenizer']]) {
+for (const [token, setter] of [
+  ['ShipTokens', 'setShipTokenizer'],
+  ['PlanetTokens', 'setPlanetTokenizer'],
+  ['Credits', 'setCreditTokenizer']
+]) {
   const tokenContract = await deploy(token)
   await send(tokenContract.transferOwnership(deployed.Orbiter8))
   await send(game[setter](deployed[token]))

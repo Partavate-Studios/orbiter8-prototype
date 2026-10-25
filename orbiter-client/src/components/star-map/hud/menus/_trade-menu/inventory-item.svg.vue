@@ -8,7 +8,6 @@
 </template>
 
 <script>
-
 export default {
   name: 'InventoryItem',
   props: {
@@ -25,16 +24,15 @@ export default {
       default: 0
     }
   },
-  computed: {  
-    buyingOrSelling () {
+  computed: {
+    buyingOrSelling() {
       if (this.inventory > 0) {
         return 'Selling'
       } else if (this.inventory < 0) {
         return 'Buying'
       }
-      return '' 
-    },
-
+      return ''
+    }
   }
 }
 </script>

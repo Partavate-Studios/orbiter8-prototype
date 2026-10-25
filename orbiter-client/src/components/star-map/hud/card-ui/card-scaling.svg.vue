@@ -16,21 +16,15 @@ export default {
   props: {
     sprite: {
       type: Object,
-      default () {
-        return {
-        }
+      default() {
+        return {}
       }
-    },
+    }
   },
   computed: {
-    ...mapState(useUIStore, [
-      'viewport',
-      'cameraMotionRemaining'
-    ]),
-    ...mapState(useStarMapStore, [
-      'gameTime'
-    ]),
-    cardUiTranslate () {
+    ...mapState(useUIStore, ['viewport', 'cameraMotionRemaining']),
+    ...mapState(useStarMapStore, ['gameTime']),
+    cardUiTranslate() {
       // Sprites are raw objects updated in place each frame; reading gameTime makes this re-evaluate per frame.
       void this.gameTime
       // position is the sprite's absolute place in the system (orbit + its parent's orbit).
@@ -38,12 +32,12 @@ export default {
       let y = this.sprite.position.y + this.viewport.y
       x = Math.round((x / this.viewport.scale) * 1000) / 1000
       y = Math.round((y / this.viewport.scale) * 1000) / 1000
-      return  x + ' ' + y
+      return x + ' ' + y
     },
-    cardUiScale () {
+    cardUiScale() {
       let cap = Math.min(1, Math.max(0, 1.5 - this.viewport.scale))
       let scale = 1 - ((this.cameraMotionRemaining - 5) * this.viewport.scale) / 15
-      return Math.max(Math.min((scale), cap), 0)
+      return Math.max(Math.min(scale, cap), 0)
     }
   }
 }

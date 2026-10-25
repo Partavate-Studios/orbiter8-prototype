@@ -10,7 +10,8 @@
       height="10"
       stroke-width="3"
       stroke="#5c1aae88"
-      fill="#00000044" />
+      fill="#00000044"
+    />
 
     <g v-if="reverse">
       <rect
@@ -24,19 +25,21 @@
         height="8"
         stroke-width="1"
         fill="url(#cardGradient)"
-        stroke="#ffffff44" />
+        stroke="#ffffff44"
+      />
       <rect
-        ry=3
-        rx=3
+        ry="3"
+        rx="3"
         :x="sliderRight - placement"
         y="-2"
         :width="placement"
         height="4"
         stroke="#ffffff"
         stroke-width="0"
-        fill="#ffffff88" />
+        fill="#ffffff88"
+      />
 
-      <g :transform="'translate(' + (sliderRight - placement) + ' 0) scale(1.5) rotate(180)'"><slider-arrow   /></g>
+      <g :transform="'translate(' + (sliderRight - placement) + ' 0) scale(1.5) rotate(180)'"><slider-arrow /></g>
     </g>
     <g v-else>
       <rect
@@ -50,58 +53,61 @@
         height="8"
         stroke-width="1"
         fill="url(#cardGradient)"
-        stroke="#ffffff44" />
+        stroke="#ffffff44"
+      />
       <rect
-        ry=3
-        rx=3
+        ry="3"
+        rx="3"
         :x="sliderLeft"
         y="-2"
         :width="placement"
         height="4"
         stroke="#ffffff"
         stroke-width="0"
-        fill="#ffffff88" />
-      <g :transform="'translate(' + (sliderLeft + placement) + ' 0) scale(1.5)'"><slider-arrow   /></g>
+        fill="#ffffff88"
+      />
+      <g :transform="'translate(' + (sliderLeft + placement) + ' 0) scale(1.5)'"><slider-arrow /></g>
     </g>
 
-
-
     <g :opacity="opacityLeft">
-      <g :transform="'translate(' + ((sliderWidth / -2) - 16) + ' 0) rotate(180)'" opacity="0.5"><slider-arrow   /></g>
+      <g :transform="'translate(' + (sliderWidth / -2 - 16) + ' 0) rotate(180)'" opacity="0.5"><slider-arrow /></g>
       <rect
         ref="leftButton"
         :x="sliderWidth / -2 - 23"
         y="-8"
-        ry=3
-        rx=3
+        ry="3"
+        rx="3"
         width="16"
         height="16"
         stroke="#ffffff44"
         stroke-width="0.5"
         fill="#ffffff22"
         class="can-click"
-        v-on:click="decrementSlider" />
+        v-on:click="decrementSlider"
+      />
     </g>
 
     <g :opacity="opacityRight">
-      <g :transform="'translate(' + ((sliderWidth / 2) + 16) + ' 0 )'" opacity="0.5"><slider-arrow  /></g>
+      <g :transform="'translate(' + (sliderWidth / 2 + 16) + ' 0 )'" opacity="0.5"><slider-arrow /></g>
       <rect
         ref="rightButton"
         :x="sliderWidth / 2 + 7"
         y="-8"
-        ry=3
-        rx=3
+        ry="3"
+        rx="3"
         width="16"
         height="16"
         stroke="#ffffff44"
         stroke-width="0.5"
         fill="#ffffff22"
         class="can-click"
-        v-on:click="incrementSlider" />
+        v-on:click="incrementSlider"
+      />
     </g>
 
     <g>
-      <rect ref="touchArea"
+      <rect
+        ref="touchArea"
         :x="touchAreaLeftEdge"
         :y="-7 - padding"
         :width="highlight + padding * 2"
@@ -115,13 +121,12 @@
         @mouseleave="handleMouseLeave"
         class="can-drag"
         :class="{ 'is-dragging': mouseHold }"
-          />
+      />
     </g>
   </g>
 </template>
 
 <script>
-
 import _ from 'lodash'
 import SliderArrow from '../widgets/arrow.svg'
 
@@ -156,7 +161,7 @@ export default {
       default: false
     }
   },
-  data () {
+  data() {
     return {
       mouseHold: false,
       padding: 5
@@ -164,42 +169,42 @@ export default {
   },
 
   methods: {
-    handleMouseDown (event) {
+    handleMouseDown(event) {
       this.mouseHold = true
       this.updateSlider(event)
     },
-    handleMouseUp () {
+    handleMouseUp() {
       this.mouseHold = false
     },
     handleMouseMove: _.throttle(function (event) {
-      if(this.mouseHold) {
+      if (this.mouseHold) {
         this.updateSlider(event)
       }
     }, 2),
-    handleMouseLeave (event) {
+    handleMouseLeave(event) {
       if (this.mouseHold) {
         this.updateSlider(event)
         this.mouseHold = false
       }
     },
-    updateSlider (event) {
+    updateSlider(event) {
       let boxLeft = parseInt(this.$refs.sliderLine.getBoundingClientRect().left)
       let boxRight = parseInt(this.$refs.sliderLine.getBoundingClientRect().right)
       let width = boxRight - boxLeft
-      let percentage = Math.max(0, Math.min(1, (event.pageX - boxLeft)  / width))
+      let percentage = Math.max(0, Math.min(1, (event.pageX - boxLeft) / width))
       if (this.reverse) {
         percentage = 1 - percentage
       }
-      this.$emit('update:percentage', percentage);
+      this.$emit('update:percentage', percentage)
     },
-    decrementSlider () {
+    decrementSlider() {
       if (this.reverse) {
         this.$emit('update:increment')
       } else {
         this.$emit('update:decrement')
       }
     },
-    incrementSlider () {
+    incrementSlider() {
       if (this.reverse) {
         this.$emit('update:decrement')
       } else {
@@ -208,35 +213,39 @@ export default {
     }
   },
   computed: {
-    sliderLeft () {
+    sliderLeft() {
       return this.sliderWidth / -2
     },
-    sliderRight () {
+    sliderRight() {
       return this.sliderWidth / 2
     },
-    placement () {
+    placement() {
       return (this.currentValue / this.highestValue) * this.sliderWidth
     },
-    highlight () {
-      return parseInt(this.highlightValue / this.highestValue * this.sliderWidth)
+    highlight() {
+      return parseInt((this.highlightValue / this.highestValue) * this.sliderWidth)
     },
-    touchAreaLeftEdge () {
+    touchAreaLeftEdge() {
       if (this.reverse) {
-        return (this.sliderRight - this.highlight - this.padding)
+        return this.sliderRight - this.highlight - this.padding
       }
-      return (this.sliderLeft - this.padding)
+      return this.sliderLeft - this.padding
     },
-    opacityLeft () {
-      if ((!this.reverse && (this.currentValue > this.lowestValue)) ||
-          (this.reverse && (this.currentValue < this.highlightValue))){
-          return 1
+    opacityLeft() {
+      if (
+        (!this.reverse && this.currentValue > this.lowestValue) ||
+        (this.reverse && this.currentValue < this.highlightValue)
+      ) {
+        return 1
       }
       return 0.25
     },
-    opacityRight () {
-      if ((this.reverse && (this.currentValue > this.lowestValue)) ||
-          (!this.reverse && (this.currentValue < this.highlightValue))){
-          return 1
+    opacityRight() {
+      if (
+        (this.reverse && this.currentValue > this.lowestValue) ||
+        (!this.reverse && this.currentValue < this.highlightValue)
+      ) {
+        return 1
       }
       return 0.25
     }
@@ -245,14 +254,14 @@ export default {
 </script>
 
 <style lang="scss">
-  .is-dragging {
-    cursor: grabbing;
-  }
-  .can-click:hover {
-    cursor: pointer;
-    fill: #ffffff44;
-  }
-  .can-drag:hover {
-    cursor: grabbing;
-  }
+.is-dragging {
+  cursor: grabbing;
+}
+.can-click:hover {
+  cursor: pointer;
+  fill: #ffffff44;
+}
+.can-drag:hover {
+  cursor: grabbing;
+}
 </style>

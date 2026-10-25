@@ -10,7 +10,8 @@
     stroke-dasharray="0.5 1"
     :stroke-width="selected ? 0.05 : 0.01"
     :opacity="opacity"
-    fill="none" />
+    fill="none"
+  />
 </template>
 
 <script>
@@ -30,10 +31,8 @@ export default {
     selected: { type: Boolean, default: false }
   },
   computed: {
-    ...mapState(useUIStore, [
-      'drawnPixelsPerUnit'
-    ]),
-    opacity () {
+    ...mapState(useUIStore, ['drawnPixelsPerUnit']),
+    opacity() {
       const radius = this.r * this.drawnPixelsPerUnit
       const fade = (radius - HIDDEN_BELOW) / (SHOWN_ABOVE - HIDDEN_BELOW)
       return Math.min(1, Math.max(0, fade))

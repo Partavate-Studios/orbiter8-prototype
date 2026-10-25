@@ -12,7 +12,7 @@ import { networkFor } from './networks'
 let contracts = null
 
 /** Binds the contracts for the connected network. Returns false if the game isn't deployed there. */
-export async function initContracts () {
+export async function initContracts() {
   const { signer, chainId, provider } = getSession()
   const network = networkFor(chainId)
   if (!network) return false
@@ -31,7 +31,7 @@ export async function initContracts () {
 }
 
 /** Addresses of the bound game and avatar contracts. */
-export function contractAddresses () {
+export function contractAddresses() {
   return { game: contracts.game.target, avatars: contracts.avatars.target }
 }
 
@@ -40,7 +40,7 @@ export function contractAddresses () {
  * @param {'game' | 'avatars'} contract
  * @param {string} method  the ABI function name
  */
-async function read (contract, method, ...args) {
+async function read(contract, method, ...args) {
   return toPlain(await contracts[contract][method](...args))
 }
 
@@ -49,7 +49,7 @@ async function read (contract, method, ...args) {
  * @param {'game' | 'avatars'} contract
  * @param {string} method  the ABI function name
  */
-async function write (contract, method, ...args) {
+async function write(contract, method, ...args) {
   const tx = await contracts[contract][method](...args)
   return tx.wait()
 }
@@ -61,7 +61,7 @@ async function write (contract, method, ...args) {
  * @param {number | 'latest'} fromBlock
  * @param {number | 'latest'} [toBlock]
  */
-async function events (contract, eventName, fromBlock, toBlock = 'latest') {
+async function events(contract, eventName, fromBlock, toBlock = 'latest') {
   // Clamp: "the last N blocks" goes negative on a young chain (e.g. the local dev chain).
   const from = typeof fromBlock === 'number' ? Math.max(0, fromBlock) : fromBlock
   const logs = await contracts[contract].queryFilter(eventName, from, toBlock)
@@ -69,7 +69,7 @@ async function events (contract, eventName, fromBlock, toBlock = 'latest') {
 }
 
 /** The chain's latest block number. */
-export async function getBlockNumber () {
+export async function getBlockNumber() {
   return getSession().provider.getBlockNumber()
 }
 
@@ -84,20 +84,20 @@ const MAX_BLOCKS_TO_SCAN = 30
  * @param {number} toBlock
  * @param {string[]} addresses  contracts that matter (game, avatars, tokens)
  */
-export async function gameChangedBetween (fromBlock, toBlock, addresses) {
+export async function gameChangedBetween(fromBlock, toBlock, addresses) {
   if (toBlock - fromBlock > MAX_BLOCKS_TO_SCAN) return true
-  const watched = new Set(addresses.filter(Boolean).map(address => address.toLowerCase()))
+  const watched = new Set(addresses.filter(Boolean).map((address) => address.toLowerCase()))
   const { provider } = getSession()
   for (let number = fromBlock + 1; number <= toBlock; number++) {
     const block = await provider.getBlock(number, true)
     if (!block) return true
-    if (block.prefetchedTransactions.some(tx => tx.to && watched.has(tx.to.toLowerCase()))) return true
+    if (block.prefetchedTransactions.some((tx) => tx.to && watched.has(tx.to.toLowerCase()))) return true
   }
   return false
 }
 
 /** Native currency balance of the connected account, as a decimal string (e.g. "0.25"). */
-export async function getNativeBalance () {
+export async function getNativeBalance() {
   const { provider, account } = getSession()
   return formatEther(await provider.getBalance(account))
 }
@@ -105,9 +105,9 @@ export async function getNativeBalance () {
 /** The AvatarControls contract: player names. Method names match the ABI. */
 export const avatars = {
   getEvents: () => events('avatars', 'New', 'latest'),
-  createAvatar: name => write('avatars', 'createAvatar', name),
+  createAvatar: (name) => write('avatars', 'createAvatar', name),
   getMyAvatarName: () => read('avatars', 'getMyAvatarName'),
-  getAvatarNameByAddress: owner => read('avatars', 'getAvatarNameByAddress', owner),
+  getAvatarNameByAddress: (owner) => read('avatars', 'getAvatarNameByAddress', owner),
   haveAvatar: () => read('avatars', 'haveAvatar'),
   getAvatarCount: () => read('avatars', 'getAvatarCount')
 }
@@ -121,25 +121,26 @@ export const galaxy = {
   myBalance: () => read('game', 'myBalance'),
   getSystemCount: () => read('game', 'getSystemCount'),
   getPlayerSystemData: () => read('game', 'getPlayerSystemData'),
-  getSystemName: systemId => read('game', 'getSystemName', systemId),
-  getPlanet: planetId => read('game', 'getPlanet', planetId),
+  getSystemName: (systemId) => read('game', 'getSystemName', systemId),
+  getPlanet: (planetId) => read('game', 'getPlanet', planetId),
   getMoon: (planetId, moonId) => read('game', 'getMoon', planetId, moonId),
-  getStation: planetId => read('game', 'getStation', planetId),
-  getShip: shipId => read('game', 'getShip', shipId),
+  getStation: (planetId) => read('game', 'getStation', planetId),
+  getShip: (shipId) => read('game', 'getShip', shipId),
   getMyShipLocation: () => read('game', 'getMyShipLocation'),
   getMyShipId: () => read('game', 'getMyShipId'),
   getMyShip: () => read('game', 'getMyShip'),
 
-  sendChat: message => write('game', 'sendChat', message),
-  moveToSystem: systemId => write('game', 'moveToSystem', systemId),
-  renameStar: name => write('game', 'renameStar', name),
+  sendChat: (message) => write('game', 'sendChat', message),
+  moveToSystem: (systemId) => write('game', 'moveToSystem', systemId),
+  renameStar: (name) => write('game', 'renameStar', name),
   claimPlanet: (planetId, name) => write('game', 'claimPlanet', planetId, name),
   buildStation: (planetId, name) => write('game', 'buildStation', planetId, name),
   renamePlanet: (planetId, name) => write('game', 'renamePlanet', planetId, name),
   renameMoon: (planetId, moonId, name) => write('game', 'renameMoon', planetId, moonId, name),
   renameStation: (planetId, name) => write('game', 'renameStation', planetId, name),
-  tradeAtPort: (planetId, equipment, fuel, organics) => write('game', 'tradeAtPort', planetId, equipment, fuel, organics),
-  launchShip: name => write('game', 'launchShip', name),
-  renameMyShip: name => write('game', 'renameMyShip', name),
+  tradeAtPort: (planetId, equipment, fuel, organics) =>
+    write('game', 'tradeAtPort', planetId, equipment, fuel, organics),
+  launchShip: (name) => write('game', 'launchShip', name),
+  renameMyShip: (name) => write('game', 'renameMyShip', name),
   addHoldsToShip: (planetId, holds) => write('game', 'addHoldsToShip', planetId, holds)
 }

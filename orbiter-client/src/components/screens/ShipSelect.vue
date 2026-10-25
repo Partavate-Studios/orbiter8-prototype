@@ -1,19 +1,12 @@
 <template>
-    <div>
-        <div id="logocontainer">
-            <orbiter8logo width="80%"></orbiter8logo>
-        <gameinfo />
-        </div>
-
-        <a class="button" href="#/play">
-          Take Command of {{ gameState.avatar.ship.name }} &#10143;
-        </a>
-
-
-
-
+  <div>
+    <div id="logocontainer">
+      <orbiter8logo width="80%"></orbiter8logo>
+      <gameinfo />
     </div>
 
+    <a class="button" href="#/play"> Take Command of {{ gameState.avatar.ship.name }} &#10143; </a>
+  </div>
 </template>
 
 <script>
@@ -29,9 +22,7 @@ export default {
   },
   name: 'ShipSelect',
   computed: {
-    ...mapState(useGameStateStore, [
-      'gameState'
-    ]),
+    ...mapState(useGameStateStore, ['gameState'])
   }
 }
 </script>
@@ -46,15 +37,14 @@ export default {
   margin-bottom: 2vh;
 }
 #ship {
-    width: 32px;
-    height: 32px;
-    margin: 1px;
-    float: left;
-    perspective: 500px;
+  width: 32px;
+  height: 32px;
+  margin: 1px;
+  float: left;
+  perspective: 500px;
 }
 a.button {
   vertical-align: middle;
   line-height: 2.5em;
-
 }
 </style>

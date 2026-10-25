@@ -3,10 +3,10 @@ import { bearingDegrees, scopeOpacity } from './bearing'
 import { planetTypeName } from './planet-types'
 
 // The original scope function, except for its bug: (0, negative y) returned 1 instead of 180.
-function originalBearing (x, y) {
+function originalBearing(x, y) {
   if (x === 0) return y > 0 ? 0 : 180
-  if (x > 0) return 270 + Math.atan(y / x) * 180 / Math.PI
-  return 90 + Math.atan(y / x) * 180 / Math.PI
+  if (x > 0) return 270 + (Math.atan(y / x) * 180) / Math.PI
+  return 90 + (Math.atan(y / x) * 180) / Math.PI
 }
 
 describe('bearingDegrees', () => {

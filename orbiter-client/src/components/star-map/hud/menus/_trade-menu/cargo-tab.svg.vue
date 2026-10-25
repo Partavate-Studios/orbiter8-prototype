@@ -3,7 +3,9 @@
     <g>
       <rect x="-4" y="-4" width="48" height="25" rx="4" ry="4" fill="#310F5Ddd" stroke="#ffffff88" stroke-width="0.5" />
       <g>
-        <text v-if="before != after" font-size="0.4em" x="00" y="5" text-anchor="start" fill="#ffffff">{{ before }} &gt;</text>
+        <text v-if="before != after" font-size="0.4em" x="00" y="5" text-anchor="start" fill="#ffffff"
+          >{{ before }} &gt;</text
+        >
         <text font-size="0.7em" x="40" y="5" text-anchor="end" fill="#ffffff">{{ after }}</text>
         <text font-size="0.5em" x="20" y="14" text-anchor="middle" fill="#ffffff88">{{ label }}</text>
       </g>
@@ -12,7 +14,6 @@
 </template>
 
 <script>
-
 export default {
   name: 'TransferTab',
   props: {

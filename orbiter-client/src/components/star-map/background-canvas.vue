@@ -31,15 +31,15 @@ const JUMP_STAR_SPEED = 25
 
 // How far the camera's zoom (viewport.scale) changes the size of each background layer.
 // These are the original formulas from map.vue.
-const backdropScaleFor = scale => (Math.sqrt(10 / scale) + 10) / 4
-const starfieldScaleFor = scale => (Math.sqrt(12 / scale) + 10) / 4
+const backdropScaleFor = (scale) => (Math.sqrt(10 / scale) + 10) / 4
+const starfieldScaleFor = (scale) => (Math.sqrt(12 / scale) + 10) / 4
 // The starfield drifts at 1/20 of the camera's movement (parallax).
 const PARALLAX = 20
 
 // Parsed once; the art never changes.
-const backdropPaths = backdropShapes.map(shape => shape.type === 'path' ? new Path2D(shape.d) : null)
+const backdropPaths = backdropShapes.map((shape) => (shape.type === 'path' ? new Path2D(shape.d) : null))
 
-function randomStars (count) {
+function randomStars(count) {
   const stars = []
   for (let i = 0; i < count; i++) {
     stars.push({
@@ -55,21 +55,13 @@ function randomStars (count) {
 export default {
   name: 'BackgroundCanvas',
   computed: {
-    ...mapState(useUIStore, [
-      'viewport',
-      'screenSize',
-      'jumpAnimationState'
-    ]),
-    ...mapState(useConfigStore, [
-      'graphicsQuality'
-    ]),
-    ...mapState(useStarMapStore, [
-      'gameTime'
-    ]),
-    showStars () {
+    ...mapState(useUIStore, ['viewport', 'screenSize', 'jumpAnimationState']),
+    ...mapState(useConfigStore, ['graphicsQuality']),
+    ...mapState(useStarMapStore, ['gameTime']),
+    showStars() {
       return this.graphicsQuality > 1
     },
-    oversizedBox () {
+    oversizedBox() {
       return {
         left: -MARGIN + 'px',
         top: -MARGIN + 'px',
@@ -80,17 +72,17 @@ export default {
   },
   watch: {
     screenSize: {
-      handler () {
+      handler() {
         this.$nextTick(this.resize)
       },
       deep: true
     },
-    graphicsQuality () {
+    graphicsQuality() {
       this.generateStars()
       this.drawStars()
     }
   },
-  mounted () {
+  mounted() {
     this.generateStars()
     this.jumpStreaks = Array.from({ length: JUMP_STREAK_COUNT }, () => ({
       x: Math.random() * 5000,
@@ -101,19 +93,19 @@ export default {
     this.resize()
     this.stopFrames = onFrame(this.onFrame, FRAME_ORDER.render)
   },
-  unmounted () {
+  unmounted() {
     this.stopFrames()
   },
   methods: {
-    generateStars () {
+    generateStars() {
       // Frozen: positions never change, so Vue doesn't need to track them.
       this.stars = Object.freeze(randomStars(this.graphicsQuality > 2 ? 3200 : 800))
     },
     /** Pixels per map unit: the map fits 1200 units (viewport.resolution) into the screenSize height. */
-    unit () {
+    unit() {
       return this.screenSize.height / this.viewport.resolution
     },
-    resize () {
+    resize() {
       const dpr = window.devicePixelRatio || 1
       for (const ref of ['backdrop', 'stars']) {
         const canvas = this.$refs[ref]
@@ -126,15 +118,22 @@ export default {
       this.drawStars()
     },
     /** A 2D context with its origin at the screen center, in CSS pixels. */
-    centeredContext (canvas, margin) {
+    centeredContext(canvas, margin) {
       const dpr = window.devicePixelRatio || 1
       const ctx = canvas.getContext('2d')
       ctx.setTransform(1, 0, 0, 1, 0, 0)
       ctx.clearRect(0, 0, canvas.width, canvas.height)
-      ctx.setTransform(dpr, 0, 0, dpr, dpr * (this.screenSize.width / 2 + margin), dpr * (this.screenSize.height / 2 + margin))
+      ctx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        dpr * (this.screenSize.width / 2 + margin),
+        dpr * (this.screenSize.height / 2 + margin)
+      )
       return ctx
     },
-    drawBackdrop () {
+    drawBackdrop() {
       const scale = backdropScaleFor(this.viewport.scale)
       this.drawnBackdrop = { scale }
       const ctx = this.centeredContext(this.$refs.backdrop, MARGIN)
@@ -155,7 +154,7 @@ export default {
         }
       })
     },
-    drawStars () {
+    drawStars() {
       if (!this.showStars) return
       const scale = starfieldScaleFor(this.viewport.scale)
       const x = this.viewport.x / PARALLAX
@@ -166,7 +165,10 @@ export default {
       ctx.translate(unit * x, unit * y)
       ctx.scale(unit * scale, unit * scale)
       // Bright cores first, then the soft glare over them, as the SVG version drew them.
-      for (const [color, radius] of [[STAR_COLOR, 0.15], [STAR_GLARE_COLOR, 0.75]]) {
+      for (const [color, radius] of [
+        [STAR_COLOR, 0.15],
+        [STAR_GLARE_COLOR, 0.75]
+      ]) {
         ctx.fillStyle = color
         ctx.beginPath()
         for (const star of this.stars) {
@@ -176,7 +178,7 @@ export default {
         ctx.fill()
       }
     },
-    onFrame () {
+    onFrame() {
       if (this.jumpAnimationState) {
         this.drawJump()
         return
@@ -206,19 +208,27 @@ export default {
       if (this.starsLayer.update(starsDelta)) this.drawStars()
     },
     /** The jump animation's star streaks, redrawn every frame while jumping. */
-    drawJump () {
+    drawJump() {
       const canvas = this.$refs.jump
       const ctx = this.centeredContext(canvas, 0)
       ctx.fillStyle = JUMP_BACKGROUND
-      ctx.fillRect(-this.screenSize.width / 2, -this.screenSize.height / 2, this.screenSize.width, this.screenSize.height)
+      ctx.fillRect(
+        -this.screenSize.width / 2,
+        -this.screenSize.height / 2,
+        this.screenSize.width,
+        this.screenSize.height
+      )
 
       // Map units inside the HUD's 1.25x group, as the SVG version used.
       const unit = this.unit() * 1.25
       ctx.scale(unit, unit)
-      const leftSlide = (JUMP_STAR_SPEED * this.gameTime / 10) % 10000
-      const rightSlide = (JUMP_STAR_SPEED * this.gameTime / 10 + 5000) % 10000
+      const leftSlide = ((JUMP_STAR_SPEED * this.gameTime) / 10) % 10000
+      const rightSlide = ((JUMP_STAR_SPEED * this.gameTime) / 10 + 5000) % 10000
       const streak = this.streakSprite(unit)
-      for (const [groupScale, mirror] of [[1, false], [0.65, true]]) {
+      for (const [groupScale, mirror] of [
+        [1, false],
+        [0.65, true]
+      ]) {
         for (const slide of [leftSlide, rightSlide]) {
           ctx.save()
           ctx.scale(groupScale, groupScale)
@@ -231,7 +241,7 @@ export default {
       }
     },
     /** One star streak (500 x 8 units, fading out to the right), pre-rendered for the current size. */
-    streakSprite (unit) {
+    streakSprite(unit) {
       const dpr = window.devicePixelRatio || 1
       const key = unit * dpr
       if (this.streak?.key === key) return this.streak.canvas
@@ -257,14 +267,14 @@ export default {
 </script>
 
 <style scoped>
-  .background-canvas {
-    position: absolute;
-  }
-  .jump-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-  }
+.background-canvas {
+  position: absolute;
+}
+.jump-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
 </style>

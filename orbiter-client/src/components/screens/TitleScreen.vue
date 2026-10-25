@@ -1,18 +1,18 @@
 <template>
   <div class="hello layer">
-      <div class="box">
-        <div v-if="haveAvatar">
-          <div v-if="haveShip">
-            <ship-select />
-          </div>
-          <div v-else>
-            <ship-create />
-          </div>
+    <div class="box">
+      <div v-if="haveAvatar">
+        <div v-if="haveShip">
+          <ship-select />
         </div>
         <div v-else>
-           <avatar-create />
+          <ship-create />
         </div>
       </div>
+      <div v-else>
+        <avatar-create />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -32,21 +32,16 @@ export default {
   },
   name: 'TitleScreen',
   computed: {
-    ...mapState(useGameStateStore, [
-      'haveAvatar',
-      'haveShip'
-    ]),
+    ...mapState(useGameStateStore, ['haveAvatar', 'haveShip'])
   },
   methods: {
-    ...mapActions(useChainStore, [
-      'startBlockPolling'
-    ])
+    ...mapActions(useChainStore, ['startBlockPolling'])
   },
-  created () {
+  created() {
     this.startBlockPolling()
     this.o8audio.playMusic('title')
   },
-  beforeUnmount () {
+  beforeUnmount() {
     this.o8audio.stopMusic()
   }
 }

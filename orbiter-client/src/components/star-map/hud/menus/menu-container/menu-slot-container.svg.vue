@@ -1,15 +1,25 @@
 <template>
   <g>
-    <g :transform="'translate(' + (1 - slotWidth / 2) + ' 0)'" @mouseover="hover = true" @mouseleave="hover = false" >
+    <g :transform="'translate(' + (1 - slotWidth / 2) + ' 0)'" @mouseover="hover = true" @mouseleave="hover = false">
       <defs>
         <clipPath :id="clipId">
-          <rect x="5" y="5" :width="slotWidth -10" rx="10" ry="10" height="60" />
+          <rect x="5" y="5" :width="slotWidth - 10" rx="10" ry="10" height="60" />
         </clipPath>
       </defs>
 
-      <rect x="5" y="5" :width="slotWidth - 10" rx="10" ry="10" height="60" :fill="slotBackground" stroke-width="1" :stroke="slotBorder" />
+      <rect
+        x="5"
+        y="5"
+        :width="slotWidth - 10"
+        rx="10"
+        ry="10"
+        height="60"
+        :fill="slotBackground"
+        stroke-width="1"
+        :stroke="slotBorder"
+      />
 
-      <g  :clip-path="'url(#' + clipId + ')'">
+      <g :clip-path="'url(#' + clipId + ')'">
         <slot />
       </g>
     </g>
@@ -23,7 +33,7 @@ import uniqueId from 'lodash/uniqueId'
 import { useUIStore } from '@/stores/ui'
 export default {
   name: 'MenuSlotContainer',
-  data () {
+  data() {
     return {
       hover: false,
       // Unique per instance: the clip's shape depends on this component's size.
@@ -36,9 +46,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(useUIStore, [
-      'viewport'
-    ]),
+    ...mapState(useUIStore, ['viewport']),
     slotBackground() {
       if (this.hover) {
         return '#00000066'
@@ -48,14 +56,13 @@ export default {
     slotBorder() {
       if (this.highlight) {
         return '#ffffff88'
-      }
-      else if (this.hover) {
+      } else if (this.hover) {
         return '#ffffff66'
       }
       return '#ffffff22'
     },
     slotWidth() {
-      return Math.min(this.viewport.width - 100, 700);
+      return Math.min(this.viewport.width - 100, 700)
     }
   }
 }

@@ -2,7 +2,7 @@
   <g>
     <menu-container>
       <g v-for="(id, index) in spriteIds.planets" v-bind:key="'planet' + id">
-        <g :transform="'translate(0 ' + (-400 + (70 * index)) +  ')' " >
+        <g :transform="'translate(0 ' + (-400 + 70 * index) + ')'">
           <a v-on:click.prevent="selectAndClose(id)" cursor="pointer">
             <planet-slot :planetId="id" />
           </a>
@@ -13,7 +13,6 @@
 </template>
 
 <script>
-
 import { useStarMapStore } from '@/stores/starmap'
 import { mapActions, mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
@@ -27,10 +26,7 @@ export default {
     PlanetSlot
   },
   methods: {
-    ...mapActions(useUIStore, [
-      'selectSprite',
-      'closeMenu'
-    ]),
+    ...mapActions(useUIStore, ['selectSprite', 'closeMenu']),
     selectAndClose(spriteId) {
       this.o8audio.playEffect('click')
       this.selectSprite(spriteId)
@@ -38,9 +34,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(useStarMapStore, [
-      'spriteIds'
-    ])
+    ...mapState(useStarMapStore, ['spriteIds'])
   }
 }
 </script>

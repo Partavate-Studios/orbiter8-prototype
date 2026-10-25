@@ -9,7 +9,7 @@ export const FRAME_ORDER = { game: 0, render: 1 }
 let subscribers = []
 let frameId = null
 
-function tick (now) {
+function tick(now) {
   frameId = requestAnimationFrame(tick)
   for (const { callback } of subscribers) callback(now)
 }
@@ -20,12 +20,12 @@ function tick (now) {
  * @param {number} [order] lower runs first within a frame (see FRAME_ORDER)
  * @returns {() => void}
  */
-export function onFrame (callback, order = FRAME_ORDER.game) {
+export function onFrame(callback, order = FRAME_ORDER.game) {
   const subscriber = { callback, order }
   subscribers = [...subscribers, subscriber].sort((a, b) => a.order - b.order)
   if (frameId === null) frameId = requestAnimationFrame(tick)
   return () => {
-    subscribers = subscribers.filter(entry => entry !== subscriber)
+    subscribers = subscribers.filter((entry) => entry !== subscriber)
     if (subscribers.length === 0 && frameId !== null) {
       cancelAnimationFrame(frameId)
       frameId = null

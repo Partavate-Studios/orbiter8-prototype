@@ -1,17 +1,11 @@
 <template>
   <g @mouseover="hover = true" @mouseleave="hover = false">
-      <g  clip-path="url(#icon-clip)">
-        <circle
-          cx="0"
-          cy="0"
-          r="30"
-          stroke="#ffffff22"
-          stroke-width="1"
-          :fill="fillColor" />
-        <g :transform="'scale(' + scaleSize + ')'">
-          <slot />
-        </g>
+    <g clip-path="url(#icon-clip)">
+      <circle cx="0" cy="0" r="30" stroke="#ffffff22" stroke-width="1" :fill="fillColor" />
+      <g :transform="'scale(' + scaleSize + ')'">
+        <slot />
       </g>
+    </g>
   </g>
 </template>
 
@@ -21,7 +15,7 @@ import { useConfigStore } from '@/stores/config'
 
 export default {
   name: 'IconContainer',
-  data () {
+  data() {
     return {
       hover: false
     }
@@ -33,22 +27,19 @@ export default {
     }
   },
   computed: {
-    ...mapState(useConfigStore, [
-      'graphicsQuality'
-    ]),
-    fillColor: function() {
+    ...mapState(useConfigStore, ['graphicsQuality']),
+    fillColor: function () {
       if (this.hover || this.selected) {
-        return "#140828"
+        return '#140828'
       } else {
         if (this.graphicsQuality > 2) {
-          return "#00000044"
+          return '#00000044'
         } else {
-          return "#230b41"
-
+          return '#230b41'
         }
       }
     },
-    scaleSize: function() {
+    scaleSize: function () {
       if (this.hover || this.selected) {
         return 1.2
       } else {

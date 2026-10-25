@@ -14,7 +14,7 @@ export class CompositedLayer {
    *   a mouse-wheel step is 1.25x, so 2 lets a zoom-in gesture run a few steps between redraws)
    * @param {() => number} [options.minScale]  re-render once the CSS scale shrinks below this
    */
-  constructor (element, { margin, maxScale = 2, minScale = () => 0.5 }) {
+  constructor(element, { margin, maxScale = 2, minScale = () => 0.5 }) {
     this.element = element
     this.margin = margin
     this.maxScale = maxScale
@@ -31,7 +31,7 @@ export class CompositedLayer {
    * @returns {boolean} true when the caller should re-render the layer for the current camera now
    *   (the transform has already been cleared, so render in this same frame)
    */
-  update (delta) {
+  update(delta) {
     // Whole device pixels keep translated content sharp.
     const dpr = window.devicePixelRatio || 1
     const x = Math.round(delta.x * dpr) / dpr
@@ -66,7 +66,7 @@ export class CompositedLayer {
     return false
   }
 
-  clear () {
+  clear() {
     this.last = null
     this.stableFrames = 0
     if (!this.active) return

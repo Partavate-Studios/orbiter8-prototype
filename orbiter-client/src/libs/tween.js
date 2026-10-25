@@ -5,7 +5,7 @@ import { markRaw } from 'vue'
  * default, or linear. The camera and the menus use these for their animated moves.
  */
 export default class Tween {
-  constructor (origin, target, duration) {
+  constructor(origin, target, duration) {
     this.origin = origin
     this.target = target
     this.delta = target - origin
@@ -16,7 +16,7 @@ export default class Tween {
     return markRaw(this)
   }
 
-  valueAt (time) {
+  valueAt(time) {
     if (this.method == 'ease') {
       return this.easedValueAt(time)
     } else {
@@ -24,47 +24,46 @@ export default class Tween {
     }
   }
 
-  useLinear () {
+  useLinear() {
     this.method = 'linear'
   }
 
-  useEase () {
+  useEase() {
     this.method = 'ease'
   }
 
-  easedValueAt (time) {
+  easedValueAt(time) {
     if (this.isDone(time)) {
       return this.target
     }
-    let timeDelta = (time - this.start)
-    let timeRatio = (timeDelta / this.duration)
+    let timeDelta = time - this.start
+    let timeRatio = timeDelta / this.duration
 
     timeRatio = 1 - Math.pow(1 - timeRatio, 5)
 
-    let progress = (timeRatio * this.delta)
-    return (this.origin + progress)
+    let progress = timeRatio * this.delta
+    return this.origin + progress
   }
 
-  linearValueAt (time) {
+  linearValueAt(time) {
     if (this.isDone(time)) {
       return this.target
     }
-    let timeDelta = (time - this.start)
-    let timeRatio = (timeDelta / this.duration)
-    let progress = (timeRatio * this.delta)
-    return (this.origin + progress)
+    let timeDelta = time - this.start
+    let timeRatio = timeDelta / this.duration
+    let progress = timeRatio * this.delta
+    return this.origin + progress
   }
 
-  isDone (time) {
-    if ((time - this.start) >= this.duration) {
-      return true;
+  isDone(time) {
+    if (time - this.start >= this.duration) {
+      return true
     }
-    return false;
+    return false
   }
 
-  updateTarget (target) {
+  updateTarget(target) {
     this.target = target
     this.delta = target - this.origin
   }
 }
-

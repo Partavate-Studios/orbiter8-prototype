@@ -1,8 +1,13 @@
 <template>
   <div class="gameinfo">
     <p>
-      <span class="light"><b>{{ gameState.avatarCount }}</b> pilots</span> have discovered
-      <span class="light"><b>{{ gameState.starSystemCount }}</b> star systems systems</span>
+      <span class="light"
+        ><b>{{ gameState.avatarCount }}</b> pilots</span
+      >
+      have discovered
+      <span class="light"
+        ><b>{{ gameState.starSystemCount }}</b> star systems systems</span
+      >
     </p>
     <p>Welcome back, {{ gameState.avatar.name }}. Your ship is ready for your command.</p>
   </div>
@@ -16,27 +21,24 @@ import { useGameStateStore } from '@/stores/gamestate'
 export default {
   name: 'GameInfo',
   computed: {
-    ...mapState(useGameStateStore, [
-      'gameState'
-    ])
+    ...mapState(useGameStateStore, ['gameState'])
   },
-  mounted () {
-  },
+  mounted() {},
   watch: {
-    avatarCount () {},
-    systemCount () {}
+    avatarCount() {},
+    systemCount() {}
   }
 }
 </script>
 
 <style scoped lang="scss">
-  div.gameinfo {
-    margin: 0;
-    padding: 0.25em;
-    font-size: 1.2em;
-    border-radius: 1em;
-  }
-  .light {
-    color: #ffffff;
-  }
+div.gameinfo {
+  margin: 0;
+  padding: 0.25em;
+  font-size: 1.2em;
+  border-radius: 1em;
+}
+.light {
+  color: #ffffff;
+}
 </style>

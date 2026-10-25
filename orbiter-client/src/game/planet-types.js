@@ -18,6 +18,6 @@ export const PLANET_TYPE_NAMES = [
  * @param {number} planetClass
  * @returns {string | number}
  */
-export function planetTypeName (planetClass) {
+export function planetTypeName(planetClass) {
   return PLANET_TYPE_NAMES[planetClass] ?? planetClass
 }

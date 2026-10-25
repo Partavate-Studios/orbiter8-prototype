@@ -4,7 +4,7 @@ const RPC = import.meta.env.VITE_LOCAL_RPC || 'http://127.0.0.1:8545'
 const accountIndex = Number(new URLSearchParams(location.search).get('account') ?? 1)
 
 let nextId = 0
-async function rpc (method, params = []) {
+async function rpc(method, params = []) {
   const res = await fetch(RPC, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
@@ -23,7 +23,7 @@ async function rpc (method, params = []) {
 const accounts = await rpc('eth_accounts')
 const account = accounts[accountIndex]
 
-async function request ({ method, params }) {
+async function request({ method, params }) {
   switch (method) {
     case 'eth_requestAccounts':
     case 'eth_accounts':
@@ -41,15 +41,21 @@ const provider = {
   isDevWallet: true,
   selectedAddress: account,
   request,
-  on () {},
-  removeListener () {}
+  on() {},
+  removeListener() {}
 }
 
 window.ethereum = provider
 
 // EIP-6963 discovery, so wallet pickers list it too.
-const info = { uuid: 'b1d1e7a0-0000-4000-8000-0000000d3a11', name: 'Orbiter 8 Dev Wallet', icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg"/%3E', rdns: 'com.orbiter8.devwallet' }
-const announce = () => window.dispatchEvent(new CustomEvent('eip6963:announceProvider', { detail: Object.freeze({ info, provider }) }))
+const info = {
+  uuid: 'b1d1e7a0-0000-4000-8000-0000000d3a11',
+  name: 'Orbiter 8 Dev Wallet',
+  icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg"/%3E',
+  rdns: 'com.orbiter8.devwallet'
+}
+const announce = () =>
+  window.dispatchEvent(new CustomEvent('eip6963:announceProvider', { detail: Object.freeze({ info, provider }) }))
 window.addEventListener('eip6963:requestProvider', announce)
 announce()
 

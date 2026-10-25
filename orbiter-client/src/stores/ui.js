@@ -34,8 +34,8 @@ export const useUIStore = defineStore('UI', {
         x: 0,
         y: 0,
         xFromCenter: 0,
-        yFromCenter: 0,
-      },
+        yFromCenter: 0
+      }
     },
     hud: {
       spriteToDisplay: null,
@@ -52,7 +52,6 @@ export const useUIStore = defineStore('UI', {
         shipyardMenu: false,
         chatMenu: false,
         spriteMenus: []
-
       }
     },
     selectedSprite: null,
@@ -70,20 +69,20 @@ export const useUIStore = defineStore('UI', {
   }),
   getters: {
     /** Screen pixels per map-group unit, before the camera's zoom. */
-    groupPixels: state => state.baseScale * state.screenSize.height / state.viewport.resolution,
+    groupPixels: (state) => (state.baseScale * state.screenSize.height) / state.viewport.resolution,
     /** Screen pixels per world unit as the world layer is drawn (changes only on a redraw). */
-    drawnPixelsPerUnit () {
+    drawnPixelsPerUnit() {
       return this.groupPixels / this.drawnView.scale
     },
     /** Screen pixels per world unit for the live camera. */
-    livePixelsPerUnit () {
+    livePixelsPerUnit() {
       return this.groupPixels / this.viewport.scale
     },
     /**
      * Whether a circle at world (x, y) with the given world radius is on screen (with a margin),
      * for the live camera. The world sits 100 group units above the screen center.
      */
-    isOnScreen () {
+    isOnScreen() {
       const pixels = this.livePixelsPerUnit
       const halfWidth = this.screenSize.width / 2 + OFFSCREEN_MARGIN_PX
       const halfHeight = this.screenSize.height / 2 + OFFSCREEN_MARGIN_PX
@@ -95,12 +94,12 @@ export const useUIStore = defineStore('UI', {
         return dx - r < halfWidth && dy - r < halfHeight
       }
     },
-    minervaHistory: state => state.minerva.terminal.history,
-    spriteToDisplay: state => state.hud.spriteToDisplay,
-    jumpAnimationState: state => state.hud.jumpAnimationState,
-    selected: state => state.selectedSprite,
-    menuState: state => state.hud.menuState,
-    isMenuOn: state => {
+    minervaHistory: (state) => state.minerva.terminal.history,
+    spriteToDisplay: (state) => state.hud.spriteToDisplay,
+    jumpAnimationState: (state) => state.hud.jumpAnimationState,
+    selected: (state) => state.selectedSprite,
+    menuState: (state) => state.hud.menuState,
+    isMenuOn: (state) => {
       if (state.hud.menuState.jumpMenu) {
         return true
       }
@@ -121,85 +120,73 @@ export const useUIStore = defineStore('UI', {
       }
       return false
     },
-    cameraMotionRemaining: state => {
+    cameraMotionRemaining: (state) => {
       let x = 0
       let y = 0
       let z = 0
-      if ((state.viewport.xTween != null)) {
+      if (state.viewport.xTween != null) {
         x = Math.abs(state.viewport.x - state.viewport.xTween.target)
       }
-      if ((state.viewport.yTween != null)) {
+      if (state.viewport.yTween != null) {
         y = Math.abs(state.viewport.y - state.viewport.yTween.target)
       }
-      if ((state.viewport.scaleTween != null)) {
+      if (state.viewport.scaleTween != null) {
         z = Math.abs(state.viewport.scale - state.viewport.scaleTween.target)
       }
-      return x+y+z
+      return x + y + z
     },
-    viewRatio: state => {
+    viewRatio: (state) => {
       return state.viewport.width / state.viewport.height
     },
-    leftMostX: state => {
-      return 0 - (state.viewport.width / 2)
+    leftMostX: (state) => {
+      return 0 - state.viewport.width / 2
     },
-    rightMostX: state => {
+    rightMostX: (state) => {
       return state.viewport.width / 2
     },
-    topMostY: state => {
-      return 0 - (state.viewport.height / 2)
+    topMostY: (state) => {
+      return 0 - state.viewport.height / 2
     },
-    bottomMostY: state => {
+    bottomMostY: (state) => {
       return state.viewport.height / 2
     }
   },
   actions: {
-    calculateViewableArea ({x, y}) {
+    calculateViewableArea({ x, y }) {
       let ratio = this.viewport.resolution / y
       this.viewport.width = parseInt(x * ratio * 0.8)
-      this.viewport.height = parseInt(this.viewport.resolution * .8)
+      this.viewport.height = parseInt(this.viewport.resolution * 0.8)
       this.screenSize.width = parseInt(x)
       this.screenSize.height = parseInt(y)
     },
-    toggleScope () {
+    toggleScope() {
       this.showScope = !this.showScope
     },
-    toggleMinerva () {
+    toggleMinerva() {
       this.showMinerva = !this.showMinerva
     },
-    toggleShowLabels () {
+    toggleShowLabels() {
       this.showLabels = !this.showLabels
     },
-    drawWorldAt (view) {
+    drawWorldAt(view) {
       this.drawnView = { x: view.x, y: view.y, scale: view.scale }
     },
-    selectSprite (spriteId) {
+    selectSprite(spriteId) {
       if (this.selectedSprite != spriteId) {
         // close old menu
-        this.selectedSprite = spriteId;
+        this.selectedSprite = spriteId
 
-        this.viewport.xTween = new Tween(
-          this.viewport.x,
-          this.viewport.x,
-          CAMERA.SELECT_TWEEN_MS
-        )
-        this.viewport.yTween = new Tween(
-          this.viewport.y,
-          this.viewport.y,
-          CAMERA.SELECT_TWEEN_MS
-        )
-        this.viewport.scaleTween = new Tween(
-          this.viewport.scale,
-          this.viewport.scale,
-          CAMERA.SELECT_TWEEN_MS
-        )
+        this.viewport.xTween = new Tween(this.viewport.x, this.viewport.x, CAMERA.SELECT_TWEEN_MS)
+        this.viewport.yTween = new Tween(this.viewport.y, this.viewport.y, CAMERA.SELECT_TWEEN_MS)
+        this.viewport.scaleTween = new Tween(this.viewport.scale, this.viewport.scale, CAMERA.SELECT_TWEEN_MS)
       }
     },
-    selectNone () {
+    selectNone() {
       this.selectedSprite = null
       this.viewport.xTween = null
       this.viewport.yTween = null
     },
-    setSelectedTelemetry (telemetry) {
+    setSelectedTelemetry(telemetry) {
       let newX = telemetry.translatex * -1
       let newY = telemetry.translatey * -1
       if (this.viewport.xTween != null) {
@@ -213,12 +200,11 @@ export const useUIStore = defineStore('UI', {
         this.viewport.y = newY
       }
       // a zoom tween that has nothing left to do takes on the selected sprite's zoom
-      if (this.viewport.scaleTween != null &&
-          this.viewport.scaleTween.delta == 0 ) {
+      if (this.viewport.scaleTween != null && this.viewport.scaleTween.delta == 0) {
         this.viewport.scaleTween.updateTarget(telemetry.scale)
       }
     },
-    viewportToTime (time) {
+    viewportToTime(time) {
       if (this.viewport.scaleTween != null) {
         this.viewport.scale = this.viewport.scaleTween.valueAt(time)
         if (this.viewport.scaleTween.isDone(time)) {
@@ -264,38 +250,38 @@ export const useUIStore = defineStore('UI', {
         this.viewport.y = CAMERA.MAX_PAN * Math.sign(this.viewport.y)
       }
     },
-    moveUp (distance) {
+    moveUp(distance) {
       this.viewport.yTween = new Tween(
         this.viewport.y,
-        this.viewport.y + (distance * this.viewport.scale),
+        this.viewport.y + distance * this.viewport.scale,
         CAMERA.NUDGE_TWEEN_MS
       )
     },
-    moveDown (distance) {
+    moveDown(distance) {
       this.viewport.yTween = new Tween(
         this.viewport.y,
-        this.viewport.y - (distance * this.viewport.scale),
+        this.viewport.y - distance * this.viewport.scale,
         CAMERA.NUDGE_TWEEN_MS
       )
     },
-    moveLeft (distance) {
+    moveLeft(distance) {
       this.viewport.xTween = new Tween(
         this.viewport.x,
-        this.viewport.x + (distance * this.viewport.scale),
+        this.viewport.x + distance * this.viewport.scale,
         CAMERA.NUDGE_TWEEN_MS
       )
     },
-    moveRight (distance) {
+    moveRight(distance) {
       this.viewport.xTween = new Tween(
         this.viewport.x,
-        this.viewport.x - (distance * this.viewport.scale),
+        this.viewport.x - distance * this.viewport.scale,
         CAMERA.NUDGE_TWEEN_MS
       )
     },
-    scaleBy (scaler) {
-      this.viewport.scale =  Math.min(CAMERA.MAX_SCALE, scaler * this.viewport.scale)
+    scaleBy(scaler) {
+      this.viewport.scale = Math.min(CAMERA.MAX_SCALE, scaler * this.viewport.scale)
     },
-    scaleAnimateBy ({scaler, time}) {
+    scaleAnimateBy({ scaler, time }) {
       if (this.viewport.scaleTween == null) {
         this.viewport.scaleTween = new Tween(
           this.viewport.scale,
@@ -304,56 +290,38 @@ export const useUIStore = defineStore('UI', {
         )
         this.viewport.scaleTween.useLinear()
       } else {
-        this.viewport.scaleTween.updateTarget(
-          Math.min(CAMERA.MAX_SCALE, scaler * this.viewport.scaleTween.target)
-        )
+        this.viewport.scaleTween.updateTarget(Math.min(CAMERA.MAX_SCALE, scaler * this.viewport.scaleTween.target))
       }
     },
-    scaleTo (scale) {
+    scaleTo(scale) {
       this.viewport.scale = scale
     },
-    scaleAnimateTo ({scale, time}) {
-      this.viewport.scaleTween = new Tween(
-        this.viewport.scale,
-        scale,
-        time
-      )
+    scaleAnimateTo({ scale, time }) {
+      this.viewport.scaleTween = new Tween(this.viewport.scale, scale, time)
     },
-    rotateTo (rotation) {
-      this.viewport.rotationTween = new Tween(
-        this.viewport.rotation,
-        rotation,
-        CAMERA.NUDGE_TWEEN_MS
-      )
+    rotateTo(rotation) {
+      this.viewport.rotationTween = new Tween(this.viewport.rotation, rotation, CAMERA.NUDGE_TWEEN_MS)
     },
-    viewTo (location) {
+    viewTo(location) {
       this.viewport.x = location.x
       this.viewport.y = location.y
     },
-    viewAnimateMoveTo (location) {
+    viewAnimateMoveTo(location) {
       if (this.viewport.xTween == null) {
-        this.viewport.xTween = new Tween(
-          this.viewport.x,
-          location.x,
-          location.time
-        )
+        this.viewport.xTween = new Tween(this.viewport.x, location.x, location.time)
         this.viewport.xTween.useLinear()
       } else {
         this.viewport.xTween.updateTarget(location.x)
       }
 
       if (this.viewport.yTween == null) {
-        this.viewport.yTween = new Tween(
-          this.viewport.y,
-          location.y,
-          location.time
-        )
+        this.viewport.yTween = new Tween(this.viewport.y, location.y, location.time)
         this.viewport.yTween.useLinear()
       } else {
         this.viewport.yTween.updateTarget(location.y)
       }
     },
-    mousewheelAnimateTo ({scale, time}) {
+    mousewheelAnimateTo({ scale, time }) {
       if (this.viewport.scaleTween == null) {
         this.viewport.scaleTween = new Tween(
           this.viewport.scale,
@@ -362,34 +330,28 @@ export const useUIStore = defineStore('UI', {
         )
         this.viewport.scaleTween.useLinear()
       } else {
-        this.viewport.scaleTween.updateTarget(
-          Math.min(CAMERA.MAX_SCALE, scale * this.viewport.scaleTween.target),
-        )
+        this.viewport.scaleTween.updateTarget(Math.min(CAMERA.MAX_SCALE, scale * this.viewport.scaleTween.target))
       }
     },
 
-    setMouse (payload) {
+    setMouse(payload) {
       this.screenSize.mouse.x = payload.x
       this.screenSize.mouse.y = payload.y
       this.screenSize.mouse.xPercent = payload.x / this.screenSize.width
       this.screenSize.mouse.yPercent = payload.y / this.screenSize.height
     },
-    addToHistory (payload) {
+    addToHistory(payload) {
       this.minerva.terminal.history.push(payload)
     },
-    clearHistory () {
+    clearHistory() {
       this.minerva.terminal.history = []
     },
-    jumpMenuOn () {
+    jumpMenuOn() {
       this.selectedSprite = STAR_KEY
-      this.viewport.scaleTween = new Tween(
-        this.viewport.scale,
-        CAMERA.JUMP_MENU_SCALE,
-        CAMERA.JUMP_MENU_TWEEN_MS
-      )
+      this.viewport.scaleTween = new Tween(this.viewport.scale, CAMERA.JUMP_MENU_SCALE, CAMERA.JUMP_MENU_TWEEN_MS)
       this.hud.menuState.jumpMenu = true
     },
-    jumpMenuOff () {
+    jumpMenuOff() {
       if (this.hud.menuState.jumpMenu) {
         this.viewport.scaleTween = new Tween(
           this.viewport.scale,
@@ -399,14 +361,14 @@ export const useUIStore = defineStore('UI', {
         this.hud.menuState.jumpMenu = false
       }
     },
-    openMenu (menu) {
+    openMenu(menu) {
       this.hud.menuState.shipsMenu = false
       this.hud.menuState.planetsMenu = false
       this.hud.menuState.settingsMenu = false
       this.hud.menuState.tradeMenu = false
       this.hud.menuState.shipyardMenu = false
       this.hud.menuState.chatMenu = false
-      switch(menu) {
+      switch (menu) {
         case 'planets':
           this.hud.menuState.planetsMenu = true
           break
@@ -431,7 +393,7 @@ export const useUIStore = defineStore('UI', {
           break
       }
     },
-    closeMenu () {
+    closeMenu() {
       this.hud.menuState.shipsMenu = false
       this.hud.menuState.planetsMenu = false
       this.hud.menuState.settingsMenu = false
@@ -442,20 +404,20 @@ export const useUIStore = defineStore('UI', {
     },
     // unevaluated
 
-    setSpriteToDisplay (payload) {
+    setSpriteToDisplay(payload) {
       this.hud.spriteToDisplay = payload
     },
-    jumpAnimationOff () {
+    jumpAnimationOff() {
       if (this.hud.jumpAnimationState) {
         this.hud.jumpAnimationState = false
       }
     },
-    jumpAnimationOn () {
+    jumpAnimationOn() {
       this.selectedSprite = null
       this.viewport.x = 0
       this.viewport.y = 0
       this.viewport.scale = CAMERA.JUMP_ANIMATION_SCALE
       this.hud.jumpAnimationState = true
-    },
+    }
   }
 })

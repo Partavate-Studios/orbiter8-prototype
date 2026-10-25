@@ -27,41 +27,43 @@ export const useStarMapStore = defineStore('StarMap', {
     timeDelta: 0
   }),
   getters: {
-    currentStarSystemId: state => state.starId,
-    currentStarSystemName: state => state.starName,
-    mapLoadedPercentage: state => Math.min(100, Math.max(0, state.loadProgress)),
+    currentStarSystemId: (state) => state.starId,
+    currentStarSystemName: (state) => state.starName,
+    mapLoadedPercentage: (state) => Math.min(100, Math.max(0, state.loadProgress)),
     /** Key of the player's ship in this system (falls back to the star, as before). */
-    myShipId: state => {
-      const ship = Object.values(state.systemObjects).find(sprite => sprite.type === 'ship' && sprite.isMine)
+    myShipId: (state) => {
+      const ship = Object.values(state.systemObjects).find((sprite) => sprite.type === 'ship' && sprite.isMine)
       return ship ? ship.key : STAR_KEY
     },
     /** Key of the space station orbiting a planet (by planet key), or null. */
-    portForPlanet: state => (planetKey) => {
-      const station = Object.values(state.systemObjects).find(sprite => sprite.type === 'station' && sprite.orbiting === planetKey)
+    portForPlanet: (state) => (planetKey) => {
+      const station = Object.values(state.systemObjects).find(
+        (sprite) => sprite.type === 'station' && sprite.orbiting === planetKey
+      )
       return station ? station.key : null
     },
-    moonsForPlanet: state => (planetKey) => {
+    moonsForPlanet: (state) => (planetKey) => {
       return Object.values(state.systemObjects)
-        .filter(sprite => sprite.type === 'moon' && sprite.orbiting === planetKey)
-        .map(sprite => sprite.key)
+        .filter((sprite) => sprite.type === 'moon' && sprite.orbiting === planetKey)
+        .map((sprite) => sprite.key)
     }
   },
   actions: {
     /** Loads the star map for the player's current star system */
-    async loadStarMap () {
+    async loadStarMap() {
       if (this.isLoading) {
         return
       }
       console.debug('Loading star map...')
 
-      this.setProp({key: 'isLoading', value: true})
-      this.setProp({key: 'loadProgress', value: 1})
+      this.setProp({ key: 'isLoading', value: true })
+      this.setProp({ key: 'loadProgress', value: 1 })
 
       try {
         /** Grab the current system and go from there */
         const systemBase = await galaxy.getPlayerSystemData()
 
-        this.setProp({key: 'loadProgress', value: 2})
+        this.setProp({ key: 'loadProgress', value: 2 })
 
         let isNewSystem = false
         if (parseInt(systemBase[0]) != this.starId) {
@@ -83,13 +85,18 @@ export const useStarMapStore = defineStore('StarMap', {
           avatarNames: {}
         }
 
-        this.setProp({key: 'loadProgress', value: 4})
+        this.setProp({ key: 'loadProgress', value: 4 })
 
         //Add pioneer to first visit sun to name index
-        if ((starMapBlockData.discoveredBy > 0) && (typeof starMapBlockData.avatarNames[starMapBlockData.discoveredBy] === 'undefined')) {
-          starMapBlockData.avatarNames[starMapBlockData.discoveredBy] = await avatars.getAvatarNameByAddress(starMapBlockData.discoveredBy)
+        if (
+          starMapBlockData.discoveredBy > 0 &&
+          typeof starMapBlockData.avatarNames[starMapBlockData.discoveredBy] === 'undefined'
+        ) {
+          starMapBlockData.avatarNames[starMapBlockData.discoveredBy] = await avatars.getAvatarNameByAddress(
+            starMapBlockData.discoveredBy
+          )
         }
-        this.setProp({key: 'loadProgress', value: 5})
+        this.setProp({ key: 'loadProgress', value: 5 })
 
         /** Add the names for neighboring stars */
         for (const [key, neighborId] of Object.entries(starMapBlockData.neighborIds)) {
@@ -98,15 +105,15 @@ export const useStarMapStore = defineStore('StarMap', {
             id: neighborId,
             name: starName
           }
-          this.setProp({key: 'loadProgress', value: Math.min(24, 6 + key)})
+          this.setProp({ key: 'loadProgress', value: Math.min(24, 6 + key) })
         }
 
-        this.setProp({key: 'loadProgress', value: 25})
+        this.setProp({ key: 'loadProgress', value: 25 })
 
         /** Add each ship known to be in this system */
         for (const key of Object.keys(starMapBlockData.shipIds)) {
           let shipId = starMapBlockData.shipIds[key]
-          if ((shipId > 0) && !(shipId in starMapBlockData.ships)) {
+          if (shipId > 0 && !(shipId in starMapBlockData.ships)) {
             const shipBase = await galaxy.getShip(String(shipId))
             const ship = {
               id: shipId,
@@ -120,15 +127,14 @@ export const useStarMapStore = defineStore('StarMap', {
             }
 
             //Add ship owner name to name index
-            if ((ship.owner !== '0x0') && (typeof starMapBlockData.avatarNames[ship.owner] === 'undefined')) {
+            if (ship.owner !== '0x0' && typeof starMapBlockData.avatarNames[ship.owner] === 'undefined') {
               starMapBlockData.avatarNames[ship.owner] = await avatars.getAvatarNameByAddress(ship.owner)
             }
           }
-          this.setProp({key: 'loadProgress', value: Math.min(75, 25 + key)})
+          this.setProp({ key: 'loadProgress', value: Math.min(75, 25 + key) })
         }
 
-
-        this.setProp({key: 'loadProgress', value: 80})
+        this.setProp({ key: 'loadProgress', value: 80 })
 
         /** Add details for all the planets */
         // A planet's index in planetIds is its orbital position (the contract's systems[id].planets[orbitalId]).
@@ -150,7 +156,7 @@ export const useStarMapStore = defineStore('StarMap', {
               station: {}
             }
             //Add planet owner name to name index (need to deal with unknwon)
-            if ((planet.owner > 0) && (typeof starMapBlockData.avatarNames[planet.owner] === 'undefined')) {
+            if (planet.owner > 0 && typeof starMapBlockData.avatarNames[planet.owner] === 'undefined') {
               starMapBlockData.avatarNames[planet.owner] = await avatars.getAvatarNameByAddress(planet.owner)
             }
 
@@ -173,7 +179,7 @@ export const useStarMapStore = defineStore('StarMap', {
                   holds: parseInt(station[3][3])
                 },
                 orbitSpeed: 1,
-                owner: planet.owner,
+                owner: planet.owner
               }
             }
 
@@ -192,18 +198,21 @@ export const useStarMapStore = defineStore('StarMap', {
                 }
                 planet.moons[moonkey] = moon
                 //Add moon owner name to name index
-                if ((moon.owner > 0) && (typeof starMapBlockData.avatarNames[moon.owner] === 'undefined')) {
+                if (moon.owner > 0 && typeof starMapBlockData.avatarNames[moon.owner] === 'undefined') {
                   starMapBlockData.avatarNames[moon.owner] = await avatars.getAvatarNameByAddress(moon.owner)
                 }
               }
             }
             starMapBlockData.planets[key] = planet
-            this.setProp({key: 'loadProgress', value: Math.min(98, 80 + key)})
+            this.setProp({ key: 'loadProgress', value: Math.min(98, 80 + key) })
           }
         }
-        this.setProp({key: 'loadProgress', value: 99})
-        this.importStarMapBlockData({blockData: starMapBlockData, playerAccount: String(useChainStore().account).toLowerCase()} )
-        this.setProp({key: 'loadProgress', value: 100})
+        this.setProp({ key: 'loadProgress', value: 99 })
+        this.importStarMapBlockData({
+          blockData: starMapBlockData,
+          playerAccount: String(useChainStore().account).toLowerCase()
+        })
+        this.setProp({ key: 'loadProgress', value: 100 })
         if (isNewSystem) {
           useUIStore().jumpAnimationOff()
         }
@@ -214,12 +223,12 @@ export const useStarMapStore = defineStore('StarMap', {
       }
     },
     //generic setter
-    setProp ({ key, value }) {
+    setProp({ key, value }) {
       this[key] = value
     },
 
     /** Advances gameTime to now, once per tick. Orbits are computed from it. */
-    incrementGameTime () {
+    incrementGameTime() {
       const newTime = Date.now()
       this.timeDelta = newTime - this.gameTime
       this.gameTime = newTime
@@ -229,7 +238,7 @@ export const useStarMapStore = defineStore('StarMap', {
      * Builds the system's sprites from freshly loaded chain data. Each sprite's key comes from what it
      * is ('planet:3'), so a sprite keeps its key, and its selection, when others appear or disappear.
      */
-    importStarMapBlockData ({blockData, playerAccount}) {
+    importStarMapBlockData({ blockData, playerAccount }) {
       // Keyed by stable sprite key; insertion order is drawing order.
       const objects = {}
       const ids = {
@@ -259,7 +268,7 @@ export const useStarMapStore = defineStore('StarMap', {
       //add planets
       for (const orbitalPosition in blockData.planets) {
         let planet = blockData.planets[orbitalPosition]
-        let planetOwnerName = "unclaimed"
+        let planetOwnerName = 'unclaimed'
         if (planet.owner > 0) {
           planetOwnerName = this.players[planet.owner]
         }
@@ -270,7 +279,7 @@ export const useStarMapStore = defineStore('StarMap', {
           speed: planet.orbitSpeed,
           size: planet.size,
           orbitalPosition: orbitalPosition,
-          class:  planet.class,
+          class: planet.class,
           rings: planet.rings,
           owner: planet.owner,
           ownerName: planetOwnerName,
@@ -305,12 +314,12 @@ export const useStarMapStore = defineStore('StarMap', {
           const moon = add('moon', {
             id: orbitalMoonPosition,
             name: planet.moons[orbitalMoonPosition].name,
-            size:  planet.moons[orbitalMoonPosition].size,
-            class:  planet.moons[orbitalMoonPosition].class,
+            size: planet.moons[orbitalMoonPosition].size,
+            class: planet.moons[orbitalMoonPosition].class,
             orbitalPosition: orbitalMoonPosition,
             planet: planet.id,
             distance: moonOrbitRadius(planet.size, orbitalMoonPosition),
-            speed:  planet.moons[orbitalMoonPosition].orbitSpeed,
+            speed: planet.moons[orbitalMoonPosition].orbitSpeed,
             orbiting: planetSprite.key,
             owner: planet.owner,
             ownerName: planetOwnerName,
@@ -334,7 +343,7 @@ export const useStarMapStore = defineStore('StarMap', {
           shipOwnerName = this.players[ship.owner]
         }
         for (const object of Object.values(objects)) {
-          if ((object.id == ship.orbit) && (object.type == 'planet')) {
+          if (object.id == ship.orbit && object.type == 'planet') {
             parent = object.key
             distance = shipOrbitRadius(object.size)
           }
@@ -381,7 +390,7 @@ export const useStarMapStore = defineStore('StarMap', {
       this.mapDataLoaded = true
     },
     /** Advances every orbit to the current game time. Sprites are raw objects, so this triggers no re-renders by itself. */
-    updateAllTelemtry () {
+    updateAllTelemtry() {
       const objects = this.systemObjects
       const sprites = Object.values(objects)
       for (const sprite of sprites) {

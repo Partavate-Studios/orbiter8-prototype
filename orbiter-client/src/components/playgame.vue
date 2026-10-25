@@ -25,27 +25,16 @@ export default {
     layerHtml
   },
   computed: {
-    ...mapState(useGameStateStore, [
-      'haveAvatar',
-      'haveShip'
-    ]),
-    ...mapState(useUIStore, [
-      'selected',
-      'jumpAnimationState'
-    ]),
-    ...mapState(useStarMapStore, [
-      'gameTime',
-      'systemObjects'
-    ]),
-    ...mapState(useConfigStore, [
-      'tickDelay'
-    ]),
+    ...mapState(useGameStateStore, ['haveAvatar', 'haveShip']),
+    ...mapState(useUIStore, ['selected', 'jumpAnimationState']),
+    ...mapState(useStarMapStore, ['gameTime', 'systemObjects']),
+    ...mapState(useConfigStore, ['tickDelay'])
   },
   watch: {
     jumpAnimationState: {
       handler: function (newval, oldval) {
         if (newval != oldval) {
-          if(newval) {
+          if (newval) {
             this.o8audio.playMusic('jump')
           } else {
             this.o8audio.playMusic('map')
@@ -55,32 +44,25 @@ export default {
     }
   },
   methods: {
-    screenshot () {
+    screenshot() {
       let svgRoot = document.getElementById('gameSVG')
       let svgSource = svgRoot.outerHTML
       let svgDataUri = 'data:image/svg+xml;base64,' + btoa(svgSource)
       let downloadLink = document.createElement('a')
       downloadLink.href = svgDataUri
 
-      let today = new Date();
-      let date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-      let time = today.getHours() + "." + today.getMinutes() + "." + today.getSeconds();
-      let dateTime = date+'_'+time;
+      let today = new Date()
+      let date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate()
+      let time = today.getHours() + '.' + today.getMinutes() + '.' + today.getSeconds()
+      let dateTime = date + '_' + time
       downloadLink.download = 'screenshot' + dateTime + '.svg'
       document.body.appendChild(downloadLink)
       downloadLink.click()
       document.body.removeChild(downloadLink)
     },
-    ...mapActions(useChainStore, [
-      'startBlockPolling'
-    ]),
-    ...mapActions(useStarMapStore, [
-      'incrementGameTime',
-      'updateAllTelemtry'
-    ]),
-    ...mapActions(useConfigStore, [
-      'toggleGraphicsQuality'
-    ]),
+    ...mapActions(useChainStore, ['startBlockPolling']),
+    ...mapActions(useStarMapStore, ['incrementGameTime', 'updateAllTelemtry']),
+    ...mapActions(useConfigStore, ['toggleGraphicsQuality']),
     ...mapActions(useUIStore, [
       'toggleMinerva',
       'viewportToTime',
@@ -92,12 +74,12 @@ export default {
       'scaleBy',
       'mousewheelAnimateTo'
     ]),
-    onWheel (event) {
+    onWheel(event) {
       // Wheel up zooms in (smaller scale = closer).
       const scale = event.deltaY < 0 ? CAMERA.WHEEL_ZOOM_IN : CAMERA.WHEEL_ZOOM_OUT
       this.mousewheelAnimateTo({ scale, time: CAMERA.WHEEL_TWEEN_MS })
     },
-    handleKeyPress (event) {
+    handleKeyPress(event) {
       switch (event.key) {
         case '`':
           this.toggleMinerva()
@@ -135,13 +117,13 @@ export default {
       }
     },
     /** One game tick: advance time, the camera's animations, every orbit, then keep the camera on the selected sprite. */
-    advanceGame () {
+    advanceGame() {
       this.incrementGameTime()
       this.viewportToTime(this.gameTime)
       this.updateAllTelemtry()
       this.followSelectedSprite()
     },
-    followSelectedSprite () {
+    followSelectedSprite() {
       const sprite = this.selected != null ? this.systemObjects[this.selected] : null
       if (!sprite) return
       this.setSelectedTelemetry({
@@ -150,24 +132,23 @@ export default {
         scale: sprite.cameraScale
       })
     },
-    onFrame (now) {
+    onFrame(now) {
       // Low graphics tier ticks at ~30 fps (tickDelay); the others tick every frame.
       if (now - this.lastTick < this.tickDelay) return
       this.lastTick = now
       this.advanceGame()
     }
   },
-  mounted () {
+  mounted() {
     this.o8audio.playMusic('map')
   },
-  beforeCreate () {
-  },
-  unmounted () {
+  beforeCreate() {},
+  unmounted() {
     window.removeEventListener('keyup', this.handleKeyPress)
     window.removeEventListener('wheel', this.onWheel)
     this.stopFrames()
   },
-  created () {
+  created() {
     window.addEventListener('keyup', this.handleKeyPress)
     window.addEventListener('wheel', this.onWheel)
     if (!this.haveAvatar || !this.haveShip) {
@@ -183,23 +164,23 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-  .playorbiter8 {
-    user-select: none;
-    width: 100%;
-    height: 100%;
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
+.playorbiter8 {
+  user-select: none;
+  width: 100%;
+  height: 100%;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
 </style>
 
 <style lang="scss">
-  a:focus {
-    outline: none;
-  }
+a:focus {
+  outline: none;
+}
 
-  .is-dragging {
-    cursor: grabbing;
-  }
+.is-dragging {
+  cursor: grabbing;
+}
 </style>

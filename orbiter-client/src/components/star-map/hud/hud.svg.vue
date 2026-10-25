@@ -1,33 +1,56 @@
 <template>
   <g>
     <defs>
-      <linearGradient id="profileGradient"
-        x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#7c39cd" stop-opacity="1"/>
-          <stop offset="20%" stop-color="#280b4b" stop-opacity="1"/>
-          <stop offset="50%" stop-color="#5c1aae" stop-opacity="1"/>
-          <stop offset="80%" stop-color="#280b4b" stop-opacity="1"/>
-          <stop offset="100%" stop-color="#7c39cd" stop-opacity="1"/>
+      <linearGradient id="profileGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#7c39cd" stop-opacity="1" />
+        <stop offset="20%" stop-color="#280b4b" stop-opacity="1" />
+        <stop offset="50%" stop-color="#5c1aae" stop-opacity="1" />
+        <stop offset="80%" stop-color="#280b4b" stop-opacity="1" />
+        <stop offset="100%" stop-color="#7c39cd" stop-opacity="1" />
       </linearGradient>
     </defs>
-    <g  v-if="!isMenuOn">
+    <g v-if="!isMenuOn">
       <current-system :transform="'translate(' + (rightMostX - 100) + ' ' + (topMostY + 45) + ')'" />
 
-      <g :transform="'translate(' + (profileX) + ' ' + (profileY)  + ')'">
+      <g :transform="'translate(' + profileX + ' ' + profileY + ')'">
         <g font-size="0.7em" fill="#ffffff88" transform="translate(0 40)">
-          <rect x="0" y="-40" width="200" height="100" fill="url(#profileGradient)" stroke="#ffffff22" rx="10" ry="10" stroke-width="1" />
-          <rect x="4" y="-36" width="192" height="92" fill="#00000088" stroke="#000000" rx="8" ry="8" stroke-width="1" />
-          <text text-anchor="start" transform="translate(35 -20)" fill="#ffffff" font-size="1.2em">{{avatar.name}} </text>
+          <rect
+            x="0"
+            y="-40"
+            width="200"
+            height="100"
+            fill="url(#profileGradient)"
+            stroke="#ffffff22"
+            rx="10"
+            ry="10"
+            stroke-width="1"
+          />
+          <rect
+            x="4"
+            y="-36"
+            width="192"
+            height="92"
+            fill="#00000088"
+            stroke="#000000"
+            rx="8"
+            ry="8"
+            stroke-width="1"
+          />
+          <text text-anchor="start" transform="translate(35 -20)" fill="#ffffff" font-size="1.2em"
+            >{{ avatar.name }}
+          </text>
           <text text-anchor="end" transform="translate(70 -04)">Starship:</text>
-          <text text-anchor="start" transform="translate(75 -04)"  fill="#ffffff">{{avatar.ship.name}}</text>
+          <text text-anchor="start" transform="translate(75 -04)" fill="#ffffff">{{ avatar.ship.name }}</text>
           <text text-anchor="end" transform="translate(70 11)">Credits:</text>
-          <text text-anchor="start" transform="translate(75 11)" fill="#ffffff" >{{avatar.credits}}&cent;</text>
+          <text text-anchor="start" transform="translate(75 11)" fill="#ffffff">{{ avatar.credits }}&cent;</text>
 
           <g font-size="0.9em">
             <text text-anchor="end" transform="translate(40 30)" fill="#ffffff">{{ avatar.ship.equipment }}</text>
             <text text-anchor="end" transform="translate(140 30)" fill="#ffffff">{{ avatar.ship.fuel }}</text>
             <text text-anchor="end" transform="translate(40 45)" fill="#ffffff">{{ avatar.ship.organics }}</text>
-            <text text-anchor="end" transform="translate(140 45)" fill="#ffffff">{{ avatar.ship.holds - (avatar.ship.equipment + avatar.ship.fuel + avatar.ship.organics) }}</text>
+            <text text-anchor="end" transform="translate(140 45)" fill="#ffffff">{{
+              avatar.ship.holds - (avatar.ship.equipment + avatar.ship.fuel + avatar.ship.organics)
+            }}</text>
             <text text-anchor="start" transform="translate(45 30)">Equipment</text>
             <text text-anchor="start" transform="translate(145 30)">Fuel</text>
             <text text-anchor="start" transform="translate(45 45)">Organics</text>
@@ -36,100 +59,99 @@
         </g>
       </g>
 
-      <g :transform="'translate(' + (leftMostX + 50) + ' ' + (topMostY + 50)  + ')'">
-        <a
-          v-on:click.prevent="selectMyShip()"
-          cursor="pointer">
+      <g :transform="'translate(' + (leftMostX + 50) + ' ' + (topMostY + 50) + ')'">
+        <a v-on:click.prevent="selectMyShip()" cursor="pointer">
           <avatar-icon />
         </a>
       </g>
 
-
-      <g :transform="'translate(' + (rightMostX - 50) + ' ' + (topMostY + 50)  + ')'">
-        <a
-          v-on:click.prevent="selectStar()"
-          cursor="pointer">
+      <g :transform="'translate(' + (rightMostX - 50) + ' ' + (topMostY + 50) + ')'">
+        <a v-on:click.prevent="selectStar()" cursor="pointer">
           <jump-icon />
         </a>
       </g>
 
-
-      <g v-if="false" :transform="'translate(' + (leftMostX + 50) + ' ' + (bottomMostY - 150)  + ')'">
-        <a
-          v-on:click.prevent="mute()"
-          cursor="pointer">
+      <g v-if="false" :transform="'translate(' + (leftMostX + 50) + ' ' + (bottomMostY - 150) + ')'">
+        <a v-on:click.prevent="mute()" cursor="pointer">
           <speaker-icon />
         </a>
       </g>
 
-      <g :transform="'translate(' + (leftMostX + 50) + ' ' + (bottomMostY - 150)  + ')'">
-        <a
-          v-on:click.prevent="showChat()"
-          cursor="pointer">
+      <g :transform="'translate(' + (leftMostX + 50) + ' ' + (bottomMostY - 150) + ')'">
+        <a v-on:click.prevent="showChat()" cursor="pointer">
           <broadcast-icon />
           <g v-if="chatEventsCount">
-            <circle cx=-25 cy=20 fill="#230b41" stroke="#ffffff88" stroke-width="0.5" r="10" />
-            <text text-anchor="middle" dominant-baseline="middle" font-size="0.65em" fill="#ffffffaa" transform="translate(-25 20)">{{ chatEventsCount }}</text>
+            <circle cx="-25" cy="20" fill="#230b41" stroke="#ffffff88" stroke-width="0.5" r="10" />
+            <text
+              text-anchor="middle"
+              dominant-baseline="middle"
+              font-size="0.65em"
+              fill="#ffffffaa"
+              transform="translate(-25 20)"
+              >{{ chatEventsCount }}</text
+            >
           </g>
         </a>
       </g>
 
-
       <zoom-slider transform="translate(0 430) scale(1.5)" />
 
-      <scope-toggle :transform="'translate(' + 0 + ' ' + (bottomMostY - 100)  + ')'" />
+      <scope-toggle :transform="'translate(' + 0 + ' ' + (bottomMostY - 100) + ')'" />
 
-      <g :transform="'translate(' + (leftMostX + 50) + ' ' + (bottomMostY - 50)  + ')'">
-        <a
-          v-on:click.prevent="showSettings()"
-          cursor="pointer">
+      <g :transform="'translate(' + (leftMostX + 50) + ' ' + (bottomMostY - 50) + ')'">
+        <a v-on:click.prevent="showSettings()" cursor="pointer">
           <gear-icon />
         </a>
       </g>
 
-      <g :transform="'translate(' + (rightMostX - 50) + ' ' + (bottomMostY - 150)  + ')'">
-        <a
-          v-on:click.prevent="showShips()"
-          cursor="pointer">
+      <g :transform="'translate(' + (rightMostX - 50) + ' ' + (bottomMostY - 150) + ')'">
+        <a v-on:click.prevent="showShips()" cursor="pointer">
           <ships-icon />
           <g v-if="shipCount">
-            <circle cx=25 cy=20 fill="#230b41" stroke="#ffffff88" stroke-width="0.5" r="10" />
-            <text text-anchor="middle" dominant-baseline="middle" font-size="0.65em" fill="#ffffffaa" transform="translate(25 20)">{{ shipCount }}</text>
+            <circle cx="25" cy="20" fill="#230b41" stroke="#ffffff88" stroke-width="0.5" r="10" />
+            <text
+              text-anchor="middle"
+              dominant-baseline="middle"
+              font-size="0.65em"
+              fill="#ffffffaa"
+              transform="translate(25 20)"
+              >{{ shipCount }}</text
+            >
           </g>
         </a>
       </g>
-      <g :transform="'translate(' + (rightMostX - 50) + ' ' + (bottomMostY - 250)  + ')'">
-        <a
-          v-on:click.prevent="showPlanets()"
-          cursor="pointer">
+      <g :transform="'translate(' + (rightMostX - 50) + ' ' + (bottomMostY - 250) + ')'">
+        <a v-on:click.prevent="showPlanets()" cursor="pointer">
           <planets-icon />
           <g>
-            <circle cx=25 cy=20 fill="#230b41" stroke="#ffffff88" stroke-width="0.5" r="10" />
-            <text text-anchor="middle" dominant-baseline="middle" font-size="0.65em" fill="#ffffffaa" transform="translate(25 20)">{{ planetCount }}</text>
+            <circle cx="25" cy="20" fill="#230b41" stroke="#ffffff88" stroke-width="0.5" r="10" />
+            <text
+              text-anchor="middle"
+              dominant-baseline="middle"
+              font-size="0.65em"
+              fill="#ffffffaa"
+              transform="translate(25 20)"
+              >{{ planetCount }}</text
+            >
           </g>
         </a>
       </g>
 
-      <g :transform="'translate(' + (rightMostX - 50) + ' ' + (bottomMostY - 50)  + ')'">
-        <a
-          v-on:click.prevent="toggleShowLabels()"
-          cursor="pointer">
+      <g :transform="'translate(' + (rightMostX - 50) + ' ' + (bottomMostY - 50) + ')'">
+        <a v-on:click.prevent="toggleShowLabels()" cursor="pointer">
           <info-icon />
         </a>
       </g>
-
     </g>
 
     <g v-if="showScope" transform="translate(0 -100)">
-
       <!-- selected sprite menu -->
-      <g v-if="(selected != null)">
+      <g v-if="selected != null">
         <card-ui :objectId="selected" />
       </g>
       <g v-else>
         <scope />
       </g>
-
     </g>
 
     <g>
@@ -152,8 +174,6 @@
         <chat-menu />
       </g>
     </g>
-
-
   </g>
 </template>
 
@@ -225,39 +245,33 @@ export default {
       'isMenuOn',
       'viewRatio'
     ]),
-    ...mapState(useStarMapStore, [
-      'myShipId',
-      'spriteIds'
-    ]),
-    ...mapState(useGameStateStore, [
-      'avatar',
-      'events'
-    ]),
-    profileX () {
+    ...mapState(useStarMapStore, ['myShipId', 'spriteIds']),
+    ...mapState(useGameStateStore, ['avatar', 'events']),
+    profileX() {
       if (this.viewRatio <= 1) {
         return this.leftMostX + 20
       }
-        return this.leftMostX + 100
+      return this.leftMostX + 100
     },
-    profileY () {
+    profileY() {
       if (this.viewRatio <= 1) {
         return this.topMostY + 90
       }
       return this.topMostY + 15
     },
-    chatEventsCount () {
+    chatEventsCount() {
       if (Array.isArray(this.events.chatEvents)) {
         return this.events.chatEvents.length
       }
       return 0
     },
-    planetCount () {
+    planetCount() {
       if (Array.isArray(this.spriteIds.planets)) {
         return this.spriteIds.planets.length
       }
       return 0
     },
-    shipCount () {
+    shipCount() {
       if (Array.isArray(this.spriteIds.ships)) {
         return this.spriteIds.ships.length
       }
@@ -265,36 +279,30 @@ export default {
     }
   },
   methods: {
-    ...mapActions(useUIStore, [
-      'selectSprite',
-      'scaleAnimateTo',
-      'jumpMenuOn',
-      'toggleShowLabels',
-      'openMenu'
-    ]),
+    ...mapActions(useUIStore, ['selectSprite', 'scaleAnimateTo', 'jumpMenuOn', 'toggleShowLabels', 'openMenu']),
     showSettings() {
-      this.o8audio.playEffect('click');
+      this.o8audio.playEffect('click')
       this.openMenu('settings')
     },
     showPlanets() {
-      this.o8audio.playEffect('click');
+      this.o8audio.playEffect('click')
       this.openMenu('planets')
     },
     showShips() {
-      this.o8audio.playEffect('click');
+      this.o8audio.playEffect('click')
       this.openMenu('ships')
     },
     showChat() {
-      this.o8audio.playEffect('click');
+      this.o8audio.playEffect('click')
       this.openMenu('chat')
     },
     selectMyShip() {
-      this.o8audio.playEffect('click');
+      this.o8audio.playEffect('click')
       this.selectSprite(this.myShipId)
-      this.scaleAnimateTo({scale: '0.05', time: 1000})
+      this.scaleAnimateTo({ scale: '0.05', time: 1000 })
     },
     selectStar() {
-      this.o8audio.playEffect('click');
+      this.o8audio.playEffect('click')
       if (this.selected != STAR_KEY) {
         this.selectSprite(STAR_KEY)
       } else {

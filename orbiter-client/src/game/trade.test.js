@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import {
-  usedHolds, emptyHolds, tradeBalance, emptyHoldsAfterTrade, isValidTrade, maxTradable,
-  clampTradeAmount, maxHoldsToBuy, canAfford, MAX_CARGO_HOLDS
+  usedHolds,
+  emptyHolds,
+  tradeBalance,
+  emptyHoldsAfterTrade,
+  isValidTrade,
+  maxTradable,
+  clampTradeAmount,
+  maxHoldsToBuy,
+  canAfford,
+  MAX_CARGO_HOLDS
 } from './trade'
 
 const ship = { holds: 10, equipment: 2, fuel: 1, organics: 3 }

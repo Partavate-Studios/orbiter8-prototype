@@ -1,11 +1,16 @@
 import { describe, expect, it } from 'vitest'
 import {
-  orbitAt, planetOrbitRadius, moonOrbitRadius, stationOrbitRadius, shipOrbitRadius, shipOrbitSpeed
+  orbitAt,
+  planetOrbitRadius,
+  moonOrbitRadius,
+  stationOrbitRadius,
+  shipOrbitRadius,
+  shipOrbitSpeed
 } from './orbits'
 
 // The formulas as they were written in Sprite.updateTelemetry and the star map import.
-function originalTelemetry (distance, speed, gameTime) {
-  const theta = gameTime * speed * 0.000000005 % (Math.PI * 2)
+function originalTelemetry(distance, speed, gameTime) {
+  const theta = (gameTime * speed * 0.000000005) % (Math.PI * 2)
   const x = distance * Math.cos(theta)
   const y = distance * Math.sin(theta)
   return { x, y, rotation: Math.atan2(y, x) * (180 / Math.PI) }
@@ -13,7 +18,11 @@ function originalTelemetry (distance, speed, gameTime) {
 
 describe('orbitAt', () => {
   it('matches the original orbit math', () => {
-    for (const [distance, speed, time] of [[435, 700, 1.7e12], [12, 2525, 1.8e12], [0, 100, 5e11]]) {
+    for (const [distance, speed, time] of [
+      [435, 700, 1.7e12],
+      [12, 2525, 1.8e12],
+      [0, 100, 5e11]
+    ]) {
       const expected = originalTelemetry(distance, speed, time)
       const orbit = orbitAt(distance, speed, time)
       expect(orbit.x).toBeCloseTo(expected.x, 9)

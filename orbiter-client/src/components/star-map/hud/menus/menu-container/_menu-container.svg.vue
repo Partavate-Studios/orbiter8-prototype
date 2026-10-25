@@ -1,24 +1,22 @@
 <template>
   <g>
     <g id="tacoman" :transform="'translate(' + 0 + ' ' + offset + ')'">
-
       <rect
         :x="leftMostX"
         :y="topMostY"
         :width="viewport.width"
         :height="viewport.height"
         v-on:click.prevent="setMenuToClose()"
-        fill="#ffffff00" />
+        fill="#ffffff00"
+      />
 
       <menu-background />
 
       <slot />
 
-      <g :transform="'translate(' + 0 + ' ' + (bottomMostY - 50)  + ') scale(0.75)'">
-        <a
-          v-on:click.prevent="setMenuToClose()"
-          cursor="pointer">
-          <close-button  />
+      <g :transform="'translate(' + 0 + ' ' + (bottomMostY - 50) + ') scale(0.75)'">
+        <a v-on:click.prevent="setMenuToClose()" cursor="pointer">
+          <close-button />
         </a>
       </g>
     </g>
@@ -39,7 +37,7 @@ export default {
     CloseButton,
     MenuBackground
   },
-  data () {
+  data() {
     return {
       timeToAnimate: 200,
       offset: 0,
@@ -48,15 +46,8 @@ export default {
     }
   },
   computed: {
-    ...mapState(useUIStore, [
-      'leftMostX',
-      'topMostY',
-      'bottomMostY',
-      'viewport'
-    ]),
-    ...mapState(useStarMapStore, [
-      'gameTime'
-    ])
+    ...mapState(useUIStore, ['leftMostX', 'topMostY', 'bottomMostY', 'viewport']),
+    ...mapState(useStarMapStore, ['gameTime'])
   },
   watch: {
     gameTime: function (newTime) {
@@ -75,25 +66,15 @@ export default {
       }
     }
   },
-  created () {
+  created() {
     this.offset = this.viewport.height
-    this.slideIn = new Tween(
-      this.viewport.height,
-      0,
-      this.timeToAnimate
-    )
+    this.slideIn = new Tween(this.viewport.height, 0, this.timeToAnimate)
   },
   methods: {
-    ...mapActions(useUIStore, [
-      'closeMenu'
-    ]),
+    ...mapActions(useUIStore, ['closeMenu']),
     setMenuToClose() {
       this.o8audio.playEffect('click')
-      this.slideOut =  new Tween(
-        0,
-        this.viewport.height,
-        this.timeToAnimate
-      )
+      this.slideOut = new Tween(0, this.viewport.height, this.timeToAnimate)
     }
   }
 }

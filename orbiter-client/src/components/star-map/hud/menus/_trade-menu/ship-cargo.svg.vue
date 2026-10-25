@@ -1,6 +1,6 @@
 <template>
   <g transform="scale(4)">
-    <g mask="url(#tradeTabMask)" >
+    <g mask="url(#tradeTabMask)">
       <g transform="rotate(0) translate(24 4) scale(3.5)" opacity="0.1"><ship /></g>
       <g transform="rotate(0) translate(-24 -8) scale(3.5)" opacity="0.5"><station /></g>
 
@@ -9,7 +9,12 @@
 
       <line x1="2" y1="-8" x2="16" y2="-8" stroke="#ffffff88" stroke-width="0.5" />
       <line x1="2" y1="-6" x2="16" y2="-6" stroke="#ffffff88" stroke-width="0.5" />
-      <cargo-holds transform="translate(24 4)" :cargoHolds="maxCargoHolds" :predictedLoad="predictedLoad" :existingLoad="existingLoad" />
+      <cargo-holds
+        transform="translate(24 4)"
+        :cargoHolds="maxCargoHolds"
+        :predictedLoad="predictedLoad"
+        :existingLoad="existingLoad"
+      />
     </g>
     <rect x="-41" y="-21" rx="1" ry="1" width="82" height="42" fill="#00000011" stroke-width="0.5" stroke="#c3b3da44" />
   </g>
@@ -45,15 +50,13 @@ export default {
       default: 0
     }
   },
-  methods: {
-  },
+  methods: {},
   computed: {
-    maxCargoHolds () {
+    maxCargoHolds() {
       return Math.min(this.cargoHolds, 24)
     }
   }
 }
 </script>
 
-<style lang="scss">
-</style>
+<style lang="scss"></style>

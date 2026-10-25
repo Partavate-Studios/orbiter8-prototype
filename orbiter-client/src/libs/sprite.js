@@ -10,16 +10,19 @@ export const STAR_KEY = 'star'
  * when other objects appear or disappear (a new station no longer shifts every sprite after it).
  * Moons are numbered per planet, so their key includes the planet.
  */
-export function spriteKey (type, { id, planet }) {
+export function spriteKey(type, { id, planet }) {
   switch (type) {
-    case 'star': return STAR_KEY
-    case 'moon': return `moon:${planet}:${id}`
-    default: return `${type}:${id}`
+    case 'star':
+      return STAR_KEY
+    case 'moon':
+      return `moon:${planet}:${id}`
+    default:
+      return `${type}:${id}`
   }
 }
 
 export default class Sprite {
-  constructor (type, autoFillValues) {
+  constructor(type, autoFillValues) {
     // defaults, overridden by the values from the chain
     this.objectId = parseInt(autoFillValues.id)
     this.orbiting = 0
@@ -70,7 +73,7 @@ export default class Sprite {
     return markRaw(this)
   }
 
-  updateTelemetry (gameTime) {
+  updateTelemetry(gameTime) {
     const orbit = orbitAt(this.distance, this.speed, gameTime)
     this.telemetry.translatex = orbit.x
     this.telemetry.translatey = orbit.y
@@ -78,7 +81,6 @@ export default class Sprite {
     this.telemetry.rotation = this.type == 'station' ? -orbit.angle * 4 : orbit.angle
     return this.telemetry
   }
-
 
   //carry over non-chain data from an old sprite
   consumeSpriteData(oldSprite) {
@@ -92,7 +94,7 @@ export default class Sprite {
   }
 
   /** The actions offered in this sprite's card menu. */
-  getMenu () {
+  getMenu() {
     let menu = []
     switch (this.type) {
       case 'star':
@@ -205,12 +207,12 @@ export default class Sprite {
 
     if (this.isMine) {
       menu.push({
-        text: 'Rename '+ this.type.charAt(0).toUpperCase() + this.type.slice(1),
+        text: 'Rename ' + this.type.charAt(0).toUpperCase() + this.type.slice(1),
         enabled: true,
         command: 'rename'
       })
     } else {
-      if ((this.owner != null) && (this.owner.length === 0)) {
+      if (this.owner != null && this.owner.length === 0) {
         menu.push({
           text: 'Claim Ownership',
           enabled: true,

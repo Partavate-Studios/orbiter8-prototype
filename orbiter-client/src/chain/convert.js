@@ -8,7 +8,7 @@
  * @param {unknown} value
  * @returns {any}
  */
-export function toPlain (value) {
+export function toPlain(value) {
   if (typeof value === 'bigint') {
     if (value > BigInt(Number.MAX_SAFE_INTEGER) || value < BigInt(Number.MIN_SAFE_INTEGER)) {
       throw new RangeError(`Chain value ${value} is too large to convert to a Number`)
@@ -23,7 +23,7 @@ export function toPlain (value) {
  * Converts an ethers EventLog into the shape the UI already uses (web3's `returnValues`).
  * @param {import('ethers').EventLog} log
  */
-export function toPlainEvent (log) {
+export function toPlainEvent(log) {
   const args = log.args.toObject()
   const returnValues = {}
   for (const [key, value] of Object.entries(args)) returnValues[key] = toPlain(value)

@@ -1,6 +1,5 @@
 <template>
-    <g>
-
+  <g>
     <g @mousedown.stop="handleMouseDown">
       <g transform="translate(-70 -70)">
         <g>
@@ -13,7 +12,8 @@
             height="214"
             fill="url(#cardGradient)"
             opacity="1"
-            stroke-width="0" />
+            stroke-width="0"
+          />
           <rect
             x="0"
             y="0"
@@ -24,22 +24,19 @@
             fill="#000000"
             opacity="0.5"
             stroke="#5b1aaa"
-            stroke-width="0.25" />
+            stroke-width="0.25"
+          />
         </g>
-
-
-      </g>
       </g>
     </g>
+  </g>
 </template>
 
 <script>
-
 export default {
   name: 'CardBackground',
   methods: {
-    handleMouseDown () {
-    },
+    handleMouseDown() {}
   }
 }
 </script>

@@ -1,7 +1,12 @@
 <template>
   <g>
-    <orbit-ring v-if="frameOf !== 'self' && (isSelected || hasOrbitRing)"
-      :cx="placement.ringX" :cy="placement.ringY" :r="sprite.distance" :selected="isSelected" />
+    <orbit-ring
+      v-if="frameOf !== 'self' && (isSelected || hasOrbitRing)"
+      :cx="placement.ringX"
+      :cy="placement.ringY"
+      :r="sprite.distance"
+      :selected="isSelected"
+    />
     <g :transform="getOrbitalTransform" v-if="shouldDisplay">
       <g>
         <slot />
@@ -16,47 +21,48 @@
           <g transform="rotate(180)"><ship v-if="type === 'ship'" :ship="sprite" :should-show-engines="true" /></g>
           <star v-if="type === 'star'" />
         </template>
-        <a
-          @mouseover="hover = true"
-          @mouseleave="hover = false"
-          v-on:click.prevent="spriteAction()"
-          cursor="pointer">
+        <a @mouseover="hover = true" @mouseleave="hover = false" v-on:click.prevent="spriteAction()" cursor="pointer">
           <circle
-            cx="0" cy="0" :r="sprite.selectorSize"
+            cx="0"
+            cy="0"
+            :r="sprite.selectorSize"
             stroke-dasharray="2 1"
             stroke-width="0.2"
             :stroke="selectionStroke"
-            fill="#ffffff00" />
-          </a>
+            fill="#ffffff00"
+          />
+        </a>
       </g>
       <g>
-        <text v-if="(isSelected && !showScope) || showLabels || (hover && !isSelected)"
-          x="0" :y="(sprite.size / 4) + 4"
+        <text
+          v-if="(isSelected && !showScope) || showLabels || (hover && !isSelected)"
+          x="0"
+          :y="sprite.size / 4 + 4"
           font-size="0.1em"
           fill="#ffffff66"
           stroke="#00000000"
           stroke-width="4"
           text-anchor="middle"
-          alignment-baseline="central">{{ sprite.name }}</text>
+          alignment-baseline="central"
+          >{{ sprite.name }}</text
+        >
       </g>
-
     </g>
   </g>
 </template>
 
 <script>
-
 import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
 import { mapActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 import { spriteScale } from '@/game/sprite-types'
- import Star from './star.svg'
- import Ship from './ship.svg'
- import Station from './station.svg'
- import Moon from './moon.svg'
- import Planet from './planet.svg'
- import OrbitRing from './orbit-ring.svg.vue'
+import Star from './star.svg'
+import Ship from './ship.svg'
+import Station from './station.svg'
+import Moon from './moon.svg'
+import Planet from './planet.svg'
+import OrbitRing from './orbit-ring.svg.vue'
 
 // Rotations change in steps this size (degrees), and positions in whole device pixels, so a slowly
 // moving sprite only touches the DOM (and makes the browser repaint) when it visibly moves.
@@ -75,7 +81,7 @@ export default {
     Star,
     OrbitRing
   },
-  data () {
+  data() {
     return {
       hover: false
     }
@@ -83,7 +89,7 @@ export default {
   props: {
     sprite: {
       type: Object,
-      default () {
+      default() {
         return {
           name: '...',
           speed: 0,
@@ -100,7 +106,7 @@ export default {
     },
     type: {
       type: String,
-      default () {
+      default() {
         return ''
       }
     },
@@ -116,26 +122,14 @@ export default {
     }
   },
   computed: {
-    ...mapState(useStarMapStore, [
-      'systemObjects',
-      'gameTime'
-    ]),
-    ...mapState(useUIStore, [
-      'selected',
-      'showLabels',
-      'isMenuOn',
-      'drawnPixelsPerUnit',
-      'isOnScreen',
-      'showScope'
-    ]),
-    ...mapState(useConfigStore, [
-      'graphicsQuality'
-    ]),
+    ...mapState(useStarMapStore, ['systemObjects', 'gameTime']),
+    ...mapState(useUIStore, ['selected', 'showLabels', 'isMenuOn', 'drawnPixelsPerUnit', 'isOnScreen', 'showScope']),
+    ...mapState(useConfigStore, ['graphicsQuality']),
     /**
      * This frame's position data. Sprites are raw (non-reactive) objects that the frame loop
      * updates in place, so reading gameTime here is what makes this re-evaluate every frame.
      */
-    frame () {
+    frame() {
       void this.gameTime
       const parent = this.sprite.orbiting ? this.systemObjects[this.sprite.orbiting] : null
       return {
@@ -146,14 +140,14 @@ export default {
         parentY: parent ? parent.telemetry.translatey : 0
       }
     },
-    hasOrbitRing () {
+    hasOrbitRing() {
       if (this.sprite.type != 'star') {
         return true
       }
       return false
     },
     /** Where the orbit ring's center and the sprite go, in this sprite's coordinate system. */
-    placement () {
+    placement() {
       if (this.frameOf === 'self') {
         return { ringX: 0, ringY: 0, x: 0, y: 0 }
       }
@@ -162,52 +156,51 @@ export default {
       }
       return { ringX: this.frame.parentX, ringY: this.frame.parentY, x: this.frame.x, y: this.frame.y }
     },
-    getOrbitalTransform () {
+    getOrbitalTransform() {
       // Snap to the device-pixel grid of the drawn world.
       const step = 1 / (this.drawnPixelsPerUnit * (window.devicePixelRatio || 1))
       const x = Math.round(this.placement.x / step) * step
       const y = Math.round(this.placement.y / step) * step
       return 'translate(' + x + ',' + y + ')'
     },
-    getRotationalTransform () {
+    getRotationalTransform() {
       return 'rotate(' + Math.round(this.frame.rotation / ROTATION_STEP) * ROTATION_STEP + ')'
     },
     /** The sprite's group scale (world units per sprite unit). */
-    spriteScale () {
+    spriteScale() {
       return spriteScale(this.sprite.size)
     },
     /** Roughly how far the sprite reaches from its center, in world units. */
-    visualRadius () {
+    visualRadius() {
       return this.sprite.selectorSize * this.spriteScale
     },
-    isTiny () {
+    isTiny() {
       if (DETAILED_WHEN_TINY.includes(this.type)) return false
       // Drawn scale, not live: between redraws the layer's CSS transform handles the zoom.
       return 2 * this.visualRadius * this.drawnPixelsPerUnit < TINY_DIAMETER
     },
     /** Half the sprite's size, but never under one pixel (in sprite units). */
-    dotRadius () {
+    dotRadius() {
       const onePixel = 1 / (this.drawnPixelsPerUnit * this.spriteScale)
       return Math.max(this.sprite.selectorSize / 2, onePixel)
     },
-    getScaleTransform () {
+    getScaleTransform() {
       return 'scale(' + this.spriteScale + ')'
     },
-    isSelected () {
+    isSelected() {
       if (this.objectIndex === this.selected) {
-        return true;
+        return true
       }
-      return false;
+      return false
     },
     selectionStroke: function () {
-      if ((!this.isSelected && this.hover) ||
-         (this.isSelected && !this.showScope)) {
+      if ((!this.isSelected && this.hover) || (this.isSelected && !this.showScope)) {
         return '#ffffffff'
       }
       return 'none'
     },
-    shouldDisplay () {
-      if (this.isMenuOn && (this.graphicsQuality < 2)){
+    shouldDisplay() {
+      if (this.isMenuOn && this.graphicsQuality < 2) {
         return false
       }
       // Off screen: don't draw it, so it costs nothing per frame. (The label hangs below the sprite.)
@@ -215,10 +208,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(useUIStore, [
-      'toggleScope',
-      'selectSprite'
-    ]),
+    ...mapActions(useUIStore, ['toggleScope', 'selectSprite']),
     spriteAction: function () {
       if (this.isSelected) {
         this.toggleScope()

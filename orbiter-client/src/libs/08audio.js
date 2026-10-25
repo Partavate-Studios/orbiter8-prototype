@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie'
 
 export default class Sound {
-  constructor () {
+  constructor() {
     this.currentMusic = ''
     this.musicVolume = Cookies.get('musicVolume') || 0.25
     this.effectsVolume = Cookies.get('effectsVolume') || 0.25
@@ -11,14 +11,14 @@ export default class Sound {
     this.music['map'] = new Audio('./audio/music/starmap/UnderwaterWorld.mp3')
     this.music['map'].loop = true
 
-    this.music['jump'] =  new Audio('./audio/music/jumping/BeyondTheSkies.mp3')
+    this.music['jump'] = new Audio('./audio/music/jumping/BeyondTheSkies.mp3')
     this.music['jump'].loop = true
 
-    this.music['title'] =  new Audio('./audio/music/title/WhereNoManHasGoneBefore.mp3')
+    this.music['title'] = new Audio('./audio/music/title/WhereNoManHasGoneBefore.mp3')
     this.music['title'].loop = true
 
     this.effects = []
-    this.effects['click'] =  new Audio('./audio/effects/beep.mp3')
+    this.effects['click'] = new Audio('./audio/effects/beep.mp3')
   }
 
   getMusicVolume() {
@@ -46,13 +46,12 @@ export default class Sound {
   }
 
   playMusic(song) {
-
     if (this.currentMusic != '') {
       this.music[this.currentMusic].pause()
     }
 
     if (this.musicVolume > 0) {
-      this.music[song].currentTime = 0;
+      this.music[song].currentTime = 0
       this.music[song].volume = this.musicVolume
       this.music[song].play()
     }
@@ -68,13 +67,13 @@ export default class Sound {
     }
   }
 
-  silenceMusic () {
+  silenceMusic() {
     if (this.currentMusic != '') {
       this.music[this.currentMusic].pause()
     }
   }
 
-  resumeMusic () {
+  resumeMusic() {
     if (this.currentMusic != '') {
       this.music[this.currentMusic].volume = this.musicVolume
       this.music[this.currentMusic].play()
@@ -87,6 +86,4 @@ export default class Sound {
       this.effects[effect].play()
     }
   }
-
 }
-

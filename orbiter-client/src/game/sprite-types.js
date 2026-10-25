@@ -23,6 +23,6 @@ export const SHIP_SIZE = 10
 export const STATION_START_ROTATION = -15
 
 /** How much a sprite of this size is scaled up from its artwork (world units per sprite unit). */
-export function spriteScale (size) {
+export function spriteScale(size) {
   return size * 0.02 + 0.1
 }

@@ -1,16 +1,16 @@
 <template>
-    <div class="terminal">
-        <pre class="history" ref="history">
+  <div class="terminal">
+    <pre class="history" ref="history">
           <div
             v-for="(line, index) in minervaHistory"
             class="line"
             v-bind:key="'line' + index">{{ line }}</div>
 
         </pre>
-        <form v-on:submit.prevent="doSubmit">
-          <div class="input"><input v-model="terminalInput" type="text"></div>
-        </form>
-    </div>
+    <form v-on:submit.prevent="doSubmit">
+      <div class="input"><input v-model="terminalInput" type="text" /></div>
+    </form>
+  </div>
 </template>
 
 <script>
@@ -21,15 +21,13 @@ import { useUIStore } from '@/stores/ui'
 
 export default {
   name: 'Terminal',
-  data () {
+  data() {
     return {
       terminalInput: ''
     }
   },
   computed: {
-    ...mapState(useUIStore, [
-      'minervaHistory'
-    ])
+    ...mapState(useUIStore, ['minervaHistory'])
   },
   watch: {
     minervaHistory: {
@@ -39,20 +37,10 @@ export default {
     }
   },
   methods: {
-    ...mapActions(useChainStore, [
-      'checkForNewBlock'
-    ]),
-    ...mapActions(useStarMapStore, [
-      'moveToSystem',
-      'genesis'
-    ]),
-    ...mapActions(useUIStore, [
-      'scaleTo',
-      'rotateTo',
-      'addToHistory',
-      'clearHistory'
-    ]),
-    doSubmit () {
+    ...mapActions(useChainStore, ['checkForNewBlock']),
+    ...mapActions(useStarMapStore, ['moveToSystem', 'genesis']),
+    ...mapActions(useUIStore, ['scaleTo', 'rotateTo', 'addToHistory', 'clearHistory']),
+    doSubmit() {
       let parts = this.terminalInput.split(' ')
       this.addToHistory('> ' + this.terminalInput)
       if (parts.length > 0) {
@@ -109,10 +97,10 @@ export default {
             const svgDataUri = 'data:image/svg+xml;base64,' + btoa(svgSource)
             const downloadLink = document.createElement('a')
             downloadLink.href = svgDataUri
-            let today = new Date();
-            let date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-            let time = today.getHours() + "." + today.getMinutes() + "." + today.getSeconds();
-            let dateTime = date+'_'+time;
+            let today = new Date()
+            let date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate()
+            let time = today.getHours() + '.' + today.getMinutes() + '.' + today.getSeconds()
+            let dateTime = date + '_' + time
             downloadLink.download = 'screenshot' + dateTime + '.svg'
             document.body.appendChild(downloadLink)
             downloadLink.click()
@@ -148,34 +136,34 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-    .terminal {
-      border: 1px solid #5d289e;
-      background: #00000025;
-        .history {
-            margin: 0;
-            padding: 0.5em;
-            height: 15em;
-            overflow: auto;
-            .line {
-              font-family: monospace;
-            }
-        }
-        form {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-        }
-        .input{
-            input[type=text] {
-                border: 0;
-                width: 100%;
-                margin: 0;
-                padding: 0.5em;
-                background: #5d289e;
-            }
-            input[type=text]:focus {
-                background: #8e7aaa;
-            }
-        }
+.terminal {
+  border: 1px solid #5d289e;
+  background: #00000025;
+  .history {
+    margin: 0;
+    padding: 0.5em;
+    height: 15em;
+    overflow: auto;
+    .line {
+      font-family: monospace;
     }
+  }
+  form {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  .input {
+    input[type='text'] {
+      border: 0;
+      width: 100%;
+      margin: 0;
+      padding: 0.5em;
+      background: #5d289e;
+    }
+    input[type='text']:focus {
+      background: #8e7aaa;
+    }
+  }
+}
 </style>

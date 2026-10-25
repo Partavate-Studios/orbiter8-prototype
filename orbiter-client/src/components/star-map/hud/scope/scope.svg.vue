@@ -1,25 +1,20 @@
 <template>
   <g>
-
-    <g v-if="showScope"
-        :transform="'scale(' + (scale) + ')'">
-
-      <g
-        v-for="(sprite, key) in systemObjects"
-        v-bind:sprite="sprite"
-        :key="'svg-mini-sprite-' + key">
-
+    <g v-if="showScope" :transform="'scale(' + scale + ')'">
+      <g v-for="(sprite, key) in systemObjects" v-bind:sprite="sprite" :key="'svg-mini-sprite-' + key">
         <g
           v-if="sprite.type === 'planet'"
-          :opacity = "markerOpacity(sprite)"
-          :transform="'rotate(' + bearingToSprite(sprite) + ')'">
+          :opacity="markerOpacity(sprite)"
+          :transform="'rotate(' + bearingToSprite(sprite) + ')'"
+        >
           <scope-marker :spriteKey="key"><compass-planet></compass-planet></scope-marker>
         </g>
 
         <g
           v-if="isMyShip(sprite)"
-          :opacity = "markerOpacity(sprite)"
-          :transform="'rotate(' + bearingToSprite(sprite) + ')'">
+          :opacity="markerOpacity(sprite)"
+          :transform="'rotate(' + bearingToSprite(sprite) + ')'"
+        >
           <g transform="translate(0 140) rotate(180)">
             <scope-marker :spriteKey="key"><ship></ship></scope-marker>
           </g>
@@ -27,37 +22,38 @@
       </g>
 
       <g v-if="hoveredSprite" pointer-events="none">
-        <circle cx="0" cy="0" r="99" stroke-width="0" fill="url(#scopeFill)" ></circle>
+        <circle cx="0" cy="0" r="99" stroke-width="0" fill="url(#scopeFill)"></circle>
 
         <g stroke-width="0.25" font-weight="bold" stroke="#280b4bee" fill="#ffffff">
           <text
             v-if="isMyShip(hoveredSprite)"
-            x="0" y="-10"
+            x="0"
+            y="-10"
             font-size="0.85em"
             text-anchor="middle"
-            alignment-baseline="central"> (My Ship)</text>
-          <text
-            v-else
-            x="0" y="-10"
-            font-size="0.85em"
-            text-anchor="middle"
-            alignment-baseline="central"> ({{ hoveredSprite.type }} #{{ hoveredSprite.objectId }}) </text>
-          <text
-            x="0" y="10"
-            font-size="1.25em"
-            text-anchor="middle"
-            alignment-baseline="central">{{ hoveredSprite.name }}</text>
+            alignment-baseline="central"
+          >
+            (My Ship)</text
+          >
+          <text v-else x="0" y="-10" font-size="0.85em" text-anchor="middle" alignment-baseline="central">
+            ({{ hoveredSprite.type }} #{{ hoveredSprite.objectId }})
+          </text>
+          <text x="0" y="10" font-size="1.25em" text-anchor="middle" alignment-baseline="central">{{
+            hoveredSprite.name
+          }}</text>
         </g>
       </g>
       <g
-        v-if="(systemObjects.star && markerOpacity(systemObjects.star))"
+        v-if="systemObjects.star && markerOpacity(systemObjects.star)"
         :transform="'rotate(' + bearingToSprite(systemObjects.star) + ')'"
         stroke-width="4"
         stroke-color="#ffffff"
         :stroke-opacity="markerOpacity(systemObjects.star)"
       >
         <compass-arrow></compass-arrow>
-        <scope-marker spriteKey="star"><compass-sun :opacity="markerOpacity(systemObjects.star)"></compass-sun></scope-marker>
+        <scope-marker spriteKey="star"
+          ><compass-sun :opacity="markerOpacity(systemObjects.star)"></compass-sun
+        ></scope-marker>
       </g>
 
       <compass></compass>
@@ -80,7 +76,7 @@ import Ship from '../../sprites/ship.svg'
 
 export default {
   name: 'Hud',
-  data () {
+  data() {
     return {
       scale: 1.25
     }
@@ -94,25 +90,17 @@ export default {
     Ship
   },
   computed: {
-    ...mapState(useUIStore, [
-      'showScope',
-      'viewport',
-      'spriteToDisplay',
-      'selected'
-    ]),
-    ...mapState(useStarMapStore, [
-      'gameTime',
-      'systemObjects'
-    ]),
+    ...mapState(useUIStore, ['showScope', 'viewport', 'spriteToDisplay', 'selected']),
+    ...mapState(useStarMapStore, ['gameTime', 'systemObjects']),
     /** The sprite whose scope marker is hovered, unless it's already selected (or has left the system). */
-    hoveredSprite () {
+    hoveredSprite() {
       if (this.spriteToDisplay == null || this.spriteToDisplay === this.selected) return null
       return this.systemObjects[this.spriteToDisplay] || null
     }
   },
   methods: {
     /** Where the sprite is relative to the view center, in world units. */
-    offsetFromView (sprite) {
+    offsetFromView(sprite) {
       // Sprites are raw objects updated in place each frame; reading gameTime makes this re-evaluate per frame.
       void this.gameTime
       return {
@@ -120,18 +108,18 @@ export default {
         y: sprite.position.y + this.viewport.y
       }
     },
-    bearingToSprite (sprite) {
+    bearingToSprite(sprite) {
       const { x, y } = this.offsetFromView(sprite)
       // 0.25° steps: the arrows only touch the DOM when they visibly turn.
       return Math.round(bearingDegrees(x, y) / 0.25) * 0.25
     },
-    markerOpacity (sprite) {
+    markerOpacity(sprite) {
       const { x, y } = this.offsetFromView(sprite)
       // Steps of 0.02: only touch the DOM when the fade visibly changes.
       return Math.round(scopeOpacity(x, y, this.viewport.scale, sprite.type === 'star') * 50) / 50
     },
-    isMyShip (sprite) {
-      return ((sprite.type === 'ship') && (sprite.isMine))
+    isMyShip(sprite) {
+      return sprite.type === 'ship' && sprite.isMine
     }
   }
 }

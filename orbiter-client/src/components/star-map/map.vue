@@ -13,17 +13,24 @@
         :class="{ 'is-dragging': mouseHold }"
         id="gamelayer"
         ref="gamelayer"
-        xmlns="http://www.w3.org/2000/svg">
+        xmlns="http://www.w3.org/2000/svg"
+      >
         <g font-family="Ubuntu, sans-serif" :transform="'scale(' + baseScale + ')'">
           <g v-if="mapDataLoaded && !jumpAnimationState" transform="translate(0 -100)">
             <g :transform="worldTransform">
               <grid :scale="drawnView.scale"></grid>
             </g>
-            <rect x="-2000" y="-1000" width="4000" height="2000" fill="#ffffff00"
-            @mousedown="handleMouseDown"
-            @mouseup="handleMouseUp"
-            @mousemove="handleMouseMove"
-            @mouseleave="handleMouseLeave"/>
+            <rect
+              x="-2000"
+              y="-1000"
+              width="4000"
+              height="2000"
+              fill="#ffffff00"
+              @mousedown="handleMouseDown"
+              @mouseup="handleMouseUp"
+              @mousemove="handleMouseMove"
+              @mouseleave="handleMouseLeave"
+            />
             <g :transform="worldTransform">
               <solar-system />
             </g>
@@ -35,13 +42,11 @@
         :drawn-view="drawnView"
         :unit="worldUnit"
         :origin-x="screenSize.width / 2 + worldMargin"
-        :origin-y="screenSize.height / 2 + worldMargin + worldUnit * worldOffsetY" />
+        :origin-y="screenSize.height / 2 + worldMargin + worldUnit * worldOffsetY"
+      />
     </div>
 
-    <svg
-      class="map-layer hud-layer"
-      :viewBox="layerViewBox"
-      xmlns="http://www.w3.org/2000/svg">
+    <svg class="map-layer hud-layer" :viewBox="layerViewBox" xmlns="http://www.w3.org/2000/svg">
       <g font-family="Ubuntu, sans-serif" :transform="'scale(' + baseScale + ')'">
         <g v-if="mapDataLoaded">
           <g v-if="jumpAnimationState">
@@ -98,7 +103,7 @@ export default {
     LoadingBar
   },
   name: 'StarMap',
-  data () {
+  data() {
     return {
       //these should be in UI store
       mouseHold: false,
@@ -110,19 +115,19 @@ export default {
       worldOffsetY: WORLD_OFFSET_Y
     }
   },
-  mounted () {
+  mounted() {
     this.drawWorld()
     // While zooming out, the shrinking world may briefly leave its faint grid lines short of the
     // screen edges (the background stays put behind it); that beats redrawing at every wheel step.
     this.worldLayer = new CompositedLayer(this.$refs.world, { margin: WORLD_MARGIN })
     this.stopFrames = onFrame(this.followCamera, FRAME_ORDER.render)
-    this.$nextTick(function() {
+    this.$nextTick(function () {
       this.resizeHandler() //set initial ratio
       window.addEventListener('resize', this.resizeHandler)
     })
   },
   beforeUnmount() {
-    window.removeEventListener('resize', this.resizeHandler);
+    window.removeEventListener('resize', this.resizeHandler)
     this.stopFrames()
   },
   computed: {
@@ -136,24 +141,20 @@ export default {
       'isMenuOn',
       'jumpAnimationState'
     ]),
-    ...mapState(useStarMapStore, [
-      'currentStarSystemId',
-      'mapDataLoaded',
-      'myShipId'
-    ]),
+    ...mapState(useStarMapStore, ['currentStarSystemId', 'mapDataLoaded', 'myShipId']),
     /**
      * Every layer maps 1200 units to the screen's height, centered on the origin (this is
      * what the original single SVG did at any aspect ratio), so the layers line up exactly.
      */
     /** Pixels per world-group unit (before the camera's zoom). */
-    worldUnit () {
+    worldUnit() {
       return this.groupPixels
     },
-    worldTransform () {
-      return 'scale(' + (1 / this.drawnView.scale) + ') translate(' + this.drawnView.x + ' ' + this.drawnView.y + ')'
+    worldTransform() {
+      return 'scale(' + 1 / this.drawnView.scale + ') translate(' + this.drawnView.x + ' ' + this.drawnView.y + ')'
     },
     /** The world layer covers the screen plus WORLD_MARGIN on every side, at the same scale as the other layers. */
-    worldBox () {
+    worldBox() {
       return {
         left: -WORLD_MARGIN + 'px',
         top: -WORLD_MARGIN + 'px',
@@ -161,21 +162,19 @@ export default {
         height: this.screenSize.height + 2 * WORLD_MARGIN + 'px'
       }
     },
-    worldViewBox () {
+    worldViewBox() {
       const unitsPerPixel = this.viewport.resolution / this.screenSize.height
       const width = (this.screenSize.width + 2 * WORLD_MARGIN) * unitsPerPixel
       const height = (this.screenSize.height + 2 * WORLD_MARGIN) * unitsPerPixel
-      return (-width / 2) + ' ' + (-height / 2) + ' ' + width + ' ' + height
+      return -width / 2 + ' ' + -height / 2 + ' ' + width + ' ' + height
     },
-    layerViewBox () {
-      const width = this.viewport.resolution * this.screenSize.width / this.screenSize.height
+    layerViewBox() {
+      const width = (this.viewport.resolution * this.screenSize.width) / this.screenSize.height
       const height = this.viewport.resolution
-      return (-width / 2) + ' ' + (-height / 2) + ' ' + width + ' ' + height
-    },
-
-
+      return -width / 2 + ' ' + -height / 2 + ' ' + width + ' ' + height
+    }
   },
-  created () {
+  created() {
     this.selectSprite(this.myShipId)
   },
   watch: {
@@ -183,12 +182,12 @@ export default {
       if (val != oldVal) {
         if (this.myShipId != 0) {
           this.selectSprite(this.myShipId)
-          this.scaleAnimateTo({scale: CAMERA.ARRIVAL_SHIP_SCALE, time: CAMERA.ARRIVAL_TWEEN_MS})
+          this.scaleAnimateTo({ scale: CAMERA.ARRIVAL_SHIP_SCALE, time: CAMERA.ARRIVAL_TWEEN_MS })
         } else {
-          this.scaleAnimateTo({scale: CAMERA.ARRIVAL_SYSTEM_SCALE, time: CAMERA.ARRIVAL_TWEEN_MS})
+          this.scaleAnimateTo({ scale: CAMERA.ARRIVAL_SYSTEM_SCALE, time: CAMERA.ARRIVAL_TWEEN_MS })
         }
       }
-    },
+    }
   },
   methods: {
     ...mapActions(useUIStore, [
@@ -202,16 +201,16 @@ export default {
       'drawWorldAt',
       'closeMenu'
     ]),
-    resizeHandler () {
-      this.calculateViewableArea({x: window.innerWidth, y: window.innerHeight})
+    resizeHandler() {
+      this.calculateViewableArea({ x: window.innerWidth, y: window.innerHeight })
       this.drawWorld()
     },
     /** Redraw the world for the live camera (sharp at the current zoom). */
-    drawWorld () {
+    drawWorld() {
       this.drawWorldAt(this.viewport)
     },
     /** Each frame: show the drawn world at the live camera's position and zoom, redrawing when needed. */
-    followCamera () {
+    followCamera() {
       if (!this.worldLayer) return
       const drawn = this.drawnView
       const live = this.viewport
@@ -219,14 +218,14 @@ export default {
       const unit = this.worldUnit
       const delta = {
         scale: drawn.scale / live.scale,
-        x: unit * (live.x - drawn.x) / live.scale,
-        y: unit * (live.y - drawn.y) / live.scale,
+        x: (unit * (live.x - drawn.x)) / live.scale,
+        y: (unit * (live.y - drawn.y)) / live.scale,
         originX: this.screenSize.width / 2 + WORLD_MARGIN,
         originY: this.screenSize.height / 2 + WORLD_MARGIN + unit * WORLD_OFFSET_Y
       }
       if (this.worldLayer.update(delta)) this.drawWorld()
     },
-    handleMouseDown () {
+    handleMouseDown() {
       this.selectNone()
       if (this.isMenuOn) {
         this.jumpMenuOff()
@@ -237,7 +236,7 @@ export default {
         this.mouseYThreshold = this.prevMouseY
       }
     },
-    handleMouseUp () {
+    handleMouseUp() {
       this.mouseHold = false
     },
     handleMouseMove: _.throttle(function (event) {
@@ -247,16 +246,13 @@ export default {
       }
       let screenX = event.pageX
       let screenY = event.pageY
-      this.setMouse({x: screenX, y: screenY})
+      this.setMouse({ x: screenX, y: screenY })
       let x = this.viewport.x
       let y = this.viewport.y
 
-      let minDistance = Math.max(
-         Math.abs(screenX - this.mouseXThreshold),
-         Math.abs(screenY - this.mouseYThreshold)
-      )
+      let minDistance = Math.max(Math.abs(screenX - this.mouseXThreshold), Math.abs(screenY - this.mouseYThreshold))
 
-      if (this.mouseHold && (minDistance > CAMERA.DRAG_THRESHOLD_PX)) {
+      if (this.mouseHold && minDistance > CAMERA.DRAG_THRESHOLD_PX) {
         this.selectNone()
         this.jumpMenuOff()
         this.closeMenu()
@@ -266,27 +262,22 @@ export default {
           x -= Math.abs(this.prevMouseX - screenX) * acceleration
         }
         if (screenX > this.prevMouseX) {
-          x += (Math.abs(this.prevMouseX - screenX)) * acceleration
+          x += Math.abs(this.prevMouseX - screenX) * acceleration
         }
         if (screenY < this.prevMouseY) {
-          y -= (Math.abs(this.prevMouseY - screenY)) * acceleration
+          y -= Math.abs(this.prevMouseY - screenY) * acceleration
         }
         if (screenY > this.prevMouseY) {
-          y += (Math.abs(this.prevMouseY - screenY)) * acceleration
+          y += Math.abs(this.prevMouseY - screenY) * acceleration
         }
-        this.viewTo({x, y})
+        this.viewTo({ x, y })
       }
 
       this.prevMouseX = screenX
       this.prevMouseY = screenY
     }, 4),
-    handleMouseLeave ({ clientX, clientY }) {
-      if (
-        clientX <= 0 ||
-        clientY <= 0 ||
-        clientX >= window.innerWidth ||
-        clientY >= window.innerHeight
-      ) {
+    handleMouseLeave({ clientX, clientY }) {
+      if (clientX <= 0 || clientY <= 0 || clientX >= window.innerWidth || clientY >= window.innerHeight) {
         this.mouseHold = false
       }
     }
@@ -296,31 +287,31 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-  .star-map {
-    display: block;
+.star-map {
+  display: block;
+}
+.map-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  shape-rendering: geometricPrecision;
+  text-rendering: geometricPrecision;
+}
+// The HUD covers the whole screen, but only its painted parts take the mouse; the rest
+// passes through to the world layer underneath (panning, clicking sprites).
+.hud-layer {
+  pointer-events: none;
+  > g {
+    pointer-events: auto;
   }
-  .map-layer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: block;
-    shape-rendering: geometricPrecision;
-    text-rendering: geometricPrecision;
-  }
-  // The HUD covers the whole screen, but only its painted parts take the mouse; the rest
-  // passes through to the world layer underneath (panning, clicking sprites).
-  .hud-layer {
-    pointer-events: none;
-    > g {
-      pointer-events: auto;
-    }
-  }
-  .world-layer {
-    position: absolute;
-  }
-  .is-dragging {
-    cursor: grabbing;
-  }
+}
+.world-layer {
+  position: absolute;
+}
+.is-dragging {
+  cursor: grabbing;
+}
 </style>

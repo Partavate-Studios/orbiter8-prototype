@@ -1,12 +1,7 @@
 <template>
   <g>
     <card-scaling :sprite="systemObjects[objectId]">
-      <g
-        v-if="viewRatio > 1"
-        stroke="#c3b3da88"
-        stroke-width="2"
-        stroke-dasharray="3 3"
-      >
+      <g v-if="viewRatio > 1" stroke="#c3b3da88" stroke-width="2" stroke-dasharray="3 3">
         <line x1="-70" y1="70" x2="-120" y2="120" />
         <line x1="-150" y1="120" x2="-120" y2="120" />
         <g v-if="menuShouldDisplay">
@@ -19,10 +14,8 @@
         <info :objectId="objectId" />
 
         <g transform="translate(45 120) scale(0.4)">
-          <a v-if="viewRatio <= 1"
-            v-on:click.prevent="selectMainMenu()"
-            cursor="pointer">
-            <hamburger-icon  :selected="menuShouldDisplay" />
+          <a v-if="viewRatio <= 1" v-on:click.prevent="selectMainMenu()" cursor="pointer">
+            <hamburger-icon :selected="menuShouldDisplay" />
           </a>
         </g>
 
@@ -42,12 +35,12 @@
           </g>
           <g v-if="systemObjects[objectId].moons.length > 0" transform="translate(-15 120) scale(0.4)">
             <a v-on:click.prevent="selectMenu('moons')" cursor="pointer">
-              <icon-container :selected="currentMenu =='moons'">
+              <icon-container :selected="currentMenu == 'moons'">
                 <g transform="translate(-2 -2) scale(0.75)">
                   <sprite :objectId="systemObjects[objectId].moons[0].moonId" />
                 </g>
               </icon-container>
-              <circle cx="18" cy="18" fill="#000000" stroke="#ffffff" stroke-width="1" r=10 opacity="0.15" />
+              <circle cx="18" cy="18" fill="#000000" stroke="#ffffff" stroke-width="1" r="10" opacity="0.15" />
               <text x="18" y="19" text-anchor="middle" font-size="1em" fill="#ffffff" dominant-baseline="middle">
                 {{ systemObjects[objectId].moons.length }}
               </text>
@@ -76,44 +69,31 @@
             </a>
           </g>
         </g>
-
-
       </g>
 
       <g :transform="getMenuTranslate()">
-
         <g v-if="menuShouldDisplay">
-
           <g v-if="currentMenu == 'main'">
-            <main-menu :objectId="objectId"  v-on:moon-menu="selectMenu('moons')" />
+            <main-menu :objectId="objectId" v-on:moon-menu="selectMenu('moons')" />
             <g transform="translate(45 120) scale(0.4)">
-              <a v-if="(viewRatio <= 1)"
-                v-on:click.prevent="closeMenu()"
-                cursor="pointer"><info-icon /></a>
+              <a v-if="viewRatio <= 1" v-on:click.prevent="closeMenu()" cursor="pointer"><info-icon /></a>
             </g>
           </g>
-
 
           <g v-else-if="currentMenu == 'moons'">
-            <moons-menu :objectId="objectId"/>
+            <moons-menu :objectId="objectId" />
             <g transform="translate(45 120) scale(0.4)">
-              <a v-if="(viewRatio <= 1)"
-                v-on:click.prevent="closeMenu()"
-                cursor="pointer"><info-icon /></a>
-              <a v-else
-                v-on:click.prevent="selectMainMenu()"
-                cursor="pointer"><back-icon /></a>
+              <a v-if="viewRatio <= 1" v-on:click.prevent="closeMenu()" cursor="pointer"><info-icon /></a>
+              <a v-else v-on:click.prevent="selectMainMenu()" cursor="pointer"><back-icon /></a>
             </g>
           </g>
-       </g>
-
+        </g>
       </g>
     </card-scaling>
   </g>
 </template>
 
 <script>
-
 import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
 import { mapActions, mapState } from 'pinia'
@@ -141,26 +121,22 @@ export default {
     BackIcon,
     Info,
     Sprite,
-    XIcon,
+    XIcon
   },
   props: {
-    objectId: null,
+    objectId: null
   },
-  data () {
+  data() {
     return {
       menuShowing: false,
       currentMenu: 'main'
     }
   },
   computed: {
-    ...mapState(useStarMapStore, [
-      'systemObjects'
-    ]),
-    ...mapState(useUIStore, [
-      'viewRatio'
-    ]),
+    ...mapState(useStarMapStore, ['systemObjects']),
+    ...mapState(useUIStore, ['viewRatio']),
     menuShouldDisplay() {
-      if (this.menuShowing || (this.viewRatio > 1)) {
+      if (this.menuShowing || this.viewRatio > 1) {
         return true
       }
       return false
@@ -176,10 +152,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(useUIStore, [
-      'toggleScope',
-      'selectSprite'
-    ]),
+    ...mapActions(useUIStore, ['toggleScope', 'selectSprite']),
     getInfoCardTranslate() {
       if (this.viewRatio > 1) {
         return 'translate(-260 -35) scale(1.75)'
@@ -191,9 +164,8 @@ export default {
         return 'translate(260 -35) scale(1.75)'
       }
       return 'scale(2.5)'
-
     },
-    closeMenu () {
+    closeMenu() {
       this.menuShowing = false
       this.currentMenu = 'main'
     },
@@ -201,7 +173,7 @@ export default {
       this.menuShowing = true
       this.currentMenu = menu
     },
-    selectMainMenu () {
+    selectMainMenu() {
       this.menuShowing = true
       this.currentMenu = 'main'
     }

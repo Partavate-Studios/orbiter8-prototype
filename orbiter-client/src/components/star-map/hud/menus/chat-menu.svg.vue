@@ -2,25 +2,24 @@
   <g>
     <menu-container>
       <g>
-        <g transform="translate(0 -400)" dominant-baseline="middle" text-anchor="middle" >
-
+        <g transform="translate(0 -400)" dominant-baseline="middle" text-anchor="middle">
           <g>
-            <text x="0" y="5" fill="#ffffff88"
-                font-size="1.5em"> Broadcasts  </text>
+            <text x="0" y="5" fill="#ffffff88" font-size="1.5em"> Broadcasts </text>
           </g>
 
-
           <g v-for="(event, index) in chatEvents" :key="'event' + index">
-            <g v-if="index < 12" :transform="'translate(0 ' + (50 + 40 * index) +  ')'" :opacity="1 - index / 15">
-                <chat-slot-container :name="getName(event.returnValues._sender)" :message="event.returnValues._message" :blockId="blockId - event.blockNumber">
-                </chat-slot-container>
+            <g v-if="index < 12" :transform="'translate(0 ' + (50 + 40 * index) + ')'" :opacity="1 - index / 15">
+              <chat-slot-container
+                :name="getName(event.returnValues._sender)"
+                :message="event.returnValues._message"
+                :blockId="blockId - event.blockNumber"
+              >
+              </chat-slot-container>
             </g>
           </g>
 
           <g :transform="'translate(0 620)'">
-              <menu-button
-                  v-on:buttonclick="broadcast"
-                  text="Send Broadcast" />
+            <menu-button v-on:buttonclick="broadcast" text="Send Broadcast" />
           </g>
         </g>
       </g>
@@ -29,7 +28,6 @@
 </template>
 
 <script>
-
 import { useChainStore } from '@/stores/chain'
 import { useGameStateStore } from '@/stores/gamestate'
 import { mapActions, mapState } from 'pinia'
@@ -40,17 +38,14 @@ import ChatSlotContainer from './menu-container/chat-slot-container.svg'
 
 export default {
   name: 'ChatMenu',
-  props: {
-  },
+  props: {},
   components: {
     MenuContainer,
     MenuButton,
     ChatSlotContainer
   },
   methods: {
-    ...mapActions(useGameStateStore, [
-      'sendChat'
-    ]),
+    ...mapActions(useGameStateStore, ['sendChat']),
     broadcast() {
       let message = prompt('Send a message?')
       if (message.length > 0) {
@@ -62,20 +57,14 @@ export default {
       if (typeof this.players[address.toLowerCase()] !== 'undefined') {
         name = this.players[address.toLowerCase()]
       }
-      return (name)
+      return name
     }
   },
   computed: {
-    ...mapState(useChainStore, [
-      'blockId'
-    ]),
-    ...mapState(useGameStateStore, [
-      'events'
-    ]),
-    ...mapState(useStarMapStore, [
-      'players'
-    ]),
-    chatEvents () {
+    ...mapState(useChainStore, ['blockId']),
+    ...mapState(useGameStateStore, ['events']),
+    ...mapState(useStarMapStore, ['players']),
+    chatEvents() {
       // Newest first. Copy before reversing: reverse() works in place and would flip the store's array on every re-render.
       return [...(this.events.chatEvents ?? [])].reverse()
     }

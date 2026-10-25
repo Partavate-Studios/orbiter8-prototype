@@ -1,23 +1,22 @@
 <template>
   <g>
-    <g :transform="'translate(0 ' + (bottomMostY - 20)  + ')'" stroke="#888888" stroke-width="0.5">
+    <g :transform="'translate(0 ' + (bottomMostY - 20) + ')'" stroke="#888888" stroke-width="0.5">
       <rect :x="-12" :y="-6" rx="5" ry="5" width="24" height="12" stroke="#000000" fill="#00000088" />
       <g v-if="isLoading">
-        <circle cx="-5" cy="0" r="3"  fill="#ffffff" />
+        <circle cx="-5" cy="0" r="3" fill="#ffffff" />
       </g>
       <g v-else>
-        <circle cx="-5" cy="0" r="3"  fill="none" />
+        <circle cx="-5" cy="0" r="3" fill="none" />
       </g>
 
       <g v-if="gameDataLoading">
-        <circle cx="5" cy="0" r="3"  fill="#ffffff" />
+        <circle cx="5" cy="0" r="3" fill="#ffffff" />
       </g>
       <g v-else>
-        <circle cx="5" cy="0" r="3"  fill="none" />
+        <circle cx="5" cy="0" r="3" fill="none" />
       </g>
 
-
-      <text x="0" y="12" font-size="0.5em" text-anchor="middle"  dominant-baseline="central" fill="#888888">
+      <text x="0" y="12" font-size="0.5em" text-anchor="middle" dominant-baseline="central" fill="#888888">
         {{ blockId }}
       </text>
     </g>
@@ -25,7 +24,6 @@
 </template>
 
 <script>
-
 import { useChainStore } from '@/stores/chain'
 import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
@@ -35,18 +33,10 @@ import { useUIStore } from '@/stores/ui'
 export default {
   name: 'ConnectionStatus',
   computed: {
-    ...mapState(useChainStore, [
-      'blockId'
-    ]),
-    ...mapState(useStarMapStore, [
-      'isLoading'
-    ]),
-    ...mapState(useGameStateStore, [
-      'gameDataLoading'
-    ]),
-    ...mapState(useUIStore, [
-      'bottomMostY'
-    ])
+    ...mapState(useChainStore, ['blockId']),
+    ...mapState(useStarMapStore, ['isLoading']),
+    ...mapState(useGameStateStore, ['gameDataLoading']),
+    ...mapState(useUIStore, ['bottomMostY'])
   }
 }
 </script>

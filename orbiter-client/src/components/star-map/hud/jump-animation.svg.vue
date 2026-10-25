@@ -1,68 +1,50 @@
-
 <template>
   <g>
     <!-- The background and star streaks are drawn on canvas (background-canvas.vue). -->
     <g transform="translate(0 -100)">
       <g :transform="getShipTranslate()">
         <g transform="scale(15) rotate(90)">
-            <ship />
+          <ship />
         </g>
         <g transform="rotate(180)">
-            <rect
-                x="35"
-                y="-40"
-                width="1000"
-                height="80"
-                ry="80"
-                rx="80"
-                stroke-width="0"
-                fill="url(#starStreak)" />
-            <rect
-                x="25"
-                y="-89"
-                width="1000"
-                height="40"
-                ry="80"
-                rx="80"
-                stroke-width="0"
-                fill="url(#starStreak)" />
-            <rect
-                x="25"
-                y="49"
-                width="1000"
-                height="40"
-                ry="80"
-                rx="80"
-                stroke-width="0"
-                fill="url(#starStreak)" />
+          <rect x="35" y="-40" width="1000" height="80" ry="80" rx="80" stroke-width="0" fill="url(#starStreak)" />
+          <rect x="25" y="-89" width="1000" height="40" ry="80" rx="80" stroke-width="0" fill="url(#starStreak)" />
+          <rect x="25" y="49" width="1000" height="40" ry="80" rx="80" stroke-width="0" fill="url(#starStreak)" />
         </g>
       </g>
     </g>
 
     <text
-        x="0" y="250"
-        font-size="3em"
-        fill="#ffffffaa"
-        stroke-width="0"
-        text-anchor="middle"
-        alignment-baseline="central">Traveling to a new star system... brb
+      x="0"
+      y="250"
+      font-size="3em"
+      fill="#ffffffaa"
+      stroke-width="0"
+      text-anchor="middle"
+      alignment-baseline="central"
+      >Traveling to a new star system... brb
     </text>
 
     <text
-        x="0" y="300"
-        font-size="1em"
-        fill="#ffffffaa"
-        stroke-width="0"
-        text-anchor="middle"
-        alignment-baseline="central">While the client is waiting for the transaction to complete, did you know:
+      x="0"
+      y="300"
+      font-size="1em"
+      fill="#ffffffaa"
+      stroke-width="0"
+      text-anchor="middle"
+      alignment-baseline="central"
+      >While the client is waiting for the transaction to complete, did you know:
     </text>
     <text
-        x="0" y="320"
-        font-size="1em"
-        fill="#ffffffaa"
-        stroke-width="0"
-        text-anchor="middle"
-        alignment-baseline="central"> {{ loreTip }}
+      x="0"
+      y="320"
+      font-size="1em"
+      fill="#ffffffaa"
+      stroke-width="0"
+      text-anchor="middle"
+      alignment-baseline="central"
+    >
+      {{ loreTip }}
     </text>
   </g>
 </template>
@@ -74,7 +56,7 @@ import Ship from '../sprites/ship.svg'
 
 export default {
   name: 'JumpAnimation',
-  data () {
+  data() {
     return {
       loreTip: '',
       starSpeed: 25
@@ -87,19 +69,25 @@ export default {
     this.loreTip = this.randomLoreTip()
   },
   computed: {
-    ...mapState(useStarMapStore, [
-      'gameTime'
-    ]),
+    ...mapState(useStarMapStore, ['gameTime']),
     // Where the streak cycle is; the ship bobs in time with it.
-    rightSlideX () {
-      return (this.starSpeed * this.gameTime / 10 + 5000) % 10000
+    rightSlideX() {
+      return ((this.starSpeed * this.gameTime) / 10 + 5000) % 10000
     }
   },
   methods: {
-    getShipTranslate () {
-      return 'scale(' + (2 + (Math.sin(this.rightSlideX / 1000) / 50)) + ') translate(' + Math.sin(this.rightSlideX / 300)  + ' ' + Math.sin(this.rightSlideX / 200 + 0.5) + ')'
+    getShipTranslate() {
+      return (
+        'scale(' +
+        (2 + Math.sin(this.rightSlideX / 1000) / 50) +
+        ') translate(' +
+        Math.sin(this.rightSlideX / 300) +
+        ' ' +
+        Math.sin(this.rightSlideX / 200 + 0.5) +
+        ')'
+      )
     },
-    randomLoreTip () {
+    randomLoreTip() {
       let tips = [
         'It is the year 2140, just a little more than a century after humans began off-world colonization.',
         'The Orbiter 8 is the first line of orbiter ships capable of interstellar travel, making it a true "Star Ship"',
@@ -118,5 +106,4 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped lang="scss">
-</style>
+<style scoped lang="scss"></style>

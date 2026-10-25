@@ -3,8 +3,15 @@
     <circle cx="0" cy="0" r="130" stroke="#ffffff" stroke-width="0.15" fill="url(#starGradient)" />
     <circle cx="0" cy="0" r="140" stroke="#ffffff" stroke-width="0" fill="#ffffff00" />
 
-    <circle v-if="graphicsQuality > 1" cx="0" cy="0" r="240" stroke-width="0" fill="url(#glowingGradient)"  pointer-events="none"/>
-
+    <circle
+      v-if="graphicsQuality > 1"
+      cx="0"
+      cy="0"
+      r="240"
+      stroke-width="0"
+      fill="url(#glowingGradient)"
+      pointer-events="none"
+    />
   </g>
 </template>
 
@@ -14,12 +21,9 @@ import { useConfigStore } from '@/stores/config'
 
 export default {
   name: 'star',
-  props: {
-  },
+  props: {},
   computed: {
-    ...mapState(useConfigStore, [
-      'graphicsQuality'
-    ])
+    ...mapState(useConfigStore, ['graphicsQuality'])
   }
 }
 </script>

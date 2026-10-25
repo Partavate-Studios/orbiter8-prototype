@@ -3,20 +3,25 @@
     <div>
       <ship-scene :warmingUp="warmingUp" />
 
-      <div  v-if="step == 1">
-      <p>The time has come to conquer the stars.</p>
-      <p>This Is Your New Starship, <span class="light">{{ gameState.avatar.name }}</span></p>
-      <p>What will you name your new Orbiter 8?</p>
-      <p class="name">
-        <input name="name" v-model="newShipName" @keydown="keydown_check">
-      </p>
-      <p class="next">
-        <span class="button" @click="launch" name="signup">Take Off &#10143;</span>
-      </p>
+      <div v-if="step == 1">
+        <p>The time has come to conquer the stars.</p>
+        <p>
+          This Is Your New Starship, <span class="light">{{ gameState.avatar.name }}</span>
+        </p>
+        <p>What will you name your new Orbiter 8?</p>
+        <p class="name">
+          <input name="name" v-model="newShipName" @keydown="keydown_check" />
+        </p>
+        <p class="next">
+          <span class="button" @click="launch" name="signup">Take Off &#10143;</span>
+        </p>
       </div>
       <div v-if="step == 2">
-      <p>Warming up <span class="light">{{ newShipName }}</span>'s engines!</p>
-      <p>Once the transaction completes we are clear for launch.</p>
+        <p>
+          Warming up <span class="light">{{ newShipName }}</span
+          >'s engines!
+        </p>
+        <p>Once the transaction completes we are clear for launch.</p>
       </div>
     </div>
   </div>
@@ -32,17 +37,15 @@ export default {
     ShipScene
   },
   name: 'launch',
-  data () {
+  data() {
     return {
       newShipName: '',
       step: 1
     }
   },
   methods: {
-    ...mapActions(useGameStateStore, [
-      'launchShip'
-    ]),
-    async launch () {
+    ...mapActions(useGameStateStore, ['launchShip']),
+    async launch() {
       if (this.newShipName.length === 0) {
         alert('You should enter a name')
       } else {
@@ -50,18 +53,16 @@ export default {
         await this.launchShip(this.newShipName)
       }
     },
-    keydown_check (event) {
+    keydown_check(event) {
       if (event.which === 13) {
         this.launch()
       }
     }
   },
   computed: {
-    ...mapState(useGameStateStore, [
-      'gameState'
-    ]),
-    warmingUp () {
-      if(this.step > 1) {
+    ...mapState(useGameStateStore, ['gameState']),
+    warmingUp() {
+      if (this.step > 1) {
         return true
       }
       return false
@@ -71,33 +72,32 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  div.signup {
-    margin: 0em auto;
-    text-align: left;
-    max-width: 30em;
-    overflow: hidden;
-  }
-  input {
-    background-color: #00000020;
-    border: 1px solid #ffffff80;
-    border-radius: 0.5em;
-    color: #fff;
-    padding: 0.15em;
-    text-align: center;
-    margin: 0 auto;
-    font-size: 1.2em;
-    outline: 0;
-    max-width: 95%;
-  }
-  p.name {
-    text-align: center;
-  }
-  p.next {
-    padding: 0.5em;
-    text-align: center;
-  }
-  .light {
-    color: #ffffff;
-  }
-
+div.signup {
+  margin: 0em auto;
+  text-align: left;
+  max-width: 30em;
+  overflow: hidden;
+}
+input {
+  background-color: #00000020;
+  border: 1px solid #ffffff80;
+  border-radius: 0.5em;
+  color: #fff;
+  padding: 0.15em;
+  text-align: center;
+  margin: 0 auto;
+  font-size: 1.2em;
+  outline: 0;
+  max-width: 95%;
+}
+p.name {
+  text-align: center;
+}
+p.next {
+  padding: 0.5em;
+  text-align: center;
+}
+.light {
+  color: #ffffff;
+}
 </style>

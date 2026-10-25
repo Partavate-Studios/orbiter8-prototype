@@ -1,7 +1,17 @@
 <template>
   <g>
     <g font-size="0.8em">
-      <rect x="-5" y="-5" width="55" height="30" rx="5" ry="5" fill="url(#tabGradient)" stroke="#ffffff88" stroke-width="0.5" />
+      <rect
+        x="-5"
+        y="-5"
+        width="55"
+        height="30"
+        rx="5"
+        ry="5"
+        fill="url(#tabGradient)"
+        stroke="#ffffff88"
+        stroke-width="0.5"
+      />
       <g v-if="quantity > 0">
         <text x="5" y="5" text-anchor="start" fill="#ffffff">&#8594;</text>
         <text x="45" y="5" text-anchor="end" fill="#ffffff">{{ Math.abs(quantity) }}x </text>
@@ -17,7 +27,6 @@
 </template>
 
 <script>
-
 export default {
   name: 'TransferTab',
   props: {

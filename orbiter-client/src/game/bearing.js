@@ -7,11 +7,11 @@
  * @param {number} x
  * @param {number} y
  */
-export function bearingDegrees (x, y) {
+export function bearingDegrees(x, y) {
   if (x === 0 && y === 0) {
     return 0
   }
-  return (Math.atan2(y, x) * 180 / Math.PI + 270) % 360
+  return ((Math.atan2(y, x) * 180) / Math.PI + 270) % 360
 }
 
 /**
@@ -23,7 +23,7 @@ export function bearingDegrees (x, y) {
  * @param {number} zoom  the camera's viewport.scale
  * @param {boolean} isStar
  */
-export function scopeOpacity (x, y, zoom, isStar) {
+export function scopeOpacity(x, y, zoom, isStar) {
   let length = Math.sqrt(x * x + y * y) / zoom
   if (isStar) {
     length = length / 2

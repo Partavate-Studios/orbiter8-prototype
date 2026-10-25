@@ -8,27 +8,31 @@
       v-for="planetIndex in spriteIds.planets"
       :key="'planet-layer-' + planetIndex"
       class="planet-layer"
-      :style="{ transform: layerTranslate(planetIndex) }">
+      :style="{ transform: layerTranslate(planetIndex) }"
+    >
       <svg
         :width="layerSize(planetIndex)"
         :height="layerSize(planetIndex)"
         :viewBox="layerViewBox(planetIndex)"
         :style="layerOffset(planetIndex)"
         font-family="Ubuntu, sans-serif"
-        xmlns="http://www.w3.org/2000/svg">
+        xmlns="http://www.w3.org/2000/svg"
+      >
         <g>
           <sprite-transform
             :sprite="systemObjects[planetIndex]"
             :objectIndex="planetIndex"
             type="planet"
-            frame-of="self" />
+            frame-of="self"
+          />
           <sprite-transform
             v-for="childIndex in childrenOf(planetIndex)"
             :key="'sprite-' + childIndex"
             :sprite="systemObjects[childIndex]"
             :objectIndex="childIndex"
             :type="systemObjects[childIndex].type"
-            frame-of="parent" />
+            frame-of="parent"
+          />
         </g>
       </svg>
     </div>
@@ -58,52 +62,48 @@ export default {
     originY: { type: Number, required: true }
   },
   computed: {
-    ...mapState(useStarMapStore, [
-      'systemObjects',
-      'spriteIds',
-      'gameTime'
-    ]),
+    ...mapState(useStarMapStore, ['systemObjects', 'spriteIds', 'gameTime']),
     /** Pixels per world unit at the drawn zoom. */
-    pixelsPerUnit () {
+    pixelsPerUnit() {
       return this.unit / this.drawnView.scale
     },
-    childIndexes () {
+    childIndexes() {
       const children = {}
       for (const [key, sprite] of Object.entries(this.systemObjects)) {
         if (sprite.type !== 'planet' && this.systemObjects[sprite.orbiting]?.type === 'planet') {
-          (children[sprite.orbiting] ??= []).push(key)
+          ;(children[sprite.orbiting] ??= []).push(key)
         }
       }
       return children
     },
     /** Half the width of each planet's layer, in world units. */
-    layerRadius () {
+    layerRadius() {
       const radius = {}
       for (const planetIndex of this.spriteIds.planets) {
         const children = this.childIndexes[planetIndex] ?? []
-        const outermost = Math.max(0, ...children.map(index => this.systemObjects[index].distance))
+        const outermost = Math.max(0, ...children.map((index) => this.systemObjects[index].distance))
         radius[planetIndex] = outermost + LAYER_PADDING
       }
       return radius
     }
   },
   methods: {
-    childrenOf (planetIndex) {
+    childrenOf(planetIndex) {
       return this.childIndexes[planetIndex] ?? []
     },
-    layerSize (planetIndex) {
+    layerSize(planetIndex) {
       return 2 * this.layerRadius[planetIndex] * this.pixelsPerUnit
     },
-    layerViewBox (planetIndex) {
+    layerViewBox(planetIndex) {
       const r = this.layerRadius[planetIndex]
       return -r + ' ' + -r + ' ' + 2 * r + ' ' + 2 * r
     },
-    layerOffset (planetIndex) {
+    layerOffset(planetIndex) {
       const half = -this.layerSize(planetIndex) / 2 + 'px'
       return { left: half, top: half }
     },
     /** Where the planet is this frame, relative to the world origin, in whole device pixels. */
-    layerTranslate (planetIndex) {
+    layerTranslate(planetIndex) {
       // Sprites are raw objects updated in place each frame; reading gameTime makes this re-evaluate per frame.
       void this.gameTime
       const planet = this.systemObjects[planetIndex]
@@ -117,27 +117,27 @@ export default {
 </script>
 
 <style scoped>
-  .planet-layers {
-    position: absolute;
-    width: 0;
-    height: 0;
-    pointer-events: none;
-  }
-  .planet-layer {
-    position: absolute;
-    left: 0;
-    top: 0;
-    /* These layers only ever translate, so keeping them promoted can't leave a blurry scaled bitmap. */
-    will-change: transform;
-  }
-  .planet-layer svg {
-    position: absolute;
-    overflow: visible;
-    shape-rendering: geometricPrecision;
-    text-rendering: geometricPrecision;
-  }
-  /* Only painted parts of the sprites take the mouse; the rest reaches the world layer below. */
-  .planet-layer svg > g {
-    pointer-events: auto;
-  }
+.planet-layers {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.planet-layer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  /* These layers only ever translate, so keeping them promoted can't leave a blurry scaled bitmap. */
+  will-change: transform;
+}
+.planet-layer svg {
+  position: absolute;
+  overflow: visible;
+  shape-rendering: geometricPrecision;
+  text-rendering: geometricPrecision;
+}
+/* Only painted parts of the sprites take the mouse; the rest reaches the world layer below. */
+.planet-layer svg > g {
+  pointer-events: auto;
+}
 </style>

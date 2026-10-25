@@ -21,12 +21,9 @@ import { useConfigStore } from '@/stores/config'
 
 export default {
   name: 'moon',
-  props: {
-  },
+  props: {},
   computed: {
-    ...mapState(useConfigStore, [
-      'graphicsQuality'
-    ])
+    ...mapState(useConfigStore, ['graphicsQuality'])
   }
 }
 </script>

@@ -72,38 +72,42 @@ const deployed = [
     },
     funding: [
       { text: 'Get DEV tokens by ' },
-      { text: 'following this documentation ↗', url: 'https://docs.moonbeam.network/builders/get-started/networks/moonbase/' }
+      {
+        text: 'following this documentation ↗',
+        url: 'https://docs.moonbeam.network/builders/get-started/networks/moonbase/'
+      }
     ]
   }
 ]
 
 // Dev builds only: the chain started by `npm run local`, with addresses from dev/local-deployment.json.
 // Lazy (not eager) so production builds drop the import along with this branch.
-const localLoaders = import.meta.env.DEV
-  ? import.meta.glob('/dev/local-deployment.json', { import: 'default' })
-  : {}
+const localLoaders = import.meta.env.DEV ? import.meta.glob('/dev/local-deployment.json', { import: 'default' }) : {}
 const localDeployment = await Object.values(localLoaders)[0]?.()
 
 /** @type {Network[]} */
 export const networks = localDeployment
-  ? [...deployed, {
-      chainId: localDeployment.chainId,
-      name: 'Local Dev Chain',
-      shortName: 'Local',
-      currency: { name: 'Dev Ether', symbol: 'ETH', decimals: 18 },
-      rpc: ['http://127.0.0.1:8545'],
-      explorer: [],
-      contracts: {
-        Orbiter8: localDeployment.contracts.Orbiter8,
-        AvatarControls: localDeployment.contracts.AvatarControls
-      },
-      funding: [{ text: 'Test accounts on the local chain start with 10,000 ETH.' }]
-    }]
+  ? [
+      ...deployed,
+      {
+        chainId: localDeployment.chainId,
+        name: 'Local Dev Chain',
+        shortName: 'Local',
+        currency: { name: 'Dev Ether', symbol: 'ETH', decimals: 18 },
+        rpc: ['http://127.0.0.1:8545'],
+        explorer: [],
+        contracts: {
+          Orbiter8: localDeployment.contracts.Orbiter8,
+          AvatarControls: localDeployment.contracts.AvatarControls
+        },
+        funding: [{ text: 'Test accounts on the local chain start with 10,000 ETH.' }]
+      }
+    ]
   : deployed
 
 /** @returns {Network | undefined} */
-export function networkFor (chainId) {
-  return networks.find(network => network.chainId === Number(chainId))
+export function networkFor(chainId) {
+  return networks.find((network) => network.chainId === Number(chainId))
 }
 
 // Names for common networks the game isn't on, so "wrong network" messages can say which one.
@@ -119,6 +123,6 @@ const otherNetworkNames = {
 }
 
 /** A display name for any chain id. */
-export function chainName (chainId) {
+export function chainName(chainId) {
   return networkFor(chainId)?.name ?? otherNetworkNames[Number(chainId)] ?? 'chain ' + chainId
 }

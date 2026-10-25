@@ -1,15 +1,12 @@
 <template>
   <g font-size="0.8em">
     <g v-if="portInventory > 0">
-        <text x="-100" y="0" text-anchor="start">
-            Buy {{ label }}</text>
+      <text x="-100" y="0" text-anchor="start"> Buy {{ label }}</text>
     </g>
     <g v-else-if="portInventory < 0">
-        <text x="-100" y="0" text-anchor="start">
-            Sell {{ label }}</text>
+      <text x="-100" y="0" text-anchor="start"> Sell {{ label }}</text>
     </g>
-        <text x="100" y="0" text-anchor="end">
-            {{ Math.abs(inventoryToTrade) }} / {{ maxAllowed }}</text>
+    <text x="100" y="0" text-anchor="end"> {{ Math.abs(inventoryToTrade) }} / {{ maxAllowed }}</text>
 
     <g transform="translate(0 20) scale(1.25)">
       <slider
@@ -20,9 +17,9 @@
         :highestValue="Math.abs(maxHolds)"
         :highlightValue="Math.abs(maxAllowed)"
         :reverse="getReverse"
-        :currentValue="Math.abs(inventoryToTrade)" />
+        :currentValue="Math.abs(inventoryToTrade)"
+      />
     </g>
-
   </g>
 </template>
 
@@ -32,7 +29,7 @@ import Slider from './slider.svg'
 export default {
   name: 'TradeMenuInventory',
   methods: {
-    calculatedReturnValue ($event) {
+    calculatedReturnValue($event) {
       return Math.min(parseInt(Math.round($event * this.maxHolds)), this.maxAllowed) * Math.sign(this.portInventory)
     },
     incrementValue() {
@@ -40,7 +37,7 @@ export default {
     },
     decrementValue() {
       return Math.max(Math.abs(this.inventoryToTrade) - 1, 0) * Math.sign(this.portInventory)
-    },
+    }
   },
   computed: {
     getReverse() {
@@ -78,5 +75,4 @@ export default {
 }
 </script>
 
-<style lang="scss">
-</style>
+<style lang="scss"></style>

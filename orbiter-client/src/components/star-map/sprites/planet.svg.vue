@@ -5,20 +5,20 @@
     <circle cx="0" cy="0" r="10" stroke="#c3b3da" stroke-width="0.25" fill="url(#planetGradient)" />
 
     <g v-if="graphicsQuality > 1" clip-path="url(#just-the-planet)" :transform="'rotate(' + surfaceRotation + ')'">
-      <g v-if="planet.class == 0"  stroke-width="0.5" stroke="#ffffff11" fill="#ffffff22" >
-      <!-- Earth Like -->
+      <g v-if="planet.class == 0" stroke-width="0.5" stroke="#ffffff11" fill="#ffffff22">
+        <!-- Earth Like -->
         <rect x="-2" y="-8" width="12" height="2" rx="1" ry="1" />
         <rect x="0" y="-6" width="14" height="2" rx="1" ry="1" />
         <rect x="-2" y="-5" width="7" height="2" rx="1" ry="1" />
-        <rect x="-9" y="-7" width="6" height="2" rx="1" ry="1"  />
-        <rect x="-10" y="-4" width="10" height="2" rx="1" ry="1"  />
-        <rect x="-1" y="-2" width="12" height="2" rx="1" ry="1"  />
-        <rect x="-12"  y="1" width="12" height="2" rx="1" ry="1"  />
-        <rect x="-10"  y="3" width="14" height="2" rx="1" ry="1"  />
-        <rect x="-4"  y="4" width="14" height="2" rx="1" ry="1"  />
-        <rect x="0"  y="6" width="6" height="2" rx="1" ry="1"  />
-        <rect x="-6"  y="8" width="4" height="2" rx="1" ry="1"  />
-        <rect x="-10"  y="9" width="12" height="2" rx="1" ry="1"  />
+        <rect x="-9" y="-7" width="6" height="2" rx="1" ry="1" />
+        <rect x="-10" y="-4" width="10" height="2" rx="1" ry="1" />
+        <rect x="-1" y="-2" width="12" height="2" rx="1" ry="1" />
+        <rect x="-12" y="1" width="12" height="2" rx="1" ry="1" />
+        <rect x="-10" y="3" width="14" height="2" rx="1" ry="1" />
+        <rect x="-4" y="4" width="14" height="2" rx="1" ry="1" />
+        <rect x="0" y="6" width="6" height="2" rx="1" ry="1" />
+        <rect x="-6" y="8" width="4" height="2" rx="1" ry="1" />
+        <rect x="-10" y="9" width="12" height="2" rx="1" ry="1" />
       </g>
       <g v-if="planet.class == 1" stroke-width="0.5" stroke="#00000011" fill="#340f6122">
         <circle cx="-5" cy="-5" r="1" />
@@ -39,71 +39,68 @@
         <circle cx="5" cy="-5" r="0.75" />
         <circle cx="-2" cy="-1" r="0.5" />
       </g>
-      <g v-if="planet.class == 2">
-      </g>
-      <g v-if="planet.class == 3">
-      </g>
-      <g v-if="planet.class == 4"  stroke-width="0" stroke="#ffffff11" fill="#ffffff22" >
-      <!-- Thin Atmo -->
+      <g v-if="planet.class == 2"> </g>
+      <g v-if="planet.class == 3"> </g>
+      <g v-if="planet.class == 4" stroke-width="0" stroke="#ffffff11" fill="#ffffff22">
+        <!-- Thin Atmo -->
         <rect x="-2" y="-8" width="12" height="1" rx="1" ry="1" />
-        <rect x="-9" y="-7" width="6" height="1" rx="1" ry="1"  />
-        <rect x="-10" y="-4" width="10" height="1" rx="1" ry="1"  />
-        <rect x="-10"  y="3" width="14" height="1" rx="1" ry="1"  />
-        <rect x="0"  y="6" width="6" height="1" rx="1" ry="1"  />
-        <rect x="-6"  y="8" width="4" height="1" rx="1" ry="1"  />
+        <rect x="-9" y="-7" width="6" height="1" rx="1" ry="1" />
+        <rect x="-10" y="-4" width="10" height="1" rx="1" ry="1" />
+        <rect x="-10" y="3" width="14" height="1" rx="1" ry="1" />
+        <rect x="0" y="6" width="6" height="1" rx="1" ry="1" />
+        <rect x="-6" y="8" width="4" height="1" rx="1" ry="1" />
       </g>
-    <!-- gassy rocky -->
+      <!-- gassy rocky -->
       <g v-if="planet.class == 5" stroke-width="0.5" stroke="#ffffff11" fill="#00000022">
         <rect x="-10" y="-9" width="17" height="4" rx="2" ry="2" />
         <rect x="4" y="-7" width="10" height="4" rx="2" ry="2" />
-        <rect x="-9" y="-6" width="12" height="4" rx="2" ry="2"  />
+        <rect x="-9" y="-6" width="12" height="4" rx="2" ry="2" />
         <rect x="-2" y="-5" width="12" height="4" rx="2" ry="2" />
-        <rect x="-10" y="-3" width="6" height="4" rx="2" ry="2"  />
-        <rect x="-1" y="-2" width="12" height="4" rx="2" ry="2"  />
-        <rect x="-10"  y="0" width="18" height="4" rx="2" ry="2"  />
-        <rect x="-6"  y="1" width="18" height="4" rx="2" ry="2"  />
-        <rect x="-12"  y="3" width="12" height="4" rx="2" ry="2"  />
-        <rect x="0"  y="5" width="12" height="4" rx="2" ry="2"  />
-        <rect x="-6"  y="6" width="10" height="4" rx="2" ry="2"  />
-        <rect x="-10"  y="8" width="12" height="4" rx="2" ry="2"  />
+        <rect x="-10" y="-3" width="6" height="4" rx="2" ry="2" />
+        <rect x="-1" y="-2" width="12" height="4" rx="2" ry="2" />
+        <rect x="-10" y="0" width="18" height="4" rx="2" ry="2" />
+        <rect x="-6" y="1" width="18" height="4" rx="2" ry="2" />
+        <rect x="-12" y="3" width="12" height="4" rx="2" ry="2" />
+        <rect x="0" y="5" width="12" height="4" rx="2" ry="2" />
+        <rect x="-6" y="6" width="10" height="4" rx="2" ry="2" />
+        <rect x="-10" y="8" width="12" height="4" rx="2" ry="2" />
       </g>
-    <!-- gas giant -->
+      <!-- gas giant -->
       <g v-if="planet.class == 6" stroke-width="0.5" stroke="#5c1aae22" fill="#ffffff22">
         <rect x="-10" y="-9" width="17" height="4" rx="2" ry="2" />
         <rect x="4" y="-7" width="10" height="4" rx="2" ry="2" />
-        <rect x="-9" y="-6" width="12" height="4" rx="2" ry="2"  />
+        <rect x="-9" y="-6" width="12" height="4" rx="2" ry="2" />
         <rect x="-2" y="-5" width="12" height="4" rx="2" ry="2" />
-        <rect x="-10" y="-3" width="6" height="4" rx="2" ry="2"  />
-        <rect x="-1" y="-2" width="12" height="4" rx="2" ry="2"  />
-        <rect x="-10"  y="0" width="18" height="4" rx="2" ry="2"  />
-        <rect x="-6"  y="1" width="18" height="4" rx="2" ry="2"  />
-        <rect x="-12"  y="3" width="12" height="4" rx="2" ry="2"  />
-        <rect x="0"  y="5" width="12" height="4" rx="2" ry="2"  />
-        <rect x="-6"  y="6" width="10" height="4" rx="2" ry="2"  />
-        <rect x="-10"  y="8" width="12" height="4" rx="2" ry="2"  />
+        <rect x="-10" y="-3" width="6" height="4" rx="2" ry="2" />
+        <rect x="-1" y="-2" width="12" height="4" rx="2" ry="2" />
+        <rect x="-10" y="0" width="18" height="4" rx="2" ry="2" />
+        <rect x="-6" y="1" width="18" height="4" rx="2" ry="2" />
+        <rect x="-12" y="3" width="12" height="4" rx="2" ry="2" />
+        <rect x="0" y="5" width="12" height="4" rx="2" ry="2" />
+        <rect x="-6" y="6" width="10" height="4" rx="2" ry="2" />
+        <rect x="-10" y="8" width="12" height="4" rx="2" ry="2" />
       </g>
-    <!-- ferrous -->
+      <!-- ferrous -->
       <g v-if="planet.class == 7" stroke="#c3b3da44" stroke-width="0.15" fill="#340f6122">
         <circle cx="-2.5" cy="2" r="1.5" />
-        <circle cx="2" cy="-2.5" r="0.75"  />
-        <circle cx="3" cy="2" r="1"  />
-        <circle cx="-2.5" cy="-3.5" r="0.5"  />
-        <circle cx="-6" cy="-2" r="1"  />
-        <circle cx="6" cy="-1" r="1"  />
-        <circle cx="-2" cy="-6" r="0.75"  />
-        <circle cx="-0.5" cy="6" r="0.5"  />
-        <circle cx="7" cy="3" r="3"  />
-        <circle cx="10" cy="-4" r="1"  />
-        <circle cx="-5" cy="-6" r="2"  />
-        <circle cx="-5" cy="6" r="1"  />
+        <circle cx="2" cy="-2.5" r="0.75" />
+        <circle cx="3" cy="2" r="1" />
+        <circle cx="-2.5" cy="-3.5" r="0.5" />
+        <circle cx="-6" cy="-2" r="1" />
+        <circle cx="6" cy="-1" r="1" />
+        <circle cx="-2" cy="-6" r="0.75" />
+        <circle cx="-0.5" cy="6" r="0.5" />
+        <circle cx="7" cy="3" r="3" />
+        <circle cx="10" cy="-4" r="1" />
+        <circle cx="-5" cy="-6" r="2" />
+        <circle cx="-5" cy="6" r="1" />
       </g>
-    <!-- Lava -->
+      <!-- Lava -->
       <g v-if="planet.class == 8" stroke-width="0" stroke="none" fill="#ffffff44">
         <circle cx="0" cy="0" r="9" />
       </g>
-    <!-- Swamp -->
-      <g v-if="planet.class == 9">
-      </g>
+      <!-- Swamp -->
+      <g v-if="planet.class == 9"> </g>
     </g>
 
     <circle
@@ -113,21 +110,21 @@
       stroke="url(#ringGradient)"
       opacity="0.5"
       :stroke-width="planet.rings"
-      fill="none" />
+      fill="none"
+    />
     <g v-if="graphicsQuality > 1">
       <circle
         v-for="n in parseInt(planet.rings)"
         :key="n"
         cx="0"
         cy="0"
-        :r="20 + (n - (planet.rings/2))"
+        :r="20 + (n - planet.rings / 2)"
         stroke="url(#ringGradient)"
         opacity="0.2"
-        :stroke-width="0.1 + ((planet.rings/2) - Math.abs(n - (planet.rings/2)))/100"
-        fill="none" />
+        :stroke-width="0.1 + (planet.rings / 2 - Math.abs(n - planet.rings / 2)) / 100"
+        fill="none"
+      />
     </g>
-
-
   </g>
 </template>
 
@@ -141,7 +138,7 @@ export default {
   props: {
     planet: {
       type: Object,
-      default () {
+      default() {
         return {
           rings: 0
         }
@@ -149,14 +146,10 @@ export default {
     }
   },
   computed: {
-    ...mapState(useConfigStore, [
-      'graphicsQuality'
-    ]),
-    ...mapState(useStarMapStore, [
-      'gameTime'
-    ]),
+    ...mapState(useConfigStore, ['graphicsQuality']),
+    ...mapState(useStarMapStore, ['gameTime']),
     // The surface turns against the sprite's rotation, so it appears to spin under the clip.
-    surfaceRotation () {
+    surfaceRotation() {
       // Sprites are raw objects updated in place each frame; reading gameTime makes this re-evaluate per frame.
       void this.gameTime
       // Same 0.25° steps as the sprite's own rotation (sprite-transform), so they cancel exactly.

@@ -11,8 +11,15 @@ import { useUIStore } from '@/stores/ui'
 import { blockData } from '@/test/star-system'
 
 const silentAudio = {
-  playEffect () {}, playMusic () {}, stopMusic () {}, silenceMusic () {}, resumeMusic () {},
-  getMusicVolume: () => 0.25, getEffectsVolume: () => 0.25, setMusicVolume () {}, setEffectsVolume () {}
+  playEffect() {},
+  playMusic() {},
+  stopMusic() {},
+  silenceMusic() {},
+  resumeMusic() {},
+  getMusicVolume: () => 0.25,
+  getEffectsVolume: () => 0.25,
+  setMusicVolume() {},
+  setEffectsVolume() {}
 }
 
 let app, problems, ui
@@ -23,8 +30,8 @@ beforeEach(() => {
   app = createApp({ render: () => h('svg', [h(Hud)]) })
   app.use(pinia)
   app.config.globalProperties.o8audio = silentAudio
-  app.config.errorHandler = error => problems.push(error)
-  app.config.warnHandler = message => problems.push(message)
+  app.config.errorHandler = (error) => problems.push(error)
+  app.config.warnHandler = (message) => problems.push(message)
 
   const starMap = useStarMapStore(pinia)
   starMap.starId = 7
@@ -45,7 +52,7 @@ beforeEach(() => {
 
 afterEach(() => app.unmount())
 
-async function settle () {
+async function settle() {
   await nextTick()
   await nextTick()
 }

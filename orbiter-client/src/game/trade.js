@@ -10,12 +10,12 @@
 export const MAX_CARGO_HOLDS = 250
 
 /** Holds in use. @param {ShipCargo} ship */
-export function usedHolds (ship) {
+export function usedHolds(ship) {
   return ship.equipment + ship.fuel + ship.organics
 }
 
 /** Free holds. @param {ShipCargo} ship */
-export function emptyHolds (ship) {
+export function emptyHolds(ship) {
   return ship.holds - usedHolds(ship)
 }
 
@@ -24,17 +24,17 @@ export function emptyHolds (ship) {
  * @param {Goods} amounts  what the player trades
  * @param {Goods} prices  the port's price per unit
  */
-export function tradeBalance (amounts, prices) {
+export function tradeBalance(amounts, prices) {
   return -(amounts.equipment * prices.equipment + amounts.fuel * prices.fuel + amounts.organics * prices.organics)
 }
 
 /** Free holds after the trade. @param {ShipCargo} ship @param {Goods} amounts */
-export function emptyHoldsAfterTrade (ship, amounts) {
+export function emptyHoldsAfterTrade(ship, amounts) {
   return emptyHolds(ship) - amounts.equipment - amounts.fuel - amounts.organics
 }
 
 /** @param {Goods} amounts */
-export function isEmptyTrade (amounts) {
+export function isEmptyTrade(amounts) {
   return amounts.equipment === 0 && amounts.fuel === 0 && amounts.organics === 0
 }
 
@@ -42,7 +42,7 @@ export function isEmptyTrade (amounts) {
  * Whether a trade can go through: something is traded, the player can pay, and it fits.
  * @param {{ credits: number, ship: ShipCargo, amounts: Goods, prices: Goods }} trade
  */
-export function isValidTrade ({ credits, ship, amounts, prices }) {
+export function isValidTrade({ credits, ship, amounts, prices }) {
   if (isEmptyTrade(amounts)) return false
   if (credits + tradeBalance(amounts, prices) < 0) return false
   return emptyHoldsAfterTrade(ship, amounts) >= 0
@@ -56,7 +56,7 @@ export function isValidTrade ({ credits, ship, amounts, prices }) {
  * @param {number} shipGoods  how much the ship carries
  * @param {number} freeHolds  free holds, counting this good's current amount in the trade as free
  */
-export function maxTradable (portGoods, shipGoods, freeHolds) {
+export function maxTradable(portGoods, shipGoods, freeHolds) {
   if (portGoods < 0) {
     return Math.min(Math.abs(shipGoods), Math.abs(portGoods))
   }
@@ -71,7 +71,7 @@ export function maxTradable (portGoods, shipGoods, freeHolds) {
  * @param {number} current  the amount in the trade so far
  * @param {number} freeHolds  free holds with the trade as it stands
  */
-export function clampTradeAmount (requested, current, freeHolds) {
+export function clampTradeAmount(requested, current, freeHolds) {
   if (requested <= 0 && requested <= current) {
     return requested
   }
@@ -84,11 +84,11 @@ export function clampTradeAmount (requested, current, freeHolds) {
  * @param {number} currentHolds
  * @param {number} holdPrice
  */
-export function maxHoldsToBuy (credits, currentHolds, holdPrice) {
+export function maxHoldsToBuy(credits, currentHolds, holdPrice) {
   return Math.min(MAX_CARGO_HOLDS - currentHolds, Math.floor(credits / holdPrice))
 }
 
 /** Whether the player has enough credits for a purchase. */
-export function canAfford (credits, cost) {
+export function canAfford(credits, cost) {
   return credits >= cost
 }
