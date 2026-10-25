@@ -84,9 +84,10 @@ const deployed = [
   }
 ]
 
-// Dev builds only: the chain started by `npm run local`, with addresses from dev/local-deployment.json.
-// Lazy (not eager) so production builds drop the import along with this branch.
-const localLoaders = import.meta.env.DEV ? import.meta.glob('/dev/local-deployment.json', { import: 'default' }) : {}
+// Dev builds (and `npm run build:local`) only: the chain started by `npm run local`, with addresses
+// from dev/local-deployment.json. Lazy (not eager) so production builds drop the import along with this branch.
+const includeLocal = import.meta.env.DEV || import.meta.env.VITE_LOCAL_NETWORK === '1'
+const localLoaders = includeLocal ? import.meta.glob('/dev/local-deployment.json', { import: 'default' }) : {}
 const localDeployment = await Object.values(localLoaders)[0]?.()
 
 /** @type {Network[]} */

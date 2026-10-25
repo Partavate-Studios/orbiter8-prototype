@@ -3,7 +3,7 @@ import pluginVue from 'eslint-plugin-vue'
 import globals from 'globals'
 
 export default [
-  { ignores: ['dist/', 'src/contract-artifacts/'] },
+  { ignores: ['dist/', 'dist-local/', 'src/contract-artifacts/'] },
   js.configs.recommended,
   ...pluginVue.configs['flat/recommended'],
   {
