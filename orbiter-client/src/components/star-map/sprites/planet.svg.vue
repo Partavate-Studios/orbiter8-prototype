@@ -4,7 +4,7 @@
 
     <circle cx="0" cy="0" r="10" stroke="#c3b3da" stroke-width="0.25" fill="url(#planetGradient)" />
 
-    <g v-if="graphicsQuality > 2" clip-path="url(#just-the-planet)" :transform="'rotate(' + surfaceRotation + ')'">
+    <g v-if="graphicsQuality > 1" clip-path="url(#just-the-planet)" :transform="'rotate(' + surfaceRotation + ')'">
       <g v-if="planet.class == 0"  stroke-width="0.5" stroke="#ffffff11" fill="#ffffff22" >
       <!-- Earth Like -->
         <rect x="-2" y="-8" width="12" height="2" rx="1" ry="1" />
