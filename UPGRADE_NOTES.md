@@ -433,6 +433,40 @@ src/sdk/
   - Owner names and the star's id on first load were stale.
   - Two store mappings I removed in Phase 6 were still in use.
 
+### Step 3: thin stores (done)
+
+- **`sdk/client.js` `createGameClient()`** is the game client; the app has one, `game`.
+  - It connects to a wallet and binds the contracts (including the token addresses).
+  - It watches blocks and, when a block touches the game, reloads the player, recent events and the current system.
+  - It keeps all of that in one plain `state` object and calls subscribers with what changed. A failed load is reported as `{ error, what }`, and the previous state is kept.
+  - It exposes `actions`.
+- **`stores/game-bindings.js`** copies each change into the Pinia stores. The stores no longer load anything. What's left in them:
+  - **Chain:** wallet discovery and choice, and the poll timer, which pauses while the tab is hidden.
+  - **GameState:** the actions' error logging and the jump animation around `moveTo`.
+  - **StarMap:** turning a loaded system into game objects and sprites.
+- **Vue cleanups:**
+  - Props are declared with types, events with `emits`.
+  - Component names match their files: `NetworkSelect` was still named `howtoweb3`.
+  - Templates no longer use `this.`, and five template-called methods became computed properties.
+  - The Vuex-era `setProp` setters are gone, along with state nothing read.
+  - ESLint uses `eslint-plugin-vue` `flat/recommended`, with the layout rules off since Prettier owns layout. Its style fixes are in a commit of their own (`b5a3185`).
+- **Checked live on the local chain:**
+  - an empty block is skipped;
+  - a chat message triggers a reload and appears;
+  - a real jump loads the new system and ends the jump animation;
+  - trades, slider events and the slide-up menus' close button work.
+
+### Step 4: tests for the sync logic (done)
+
+- **`sdk/client.test.js`** runs the game client against a scripted chain:
+  - the first block loads everything;
+  - blocks that don't touch the game are skipped;
+  - overlapping checks are ignored;
+  - a system reload already in flight isn't started twice;
+  - a failed load is reported and keeps the previous state.
+- **`sdk/chain/contracts.test.js`** checks `gameChangedBetween` against scripted blocks.
+- 55 tests in all, under 2 s.
+
 ## Bugs
 
 ### Fixed
@@ -677,12 +711,12 @@ Each phase goes on `modernize` with its own commits. Bug fixes get separate comm
 7. **Phase 6b, data layer** (agreed with Koda 2026-10-25; see "Architecture: data flow" below). Behavior-preserving: the contracts don't change, and the captures and tests must match.
    1. ~~Move sync and actions into `src/sdk/`, with no Vue imports. Decode contract tuples into named game objects there.~~ Done; see the Phase 6b section.
    2. ~~Split game data from drawing data in `Sprite`.~~ Done; see the Phase 6b section.
-   3. Make the stores thin subscribers. At the same time:
+   3. ~~Make the stores thin subscribers.~~ Done; see the Phase 6b section. At the same time:
       - remove `setProp`;
       - declare props (with types) and emits;
       - turn template-called methods into computed values;
       - switch ESLint to `flat/recommended`.
-   4. Add tests for the sync logic, against fixture chain data.
+   4. ~~Add tests for the sync logic, against fixture chain data.~~ Done.
    5. Frame loop: the loop writes sprite transforms directly, and Vue renders only on rarer changes (selection, labels, menus). This removes the `void this.gameTime` per-frame re-render. Measure it with the same trace.
 8. **Phase 7, verification.** Same harness: `docs/after/`, the trace comparison, paint flashing, a manual checklist for Koda, and the code review.
 
