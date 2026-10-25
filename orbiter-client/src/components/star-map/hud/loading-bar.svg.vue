@@ -2,7 +2,7 @@
   <g>
       <defs>
       <linearGradient id="barGradient"
-        x1="0%" y1="0%" x2="0%" y2="100%" gradientTransform="rotate(0)">
+        x1="0%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" stop-color="#5c1aae" stop-opacity="1"/>
           <stop offset="10%" stop-color="#c3b3da" stop-opacity="1"/>
           <stop offset="15%" stop-color="#ffffff" stop-opacity="1"/>

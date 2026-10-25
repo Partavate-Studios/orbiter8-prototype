@@ -26,8 +26,7 @@
         height="8"
         rx = "4"
         ry = "4"
-        fill="#ffffff"
-        transform=" translate(0 0) " />
+        fill="#ffffff" />
 
     </icon>
   </g>

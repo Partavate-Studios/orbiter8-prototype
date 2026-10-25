@@ -4,13 +4,13 @@
       <g>
         <g transform="translate(0 -400)" dominant-baseline="middle" text-anchor="middle" >
 
-          <g transform="">
+          <g>
             <text x="0" y="5" fill="#ffffff88"
                 font-size="1.5em"> Broadcasts  </text>
           </g>
 
 
-          <g transform="" v-for="(event, index) in chatEvents" :key="'event' + index">
+          <g v-for="(event, index) in chatEvents" :key="'event' + index">
             <g v-if="index < 12" :transform="'translate(0 ' + (50 + 40 * index) +  ')'" :opacity="1 - index / 15">
                 <chat-slot-container :name="getName(event.returnValues._sender)" :message="event.returnValues._message" :blockId="blockId - event.blockNumber">
                 </chat-slot-container>

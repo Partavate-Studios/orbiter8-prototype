@@ -2,7 +2,7 @@
   <g v-if="objectId != null">
     <menu-container>
       <g v-if="pending">
-            <g transform="translate(0 0)">
+            <g>
               <ship-upgrade :cargoHolds="avatar.ship.holds" :predictedLoad="avatar.ship.holds" :existingLoad="0" />
             </g>
           <g  transform="translate(0 220)">
@@ -12,7 +12,7 @@
       <g v-else>
         <g transform="translate(0 -400)" dominant-baseline="middle" text-anchor="middle" >
 
-          <g transform="">
+          <g>
             <text x="0" y="5" fill="#ffffff88"
                 font-size="1.5em">{{ systemObjects[this.objectId].name }}</text>
           </g>

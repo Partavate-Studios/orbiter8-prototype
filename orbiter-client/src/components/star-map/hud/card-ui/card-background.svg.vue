@@ -2,7 +2,7 @@
     <g>
 
     <g @mousedown.stop="handleMouseDown">
-      <g transform="translate(-70 -70) scale(1)">
+      <g transform="translate(-70 -70)">
         <g>
           <rect
             x="-2"

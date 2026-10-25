@@ -1,6 +1,6 @@
 <template>
   <g>
-    <g :transform="'translate(0 0) scale(' + scopeButtonScale() + ')'">
+    <g :transform="'scale(' + scopeButtonScale() + ')'">
       <a
         v-on:click.prevent="toggleScope()"
         v-on:mouseout="setSpriteToDisplay(null)"

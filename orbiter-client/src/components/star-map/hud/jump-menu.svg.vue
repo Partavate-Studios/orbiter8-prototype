@@ -1,6 +1,6 @@
 
 <template>
-  <g transform="">
+  <g>
 
     <a
       cursor="pointer"

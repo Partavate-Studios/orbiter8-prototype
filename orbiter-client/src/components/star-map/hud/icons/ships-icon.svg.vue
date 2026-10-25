@@ -1,7 +1,7 @@
 <template>
   <g>
     <icon>
-      <ship transform="translate(16 -6) scale(1)" />
+      <ship transform="translate(16 -6)" />
       <ship transform="translate(6 0) scale(1.5)" />
       <ship transform="translate(-8 8) scale(2)" />
     </icon>

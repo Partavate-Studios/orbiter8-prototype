@@ -1,5 +1,5 @@
 <template>
-  <g transform="" font-size="0.8em">
+  <g font-size="0.8em">
     <g v-if="portInventory > 0">
         <text x="-100" y="0" text-anchor="start">
             Buy {{ label }}</text>

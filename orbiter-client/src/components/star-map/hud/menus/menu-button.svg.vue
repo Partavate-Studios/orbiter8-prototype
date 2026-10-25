@@ -1,5 +1,5 @@
 <template>
-  <g dominant-baseline="middle" transform="">
+  <g dominant-baseline="middle">
     <rect
       x="-125"
       y="-16"

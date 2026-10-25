@@ -3,7 +3,7 @@
     <menu-container>
 
       <g v-if="pending">
-            <g transform="translate(0 0)">
+            <g>
               <ship-cargo :cargoHolds="0" :predictedLoad="0" :existingLoad="0" />
             </g>
           <g  transform="translate(0 220)">

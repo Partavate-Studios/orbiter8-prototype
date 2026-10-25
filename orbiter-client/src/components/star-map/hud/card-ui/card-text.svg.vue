@@ -1,5 +1,5 @@
 <template>
-  <g transform="translate(-70 -70) scale(1)">
+  <g transform="translate(-70 -70)">
 
     <text fill="#000000" x="70" y="10" font-size="0.5em" text-anchor="middle" transform="translate(0 5)" font-style="bold" stroke="#000000" stroke-width="2" opacity="0.3">
       {{ systemObjects[objectId].name }}

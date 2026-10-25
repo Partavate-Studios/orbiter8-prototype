@@ -2,7 +2,7 @@
   <g>
     <defs>
       <linearGradient id="profileGradient"
-        x1="0%" y1="0%" x2="100%" y2="100%" gradientTransform="rotate(0)">
+        x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stop-color="#7c39cd" stop-opacity="1"/>
           <stop offset="20%" stop-color="#280b4b" stop-opacity="1"/>
           <stop offset="50%" stop-color="#5c1aae" stop-opacity="1"/>

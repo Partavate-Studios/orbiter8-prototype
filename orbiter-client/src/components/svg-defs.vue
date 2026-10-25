@@ -96,7 +96,7 @@
 
       <!-- Info cards -->
       <linearGradient id="cardGradient"
-        x1="0%" y1="0%" x2="100%" y2="100%" gradientTransform="rotate(0)">
+        x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stop-color="#5c1aae" stop-opacity="1"/>
           <stop offset="10%" stop-color="#280b4b" stop-opacity="1"/>
           <stop offset="50%" stop-color="#5c1aae" stop-opacity="1"/>
@@ -106,31 +106,31 @@
 
       <!-- Cargo hold blocks -->
       <linearGradient id="emptyBlockGradient"
-        x1="0%" y1="0%" x2="0%" y2="100%" gradientTransform="rotate(0)">
+        x1="0%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" stop-color="#c3b3da00" stop-opacity="1"/>
           <stop offset="100%" stop-color="#ffffff00" stop-opacity="1"/>
         </linearGradient>
       <linearGradient id="fullBlockGradient"
-        x1="0%" y1="0%" x2="0%" y2="100%" gradientTransform="rotate(0)">
+        x1="0%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" stop-color="#c3b3da" stop-opacity="1"/>
           <stop offset="100%" stop-color="#ffffff" stop-opacity="1"/>
       </linearGradient>
       <linearGradient id="soldBlockGradient"
-        x1="0%" y1="0%" x2="0%" y2="100%" gradientTransform="rotate(0)">
+        x1="0%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" stop-color="#c3b3da" stop-opacity="1"/>
           <stop offset="100%" stop-color="#5c1aae" stop-opacity="1"/>
       </linearGradient>
 
       <!-- Trade menu tabs -->
       <linearGradient id="tabGradient"
-        x1="0%" y1="0%" x2="100%" y2="0%" gradientTransform="rotate(0)">
+        x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%" stop-color="#290C4C" stop-opacity="1"/>
           <stop offset="40%" stop-color="#310F5Ddd" stop-opacity="1"/>
           <stop offset="100%" stop-color="#5D1EB0" stop-opacity="1"/>
         </linearGradient>
 
       <linearGradient id="cargoTabGradient"
-        x1="0%" y1="0%" x2="100%" y2="0%" gradientTransform="rotate(0)">
+        x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%" stop-color="#5D1EB0" stop-opacity="1"/>
           <stop offset="60%" stop-color="#310F5Ddd" stop-opacity="1"/>
           <stop offset="100%" stop-color="#290C4C" stop-opacity="1"/>

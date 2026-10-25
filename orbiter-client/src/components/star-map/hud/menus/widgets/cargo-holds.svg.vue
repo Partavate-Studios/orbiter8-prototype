@@ -1,5 +1,5 @@
 <template>
-  <g transform="">
+  <g>
       <rect
         v-for="n in maxCargoHolds"
         :key="'hold-' + n"
