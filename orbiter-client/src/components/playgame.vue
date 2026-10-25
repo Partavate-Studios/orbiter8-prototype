@@ -92,19 +92,9 @@ export default {
       'mousewheelAnimateTo'
     ]),
     onWheel (event) {
-      let scale = 1
-      let time = 100
-      if (event.deltaY < 0) {
-        scale = 0.8
-      } else {
-        scale = 1.25
-      }
-      this.mousewheelAnimateTo(
-        {
-          scale: scale,
-          time: time
-        }
-      )
+      // Wheel up zooms in (smaller scale = closer), each step over 100 ms.
+      const scale = event.deltaY < 0 ? 0.8 : 1.25
+      this.mousewheelAnimateTo({ scale, time: 100 })
     },
     handleKeyPress (event) {
       switch (event.key) {

@@ -215,6 +215,7 @@ export default {
           try {
             await walletRequest('wallet_addEthereumChain', data)
           } catch (error) {
+            console.error('Adding the network failed:', error.shortMessage ?? error.message)
             alert('We were unable to add the network.')
           }
 

@@ -52,7 +52,7 @@
 
 
 export default {
-  name: 'Button',
+  name: 'CardButton',
   props: {
     text: {
       type: String,
