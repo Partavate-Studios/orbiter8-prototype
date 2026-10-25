@@ -256,6 +256,61 @@ Also found:
 - **`scope-toggle.svg.vue` has an unfinished branch** that reads `sprites` and calls two methods it doesn't define. `sprites` is always empty, so it never runs. It goes in the Phase 6 dead-code pass.
 - **Headless fps varies a lot between identical runs** (39–52 fps). Phase 5/7 comparisons will average several runs.
 
+## Phase 5: Rendering (scope A: rendering core, HUD stays SVG)
+
+### What changed, back to front
+
+1. **Background on canvas** (`background-canvas.vue`). Everything is sized by `devicePixelRatio`.
+   - **The nebula backdrop** is drawn from `assets/backdrop-art.js`, which holds the original SVG's 62 shapes extracted verbatim, as vector paths. It stays sharp at any zoom.
+   - **The starfield** has 800 stars, or 3,200 on the high tier, each with its glare.
+   - Both are drawn only when the zoom settles or the window resizes. In between, a composited CSS transform follows the camera, including the starfield's 1/20 parallax.
+   - **The jump animation's star streaks** draw on a third canvas every frame, from a pre-rendered streak sprite.
+2. **World layer.** The grid, the star, the planets' rings around the star, and ships orbiting the star.
+   - It's drawn for one camera (`drawnView`) with a 256 px margin.
+   - Each frame `libs/composited-layer.js` maps it onto the live camera with a CSS `translate` and `scale`, rounded to device pixels, with no repaint.
+   - It's redrawn sharp when a zoom settles (about 100 ms still), when the zoom drifts past 15% (so long zoom animations re-sharpen as they go), or when a pan nears the margin.
+   - `will-change` is set only while a transform is applied.
+3. **Planet layers** (`planet-layers.vue`). Profiling showed the world SVG still repainted heavily, so this step was needed: every ring around a planet moved with the planet, and Luna's ring alone repainted an 800 px square per frame at ship zoom.
+   - Each planet, with its moons, station, ships and their rings, is its own small SVG in its own composited layer, moved as a unit with a CSS translate.
+   - That's nine promoted layers in Sol.
+4. **HUD and menus.** These are their own SVG layer on top, as decided in scope A.
+   - Only their painted parts take the mouse, so drags and clicks reach the world.
+   - The HTML port waits for the UI rebuild.
+
+### The loop
+
+- **One `requestAnimationFrame` loop** (`libs/frame-loop.js`), ordered so game logic runs before rendering.
+  - Each frame it advances game time and the camera animations, updates every orbit (including absolute positions), and keeps the camera on the selected sprite. Previously that was a deep watcher on every sprite component.
+  - The game now ticks **every frame** on normal and high (it was every 32–64 ms); low ticks at about 30 fps.
+- **Sprites and camera `Rubber`s are raw (`markRaw`) objects.**
+  - The few components that draw live positions compute them from the raw sprite, and read `gameTime` as their per-frame signal. Those are sprite placement, planet surfaces, the scope, cards and the planet list.
+  - Static art isn't touched per frame, and Vue hoists it.
+- **Nothing ticks while the tab is hidden.** rAF pauses on its own, and the block poller skips hidden tabs.
+
+### Quality tiers
+
+- **Low** drops the starfield, glow circles, engine plumes, the ring gradient detail and planet surfaces.
+- **Medium and up** now show the rotating planet surfaces, which used to be high-only. That's cheap now, as the brief notes. **This is a visible change on the default tier**, so please check you like it.
+- None of the tiers uses the blur filters (`#blur`, `#soft`): they're defined but nothing references them.
+
+### Numbers (10 s scripted pan + wheel zoom, headless Chrome, software raster, average of 3 runs each)
+
+| | Baseline (demo3) | After Phase 5 |
+| --- | --- | --- |
+| Average fps | 50.3 | **56.2** |
+| Frame time p95 | 33.4 ms (every run) | **16.8 ms** (2 of 3 runs) |
+| Raster | 30.0 s | **11.5 s** |
+| Paint | 577 ms | **250 ms** |
+| Layerize | 4.4 s | **2.6 s** |
+| Game ticks per second | ~20 | **60** |
+
+The baseline is the production build. The new build was measured on the **dev server** (unminified Vue with dev checks), which handicaps it, and it still wins. Phase 7 will re-measure a production build.
+
+Paint flashing at idle confirms the split:
+- At ship zoom, only the moving ship, the rotating planet body, the station and the card's mini ship repaint.
+- At star zoom, only a few small boxes for distant moving bodies repaint.
+- Zooming at DPR 2 stays sharp, because the world re-renders as soon as the CSS scale drifts.
+
 ## Bugs
 
 ### Fixed
@@ -307,3 +362,7 @@ Tests (Koda's call was "only where they catch important things"): Vitest unit te
 2. **Local play:** yes. Make it easy to run the whole game locally (`orbiter-client/dev/`).
 3. **Types:** JSDoc for now. No TypeScript.
 4. **Node:** target the current LTS (24) via `.nvmrc`.
+5. **Phase 5 scope (2026-10-24): option A.**
+   - The rendering core is in scope: canvas background, a separate world layer with compositor pan/zoom, and animation outside Vue reactivity.
+   - The HUD and menus become their own overlay layer but **stay SVG**.
+   - The HTML/CSS port of the menus waits for the integration of Koda's UI rebuild, which would replace them.
