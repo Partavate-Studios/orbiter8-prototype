@@ -56,8 +56,9 @@ export default {
   methods: {
     ...mapActions(useGameStateStore, ['sendChat']),
     broadcast() {
-      let message = prompt('Send a message?')
-      if (message.length > 0) {
+      const message = prompt('Send a message?')
+      // null when the player cancels
+      if (message) {
         this.sendChat(message)
       }
     },
