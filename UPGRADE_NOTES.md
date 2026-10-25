@@ -467,6 +467,25 @@ src/sdk/
 - **`sdk/chain/contracts.test.js`** checks `gameChangedBetween` against scripted blocks.
 - 55 tests in all, under 2 s.
 
+### Step 5: the frame loop moves sprites directly (done)
+
+- **Sprites, planet layers and planet surfaces write their own transforms** (and, for culling, `display`) from the frame loop, only when the value changes (`libs/dom-writes.js`).
+  - They no longer read the per-frame `gameTime`, so Vue re-renders them only when what they show changes.
+  - When the world is redrawn at a new zoom mid-frame, they re-place themselves before paint.
+- **Measuring found the bigger cost elsewhere:** the guides canvas, new this phase, was redrawn every frame while the camera moved. Handing a new full-screen texture to the compositor every frame cost Chrome about half of each frame (`Commit`). It's now drawn 128 px beyond the screen and shifted with a whole-pixel CSS translate when only the camera's position changes.
+- **Results:**
+
+  | Measure | Before | After |
+  |---|---|---|
+  | Chrome, following a ship, Commit per 5 s | 2.3 s | 0.4 s |
+  | Chrome, following a ship, script per 5 s | 644 ms | 306 ms |
+  | Chrome pan/zoom trace | | 59.9 fps, no frame over 34 ms |
+  | Firefox, ship selected | | 60 fps |
+  | Firefox, wheeling out | about 46 fps earlier in the upgrade | 60 fps |
+
+  Selected objects still move 0 px in both browsers, and the screenshots are unchanged.
+- **The per-frame work in the frame loop itself** is about 0.6 ms per frame (measured per subscriber), so there's little left to gain there.
+
 ## Bugs
 
 ### Fixed
@@ -717,7 +736,7 @@ Each phase goes on `modernize` with its own commits. Bug fixes get separate comm
       - turn template-called methods into computed values;
       - switch ESLint to `flat/recommended`.
    4. ~~Add tests for the sync logic, against fixture chain data.~~ Done.
-   5. Frame loop: the loop writes sprite transforms directly, and Vue renders only on rarer changes (selection, labels, menus). This removes the `void this.gameTime` per-frame re-render. Measure it with the same trace.
+   5. ~~Frame loop: the loop writes sprite transforms directly, and Vue renders only on rarer changes (selection, labels, menus). This removes the `void this.gameTime` per-frame re-render. Measure it with the same trace.~~ Done.
 8. **Phase 7, verification.** Same harness: `docs/after/`, the trace comparison, paint flashing, a manual checklist for Koda, and the code review.
 
 Not on this branch:
