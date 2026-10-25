@@ -3,7 +3,7 @@
 // repaint. Translation stays sharp; scaling is briefly soft, so the layer asks to be re-rendered
 // ("committed") once the zoom settles or drifts too far. Map libraries like Leaflet do the same.
 
-const SETTLE_FRAMES = 6 // ~100 ms without camera change counts as the end of a gesture
+const SETTLE_FRAMES = 6 // ~100 ms without a zoom change counts as the end of a zoom gesture
 
 export class CompositedLayer {
   /**
@@ -38,8 +38,10 @@ export class CompositedLayer {
     const y = Math.round(delta.y * dpr) / dpr
     const scale = delta.scale
 
-    const changed = !this.last || this.last.x !== x || this.last.y !== y || this.last.scale !== scale
-    this.stableFrames = changed ? 0 : this.stableFrames + 1
+    // Only the zoom has to settle: a translated layer is already sharp, and a camera following a
+    // moving sprite never stops translating, which would leave a zoomed layer soft indefinitely.
+    const zoomChanged = !this.last || this.last.scale !== scale
+    this.stableFrames = zoomChanged ? 0 : this.stableFrames + 1
     this.last = { x, y, scale }
 
     const isIdentity = scale === 1 && x === 0 && y === 0
@@ -48,7 +50,7 @@ export class CompositedLayer {
       scale < this.minScale() ||
       Math.abs(x) > this.margin * 0.8 ||
       Math.abs(y) > this.margin * 0.8 ||
-      (!isIdentity && this.stableFrames >= SETTLE_FRAMES)
+      (scale !== 1 && this.stableFrames >= SETTLE_FRAMES)
 
     if (needsCommit || isIdentity) {
       this.clear()
