@@ -117,14 +117,9 @@ export default {
   },
   mounted () {
     this.drawWorld()
-    this.worldLayer = new CompositedLayer(this.$refs.world, {
-      margin: WORLD_MARGIN,
-      // Shrinking the drawn world (zooming out) is fine until its edges would come on screen.
-      minScale: () => Math.max(
-        (this.container.width / 2) / (this.container.width / 2 + WORLD_MARGIN),
-        (this.container.height / 2) / (this.container.height / 2 + WORLD_MARGIN)
-      )
-    })
+    // While zooming out, the shrinking world may briefly leave its faint grid lines short of the
+    // screen edges (the background stays put behind it); that beats redrawing at every wheel step.
+    this.worldLayer = new CompositedLayer(this.$refs.world, { margin: WORLD_MARGIN })
     this.stopFrames = onFrame(this.followCamera, FRAME_ORDER.render)
     this.$nextTick(function() {
       this.resizeHandler() //set initial ratio

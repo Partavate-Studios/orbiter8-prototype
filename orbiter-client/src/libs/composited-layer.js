@@ -12,8 +12,7 @@ export class CompositedLayer {
    * @param {number} options.margin  extra pixels rendered beyond each screen edge; panning further needs a commit
    * @param {number} [options.maxScale]  re-render once the CSS scale grows past this (bounds the blur;
    *   a mouse-wheel step is 1.25x, so 2 lets a zoom-in gesture run a few steps between redraws)
-   * @param {() => number} [options.minScale]  re-render once the CSS scale shrinks below this; shrinking
-   *   further would show the layer's edges, so it depends on the margin and the screen size
+   * @param {() => number} [options.minScale]  re-render once the CSS scale shrinks below this
    */
   constructor (element, { margin, maxScale = 2, minScale = () => 0.5 }) {
     this.element = element

@@ -125,7 +125,6 @@ export default {
       'showLabels',
       'isMenuOn',
       'drawnPixelsPerUnit',
-      'livePixelsPerUnit',
       'isOnScreen'
     ]),
     ...mapState(useConfigStore, [
@@ -183,11 +182,12 @@ export default {
     },
     isTiny () {
       if (DETAILED_WHEN_TINY.includes(this.type)) return false
-      return 2 * this.visualRadius * this.livePixelsPerUnit < TINY_DIAMETER
+      // Drawn scale, not live: between redraws the layer's CSS transform handles the zoom.
+      return 2 * this.visualRadius * this.drawnPixelsPerUnit < TINY_DIAMETER
     },
     /** Half the sprite's size, but never under one pixel (in sprite units). */
     dotRadius () {
-      const onePixel = 1 / (this.livePixelsPerUnit * this.spriteScale)
+      const onePixel = 1 / (this.drawnPixelsPerUnit * this.spriteScale)
       return Math.max(this.sprite.selectorSize / 2, onePixel)
     },
     // todo: this should probably come from sprite.js
