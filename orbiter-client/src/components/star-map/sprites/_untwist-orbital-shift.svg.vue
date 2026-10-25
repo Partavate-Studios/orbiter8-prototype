@@ -8,7 +8,8 @@
 
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapState } from 'pinia'
+import { useStarMapStore } from '@/stores/starmap'
 
 export default {
   name: 'untwist',
@@ -26,7 +27,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('StarMap', [
+    ...mapState(useStarMapStore, [
       'gameTime'
     ])
   },

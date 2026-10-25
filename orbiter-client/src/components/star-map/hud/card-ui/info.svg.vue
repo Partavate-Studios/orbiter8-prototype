@@ -36,13 +36,14 @@
 </template>
 
 <script>
+import { mapState } from 'pinia'
 
 import PlanetTypes from '@/libs/planet-types.js'
 import CardBackground from './card-background.svg'
 import CardText from './card-text.svg'
 import Sprite from './sprite.svg'
 
-import { mapGetters } from 'vuex'
+import { useStarMapStore } from '@/stores/starmap'
 
 export default {
   name: 'CardInfo',
@@ -62,7 +63,7 @@ export default {
   methods: {
   },
   computed: {
-    ...mapGetters('StarMap', [
+    ...mapState(useStarMapStore, [
       'systemObjects'
     ]),
   }

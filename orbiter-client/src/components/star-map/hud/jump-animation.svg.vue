@@ -122,7 +122,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapState } from 'pinia'
+import { useStarMapStore } from '@/stores/starmap'
 import Ship from '../sprites/ship.svg'
 
 export default {
@@ -154,7 +155,7 @@ export default {
     this.tick()
   },
   computed: {
-    ...mapGetters('StarMap', [
+    ...mapState(useStarMapStore, [
       'gameTime'
     ]),
   },

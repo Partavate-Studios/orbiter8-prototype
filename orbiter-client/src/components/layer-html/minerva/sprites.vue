@@ -26,8 +26,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import { mapActions } from 'pinia'
+import { useStarMapStore } from '@/stores/starmap'
+import { mapActions, mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
 
 export default {
@@ -41,7 +41,7 @@ export default {
   beforeMount: function () {
   },
   computed: {
-    ...mapGetters('StarMap', [
+    ...mapState(useStarMapStore, [
       'systemObjects'
     ])
   },

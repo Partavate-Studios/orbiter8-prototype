@@ -9,6 +9,7 @@
 </template>
 
 <script>
+import { mapState } from 'pinia'
 
 import Ship from '../../sprites/ship.svg'
 import Station from '../../sprites/station.svg'
@@ -16,7 +17,7 @@ import Star from '../../sprites/star.svg'
 import Moon from '../../sprites/moon.svg'
 import Planet from '../../sprites/planet.svg'
 
-import { mapGetters } from 'vuex'
+import { useStarMapStore } from '@/stores/starmap'
 
 export default {
   name: 'Sprite',
@@ -33,7 +34,7 @@ export default {
   methods: {
   },
   computed: {
-    ...mapGetters('StarMap', [
+    ...mapState(useStarMapStore, [
       'systemObjects'
     ]),
   }

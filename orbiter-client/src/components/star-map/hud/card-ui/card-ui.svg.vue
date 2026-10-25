@@ -114,7 +114,7 @@
 
 <script>
 
-import { mapGetters } from 'vuex'
+import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
 import { mapActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
@@ -155,7 +155,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('StarMap', [
+    ...mapState(useStarMapStore, [
       'systemObjects'
     ]),
     ...mapState(useUIStore, [

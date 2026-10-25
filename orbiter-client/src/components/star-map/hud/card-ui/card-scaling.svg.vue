@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { useStarMapStore } from '@/stores/starmap'
 import { mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
 
@@ -33,7 +33,7 @@ export default {
       'viewport',
       'viewportTotalRubber'
     ]),
-    ...mapGetters('StarMap', [
+    ...mapState(useStarMapStore, [
       'systemObjects',
     ]),
     cardUiTranslate () {

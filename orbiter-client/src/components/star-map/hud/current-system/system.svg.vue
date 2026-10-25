@@ -38,8 +38,9 @@
 </template>
 
 <script>
+import { mapState } from 'pinia'
 
-import { mapGetters } from 'vuex'
+import { useStarMapStore } from '@/stores/starmap'
 
 export default {
   name: 'CurrentSystem',
@@ -50,7 +51,7 @@ export default {
   components: {
   },
   computed: {
-    ...mapGetters('StarMap', [
+    ...mapState(useStarMapStore, [
       'currentStarSystemId',
       'currentStarSystemName',
     ]),

@@ -1,6 +1,7 @@
 import Web3 from 'web3'
 import AvatarContract from '@/contract-interfaces/avatar'
 import GalaxyContract from '@/contract-interfaces/galaxy'
+import { useStarMapStore } from '@/stores/starmap'
 
 export default {
   /** Init all the things */
@@ -112,7 +113,7 @@ export default {
           commit('setProp', {key: 'currentBlockId', value: blockNumber })
           dispatch('GameState/loadGameState', null, {root:true})
           dispatch('GameState/loadEvents', null, {root:true})
-          dispatch('StarMap/loadStarMap', null, {root:true})
+          useStarMapStore().loadStarMap()
         }
       }
     })

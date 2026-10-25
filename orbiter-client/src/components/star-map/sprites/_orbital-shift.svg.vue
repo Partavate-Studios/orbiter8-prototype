@@ -9,7 +9,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapState } from 'pinia'
+import { useStarMapStore } from '@/stores/starmap'
 
 export default {
   name: 'orbitalshift',
@@ -31,7 +32,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('StarMap', [
+    ...mapState(useStarMapStore, [
       'gameTime'
     ])
   },

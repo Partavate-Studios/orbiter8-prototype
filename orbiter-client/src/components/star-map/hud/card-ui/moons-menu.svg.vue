@@ -15,8 +15,9 @@
 
 <script>
 
-import { mapGetters, mapActions } from 'vuex'
-import { mapActions as mapPiniaActions } from 'pinia'
+import { mapActions } from 'vuex'
+import { useStarMapStore } from '@/stores/starmap'
+import { mapActions as mapPiniaActions, mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
 import CardBackground from './card-background.svg'
 import CardButton from './card-button.svg'
@@ -39,7 +40,7 @@ export default {
     ])
   },
   computed: {
-    ...mapGetters('StarMap', [
+    ...mapState(useStarMapStore, [
       'systemObjects'
     ]),
   }

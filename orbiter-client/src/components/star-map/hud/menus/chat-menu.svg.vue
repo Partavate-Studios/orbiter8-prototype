@@ -30,7 +30,9 @@
 
 <script>
 
-import {  mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
+import { mapState } from 'pinia'
+import { useStarMapStore } from '@/stores/starmap'
 import MenuContainer from './menu-container/_menu-container.svg'
 import MenuButton from './menu-button.svg'
 import ChatSlotContainer from './menu-container/chat-slot-container.svg'
@@ -77,7 +79,7 @@ export default {
     ...mapGetters('GameState', [
       'events'
     ]),
-    ...mapGetters('StarMap', [
+    ...mapState(useStarMapStore, [
       'players'
     ]),
     chatEvents () {

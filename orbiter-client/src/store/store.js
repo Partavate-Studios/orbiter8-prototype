@@ -7,7 +7,6 @@ import mutations from './mutations'
 import getters from './getters'
 
 import GameState from './gamestate'
-import StarMap from './starmap'
 
 
 const state = {
@@ -347,7 +346,6 @@ const state = {
 export default createStore({
   modules: {
     GameState,
-    StarMap,
   },
   state,
   mutations,

@@ -6,7 +6,8 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations, mapActions } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
+import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
 import { mapActions as mapPiniaActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
@@ -42,7 +43,7 @@ export default {
       'selected',
       'jumpAnimationState'
     ]),
-    ...mapGetters('StarMap', [
+    ...mapState(useStarMapStore, [
       'mapDataLoaded',
       'gameTime'
     ]),
@@ -83,10 +84,10 @@ export default {
     ...mapActions([
       'checkForNewBlock'
     ]),
-    ...mapActions('StarMap', [
+    ...mapPiniaActions(useStarMapStore, [
       'loadStarMap'
     ]),
-    ...mapMutations('StarMap', [
+    ...mapPiniaActions(useStarMapStore, [
       'incrementGameTime'
     ]),
     ...mapPiniaActions(useConfigStore, [

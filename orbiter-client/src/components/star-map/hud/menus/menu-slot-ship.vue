@@ -46,7 +46,7 @@
 
 <script>
 
-import { mapGetters } from 'vuex'
+import { useStarMapStore } from '@/stores/starmap'
 import { mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
 import MenuSlotContainer from './menu-container/menu-slot-container.svg'
@@ -74,7 +74,7 @@ export default {
     ...mapState(useUIStore, [
       'viewport'
     ]),
-    ...mapGetters('StarMap', [
+    ...mapState(useStarMapStore, [
       'systemObjects',
       'players'
     ]),

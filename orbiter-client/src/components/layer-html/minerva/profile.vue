@@ -36,6 +36,7 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
+import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
 import { mapActions as mapPiniaActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
@@ -63,7 +64,7 @@ export default {
       'gameState',
       'avatar'
     ]),
-    ...mapGetters('StarMap', [
+    ...mapState(useStarMapStore, [
       'currentStarSystemId',
       'gameTime',
       'timeDelta',
@@ -81,7 +82,7 @@ export default {
       'loadGameState',
       'moveToSystem',
     ]),
-    ...mapActions('StarMap', [
+    ...mapPiniaActions(useStarMapStore, [
       'loadStarMap'
     ]),
     refreshData () {

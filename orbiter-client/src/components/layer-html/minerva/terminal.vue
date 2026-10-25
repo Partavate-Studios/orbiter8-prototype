@@ -15,6 +15,7 @@
 
 <script>
 import { mapActions } from 'vuex'
+import { useStarMapStore } from '@/stores/starmap'
 import { mapActions as mapPiniaActions, mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
 
@@ -45,7 +46,7 @@ export default {
     ...mapActions([
       'checkForNewBlock'
     ]),
-    ...mapActions('StarMap', [
+    ...mapPiniaActions(useStarMapStore, [
       'moveToSystem',
       'genesis'
     ]),

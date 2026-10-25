@@ -13,8 +13,9 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'pinia'
 
-import { mapGetters, mapMutations } from 'vuex'
+import { useStarMapStore } from '@/stores/starmap'
 import SpriteTransform from './sprites/sprite-transform.svg'
 
 export default {
@@ -37,7 +38,7 @@ export default {
     this.updateTelemetry()
   },
   methods: {
-    ...mapMutations('StarMap', [
+    ...mapActions(useStarMapStore, [
       'updateAllTelemtry'
     ]),
     updateTelemetry: function () {
@@ -45,7 +46,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('StarMap', [
+    ...mapState(useStarMapStore, [
       'currentStarSystemId',
       'gameTime',
       'systemObjects'

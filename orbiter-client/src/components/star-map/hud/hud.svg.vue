@@ -160,6 +160,7 @@
 <script>
 
 import { mapGetters } from 'vuex'
+import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
 import { mapActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
@@ -229,7 +230,7 @@ export default {
       'isMenuOn',
       'viewRatio'
     ]),
-    ...mapGetters('StarMap', [
+    ...mapState(useStarMapStore, [
       'myShipId',
       'systemObjects',
       'gameTime',

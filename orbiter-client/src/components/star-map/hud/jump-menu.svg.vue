@@ -82,8 +82,9 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
-import { mapActions as mapPiniaActions } from 'pinia'
+import { mapActions } from 'vuex'
+import { useStarMapStore } from '@/stores/starmap'
+import { mapActions as mapPiniaActions, mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
 import Ship from '../sprites/ship.svg'
 
@@ -107,7 +108,7 @@ export default {
   mounted: function () {
   },
   computed: {
-    ...mapGetters('StarMap', [
+    ...mapState(useStarMapStore, [
       'neighbors'
     ]),
     starName () {

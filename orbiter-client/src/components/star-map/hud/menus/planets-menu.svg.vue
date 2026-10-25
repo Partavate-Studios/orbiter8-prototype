@@ -14,8 +14,8 @@
 
 <script>
 
-import { mapGetters } from 'vuex'
-import { mapActions } from 'pinia'
+import { useStarMapStore } from '@/stores/starmap'
+import { mapActions, mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
 import MenuContainer from './menu-container/_menu-container.svg'
 import PlanetSlot from './menu-slot-planet'
@@ -42,7 +42,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('StarMap', [
+    ...mapState(useStarMapStore, [
       'systemObjects',
       'spriteIds'
     ])

@@ -190,6 +190,8 @@
 <script>
 
 import { mapGetters } from 'vuex'
+import { mapState } from 'pinia'
+import { useStarMapStore } from '@/stores/starmap'
 
 import PlanetTypes from '@/libs/planet-types.js'
 
@@ -210,7 +212,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('StarMap', [
+    ...mapState(useStarMapStore, [
       'systemObjects',
       'players'
     ]),

@@ -165,6 +165,7 @@
 <script>
 
 import { mapGetters, mapActions } from 'vuex'
+import { useStarMapStore } from '@/stores/starmap'
 import { mapActions as mapPiniaActions, mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
 import MenuButton from './menu-button.svg'
@@ -272,7 +273,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('StarMap', [
+    ...mapState(useStarMapStore, [
       'systemObjects'
     ]),
     ...mapGetters('GameState', [

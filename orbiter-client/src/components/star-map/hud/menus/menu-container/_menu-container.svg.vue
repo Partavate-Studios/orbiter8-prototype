@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { useStarMapStore } from '@/stores/starmap'
 import { mapActions, mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
 import CloseButton from './close-button.svg'
@@ -56,7 +56,7 @@ export default {
       'bottomMostY',
       'viewport'
     ]),
-    ...mapGetters('StarMap', [
+    ...mapState(useStarMapStore, [
       'gameTime'
     ])
   },

@@ -23,7 +23,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapState } from 'pinia'
+import { useStarMapStore } from '@/stores/starmap'
 import Icon from './_icon-container.svg'
 
 export default {
@@ -36,7 +37,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('StarMap', [
+    ...mapState(useStarMapStore, [
       'neighbors'
     ])
   }

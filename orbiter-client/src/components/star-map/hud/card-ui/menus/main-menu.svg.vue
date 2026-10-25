@@ -17,7 +17,8 @@
 <script>
 
 import { mapGetters, mapActions } from 'vuex'
-import { mapActions as mapPiniaActions } from 'pinia'
+import { useStarMapStore } from '@/stores/starmap'
+import { mapActions as mapPiniaActions, mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
 import CardBackground from '../card-background.svg'
 import CardButton from '../card-button.svg'
@@ -147,7 +148,7 @@ export default {
       'chainId',
       'planetTokenAddress',
     ]),
-    ...mapGetters('StarMap', [
+    ...mapState(useStarMapStore, [
       'systemObjects'
     ]),
     ...mapGetters('GameState', [

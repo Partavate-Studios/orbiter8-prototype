@@ -27,6 +27,7 @@
 <script>
 
 import { mapGetters } from 'vuex'
+import { useStarMapStore } from '@/stores/starmap'
 import { mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
 
@@ -36,7 +37,7 @@ export default {
     ...mapGetters([
       'blockId'
     ]),
-    ...mapGetters('StarMap', [
+    ...mapState(useStarMapStore, [
       'isLoading',
       'currentStarSystemId',
     ]),
