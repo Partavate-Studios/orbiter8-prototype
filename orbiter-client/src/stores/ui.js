@@ -169,7 +169,15 @@ export const useUIStore = defineStore('UI', {
       this.showLabels = !this.showLabels
     },
     drawWorldAt(view) {
-      this.drawnView = { x: view.x, y: view.y, scale: view.scale }
+      // Draw for a camera position on the device-pixel grid. Every layer and sprite then rounds
+      // onto the same grid, so the roundings cancel: an object the camera follows stays perfectly
+      // still instead of shifting a pixel back and forth.
+      const devicePixelsPerUnit = (this.groupPixels / view.scale) * (window.devicePixelRatio || 1)
+      this.drawnView = {
+        x: Math.round(view.x * devicePixelsPerUnit) / devicePixelsPerUnit,
+        y: Math.round(view.y * devicePixelsPerUnit) / devicePixelsPerUnit,
+        scale: view.scale
+      }
     },
     selectSprite(spriteId) {
       if (this.selectedSprite != spriteId) {

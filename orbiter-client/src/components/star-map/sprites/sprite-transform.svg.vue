@@ -159,9 +159,17 @@ export default {
     getOrbitalTransform() {
       // Snap to the device-pixel grid of the drawn world.
       const step = 1 / (this.drawnPixelsPerUnit * (window.devicePixelRatio || 1))
-      const x = Math.round(this.placement.x / step) * step
-      const y = Math.round(this.placement.y / step) * step
-      return 'translate(' + x + ',' + y + ')'
+      const snap = (value) => Math.round(value / step) * step
+      if (this.frameOf === 'parent') {
+        // Inside its planet's layer, which is itself snapped: round the absolute position and
+        // subtract the planet's rounded position, so the sprite lands on the rounding of where it
+        // really is. Rounding its offset from the planet instead adds a second rounding error, and
+        // a followed ship or moon visibly shifts a pixel back and forth.
+        const x = snap(this.frame.x) - snap(this.frame.parentX)
+        const y = snap(this.frame.y) - snap(this.frame.parentY)
+        return 'translate(' + x + ',' + y + ')'
+      }
+      return 'translate(' + snap(this.placement.x) + ',' + snap(this.placement.y) + ')'
     },
     getRotationalTransform() {
       return 'rotate(' + Math.round(this.frame.rotation / ROTATION_STEP) * ROTATION_STEP + ')'
