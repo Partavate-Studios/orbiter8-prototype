@@ -68,6 +68,7 @@
 
 <script>
 import { CAMERA, WORLD_OFFSET_Y } from '@/constants'
+import { STAR_KEY } from '@/sdk/system'
 
 import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
@@ -178,7 +179,7 @@ export default {
   watch: {
     currentStarSystemId: function (val, oldVal) {
       if (val != oldVal) {
-        if (this.myShipId != 0) {
+        if (this.myShipId !== STAR_KEY) {
           this.selectSprite(this.myShipId)
           this.scaleAnimateTo({ scale: CAMERA.ARRIVAL_SHIP_SCALE, time: CAMERA.ARRIVAL_TWEEN_MS })
         } else {

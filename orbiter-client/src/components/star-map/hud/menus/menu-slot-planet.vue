@@ -39,7 +39,7 @@
         <text :x="slotWidth * 0.325" y="50" font-size="0.75em" text-anchor="end" fill="#ffffff">
           {{ planetTypeName(planet.class) }}
         </text>
-        <g v-if="portForPlanet(planetId) > 0" :transform="'translate(' + slotWidth * 0.37 + ' 22)'">
+        <g v-if="portForPlanet(planetId)" :transform="'translate(' + slotWidth * 0.37 + ' 22)'">
           <g transform="scale(0.9)"><station /></g>
           <text x="12" y="4" fill="#ffffff" font-size="0.8em" text-anchor="start">
             [{{ getPortType }}] {{ systemObjects[portForPlanet(planetId)].name }}
@@ -84,7 +84,7 @@
           Moons: {{ getMoonCount(planetId) }}
         </text>
 
-        <g v-if="portForPlanet(planetId) > 0" :transform="'translate(' + slotWidth * 0.54 + ' 46)'">
+        <g v-if="portForPlanet(planetId)" :transform="'translate(' + slotWidth * 0.54 + ' 46)'">
           <g transform="scale(0.9)"><station /></g>
           <text x="12" y="4" fill="#ffffff" font-size="0.8em" text-anchor="left">
             [{{ getPortType }}]{{ systemObjects[portForPlanet(planetId)].name }}
@@ -107,7 +107,7 @@
         <text :x="slotWidth * 0.35" y="30" font-size="1.25em" text-anchor="start" font-style="bold" fill="#ffffff">
           {{ planet.name }}
         </text>
-        <g v-if="portForPlanet(planetId) > 0" :transform="'translate(' + slotWidth * 0.38 + ' 46)'">
+        <g v-if="portForPlanet(planetId)" :transform="'translate(' + slotWidth * 0.38 + ' 46)'">
           <g transform="scale(0.9)"><station /></g>
           <text x="12" y="4" fill="#ffffff" font-size="0.8em" text-anchor="left">
             [{{ getPortType }}]{{ systemObjects[portForPlanet(planetId)].name }}

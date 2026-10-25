@@ -90,6 +90,13 @@ describe('HUD', () => {
     })
   }
 
+  it("lists each planet's port in the planets menu", async () => {
+    ui.openMenu('planets')
+    await settle()
+    expect(root.textContent).toContain('New Station')
+    expect(problems).toEqual([])
+  })
+
   it("opens a planet's moons menu from its card", async () => {
     ui.calculateViewableArea({ x: 1440, y: 900 }) // the card menu shows beside the card on a landscape screen
     ui.selectSprite('planet:2')
