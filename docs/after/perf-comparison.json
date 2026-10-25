@@ -1,0 +1,244 @@
+{
+  "original": {
+    "runs": [
+      {
+        "frames": {
+          "frames": 563,
+          "avgFps": 54.8,
+          "p50ms": 16.7,
+          "p95ms": 33.3,
+          "maxMs": 33.4,
+          "over50ms": 0
+        },
+        "trace": {
+          "traceSeconds": 10.59,
+          "script": {
+            "ms": 728,
+            "events": 2260
+          },
+          "styleLayout": {
+            "ms": 291,
+            "events": 1893
+          },
+          "paint": {
+            "ms": 528,
+            "events": 588
+          },
+          "layerize": {
+            "ms": 2665,
+            "events": 1419
+          },
+          "raster": {
+            "ms": 25957,
+            "events": 6635
+          }
+        }
+      },
+      {
+        "frames": {
+          "frames": 566,
+          "avgFps": 51.3,
+          "p50ms": 16.7,
+          "p95ms": 33.4,
+          "maxMs": 33.4,
+          "over50ms": 0
+        },
+        "trace": {
+          "traceSeconds": 11.34,
+          "script": {
+            "ms": 783,
+            "events": 2311
+          },
+          "styleLayout": {
+            "ms": 357,
+            "events": 2032
+          },
+          "paint": {
+            "ms": 605,
+            "events": 646
+          },
+          "layerize": {
+            "ms": 3963,
+            "events": 1454
+          },
+          "raster": {
+            "ms": 30382,
+            "events": 7346
+          }
+        }
+      },
+      {
+        "frames": {
+          "frames": 510,
+          "avgFps": 48.9,
+          "p50ms": 16.7,
+          "p95ms": 33.4,
+          "maxMs": 33.4,
+          "over50ms": 0
+        },
+        "trace": {
+          "traceSeconds": 10.74,
+          "script": {
+            "ms": 769,
+            "events": 2037
+          },
+          "styleLayout": {
+            "ms": 376,
+            "events": 1927
+          },
+          "paint": {
+            "ms": 616,
+            "events": 652
+          },
+          "layerize": {
+            "ms": 4666,
+            "events": 1347
+          },
+          "raster": {
+            "ms": 31301,
+            "events": 7527
+          }
+        }
+      }
+    ],
+    "average": {
+      "fps": 51.7,
+      "p95ms": 33.4,
+      "maxMs": 33.4,
+      "scriptMs": 760,
+      "styleLayoutMs": 341.3,
+      "paintMs": 583,
+      "layerizeMs": 3764.7,
+      "rasterMs": 29213.3
+    }
+  },
+  "production": {
+    "runs": [
+      {
+        "frames": {
+          "frames": 632,
+          "avgFps": 60,
+          "p50ms": 16.7,
+          "p95ms": 16.7,
+          "maxMs": 16.8,
+          "over50ms": 0
+        },
+        "trace": {
+          "traceSeconds": 10.56,
+          "script": {
+            "ms": 1138,
+            "events": 3996
+          },
+          "styleLayout": {
+            "ms": 218,
+            "events": 3345
+          },
+          "paint": {
+            "ms": 103,
+            "events": 1458
+          },
+          "layerize": {
+            "ms": 4861,
+            "events": 3194
+          },
+          "raster": {
+            "ms": 512,
+            "events": 4240
+          }
+        }
+      },
+      {
+        "frames": {
+          "frames": 632,
+          "avgFps": 60,
+          "p50ms": 16.7,
+          "p95ms": 16.8,
+          "maxMs": 16.8,
+          "over50ms": 0
+        },
+        "trace": {
+          "traceSeconds": 10.56,
+          "script": {
+            "ms": 1154,
+            "events": 3980
+          },
+          "styleLayout": {
+            "ms": 212,
+            "events": 3282
+          },
+          "paint": {
+            "ms": 94,
+            "events": 1408
+          },
+          "layerize": {
+            "ms": 4782,
+            "events": 3118
+          },
+          "raster": {
+            "ms": 540,
+            "events": 4293
+          }
+        }
+      },
+      {
+        "frames": {
+          "frames": 630,
+          "avgFps": 60,
+          "p50ms": 16.7,
+          "p95ms": 16.8,
+          "maxMs": 16.8,
+          "over50ms": 0
+        },
+        "trace": {
+          "traceSeconds": 10.53,
+          "script": {
+            "ms": 1131,
+            "events": 3993
+          },
+          "styleLayout": {
+            "ms": 201,
+            "events": 3255
+          },
+          "paint": {
+            "ms": 90,
+            "events": 1379
+          },
+          "layerize": {
+            "ms": 4794,
+            "events": 3102
+          },
+          "raster": {
+            "ms": 503,
+            "events": 4042
+          }
+        }
+      }
+    ],
+    "average": {
+      "fps": 60,
+      "p95ms": 16.8,
+      "maxMs": 16.8,
+      "scriptMs": 1141,
+      "styleLayoutMs": 210.3,
+      "paintMs": 95.7,
+      "layerizeMs": 4812.3,
+      "rasterMs": 518.3
+    }
+  },
+  "idleFollowingShip5s": {
+    "original": {
+      "scriptMs": 780,
+      "styleLayoutMs": 56,
+      "paintMs": 154,
+      "layerizeMs": 49,
+      "rasterMs": 8882
+    },
+    "production": {
+      "scriptMs": 218,
+      "styleLayoutMs": 26,
+      "paintMs": 14,
+      "layerizeMs": 438,
+      "rasterMs": 58
+    }
+  }
+}

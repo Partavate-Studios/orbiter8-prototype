@@ -1,0 +1,6 @@
+[debug] [vite] connecting...
+[debug] [vite] connected.
+[log] Dev wallet: account #1 0xffcf8fdee72ac11b5c542428b35eef5769c409f0
+[debug] Loading game state...
+[debug] Game changed by block 23; reloading
+[panzoom] {"frames":621,"avgFps":59.7,"p50ms":16.7,"p95ms":16.7,"maxMs":66.7,"over50ms":1}
