@@ -35,12 +35,12 @@
         </g>
       </g>
 
-      <g v-if="((spriteToDisplay != null) &&  (spriteToDisplay != selected))" pointer-events="none">
+      <g v-if="hoveredSprite" pointer-events="none">
         <circle cx="0" cy="0" r="99" stroke-width="0" fill="url(#scopeFill)" ></circle>
 
         <g stroke-width="0.25" font-weight="bold" stroke="#280b4bee" fill="#ffffff">
           <text
-            v-if="(isMyShip(systemObjects[spriteToDisplay]))"
+            v-if="isMyShip(hoveredSprite)"
             x="0" y="-10"
             font-size="0.85em"
             text-anchor="middle"
@@ -50,12 +50,12 @@
             x="0" y="-10"
             font-size="0.85em"
             text-anchor="middle"
-            alignment-baseline="central"> ({{ systemObjects[spriteToDisplay].type }} #{{ systemObjects[spriteToDisplay].objectId }}) </text>
+            alignment-baseline="central"> ({{ hoveredSprite.type }} #{{ hoveredSprite.objectId }}) </text>
           <text
             x="0" y="10"
             font-size="1.25em"
             text-anchor="middle"
-            alignment-baseline="central">{{ systemObjects[spriteToDisplay].name }}</text>
+            alignment-baseline="central">{{ hoveredSprite.name }}</text>
         </g>
       </g>
       <g
@@ -73,7 +73,7 @@
             alignment-baseline="central"></text>
         <a
           v-on:click.prevent="o8audio.playEffect('click'); selectSprite('star')"
-          v-on:mouseover="setSpriteToDisplay(0)"
+          v-on:mouseover="setSpriteToDisplay('star')"
           v-on:mouseout="setSpriteToDisplay(null)"
           cursor="pointer"><compass-sun :opacity="markerOpacity(systemObjects.star)"></compass-sun></a>
       </g>
@@ -119,7 +119,12 @@ export default {
     ...mapState(useStarMapStore, [
       'gameTime',
       'systemObjects'
-    ])
+    ]),
+    /** The sprite whose scope marker is hovered, unless it's already selected (or has left the system). */
+    hoveredSprite () {
+      if (this.spriteToDisplay == null || this.spriteToDisplay === this.selected) return null
+      return this.systemObjects[this.spriteToDisplay] || null
+    }
   },
   methods: {
     ...mapActions(useUIStore, [
