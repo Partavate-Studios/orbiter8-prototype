@@ -45,7 +45,7 @@ Public testnet RPCs proved unreliable for forking: the fork node hung or lost hi
 - The capture script plays the new-player flow (register, name ship, take off), then opens each screen through store mutations, so the shots don't depend on where the orbits happen to be.
 - The baseline client was built from a copy of `demo3` with `networks["1337"]` pointed at the local deployment. The repo artifacts were not modified.
 
-The harness currently lives outside the repo. I propose adding it under `orbiter-client/dev/` (see "Decisions for Koda").
+The harness now lives in the repo under `orbiter-client/dev/harness/` (added in Phase 7).
 
 ### Baseline captures: `docs/baseline/`
 
@@ -486,6 +486,74 @@ src/sdk/
   Selected objects still move 0 px in both browsers, and the screenshots are unchanged.
 - **The per-frame work in the frame loop itself** is about 0.6 ms per frame (measured per subscriber), so there's little left to gain there.
 
+## Phase 7: Verification (done 2026-10-25)
+
+### Before and after: the production builds
+
+- **Setup:** the original `demo3` production build against the new production build (`npm run build:local`). Same local chain, same player, same scripted 10 s pan + wheel zoom. Headless Chrome with software raster, three runs each, averaged. Raw data: `docs/after/perf-comparison.json`.
+
+| 10 s pan + wheel zoom | Original | New |
+|---|---|---|
+| Average fps | 51.7 | **60.0** (every run) |
+| Frame time p95 / worst | 33.4 / 33.4 ms | **16.8 / 16.8 ms** |
+| Raster (all threads) | 29.2 s | **0.5 s** |
+| Paint | 583 ms | **96 ms** |
+| Style + layout | 341 ms | **210 ms** |
+| Script | 760 ms | 1,141 ms |
+| Layerize / commit | 3.8 s | 4.8 s |
+
+| 5 s idle, following the player's ship | Original | New |
+|---|---|---|
+| Raster | 8.9 s | **0.06 s** |
+| Script | 780 ms | **218 ms** |
+| Paint | 154 ms | **14 ms** |
+| Layerize / commit | 49 ms | 438 ms |
+| **Total CPU** | **about 9.9 s** | **about 0.75 s** |
+
+- **What went up, and why:**
+  - **Script:** the original ticked the game about 20 times a second; the new one ticks 60.
+  - **Layerize/commit:** there are now several composited layers (background, guides, world, one per planet, HUD).
+
+  Both are small next to the raster savings, and the new build never misses a frame.
+- **Download size:** JavaScript went from 8.4 MB to 0.67 MB (2.6 MB → 0.2 MB gzipped). The original also shipped 22 MB of public source maps; the new build ships none. Images and audio are the same 13 MB.
+- **Firefox** (headless, real GPU): 60 fps with a ship selected and while wheeling out.
+- **Selection stillness:** a followed ship, moon, station or planet moves 0 px in Chrome and Firefox, at DPR 1 and 2.
+
+### Screens and paint flashing: `docs/after/`
+
+- **Screenshots** use the same 16 names as `docs/baseline/`; compare them with `python3 orbiter-client/dev/harness/diff.py docs/after`. Everything matches within a few percent (orbits move), except:
+  - **the preflight screen,** whose network list and wording changed on purpose in Phase 3;
+  - **the end of the pan/zoom,** where the test ends depends on timing.
+- **Paint flashing** (`paint-flashing-idle-*.png`): at idle, only moving things repaint.
+  - At ship zoom: the ship and its flames, the card's spinning mini-ship and a passing station.
+  - With the whole system in view: a few small boxes for moving bodies.
+
+### Kept in the repo
+
+- **`orbiter-client/dev/harness/`:** the Puppeteer scripts used throughout the upgrade (captures, diffs, traces, jitter, idle, zoom sets, paint flashing, Firefox). See its README.
+- **`npm run build:local`:** a production build that knows the local chain (output in `dist-local/`, ignored), to try the real bundle against `npm run local`.
+- **`docs/original-code-review.md`:** the frank review of the original client Koda asked for.
+
+### For Koda to check by hand
+
+These need a real wallet, a real GPU or another player, which the scripted runs don't have:
+
+1. **Sepolia with your wallet:**
+   - connect (wallet picker; a wrong network gets a clear message, not a freeze);
+   - take command, jump, trade, buy holds, claim a planet, build a station, rename, chat;
+   - reload while on `#/play`.
+2. **"View on Rarible"** from a planet card and a ship card on Sepolia. Planets will show "Untitled" until the planet metadata route is fixed.
+3. **Firefox on your machine,** all three graphics tiers:
+   - pan, wheel zoom, and select a ship, a moon and a planet;
+   - the zoom-out after selecting a planet (no darker rectangle);
+   - selected objects hold perfectly still;
+   - after a reload, the low tier still runs at its lower frame rate.
+4. **Several ships at Earth:** orbit rings pass under every ship.
+5. **The planets menu** lists each planet's port with its `[SBB]`-style code.
+6. **A station built while another player watches the system.** Tested locally, not with two real players.
+7. **The look of the far-zoom simplifications** (tiny ships drawn as dots, rings fading out).
+8. **Optional:** `npm run build:local` then `npx vite preview --outDir dist-local`, to play the production bundle locally.
+
 ## Bugs
 
 ### Fixed
@@ -739,7 +807,7 @@ Each phase goes on `modernize` with its own commits. Bug fixes get separate comm
       - switch ESLint to `flat/recommended`.
    4. ~~Add tests for the sync logic, against fixture chain data.~~ Done.
    5. ~~Frame loop: the loop writes sprite transforms directly, and Vue renders only on rarer changes (selection, labels, menus). This removes the `void this.gameTime` per-frame re-render. Measure it with the same trace.~~ Done.
-8. **Phase 7, verification.** Same harness: `docs/after/`, the trace comparison, paint flashing, a manual checklist for Koda, and the code review.
+8. ~~**Phase 7, verification.** Same harness: `docs/after/`, the trace comparison, paint flashing, a manual checklist for Koda, and the code review.~~ Done; see the Phase 7 section.
 
 Not on this branch:
 - Options API → `<script setup>`. Koda's rebuild should start in that style instead.
