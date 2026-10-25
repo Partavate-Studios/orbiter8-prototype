@@ -7,8 +7,8 @@
     <div
       v-for="planetIndex in spriteIds.planets"
       :key="'planet-layer-' + planetIndex"
+      :ref="(element) => setLayerElement(planetIndex, element)"
       class="planet-layer"
-      :style="{ transform: layerTranslate(planetIndex) }"
     >
       <svg
         :width="layerSize(planetIndex)"
@@ -47,6 +47,8 @@ import { useStarMapStore } from '@/stores/starmap'
 import SpriteTransform from './sprites/sprite-transform.svg'
 import OrbitRing from './sprites/orbit-ring.svg.vue'
 import { useUIStore } from '@/stores/ui'
+import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
+import { writeStyle } from '@/libs/dom-writes'
 
 // Room around a planet's outermost orbit for the orbiting bodies and their labels, in world units.
 const LAYER_PADDING = 30
@@ -67,7 +69,7 @@ export default {
     originY: { type: Number, required: true }
   },
   computed: {
-    ...mapState(useStarMapStore, ['systemObjects', 'sprites', 'spriteIds', 'gameTime']),
+    ...mapState(useStarMapStore, ['systemObjects', 'sprites', 'spriteIds']),
     ...mapState(useUIStore, ['selected']),
     /** Pixels per world unit at the drawn zoom. */
     pixelsPerUnit() {
@@ -93,6 +95,26 @@ export default {
       return radius
     }
   },
+  watch: {
+    // Redrawn for a new camera (inside this frame, after writeFrame ran): re-place the layers before paint.
+    drawnView() {
+      this.writeFrame()
+    }
+  },
+  created() {
+    // Planet key → its layer element; not reactive, only writeFrame reads it.
+    this.layerElements = {}
+  },
+  mounted() {
+    this.stopFrames = onFrame(this.writeFrame, FRAME_ORDER.render)
+    this.writeFrame()
+  },
+  updated() {
+    this.writeFrame()
+  },
+  unmounted() {
+    this.stopFrames()
+  },
   methods: {
     childrenOf(planetIndex) {
       return this.childIndexes[planetIndex] ?? []
@@ -108,15 +130,20 @@ export default {
       const half = -this.layerSize(planetIndex) / 2 + 'px'
       return { left: half, top: half }
     },
-    /** Where the planet is this frame, relative to the world origin, in whole device pixels. */
-    layerTranslate(planetIndex) {
-      // Sprites are raw objects updated in place each frame; reading gameTime makes this re-evaluate per frame.
-      void this.gameTime
-      const planet = this.sprites[planetIndex]
+    setLayerElement(planetIndex, element) {
+      if (element) this.layerElements[planetIndex] = element
+      else delete this.layerElements[planetIndex]
+    },
+    /** Moves each planet's layer to where the planet is this frame (in whole device pixels). */
+    writeFrame() {
       const dpr = window.devicePixelRatio || 1
-      const x = Math.round((planet.position.x + this.drawnView.x) * this.pixelsPerUnit * dpr) / dpr
-      const y = Math.round((planet.position.y + this.drawnView.y) * this.pixelsPerUnit * dpr) / dpr
-      return `translate(${x}px, ${y}px)`
+      for (const [planetIndex, element] of Object.entries(this.layerElements)) {
+        const planet = this.sprites[planetIndex]
+        if (!planet) continue
+        const x = Math.round((planet.position.x + this.drawnView.x) * this.pixelsPerUnit * dpr) / dpr
+        const y = Math.round((planet.position.y + this.drawnView.y) * this.pixelsPerUnit * dpr) / dpr
+        writeStyle(element, 'transform', `translate(${x}px, ${y}px)`)
+      }
     }
   }
 }

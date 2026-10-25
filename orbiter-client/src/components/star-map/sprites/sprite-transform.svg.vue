@@ -1,10 +1,12 @@
 <template>
   <g>
-    <g v-if="shouldDisplay" :transform="getOrbitalTransform">
+    <!-- Position, rotation and (when off screen) display are written every frame by writeFrame,
+         not by Vue, so a moving sprite never re-renders. -->
+    <g v-if="!hiddenByMenu" ref="placed">
       <g>
         <slot />
       </g>
-      <g :transform="getScaleTransform + ' ' + getRotationalTransform">
+      <g ref="turned">
         <!-- Only a few pixels across: a plain dot looks the same and costs far less to draw. -->
         <circle v-if="isTiny" cx="0" cy="0" :r="dotRadius" fill="#e5cfff" />
         <template v-else>
@@ -50,6 +52,8 @@ import { useUIStore } from '@/stores/ui'
 import { mapActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 import { spriteScale } from '@/libs/sprite-types'
+import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
+import { writeAttribute } from '@/libs/dom-writes'
 import Star from './star.svg'
 import Ship from './ship.svg'
 import Station from './station.svg'
@@ -103,43 +107,9 @@ export default {
     }
   },
   computed: {
-    ...mapState(useStarMapStore, ['sprites', 'gameTime']),
+    ...mapState(useStarMapStore, ['sprites']),
     ...mapState(useUIStore, ['selected', 'showLabels', 'isMenuOn', 'drawnPixelsPerUnit', 'isOnScreen', 'showScope']),
     ...mapState(useConfigStore, ['graphicsQuality']),
-    /**
-     * This frame's position data. Sprites are raw (non-reactive) objects that the frame loop
-     * updates in place, so reading gameTime here is what makes this re-evaluate every frame.
-     */
-    frame() {
-      void this.gameTime
-      const parent = this.sprite.orbiting ? this.sprites[this.sprite.orbiting] : null
-      return {
-        x: this.sprite.position.x,
-        y: this.sprite.position.y,
-        rotation: this.sprite.telemetry.rotation,
-        parentX: parent ? parent.telemetry.translatex : 0,
-        parentY: parent ? parent.telemetry.translatey : 0
-      }
-    },
-    getOrbitalTransform() {
-      // Snap to the device-pixel grid of the drawn world.
-      const step = 1 / (this.drawnPixelsPerUnit * (window.devicePixelRatio || 1))
-      const snap = (value) => Math.round(value / step) * step
-      if (this.frameOf === 'parent') {
-        // Inside its planet's layer, which is itself snapped: round the absolute position and
-        // subtract the planet's rounded position, so the sprite lands on the rounding of where it
-        // really is. Rounding its offset from the planet instead adds a second rounding error, and
-        // a followed ship or moon visibly shifts a pixel back and forth.
-        const x = snap(this.frame.x) - snap(this.frame.parentX)
-        const y = snap(this.frame.y) - snap(this.frame.parentY)
-        return 'translate(' + x + ',' + y + ')'
-      }
-      if (this.frameOf === 'self') return 'translate(0,0)'
-      return 'translate(' + snap(this.frame.x) + ',' + snap(this.frame.y) + ')'
-    },
-    getRotationalTransform() {
-      return 'rotate(' + Math.round(this.frame.rotation / ROTATION_STEP) * ROTATION_STEP + ')'
-    },
     /** The sprite's group scale (world units per sprite unit). */
     spriteScale() {
       return spriteScale(this.sprite.size)
@@ -158,9 +128,6 @@ export default {
       const onePixel = 1 / (this.drawnPixelsPerUnit * this.spriteScale)
       return Math.max(this.sprite.selectorSize / 2, onePixel)
     },
-    getScaleTransform() {
-      return 'scale(' + this.spriteScale + ')'
-    },
     isSelected() {
       if (this.objectIndex === this.selected) {
         return true
@@ -173,16 +140,59 @@ export default {
       }
       return 'none'
     },
-    shouldDisplay() {
-      if (this.isMenuOn && this.graphicsQuality < 2) {
-        return false
-      }
-      // Off screen: don't draw it, so it costs nothing per frame. (The label hangs below the sprite.)
-      return this.isSelected || this.isOnScreen(this.frame.x, this.frame.y, this.visualRadius + 10)
+    /** On the low graphics tier, the world is hidden behind open menus. */
+    hiddenByMenu() {
+      return this.isMenuOn && this.graphicsQuality < 2
     }
+  },
+  watch: {
+    // The world was just redrawn at a new zoom (inside this frame, after writeFrame ran):
+    // re-place the sprite for it before the browser paints.
+    drawnPixelsPerUnit() {
+      this.writeFrame()
+    }
+  },
+  mounted() {
+    this.stopFrames = onFrame(this.writeFrame, FRAME_ORDER.render)
+    this.writeFrame()
+  },
+  updated() {
+    // A re-render may have created new elements (e.g. the menu closed): place them before paint.
+    this.writeFrame()
+  },
+  unmounted() {
+    this.stopFrames()
   },
   methods: {
     ...mapActions(useUIStore, ['toggleScope', 'selectSprite']),
+    /** Moves, turns, and shows or hides the sprite for this frame. */
+    writeFrame() {
+      const placed = this.$refs.placed
+      if (!placed) return
+      const { x, y } = this.sprite.position
+      // Off screen: hidden, so it costs nothing to draw. (The label hangs below the sprite.)
+      const visible = this.isSelected || this.isOnScreen(x, y, this.visualRadius + 10)
+      writeAttribute(placed, 'display', visible ? 'inline' : 'none')
+      if (!visible) return
+      writeAttribute(placed, 'transform', this.placement(x, y))
+      const rotation = Math.round(this.sprite.telemetry.rotation / ROTATION_STEP) * ROTATION_STEP
+      writeAttribute(this.$refs.turned, 'transform', 'scale(' + this.spriteScale + ') rotate(' + rotation + ')')
+    },
+    /** The translate that puts the sprite at (x, y), snapped to the device-pixel grid of the drawn world. */
+    placement(x, y) {
+      if (this.frameOf === 'self') return 'translate(0,0)'
+      const step = 1 / (this.drawnPixelsPerUnit * (window.devicePixelRatio || 1))
+      const snap = (value) => Math.round(value / step) * step
+      if (this.frameOf === 'parent') {
+        // Inside its planet's layer, which is itself snapped: round the absolute position and
+        // subtract the planet's rounded position, so the sprite lands on the rounding of where it
+        // really is. Rounding its offset from the planet instead adds a second rounding error, and
+        // a followed ship or moon visibly shifts a pixel back and forth.
+        const parent = this.sprites[this.sprite.orbiting].position
+        return 'translate(' + (snap(x) - snap(parent.x)) + ',' + (snap(y) - snap(parent.y)) + ')'
+      }
+      return 'translate(' + snap(x) + ',' + snap(y) + ')'
+    },
     spriteAction: function () {
       if (this.isSelected) {
         this.toggleScope()

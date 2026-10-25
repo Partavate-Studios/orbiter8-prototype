@@ -4,7 +4,9 @@
 
     <circle cx="0" cy="0" r="10" stroke="#c3b3da" stroke-width="0.25" fill="url(#planetGradient)" />
 
-    <g v-if="graphicsQuality > 1" clip-path="url(#just-the-planet)" :transform="'rotate(' + surfaceRotation + ')'">
+    <!-- The surface turns against the sprite's rotation, so it appears to spin under the clip.
+         Its rotation is written every frame by writeSurface, not by Vue. -->
+    <g v-if="graphicsQuality > 1" ref="surface" clip-path="url(#just-the-planet)">
       <g v-if="planet.class == 0" stroke-width="0.5" stroke="#ffffff11" fill="#ffffff22">
         <!-- Earth Like -->
         <rect x="-2" y="-8" width="12" height="2" rx="1" ry="1" />
@@ -129,9 +131,10 @@
 </template>
 
 <script>
+import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
+import { writeAttribute } from '@/libs/dom-writes'
 import { mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
-import { useStarMapStore } from '@/stores/starmap'
 
 export default {
   name: 'Planet',
@@ -143,14 +146,23 @@ export default {
     planet() {
       return this.sprite.object
     },
-    ...mapState(useConfigStore, ['graphicsQuality']),
-    ...mapState(useStarMapStore, ['gameTime']),
-    // The surface turns against the sprite's rotation, so it appears to spin under the clip.
-    surfaceRotation() {
-      // Sprites are raw objects updated in place each frame; reading gameTime makes this re-evaluate per frame.
-      void this.gameTime
+    ...mapState(useConfigStore, ['graphicsQuality'])
+  },
+  mounted() {
+    this.stopFrames = onFrame(this.writeSurface, FRAME_ORDER.render)
+    this.writeSurface()
+  },
+  updated() {
+    this.writeSurface()
+  },
+  unmounted() {
+    this.stopFrames()
+  },
+  methods: {
+    writeSurface() {
       // Same 0.25° steps as the sprite's own rotation (sprite-transform), so they cancel exactly.
-      return 0 - Math.round(this.sprite.telemetry.rotation / 0.25) * 0.25
+      const rotation = 0 - Math.round(this.sprite.telemetry.rotation / 0.25) * 0.25
+      writeAttribute(this.$refs.surface, 'transform', 'rotate(' + rotation + ')')
     }
   }
 }
