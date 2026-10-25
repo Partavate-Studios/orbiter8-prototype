@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   usedHolds, emptyHolds, tradeBalance, emptyHoldsAfterTrade, isValidTrade, maxTradable,
-  clampTradeAmount, maxHoldsToBuy, MAX_CARGO_HOLDS
+  clampTradeAmount, maxHoldsToBuy, canAfford, MAX_CARGO_HOLDS
 } from './trade'
 
 const ship = { holds: 10, equipment: 2, fuel: 1, organics: 3 }
@@ -52,6 +52,11 @@ describe('trading', () => {
 })
 
 describe('shipyard', () => {
+  it('exactly enough credits is enough', () => {
+    expect(canAfford(100, 100)).toBe(true)
+    expect(canAfford(99, 100)).toBe(false)
+  })
+
   it('limits holds to the contract maximum and to what the player can pay', () => {
     expect(maxHoldsToBuy(1000, 10, 100)).toBe(10)
     expect(maxHoldsToBuy(1e9, MAX_CARGO_HOLDS - 5, 1)).toBe(5)

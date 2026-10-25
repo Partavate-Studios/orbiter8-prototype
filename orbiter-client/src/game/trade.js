@@ -90,5 +90,5 @@ export function maxHoldsToBuy (credits, currentHolds, holdPrice) {
 
 /** Whether the player has enough credits for a purchase. */
 export function canAfford (credits, cost) {
-  return credits > cost
+  return credits >= cost
 }
