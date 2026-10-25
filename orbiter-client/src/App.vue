@@ -28,6 +28,10 @@ export default {
     NetworkSelect,
     SvgDefs
   },
+  computed: {
+    ...mapState(useChainStore, ['playerReady']),
+    ...mapState(useGameStateStore, ['gameDataLoaded'])
+  },
   created: function () {
     this.initWeb3()
     // Always start at the title screen. Vue Router 4 resolves the URL asynchronously,
@@ -37,10 +41,6 @@ export default {
         router.push('/')
       }
     })
-  },
-  computed: {
-    ...mapState(useChainStore, ['playerReady']),
-    ...mapState(useGameStateStore, ['gameDataLoaded'])
   },
   methods: {
     ...mapActions(useChainStore, ['initWeb3'])

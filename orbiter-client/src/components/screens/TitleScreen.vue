@@ -25,17 +25,14 @@ import ShipCreate from '@/components/screens/ShipCreate'
 import ShipSelect from '@/components/screens/ShipSelect'
 
 export default {
+  name: 'TitleScreen',
   components: {
     AvatarCreate,
     ShipCreate,
     ShipSelect
   },
-  name: 'TitleScreen',
   computed: {
     ...mapState(useGameStateStore, ['haveAvatar', 'haveShip'])
-  },
-  methods: {
-    ...mapActions(useChainStore, ['startBlockPolling'])
   },
   created() {
     this.startBlockPolling()
@@ -43,6 +40,9 @@ export default {
   },
   beforeUnmount() {
     this.o8audio.stopMusic()
+  },
+  methods: {
+    ...mapActions(useChainStore, ['startBlockPolling'])
   }
 }
 </script>

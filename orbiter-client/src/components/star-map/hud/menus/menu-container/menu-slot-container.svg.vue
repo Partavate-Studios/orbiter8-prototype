@@ -33,15 +33,15 @@ import uniqueId from 'lodash/uniqueId'
 import { useUIStore } from '@/stores/ui'
 export default {
   name: 'MenuSlotContainer',
+  props: {
+    highlight: { type: Boolean, default: false }
+  },
   data() {
     return {
       hover: false,
       // Unique per instance: the clip's shape depends on this component's size.
       clipId: uniqueId('menu-slot-clip-')
     }
-  },
-  props: {
-    highlight: { type: Boolean, default: false }
   },
   computed: {
     ...mapState(useUIStore, ['viewport']),

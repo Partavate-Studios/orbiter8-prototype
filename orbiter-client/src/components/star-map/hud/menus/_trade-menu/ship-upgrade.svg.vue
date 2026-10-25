@@ -32,9 +32,9 @@
 
       <cargo-holds
         transform="translate(4 4)"
-        :cargoHolds="cargoHolds"
-        :predictedLoad="predictedLoad"
-        :existingLoad="existingLoad"
+        :cargo-holds="cargoHolds"
+        :predicted-load="predictedLoad"
+        :existing-load="existingLoad"
       />
     </g>
     <rect x="-41" y="-21" rx="1" ry="1" width="82" height="42" fill="#00000011" stroke-width="0.5" stroke="#c3b3da44" />
@@ -71,8 +71,8 @@ export default {
       default: 0
     }
   },
-  methods: {},
-  computed: {}
+  computed: {},
+  methods: {}
 }
 </script>
 

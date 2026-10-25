@@ -64,7 +64,7 @@
       </text>
 
       <g v-for="index in 3" :key="'grapahics' + index" :transform="'translate(' + (index * 40 - 80) + ' -270)'">
-        <a v-on:click.prevent="chooseGraphicsQuality(index)" cursor="pointer">
+        <a cursor="pointer" @click.prevent="chooseGraphicsQuality(index)">
           <menu-checkbox :checked="graphicsQuality == index" />
         </a>
       </g>
@@ -105,7 +105,7 @@
         Music
       </text>
       <g v-for="index in 4" :key="'music' + index" :transform="'translate(' + (index * 60 - 100) + ' -125)'">
-        <a v-on:click.prevent="setMusicVolume(index - 1)" cursor="pointer">
+        <a cursor="pointer" @click.prevent="setMusicVolume(index - 1)">
           <menu-checkbox :checked="getMusicVolume() == index - 1" />
         </a>
       </g>
@@ -124,7 +124,7 @@
       </text>
 
       <g v-for="index in 4" :key="'effects' + index" :transform="'translate(' + (index * 60 - 100) + ' -85)'">
-        <a v-on:click.prevent="setEffectsVolume(index - 1)" cursor="pointer">
+        <a cursor="pointer" @click.prevent="setEffectsVolume(index - 1)">
           <menu-checkbox :checked="getEffectsVolume() == index - 1" />
         </a>
       </g>
@@ -158,6 +158,9 @@ export default {
     MenuContainer,
     MenuCheckbox
   },
+  computed: {
+    ...mapState(useConfigStore, ['graphicsQuality'])
+  },
   methods: {
     ...mapActions(useConfigStore, ['setGraphicsQuality']),
     chooseGraphicsQuality(quality) {
@@ -180,9 +183,6 @@ export default {
     getEffectsVolume() {
       return parseInt(this.o8audio.getEffectsVolume() * 3)
     }
-  },
-  computed: {
-    ...mapState(useConfigStore, ['graphicsQuality'])
   }
 }
 </script>

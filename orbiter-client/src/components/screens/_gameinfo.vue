@@ -23,11 +23,11 @@ export default {
   computed: {
     ...mapState(useGameStateStore, ['gameState'])
   },
-  mounted() {},
   watch: {
     avatarCount() {},
     systemCount() {}
-  }
+  },
+  mounted() {}
 }
 </script>
 

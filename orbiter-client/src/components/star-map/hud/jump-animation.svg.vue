@@ -56,17 +56,14 @@ import Ship from '../sprites/ship.svg'
 
 export default {
   name: 'JumpAnimation',
+  components: {
+    Ship
+  },
   data() {
     return {
       loreTip: '',
       starSpeed: 25
     }
-  },
-  components: {
-    Ship
-  },
-  mounted: function () {
-    this.loreTip = this.randomLoreTip()
   },
   computed: {
     ...mapState(useStarMapStore, ['gameTime']),
@@ -74,6 +71,9 @@ export default {
     rightSlideX() {
       return ((this.starSpeed * this.gameTime) / 10 + 5000) % 10000
     }
+  },
+  mounted: function () {
+    this.loreTip = this.randomLoreTip()
   },
   methods: {
     getShipTranslate() {

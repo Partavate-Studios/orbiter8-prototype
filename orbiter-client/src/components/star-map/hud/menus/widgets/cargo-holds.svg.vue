@@ -33,6 +33,11 @@ export default {
       default: 0
     }
   },
+  computed: {
+    maxCargoHolds() {
+      return Math.min(this.cargoHolds, 35)
+    }
+  },
   methods: {
     fillPatternFor(n) {
       if (n <= (this.predictedLoad / this.cargoHolds) * this.maxCargoHolds) {
@@ -41,11 +46,6 @@ export default {
         return "url('#soldBlockGradient')"
       }
       return "url('#emptyBlockGradient')"
-    }
-  },
-  computed: {
-    maxCargoHolds() {
-      return Math.min(this.cargoHolds, 35)
     }
   }
 }

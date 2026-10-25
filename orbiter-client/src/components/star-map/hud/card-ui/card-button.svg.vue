@@ -35,7 +35,7 @@
     >
       {{ text }}
     </text>
-    <a v-on:click.prevent="click" v-on:mouseover="hover = true" v-on:mouseout="hover = false" cursor="pointer">
+    <a cursor="pointer" @click.prevent="click" @mouseover="hover = true" @mouseout="hover = false">
       <rect x="5" y="5" width="130" height="14" stroke="#5b1aaa00" fill="#3d127300" stroke-width="2"
     /></a>
   </g>
@@ -44,13 +44,13 @@
 <script>
 export default {
   name: 'CardButton',
-  emits: ['buttonclick'],
   props: {
     text: {
       type: String,
       default: 'default'
     }
   },
+  emits: ['buttonclick'],
   data() {
     return {
       hover: false,

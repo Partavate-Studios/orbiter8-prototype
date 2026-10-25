@@ -1,9 +1,9 @@
 <template>
   <a
-    v-on:click.prevent="select"
-    v-on:mouseover="setSpriteToDisplay(spriteKey)"
-    v-on:mouseout="setSpriteToDisplay(null)"
     cursor="pointer"
+    @click.prevent="select"
+    @mouseover="setSpriteToDisplay(spriteKey)"
+    @mouseout="setSpriteToDisplay(null)"
     ><slot></slot
   ></a>
 </template>

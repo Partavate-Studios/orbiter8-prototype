@@ -9,7 +9,7 @@
 
       <circle cx="0" cy="0" r="10" :fill="checkboxBackground" stroke-width="2" :stroke="checkboxBorder" />
 
-      <g :clip-path="'url(#' + clipId + ')'" v-if="checked"> </g>
+      <g v-if="checked" :clip-path="'url(#' + clipId + ')'"> </g>
     </g>
   </g>
 </template>

@@ -1,19 +1,19 @@
 <template>
   <!-- Back to front: background, world (the star system) and HUD are separate elements,
        so changes in one layer never make the browser repaint the others. -->
-  <div class="layer star-map" ref="gamelayerContainer">
+  <div ref="gamelayerContainer" class="layer star-map">
     <background-canvas />
     <guides-canvas />
 
     <!-- The world is drawn for the camera in drawnView and slightly larger than the screen;
          between redraws a CSS transform (composited, no repaint) follows the live camera. -->
-    <div class="world-layer" :style="worldBox" ref="world">
+    <div ref="world" class="world-layer" :style="worldBox">
       <svg
+        id="gamelayer"
+        ref="gamelayer"
         class="map-layer"
         :viewBox="worldViewBox"
         :class="{ 'is-dragging': mouseHold }"
-        id="gamelayer"
-        ref="gamelayer"
         xmlns="http://www.w3.org/2000/svg"
       >
         <g font-family="Ubuntu, sans-serif" :transform="'scale(' + baseScale + ')'">
@@ -90,6 +90,7 @@ import { CompositedLayer } from '@/libs/composited-layer'
 const WORLD_MARGIN = 256
 
 export default {
+  name: 'StarMap',
   components: {
     Hud,
     JumpMenu,
@@ -101,7 +102,6 @@ export default {
     ConnectionStatus,
     LoadingBar
   },
-  name: 'StarMap',
   data() {
     return {
       //these should be in UI store
@@ -113,21 +113,6 @@ export default {
       worldMargin: WORLD_MARGIN,
       worldOffsetY: WORLD_OFFSET_Y
     }
-  },
-  mounted() {
-    this.drawWorld()
-    // While zooming out, the shrinking world may briefly show nothing near the screen edges until
-    // it redraws (the background and the guides stay put); that beats redrawing at every wheel step.
-    this.worldLayer = new CompositedLayer(this.$refs.world, { margin: WORLD_MARGIN })
-    this.stopFrames = onFrame(this.followCamera, FRAME_ORDER.render)
-    this.$nextTick(function () {
-      this.resizeHandler() //set initial ratio
-      window.addEventListener('resize', this.resizeHandler)
-    })
-  },
-  beforeUnmount() {
-    window.removeEventListener('resize', this.resizeHandler)
-    this.stopFrames()
   },
   computed: {
     ...mapState(useUIStore, [
@@ -173,9 +158,6 @@ export default {
       return -width / 2 + ' ' + -height / 2 + ' ' + width + ' ' + height
     }
   },
-  created() {
-    this.selectSprite(this.myShipId)
-  },
   watch: {
     currentStarSystemId: function (val, oldVal) {
       if (val != oldVal) {
@@ -187,6 +169,24 @@ export default {
         }
       }
     }
+  },
+  created() {
+    this.selectSprite(this.myShipId)
+  },
+  mounted() {
+    this.drawWorld()
+    // While zooming out, the shrinking world may briefly show nothing near the screen edges until
+    // it redraws (the background and the guides stay put); that beats redrawing at every wheel step.
+    this.worldLayer = new CompositedLayer(this.$refs.world, { margin: WORLD_MARGIN })
+    this.stopFrames = onFrame(this.followCamera, FRAME_ORDER.render)
+    this.$nextTick(function () {
+      this.resizeHandler() //set initial ratio
+      window.addEventListener('resize', this.resizeHandler)
+    })
+  },
+  beforeUnmount() {
+    window.removeEventListener('resize', this.resizeHandler)
+    this.stopFrames()
   },
   methods: {
     ...mapActions(useUIStore, [

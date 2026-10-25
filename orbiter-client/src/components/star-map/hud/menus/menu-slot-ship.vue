@@ -80,15 +80,15 @@ import Ship from '@/components/star-map/sprites/ship.svg'
 
 export default {
   name: 'ShipsMenu',
+  components: {
+    MenuSlotContainer,
+    Ship
+  },
   props: {
     shipId: {
       type: String,
       default: null
     }
-  },
-  components: {
-    MenuSlotContainer,
-    Ship
   },
   computed: {
     ...mapState(useUIStore, ['viewport']),

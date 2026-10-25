@@ -49,7 +49,7 @@
           <text x="12" y="0" fill="#ffffff" font-size="0.5em" text-anchor="end"> owner: {{ ownerName }} </text>
         </g>
         <g v-if="getMoonCount(planetId) > 0" :transform="'translate(' + slotWidth * 0.39 + ' 40)'">
-          <g v-for="(moon, index) in moonsForPlanet(planetId)" v-bind:key="'moon' + moon">
+          <g v-for="(moon, index) in moonsForPlanet(planetId)" :key="'moon' + moon">
             <g :transform="'translate(' + (index * slotWidth) / 10 + ' 0)'">
               <g :transform="'scale(' + (systemObjects[moon].size / 10 + 1) + ')'">
                 <moon />
@@ -132,12 +132,6 @@ import { planetTypeName } from '@/sdk/game/planet-types'
 
 export default {
   name: 'PlanetsMenu',
-  props: {
-    planetId: {
-      type: String,
-      default: null
-    }
-  },
   components: {
     MenuSlotContainer,
     Planet,
@@ -145,11 +139,10 @@ export default {
     Moon,
     Ship
   },
-  methods: {
-    planetTypeName,
-    getMoonCount(planetId) {
-      let moons = this.moonsForPlanet(planetId)
-      return moons.length
+  props: {
+    planetId: {
+      type: String,
+      default: null
     }
   },
   computed: {
@@ -210,6 +203,13 @@ export default {
         name = this.players[address] + ' ' + name
       }
       return name
+    }
+  },
+  methods: {
+    planetTypeName,
+    getMoonCount(planetId) {
+      let moons = this.moonsForPlanet(planetId)
+      return moons.length
     }
   }
 }

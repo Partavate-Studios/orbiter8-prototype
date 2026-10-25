@@ -43,6 +43,26 @@ export default {
       }
     }
   },
+  beforeCreate() {},
+  created() {
+    window.addEventListener('keyup', this.handleKeyPress)
+    window.addEventListener('wheel', this.onWheel)
+    if (!this.haveAvatar || !this.haveShip) {
+      router.push('/')
+    }
+    this.lastTick = 0
+    this.stopFrames = onFrame(this.onFrame)
+    // The map only loads when a new block is seen; make sure the (single) poller runs however we got here.
+    this.startBlockPolling()
+  },
+  mounted() {
+    this.o8audio.playMusic('map')
+  },
+  unmounted() {
+    window.removeEventListener('keyup', this.handleKeyPress)
+    window.removeEventListener('wheel', this.onWheel)
+    this.stopFrames()
+  },
   methods: {
     screenshot() {
       let svgRoot = document.getElementById('gameSVG')
@@ -138,26 +158,6 @@ export default {
       this.lastTick = now
       this.advanceGame()
     }
-  },
-  mounted() {
-    this.o8audio.playMusic('map')
-  },
-  beforeCreate() {},
-  unmounted() {
-    window.removeEventListener('keyup', this.handleKeyPress)
-    window.removeEventListener('wheel', this.onWheel)
-    this.stopFrames()
-  },
-  created() {
-    window.addEventListener('keyup', this.handleKeyPress)
-    window.addEventListener('wheel', this.onWheel)
-    if (!this.haveAvatar || !this.haveShip) {
-      router.push('/')
-    }
-    this.lastTick = 0
-    this.stopFrames = onFrame(this.onFrame)
-    // The map only loads when a new block is seen; make sure the (single) poller runs however we got here.
-    this.startBlockPolling()
   }
 }
 </script>

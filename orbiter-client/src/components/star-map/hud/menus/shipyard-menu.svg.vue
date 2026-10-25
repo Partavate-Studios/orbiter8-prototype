@@ -3,7 +3,7 @@
     <menu-container>
       <g v-if="pending">
         <g>
-          <ship-upgrade :cargoHolds="avatar.ship.holds" :predictedLoad="avatar.ship.holds" :existingLoad="0" />
+          <ship-upgrade :cargo-holds="avatar.ship.holds" :predicted-load="avatar.ship.holds" :existing-load="0" />
         </g>
         <g transform="translate(0 220)">
           <text v-if="pending" text-anchor="middle" fill="#ffffff" font-size="4em">Transacting... </text>
@@ -17,9 +17,9 @@
 
           <g transform="translate(0 200)">
             <ship-upgrade
-              :cargoHolds="avatar.ship.holds + holdsToBuy"
-              :predictedLoad="avatar.ship.holds"
-              :existingLoad="avatar.ship.holds"
+              :cargo-holds="avatar.ship.holds + holdsToBuy"
+              :predicted-load="avatar.ship.holds"
+              :existing-load="avatar.ship.holds"
             />
           </g>
 
@@ -65,7 +65,7 @@
                 stroke-width="0.5"
                 fill="#ffffff22"
                 class="can-click"
-                v-on:click="decrementHolds"
+                @click="decrementHolds"
               />
 
               <rect
@@ -80,13 +80,13 @@
                 stroke-width="0.5"
                 fill="#ffffff22"
                 class="can-click"
-                v-on:click="incrementHolds"
+                @click="incrementHolds"
               />
             </g>
           </g>
 
           <g :transform="'translate(0 620)'">
-            <menu-button v-on:buttonclick="applyUpgrades" :enabled="canUpgrade" text="Upgrade" />
+            <menu-button :enabled="canUpgrade" text="Upgrade" @buttonclick="applyUpgrades" />
           </g>
         </g>
       </g>
@@ -108,37 +108,20 @@ import ShipUpgrade from './_trade-menu/ship-upgrade.svg'
 
 export default {
   name: 'TradeMenu',
-  data() {
-    return {
-      holdsToBuy: 0,
-      pending: false
-    }
-  },
-  props: {
-    /** The selected object's key (see sdk/system.js objectKey). */
-    objectId: { type: String, default: null }
-  },
   components: {
     MenuContainer,
     MenuButton,
     Arrow,
     ShipUpgrade
   },
-  methods: {
-    ...mapActions(useGameStateStore, ['addHoldsToShip']),
-    ...mapActions(useUIStore, ['closeMenu']),
-    applyUpgrades() {
-      this.o8audio.playEffect('click')
-      if (this.holdsToBuy > 0) {
-        this.addHoldsToShip({ planetId: this.systemObjects[this.objectId].id, amount: this.holdsToBuy })
-        this.pending = true
-      }
-    },
-    decrementHolds() {
-      this.holdsToBuy = Math.max(0, this.holdsToBuy - 1)
-    },
-    incrementHolds() {
-      this.holdsToBuy = Math.min(this.maxHoldsAvailable, this.holdsToBuy + 1)
+  props: {
+    /** The selected object's key (see sdk/system.js objectKey). */
+    objectId: { type: String, default: null }
+  },
+  data() {
+    return {
+      holdsToBuy: 0,
+      pending: false
     }
   },
   computed: {
@@ -172,6 +155,23 @@ export default {
         }
       },
       deep: true
+    }
+  },
+  methods: {
+    ...mapActions(useGameStateStore, ['addHoldsToShip']),
+    ...mapActions(useUIStore, ['closeMenu']),
+    applyUpgrades() {
+      this.o8audio.playEffect('click')
+      if (this.holdsToBuy > 0) {
+        this.addHoldsToShip({ planetId: this.systemObjects[this.objectId].id, amount: this.holdsToBuy })
+        this.pending = true
+      }
+    },
+    decrementHolds() {
+      this.holdsToBuy = Math.max(0, this.holdsToBuy - 1)
+    },
+    incrementHolds() {
+      this.holdsToBuy = Math.min(this.maxHoldsAvailable, this.holdsToBuy + 1)
     }
   }
 }

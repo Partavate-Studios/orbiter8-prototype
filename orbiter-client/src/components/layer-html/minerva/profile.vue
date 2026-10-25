@@ -1,6 +1,6 @@
 <template>
   <div>
-    <span v-on:click="refreshData" class="refresh" alt="Refresh" title="Refresh">&#x21bb;</span>
+    <span class="refresh" alt="Refresh" title="Refresh" @click="refreshData">&#x21bb;</span>
 
     <div v-if="haveAvatar" class="title">Commander {{ avatar.name }}</div>
     <div v-if="haveAvatar">Credits {{ avatar.credits }}</div>
@@ -25,9 +25,8 @@
     {{ viewport.height }} @ {{ viewRatio }})
     <hr />
     Neighbors:
-    <div v-for="(neighbor, index) in neighbors" v-bind:key="index" class="jump">
-      <a v-on:click.prevent="move(neighbor.id)" href="" v-if="neighbor.id > 0"
-        >{{ neighbor.name }} ({{ neighbor.id }})</a
+    <div v-for="(neighbor, index) in neighbors" :key="index" class="jump">
+      <a v-if="neighbor.id > 0" href="" @click.prevent="move(neighbor.id)">{{ neighbor.name }} ({{ neighbor.id }})</a
       ><br />
     </div>
     <br />

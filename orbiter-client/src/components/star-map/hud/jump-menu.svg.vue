@@ -1,6 +1,6 @@
 <template>
   <g>
-    <a cursor="pointer" v-on:mouseover="hide = true" v-on:mouseleave="hide = false" v-on:click.prevent="close()">
+    <a cursor="pointer" @mouseover="hide = true" @mouseleave="hide = false" @click.prevent="close()">
       <circle cx="0" cy="0" r="65" stroke-width="4" fill="#ffffff00" stroke="none" />
     </a>
     <g v-if="hide">
@@ -9,8 +9,8 @@
     <g v-else>
       <circle cx="0" cy="0" r="70" stroke-width="4" fill="none" stroke="#ffffff44" stroke-dasharray="4 2" />
     </g>
-    <g v-bind:class="{ disabled: hide }">
-      <g v-for="(neighbor, index) in neighbors" v-bind:key="index">
+    <g :class="{ disabled: hide }">
+      <g v-for="(neighbor, index) in neighbors" :key="index">
         <g v-if="index == hover">
           <circle cx="0" cy="0" r="70" stroke-width="1" fill="none" stroke="#ffffff" />
           <circle cx="0" cy="0" r="70" stroke-width="0" fill="url(#scopeFill)" />
@@ -36,7 +36,7 @@
           </text>
         </g>
 
-        <g :transform="'rotate(' + index * 30 + ')'" v-if="neighbor.id > 0">
+        <g v-if="neighbor.id > 0" :transform="'rotate(' + index * 30 + ')'">
           <g v-if="index == hover" stroke="#ffffff" stroke-width="1">
             <g transform="scale(2) translate(66 12) rotate(145)">
               <ship></ship>
@@ -50,10 +50,10 @@
           <g :transform="'translate(165 65)'">
             <g :transform="'rotate(' + index * -30 + ')'">
               <a
-                v-on:mouseover="hover = index"
-                v-on:mouseout="hover = null"
                 cursor="pointer"
-                v-on:click.prevent="move(neighbor.id)"
+                @mouseover="hover = index"
+                @mouseout="hover = null"
+                @click.prevent="move(neighbor.id)"
               >
                 <circle cx="0" cy="0" r="28" stroke-width="0" fill="url(#glowingGradient)" stroke="none" />
                 <circle cx="0" cy="0" r="26" stroke-width="2" fill="url(#starGradient)" stroke="#ffffffaa" />
@@ -65,7 +65,7 @@
                   stroke="#00000044"
                   stroke-width="0.5"
                   text-anchor="middle"
-                  v-bind:class="{ newStar: neighbor.name == 'Unexplored Star' }"
+                  :class="{ newStar: neighbor.name == 'Unexplored Star' }"
                   dominant-baseline="middle"
                   >{{ neighbor.id }}
                 </text>
@@ -87,16 +87,16 @@ import Ship from '../sprites/ship.svg'
 
 export default {
   name: 'JumpMenu',
+  components: {
+    Ship
+  },
+  props: {},
   data() {
     return {
       hover: null,
       hide: false
     }
   },
-  components: {
-    Ship
-  },
-  props: {},
   computed: {
     ...mapState(useStarMapStore, ['neighbors'])
   },

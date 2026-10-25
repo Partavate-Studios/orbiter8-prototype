@@ -165,9 +165,6 @@ export default {
     /** The selected object's key (see sdk/system.js objectKey). */
     objectId: { type: String, default: null }
   },
-  methods: {
-    planetTypeName
-  },
   computed: {
     ...mapState(useStarMapStore, ['systemObjects', 'players']),
     ...mapState(useGameStateStore, ['avatar']),
@@ -202,6 +199,9 @@ export default {
       }
       return name
     }
+  },
+  methods: {
+    planetTypeName
   }
 }
 </script>

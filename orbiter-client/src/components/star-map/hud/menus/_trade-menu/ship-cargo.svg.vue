@@ -11,9 +11,9 @@
       <line x1="2" y1="-6" x2="16" y2="-6" stroke="#ffffff88" stroke-width="0.5" />
       <cargo-holds
         transform="translate(24 4)"
-        :cargoHolds="maxCargoHolds"
-        :predictedLoad="predictedLoad"
-        :existingLoad="existingLoad"
+        :cargo-holds="maxCargoHolds"
+        :predicted-load="predictedLoad"
+        :existing-load="existingLoad"
       />
     </g>
     <rect x="-41" y="-21" rx="1" ry="1" width="82" height="42" fill="#00000011" stroke-width="0.5" stroke="#c3b3da44" />
@@ -50,12 +50,12 @@ export default {
       default: 0
     }
   },
-  methods: {},
   computed: {
     maxCargoHolds() {
       return Math.min(this.cargoHolds, 24)
     }
-  }
+  },
+  methods: {}
 }
 </script>
 

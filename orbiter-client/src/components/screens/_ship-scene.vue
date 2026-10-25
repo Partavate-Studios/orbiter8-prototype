@@ -72,10 +72,10 @@
 import Ship from '../star-map/sprites/ship.svg.vue'
 
 export default {
+  name: 'ShipScene',
   components: {
     Ship
   },
-  name: 'ShipScene',
   props: {
     warmingUp: { type: Boolean, default: false }
   }

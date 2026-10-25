@@ -37,18 +37,18 @@ import uniqueId from 'lodash/uniqueId'
 import { useUIStore } from '@/stores/ui'
 export default {
   name: 'ChatSlotContainer',
+  props: {
+    name: { type: String, default: '' },
+    /** How many blocks ago the message was sent. */
+    blockId: { type: Number, default: 0 },
+    message: { type: String, default: '' }
+  },
   data() {
     return {
       hover: false,
       // Unique per instance: the clip's shape depends on this component's size.
       clipId: uniqueId('menu-slot-clip-')
     }
-  },
-  props: {
-    name: { type: String, default: '' },
-    /** How many blocks ago the message was sent. */
-    blockId: { type: Number, default: 0 },
-    message: { type: String, default: '' }
   },
   computed: {
     ...mapState(useUIStore, ['viewport']),

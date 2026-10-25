@@ -1,9 +1,9 @@
 <template>
   <g stroke-width="0">
     <rect
+      ref="sliderLine"
       ry="3"
       rx="3"
-      ref="sliderLine"
       :x="sliderLeft"
       y="-5"
       :width="sliderWidth"
@@ -16,9 +16,9 @@
     <g v-if="reverse">
       <rect
         v-if="highlightValue > 0"
+        ref="sliderLineHighlight"
         ry="2"
         rx="2"
-        ref="sliderLineHighlight"
         :x="sliderRight - highlight"
         y="-4"
         :width="highlight"
@@ -44,9 +44,9 @@
     <g v-else>
       <rect
         v-if="highlightValue > 0"
+        ref="sliderLineHighlight"
         ry="2"
         rx="2"
-        ref="sliderLineHighlight"
         :x="sliderLeft"
         y="-4"
         :width="highlight"
@@ -83,7 +83,7 @@
         stroke-width="0.5"
         fill="#ffffff22"
         class="can-click"
-        v-on:click="decrementSlider"
+        @click="decrementSlider"
       />
     </g>
 
@@ -101,7 +101,7 @@
         stroke-width="0.5"
         fill="#ffffff22"
         class="can-click"
-        v-on:click="incrementSlider"
+        @click="incrementSlider"
       />
     </g>
 
@@ -115,12 +115,12 @@
         stroke="#ffffff"
         stroke-width="0"
         fill="#00000000"
+        class="can-drag"
+        :class="{ 'is-dragging': mouseHold }"
         @mousedown.stop="handleMouseDown"
         @mouseup.stop="handleMouseUp"
         @mousemove.stop="handleMouseMove"
         @mouseleave="handleMouseLeave"
-        class="can-drag"
-        :class="{ 'is-dragging': mouseHold }"
       />
     </g>
   </g>
@@ -135,7 +135,6 @@ export default {
   components: {
     SliderArrow
   },
-  emits: ['update:percentage', 'update:increment', 'update:decrement'],
   props: {
     lowestValue: {
       type: Number,
@@ -162,13 +161,51 @@ export default {
       default: false
     }
   },
+  emits: ['update:percentage', 'update:increment', 'update:decrement'],
   data() {
     return {
       mouseHold: false,
       padding: 5
     }
   },
-
+  computed: {
+    sliderLeft() {
+      return this.sliderWidth / -2
+    },
+    sliderRight() {
+      return this.sliderWidth / 2
+    },
+    placement() {
+      return (this.currentValue / this.highestValue) * this.sliderWidth
+    },
+    highlight() {
+      return parseInt((this.highlightValue / this.highestValue) * this.sliderWidth)
+    },
+    touchAreaLeftEdge() {
+      if (this.reverse) {
+        return this.sliderRight - this.highlight - this.padding
+      }
+      return this.sliderLeft - this.padding
+    },
+    opacityLeft() {
+      if (
+        (!this.reverse && this.currentValue > this.lowestValue) ||
+        (this.reverse && this.currentValue < this.highlightValue)
+      ) {
+        return 1
+      }
+      return 0.25
+    },
+    opacityRight() {
+      if (
+        (this.reverse && this.currentValue > this.lowestValue) ||
+        (!this.reverse && this.currentValue < this.highlightValue)
+      ) {
+        return 1
+      }
+      return 0.25
+    }
+  },
   methods: {
     handleMouseDown(event) {
       this.mouseHold = true
@@ -211,44 +248,6 @@ export default {
       } else {
         this.$emit('update:increment')
       }
-    }
-  },
-  computed: {
-    sliderLeft() {
-      return this.sliderWidth / -2
-    },
-    sliderRight() {
-      return this.sliderWidth / 2
-    },
-    placement() {
-      return (this.currentValue / this.highestValue) * this.sliderWidth
-    },
-    highlight() {
-      return parseInt((this.highlightValue / this.highestValue) * this.sliderWidth)
-    },
-    touchAreaLeftEdge() {
-      if (this.reverse) {
-        return this.sliderRight - this.highlight - this.padding
-      }
-      return this.sliderLeft - this.padding
-    },
-    opacityLeft() {
-      if (
-        (!this.reverse && this.currentValue > this.lowestValue) ||
-        (this.reverse && this.currentValue < this.highlightValue)
-      ) {
-        return 1
-      }
-      return 0.25
-    },
-    opacityRight() {
-      if (
-        (this.reverse && this.currentValue > this.lowestValue) ||
-        (!this.reverse && this.currentValue < this.highlightValue)
-      ) {
-        return 1
-      }
-      return 0.25
     }
   }
 }

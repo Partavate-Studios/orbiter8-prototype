@@ -26,12 +26,12 @@
             :r="systemObjects[childIndex].orbit.radius"
             :selected="childIndex === selected"
           />
-          <sprite-transform :sprite="sprites[planetIndex]" :objectIndex="planetIndex" type="planet" frame-of="self" />
+          <sprite-transform :sprite="sprites[planetIndex]" :object-index="planetIndex" type="planet" frame-of="self" />
           <sprite-transform
             v-for="childIndex in childrenOf(planetIndex)"
             :key="'sprite-' + childIndex"
             :sprite="sprites[childIndex]"
-            :objectIndex="childIndex"
+            :object-index="childIndex"
             :type="systemObjects[childIndex].type"
             frame-of="parent"
           />

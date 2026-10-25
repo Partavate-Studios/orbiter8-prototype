@@ -3,7 +3,7 @@
     <menu-container>
       <g v-if="pending">
         <g>
-          <ship-cargo :cargoHolds="0" :predictedLoad="0" :existingLoad="0" />
+          <ship-cargo :cargo-holds="0" :predicted-load="0" :existing-load="0" />
         </g>
         <g transform="translate(0 220)">
           <text v-if="pending" text-anchor="middle" fill="#ffffff" font-size="4em">Transacting... </text>
@@ -17,7 +17,11 @@
 
           <g transform="translate(0 35)">
             <g transform="translate(0 95)">
-              <ship-cargo :cargoHolds="avatar.ship.holds" :predictedLoad="predictedHolds" :existingLoad="fullHolds" />
+              <ship-cargo
+                :cargo-holds="avatar.ship.holds"
+                :predicted-load="predictedHolds"
+                :existing-load="fullHolds"
+              />
             </g>
             <g dominant-baseline="middle" font-size="0.7em">
               <g v-if="equipmentToTrade != 0" transform="translate(-45 30)">
@@ -106,7 +110,7 @@
               >
             </g>
 
-            <g transform="translate(-120 180)" v-if="avatar.credits != 0" dominant-baseline="middle">
+            <g v-if="avatar.credits != 0" transform="translate(-120 180)" dominant-baseline="middle">
               <rect
                 x="-55"
                 y="-10"
@@ -135,20 +139,21 @@
                 stroke="#ffffff44"
                 stroke-width="1.5"
               />
-              <text x="0" y="0" text-anchor="middle" fill="#ffffff" v-if="currentBalance < 0" font-size="0.7em"
+              <text v-if="currentBalance < 0" x="0" y="0" text-anchor="middle" fill="#ffffff" font-size="0.7em"
                 >Pay: &#8595; {{ Math.abs(currentBalance) }}&cent;</text
               >
-              <text x="0" y="0" text-anchor="middle" fill="#ffffff" v-else-if="currentBalance > 0" font-size="0.7em"
+              <text v-else-if="currentBalance > 0" x="0" y="0" text-anchor="middle" fill="#ffffff" font-size="0.7em"
                 >Gain: &#8593; {{ currentBalance }}&cent;</text
               >
             </g>
 
             <g
+              v-if="currentBalance != 0 && avatar.credits + currentBalance > 0"
               transform="translate(120 180)"
               dominant-baseline="middle"
-              v-if="currentBalance != 0 && avatar.credits + currentBalance > 0"
             >
               <rect
+                v-if="currentBalance > 0"
                 x="-55"
                 y="-10"
                 width="110"
@@ -158,9 +163,9 @@
                 fill="#5D1EB0"
                 stroke="#ffffff44"
                 stroke-width="1.5"
-                v-if="currentBalance > 0"
               />
               <rect
+                v-else
                 x="-55"
                 y="-10"
                 width="110"
@@ -170,13 +175,12 @@
                 fill="#280b4b"
                 stroke="#ffffff44"
                 stroke-width="1.5"
-                v-else
               />
               <text x="2" y="0" text-anchor="middle" fill="#ffffff" font-size="0.7em"
                 >Fin: {{ avatar.credits + currentBalance }}&cent;</text
               >
             </g>
-            <g transform="translate(120 180)" dominant-baseline="middle" v-if="avatar.credits + currentBalance < 0">
+            <g v-if="avatar.credits + currentBalance < 0" transform="translate(120 180)" dominant-baseline="middle">
               <rect
                 x="-55"
                 y="-10"
@@ -190,7 +194,7 @@
               />
               <text x="-2" y="0" text-anchor="middle" fill="#ffffff" font-size="0.7em">Insufficient Funds</text>
             </g>
-            <g transform="translate(120 180)" dominant-baseline="middle" v-if="!nothingToTrade && currentBalance == 0">
+            <g v-if="!nothingToTrade && currentBalance == 0" transform="translate(120 180)" dominant-baseline="middle">
               <rect
                 x="-55"
                 y="-10"
@@ -215,39 +219,39 @@
           <g transform="translate(0 10)">
             <inventory-dial
               label="Equipment"
-              :portInventory="parseInt(portInventory.equipment)"
-              v-on:update:inventoryToTrade="updateEquipmentToTrade($event)"
-              :inventoryToTrade="Math.abs(equipmentToTrade)"
-              :maxAllowed="equipmentAllowed"
-              :maxHolds="avatar.ship.holds"
+              :port-inventory="parseInt(portInventory.equipment)"
+              :inventory-to-trade="Math.abs(equipmentToTrade)"
+              :max-allowed="equipmentAllowed"
+              :max-holds="avatar.ship.holds"
+              @update:inventory-to-trade="updateEquipmentToTrade($event)"
             />
           </g>
 
           <g transform="translate(0 80)">
             <inventory-dial
               label="Fuel Ore"
-              :portInventory="parseInt(portInventory.fuel)"
-              v-on:update:inventoryToTrade="updateFuelToTrade($event)"
-              :inventoryToTrade="Math.abs(fuelToTrade)"
-              :maxAllowed="fuelAllowed"
-              :maxHolds="avatar.ship.holds"
+              :port-inventory="parseInt(portInventory.fuel)"
+              :inventory-to-trade="Math.abs(fuelToTrade)"
+              :max-allowed="fuelAllowed"
+              :max-holds="avatar.ship.holds"
+              @update:inventory-to-trade="updateFuelToTrade($event)"
             />
           </g>
 
           <g transform="translate(0 150)">
             <inventory-dial
               label="Organics"
-              :portInventory="parseInt(portInventory.organics)"
-              v-on:update:inventoryToTrade="updateOrganicsToTrade($event)"
-              :inventoryToTrade="Math.abs(organicsToTrade)"
-              :maxAllowed="organicsAllowed"
-              :maxHolds="avatar.ship.holds"
+              :port-inventory="parseInt(portInventory.organics)"
+              :inventory-to-trade="Math.abs(organicsToTrade)"
+              :max-allowed="organicsAllowed"
+              :max-holds="avatar.ship.holds"
+              @update:inventory-to-trade="updateOrganicsToTrade($event)"
             />
           </g>
         </g>
 
         <g :transform="'translate(0 320) scale(' + slotScale + ')'">
-          <menu-button v-on:buttonclick="doTrade()" :enabled="isValidTrade" text="Make Trade" />
+          <menu-button :enabled="isValidTrade" text="Make Trade" @buttonclick="doTrade()" />
         </g>
       </g>
     </menu-container>
@@ -279,18 +283,6 @@ import ShipCargo from './_trade-menu/ship-cargo.svg'
 
 export default {
   name: 'TradeMenu',
-  data() {
-    return {
-      equipmentToTrade: 0,
-      fuelToTrade: 0,
-      organicsToTrade: 0,
-      pending: false
-    }
-  },
-  props: {
-    /** The selected object's key (see sdk/system.js objectKey). */
-    objectId: { type: String, default: null }
-  },
   components: {
     MenuButton,
     MenuContainer,
@@ -300,29 +292,16 @@ export default {
     InventoryItem,
     ShipCargo
   },
-  methods: {
-    ...mapActions(useGameStateStore, ['tradeAtPort']),
-    ...mapActions(useUIStore, ['closeMenu']),
-    doTrade() {
-      this.o8audio.playEffect('click')
-      this.pending = true
-      let planet = this.systemObjects[this.objectId].orbiting
-      let planetId = this.systemObjects[planet].id
-      this.tradeAtPort({
-        planetId: planetId,
-        equipment: this.equipmentToTrade,
-        fuel: this.fuelToTrade,
-        organics: this.organicsToTrade
-      })
-    },
-    updateEquipmentToTrade(value) {
-      this.equipmentToTrade = clampTradeAmount(value, this.equipmentToTrade, this.predictedEmptyHolds)
-    },
-    updateFuelToTrade(value) {
-      this.fuelToTrade = clampTradeAmount(value, this.fuelToTrade, this.predictedEmptyHolds)
-    },
-    updateOrganicsToTrade(value) {
-      this.organicsToTrade = clampTradeAmount(value, this.organicsToTrade, this.predictedEmptyHolds)
+  props: {
+    /** The selected object's key (see sdk/system.js objectKey). */
+    objectId: { type: String, default: null }
+  },
+  data() {
+    return {
+      equipmentToTrade: 0,
+      fuelToTrade: 0,
+      organicsToTrade: 0,
+      pending: false
     }
   },
   computed: {
@@ -402,6 +381,31 @@ export default {
         }
       },
       deep: true
+    }
+  },
+  methods: {
+    ...mapActions(useGameStateStore, ['tradeAtPort']),
+    ...mapActions(useUIStore, ['closeMenu']),
+    doTrade() {
+      this.o8audio.playEffect('click')
+      this.pending = true
+      let planet = this.systemObjects[this.objectId].orbiting
+      let planetId = this.systemObjects[planet].id
+      this.tradeAtPort({
+        planetId: planetId,
+        equipment: this.equipmentToTrade,
+        fuel: this.fuelToTrade,
+        organics: this.organicsToTrade
+      })
+    },
+    updateEquipmentToTrade(value) {
+      this.equipmentToTrade = clampTradeAmount(value, this.equipmentToTrade, this.predictedEmptyHolds)
+    },
+    updateFuelToTrade(value) {
+      this.fuelToTrade = clampTradeAmount(value, this.fuelToTrade, this.predictedEmptyHolds)
+    },
+    updateOrganicsToTrade(value) {
+      this.organicsToTrade = clampTradeAmount(value, this.organicsToTrade, this.predictedEmptyHolds)
     }
   }
 }

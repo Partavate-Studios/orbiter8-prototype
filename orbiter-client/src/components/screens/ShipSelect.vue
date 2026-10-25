@@ -16,11 +16,11 @@ import orbiter8logo from '@/components/assets/Orbiter8Logo.svg'
 import gameinfo from '@/components/screens/_gameinfo'
 
 export default {
+  name: 'ShipSelect',
   components: {
     gameinfo,
     orbiter8logo
   },
-  name: 'ShipSelect',
   computed: {
     ...mapState(useGameStateStore, ['gameState'])
   }

@@ -35,13 +35,7 @@
     >
       {{ text }}
     </text>
-    <a
-      v-if="enabled"
-      v-on:click.prevent="doClick()"
-      v-on:mouseover="hover = true"
-      v-on:mouseout="hover = false"
-      cursor="pointer"
-    >
+    <a v-if="enabled" cursor="pointer" @click.prevent="doClick()" @mouseover="hover = true" @mouseout="hover = false">
       <rect x="-125" y="-16" width="250" height="32" stroke="#5b1aaa00" fill="#3d127300" stroke-width="2"
     /></a>
   </g>
@@ -50,7 +44,6 @@
 <script>
 export default {
   name: 'MenuButton',
-  emits: ['buttonclick'],
   props: {
     text: {
       type: String,
@@ -61,15 +54,10 @@ export default {
       default: true
     }
   },
+  emits: ['buttonclick'],
   data() {
     return {
       hover: false
-    }
-  },
-  methods: {
-    doClick() {
-      this.o8audio.playEffect('click')
-      this.$emit('buttonclick')
     }
   },
   computed: {
@@ -90,6 +78,12 @@ export default {
         return '#ffffff'
       }
       return '#ffffff66'
+    }
+  },
+  methods: {
+    doClick() {
+      this.o8audio.playEffect('click')
+      this.$emit('buttonclick')
     }
   }
 }

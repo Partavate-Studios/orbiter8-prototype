@@ -1,7 +1,7 @@
 <template>
   <div class="signup">
     <div>
-      <ship-scene :warmingUp="warmingUp" />
+      <ship-scene :warming-up="warmingUp" />
 
       <div v-if="step == 1">
         <p>The time has come to conquer the stars.</p>
@@ -10,10 +10,10 @@
         </p>
         <p>What will you name your new Orbiter 8?</p>
         <p class="name">
-          <input name="name" v-model="newShipName" @keydown="keydown_check" />
+          <input v-model="newShipName" name="name" @keydown="keydown_check" />
         </p>
         <p class="next">
-          <span class="button" @click="launch" name="signup">Take Off &#10143;</span>
+          <span class="button" name="signup" @click="launch">Take Off &#10143;</span>
         </p>
       </div>
       <div v-if="step == 2">
@@ -33,14 +33,23 @@ import ShipScene from './_ship-scene.vue'
 import { useGameStateStore } from '@/stores/gamestate'
 
 export default {
+  name: 'ShipCreate',
   components: {
     ShipScene
   },
-  name: 'ShipCreate',
   data() {
     return {
       newShipName: '',
       step: 1
+    }
+  },
+  computed: {
+    ...mapState(useGameStateStore, ['gameState']),
+    warmingUp() {
+      if (this.step > 1) {
+        return true
+      }
+      return false
     }
   },
   methods: {
@@ -57,15 +66,6 @@ export default {
       if (event.which === 13) {
         this.launch()
       }
-    }
-  },
-  computed: {
-    ...mapState(useGameStateStore, ['gameState']),
-    warmingUp() {
-      if (this.step > 1) {
-        return true
-      }
-      return false
     }
   }
 }

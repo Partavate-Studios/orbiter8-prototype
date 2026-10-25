@@ -4,7 +4,7 @@
     <g>
       <g v-for="(option, key) in menuData" :key="'option-' + key">
         <g :transform="'translate(-65 ' + (-65 + 17 * key) + ')'">
-          <card-button :text="option.text" v-on:buttonclick="buttonAction(option)" :enabled="option.enabled" />
+          <card-button :text="option.text" :enabled="option.enabled" @buttonclick="buttonAction(option)" />
         </g>
       </g>
     </g>
@@ -27,10 +27,18 @@ export default {
     CardBackground,
     CardButton
   },
-  emits: ['moon-menu'],
   props: {
     /** The selected object's key (see sdk/system.js objectKey). */
     objectId: { type: String, default: null }
+  },
+  emits: ['moon-menu'],
+  computed: {
+    ...mapState(useChainStore, ['chainId', 'planetTokenAddress']),
+    ...mapState(useStarMapStore, ['systemObjects']),
+    ...mapState(useGameStateStore, ['avatar']),
+    menuData: function () {
+      return cardMenu(this.systemObjects[this.objectId])
+    }
   },
   methods: {
     buttonAction(option) {
@@ -147,14 +155,6 @@ export default {
     },
     ...mapActions(useGameStateStore, ['claimPlanet', 'buildStation', 'renameAsset']),
     ...mapActions(useUIStore, ['jumpMenuOn', 'openMenu', 'selectSprite'])
-  },
-  computed: {
-    ...mapState(useChainStore, ['chainId', 'planetTokenAddress']),
-    ...mapState(useStarMapStore, ['systemObjects']),
-    ...mapState(useGameStateStore, ['avatar']),
-    menuData: function () {
-      return cardMenu(this.systemObjects[this.objectId])
-    }
   }
 }
 </script>

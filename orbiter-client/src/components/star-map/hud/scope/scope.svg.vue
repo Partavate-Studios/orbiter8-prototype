@@ -1,13 +1,13 @@
 <template>
   <g>
     <g v-if="showScope" :transform="'scale(' + scale + ')'">
-      <g v-for="(sprite, key) in systemObjects" v-bind:sprite="sprite" :key="'svg-mini-sprite-' + key">
+      <g v-for="(sprite, key) in systemObjects" :key="'svg-mini-sprite-' + key" :sprite="sprite">
         <g
           v-if="sprite.type === 'planet'"
           :opacity="markerOpacity(sprite)"
           :transform="'rotate(' + bearingToSprite(sprite) + ')'"
         >
-          <scope-marker :spriteKey="key"><compass-planet></compass-planet></scope-marker>
+          <scope-marker :sprite-key="key"><compass-planet></compass-planet></scope-marker>
         </g>
 
         <g
@@ -16,7 +16,7 @@
           :transform="'rotate(' + bearingToSprite(sprite) + ')'"
         >
           <g transform="translate(0 140) rotate(180)">
-            <scope-marker :spriteKey="key"><ship></ship></scope-marker>
+            <scope-marker :sprite-key="key"><ship></ship></scope-marker>
           </g>
         </g>
       </g>
@@ -51,7 +51,7 @@
         :stroke-opacity="markerOpacity(systemObjects.star)"
       >
         <compass-arrow></compass-arrow>
-        <scope-marker spriteKey="star"
+        <scope-marker sprite-key="star"
           ><compass-sun :opacity="markerOpacity(systemObjects.star)"></compass-sun
         ></scope-marker>
       </g>
@@ -76,11 +76,6 @@ import Ship from '../../sprites/ship.svg'
 
 export default {
   name: 'Hud',
-  data() {
-    return {
-      scale: 1.25
-    }
-  },
   components: {
     Compass,
     CompassArrow,
@@ -88,6 +83,11 @@ export default {
     CompassPlanet,
     ScopeMarker,
     Ship
+  },
+  data() {
+    return {
+      scale: 1.25
+    }
   },
   computed: {
     ...mapState(useUIStore, ['showScope', 'viewport', 'spriteToDisplay', 'selected']),

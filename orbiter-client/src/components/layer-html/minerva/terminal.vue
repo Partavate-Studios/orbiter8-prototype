@@ -1,13 +1,13 @@
 <template>
   <div class="terminal">
-    <pre class="history" ref="history">
+    <pre ref="history" class="history">
           <div
             v-for="(line, index) in minervaHistory"
-            class="line"
-            v-bind:key="'line' + index">{{ line }}</div>
+            :key="'line' + index"
+            class="line">{{ line }}</div>
 
         </pre>
-    <form v-on:submit.prevent="doSubmit">
+    <form @submit.prevent="doSubmit">
       <div class="input"><input v-model="terminalInput" type="text" /></div>
     </form>
   </div>

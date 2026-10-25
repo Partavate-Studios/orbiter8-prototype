@@ -12,14 +12,14 @@
               <chat-slot-container
                 :name="getName(event.returnValues._sender)"
                 :message="event.returnValues._message"
-                :blockId="blockId - event.blockNumber"
+                :block-id="blockId - event.blockNumber"
               >
               </chat-slot-container>
             </g>
           </g>
 
           <g :transform="'translate(0 620)'">
-            <menu-button v-on:buttonclick="broadcast" text="Send Broadcast" />
+            <menu-button text="Send Broadcast" @buttonclick="broadcast" />
           </g>
         </g>
       </g>
@@ -38,11 +38,20 @@ import ChatSlotContainer from './menu-container/chat-slot-container.svg'
 
 export default {
   name: 'ChatMenu',
-  props: {},
   components: {
     MenuContainer,
     MenuButton,
     ChatSlotContainer
+  },
+  props: {},
+  computed: {
+    ...mapState(useChainStore, ['blockId']),
+    ...mapState(useGameStateStore, ['events']),
+    ...mapState(useStarMapStore, ['players']),
+    chatEvents() {
+      // Newest first. Copy before reversing: reverse() works in place and would flip the store's array on every re-render.
+      return [...(this.events.chatEvents ?? [])].reverse()
+    }
   },
   methods: {
     ...mapActions(useGameStateStore, ['sendChat']),
@@ -58,15 +67,6 @@ export default {
         name = this.players[address.toLowerCase()]
       }
       return name
-    }
-  },
-  computed: {
-    ...mapState(useChainStore, ['blockId']),
-    ...mapState(useGameStateStore, ['events']),
-    ...mapState(useStarMapStore, ['players']),
-    chatEvents() {
-      // Newest first. Copy before reversing: reverse() works in place and would flip the store's array on every re-render.
-      return [...(this.events.chatEvents ?? [])].reverse()
     }
   }
 }

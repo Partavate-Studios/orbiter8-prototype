@@ -26,10 +26,10 @@
       <circle cx="64" cy="0" r="8" stroke="#00000088" fill="#c3b3daee"></circle>
       <text x="64" y="4.5" font-size="1em" fill="#000000" text-anchor="middle">+</text>
 
-      <a v-on:click.prevent="zoomBy(2)" cursor="pointer">
+      <a cursor="pointer" @click.prevent="zoomBy(2)">
         <circle cx="-64" cy="0" r="10" stroke="#ffffff00" fill="#c3b3da00"></circle
       ></a>
-      <a v-on:click.prevent="zoomBy(0.5)" cursor="pointer">
+      <a cursor="pointer" @click.prevent="zoomBy(0.5)">
         <circle cx="64" cy="0" r="10" stroke="#ffffff00" fill="#c3b3da00"></circle
       ></a>
     </g>

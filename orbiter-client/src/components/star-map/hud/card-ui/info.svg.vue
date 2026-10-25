@@ -27,9 +27,9 @@
       stroke-width="0.5"
     />
 
-    <card-text v-if="objectId != null" :objectId="objectId" />
+    <card-text v-if="objectId != null" :object-id="objectId" />
     <g :transform="'rotate(' + spriteRotation + ')'">
-      <sprite :objectId="objectId" />
+      <sprite :object-id="objectId" />
     </g>
   </g>
 </template>

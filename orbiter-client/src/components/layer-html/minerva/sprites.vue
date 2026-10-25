@@ -10,10 +10,10 @@
     <tbody>
       <tr
         v-for="(sprite, index) in systemObjects"
+        :key="'line' + index"
         class="line"
         :class="{ selected: sprite.selected }"
-        v-bind:key="'line' + index"
-        v-on:click="selectObject(index)"
+        @click="selectObject(index)"
       >
         <td align="right">
           <small>{{ sprite.type }}</small>

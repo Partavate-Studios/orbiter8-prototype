@@ -6,7 +6,7 @@
       <table>
         <tbody>
           <tr>
-            <th style="cursor: pointer; text-align: right" v-on:click="toggleGraphicsQuality">Graphics:</th>
+            <th style="cursor: pointer; text-align: right" @click="toggleGraphicsQuality">Graphics:</th>
             <td v-if="graphicsQuality == 1">Efficiency</td>
             <td v-else-if="graphicsQuality == 2">Balanced</td>
             <td v-else>Luxury</td>
@@ -59,14 +59,14 @@ export default {
     ...mapState(useUIStore, ['viewport', 'screenSize', 'selected']),
     ...mapState(useConfigStore, ['graphicsQuality'])
   },
-  methods: {
-    ...mapActions(useConfigStore, ['toggleGraphicsQuality'])
-  },
   watch: {
     viewport: {
       handler: function () {},
       deep: true
     }
+  },
+  methods: {
+    ...mapActions(useConfigStore, ['toggleGraphicsQuality'])
   }
 }
 </script>

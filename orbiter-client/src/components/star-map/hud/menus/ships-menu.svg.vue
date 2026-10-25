@@ -1,18 +1,18 @@
 <template>
   <g>
     <menu-container>
-      <g v-for="(id, index) in pageData" v-bind:key="'ship' + id">
+      <g v-for="(id, index) in pageData" :key="'ship' + id">
         <g :transform="'translate(0 ' + (-400 + 70 * index) + ')'">
-          <a v-on:click.prevent="selectAndClose(id)" cursor="pointer">
-            <ship-slot :shipId="id" />
+          <a cursor="pointer" @click.prevent="selectAndClose(id)">
+            <ship-slot :ship-id="id" />
           </a>
         </g>
       </g>
-      <g text-anchor="middle" dominant-baseline="middle" v-if="totalPages > 1">
+      <g v-if="totalPages > 1" text-anchor="middle" dominant-baseline="middle">
         <g transform="translate(0, 350)">
           <text fill="#ffffff">Page {{ currentPage }} of {{ totalPages }}</text>
         </g>
-        <g transform="translate(-100, 350)" v-if="currentPage > 1">
+        <g v-if="currentPage > 1" transform="translate(-100, 350)">
           <text fill="#ffffff">&lt;</text>
           <rect
             x="-15"
@@ -23,10 +23,10 @@
             rx="10"
             ry="10"
             class="can-click"
-            v-on:click="pageDown"
+            @click="pageDown"
           />
         </g>
-        <g transform="translate(100, 350)" v-if="currentPage < totalPages">
+        <g v-if="currentPage < totalPages" transform="translate(100, 350)">
           <text fill="#ffffff">&gt;</text>
           <rect
             x="-15"
@@ -37,7 +37,7 @@
             rx="10"
             ry="10"
             class="can-click"
-            v-on:click="pageUp"
+            @click="pageUp"
           />
         </g>
       </g>
@@ -54,28 +54,14 @@ import ShipSlot from './menu-slot-ship'
 
 export default {
   name: 'PlanetsMenu',
-  data() {
-    return {
-      shipsPerPage: 10,
-      currentPage: 1
-    }
-  },
   components: {
     MenuContainer,
     ShipSlot
   },
-  methods: {
-    ...mapActions(useUIStore, ['selectSprite', 'closeMenu']),
-    selectAndClose(spriteId) {
-      this.o8audio.playEffect('click')
-      this.selectSprite(spriteId)
-      this.closeMenu()
-    },
-    pageDown() {
-      this.currentPage = Math.max(this.currentPage - 1, 1)
-    },
-    pageUp() {
-      this.currentPage = Math.min(this.currentPage + 1, this.totalPages)
+  data() {
+    return {
+      shipsPerPage: 10,
+      currentPage: 1
     }
   },
   computed: {
@@ -89,6 +75,20 @@ export default {
         this.currentPage * this.shipsPerPage
       )
       return ships
+    }
+  },
+  methods: {
+    ...mapActions(useUIStore, ['selectSprite', 'closeMenu']),
+    selectAndClose(spriteId) {
+      this.o8audio.playEffect('click')
+      this.selectSprite(spriteId)
+      this.closeMenu()
+    },
+    pageDown() {
+      this.currentPage = Math.max(this.currentPage - 1, 1)
+    },
+    pageUp() {
+      this.currentPage = Math.min(this.currentPage + 1, this.totalPages)
     }
   }
 }

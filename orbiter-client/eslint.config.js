@@ -5,7 +5,7 @@ import globals from 'globals'
 export default [
   { ignores: ['dist/', 'src/contract-artifacts/'] },
   js.configs.recommended,
-  ...pluginVue.configs['flat/essential'],
+  ...pluginVue.configs['flat/recommended'],
   {
     languageOptions: {
       ecmaVersion: 'latest',
@@ -14,7 +14,14 @@ export default [
     },
     rules: {
       // Single-word component names (Hud, Grid, Planet…) are this project's convention.
-      'vue/multi-word-component-names': 'off'
+      'vue/multi-word-component-names': 'off',
+      // Layout is Prettier's job (npm run format); these rules would fight it.
+      'vue/max-attributes-per-line': 'off',
+      'vue/singleline-html-element-content-newline': 'off',
+      'vue/multiline-html-element-content-newline': 'off',
+      'vue/html-closing-bracket-newline': 'off',
+      'vue/html-self-closing': 'off',
+      'vue/html-indent': 'off'
     }
   },
   {

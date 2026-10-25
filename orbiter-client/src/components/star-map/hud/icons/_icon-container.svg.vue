@@ -15,15 +15,15 @@ import { useConfigStore } from '@/stores/config'
 
 export default {
   name: 'IconContainer',
-  data() {
-    return {
-      hover: false
-    }
-  },
   props: {
     selected: {
       type: Boolean,
       default: false
+    }
+  },
+  data() {
+    return {
+      hover: false
     }
   },
   computed: {

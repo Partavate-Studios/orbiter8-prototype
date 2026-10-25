@@ -1,6 +1,6 @@
 <template>
   <g>
-    <g :transform="getOrbitalTransform" v-if="shouldDisplay">
+    <g v-if="shouldDisplay" :transform="getOrbitalTransform">
       <g>
         <slot />
       </g>
@@ -14,7 +14,7 @@
           <g transform="rotate(180)"><ship v-if="type === 'ship'" :should-show-engines="true" /></g>
           <star v-if="type === 'star'" />
         </template>
-        <a @mouseover="hover = true" @mouseleave="hover = false" v-on:click.prevent="spriteAction()" cursor="pointer">
+        <a cursor="pointer" @mouseover="hover = true" @mouseleave="hover = false" @click.prevent="spriteAction()">
           <circle
             cx="0"
             cy="0"
@@ -72,11 +72,6 @@ export default {
     Planet,
     Star
   },
-  data() {
-    return {
-      hover: false
-    }
-  },
   props: {
     /** How the object is drawn (libs/sprite.js); its game data is sprite.object. */
     sprite: { type: Object, required: true },
@@ -100,6 +95,11 @@ export default {
     frameOf: {
       type: String,
       default: 'world'
+    }
+  },
+  data() {
+    return {
+      hover: false
     }
   },
   computed: {

@@ -1,10 +1,10 @@
 <template>
   <g>
     <menu-container>
-      <g v-for="(id, index) in spriteIds.planets" v-bind:key="'planet' + id">
+      <g v-for="(id, index) in spriteIds.planets" :key="'planet' + id">
         <g :transform="'translate(0 ' + (-400 + 70 * index) + ')'">
-          <a v-on:click.prevent="selectAndClose(id)" cursor="pointer">
-            <planet-slot :planetId="id" />
+          <a cursor="pointer" @click.prevent="selectAndClose(id)">
+            <planet-slot :planet-id="id" />
           </a>
         </g>
       </g>
@@ -25,6 +25,9 @@ export default {
     MenuContainer,
     PlanetSlot
   },
+  computed: {
+    ...mapState(useStarMapStore, ['spriteIds'])
+  },
   methods: {
     ...mapActions(useUIStore, ['selectSprite', 'closeMenu']),
     selectAndClose(spriteId) {
@@ -32,9 +35,6 @@ export default {
       this.selectSprite(spriteId)
       this.closeMenu()
     }
-  },
-  computed: {
-    ...mapState(useStarMapStore, ['spriteIds'])
   }
 }
 </script>

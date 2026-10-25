@@ -1,8 +1,8 @@
 <template>
   <div class="networkselect">
-    <div class="icon" v-if="percentageLoaded <= 50">&#128543;</div>
-    <div class="icon" v-else-if="percentageLoaded < 100">&#129320;</div>
-    <div class="icon" v-else>&#128512;</div>
+    <div v-if="percentageLoaded <= 50" class="icon">&#128543;</div>
+    <div v-else-if="percentageLoaded < 100" class="icon">&#129320;</div>
+    <div v-else class="icon">&#128512;</div>
     <p>Preflight Checklist:</p>
     <div class="loadingbarContainer">
       <div class="loadingbar" :style="'width: ' + percentageLoaded + '%'">
@@ -34,17 +34,17 @@
         <span>
           <a
             v-for="network in networkList"
-            v-bind:key="'net-' + network.chainId"
-            v-bind:class="{ selectednetwork: chainId == network.chainId }"
+            :key="'net-' + network.chainId"
+            :class="{ selectednetwork: chainId == network.chainId }"
             :title="'Connect your wallet to ' + network.name"
             class="littlebutton"
-            v-on:click.prevent="connectNetwork(network.chainId)"
+            @click.prevent="connectNetwork(network.chainId)"
             ><span v-if="network.chainId == chainId">&#128377;</span>{{ network.shortName }}</a
           >
         </span>
       </div>
 
-      <div class="item" v-if="walletStatus === 'connected' && !isSupportedNetwork">
+      <div v-if="walletStatus === 'connected' && !isSupportedNetwork" class="item">
         <span class="name">Foreign Network:</span>
         <span class="warning">Your wallet is on {{ networkName }}. Pick one of the networks above to switch.</span>
       </div>
@@ -63,7 +63,7 @@
         <span class="name">Account Status:</span>
         <span v-if="account > 0"
           >Connected with {{ balance }} {{ currencySymbol }}
-          <span class="warning" v-if="balance < 0.001">(low balance warning)</span>
+          <span v-if="balance < 0.001" class="warning">(low balance warning)</span>
         </span>
         <span v-else>...not found</span>
       </div>
@@ -85,7 +85,7 @@
       <div class="item">
         <span class="name">Credits Token:</span>
         <span class="tracker">
-          <a class="tracker" v-if="networkData[chainId]" :href="explorerLink(creditTokenAddress)" target="_blank">{{
+          <a v-if="networkData[chainId]" class="tracker" :href="explorerLink(creditTokenAddress)" target="_blank">{{
             creditTokenAddress
           }}</a></span
         >
@@ -94,7 +94,7 @@
             v-if="creditTokenAddress"
             title="Import tokens to your wallet."
             class="littlebutton"
-            v-on:click.prevent="addCreditsToken()"
+            @click.prevent="addCreditsToken()"
             >import &#65291;</a
           >
           <a
@@ -110,7 +110,7 @@
       <div class="item">
         <span class="name">Planet NFTs:</span>
         <span class="tracker">
-          <a class="tracker" v-if="networkData[chainId]" :href="explorerLink(planetTokenAddress)" target="_blank">{{
+          <a v-if="networkData[chainId]" class="tracker" :href="explorerLink(planetTokenAddress)" target="_blank">{{
             planetTokenAddress
           }}</a></span
         >
@@ -118,7 +118,7 @@
       <div class="item">
         <span class="name">Ship NFTs:</span>
         <span class="tracker">
-          <a class="tracker" v-if="networkData[chainId]" :href="explorerLink(shipTokenAddress)" target="_blank">{{
+          <a v-if="networkData[chainId]" class="tracker" :href="explorerLink(shipTokenAddress)" target="_blank">{{
             shipTokenAddress
           }}</a></span
         >
@@ -126,7 +126,7 @@
       <div class="item">
         <span class="name">Avatars:</span>
         <span class="tracker">
-          <a class="tracker" v-if="networkData[chainId]" :href="explorerLink(avatarAddress)" target="_blank">{{
+          <a v-if="networkData[chainId]" class="tracker" :href="explorerLink(avatarAddress)" target="_blank">{{
             avatarAddress
           }}</a></span
         >
@@ -134,7 +134,7 @@
       <div class="item">
         <span class="name">Galaxy:</span>
         <span class="tracker">
-          <a class="tracker" v-if="networkData[chainId]" :href="explorerLink(galaxyAddress)" target="_blank">{{
+          <a v-if="networkData[chainId]" class="tracker" :href="explorerLink(galaxyAddress)" target="_blank">{{
             galaxyAddress
           }}</a></span
         >
@@ -167,8 +167,8 @@
           v-for="index in 4"
           :key="'music' + index"
           class="radioButton"
-          v-on:click.prevent="setMusicVolume(index - 1)"
-          v-bind:class="{ radioButtonSelected: getMusicVolume() >= index - 1 }"
+          :class="{ radioButtonSelected: getMusicVolume() >= index - 1 }"
+          @click.prevent="setMusicVolume(index - 1)"
         />
         <span v-if="getMusicVolume() == 0">off</span>
         <span v-else>{{ getMusicVolume() }}</span>
@@ -179,8 +179,8 @@
           v-for="index in 4"
           :key="'effects' + index"
           class="radioButton"
-          v-on:click.prevent="setEffectsVolume(index - 1)"
-          v-bind:class="{ radioButtonSelected: getEffectsVolume() >= index - 1 }"
+          :class="{ radioButtonSelected: getEffectsVolume() >= index - 1 }"
+          @click.prevent="setEffectsVolume(index - 1)"
         />
         <span v-if="getEffectsVolume() == 0">off</span>
         <span v-else>{{ getEffectsVolume() }}</span>
@@ -191,8 +191,8 @@
           v-for="index in 3"
           :key="'graphics' + index"
           class="radioButton"
-          v-on:click.prevent="setGraphicsQuality(index)"
-          v-bind:class="{ radioButtonSelected: graphicsQuality >= index }"
+          :class="{ radioButtonSelected: graphicsQuality >= index }"
+          @click.prevent="setGraphicsQuality(index)"
         />
         <span v-if="graphicsQuality == 1">Efficient</span>
         <span v-else-if="graphicsQuality == 3">Luxurious</span>
@@ -200,30 +200,30 @@
       </div>
     </div>
     <div v-if="gameDataLoaded" class="play">
-      <button v-on:click="setPlayerReady">Play</button>
+      <button @click="setPlayerReady">Play</button>
     </div>
     <div v-else>
       <!-- What's holding things up, in the order the player has to deal with it. -->
-      <div class="errormessage" v-if="walletStatus === 'none'">
+      <div v-if="walletStatus === 'none'" class="errormessage">
         No wallet found. Orbiter 8 needs a browser wallet such as MetaMask: install one, then reload this page.
       </div>
-      <div class="errormessage" v-else-if="walletStatus === 'choose'">Choose which wallet to play with (above).</div>
-      <div class="errormessage" v-else-if="walletStatus === 'connecting'">
+      <div v-else-if="walletStatus === 'choose'" class="errormessage">Choose which wallet to play with (above).</div>
+      <div v-else-if="walletStatus === 'connecting'" class="errormessage">
         Waiting for {{ walletName }}. Approve the connection in its popup; if you don't see one, open the wallet from
         your browser's toolbar.
       </div>
-      <div class="errormessage" v-else-if="walletStatus === 'error'">
+      <div v-else-if="walletStatus === 'error'" class="errormessage">
         Couldn't connect to {{ walletName }}: {{ walletError }}. Choose a wallet above to try again.
       </div>
-      <div class="errormessage" v-else-if="!web3Loaded">Looking for your wallet...</div>
-      <div class="errormessage" v-else-if="!(account > 0)">
+      <div v-else-if="!web3Loaded" class="errormessage">Looking for your wallet...</div>
+      <div v-else-if="!(account > 0)" class="errormessage">
         No account found. Unlock your wallet or create an account in it.
       </div>
-      <div class="errormessage" v-else-if="!isSupportedNetwork">
+      <div v-else-if="!isSupportedNetwork" class="errormessage">
         Your wallet is on {{ networkName }}, where Orbiter 8 isn't deployed. Pick Sepolia, Binance, Moonriver or
         Moonbase above to switch.
       </div>
-      <div class="errormessage" v-else-if="!contractsLoaded">
+      <div v-else-if="!contractsLoaded" class="errormessage">
         Contracts not found. The network may be unreachable right now; try reloading.
       </div>
     </div>
@@ -240,6 +240,59 @@ import { networks } from '@/sdk/chain/networks'
 
 export default {
   name: 'NetworkSelect',
+  computed: {
+    ...mapState(useChainStore, [
+      'web3Loaded',
+      'contractsLoaded',
+      'account',
+      'chainId',
+      'networkName',
+      'networkData',
+      'creditTokenAddress',
+      'planetTokenAddress',
+      'shipTokenAddress',
+      'avatarAddress',
+      'galaxyAddress',
+      'balance',
+      'wallets',
+      'walletError',
+      'walletStatus',
+      'walletName',
+      'isSupportedNetwork'
+    ]),
+    currencySymbol() {
+      return this.networkData[this.chainId]?.currency.symbol ?? ''
+    },
+    ...mapState(useGameStateStore, ['gameDataLoaded', 'haveAvatar', 'haveShip', 'avatar']),
+    ...mapState(useConfigStore, ['graphicsQuality']),
+    networkList() {
+      return networks
+    },
+    percentageLoaded() {
+      if (this.gameDataLoaded) {
+        return 100
+      } else if (this.contractsLoaded) {
+        return 75
+      } else if (this.account > 0) {
+        return 50
+      } else if (this.web3Loaded) {
+        return 25
+      }
+      return 10
+    }
+  },
+  watch: {
+    account: function (val, oldVal) {
+      if (val != oldVal && val > 0) {
+        this.initContracts()
+      }
+    },
+    contractsLoaded: function (val, oldVal) {
+      if (val != oldVal && val) {
+        this.loadGameState()
+      }
+    }
+  },
   methods: {
     ...mapActions(useChainStore, ['chooseWallet', 'initContracts']),
     ...mapActions(useGameStateStore, ['loadGameState']),
@@ -318,59 +371,6 @@ export default {
     explorerLink(address) {
       const explorer = this.networkData[this.chainId]?.explorer[0]
       return explorer ? explorer + '/address/' + address : undefined
-    }
-  },
-  watch: {
-    account: function (val, oldVal) {
-      if (val != oldVal && val > 0) {
-        this.initContracts()
-      }
-    },
-    contractsLoaded: function (val, oldVal) {
-      if (val != oldVal && val) {
-        this.loadGameState()
-      }
-    }
-  },
-  computed: {
-    ...mapState(useChainStore, [
-      'web3Loaded',
-      'contractsLoaded',
-      'account',
-      'chainId',
-      'networkName',
-      'networkData',
-      'creditTokenAddress',
-      'planetTokenAddress',
-      'shipTokenAddress',
-      'avatarAddress',
-      'galaxyAddress',
-      'balance',
-      'wallets',
-      'walletError',
-      'walletStatus',
-      'walletName',
-      'isSupportedNetwork'
-    ]),
-    currencySymbol() {
-      return this.networkData[this.chainId]?.currency.symbol ?? ''
-    },
-    ...mapState(useGameStateStore, ['gameDataLoaded', 'haveAvatar', 'haveShip', 'avatar']),
-    ...mapState(useConfigStore, ['graphicsQuality']),
-    networkList() {
-      return networks
-    },
-    percentageLoaded() {
-      if (this.gameDataLoaded) {
-        return 100
-      } else if (this.contractsLoaded) {
-        return 75
-      } else if (this.account > 0) {
-        return 50
-      } else if (this.web3Loaded) {
-        return 25
-      }
-      return 10
     }
   }
 }

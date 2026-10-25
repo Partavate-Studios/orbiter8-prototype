@@ -11,33 +11,33 @@
         <circle cx="0" cy="0" r="95" fill="none" />
       </g>
       <g :transform="getInfoCardTranslate()">
-        <info :objectId="objectId" />
+        <info :object-id="objectId" />
 
         <g transform="translate(45 120) scale(0.4)">
-          <a v-if="viewRatio <= 1" v-on:click.prevent="selectMainMenu()" cursor="pointer">
+          <a v-if="viewRatio <= 1" cursor="pointer" @click.prevent="selectMainMenu()">
             <hamburger-icon :selected="menuShouldDisplay" />
           </a>
         </g>
 
         <g transform="translate(-45 120) scale(0.4)">
-          <a v-on:click.prevent="toggleScope()" cursor="pointer"><x-icon /></a>
+          <a cursor="pointer" @click.prevent="toggleScope()"><x-icon /></a>
         </g>
 
         <g v-if="systemObjects[objectId].type == 'planet'">
           <g v-if="systemObjects[objectId].hasStation" transform="translate(15 120) scale(0.4)">
-            <a v-on:click.prevent="selectSprite(systemObjects[objectId].stationKey)" cursor="pointer">
+            <a cursor="pointer" @click.prevent="selectSprite(systemObjects[objectId].stationKey)">
               <icon-container>
                 <g transform="scale(0.5)">
-                  <sprite :objectId="systemObjects[objectId].stationKey" />
+                  <sprite :object-id="systemObjects[objectId].stationKey" />
                 </g>
               </icon-container>
             </a>
           </g>
           <g v-if="systemObjects[objectId].moons.length > 0" transform="translate(-15 120) scale(0.4)">
-            <a v-on:click.prevent="selectMenu('moons')" cursor="pointer">
+            <a cursor="pointer" @click.prevent="selectMenu('moons')">
               <icon-container :selected="currentMenu == 'moons'">
                 <g transform="translate(-2 -2) scale(0.75)">
-                  <sprite :objectId="systemObjects[objectId].moons[0].moonId" />
+                  <sprite :object-id="systemObjects[objectId].moons[0].moonId" />
                 </g>
               </icon-container>
               <circle cx="18" cy="18" fill="#000000" stroke="#ffffff" stroke-width="1" r="10" opacity="0.15" />
@@ -49,10 +49,10 @@
         </g>
         <g v-else-if="systemObjects[objectId].type == 'station'">
           <g transform="translate(15 120) scale(0.4)">
-            <a v-on:click.prevent="selectSprite(systemObjects[objectId].orbiting)" cursor="pointer">
+            <a cursor="pointer" @click.prevent="selectSprite(systemObjects[objectId].orbiting)">
               <icon-container>
                 <g transform="scale(0.5)">
-                  <sprite :objectId="systemObjects[objectId].orbiting" />
+                  <sprite :object-id="systemObjects[objectId].orbiting" />
                 </g>
               </icon-container>
             </a>
@@ -60,10 +60,10 @@
         </g>
         <g v-else-if="systemObjects[objectId].type == 'moon'">
           <g transform="translate(15 120) scale(0.4)">
-            <a v-on:click.prevent="selectSprite(systemObjects[objectId].orbiting)" cursor="pointer">
+            <a cursor="pointer" @click.prevent="selectSprite(systemObjects[objectId].orbiting)">
               <icon-container>
                 <g transform="scale(0.5)">
-                  <sprite :objectId="systemObjects[objectId].orbiting" />
+                  <sprite :object-id="systemObjects[objectId].orbiting" />
                 </g>
               </icon-container>
             </a>
@@ -74,17 +74,17 @@
       <g :transform="getMenuTranslate()">
         <g v-if="menuShouldDisplay">
           <g v-if="currentMenu == 'main'">
-            <main-menu :objectId="objectId" v-on:moon-menu="selectMenu('moons')" />
+            <main-menu :object-id="objectId" @moon-menu="selectMenu('moons')" />
             <g transform="translate(45 120) scale(0.4)">
-              <a v-if="viewRatio <= 1" v-on:click.prevent="closeMenu()" cursor="pointer"><info-icon /></a>
+              <a v-if="viewRatio <= 1" cursor="pointer" @click.prevent="closeMenu()"><info-icon /></a>
             </g>
           </g>
 
           <g v-else-if="currentMenu == 'moons'">
-            <moons-menu :objectId="objectId" />
+            <moons-menu :object-id="objectId" />
             <g transform="translate(45 120) scale(0.4)">
-              <a v-if="viewRatio <= 1" v-on:click.prevent="closeMenu()" cursor="pointer"><info-icon /></a>
-              <a v-else v-on:click.prevent="selectMainMenu()" cursor="pointer"><back-icon /></a>
+              <a v-if="viewRatio <= 1" cursor="pointer" @click.prevent="closeMenu()"><info-icon /></a>
+              <a v-else cursor="pointer" @click.prevent="selectMainMenu()"><back-icon /></a>
             </g>
           </g>
         </g>

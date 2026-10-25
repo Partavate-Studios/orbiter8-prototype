@@ -4,7 +4,7 @@
     <g>
       <g v-for="(option, key) in systemObjects[objectId].moons" :key="'moon-' + key">
         <g :transform="'translate(-65 ' + (-65 + 17 * key) + ')'">
-          <card-button :text="option.moonName" v-on:buttonclick="selectMoon(option.moonId)" />
+          <card-button :text="option.moonName" @buttonclick="selectMoon(option.moonId)" />
         </g>
       </g>
     </g>

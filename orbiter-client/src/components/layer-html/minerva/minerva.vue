@@ -2,21 +2,19 @@
   <div v-if="show" class="box">
     <div class="heading">
       <a href="/" class="home" alt="Exit" title="Exit">&#x23FB;</a>
-      <span class="owlcon" v-on:click="toggleMinerva">&#129417;</span>
+      <span class="owlcon" @click="toggleMinerva">&#129417;</span>
       Minerva:
       <span v-if="currentStarSystemName.length > 0">{{ currentStarSystemName }} ({{ currentStarSystemId }})</span>
       <span v-else>Sector {{ currentStarSystemId }}</span>
     </div>
     <small>
       <div class="tabs">
-        <span class="tab" :class="{ selected: showTab == 'profile' }" v-on:click="showTab = 'profile'">Profile </span>
-        <span v-if="isDev" class="tab" :class="{ selected: showTab == 'debug' }" v-on:click="showTab = 'debug'"
+        <span class="tab" :class="{ selected: showTab == 'profile' }" @click="showTab = 'profile'">Profile </span>
+        <span v-if="isDev" class="tab" :class="{ selected: showTab == 'debug' }" @click="showTab = 'debug'"
           >Debug
         </span>
-        <span class="tab" :class="{ selected: showTab == 'terminal' }" v-on:click="showTab = 'terminal'"
-          >Terminal
-        </span>
-        <span class="tab" :class="{ selected: showTab == 'sprites' }" v-on:click="showTab = 'sprites'">Sprites </span>
+        <span class="tab" :class="{ selected: showTab == 'terminal' }" @click="showTab = 'terminal'">Terminal </span>
+        <span class="tab" :class="{ selected: showTab == 'sprites' }" @click="showTab = 'sprites'">Sprites </span>
       </div>
       <div class="tabContent">
         <profile v-if="showTab == 'profile'"></profile>
@@ -64,15 +62,15 @@ export default {
       viewport: 'viewport'
     })
   },
-  methods: {
-    ...mapActions(useUIStore, ['toggleMinerva'])
-  },
   watch: {
     id() {},
     viewport: {
       handler: function () {},
       deep: true
     }
+  },
+  methods: {
+    ...mapActions(useUIStore, ['toggleMinerva'])
   }
 }
 </script>

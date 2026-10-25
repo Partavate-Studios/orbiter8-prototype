@@ -60,25 +60,25 @@
       </g>
 
       <g :transform="'translate(' + (leftMostX + 50) + ' ' + (topMostY + 50) + ')'">
-        <a v-on:click.prevent="selectMyShip()" cursor="pointer">
+        <a cursor="pointer" @click.prevent="selectMyShip()">
           <avatar-icon />
         </a>
       </g>
 
       <g :transform="'translate(' + (rightMostX - 50) + ' ' + (topMostY + 50) + ')'">
-        <a v-on:click.prevent="selectStar()" cursor="pointer">
+        <a cursor="pointer" @click.prevent="selectStar()">
           <jump-icon />
         </a>
       </g>
 
       <g v-if="false" :transform="'translate(' + (leftMostX + 50) + ' ' + (bottomMostY - 150) + ')'">
-        <a v-on:click.prevent="mute()" cursor="pointer">
+        <a cursor="pointer" @click.prevent="mute()">
           <speaker-icon />
         </a>
       </g>
 
       <g :transform="'translate(' + (leftMostX + 50) + ' ' + (bottomMostY - 150) + ')'">
-        <a v-on:click.prevent="showChat()" cursor="pointer">
+        <a cursor="pointer" @click.prevent="showChat()">
           <broadcast-icon />
           <g v-if="chatEventsCount">
             <circle cx="-25" cy="20" fill="#230b41" stroke="#ffffff88" stroke-width="0.5" r="10" />
@@ -99,13 +99,13 @@
       <scope-toggle :transform="'translate(' + 0 + ' ' + (bottomMostY - 100) + ')'" />
 
       <g :transform="'translate(' + (leftMostX + 50) + ' ' + (bottomMostY - 50) + ')'">
-        <a v-on:click.prevent="showSettings()" cursor="pointer">
+        <a cursor="pointer" @click.prevent="showSettings()">
           <gear-icon />
         </a>
       </g>
 
       <g :transform="'translate(' + (rightMostX - 50) + ' ' + (bottomMostY - 150) + ')'">
-        <a v-on:click.prevent="showShips()" cursor="pointer">
+        <a cursor="pointer" @click.prevent="showShips()">
           <ships-icon />
           <g v-if="shipCount">
             <circle cx="25" cy="20" fill="#230b41" stroke="#ffffff88" stroke-width="0.5" r="10" />
@@ -121,7 +121,7 @@
         </a>
       </g>
       <g :transform="'translate(' + (rightMostX - 50) + ' ' + (bottomMostY - 250) + ')'">
-        <a v-on:click.prevent="showPlanets()" cursor="pointer">
+        <a cursor="pointer" @click.prevent="showPlanets()">
           <planets-icon />
           <g>
             <circle cx="25" cy="20" fill="#230b41" stroke="#ffffff88" stroke-width="0.5" r="10" />
@@ -138,7 +138,7 @@
       </g>
 
       <g :transform="'translate(' + (rightMostX - 50) + ' ' + (bottomMostY - 50) + ')'">
-        <a v-on:click.prevent="toggleShowLabels()" cursor="pointer">
+        <a cursor="pointer" @click.prevent="toggleShowLabels()">
           <info-icon />
         </a>
       </g>
@@ -147,7 +147,7 @@
     <g v-if="showScope" transform="translate(0 -100)">
       <!-- selected sprite menu -->
       <g v-if="selected != null">
-        <card-ui :objectId="selected" />
+        <card-ui :object-id="selected" />
       </g>
       <g v-else>
         <scope />
@@ -165,10 +165,10 @@
         <settings-menu />
       </g>
       <g v-if="menuState.tradeMenu">
-        <trade-menu :objectId="selected" />
+        <trade-menu :object-id="selected" />
       </g>
       <g v-if="menuState.shipyardMenu">
-        <shipyard-menu :objectId="selected" />
+        <shipyard-menu :object-id="selected" />
       </g>
       <g v-if="menuState.chatMenu">
         <chat-menu />

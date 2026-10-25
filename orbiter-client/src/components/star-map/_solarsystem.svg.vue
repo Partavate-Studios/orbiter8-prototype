@@ -3,11 +3,11 @@
        and everything orbiting them are drawn in their own layers (planet-layers.vue); the orbit
        rings around the star are on the guides canvas, under every body. -->
   <g v-if="currentStarSystemId > 0">
-    <template v-for="(object, key) in systemObjects" v-bind:key="'sprite-' + key">
+    <template v-for="(object, key) in systemObjects" :key="'sprite-' + key">
       <sprite-transform
         v-if="object.type !== 'planet' && !orbitsPlanet(object)"
         :sprite="sprites[key]"
-        :objectIndex="key"
+        :object-index="key"
         :type="object.type"
       >
       </sprite-transform>

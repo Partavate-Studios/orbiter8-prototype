@@ -6,8 +6,8 @@
         :y="topMostY"
         :width="viewport.width"
         :height="viewport.height"
-        v-on:click.prevent="setMenuToClose()"
         fill="#ffffff00"
+        @click.prevent="setMenuToClose()"
       />
 
       <menu-background />
@@ -15,7 +15,7 @@
       <slot />
 
       <g :transform="'translate(' + 0 + ' ' + (bottomMostY - 50) + ') scale(0.75)'">
-        <a v-on:click.prevent="setMenuToClose()" cursor="pointer">
+        <a cursor="pointer" @click.prevent="setMenuToClose()">
           <close-button />
         </a>
       </g>

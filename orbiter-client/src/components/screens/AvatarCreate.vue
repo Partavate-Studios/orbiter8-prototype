@@ -21,21 +21,21 @@
         flight clearance for the entire galaxy. Are you ready to register your call sign?
       </p>
       <p class="next">
-        <span class="button" v-on:click="next">Yes, register my call sign! &#10143;</span>
+        <span class="button" @click="next">Yes, register my call sign! &#10143;</span>
       </p>
     </div>
 
     <div v-if="step == 2">
       <p><b>Minerva Galactic Registration</b></p>
-      <pilot-id-card :pilotName="newAvatarName" />
+      <pilot-id-card :pilot-name="newAvatarName" />
 
       <p class="instructions">Enter your Call Sign.</p>
       <p class="name">
-        <input name="name" v-model="newAvatarName" @keydown="keydown_check" />
+        <input v-model="newAvatarName" name="name" @keydown="keydown_check" />
       </p>
       <p class="next">
-        <span class="button" v-on:click="previous">&#8592;</span>
-        <span class="button" @click="signup" name="signup">File My Registration &#10143;</span>
+        <span class="button" @click="previous">&#8592;</span>
+        <span class="button" name="signup" @click="signup">File My Registration &#10143;</span>
       </p>
     </div>
     <div v-if="step == 3">
@@ -55,11 +55,11 @@ import PilotIdCard from './_pilot-id-card'
 import ShipIcon from '../star-map/hud/icons/ship-icon.svg'
 
 export default {
+  name: 'AvatarCreate',
   components: {
     PilotIdCard,
     ShipIcon
   },
-  name: 'AvatarCreate',
   data() {
     return {
       newAvatarName: '',
