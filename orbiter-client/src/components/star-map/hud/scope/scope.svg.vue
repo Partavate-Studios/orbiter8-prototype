@@ -13,12 +13,7 @@
           v-if="sprite.type === 'planet'"
           :opacity = "markerOpacity(sprite)"
           :transform="'rotate(' + bearingToSprite(sprite) + ')'">
-          <a
-            v-on:click.prevent="o8audio.playEffect('click'); selectSprite(key)"
-            v-on:mouseover="setSpriteToDisplay(key)"
-            v-on:mouseout="setSpriteToDisplay(null)"
-            cursor="pointer">
-            <compass-planet></compass-planet></a>
+          <scope-marker :spriteKey="key"><compass-planet></compass-planet></scope-marker>
         </g>
 
         <g
@@ -26,11 +21,7 @@
           :opacity = "markerOpacity(sprite)"
           :transform="'rotate(' + bearingToSprite(sprite) + ')'">
           <g transform="translate(0 140) rotate(180)">
-            <a
-              v-on:click.prevent="o8audio.playEffect('click'); selectSprite(key)"
-              v-on:mouseover="setSpriteToDisplay(key)"
-              v-on:mouseout="setSpriteToDisplay(null)"
-              cursor="pointer"><ship></ship></a>
+            <scope-marker :spriteKey="key"><ship></ship></scope-marker>
           </g>
         </g>
       </g>
@@ -66,16 +57,7 @@
         :stroke-opacity="markerOpacity(systemObjects.star)"
       >
         <compass-arrow></compass-arrow>
-          <text
-            x="0" y="10"
-            font-size="1.25em"
-            text-anchor="middle"
-            alignment-baseline="central"></text>
-        <a
-          v-on:click.prevent="o8audio.playEffect('click'); selectSprite('star')"
-          v-on:mouseover="setSpriteToDisplay('star')"
-          v-on:mouseout="setSpriteToDisplay(null)"
-          cursor="pointer"><compass-sun :opacity="markerOpacity(systemObjects.star)"></compass-sun></a>
+        <scope-marker spriteKey="star"><compass-sun :opacity="markerOpacity(systemObjects.star)"></compass-sun></scope-marker>
       </g>
 
       <compass></compass>
@@ -88,11 +70,12 @@ import { bearingDegrees, scopeOpacity } from '@/game/bearing'
 
 import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
-import { mapActions, mapState } from 'pinia'
+import { mapState } from 'pinia'
 import Compass from './compass.svg'
 import CompassArrow from './compass-arrow.svg'
 import CompassPlanet from './compass-planet.svg'
 import CompassSun from './compass-sun.svg'
+import ScopeMarker from './scope-marker.svg'
 import Ship from '../../sprites/ship.svg'
 
 export default {
@@ -107,6 +90,7 @@ export default {
     CompassArrow,
     CompassSun,
     CompassPlanet,
+    ScopeMarker,
     Ship
   },
   computed: {
@@ -127,10 +111,6 @@ export default {
     }
   },
   methods: {
-    ...mapActions(useUIStore, [
-      'selectSprite',
-      'setSpriteToDisplay'
-    ]),
     /** Where the sprite is relative to the view center, in world units. */
     offsetFromView (sprite) {
       // Sprites are raw objects updated in place each frame; reading gameTime makes this re-evaluate per frame.
