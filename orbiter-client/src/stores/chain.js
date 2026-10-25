@@ -1,21 +1,15 @@
 import { defineStore } from 'pinia'
 import { markRaw } from 'vue'
 import { discoverWallets, preferredWallet, rememberWallet, connectWallet } from '@/sdk/chain/wallet'
-import {
-  initContracts as bindContracts,
-  contractAddresses,
-  galaxy,
-  getBlockNumber,
-  getNativeBalance,
-  gameChangedBetween
-} from '@/sdk/chain/contracts'
+import { initContracts as bindContracts, contractAddresses, galaxy, getNativeBalance } from '@/sdk/chain/contracts'
 import { networks, networkFor, chainName } from '@/sdk/chain/networks'
+import { createBlockWatcher } from '@/sdk/sync'
 import { useStarMapStore } from '@/stores/starmap'
 import { useGameStateStore } from '@/stores/gamestate'
 import { useConfigStore } from '@/stores/config'
 
 let blockPoller = null
-let checkingBlocks = false
+let blockWatcher = null
 
 export const useChainStore = defineStore('Chain', {
   state: () => ({
@@ -29,7 +23,6 @@ export const useChainStore = defineStore('Chain', {
     chainId: 0,
     account: null,
     currentBlockId: 0,
-    lastBlockNumber: 0,
     playerReady: false,
     balance: 0,
     /** Wallets found via EIP-6963, when the player has to pick one. Raw: they hold provider objects. */
@@ -85,7 +78,6 @@ export const useChainStore = defineStore('Chain', {
         rememberWallet(wallet)
         this.chainId = session.chainId
         this.account = session.account
-        this.lastBlockNumber = await getBlockNumber()
         this.web3Loaded = true
         this.walletStatus = 'connected'
         this.balance = await getNativeBalance()
@@ -114,6 +106,23 @@ export const useChainStore = defineStore('Chain', {
     /** Polls for new blocks for the rest of the session. Safe to call again: only one poller ever runs. */
     startBlockPolling() {
       if (blockPoller) return
+      blockWatcher = createBlockWatcher({
+        watchedAddresses: () => [
+          this.galaxyAddress,
+          this.avatarAddress,
+          this.planetTokenAddress,
+          this.shipTokenAddress,
+          this.creditTokenAddress
+        ],
+        onBlock: (blockNumber, gameChanged) => {
+          this.currentBlockId = blockNumber
+          if (!gameChanged) return
+          console.debug('Game changed by block ' + blockNumber + '; reloading')
+          useGameStateStore().loadGameState()
+          useGameStateStore().loadEvents()
+          useStarMapStore().loadStarMap()
+        }
+      })
       // Paused while the tab is hidden; checks right away when the player comes back.
       const poll = () => {
         if (!document.hidden) this.checkForNewBlock()
@@ -122,36 +131,13 @@ export const useChainStore = defineStore('Chain', {
       blockPoller = setInterval(poll, useConfigStore().blockCheckDelay)
       document.addEventListener('visibilitychange', poll)
     },
-    /**
-     * Game state only changes when a block completes. Reload it when a new block contains a
-     * transaction to one of the game's contracts (or on the first check); skip blocks that don't.
-     */
+    /** Checks for a new block now; reloads the game if it changed. Needs startBlockPolling() first. */
     async checkForNewBlock() {
-      if (checkingBlocks) return
-      checkingBlocks = true
+      if (!blockWatcher) return
       try {
-        const blockNumber = await getBlockNumber()
-        if (blockNumber <= this.currentBlockId) return
-        const isFirstLoad = this.currentBlockId === 0
-        const changed =
-          isFirstLoad ||
-          (await gameChangedBetween(this.currentBlockId, blockNumber, [
-            this.galaxyAddress,
-            this.avatarAddress,
-            this.planetTokenAddress,
-            this.shipTokenAddress,
-            this.creditTokenAddress
-          ]))
-        this.currentBlockId = blockNumber
-        if (!changed) return
-        console.debug('Game changed by block ' + blockNumber + '; reloading')
-        useGameStateStore().loadGameState()
-        useGameStateStore().loadEvents()
-        useStarMapStore().loadStarMap()
+        await blockWatcher.check()
       } catch (error) {
         console.error('Block check failed:', error.message)
-      } finally {
-        checkingBlocks = false
       }
     },
     setProp({ key, value }) {
