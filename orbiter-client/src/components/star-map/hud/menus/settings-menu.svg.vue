@@ -106,7 +106,7 @@
       </text>
       <g v-for="index in 4" :key="'music' + index" :transform="'translate(' + (index * 60 - 100) + ' -125)'">
         <a cursor="pointer" @click.prevent="setMusicVolume(index - 1)">
-          <menu-checkbox :checked="getMusicVolume() == index - 1" />
+          <menu-checkbox :checked="o8audio.levels.music == index - 1" />
         </a>
       </g>
 
@@ -125,7 +125,7 @@
 
       <g v-for="index in 4" :key="'effects' + index" :transform="'translate(' + (index * 60 - 100) + ' -85)'">
         <a cursor="pointer" @click.prevent="setEffectsVolume(index - 1)">
-          <menu-checkbox :checked="getEffectsVolume() == index - 1" />
+          <menu-checkbox :checked="o8audio.levels.effects == index - 1" />
         </a>
       </g>
 
@@ -167,21 +167,13 @@ export default {
       this.o8audio.playEffect('click')
       this.setGraphicsQuality(quality)
     },
-    setMusicVolume(volume) {
-      this.o8audio.setMusicVolume(volume / 3)
+    setMusicVolume(level) {
+      this.o8audio.setMusicLevel(level)
       this.o8audio.playEffect('click')
-      this.$forceUpdate()
     },
-    setEffectsVolume(volume) {
-      this.o8audio.setEffectsVolume(volume / 3)
+    setEffectsVolume(level) {
+      this.o8audio.setEffectsLevel(level)
       this.o8audio.playEffect('click')
-      this.$forceUpdate()
-    },
-    getMusicVolume() {
-      return parseInt(this.o8audio.getMusicVolume() * 3)
-    },
-    getEffectsVolume() {
-      return parseInt(this.o8audio.getEffectsVolume() * 3)
     }
   }
 }

@@ -16,10 +16,9 @@ const silentAudio = {
   stopMusic() {},
   silenceMusic() {},
   resumeMusic() {},
-  getMusicVolume: () => 0.25,
-  getEffectsVolume: () => 0.25,
-  setMusicVolume() {},
-  setEffectsVolume() {}
+  levels: { music: 1, effects: 1 },
+  setMusicLevel() {},
+  setEffectsLevel() {}
 }
 
 let app, root, problems, ui

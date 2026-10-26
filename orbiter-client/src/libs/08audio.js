@@ -1,10 +1,21 @@
 import Cookies from 'js-cookie'
+import { reactive } from 'vue'
+
+/** Volume settings are steps: 0 (off) to LEVELS (full). */
+export const LEVELS = 3
+
+/** A saved volume (a fraction, as a string from the cookie) as the nearest step; `fallback` if unset. */
+function savedLevel(cookie, fallback) {
+  const volume = Number(Cookies.get(cookie))
+  if (Cookies.get(cookie) === undefined || !Number.isFinite(volume)) return fallback
+  return Math.max(0, Math.min(LEVELS, Math.round(volume * LEVELS)))
+}
 
 export default class Sound {
   constructor() {
     this.currentMusic = ''
-    this.musicVolume = Cookies.get('musicVolume') || 0.25
-    this.effectsVolume = Cookies.get('effectsVolume') || 0.25
+    // Reactive, so settings controls redraw when a level changes.
+    this.levels = reactive({ music: savedLevel('musicVolume', 1), effects: savedLevel('effectsVolume', 1) })
 
     this.music = []
 
@@ -21,27 +32,29 @@ export default class Sound {
     this.effects['click'] = new Audio('./audio/effects/beep.mp3')
   }
 
-  getMusicVolume() {
-    return this.musicVolume
+  get musicVolume() {
+    return this.levels.music / LEVELS
   }
 
-  getEffectsVolume() {
-    return this.effectsVolume
+  get effectsVolume() {
+    return this.levels.effects / LEVELS
   }
 
-  setMusicVolume(musicVolume) {
-    this.musicVolume = Math.max(0, Math.min(1, musicVolume))
+  /** @param {number} level  0 (off) to LEVELS */
+  setMusicLevel(level) {
+    this.levels.music = Math.max(0, Math.min(LEVELS, Math.round(level)))
     Cookies.set('musicVolume', this.musicVolume, { expires: 30 })
 
-    if (musicVolume == 0) {
+    if (this.levels.music == 0) {
       this.silenceMusic()
     } else {
       this.resumeMusic()
     }
   }
 
-  setEffectsVolume(effectsVolume) {
-    this.effectsVolume = Math.max(0, Math.min(1, effectsVolume))
+  /** @param {number} level  0 (off) to LEVELS */
+  setEffectsLevel(level) {
+    this.levels.effects = Math.max(0, Math.min(LEVELS, Math.round(level)))
     Cookies.set('effectsVolume', this.effectsVolume, { expires: 30 })
   }
 

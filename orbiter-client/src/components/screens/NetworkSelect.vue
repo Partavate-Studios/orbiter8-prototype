@@ -167,11 +167,11 @@
           v-for="index in 4"
           :key="'music' + index"
           class="radioButton"
-          :class="{ radioButtonSelected: getMusicVolume() >= index - 1 }"
+          :class="{ radioButtonSelected: o8audio.levels.music >= index - 1 }"
           @click.prevent="setMusicVolume(index - 1)"
         />
-        <span v-if="getMusicVolume() == 0">off</span>
-        <span v-else>{{ getMusicVolume() }}</span>
+        <span v-if="o8audio.levels.music == 0">off</span>
+        <span v-else>{{ o8audio.levels.music }}</span>
       </div>
       <div class="item">
         <span class="name">Effects Volume:</span>
@@ -179,11 +179,11 @@
           v-for="index in 4"
           :key="'effects' + index"
           class="radioButton"
-          :class="{ radioButtonSelected: getEffectsVolume() >= index - 1 }"
+          :class="{ radioButtonSelected: o8audio.levels.effects >= index - 1 }"
           @click.prevent="setEffectsVolume(index - 1)"
         />
-        <span v-if="getEffectsVolume() == 0">off</span>
-        <span v-else>{{ getEffectsVolume() }}</span>
+        <span v-if="o8audio.levels.effects == 0">off</span>
+        <span v-else>{{ o8audio.levels.effects }}</span>
       </div>
       <div class="item">
         <span class="name">Graphics Level:</span>
@@ -352,21 +352,13 @@ export default {
         console.error('Importing the credits token failed:', error)
       }
     },
-    setMusicVolume(volume) {
-      this.o8audio.setMusicVolume(volume / 3)
+    setMusicVolume(level) {
+      this.o8audio.setMusicLevel(level)
       this.o8audio.playEffect('click')
-      this.$forceUpdate()
     },
-    setEffectsVolume(volume) {
-      this.o8audio.setEffectsVolume(volume / 3)
+    setEffectsVolume(level) {
+      this.o8audio.setEffectsLevel(level)
       this.o8audio.playEffect('click')
-      this.$forceUpdate()
-    },
-    getMusicVolume() {
-      return parseInt(this.o8audio.getMusicVolume() * 3)
-    },
-    getEffectsVolume() {
-      return parseInt(this.o8audio.getEffectsVolume() * 3)
     },
     explorerLink(address) {
       const explorer = this.networkData[this.chainId]?.explorer[0]

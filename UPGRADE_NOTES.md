@@ -558,6 +558,10 @@ These need a real wallet, a real GPU or another player, which the scripted runs 
 
 ### Fixed
 
+- **The volume dots sometimes showed the wrong setting** (Koda, 2026-10-25). The music played at the chosen level, but the highlight was off. Two causes:
+  - **Rounding.** Volumes were saved as fractions in a cookie, and 1/3 read back as `"0.3333333333333333"`; three times that is just under 1, so the dots showed one step lower. The old default of 0.25 wasn't a step at all, so it showed as "off" while the music played.
+  - **No redraw.** The volume wasn't reactive, so the dots only changed when something else redrew.
+  - **The fix:** `08audio.js` keeps whole steps (0–3) in a reactive `levels` object, and reads old cookies by rounding to the nearest step. The settings menus read `o8audio.levels`. Covered by `libs/08audio.test.js`.
 - **Contract calls that failed never settled**, so the UI hung (e.g. "Game: ...loading" forever). The Phase 3 rewrite makes failures reject, with the revert reason.
 - **Event queries went below block 0 on young chains** (`fromBlock: block - 950`). The node then rejected them with "Method eth_getLogs is not supported". The query now clamps at 0 (Phase 3).
 
