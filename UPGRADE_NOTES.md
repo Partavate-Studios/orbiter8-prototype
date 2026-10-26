@@ -646,7 +646,7 @@ Phase 6:
   - button glyphs and rumble.
 
 **Build plan** (each step is its own commit; tick it off here when it lands):
-1. [ ] `libs/gamepad/`: pure helpers, with tests.
+1. [x] `libs/gamepad/`: pure helpers, with tests.
    - Reading a pad: dead zones, and buttons that went down this frame.
    - Spatial navigation: from a focused rectangle, pick the nearest one in a direction.
 2. [ ] `libs/gamepad/controller.js`, which polls the pad from the frame loop and maps it to game actions:
