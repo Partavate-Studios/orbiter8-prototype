@@ -73,7 +73,7 @@ describe('HUD', () => {
     })
   }
 
-  for (const menu of ['planets', 'ships', 'settings', 'chat']) {
+  for (const menu of ['planets', 'ships', 'settings', 'chat', 'leaderboard']) {
     it(`opens the ${menu} menu`, async () => {
       ui.openMenu(menu)
       await settle()

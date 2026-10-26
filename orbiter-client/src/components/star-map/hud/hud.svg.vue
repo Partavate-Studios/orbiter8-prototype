@@ -77,6 +77,12 @@
         </a>
       </g>
 
+      <g :transform="'translate(' + (leftMostX + 50) + ' ' + (bottomMostY - 250) + ')'">
+        <a cursor="pointer" @click.prevent="showLeaderboard()">
+          <trophy-icon />
+        </a>
+      </g>
+
       <g :transform="'translate(' + (leftMostX + 50) + ' ' + (bottomMostY - 150) + ')'">
         <a cursor="pointer" @click.prevent="showChat()">
           <broadcast-icon />
@@ -173,6 +179,9 @@
       <g v-if="menuState.chatMenu">
         <chat-menu />
       </g>
+      <g v-if="menuState.leaderboardMenu">
+        <leaderboard-menu />
+      </g>
     </g>
   </g>
 </template>
@@ -208,6 +217,8 @@ import ShipsMenu from './menus/ships-menu.svg'
 import TradeMenu from './menus/trade-menu.svg'
 import ShipyardMenu from './menus/shipyard-menu.svg'
 import ChatMenu from './menus/chat-menu.svg'
+import LeaderboardMenu from './menus/leaderboard-menu.svg'
+import TrophyIcon from './icons/trophy-icon.svg'
 import SettingsMenu from './menus/settings-menu.svg'
 
 export default {
@@ -223,6 +234,8 @@ export default {
     PlanetsMenu,
     SettingsMenu,
     ChatMenu,
+    LeaderboardMenu,
+    TrophyIcon,
     ShipsIcon,
     ShipsMenu,
     SpeakerIcon,
@@ -295,6 +308,10 @@ export default {
     showChat() {
       this.o8audio.playEffect('click')
       this.openMenu('chat')
+    },
+    showLeaderboard() {
+      this.o8audio.playEffect('click')
+      this.openMenu('leaderboard')
     },
     selectMyShip() {
       this.o8audio.playEffect('click')

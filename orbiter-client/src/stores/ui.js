@@ -51,6 +51,7 @@ export const useUIStore = defineStore('UI', {
         tradeMenu: false,
         shipyardMenu: false,
         chatMenu: false,
+        leaderboardMenu: false,
         spriteMenus: []
       }
     },
@@ -116,6 +117,9 @@ export const useUIStore = defineStore('UI', {
         return true
       }
       if (state.hud.menuState.shipyardMenu) {
+        return true
+      }
+      if (state.hud.menuState.leaderboardMenu) {
         return true
       }
       return false
@@ -376,6 +380,7 @@ export const useUIStore = defineStore('UI', {
       this.hud.menuState.tradeMenu = false
       this.hud.menuState.shipyardMenu = false
       this.hud.menuState.chatMenu = false
+      this.hud.menuState.leaderboardMenu = false
       switch (menu) {
         case 'planets':
           this.hud.menuState.planetsMenu = true
@@ -395,6 +400,9 @@ export const useUIStore = defineStore('UI', {
         case 'chat':
           this.hud.menuState.chatMenu = true
           break
+        case 'leaderboard':
+          this.hud.menuState.leaderboardMenu = true
+          break
         case 'jump':
           break
         case 'sprite':
@@ -409,6 +417,7 @@ export const useUIStore = defineStore('UI', {
       this.hud.menuState.tradeMenu = false
       this.hud.menuState.shipyardMenu = false
       this.hud.menuState.chatMenu = false
+      this.hud.menuState.leaderboardMenu = false
     },
     // unevaluated
 
