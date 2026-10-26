@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import Tween from '@/libs/tween'
 import { STAR_KEY } from '@/sdk/system'
 import { CAMERA, MAP_GROUP_SCALE, MAP_RESOLUTION, WORLD_OFFSET_Y } from '@/constants'
+import { useConfigStore } from '@/stores/config'
 
 // Sprites this far past the screen edge still count as on screen (labels, glows).
 const OFFSCREEN_MARGIN_PX = 100
@@ -150,6 +151,8 @@ export const useUIStore = defineStore('UI', {
     viewRatio: (state) => {
       return state.viewport.width / state.viewport.height
     },
+    /** The HUD's size setting (stores/config.js): its corner controls are drawn this much bigger. */
+    hudScale: () => useConfigStore().uiScale,
     leftMostX: (state) => {
       return 0 - state.viewport.width / 2
     },

@@ -1016,7 +1016,7 @@ Order (from the walkthrough's list). Tick each when it lands:
     - Giving other players' ships different designs (by ship id) would change the game's look for everyone; ships have no type on chain.
     - Network logos: Enterprise Circuit only has Ethereum and Moonbeam among this client's networks, so BNB and Local would have none.
   - **Original plan, for reference:** Look at Enterprise Circuit's planet art (bands, rings, named Sol planets), stations and ships against this client's, and bring over what improves the map without changing what the game means. Anything that changes how the game looks for every player is noted for Koda.
-- [ ] **6. UI scale.** A Settings option (75–200%) that scales the HUD, kept between visits.
+- [x] **6. UI scale.** Done 2026-10-26, as an "Interface size" setting (75, 100, 125, 150%, saved in a cookie) in the title's Settings panel and the in-game Settings menu. **Only the HUD's corner controls scale** (profile card, buttons, minimap, zoom slider, system name), each from its own corner. The full-screen menus and the selection cards stay as they are. Scaling the whole HUD, which was tried first, cut off the planets list at 150% on a 900 px screen. The original plan said: A Settings option (75–200%) that scales the HUD, kept between visits.
 - [ ] **7. Later ideas.** The About storyboard (Enterprise Circuit's six panels, story text verbatim) as a "Story" button on the title. The cockpit window stays an idea.
 
 ### 5a. The Bobabeam Portals demo (looked at 2026-10-26)

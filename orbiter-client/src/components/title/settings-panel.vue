@@ -35,13 +35,29 @@
       </div>
     </fieldset>
 
+    <fieldset>
+      <legend>Interface size (in the game)</legend>
+      <div class="steps">
+        <label v-for="scale in UI_SCALES" :key="scale">
+          <input
+            type="radio"
+            name="ui-scale"
+            :value="scale"
+            :checked="uiScale === scale"
+            @change="chooseUiScale(scale)"
+          />
+          <span>{{ Math.round(scale * 100) }}%</span>
+        </label>
+      </div>
+    </fieldset>
+
     <p class="footer"><button type="button" class="o8-button quiet" @click="$emit('close')">Close</button></p>
   </section>
 </template>
 
 <script>
 import { mapActions, mapState } from 'pinia'
-import { useConfigStore } from '@/stores/config'
+import { useConfigStore, UI_SCALES } from '@/stores/config'
 import { LEVELS } from '@/libs/08audio'
 
 export default {
@@ -50,6 +66,7 @@ export default {
   data() {
     return {
       LEVELS,
+      UI_SCALES,
       qualities: [
         { level: 1, label: 'Efficient' },
         { level: 2, label: 'Moderate' },
@@ -58,7 +75,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(useConfigStore, ['graphicsQuality']),
+    ...mapState(useConfigStore, ['graphicsQuality', 'uiScale']),
     volumeSettings() {
       return [
         { id: 'music', label: 'Music', set: (level) => this.setLevel('music', level) },
@@ -67,7 +84,11 @@ export default {
     }
   },
   methods: {
-    ...mapActions(useConfigStore, ['setGraphicsQuality']),
+    ...mapActions(useConfigStore, ['setGraphicsQuality', 'setUiScale']),
+    chooseUiScale(scale) {
+      this.setUiScale(scale)
+      this.o8audio.playEffect('click')
+    },
     setLevel(which, level) {
       if (which === 'music') this.o8audio.setMusicLevel(level)
       else this.o8audio.setEffectsLevel(level)

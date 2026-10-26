@@ -10,9 +10,9 @@
       </linearGradient>
     </defs>
     <g v-if="!isMenuOn">
-      <current-system :transform="'translate(' + (rightMostX - 100) + ' ' + (topMostY + 45) + ')'" />
+      <current-system :transform="corner(rightMostX, -100, topMostY, 45)" />
 
-      <g :transform="'translate(' + profileX + ' ' + profileY + ')'">
+      <g :transform="corner(leftMostX, profileOffset.x, topMostY, profileOffset.y)">
         <g font-size="0.7em" fill="#ffffff88" transform="translate(0 40)">
           <rect
             x="0"
@@ -59,18 +59,15 @@
         </g>
       </g>
 
-      <g :transform="'translate(' + (leftMostX + 50) + ' ' + (topMostY + 50) + ')'">
+      <g :transform="corner(leftMostX, 50, topMostY, 50)">
         <a cursor="pointer" @click.prevent="selectMyShip()">
           <avatar-icon />
         </a>
       </g>
 
-      <minimap
-        v-if="mapDataLoaded && !neighborView"
-        :transform="'translate(' + (rightMostX - 70) + ' ' + (topMostY + 160) + ')'"
-      />
+      <minimap v-if="mapDataLoaded && !neighborView" :transform="corner(rightMostX, -70, topMostY, 160)" />
 
-      <g :transform="'translate(' + (rightMostX - 50) + ' ' + (topMostY + 50) + ')'">
+      <g :transform="corner(rightMostX, -50, topMostY, 50)">
         <!-- A star until the star is selected; then the star-nav icon, which zooms out to its neighbors. -->
         <a cursor="pointer" @click.prevent="selectStar()">
           <jump-icon v-if="starSelected" />
@@ -84,13 +81,13 @@
         </a>
       </g>
 
-      <g :transform="'translate(' + (leftMostX + 50) + ' ' + (bottomMostY - 250) + ')'">
+      <g :transform="corner(leftMostX, 50, bottomMostY, -250)">
         <a cursor="pointer" @click.prevent="showLeaderboard()">
           <trophy-icon />
         </a>
       </g>
 
-      <g :transform="'translate(' + (leftMostX + 50) + ' ' + (bottomMostY - 150) + ')'">
+      <g :transform="corner(leftMostX, 50, bottomMostY, -150)">
         <a cursor="pointer" @click.prevent="showChat()">
           <broadcast-icon />
           <g v-if="chatEventsCount">
@@ -107,17 +104,17 @@
         </a>
       </g>
 
-      <zoom-slider transform="translate(0 430) scale(1.5)" />
+      <zoom-slider :transform="corner(0, 0, bottomMostY, -50, 1.5)" />
 
-      <scope-toggle :transform="'translate(' + 0 + ' ' + (bottomMostY - 100) + ')'" />
+      <scope-toggle :transform="corner(0, 0, bottomMostY, -100)" />
 
-      <g :transform="'translate(' + (leftMostX + 50) + ' ' + (bottomMostY - 50) + ')'">
+      <g :transform="corner(leftMostX, 50, bottomMostY, -50)">
         <a cursor="pointer" @click.prevent="showSettings()">
           <gear-icon />
         </a>
       </g>
 
-      <g :transform="'translate(' + (rightMostX - 50) + ' ' + (bottomMostY - 150) + ')'">
+      <g :transform="corner(rightMostX, -50, bottomMostY, -150)">
         <a cursor="pointer" @click.prevent="showShips()">
           <ships-icon />
           <g v-if="shipCount">
@@ -133,7 +130,7 @@
           </g>
         </a>
       </g>
-      <g :transform="'translate(' + (rightMostX - 50) + ' ' + (bottomMostY - 250) + ')'">
+      <g :transform="corner(rightMostX, -50, bottomMostY, -250)">
         <a cursor="pointer" @click.prevent="showPlanets()">
           <planets-icon />
           <g>
@@ -150,7 +147,7 @@
         </a>
       </g>
 
-      <g :transform="'translate(' + (rightMostX - 50) + ' ' + (bottomMostY - 50) + ')'">
+      <g :transform="corner(rightMostX, -50, bottomMostY, -50)">
         <a cursor="pointer" @click.prevent="toggleShowLabels()">
           <info-icon />
         </a>
@@ -271,21 +268,14 @@ export default {
       'menuState',
       'isMenuOn',
       'viewRatio',
-      'neighborView'
+      'neighborView',
+      'hudScale'
     ]),
     ...mapState(useStarMapStore, ['myShipId', 'spriteIds', 'mapDataLoaded']),
     ...mapState(useGameStateStore, ['avatar', 'events']),
-    profileX() {
-      if (this.viewRatio <= 1) {
-        return this.leftMostX + 20
-      }
-      return this.leftMostX + 100
-    },
-    profileY() {
-      if (this.viewRatio <= 1) {
-        return this.topMostY + 90
-      }
-      return this.topMostY + 15
+    /** Where the profile card sits from the top left corner: under the avatar button on portrait screens. */
+    profileOffset() {
+      return this.viewRatio <= 1 ? { x: 20, y: 90 } : { x: 100, y: 15 }
     },
     chatEventsCount() {
       if (Array.isArray(this.events.chatEvents)) {
@@ -307,6 +297,14 @@ export default {
     }
   },
   methods: {
+    /**
+     * Places a corner control (offset from a screen edge) at the player's interface size: the
+     * offset and the control grow together, so it stays the same distance inside the screen's edge.
+     */
+    corner(edgeX, offsetX, edgeY, offsetY, extraScale = 1) {
+      const scale = this.hudScale
+      return `translate(${edgeX + offsetX * scale} ${edgeY + offsetY * scale}) scale(${scale * extraScale})`
+    },
     ...mapActions(useUIStore, ['selectSprite', 'scaleAnimateTo', 'zoomOutToNeighbors', 'toggleShowLabels', 'openMenu']),
     showSettings() {
       this.o8audio.playEffect('click')
