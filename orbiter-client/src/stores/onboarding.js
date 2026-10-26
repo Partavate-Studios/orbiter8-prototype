@@ -6,6 +6,8 @@ import { useGameStateStore } from '@/stores/gamestate'
 import { onboardingStep, titleAction, wizardStepOf } from '@/libs/onboarding'
 import { walletErrorKind } from '@/sdk/chain/wallet'
 import { game } from '@/sdk/client'
+import { networks } from '@/sdk/chain/networks'
+import { loadNetworkStats } from '@/sdk/network-stats'
 
 /**
  * @typedef {object} Registration  the callsign or ship registration on screen
@@ -25,7 +27,9 @@ export const useOnboardingStore = defineStore('Onboarding', {
     /** @type {Registration | null} */
     registration: null,
     /** Callsigns in use, lowercased; null until read, or when there are too many to read. */
-    callsigns: null
+    callsigns: null,
+    /** chainId → { pilots, starSystems }, null (no RPC answered) or 'loading' (sdk/network-stats.js) */
+    networkStats: {}
   }),
   getters: {
     input() {
@@ -64,6 +68,16 @@ export const useOnboardingStore = defineStore('Onboarding', {
       this.wizardOpen = false
       // A finished or failed registration is done with; one still in flight keeps showing.
       if (this.registration && this.registration.status !== 'sent') this.registration = null
+    },
+    /** Reads how busy every network is, for choosing where to play. Each fills in as it answers. */
+    loadNetworkStats() {
+      for (const network of networks) {
+        if (this.networkStats[network.chainId] === 'loading') continue
+        this.networkStats = { ...this.networkStats, [network.chainId]: 'loading' }
+        loadNetworkStats(network).then((stats) => {
+          this.networkStats = { ...this.networkStats, [network.chainId]: stats }
+        })
+      }
     },
     /** Reads every callsign once, for the "taken" hint. Failing just leaves the hint off. */
     async loadCallsigns() {

@@ -61,7 +61,12 @@ const deployed = [
     name: 'Moonriver Alpha',
     shortName: 'Moonriver',
     currency: { name: 'MOVR', symbol: 'MOVR', decimals: 18 },
-    rpc: ['https://rpc.api.moonriver.moonbeam.network', 'https://moonriver.unitedbloc.com'],
+    // dRPC added 2026-10-26: the other two didn't answer from here (TLS failure, timeout).
+    rpc: [
+      'https://rpc.api.moonriver.moonbeam.network',
+      'https://moonriver.unitedbloc.com',
+      'https://moonriver.drpc.org'
+    ],
     explorer: ['https://moonriver.moonscan.io'],
     contracts: {
       Orbiter8: '0xC761B452726680704Fc7079B12e3e690665B91Ca',

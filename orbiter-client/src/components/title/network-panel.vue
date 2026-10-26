@@ -67,21 +67,23 @@
       </template>
     </dl>
 
-    <template v-if="walletStatus === 'connected'">
-      <h3>Play somewhere else</h3>
-      <div class="choices">
+    <h3>Where Orbiter 8 is running</h3>
+    <ul class="galaxies">
+      <li v-for="network in allNetworks" :key="network.chainId">
+        <span class="galaxy-name">{{ network.name }}</span>
+        <network-stats :chain-id="network.chainId" />
+        <span v-if="network.chainId === chainId" class="here">· you're here</span>
         <button
-          v-for="network in otherNetworks"
-          :key="network.chainId"
+          v-else-if="walletStatus === 'connected'"
           type="button"
           class="o8-button small"
           @click="switchTo(network.chainId)"
         >
-          {{ network.name }}
+          Switch
         </button>
-      </div>
-      <p v-if="switchError" class="problem" role="alert">{{ switchError }}</p>
-    </template>
+      </li>
+    </ul>
+    <p v-if="switchError" class="problem" role="alert">{{ switchError }}</p>
 
     <p class="footer"><button type="button" class="o8-button quiet" @click="$emit('close')">Close</button></p>
   </section>
@@ -92,9 +94,12 @@ import { mapActions, mapState } from 'pinia'
 import { useChainStore } from '@/stores/chain'
 import { useGameStateStore } from '@/stores/gamestate'
 import { networks } from '@/sdk/chain/networks'
+import { useOnboardingStore } from '@/stores/onboarding'
+import NetworkStats from './network-stats.vue'
 
 export default {
   name: 'NetworkPanel',
+  components: { NetworkStats },
   emits: ['close'],
   data() {
     return { switchError: null }
@@ -141,12 +146,16 @@ export default {
         { label: 'Ship NFTs', address: this.shipTokenAddress }
       ].filter((contract) => contract.address)
     },
-    otherNetworks() {
-      return networks.filter((network) => network.chainId !== this.chainId)
+    allNetworks() {
+      return networks
     }
+  },
+  mounted() {
+    this.loadNetworkStats()
   },
   methods: {
     ...mapActions(useChainStore, ['switchNetwork', 'addCreditsToken']),
+    ...mapActions(useOnboardingStore, ['loadNetworkStats']),
     async switchTo(chainId) {
       this.o8audio.playEffect('click')
       this.switchError = await this.switchNetwork(chainId)
@@ -183,10 +192,25 @@ h3 {
   font-size: 1em;
   color: #c3b3da;
 }
-.choices {
+.galaxies {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45em;
+}
+.galaxies li {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5em;
+  align-items: baseline;
+  gap: 0.3em 0.7em;
+}
+.galaxy-name {
+  min-width: 12em;
+}
+.here {
+  font-size: 0.8em;
+  color: #9be3b0;
 }
 @media (max-width: 600px) {
   dl {

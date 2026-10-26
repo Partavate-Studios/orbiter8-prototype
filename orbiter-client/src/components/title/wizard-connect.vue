@@ -51,18 +51,14 @@
         Your wallet is on <b>{{ networkName || 'an unknown network' }}</b
         >, where Orbiter 8 isn't running. Choose where to play:
       </p>
-      <div class="choices">
-        <button
-          v-for="network in networks"
-          :key="network.chainId"
-          type="button"
-          class="o8-button"
-          :disabled="switching"
-          @click="switchTo(network.chainId)"
-        >
-          {{ network.name }}
-        </button>
-      </div>
+      <ul class="galaxies">
+        <li v-for="network in networks" :key="network.chainId">
+          <button type="button" class="o8-button" :disabled="switching" @click="switchTo(network.chainId)">
+            {{ network.name }}
+          </button>
+          <network-stats :chain-id="network.chainId" />
+        </li>
+      </ul>
       <p v-if="switchError" class="problem" role="alert">{{ switchError }}</p>
       <p class="hint">Your wallet will ask you to approve the switch. Sepolia is the main test galaxy.</p>
     </template>
@@ -101,12 +97,14 @@ import { useOnboardingStore } from '@/stores/onboarding'
 import { networks } from '@/sdk/chain/networks'
 import { walletAppLink } from '@/sdk/chain/wallet'
 import { game } from '@/sdk/client'
+import NetworkStats from './network-stats.vue'
 
 // While waiting for funds, the balance is re-read this often.
 const BALANCE_CHECK_MS = 6000
 
 export default {
   name: 'WizardConnect',
+  components: { NetworkStats },
   data() {
     return { switching: false, switchError: null, appLink: walletAppLink() }
   },
@@ -150,6 +148,7 @@ export default {
       immediate: true,
       handler(step) {
         clearInterval(this.balanceTimer)
+        if (step === 'network') this.loadNetworkStats()
         if (step === 'funds') this.balanceTimer = setInterval(() => game.refreshBalance(), BALANCE_CHECK_MS)
       }
     }
@@ -159,6 +158,7 @@ export default {
   },
   methods: {
     ...mapActions(useChainStore, ['chooseWallet', 'switchNetwork', 'initContracts']),
+    ...mapActions(useOnboardingStore, ['loadNetworkStats']),
     connect(wallet) {
       this.o8audio.playEffect('click')
       this.chooseWallet(wallet)
@@ -185,6 +185,23 @@ p {
   display: flex;
   flex-wrap: wrap;
   gap: 0.6em;
+}
+.galaxies {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5em;
+}
+.galaxies li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4em 0.9em;
+}
+.galaxies .o8-button {
+  min-width: 13em;
+  text-align: left;
 }
 .wallet-icon {
   width: 1.3em;
