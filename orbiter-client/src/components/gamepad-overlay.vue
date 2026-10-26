@@ -62,15 +62,30 @@ export default {
         this.cursor = state.cursor
       }
     })
-    this.stopFrames = onFrame((now) => {
-      this.controller.poll(now)
-      if (this.active) this.frameCount++
-    }, FRAME_ORDER.render)
+    // Poll only while a controller is connected: browsers announce one (gamepadconnected) once its
+    // first button is pressed, so players without one pay nothing per frame.
+    this.stopFrames = null
+    this.onConnect = () => {
+      this.stopFrames ??= onFrame((now) => {
+        this.controller.poll(now)
+        if (this.active) this.frameCount++
+      }, FRAME_ORDER.render)
+    }
+    this.onDisconnect = () => {
+      if ([...(navigator.getGamepads?.() ?? [])].some(Boolean)) return
+      this.stopFrames?.()
+      this.stopFrames = null
+    }
+    window.addEventListener('gamepadconnected', this.onConnect)
+    window.addEventListener('gamepaddisconnected', this.onDisconnect)
+    if ([...(navigator.getGamepads?.() ?? [])].some(Boolean)) this.onConnect()
     this.onMouseMove = () => this.controller.deactivate()
     window.addEventListener('mousemove', this.onMouseMove)
   },
   unmounted() {
-    this.stopFrames()
+    this.stopFrames?.()
+    window.removeEventListener('gamepadconnected', this.onConnect)
+    window.removeEventListener('gamepaddisconnected', this.onDisconnect)
     window.removeEventListener('mousemove', this.onMouseMove)
   },
   methods: {
