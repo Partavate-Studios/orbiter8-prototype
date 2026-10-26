@@ -649,13 +649,13 @@ Phase 6:
 1. [x] `libs/gamepad/`: pure helpers, with tests.
    - Reading a pad: dead zones, and buttons that went down this frame.
    - Spatial navigation: from a focused rectangle, pick the nearest one in a direction.
-2. [ ] `libs/gamepad/controller.js`, which polls the pad from the frame loop and maps it to game actions:
+2. [x] `libs/gamepad/controller.js`, which polls the pad from the frame loop and maps it to game actions:
    - triggers zoom; past the limit, the zoom-out trigger enters the neighbor view;
    - the left stick pans;
    - the right stick moves a free cursor;
    - the face buttons, bumpers, Start and Select;
    - the D-pad moves a focus ring over the visible clickable things (HUD buttons, menus, cards, HTML buttons), and A clicks it, or clicks whatever is under the cursor if the cursor was used last.
-3. [ ] `components/gamepad-overlay.vue`, mounted in `App.vue`: draws the focus ring and the cursor while a pad is in use, and hides them when the mouse moves.
+3. [x] `components/gamepad-overlay.vue`, mounted in `App.vue`: draws the focus ring and the cursor while a pad is in use, and hides them when the mouse moves.
 4. [ ] Verify with a scripted fake gamepad in the harness (navigator.getGamepads replaced), plus notes.
 
 The original mapping and analysis follow.

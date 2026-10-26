@@ -1,5 +1,6 @@
 <template>
   <svg-defs />
+  <gamepad-overlay />
 
   <div v-if="playerReady" id="app">
     <div v-if="gameDataLoaded">
@@ -20,13 +21,15 @@ import { useGameStateStore } from '@/stores/gamestate'
 import { mapActions, mapState } from 'pinia'
 import NetworkSelect from '@/components/screens/NetworkSelect'
 import SvgDefs from '@/components/svg-defs.vue'
+import GamepadOverlay from '@/components/gamepad-overlay.vue'
 import router from '@/router/router'
 
 export default {
   name: 'Orbiter8Game',
   components: {
     NetworkSelect,
-    SvgDefs
+    SvgDefs,
+    GamepadOverlay
   },
   computed: {
     ...mapState(useChainStore, ['playerReady']),
