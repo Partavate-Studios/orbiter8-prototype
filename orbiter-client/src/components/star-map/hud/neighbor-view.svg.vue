@@ -1,7 +1,8 @@
 <template>
-  <!-- Zoomed out past the heliopause: the current system becomes a star, and its neighbors (one jump
-       away) appear around it. Another way to jump besides the jump menu. Drawn in HUD units,
-       centered where the world's star sits. -->
+  <!-- Zoomed out past the heliopause: the system's heliopause shrinks into a star, its neighbors (one
+       jump away) fly in from beyond the screen edges, and the neighbors of neighbors the player has
+       explored appear as dots further out. Another way to jump besides the jump menu. Drawn in HUD
+       units, centered where the world's star sits. -->
   <g class="neighbor-view">
     <!-- dims the system behind; clicking empty space drops the current choice -->
     <rect
@@ -10,11 +11,11 @@
       :width="rightMostX - leftMostX"
       :height="bottomMostY - topMostY"
       fill="#12052a"
-      :opacity="0.55 * progress"
+      :opacity="0.85 * phase.backdrop"
       @click="choose(null)"
     />
 
-    <g text-anchor="middle" dominant-baseline="middle" :opacity="progress">
+    <g text-anchor="middle" dominant-baseline="middle" :opacity="phase.neighbors">
       <text x="0" :y="topMostY + 60" fill="#ffffffcc" font-size="1.4em">Neighboring Stars</text>
       <text x="0" :y="topMostY + 88" fill="#ffffff66" font-size="0.8em">
         Each is one jump away. Scroll in (or press Esc) to return to {{ currentStarSystemName }}.
@@ -22,16 +23,39 @@
     </g>
 
     <g :transform="'translate(0 ' + CENTER_Y + ')'">
-      <!-- faint routes to every neighbor; the chosen one is drawn bright and animated below -->
+      <!-- second ring: explored neighbors' neighbors, and paths back to here -->
+      <path
+        v-for="star in returnPaths"
+        :key="'back-' + star.id"
+        :d="routeBack(star)"
+        fill="none"
+        stroke="#c3b3da"
+        stroke-width="1"
+        stroke-dasharray="1 5"
+        stroke-linecap="round"
+        :opacity="0.45 * phase.outer"
+      />
+      <circle
+        v-for="dot in outerDots"
+        :key="'outer-' + dot.id"
+        :cx="dot.x"
+        :cy="dot.y"
+        r="3"
+        fill="#8e7aaa"
+        :opacity="0.8 * phase.outer"
+      />
+
+      <!-- routes to the neighbors: faint, brighter on hover, animated for the chosen one -->
       <path
         v-for="star in stars"
         :key="'route-' + star.id"
         :d="routeTo(star)"
         fill="none"
-        stroke="#c3b3da"
-        stroke-width="1"
+        :stroke="star.id === hoveredId ? '#ffffff' : '#c3b3da'"
+        :stroke-width="star.id === hoveredId ? 1.6 : 1"
         stroke-dasharray="2 6"
-        :opacity="0.25 * progress"
+        stroke-linecap="round"
+        :opacity="(star.id === hoveredId ? 0.9 : 0.25) * phase.outer"
       />
       <path
         v-if="chosen"
@@ -44,36 +68,65 @@
         stroke-linecap="round"
       />
 
-      <!-- this system, shrunk to a star -->
-      <circle cx="0" cy="0" :r="centerRadius * 2.2" fill="url(#glowingGradient)" />
-      <circle cx="0" cy="0" :r="centerRadius" fill="url(#starGradient)" stroke="#ffffffaa" stroke-width="1.5" />
-      <text x="0" :y="centerRadius + 22" text-anchor="middle" fill="#ffffffcc" font-size="0.9em">
-        {{ currentStarSystemName }}
-      </text>
+      <!-- this system: its heliopause, shrinking into a star -->
+      <g :transform="'translate(' + center.x + ' ' + center.y + ')'">
+        <circle cx="0" cy="0" :r="center.radius * 2.2" fill="url(#glowingGradient)" :opacity="phase.morph" />
+        <circle
+          cx="0"
+          cy="0"
+          :r="center.radius"
+          fill="url(#starGradient)"
+          :fill-opacity="phase.morph"
+          stroke="#ffffff"
+          :stroke-width="1 + phase.morph * 0.5"
+          :stroke-opacity="1 - 0.4 * phase.morph"
+        />
+        <text
+          x="0"
+          :y="center.radius + 22"
+          text-anchor="middle"
+          fill="#ffffffcc"
+          font-size="0.9em"
+          :opacity="phase.morph"
+        >
+          {{ currentStarSystemName }}
+        </text>
+      </g>
 
       <g v-for="star in stars" :key="'star-' + star.id" :transform="'translate(' + star.x + ' ' + star.y + ')'">
-        <a cursor="pointer" @click.prevent="choose(star)">
+        <a
+          cursor="pointer"
+          @click.prevent="choose(star)"
+          @mouseover="hoveredId = star.id"
+          @mouseleave="hoveredId = null"
+        >
           <circle cx="0" cy="0" r="34" fill="#ffffff00" />
-          <circle cx="0" cy="0" :r="star.visited ? 26 : 20" fill="url(#glowingGradient)" :opacity="progress" />
           <circle
             cx="0"
             cy="0"
-            :r="star.visited ? 11 : 8"
+            :r="(star.visited ? 26 : 20) * (star.id === hoveredId ? 1.5 : 1)"
+            fill="url(#glowingGradient)"
+            :opacity="phase.neighbors"
+          />
+          <circle
+            cx="0"
+            cy="0"
+            :r="(star.visited ? 11 : 8) * (star.id === hoveredId ? 1.25 : 1)"
             :fill="star.visited ? '#e5cfff' : '#8e7aaa'"
-            :stroke="chosen && chosen.id === star.id ? '#ffffff' : 'none'"
+            :stroke="star.id === hoveredId || (chosen && chosen.id === star.id) ? '#ffffff' : 'none'"
             stroke-width="2"
-            :opacity="progress"
+            :opacity="phase.neighbors"
           />
           <text
             x="0"
             y="30"
             text-anchor="middle"
-            :fill="star.visited ? '#ffffffdd' : '#ffffff77'"
+            :fill="star.id === hoveredId ? '#ffffff' : star.visited ? '#ffffffdd' : '#ffffff77'"
             font-size="0.8em"
-            :opacity="progress"
+            :opacity="phase.neighbors"
             >{{ star.visited ? star.name : 'Unexplored' }}</text
           >
-          <text x="0" y="46" text-anchor="middle" fill="#ffffff55" font-size="0.6em" :opacity="progress">
+          <text x="0" y="46" text-anchor="middle" fill="#ffffff55" font-size="0.6em" :opacity="phase.neighbors">
             #{{ star.id }}
           </text>
         </a>
@@ -97,18 +150,29 @@
 
 <script>
 import { mapActions, mapState } from 'pinia'
+import { game } from '@/sdk/client'
 import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
 import { useGameStateStore } from '@/stores/gamestate'
-import { layoutNeighbors, pointAt, arcPath } from '@/sdk/game/neighbor-layout'
+import { layoutNeighbors, layoutOuterRing, pointAt, arcPath } from '@/sdk/game/neighbor-layout'
 import MenuButton from './menus/menu-button.svg'
 
 // The world's star sits this far above the HUD's center (WORLD_OFFSET_Y in group units).
 const CENTER_Y = -100
-// How long the neighbors take to slide out from the center.
-const ENTER_MS = 600
+// The heliopause's radius in world units (guides-canvas.vue draws it).
+const HELIOPAUSE_RADIUS = 5000
+// The star the heliopause shrinks into, in HUD units.
+const STAR_RADIUS = 7
+// The whole entrance; each part runs in its own slice of it (see `phase`).
+const ENTER_MS = 1300
+// Where the neighbors start, in ring radii: beyond the screen edges.
+const FLY_IN_FROM = 3.2
 // The contract's name for a star nobody has visited yet.
 const UNEXPLORED = 'Unexplored Star'
+
+const clamp01 = (value) => Math.min(1, Math.max(0, value))
+const easeOut = (value) => 1 - Math.pow(1 - value, 3)
+const lerp = (from, to, t) => from + (to - from) * t
 
 export default {
   name: 'NeighborView',
@@ -118,44 +182,87 @@ export default {
   data() {
     return {
       CENTER_Y,
-      // 0 → 1 while the view opens
+      // 0 → 1 over the entrance
       progress: 0,
-      chosenId: null
+      chosenId: null,
+      hoveredId: null,
+      // Where the heliopause was on screen when the view opened (set on mount).
+      start: { x: 0, y: 0, radius: 60 },
+      // Neighbor lists the player has explored, read once when the view opens.
+      explored: null
     }
   },
   computed: {
-    ...mapState(useStarMapStore, ['neighbors', 'currentStarSystemName']),
-    ...mapState(useUIStore, ['leftMostX', 'rightMostX', 'topMostY', 'bottomMostY']),
-    /** Room for the ring of stars, measured from the star: clear of the title above, the choice below. */
+    ...mapState(useStarMapStore, ['neighbors', 'currentStarSystemId', 'currentStarSystemName']),
+    ...mapState(useUIStore, ['leftMostX', 'rightMostX', 'topMostY', 'bottomMostY', 'viewport']),
+    /** Each part of the entrance, 0 → 1 in its own slice of the timeline. */
+    phase() {
+      const t = this.progress
+      const slice = (from, to) => easeOut(clamp01((t - from) / (to - from)))
+      return { backdrop: slice(0, 0.35), morph: slice(0, 0.5), neighbors: slice(0.25, 0.8), outer: slice(0.55, 1) }
+    },
+    /** The heliopause becoming the star: from its size and place on screen to a small star at the center. */
+    center() {
+      const t = this.phase.morph
+      return {
+        x: lerp(this.start.x, 0, t),
+        y: lerp(this.start.y, 0, t),
+        radius: lerp(this.start.radius, STAR_RADIUS, t)
+      }
+    },
+    neighborList() {
+      return Object.values(this.neighbors ?? {}).filter((neighbor) => Number(neighbor.id) > 0)
+    },
+    angles() {
+      return layoutNeighbors(this.neighborList.map((neighbor) => neighbor.id))
+    },
+    /** The second ring, in ring radii (see layoutOuterRing). */
+    outerRing() {
+      const explored = this.explored
+      return layoutOuterRing({
+        currentId: this.currentStarSystemId,
+        angles: this.angles,
+        neighborsOf: (id) => explored?.neighborsOf(id) ?? null
+      })
+    },
+    /** Room for the rings, measured from the star: clear of the title above and the choice below. */
     ringRadius() {
       const sideRoom = (this.rightMostX - this.leftMostX) / 2 - 90
       const roomAbove = CENTER_Y - this.topMostY - 140 // title and hint, plus a star's label
       const roomBelow = this.bottomMostY - CENTER_Y - 250 // a star's label, then the Jump / Cancel row
-      return Math.max(120, Math.min(sideRoom, roomAbove, roomBelow))
-    },
-    /** The system grows from its size at full zoom-out into a star. */
-    centerRadius() {
-      return 8 + 10 * this.progress
+      const room = Math.min(sideRoom, roomAbove, roomBelow)
+      // Leave space outside the first ring for the second, if there is one.
+      const extent = Math.max(1, ...this.outerRing.dots.map((dot) => Math.hypot(dot.x, dot.y) + 0.06))
+      return Math.max(90, room / extent)
     },
     stars() {
-      const list = Object.values(this.neighbors ?? {}).filter((neighbor) => Number(neighbor.id) > 0)
-      const angles = layoutNeighbors(list.map((neighbor) => neighbor.id))
-      const distance = this.ringRadius * (0.15 + 0.85 * this.progress)
-      return list.map((neighbor) => {
-        const { x, y } = pointAt(angles.get(String(neighbor.id)), distance)
+      const distance = this.ringRadius * lerp(FLY_IN_FROM, 1, this.phase.neighbors)
+      return this.neighborList.map((neighbor) => {
+        const { x, y } = pointAt(this.angles.get(String(neighbor.id)), distance)
         return { id: Number(neighbor.id), name: neighbor.name, visited: neighbor.name !== UNEXPLORED, x, y }
       })
+    },
+    outerDots() {
+      const scale = this.ringRadius * lerp(1.6, 1, this.phase.outer)
+      return this.outerRing.dots.map((dot) => ({ id: dot.id, x: dot.x * scale, y: dot.y * scale }))
+    },
+    returnPaths() {
+      const returning = new Set(this.outerRing.returns)
+      return this.stars.filter((star) => returning.has(star.id))
     },
     chosen() {
       return this.stars.find((star) => star.id === this.chosenId) ?? null
     }
   },
   mounted() {
-    const start = performance.now()
+    // The world's star (and its heliopause) sits at the camera offset, scaled down by the zoom.
+    const { x, y, scale } = this.viewport
+    this.start = { x: x / scale, y: y / scale, radius: HELIOPAUSE_RADIUS / scale }
+    this.explored = game.explored()
+    const begin = performance.now()
     const step = (now) => {
-      const t = Math.min(1, (now - start) / ENTER_MS)
-      this.progress = 1 - Math.pow(1 - t, 3) // ease out
-      if (t < 1) this.frame = requestAnimationFrame(step)
+      this.progress = clamp01((now - begin) / ENTER_MS)
+      if (this.progress < 1) this.frame = requestAnimationFrame(step)
     }
     this.frame = requestAnimationFrame(step)
   },
@@ -165,12 +272,25 @@ export default {
   methods: {
     ...mapActions(useUIStore, ['exitNeighborView']),
     ...mapActions(useGameStateStore, ['moveToSystem']),
-    /** The route from this star to a neighbor: it leaves the star's edge and bows to one side. */
-    routeTo(star) {
+    /** Where a straight line from the center to a star leaves the center star and reaches the other. */
+    ends(star, startGap, endGap) {
       const length = Math.hypot(star.x, star.y) || 1
-      const start = { x: (star.x / length) * (this.centerRadius + 6), y: (star.y / length) * (this.centerRadius + 6) }
-      const end = { x: star.x - (star.x / length) * 16, y: star.y - (star.y / length) * 16 }
-      return arcPath(start, end)
+      const ux = star.x / length
+      const uy = star.y / length
+      return {
+        near: { x: ux * (this.center.radius + startGap), y: uy * (this.center.radius + startGap) },
+        far: { x: star.x - ux * endGap, y: star.y - uy * endGap }
+      }
+    },
+    /** The route out to a neighbor: it leaves this star and bows to one side. */
+    routeTo(star) {
+      const { near, far } = this.ends(star, 6, 16)
+      return arcPath(near, far)
+    },
+    /** The path back from a neighbor that leads here: drawn the other way, so it bows to the other side. */
+    routeBack(star) {
+      const { near, far } = this.ends(star, 6, 16)
+      return arcPath(far, near)
     },
     choose(star) {
       if (star) this.o8audio.playEffect('click')

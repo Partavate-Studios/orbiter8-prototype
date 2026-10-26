@@ -36,7 +36,14 @@ const MARGIN = 128
 export default {
   name: 'GuidesCanvas',
   computed: {
-    ...mapState(useUIStore, ['viewport', 'screenSize', 'groupPixels', 'selected', 'jumpAnimationState']),
+    ...mapState(useUIStore, [
+      'viewport',
+      'screenSize',
+      'groupPixels',
+      'selected',
+      'jumpAnimationState',
+      'neighborView'
+    ]),
     ...mapState(useStarMapStore, ['systemObjects', 'mapDataLoaded']),
     ...mapState(useConfigStore, ['graphicsQuality']),
     oversizedBox() {
@@ -84,7 +91,8 @@ export default {
         drawn.scale === scale &&
         drawn.selected === this.selected &&
         drawn.quality === this.graphicsQuality &&
-        drawn.objects === this.systemObjects
+        drawn.objects === this.systemObjects &&
+        drawn.neighborView === this.neighborView
       if (sameScene) {
         const dpr = window.devicePixelRatio || 1
         const pixels = this.groupPixels / scale
@@ -108,7 +116,15 @@ export default {
       const pixels = this.groupPixels / scale // per world unit
       const x = Math.round(this.viewport.x * pixels * dpr) / (pixels * dpr)
       const y = Math.round(this.viewport.y * pixels * dpr) / (pixels * dpr)
-      this.drawn = { x, y, scale, selected: this.selected, quality: this.graphicsQuality, objects: this.systemObjects }
+      this.drawn = {
+        x,
+        y,
+        scale,
+        selected: this.selected,
+        quality: this.graphicsQuality,
+        objects: this.systemObjects,
+        neighborView: this.neighborView
+      }
       const ctx = this.$refs.canvas.getContext('2d')
       ctx.setTransform(1, 0, 0, 1, 0, 0)
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
@@ -127,7 +143,8 @@ export default {
 
       if (this.graphicsQuality > 1) this.drawGlow(ctx)
       this.drawGrid(ctx, scale, view)
-      this.drawHeliopause(ctx)
+      // In the neighbor view, the heliopause becomes that view's star (neighbor-view.svg.vue).
+      if (!this.neighborView) this.drawHeliopause(ctx)
       this.drawStarOrbits(ctx, pixels)
     },
     drawGlow(ctx) {

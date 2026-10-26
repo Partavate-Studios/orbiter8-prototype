@@ -748,6 +748,8 @@ Notes: the browser only reveals a gamepad after a button is pressed on the page.
 
 **Round 2 (Koda, 2026-10-25), in progress. Each step is its own commit; tick it off here when it lands:**
 1. [x] **Remember explored systems.** `sdk/explored.js` records each visited system's neighbor list, per network, in localStorage. The contracts can't list other systems' neighbors (`getSystemData` is internal), so the outer ring can only show neighbors the player has visited.
+   - **Koda (2026-10-25):** a client-side memory isn't a long-term answer, since it keeps growing. His new star-creation algorithm tracks physical positions in space, and that, with the next contracts, should replace this. Keep it for now, and pull it if it causes problems.
+   - Capped at the 1,000 most recently visited systems (about 60 KB).
 2. [ ] **The entrance animation:**
    - The heliopause becomes the star: it starts at the heliopause's on-screen size and position, then shrinks and moves to the center. The real heliopause on the guides canvas is hidden while the view is open.
    - The neighbors fly in from beyond the screen edges instead of bursting out of the center.
