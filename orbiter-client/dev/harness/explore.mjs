@@ -25,6 +25,8 @@ if (process.env.INJECT !== '0') {
   if (process.env.RPC) await page.evaluateOnNewDocument(`window.__TEST_RPC = '${process.env.RPC}'`)
   await page.evaluateOnNewDocument(providerSrc)
 }
+// PRELOAD=<file>: a script injected before the page's own (e.g. fake-gamepad.js).
+if (process.env.PRELOAD) await page.evaluateOnNewDocument(fs.readFileSync(process.env.PRELOAD, 'utf8'))
 const logs = []
 page.on('console', (m) => logs.push(`[${m.type()}] ${m.text()}`))
 page.on('pageerror', (e) => logs.push(`[pageerror] ${e.message}\n${e.stack}`))

@@ -17,8 +17,9 @@ import { useStarMapStore } from '@/stores/starmap'
 
 // Left-stick panning at full tilt, in screen pixels per second.
 const PAN_SPEED = 900
-// Trigger zoom at full pressure: the scale changes by e^ZOOM_RATE per second (about 7x).
-const ZOOM_RATE = 2
+// Trigger zoom at full pressure: the scale changes by e^ZOOM_RATE per second (about 20x), so a full
+// pull crosses the whole zoom range in about three seconds.
+const ZOOM_RATE = 3
 // Padding around the focused element's outline, in pixels.
 const RING_PADDING = 6
 

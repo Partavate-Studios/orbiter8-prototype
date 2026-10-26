@@ -635,7 +635,7 @@ Phase 6:
 
 ## Feature to-dos (Koda, 2026-10-25; next up after Phase 6b and 7)
 
-### 1. Gamepad support (in progress, started 2026-10-25)
+### 1. Gamepad support (done 2026-10-25; first version)
 
 **Koda said "let's do the gamepad support" without picking options, so the first version uses the suggested defaults:**
 - The mapping in the table below, including the *(suggested)* rows.
@@ -656,7 +656,18 @@ Phase 6:
    - the face buttons, bumpers, Start and Select;
    - the D-pad moves a focus ring over the visible clickable things (HUD buttons, menus, cards, HTML buttons), and A clicks it, or clicks whatever is under the cursor if the cursor was used last.
 3. [x] `components/gamepad-overlay.vue`, mounted in `App.vue`: draws the focus ring and the cursor while a pad is in use, and hides them when the mouse moves.
-4. [ ] Verify with a scripted fake gamepad in the harness (navigator.getGamepads replaced), plus notes.
+4. [x] Verify with a scripted fake gamepad in the harness (navigator.getGamepads replaced), plus notes. All of these were checked through the real app with `dev/harness/fake-gamepad.js` (`PRELOAD=`):
+   - R1/L1 step through planets; Start selects your ship; Y, X and Select open their menus; B backs out of each;
+   - the D-pad shows the focus ring, and A clicks the focused element (a planet row in the planets menu);
+   - R2 zooms in; holding L2 reaches the zoom limit, and pressing it again there opens the neighbor view; R2 closes it;
+   - the left stick pans and lets go of the selection; the right stick shows the cursor;
+   - moving the mouse hides the overlay.
+
+**Follow-ups:**
+- suggested names and preset chat messages, so a controller can name things and talk;
+- button glyphs on screen while a pad is in use;
+- rumble;
+- a test with Koda's real controllers in Chrome and Firefox (Firefox reports the standard mapping for fewer controllers).
 
 The original mapping and analysis follow.
 
