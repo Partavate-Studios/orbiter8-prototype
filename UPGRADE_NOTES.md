@@ -956,6 +956,7 @@ Order (from the walkthrough's list). Tick each when it lands:
    - **Wallet:** a silent check for returning players (`eth_accounts`); plain messages for 4001 and -32002; a phone link into MetaMask's own browser.
    - **Transactions:** pending callsign and ship transactions are remembered across reloads; a replaced transaction counts as success; failures come back as a reason.
    - **SDK:** `listCallsigns()` reads every callsign once (`getAvatarCount` + `getAvatarNameById`, batched), so the "taken" check costs nothing per keystroke. It's a hint only: the contracts allow duplicates.
+     - **Works today, not at scale** (Koda): the player count has no limit. It only loads while there are 2,000 callsigns or fewer; above that the hint is skipped. The real fix is a contract lookup (see the contract wish list).
 6. [ ] **The wizard steps,** in Minerva's panel with step dots and a way back to the title:
    - **Wallet** and **Network**, including the funds gate with faucets, which moves on by itself when funds arrive.
    - **Callsign:** a real text box, the pilot card filling in as you type, trimmed to 1–24 characters, and "already taken" shown as you type.
@@ -984,6 +985,10 @@ Order (from the walkthrough's list). Tick each when it lands:
 - Access control on the admin setters (see Bugs, "Found, not fixed").
 - A public `getSystemData(id)` (or `getSystemNeighbors(id)`), for the neighbor-star view's outer ring and a "systems discovered" leaderboard column.
 - Named return values in the ABI, so tuples decode by name. The client's `sdk/chain/decode.js` is the only place that would change.
+- **Design for any number of players** (Koda, 2026-10-25: the game can have as many players as Ethereum has users). Anything the client gets by reading *every* player stops working as the game grows:
+  - **Callsigns:** a name lookup (`isCallsignTaken(name)`, or a name → owner mapping that also enforces uniqueness). Today the contracts allow duplicates and empty or very long names, and the client can only check by reading every callsign.
+  - **The leaderboard:** it reads every ship and its owner's holdings. It needs either events plus an indexer (a subgraph or similar), or on-chain running totals the client can page through (top N).
+  - Name rules on chain: a length limit, at least.
 
 ## Proposed refactors (bigger than a day; not started)
 
