@@ -76,13 +76,18 @@ export const useGameStateStore = defineStore('GameState', {
      * Resolves true if the jump went through.
      */
     async moveToSystem(system) {
+      const ui = useUIStore()
+      ui.jumpPending = true
       try {
         await game.actions.moveTo(system)
       } catch (error) {
+        ui.jumpPending = false
         console.error('Jump failed:', error.shortMessage ?? error.message)
         return false
       }
-      useUIStore().jumpAnimationOn()
+      // The block watcher may have loaded the new system already (it can notice the move before the
+      // transaction reports back); then the arrival has played the animation (StarMap importSystem).
+      if (ui.jumpPending) ui.jumpAnimationOn()
       return true
     },
     async sendChat(message) {

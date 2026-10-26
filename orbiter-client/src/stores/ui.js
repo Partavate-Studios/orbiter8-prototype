@@ -73,7 +73,9 @@ export const useUIStore = defineStore('UI', {
     // Whether the neighbor-star view is showing (zoomed out past the heliopause; see neighbor-view.svg.vue).
     neighborView: false,
     // Zooming out toward the neighbor view (zoomOutToNeighbors); it opens when the zoom arrives.
-    neighborViewPending: false
+    neighborViewPending: false,
+    // A jump's transaction has been sent and the new system hasn't loaded yet (GameState moveToSystem).
+    jumpPending: false
   }),
   getters: {
     /** Screen pixels per map-group unit, before the camera's zoom. */

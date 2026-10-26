@@ -746,17 +746,22 @@ Notes: the browser only reveals a gamepad after a button is pressed on the page.
 
 ### 2. Heliopause → neighbor-star view (done 2026-10-25)
 
-**Round 3 (Koda, 2026-10-25), in progress. Each step is its own commit; tick it off here when it lands:**
+**Round 3 (Koda, 2026-10-25), done. Each step is its own commit; tick it off here when it lands:**
 1. [x] **The top-right button:**
    - It shows a plain star until the star is selected; clicking it selects the star, and it becomes the star-nav icon.
    - Clicking the star-nav icon zooms all the way out into the neighbor view, as if scrolling out.
    - The old ring menu around the sun goes. Everything that opened it (the card's jump buttons, the gamepad's X) opens the neighbor view instead.
-2. [ ] **An Orbiter 8 ship in the neighbor view:** it pops out from behind the sun as the stars arrive, then orbits at a modest speed, passing behind and in front of the star. The center star gets slightly larger.
-3. [ ] **The jump only plays once the move is on chain:**
+2. [x] **An Orbiter 8 ship in the neighbor view:** it pops out from behind the sun as the stars arrive, then orbits at a modest speed, passing behind and in front of the star. The center star gets slightly larger.
+3. [x] **The jump only plays once the move is on chain:**
    - After Jump, the view stays open while the wallet and transaction are pending, with the ship circling the sun fast, getting ready to jump.
    - The jump animation starts once the transaction is mined.
    - A rejected or failed jump returns to the choice with a message.
-4. [ ] **Verify.**
+4. [x] **Verify.** Checked on the local chain with automatic mining off, so the jump stayed pending:
+   - the view stayed open, with "Preparing to jump…" and the ship racing;
+   - after the block was mined, the jump animation played once the transaction reported back (ethers checks for receipts every few seconds);
+   - it then ended in the new system.
+
+   If the block watcher loads the new system first, the arrival plays the animation itself (StarMap `importSystem`), so the two can't fight. The animation always plays at least 2.5 s.
 
 **Round 2 (Koda, 2026-10-25), done.** The rings settle mid-screen and stretch sideways on wide screens. Verified at 1440×900 and 2000×840.
 

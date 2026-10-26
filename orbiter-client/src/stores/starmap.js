@@ -59,11 +59,18 @@ export const useStarMapStore = defineStore('StarMap', {
     /** Takes in a freshly loaded star system (sdk/load.js loadSystem) from the game client. */
     importSystem(system, playerAccount) {
       const isNewSystem = system.id != this.starId
+      const ui = useUIStore()
+      // Arrived before the jump's transaction reported back: play the jump animation now (briefly).
+      if (isNewSystem && ui.jumpPending) {
+        ui.jumpPending = false
+        if (!ui.jumpAnimationState) ui.jumpAnimationOn()
+      }
       this.loadProgress = 99
       this.importStarMapBlockData({ blockData: system, playerAccount })
       this.loadProgress = 100
       if (isNewSystem) {
-        useUIStore().jumpAnimationOff()
+        // Ends once it has played its minimum time (ui jumpAnimationOff).
+        ui.jumpAnimationOff()
       }
     },
     /** Advances gameTime to now, once per tick. Orbits are computed from it. */

@@ -190,8 +190,8 @@ const ENTER_MS = 1300
 const FLY_IN_FROM = 3.2
 // The ship's orbit around the center star: a tilted ellipse (its depth decides which side of the
 // star it's drawn on), one lap every ORBIT_SECONDS, or RACING_ORBIT_SECONDS while a jump is pending.
-const SHIP_SCALE = 0.85
-const ORBIT_GAP = 24
+const SHIP_SCALE = 1.7
+const ORBIT_GAP = 34
 const ORBIT_TILT = 0.32
 const ORBIT_SECONDS = 7
 const RACING_ORBIT_SECONDS = 0.9
