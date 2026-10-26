@@ -118,9 +118,9 @@ export default {
       }
       // With one wallet (or the one used last time), connecting is the obvious next move: the click
       // that opens the wizard also opens the wallet's approval window.
-      if (this.walletStatus === 'idle' || this.walletStatus === 'error') {
+      if (this.walletStatus === 'idle') {
         const wallet = this.defaultWallet()
-        if (wallet && this.walletStatus === 'idle') this.chooseWallet(wallet)
+        if (wallet) this.chooseWallet(wallet)
       }
       this.openWizard()
     },
