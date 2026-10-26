@@ -114,6 +114,7 @@ export default {
     /** Minerva's introduction has been read (callsign). */
     introDone: { type: Boolean, default: false }
   },
+  emits: ['blocked'],
   data() {
     return { name: '', slow: false, NAME_MAX_LENGTH, inputId: 'register-' + this.kind }
   },
@@ -152,12 +153,18 @@ export default {
       if (failure === 'pending') return 'Your wallet already has a request open: click its icon in the toolbar.'
       return `The registration didn't go through: ${reason}`
     },
-    /** Whether the form can be sent: the wizard's main button reads this. */
-    canSubmit() {
-      return !this.problem
+    /** The name can't be sent as it is (an empty name only focuses the box). */
+    blocked() {
+      return this.problem === 'taken' || this.problem === 'too long'
     }
   },
   watch: {
+    blocked: {
+      immediate: true,
+      handler(blocked) {
+        this.$emit('blocked', blocked)
+      }
+    },
     'registration.status': {
       immediate: true,
       handler(status) {

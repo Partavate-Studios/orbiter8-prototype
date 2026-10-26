@@ -7,6 +7,7 @@
       :key="registerKind"
       :kind="registerKind"
       :intro-done="introDone"
+      @blocked="formBlocked = $event"
     />
     <wizard-connect v-else />
 
@@ -49,7 +50,7 @@ export default {
   name: 'OnboardingWizard',
   components: { MinervaPanel, WizardConnect, WizardRegister },
   data() {
-    return { introDone: false, dots: DOTS }
+    return { introDone: false, formBlocked: false, dots: DOTS }
   },
   computed: {
     ...mapState(useOnboardingStore, ['step', 'wizardStep', 'registration']),
@@ -78,7 +79,7 @@ export default {
       if (this.registerKind) {
         return {
           label: this.registerKind === 'callsign' ? 'File My Registration' : 'Take Off',
-          enabled: true,
+          enabled: !this.formBlocked,
           run: () => this.$refs.register.submit()
         }
       }

@@ -105,6 +105,8 @@ export const useOnboardingStore = defineStore('Onboarding', {
       const pending = game.pendingRegistration()
       if (!pending) return
       this.registration = { ...pending, status: 'sent', reason: null, failure: null }
+      // Back where the player left off: watching the registration go through.
+      this.openWizard()
       try {
         await game.resumeRegistration()
         this.registration = { ...this.registration, status: 'done' }
