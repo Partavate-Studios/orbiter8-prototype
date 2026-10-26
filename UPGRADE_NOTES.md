@@ -892,6 +892,56 @@ Order (from the walkthrough's list). Tick each when it lands:
 6. [ ] **UI scale setting.**
 7. [ ] **Later ideas:** the About storyboard and the cockpit window.
 
+**Step 1 decisions so far (Koda, 2026-10-25):**
+- **Enterprise Circuit's title screen replaces the preflight checklist as the first screen.** Onboarding becomes a wizard, one step at a time.
+- **Keep everything useful from the old checklist.** Each item gets a place in the new flow; see the inventory in the step 1 plan, once written.
+- **The dev links on its title (Window, Portal, Tween, Assets, Ships) don't come over.** They were Koda's exploration screens.
+- **The animation may be simplified.** It's rebuilt cheaply: CSS transforms on their own layers instead of 44 SMIL animations repainting the whole SVG (about 0.5 s of raster per 5 s at 1440×900, measured).
+- **The station scene is a favorite.** Ships of various sizes are docked around the station, with shuttles (the small dots) going between the ships and the station.
+- **Version number:** 3 for demo 3, 2 for the rebuilt client, and .X for each distributed build (e.g. 3.2.0).
+- **The dark band behind the title menu** is there for contrast with the menu (Koda took it from another design he liked). Keep that purpose.
+- **Emphasize the station.** Ship types are variations within one class: like a Klingon Bird of Prey beside the Enterprise, close in size, not wildly different.
+- **"Swap on Sushi" is hidden for now.** Sushi's UI no longer supports testnets. Uniswap does, but has no Credits pool. The feature is kept as an idea for a real launch (see "Ideas for later").
+- **The wizard outline is right:** title → wallet → network (only if needed) → callsign → ship → take command. The input fields can change to whatever works best.
+
+**Step 1: every wallet and game state the wizard has to handle.** ✓ = handled today, ✗ = not handled (or handled badly), ~ = partly.
+
+| | State | Today | In the wizard |
+| --- | --- | --- | --- |
+| Wallet | No wallet installed (desktop) | ✓ "install MetaMask, then reload" | Same, on the wallet step. |
+| | No wallet on a phone (no extension) | ✗ same desktop message | Offer to open the game in MetaMask's in-app browser (a deep link). WalletConnect would be a bigger, later job. |
+| | One wallet | ✓ connects automatically | Same. |
+| | Several wallets | ✓ picker, remembered | Same, styled as a step. |
+| | Returning player, already authorized | ~ asks for accounts at once (no popup if MetaMask already trusts the site) | Check silently first (`eth_accounts`), so the title can say **Continue** straight away. Ask only on a click. |
+| | Popup open, waiting | ✓ "approve in its popup" | Same. |
+| | Popup dismissed or rejected (4001) | ~ generic error, retry | Say plainly "You closed the wallet's request", with a Try again button. |
+| | Request already pending (-32002) | ✗ generic error | "Your wallet already has a request open: click its icon in the toolbar." |
+| | Wallet locked or no accounts | ✓ message | Same. |
+| | Account or network changed mid-flow | ~ page reloads | Keep the reload; the wizard resumes at the right step because it's derived from the chain. |
+| | Site disconnected in the wallet | ~ reload | Back to the title with Connect. |
+| Network | On a supported network | ✓ | Skip this step. |
+| | On another network | ✓ warning and chips | The network step: one button per network; Sepolia first for players, Local in dev. |
+| | Wallet doesn't know the network (4902) | ✓ adds it | Same, without `alert()`. |
+| | Switch or add rejected or failed | ~ `alert()` | An inline message with retry. |
+| | RPC or contracts unreachable | ~ "Contracts not found, try reloading" | A Retry button, not a reload. |
+| Funds | Zero balance | ~ "low balance warning" | **Blocks the next step**, shows the faucets, and moves on by itself once funds arrive. Every later step needs gas. |
+| | Low balance | ✓ warning | Same. |
+| Game | Loading game data | ✓ "...loading" | A loading state on the title button. |
+| | No callsign / no ship / ready | ✓ | Begin, Launch, Continue. |
+| Transactions (callsign and ship, same for both) | Waiting for the wallet | ~ | "Confirm in your wallet". |
+| | **Rejected or failed** | **✗ stuck: the error is only logged and the screen never moves on** | Back to the form with the reason; the typed name is kept. |
+| | Sent, waiting to be mined | ~ | "Transmitting…" with an explorer link to the transaction; reassurance if it's slow. |
+| | Reverted (e.g. "You already have an avatar." from a second tab) | ✗ | Show the reason; re-read the chain and move on if the avatar exists. |
+| | Replaced (sped up in the wallet) | ✗ | ethers reports it: treat a repriced replacement as success. |
+| | Page reloaded or closed while pending | ✗ the form shows again, and a resubmit reverts | Remember the pending transaction (localStorage) and resume "Transmitting…". |
+| Names | Empty, spaces only, very long, emoji | ~ only empty is refused, by `alert()` | Trim it, 1–24 characters, a live preview on the pilot card, and an inline hint. **The contracts accept any string and don't make callsigns unique.** That's for the contract wish list. |
+| Audio | Music before any click | n/a (Play was the first click) | **The first click on the title starts the music**, whatever the button is. |
+| Motion | Reduced motion | ✗ | The title animation holds still. |
+
+**Ideas for later (Koda, 2026-10-25):**
+- **Shuttle traffic at in-game stations,** especially when selected. Eventually the docked ships would be the players who recently traded there, with shuttles in proportion. Koda wants this kind of living detail in many places.
+- **A Credits swap.** Where to put a pool depends on the launch network. Decide it with the launch.
+
 ## Contract wish list (next contracts iteration)
 
 - Events for every game action (claim, build station, jump, rename, trade…), so the client can update from events instead of reloading.
