@@ -53,7 +53,7 @@ import MenuContainer from './menu-container/_menu-container.svg'
 import ShipSlot from './menu-slot-ship'
 
 export default {
-  name: 'PlanetsMenu',
+  name: 'ShipsMenu',
   components: {
     MenuContainer,
     ShipSlot
