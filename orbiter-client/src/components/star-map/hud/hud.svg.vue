@@ -65,6 +65,11 @@
         </a>
       </g>
 
+      <minimap
+        v-if="mapDataLoaded && !neighborView"
+        :transform="'translate(' + (rightMostX - 70) + ' ' + (topMostY + 160) + ')'"
+      />
+
       <g :transform="'translate(' + (rightMostX - 50) + ' ' + (topMostY + 50) + ')'">
         <!-- A star until the star is selected; then the star-nav icon, which zooms out to its neighbors. -->
         <a cursor="pointer" @click.prevent="selectStar()">
@@ -210,6 +215,7 @@ import GearIcon from './icons/gear-icon.svg'
 import InfoIcon from './icons/info-icon.svg'
 import JumpIcon from './icons/jump-icon.svg'
 import StarIcon from './icons/star-icon.svg'
+import Minimap from './minimap.svg'
 import PlanetsIcon from './icons/planets-icon.svg'
 import ShipsIcon from './icons/ships-icon.svg'
 import SpeakerIcon from './icons/speaker-icon.svg'
@@ -234,6 +240,7 @@ export default {
     InfoIcon,
     JumpIcon,
     StarIcon,
+    Minimap,
     PlanetsIcon,
     PlanetsMenu,
     SettingsMenu,
@@ -263,9 +270,10 @@ export default {
       'bottomMostY',
       'menuState',
       'isMenuOn',
-      'viewRatio'
+      'viewRatio',
+      'neighborView'
     ]),
-    ...mapState(useStarMapStore, ['myShipId', 'spriteIds']),
+    ...mapState(useStarMapStore, ['myShipId', 'spriteIds', 'mapDataLoaded']),
     ...mapState(useGameStateStore, ['avatar', 'events']),
     profileX() {
       if (this.viewRatio <= 1) {
