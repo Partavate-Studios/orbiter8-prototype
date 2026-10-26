@@ -679,7 +679,24 @@ Other suggestions:
 
 Notes: the browser only reveals a gamepad after a button is pressed on the page. Firefox reports the standard mapping for fewer controllers than Chrome, so test with Koda's controllers early.
 
-### 2. Heliopause → neighbor-star view
+### 2. Heliopause → neighbor-star view (in progress, started 2026-10-25)
+
+**Koda's decisions (2026-10-25):**
+- This is an *additional* way to jump. The existing jump menu stays as it is.
+- Once a destination is picked, a dashed, slightly arced path runs from the current star to it, suggesting a curved route through space.
+
+**Build plan** (each step is its own commit; tick it off here when it lands):
+1. [ ] `sdk/game/neighbor-layout.js`: place each neighbor at an angle derived from its id (golden-angle hash), spread out any that overlap, and build the arced path. Pure functions, with tests.
+2. [ ] UI store: `neighborView` state and `enterNeighborView()` / `exitNeighborView()`. Wheeling out while already at the camera's zoom-out limit enters it; wheeling in, Escape, or clicking empty space leaves it.
+3. [ ] `hud/neighbor-view.svg.vue`, drawn over the map while active:
+   - the current star in the middle, shrinking in from the heliopause's on-screen size;
+   - the neighbors around it, brighter if visited ("Unexplored Star" is the contract's default name);
+   - clicking one shows the arced dashed path and a card with Jump and Cancel. Jump runs the same `moveToSystem` as the jump menu.
+4. [ ] Verify with screenshots (enter, pick, jump, leave), plus the smoke test.
+
+The original analysis follows.
+
+### 2a. Heliopause → neighbor-star view: original analysis
 
 Zooming out past the system's outermost circle (the heliopause) turns the system smoothly into a single star. The camera keeps pulling back, and the neighboring stars appear around it. Click a neighbor to choose it and jump. This replaces or absorbs the current jump menu.
 
