@@ -746,6 +746,17 @@ Notes: the browser only reveals a gamepad after a button is pressed on the page.
 
 ### 2. Heliopause → neighbor-star view (done 2026-10-25)
 
+**Round 2 (Koda, 2026-10-25), in progress. Each step is its own commit; tick it off here when it lands:**
+1. [ ] **Remember explored systems.** `sdk/explored.js` records each visited system's neighbor list, per network, in localStorage. The contracts can't list other systems' neighbors (`getSystemData` is internal), so the outer ring can only show neighbors the player has visited.
+2. [ ] **The entrance animation:**
+   - The heliopause becomes the star: it starts at the heliopause's on-screen size and position, then shrinks and moves to the center. The real heliopause on the guides canvas is hidden while the view is open.
+   - The neighbors fly in from beyond the screen edges instead of bursting out of the center.
+3. [ ] **Hover on a reachable star:** it glows, and its dotted route brightens.
+4. [ ] **The outer ring:**
+   - Each explored neighbor's own neighbors appear as small dots, under half the size, with no labels, outside the ring. They're grouped near the neighbor they belong to, never on top of each other, and not interactive.
+   - When a neighbor's neighbor is the current system, there's no dot: a second dotted line, curving the opposite way, shows the path back.
+5. [ ] **Verify** with screenshots of the animation frames, hover, and the outer ring after exploring, plus tests.
+
 **Koda's decisions (2026-10-25):**
 - This is an *additional* way to jump. The existing jump menu stays as it is.
 - Once a destination is picked, a dashed, slightly arced path runs from the current star to it, suggesting a curved route through space.
