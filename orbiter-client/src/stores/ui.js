@@ -75,7 +75,9 @@ export const useUIStore = defineStore('UI', {
     // Zooming out toward the neighbor view (zoomOutToNeighbors); it opens when the zoom arrives.
     neighborViewPending: false,
     // A jump's transaction has been sent and the new system hasn't loaded yet (GameState moveToSystem).
-    jumpPending: false
+    jumpPending: false,
+    // A sent jump that failed: { at: ms timestamp, reason }. The jump animation stalls (jump-animation.svg.vue).
+    jumpStall: null
   }),
   getters: {
     /** Screen pixels per map-group unit, before the camera's zoom. */
@@ -391,6 +393,14 @@ export const useUIStore = defineStore('UI', {
       this.viewport.scaleTween.useGeometric()
       this.neighborViewPending = true
     },
+    /** Back from the neighbor view (clicking its star) or a stalled jump: select the star and zoom in to the system. */
+    zoomInToStar() {
+      this.neighborViewPending = false
+      this.neighborView = false
+      this.selectSprite(STAR_KEY)
+      this.viewport.scaleTween = new Tween(this.viewport.scale, CAMERA.ARRIVAL_SYSTEM_SCALE, CAMERA.NEIGHBOR_ZOOM_MS)
+      this.viewport.scaleTween.useGeometric()
+    },
     openMenu(menu) {
       this.hud.menuState.shipsMenu = false
       this.hud.menuState.planetsMenu = false
@@ -443,7 +453,8 @@ export const useUIStore = defineStore('UI', {
     },
     /** Ends the jump animation, but never before it has played for CAMERA.MIN_JUMP_ANIMATION_MS. */
     jumpAnimationOff() {
-      if (!this.hud.jumpAnimationState) return
+      // A stalled jump stays on screen until the player has read why (jumpRecover).
+      if (!this.hud.jumpAnimationState || this.jumpStall) return
       clearTimeout(jumpAnimationTimer)
       const wait = jumpAnimationStartedAt + CAMERA.MIN_JUMP_ANIMATION_MS - Date.now()
       if (wait > 0) {
@@ -452,8 +463,21 @@ export const useUIStore = defineStore('UI', {
       }
       this.hud.jumpAnimationState = false
     },
+    /** A jump that was already under way failed: stall the jump animation and say why. */
+    jumpStalled(reason) {
+      clearTimeout(jumpAnimationTimer)
+      this.jumpStall = { at: Date.now(), reason }
+    },
+    /** The player read the stall message: back to the system, right away. */
+    jumpRecover() {
+      clearTimeout(jumpAnimationTimer)
+      this.jumpStall = null
+      this.hud.jumpAnimationState = false
+      this.zoomInToStar()
+    },
     jumpAnimationOn() {
       jumpAnimationStartedAt = Date.now()
+      this.jumpStall = null
       this.neighborView = false
       this.selectedSprite = null
       this.viewport.x = 0

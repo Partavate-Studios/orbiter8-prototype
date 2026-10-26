@@ -767,6 +767,15 @@ Notes: the browser only reveals a gamepad after a button is pressed on the page.
    - **The jump animation starts when the wallet *sends* the move** (committed), not when it's mined. The contract layer now reports the moment a transaction is sent (`send(…, { onSent })` in `sdk/chain/contracts.js`; `actions.moveTo(id, { onSent })`). "Preparing to jump" only covers the wallet step.
    - **If a sent move then fails,** the animation stops and the player is back in the system; the error is logged.
    - Checked with mining paused: the animation was already playing with the move sent and not yet mined, and it ended on arrival.
+6. [x] **A stalled jump (Koda, 2026-10-25).** If a move was sent and then fails (reverted, dropped or replaced), the jump animation stalls out instead of quietly ending:
+   - The star streaks coast to a stop over 3 s.
+   - The ship's engines cut out, and it falls behind: it spins faster and faster, shrinks, and slides off the left edge in about 2.5 s.
+   - Below the ship, where the travel text was, it says "The jump didn't go through", with the reason. A **Return to {star}** button is there from the first frame, so players who know the screen don't have to wait. The screen stays up until the player clicks the button.
+   - The button zooms back into the system with the star selected.
+   - A move rejected in the wallet never sent anything, so the neighbor view still handles that itself.
+   - Code: `ui.jumpStalled(reason)` and `ui.jumpRecover()`, the `stall` computed in `jump-animation.svg.vue`, and the streak speed in `background-canvas.vue`.
+   - Checked with the harness by triggering a stall from the store: the frames show the slide, and the button.
+7. [x] **Clicking the center star closes the neighbor view (Koda, 2026-10-25).** It zooms back in and selects the star (`ui.zoomInToStar()`, also used by the stall's Return button). It's ignored while a jump waits on the wallet. The subtitle now reads "Click {star} or scroll in to return." Esc and scrolling in still work.
 
 **Round 2 (Koda, 2026-10-25), done.** The rings settle mid-screen and stretch sideways on wide screens. Verified at 1440×900 and 2000×840.
 

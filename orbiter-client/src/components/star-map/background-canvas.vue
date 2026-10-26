@@ -12,7 +12,6 @@
 <script>
 import { mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
-import { useStarMapStore } from '@/stores/starmap'
 import { useConfigStore } from '@/stores/config'
 import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
 import { CompositedLayer } from '@/libs/composited-layer'
@@ -28,6 +27,8 @@ const STAR_GLARE_COLOR = '#af6fff22'
 const JUMP_BACKGROUND = '#280b4b'
 const JUMP_STREAK_COUNT = 50
 const JUMP_STAR_SPEED = 25
+// A stalled jump's streaks coast to a stop over this long (the ship falls behind faster: jump-animation.svg.vue).
+const JUMP_STALL_STOP_MS = 3000
 
 // How far the camera's zoom (viewport.scale) changes the size of each background layer.
 // These are the original formulas from map.vue.
@@ -55,9 +56,8 @@ function randomStars(count) {
 export default {
   name: 'BackgroundCanvas',
   computed: {
-    ...mapState(useUIStore, ['viewport', 'screenSize', 'jumpAnimationState']),
+    ...mapState(useUIStore, ['viewport', 'screenSize', 'jumpAnimationState', 'jumpStall']),
     ...mapState(useConfigStore, ['graphicsQuality']),
-    ...mapState(useStarMapStore, ['gameTime']),
     showStars() {
       return this.graphicsQuality > 1
     },
@@ -181,11 +181,18 @@ export default {
         ctx.fill()
       }
     },
-    onFrame() {
+    onFrame(now) {
       if (this.jumpAnimationState) {
+        // The streaks travel at jump speed, or coast to a stop if the jump stalled (eased: slowing fast, then coasting).
+        const seconds = this.lastJumpFrame ? Math.min(0.1, (now - this.lastJumpFrame) / 1000) : 0
+        this.lastJumpFrame = now
+        const stalled = this.jumpStall ? Math.min(1, (Date.now() - this.jumpStall.at) / JUMP_STALL_STOP_MS) : 0
+        const speed = (1 - stalled) * (1 - stalled)
+        this.jumpDistance = ((this.jumpDistance ?? 0) + speed * JUMP_STAR_SPEED * 100 * seconds) % 10000
         this.drawJump()
         return
       }
+      this.lastJumpFrame = null
       const unit = this.unit()
       const centerX = this.screenSize.width / 2 + MARGIN
       const centerY = this.screenSize.height / 2 + MARGIN
@@ -225,8 +232,8 @@ export default {
       // Map units inside the HUD's 1.25x group, as the SVG version used.
       const unit = this.unit() * 1.25
       ctx.scale(unit, unit)
-      const leftSlide = ((JUMP_STAR_SPEED * this.gameTime) / 10) % 10000
-      const rightSlide = ((JUMP_STAR_SPEED * this.gameTime) / 10 + 5000) % 10000
+      const leftSlide = this.jumpDistance % 10000
+      const rightSlide = (this.jumpDistance + 5000) % 10000
       const streak = this.streakSprite(unit)
       for (const [groupScale, mirror] of [
         [1, false],

@@ -2,11 +2,11 @@
   <g>
     <!-- The background and star streaks are drawn on canvas (background-canvas.vue). -->
     <g transform="translate(0 -100)">
-      <g :transform="shipTransform">
+      <g v-if="!stall || stall.visible" :transform="stall ? stall.transform : shipTransform">
         <g transform="scale(15) rotate(90)">
           <ship />
         </g>
-        <g transform="rotate(180)">
+        <g transform="rotate(180)" :opacity="stall ? stall.flames : 1">
           <rect x="35" y="-40" width="1000" height="80" ry="80" rx="80" stroke-width="0" fill="url(#starStreak)" />
           <rect x="25" y="-89" width="1000" height="40" ry="80" rx="80" stroke-width="0" fill="url(#starStreak)" />
           <rect x="25" y="49" width="1000" height="40" ry="80" rx="80" stroke-width="0" fill="url(#starStreak)" />
@@ -14,7 +14,22 @@
       </g>
     </g>
 
+    <!-- A sent jump that failed: the ship stalls out (above); say why below it, where the
+         travel text was, with a way back right away. -->
+    <g v-if="stall" text-anchor="middle">
+      <text x="0" y="240" font-size="2.4em" fill="#ffffffdd" alignment-baseline="central">
+        The jump didn't go through
+      </text>
+      <text x="0" y="285" font-size="0.9em" fill="#ffffff88" alignment-baseline="central">
+        {{ stallReason }}
+      </text>
+      <g transform="translate(0 335)">
+        <menu-button :text="'Return to ' + currentStarSystemName" @buttonclick="recover" />
+      </g>
+    </g>
+
     <text
+      v-if="!stall"
       x="0"
       y="250"
       font-size="3em"
@@ -26,6 +41,7 @@
     </text>
 
     <text
+      v-if="!stall"
       x="0"
       y="300"
       font-size="1em"
@@ -36,6 +52,7 @@
       >While the client is waiting for the transaction to complete, did you know:
     </text>
     <text
+      v-if="!stall"
       x="0"
       y="320"
       font-size="1em"
@@ -50,14 +67,24 @@
 </template>
 
 <script>
-import { mapState } from 'pinia'
+import { mapActions, mapState } from 'pinia'
 import { useStarMapStore } from '@/stores/starmap'
+import { useUIStore } from '@/stores/ui'
 import Ship from '../sprites/ship.svg'
+import MenuButton from './menus/menu-button.svg'
+
+// A stalled ship slides off the left of the screen over STALL_SLIDE_MS, spinning faster and faster
+// (STALL_SPIN turns in all) and shrinking to STALL_SCALE.
+const STALL_SLIDE_MS = 3000
+const STALL_SPIN = 3
+const STALL_SCALE = 0.3
+const STALL_FLAMES_MS = 450
 
 export default {
   name: 'JumpAnimation',
   components: {
-    Ship
+    Ship,
+    MenuButton
   },
   data() {
     return {
@@ -66,7 +93,29 @@ export default {
     }
   },
   computed: {
-    ...mapState(useStarMapStore, ['gameTime']),
+    ...mapState(useStarMapStore, ['gameTime', 'currentStarSystemName']),
+    ...mapState(useUIStore, ['jumpStall', 'leftMostX']),
+    /** The stalled ship's extra motion, `null` while the jump is going fine (re-evaluated every frame via gameTime). */
+    stall() {
+      if (!this.jumpStall) return null
+      const elapsed = Math.max(0, this.gameTime - this.jumpStall.at)
+      const t = Math.min(1, elapsed / STALL_SLIDE_MS)
+      // Falls behind, faster and faster, until it's past the left edge (the ship is ~250 units long).
+      const x = (this.leftMostX - 250) * t * t
+      const spin = STALL_SPIN * 360 * t * t
+      const scale = 1 - (1 - STALL_SCALE) * t
+      return {
+        transform: `translate(${x.toFixed(1)} 0) ${this.shipTransform} rotate(${spin.toFixed(1)}) scale(${scale.toFixed(3)})`,
+        // The engines cut out first.
+        flames: Math.max(0, 1 - elapsed / STALL_FLAMES_MS),
+        visible: t < 1
+      }
+    },
+    /** The failure reason, kept to a line. */
+    stallReason() {
+      const reason = this.jumpStall?.reason ?? ''
+      return reason.length > 110 ? reason.slice(0, 107) + '…' : reason
+    },
     // Where the streak cycle is; the ship bobs in time with it.
     rightSlideX() {
       return ((this.starSpeed * this.gameTime) / 10 + 5000) % 10000
@@ -87,6 +136,11 @@ export default {
     this.loreTip = this.randomLoreTip()
   },
   methods: {
+    ...mapActions(useUIStore, ['jumpRecover']),
+    recover() {
+      this.o8audio.playEffect('click')
+      this.jumpRecover()
+    },
     randomLoreTip() {
       let tips = [
         'It is the year 2140, just a little more than a century after humans began off-world colonization.',

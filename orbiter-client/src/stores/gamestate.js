@@ -82,9 +82,11 @@ export const useGameStateStore = defineStore('GameState', {
         await game.actions.moveTo(system, { onSent: () => ui.jumpAnimationOn() })
       } catch (error) {
         ui.jumpPending = false
-        // A move that was sent but then failed: stop the animation (after its minimum time).
-        ui.jumpAnimationOff()
-        console.error('Jump failed:', error.shortMessage ?? error.message)
+        const reason = error.shortMessage ?? error.message
+        console.error('Jump failed:', reason)
+        // Sent, then failed (reverted, dropped or replaced): the jump animation stalls and explains.
+        // Rejected in the wallet: nothing was sent, and the neighbor view says so itself.
+        if (ui.jumpAnimationState) ui.jumpStalled(reason)
         return false
       }
       return true

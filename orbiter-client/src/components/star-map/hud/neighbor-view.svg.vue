@@ -18,7 +18,7 @@
     <g text-anchor="middle" dominant-baseline="middle" :opacity="phase.neighbors">
       <text x="0" :y="topMostY + 60" fill="#ffffffcc" font-size="1.4em">Neighboring Stars</text>
       <text x="0" :y="topMostY + 88" fill="#ffffff66" font-size="0.8em">
-        Each is one jump away. Scroll in (or press Esc) to return to {{ currentStarSystemName }}.
+        Each is one jump away. Click {{ currentStarSystemName }} or scroll in to return.
       </text>
     </g>
 
@@ -73,9 +73,22 @@
         <ship :should-show-engines="jumpState === 'waiting'" />
       </g>
 
-      <!-- this system: its heliopause, shrinking into a star -->
-      <g :transform="'translate(' + center.x + ' ' + center.y + ')'">
-        <circle cx="0" cy="0" :r="center.radius * 2.2" fill="url(#glowingGradient)" :opacity="phase.morph" />
+      <!-- this system: its heliopause, shrinking into a star; clicking it goes back in -->
+      <g
+        :transform="'translate(' + center.x + ' ' + center.y + ')'"
+        cursor="pointer"
+        @click.prevent="returnToStar"
+        @mouseover="centerHovered = true"
+        @mouseout="centerHovered = false"
+      >
+        <circle cx="0" cy="0" r="34" fill="#ffffff00" />
+        <circle
+          cx="0"
+          cy="0"
+          :r="center.radius * (centerHovered ? 2.8 : 2.2)"
+          fill="url(#glowingGradient)"
+          :opacity="phase.morph"
+        />
         <circle
           cx="0"
           cy="0"
@@ -207,6 +220,7 @@ export default {
       progress: 0,
       chosenId: null,
       hoveredId: null,
+      centerHovered: false,
       // null, 'waiting' (wallet and chain) or 'failed'
       jumpState: null,
       // Where the heliopause was on screen when the view opened (set on mount).
@@ -328,7 +342,7 @@ export default {
     this.stopFrames()
   },
   methods: {
-    ...mapActions(useUIStore, ['exitNeighborView']),
+    ...mapActions(useUIStore, ['exitNeighborView', 'zoomInToStar']),
     ...mapActions(useGameStateStore, ['moveToSystem']),
     /** Where a straight line from the center to a star leaves the center star and reaches the other. */
     ends(star, startGap, endGap) {
@@ -350,6 +364,11 @@ export default {
     routeBack(star) {
       const { near, far } = this.ends(star, 6, 16)
       return arcPath(far, near)
+    },
+    returnToStar() {
+      if (this.jumpState === 'waiting') return
+      this.o8audio.playEffect('click')
+      this.zoomInToStar()
     },
     choose(star) {
       if (this.jumpState === 'waiting') return
