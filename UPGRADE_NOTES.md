@@ -888,7 +888,7 @@ Koda wants the best parts of Enterprise Circuit (`/home/koda/dev/enterprise-circ
 - Screenshots come from a scratch copy of it run against the local chain (see `docs/enterprise-circuit-walkthrough.md`).
 
 Order (from the walkthrough's list). Tick each when it lands:
-1. [ ] **Onboarding:** Minerva's voice, the callsign card, the ship launch pad, and the title button that follows the player's progress.
+1. [x] **Onboarding:** Minerva's voice, the callsign card, the ship launch pad, and the title button that follows the player's progress.
 2. [ ] **Network stats** on the connect screen ("N players exploring M star systems").
 3. [ ] **Minimap.**
 4. [ ] **Parallax star layers** on the canvas background.
@@ -942,39 +942,57 @@ Order (from the walkthrough's list). Tick each when it lands:
 | Audio | Music before any click | n/a (Play was the first click) | **The first click on the title starts the music**, whatever the button is. |
 | Motion | Reduced motion | ✗ | The title animation holds still. |
 
-**Step 1 build plan (Koda signed off, 2026-10-25).** Each step is its own commit; tick it off when it lands:
-1. [ ] **Version.** `package.json` becomes 3.2.0, and Vite bakes it in as `__APP_VERSION__`; dev builds add the commit (`3.2.0-dev+abc1234`). Release builds: `npm version patch`.
-2. [ ] **Art from Enterprise Circuit.** Its ship designs (Orbiter 8, Polygon, Boba, Moonbeam, with engines), the station, and Minerva's badge go into `src/components/assets/`, as small SVG components.
-3. [ ] **The title scene** (`components/title/title-scene.vue`):
+**Step 1 build plan (Koda signed off, 2026-10-25). Done 2026-10-26.** Each step is its own commit; tick it off when it lands:
+1. [x] **Version.** `package.json` becomes 3.2.0, and Vite bakes it in as `__APP_VERSION__`; dev builds add the commit (`3.2.0-dev+abc1234`). Release builds: `npm version patch`.
+2. [x] **Art from Enterprise Circuit.** Its ship designs (Orbiter 8, Polygon, Boba, Moonbeam, with engines), the station, and Minerva's badge go into `src/components/assets/`, as small SVG components.
+3. [x] **The title scene** (`components/title/title-scene.vue`):
    - The backdrop and stars are drawn once on a canvas (`backdropShapes`). Each moving part is its own layer, animated with CSS `@keyframes` on `transform`, so nothing repaints per frame.
    - **The sun:** two ray layers turning in opposite directions, with a slow shimmer.
    - **Ships:** three ships circling the sun, and one ship drifting across the screen.
    - **The planet and station, featured:** bigger than in Enterprise Circuit. Docked ships are close in size, varied within one class. **Shuttles fly** from each docked ship to the station and back, with short trails and staggered timing.
    - Everything holds still under "reduce motion".
-4. [ ] **The title menu:**
+4. [x] **The title menu:**
    - the dark band for contrast, the logo, and one main button that follows the player (Connect, Begin, Launch, Continue, or a loading state);
    - Network and Settings buttons, and the version at the bottom left;
    - **the first click anywhere starts the music** (`08audio.js` retries after a blocked autoplay).
-5. [ ] **The onboarding logic**, kept out of the components:
+5. [x] **The onboarding logic**, kept out of the components:
    - **`libs/onboarding.js`:** works out the current step from the stores (wallet, network, funds, game data, callsign, ship, a pending transaction), with tests covering the state map above.
    - **Wallet:** a silent check for returning players (`eth_accounts`); plain messages for 4001 and -32002; a phone link into MetaMask's own browser.
    - **Transactions:** pending callsign and ship transactions are remembered across reloads; a replaced transaction counts as success; failures come back as a reason.
    - **SDK:** `listCallsigns()` reads every callsign once (`getAvatarCount` + `getAvatarNameById`, batched), so the "taken" check costs nothing per keystroke. It's a hint only: the contracts allow duplicates.
      - **Works today, not at scale** (Koda): the player count has no limit. It only loads while there are 2,000 callsigns or fewer; above that the hint is skipped. The real fix is a contract lookup (see the contract wish list).
-6. [ ] **The wizard steps,** in Minerva's panel with step dots and a way back to the title:
+6. [x] **The wizard steps,** in Minerva's panel with step dots and a way back to the title:
    - **Wallet** and **Network**, including the funds gate with faucets, which moves on by itself when funds arrive.
    - **Callsign:** a real text box, the pilot card filling in as you type, trimmed to 1–24 characters, and "already taken" shown as you type.
    - **Ship:** the launch pad with the fleet behind it, and smoke while pending.
    - **Shared transaction states:** confirm in wallet, transmitting (with an explorer link), success, failed (with the reason, back to the form, name kept).
    - **Take command:** the welcome-back stats.
-7. [ ] **Network and Settings panels.**
+7. [x] **Network and Settings panels.**
    - **Network:** the old status report, with contracts and explorer links, import Credits, faucets, and balance. The Sushi link is hidden.
    - **Settings:** music, effects and graphics.
-8. [ ] **Wiring.** The title is the first screen; the preflight checklist and the old onboarding screens go; `/play` needs a loaded game and a ship. The harness's `capture.sh` follows the new flow (and loses the removed jump-menu steps).
-9. [ ] **Verify:**
+8. [x] **Wiring.** The title is the first screen; the preflight checklist and the old onboarding screens go; `/play` needs a loaded game and a ship. The harness's `capture.sh` follows the new flow (and loses the removed jump-menu steps).
+9. [x] **Verify:**
    - harness screenshots of every state on the board, beside Enterprise Circuit's;
    - a title performance trace against Enterprise Circuit's (0.5 s of raster per 5 s);
    - lint and tests.
+
+**Step 1 results (2026-10-26):**
+- **Checked on the local chain with the harness.**
+  - The full flow with a fresh account: title → Begin → Minerva's welcome → call sign ("vega" flagged as taken) → success → ship → launch → Take Command → the game.
+  - Every wizard state, set through the stores: no wallet, connecting, declined, wrong network, unreachable node, no funds, low balance, transmitting, failed, back to the form.
+  - The Settings and Network panels, and a returning player's title (Continue, with a welcome line).
+  - **Reloading while a registration waits to be mined** (mining paused): the wizard reopens on "Transmitting…" and moves on to success when the block is mined.
+- **Performance:** 5 s of the animating title at 1440×900 cost 0 ms of raster, paint, style and layout. Enterprise Circuit's title costs 495 ms of raster. What's left is the block watcher's regular check.
+- **Found along the way:**
+  - **The Ubuntu font never loaded for players.** The `@import` sat inside a CSS rule, where browsers ignore it, so only machines with Ubuntu installed (like Koda's) showed it. It now loads from `index.html`, along with Ubuntu Mono.
+  - **The parked gamepad support polled every frame on every screen,** about 0.4 ms per frame. It now waits for `gamepadconnected`.
+- **Not checked:**
+  - real wallet popups (MetaMask's approve, decline and speed-up), and the phone link into MetaMask's browser;
+  - claiming from the new Sepolia faucets (the links load);
+  - Firefox.
+- **For Koda:**
+  - **Continue goes straight into the game.** The old welcome-back screen's stats moved onto the title, under the button.
+  - **The station:** four ship designs docked nose-in, eight shuttles, the port turning once every 150 s. Positions and timings are constants at the top of `title-scene.vue`.
 
 **Ideas for later (Koda, 2026-10-25):**
 - **Engine trails:** ships that jumped recently arrive with fading engine trails.
