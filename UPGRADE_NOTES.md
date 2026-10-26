@@ -1017,7 +1017,16 @@ Order (from the walkthrough's list). Tick each when it lands:
     - Network logos: Enterprise Circuit only has Ethereum and Moonbeam among this client's networks, so BNB and Local would have none.
   - **Original plan, for reference:** Look at Enterprise Circuit's planet art (bands, rings, named Sol planets), stations and ships against this client's, and bring over what improves the map without changing what the game means. Anything that changes how the game looks for every player is noted for Koda.
 - [x] **6. UI scale.** Done 2026-10-26, as an "Interface size" setting (75, 100, 125, 150%, saved in a cookie) in the title's Settings panel and the in-game Settings menu. **Only the HUD's corner controls scale** (profile card, buttons, minimap, zoom slider, system name), each from its own corner. The full-screen menus and the selection cards stay as they are. Scaling the whole HUD, which was tried first, cut off the planets list at 150% on a 900 px screen. The original plan said: A Settings option (75–200%) that scales the HUD, kept between visits.
-- [ ] **7. Later ideas.** The About storyboard (Enterprise Circuit's six panels, story text verbatim) as a "Story" button on the title. The cockpit window stays an idea.
+- [ ] **7. Later ideas.** Looked at 2026-10-26 and **not built: it needs Koda's content call.**
+  - **The storyboard's six panels:** "By the year 2140…", "Still bound to our sun…", "That was until today! The first starships have arrived.", "Orbiter 8 is an MMO … for the EVM.", "Introducing Portals!", "Portals are Bridges…".
+  - **Panels 4–6 are the Bobabeam hackathon pitch.** Portals don't exist in this game, and "for the EVM" is pitch language.
+  - **Porting means about 20 Enterprise Circuit components (~2,000 lines):** the named Sol planets, moons, stations, portal, logos, and the panels' SMIL animations.
+  - **Options:**
+    - panels 1–3 only, as a short intro story behind a "Story" button on the title, rebuilt with CSS animation like the title scene;
+    - all six, verbatim;
+    - wait for new story text.
+  - The cockpit window stays an idea.
+  - **Original plan, for reference:** The About storyboard (Enterprise Circuit's six panels, story text verbatim) as a "Story" button on the title. The cockpit window stays an idea.
 
 ### 5a. The Bobabeam Portals demo (looked at 2026-10-26)
 
