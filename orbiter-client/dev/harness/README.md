@@ -28,6 +28,7 @@ the address in `ACCOUNT`. `npm run build:local` builds a production bundle that 
 | `zoomset.sh <outdir>`                 | Screenshots at five zoom levels, for before/after comparisons of the world's look.                                                                                             |
 | `paint.mjs <url> <outdir>`            | Screenshots with Chrome's repaint rectangles shown, at idle. Only moving things should flash.                                                                                  |
 | `ffps.mjs <url> <profileDir>`         | Firefox frame rate with a ship selected and while wheeling out.                                                                                                                |
+| `fake-gamepad.js` | Load with `PRELOAD=dev/harness/fake-gamepad.js`: replaces the browser's gamepads with one the steps can press (`eval:__pad.press(0)`, `__pad.hold(7, 1)`, `__pad.stick(0, 1)`, `__pad.release()`). |
 | `explore.mjs <url> <outdir> [steps…]` | The driver the others use. Steps: `wait:ms`, `click:text`, `type:selector=value`, `key:k`, `shot:name`, `eval:js`, `commit:Store/action=json`, `trace:name`, `idletrace:name`. |
 
 Example, from `orbiter-client/`:
