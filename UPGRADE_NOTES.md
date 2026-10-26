@@ -1001,6 +1001,17 @@ Order (from the walkthrough's list). Tick each when it lands:
 - **Shuttle traffic at in-game stations,** especially when selected. Eventually the docked ships would be the players who recently traded there, with shuttles in proportion. Koda wants this kind of living detail in many places.
 - **A Credits swap.** Where to put a pool depends on the launch network. Decide it with the launch.
 
+### 5a. The Bobabeam Portals demo (looked at 2026-10-26)
+
+`/home/koda/dev/orbiter8-multiverse-bobabeam` is a 2022 hackathon one-off (Boba × Moonbeam). Its idea: **flying through a portal is how a ship changes networks**, with the ship NFT bridged between universes. It has a six-panel story, then a screen to send a ship between Moonbase and Bobabase.
+- **Little new for us.** Enterprise Circuit grew out of it: the story panels, portal, planets, Minerva and logos are the same art, or earlier drafts of what Enterprise Circuit has. When those come over (art in step 5, the storyboard in step 7), use Enterprise Circuit's versions.
+- **Unique to it:**
+  - the splash (a ship flying out of a portal);
+  - the teleport screen;
+  - the `MultiverseShip` L1/L2 contracts: an ERC721 ship bridged through Boba's standard bridge.
+- **The contracts are a starting point for portals** in a future contract iteration. They're tied to Boba's bridge, and Bobabase's RPC no longer answers.
+- **An idea for later:** the wizard's network step could present networks as portals to other universes. That ties network choice to the game's fiction.
+
 ## Contract wish list (next contracts iteration)
 
 - Events for every game action (claim, build station, jump, rename, trade…), so the client can update from events instead of reloading.
