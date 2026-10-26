@@ -1008,7 +1008,14 @@ Order (from the walkthrough's list). Tick each when it lands:
   - **Deep stars** are painted into the backdrop canvas, which never pans, so they read as infinitely far away and cost no memory. Moderate and Luxurious.
   - **Near stars** get one extra canvas that pans at 1/7 of the camera (the starfield pans at 1/20). Luxurious only.
   - **Original plan, for reference:** Two more star layers on the background canvas, at different depths, so panning feels deeper. Each is its own composited layer, like the existing starfield.
-- [ ] **5. Art.** Look at Enterprise Circuit's planet art (bands, rings, named Sol planets), stations and ships against this client's, and bring over what improves the map without changing what the game means. Anything that changes how the game looks for every player is noted for Koda.
+- [x] **5. Art.** Done 2026-10-26. Most of it is already at parity:
+  - **Planets:** the same family (bands, rings, surface patterns). Enterprise Circuit's `luminanceRotation` (the lit side facing the star) is what this client already does: the sprite turns with its orbit while the surface turns back.
+  - **Stations:** the same outline.
+  - **Brought over:** the four ship designs and Minerva's emblem (in step 1), and now the launch pad's fleet mixes all four designs.
+  - **Left for Koda:**
+    - Giving other players' ships different designs (by ship id) would change the game's look for everyone; ships have no type on chain.
+    - Network logos: Enterprise Circuit only has Ethereum and Moonbeam among this client's networks, so BNB and Local would have none.
+  - **Original plan, for reference:** Look at Enterprise Circuit's planet art (bands, rings, named Sol planets), stations and ships against this client's, and bring over what improves the map without changing what the game means. Anything that changes how the game looks for every player is noted for Koda.
 - [ ] **6. UI scale.** A Settings option (75–200%) that scales the HUD, kept between visits.
 - [ ] **7. Later ideas.** The About storyboard (Enterprise Circuit's six panels, story text verbatim) as a "Story" button on the title. The cockpit window stays an idea.
 

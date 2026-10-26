@@ -37,15 +37,16 @@
         </g>
       </g>
 
+      <!-- the fleet: Orbiter 8-class ships of every design, fading into the distance -->
       <g v-for="x in 6" :key="'ship-' + x">
-        <g :transform="'translate(' + (x * 18 - 25) + ' 1) scale(0.75)'" opacity="0.1">
-          <ship />
+        <g :transform="'translate(' + (x * 18 - 25) + ' 1) scale(0.94)'" opacity="0.1">
+          <fleet-ship :type="designFor(x, 0)" />
         </g>
-        <g :transform="'translate(' + (x * 19 - 20) + ' 6) scale(1)'" opacity="0.25">
-          <ship />
+        <g :transform="'translate(' + (x * 19 - 20) + ' 6) scale(1.25)'" opacity="0.25">
+          <fleet-ship :type="designFor(x, 1)" />
         </g>
-        <g :transform="'translate(' + (x * 20 - 15) + ' 12) scale(1.25)'" opacity="0.55">
-          <ship />
+        <g :transform="'translate(' + (x * 20 - 15) + ' 12) scale(1.56)'" opacity="0.55">
+          <fleet-ship :type="designFor(x, 2)" />
         </g>
       </g>
 
@@ -72,14 +73,24 @@
 
 <script>
 import Ship from '@/components/star-map/sprites/ship.svg.vue'
+import FleetShip from '@/components/assets/fleet-ship.svg'
+
+const DESIGNS = ['orbiter8', 'polygon', 'boba', 'moonbeam']
 
 export default {
   name: 'LaunchPad',
   components: {
-    Ship
+    Ship,
+    FleetShip
   },
   props: {
     warmingUp: { type: Boolean, default: false }
+  },
+  methods: {
+    /** A mix of designs across the fleet, the same every time. */
+    designFor(column, row) {
+      return DESIGNS[(column * 3 + row) % DESIGNS.length]
+    }
   }
 }
 </script>
