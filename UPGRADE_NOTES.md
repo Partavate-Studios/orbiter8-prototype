@@ -762,6 +762,11 @@ Notes: the browser only reveals a gamepad after a button is pressed on the page.
    - it then ended in the new system.
 
    If the block watcher loads the new system first, the arrival plays the animation itself (StarMap `importSystem`), so the two can't fight. The animation always plays at least 2.5 s.
+5. [x] **Koda's follow-ups (2026-10-25):**
+   - **The orbit is a top-down circle,** matching every other orbit on the map. The ship comes out from under the star as the view opens.
+   - **The jump animation starts when the wallet *sends* the move** (committed), not when it's mined. The contract layer now reports the moment a transaction is sent (`send(…, { onSent })` in `sdk/chain/contracts.js`; `actions.moveTo(id, { onSent })`). "Preparing to jump" only covers the wallet step.
+   - **If a sent move then fails,** the animation stops and the player is back in the system; the error is logged.
+   - Checked with mining paused: the animation was already playing with the move sent and not yet mined, and it ended on arrival.
 
 **Round 2 (Koda, 2026-10-25), done.** The rings settle mid-screen and stretch sideways on wide screens. Verified at 1440×900 and 2000×840.
 

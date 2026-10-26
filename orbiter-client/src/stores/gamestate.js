@@ -71,23 +71,22 @@ export const useGameStateStore = defineStore('GameState', {
       await logFailure('Ship launch', game.actions.launchShip(name))
     },
     /**
-     * Jumps the player's ship to a neighboring system. The jump animation starts once the move is on
-     * chain (the wallet and the transaction come first) and plays until the new system loads.
-     * Resolves true if the jump went through.
+     * Jumps the player's ship to a neighboring system. The jump animation starts as soon as the wallet
+     * has sent the move (committed, not yet mined) and plays until the new system loads (StarMap
+     * importSystem). Resolves true if the jump went through.
      */
     async moveToSystem(system) {
       const ui = useUIStore()
       ui.jumpPending = true
       try {
-        await game.actions.moveTo(system)
+        await game.actions.moveTo(system, { onSent: () => ui.jumpAnimationOn() })
       } catch (error) {
         ui.jumpPending = false
+        // A move that was sent but then failed: stop the animation (after its minimum time).
+        ui.jumpAnimationOff()
         console.error('Jump failed:', error.shortMessage ?? error.message)
         return false
       }
-      // The block watcher may have loaded the new system already (it can notice the move before the
-      // transaction reports back); then the arrival has played the animation (StarMap importSystem).
-      if (ui.jumpPending) ui.jumpAnimationOn()
       return true
     },
     async sendChat(message) {

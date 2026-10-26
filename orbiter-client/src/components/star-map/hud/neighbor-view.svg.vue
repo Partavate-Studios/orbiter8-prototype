@@ -68,8 +68,8 @@
         stroke-linecap="round"
       />
 
-      <!-- the player's ship orbiting this star: this copy shows while it's behind the star -->
-      <g ref="shipBehind" display="none">
+      <!-- the player's ship orbiting this star (drawn under it, so it comes out from beneath as the view opens) -->
+      <g ref="ship" display="none">
         <ship :should-show-engines="jumpState === 'waiting'" />
       </g>
 
@@ -96,11 +96,6 @@
         >
           {{ currentStarSystemName }}
         </text>
-      </g>
-
-      <!-- …and this one while it's in front -->
-      <g ref="shipFront" display="none">
-        <ship :should-show-engines="jumpState === 'waiting'" />
       </g>
 
       <g v-for="star in stars" :key="'star-' + star.id" :transform="'translate(' + star.x + ' ' + star.y + ')'">
@@ -147,9 +142,7 @@
     <g v-if="chosen" :transform="'translate(0 ' + (bottomMostY - 150) + ')'" text-anchor="middle">
       <template v-if="jumpState === 'waiting'">
         <text x="0" y="-48" fill="#ffffffcc" font-size="1em">Preparing to jump to {{ chosenName }}…</text>
-        <text x="0" y="-20" fill="#ffffff77" font-size="0.8em"
-          >Confirm in your wallet, then wait for the move to be recorded.</text
-        >
+        <text x="0" y="-20" fill="#ffffff77" font-size="0.8em">Confirm the jump in your wallet.</text>
       </template>
       <template v-else>
         <text x="0" y="-48" fill="#ffffffcc" font-size="1em">
@@ -188,11 +181,10 @@ const STAR_RADIUS = 10
 const ENTER_MS = 1300
 // Where the neighbors start, in ring radii: beyond the screen edges.
 const FLY_IN_FROM = 3.2
-// The ship's orbit around the center star: a tilted ellipse (its depth decides which side of the
-// star it's drawn on), one lap every ORBIT_SECONDS, or RACING_ORBIT_SECONDS while a jump is pending.
+// The ship's orbit around the center star: a top-down circle like every other orbit on the map,
+// one lap every ORBIT_SECONDS, or RACING_ORBIT_SECONDS while the wallet confirms a jump.
 const SHIP_SCALE = 1.7
 const ORBIT_GAP = 34
-const ORBIT_TILT = 0.32
 const ORBIT_SECONDS = 7
 const RACING_ORBIT_SECONDS = 0.9
 // The contract's name for a star nobody has visited yet.
@@ -365,7 +357,7 @@ export default {
       this.chosenId = star ? star.id : null
       this.jumpState = null
     },
-    /** Waits here, ship racing, for the wallet and the chain; the jump animation starts once the move is mined. */
+    /** Waits here, ship racing, while the wallet confirms; the jump animation starts once the move is sent. */
     async jump() {
       this.jumpState = 'waiting'
       const jumped = await this.moveToSystem(this.chosenId)
@@ -380,20 +372,20 @@ export default {
       this.orbit.speed += (target - this.orbit.speed) * Math.min(1, seconds * 2.5)
       this.orbit.angle += this.orbit.speed * seconds
       const { angle } = this.orbit
-      const a = this.center.radius + ORBIT_GAP
-      const b = a * ORBIT_TILT
-      const x = this.center.x + a * Math.cos(angle)
-      const y = this.center.y + b * Math.sin(angle)
-      // Facing along the orbit (the art's nose points up).
-      const heading = (Math.atan2(b * Math.cos(angle), -a * Math.sin(angle)) * 180) / Math.PI + 90
-      const depth = (Math.sin(angle) + 1) / 2 // 0 = far side, 1 = near side
-      const scale = SHIP_SCALE * (0.8 + 0.2 * depth) * this.phase.neighbors
-      const transform = `translate(${x.toFixed(2)} ${y.toFixed(2)}) rotate(${heading.toFixed(1)}) scale(${scale.toFixed(3)})`
-      const behind = Math.sin(angle) < 0
-      writeAttribute(this.$refs.shipBehind, 'transform', transform)
-      writeAttribute(this.$refs.shipFront, 'transform', transform)
-      writeAttribute(this.$refs.shipBehind, 'display', behind && scale > 0 ? 'inline' : 'none')
-      writeAttribute(this.$refs.shipFront, 'display', !behind && scale > 0 ? 'inline' : 'none')
+      // It comes out from under the star as the neighbors arrive.
+      const reveal = this.phase.neighbors
+      const radius = (this.center.radius + ORBIT_GAP) * reveal
+      const x = this.center.x + radius * Math.cos(angle)
+      const y = this.center.y + radius * Math.sin(angle)
+      // Facing along the orbit (the art's nose points up; angles grow clockwise on screen).
+      const heading = (angle * 180) / Math.PI + 180
+      const scale = SHIP_SCALE * reveal
+      writeAttribute(
+        this.$refs.ship,
+        'transform',
+        `translate(${x.toFixed(2)} ${y.toFixed(2)}) rotate(${heading.toFixed(1)}) scale(${scale.toFixed(3)})`
+      )
+      writeAttribute(this.$refs.ship, 'display', scale > 0 ? 'inline' : 'none')
     }
   }
 }

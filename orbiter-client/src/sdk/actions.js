@@ -13,9 +13,12 @@ export function launchShip(name) {
   return galaxy.launchShip(name)
 }
 
-/** Jumps the player's ship to a neighboring star system. */
-export function moveTo(systemId) {
-  return galaxy.moveToSystem(systemId)
+/**
+ * Jumps the player's ship to a neighboring star system.
+ * @param {{ onSent?: (hash: string) => void }} [options]  onSent: the wallet has sent the move (before it's mined)
+ */
+export function moveTo(systemId, options) {
+  return galaxy.moveToSystem(systemId, options)
 }
 
 /** Sends a message to the galaxy-wide chat (a ChatLog event). */

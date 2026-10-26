@@ -50,7 +50,19 @@ async function read(contract, method, ...args) {
  * @param {string} method  the ABI function name
  */
 async function write(contract, method, ...args) {
+  return send(contract, method, args)
+}
+
+/**
+ * Like write, but reports the moment the wallet has sent the transaction (it's committed, not yet mined).
+ * @param {'game' | 'avatars'} contract
+ * @param {string} method
+ * @param {unknown[]} args
+ * @param {{ onSent?: (hash: string) => void }} [options]
+ */
+async function send(contract, method, args, { onSent } = {}) {
   const tx = await contracts[contract][method](...args)
+  onSent?.(tx.hash)
   return tx.wait()
 }
 
@@ -140,7 +152,7 @@ export const galaxy = {
   getMyShip: () => read('game', 'getMyShip'),
 
   sendChat: (message) => write('game', 'sendChat', message),
-  moveToSystem: (systemId) => write('game', 'moveToSystem', systemId),
+  moveToSystem: (systemId, options) => send('game', 'moveToSystem', [systemId], options),
   renameStar: (name) => write('game', 'renameStar', name),
   claimPlanet: (planetId, name) => write('game', 'claimPlanet', planetId, name),
   buildStation: (planetId, name) => write('game', 'buildStation', planetId, name),
