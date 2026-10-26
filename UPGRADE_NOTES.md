@@ -558,6 +558,7 @@ These need a real wallet, a real GPU or another player, which the scripted runs 
 
 ### Fixed
 
+- **Scroll bars on the star map, and wheeling out scrolled the page** (Koda, 2026-10-26). I caused it when I removed the old onboarding screens: I also deleted the global `.layer` style from `App.vue`, thinking only those screens used it. The map's container (`map.vue`, `class="layer star-map"`) used it too. That style held the map to the window with `overflow: hidden`; without it, the layers' 256 px drawing margin spilled out (1696×1156 in a 1440×900 window). Restored. It came in with `587f787`.
 - **The volume dots sometimes showed the wrong setting** (Koda, 2026-10-25). The music played at the chosen level, but the highlight was off. Two causes:
   - **Rounding.** Volumes were saved as fractions in a cookie, and 1/3 read back as `"0.3333333333333333"`; three times that is just under 1, so the dots showed one step lower. The old default of 0.25 wasn't a step at all, so it showed as "off" while the music played.
   - **No redraw.** The volume wasn't reactive, so the dots only changed when something else redrew.
