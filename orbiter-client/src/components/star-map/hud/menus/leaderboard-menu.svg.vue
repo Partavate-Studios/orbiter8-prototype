@@ -44,7 +44,7 @@
                 <text :x="columns.name" y="36" text-anchor="start">{{ pilotName(row.player) }}</text>
                 <text :x="columns.planets" y="36">{{ row.player.planets }}</text>
                 <text :x="columns.ports" y="36">{{ row.player.ports }}</text>
-                <text :x="columns.credits" y="36" text-anchor="end">{{ row.player.credits }}&cent;</text>
+                <text :x="columns.credits" y="36" text-anchor="end">{{ row.player.credits.toLocaleString() }}&cent;</text>
               </g>
             </menu-slot-container>
           </g>

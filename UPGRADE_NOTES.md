@@ -701,7 +701,21 @@ Zooming out past the system's outermost circle (the heliopause) turns the system
 - Does zooming out past the heliopause always enter this view, or only on a deliberate extra scroll?
 - Should "jump" from the star's card (and X on the controller) open this view too?
 
-### 3. Leaderboard (feasible with the current contracts)
+### 3. Leaderboard (done 2026-10-25)
+
+**Built:**
+- A trophy button in the HUD's left column opens a slide-up menu, ranked by planets or by credits, with ports alongside.
+- It shows the top eight, plus your own row (highlighted) if you're further down.
+- It's cached for a minute, and Refresh reloads it.
+- The house account ("The Federation") is left out.
+
+**Data:** `sdk/leaderboard.js` loads it, and `sdk/chain/batch.js` batches the reads through Multicall3 where available.
+
+**Checked on Sepolia** (read-only, as Koda's address): 8 ranked pilots in about 1 s. Koda ("Cloud") is #4 on planets.
+
+**Koda's defaults to revisit:** the columns, the placement, and whether the house account should appear.
+
+The original analysis:
 
 Checked against the contracts and the local chain:
 - **Players:** every player who has launched a ship owns a ship NFT. `ShipTokens` is `ERC721Full` (OpenZeppelin 2.x), which includes Enumerable, so `totalSupply()`, then `tokenByIndex(i)` and `ownerOf(token)`, lists them all. Players without a ship have no planets or credits.
