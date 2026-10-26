@@ -1,16 +1,33 @@
 import { defineStore } from 'pinia'
 import { markRaw } from 'vue'
-import { discoverWallets, preferredWallet, rememberWallet } from '@/sdk/chain/wallet'
+import {
+  discoverWallets,
+  preferredWallet,
+  rememberWallet,
+  isAuthorized,
+  walletErrorKind,
+  walletRequest
+} from '@/sdk/chain/wallet'
 import { networks, networkFor, chainName } from '@/sdk/chain/networks'
 import { game } from '@/sdk/client'
 import { useConfigStore } from '@/stores/config'
 
 let blockPoller = null
 
+function switchFailure(error, networkName) {
+  console.error('Switching networks failed:', error.shortMessage ?? error.message)
+  const kind = walletErrorKind(error)
+  if (kind === 'rejected') return `You declined the switch to ${networkName} in your wallet.`
+  if (kind === 'pending') return 'Your wallet already has a request open: click its icon in the toolbar.'
+  return `Your wallet couldn't switch to ${networkName}: ${error.shortMessage ?? error.message}`
+}
+
 export const useChainStore = defineStore('Chain', {
   state: () => ({
     web3Loaded: false,
     contractsLoaded: false,
+    /** Binding the contracts failed (the network's node didn't answer); the player can retry. */
+    contractsFailed: false,
     creditTokenAddress: null,
     shipTokenAddress: null,
     planetTokenAddress: null,
@@ -19,15 +36,19 @@ export const useChainStore = defineStore('Chain', {
     chainId: 0,
     account: null,
     currentBlockId: 0,
-    playerReady: false,
     balance: 0,
     /** Wallets found via EIP-6963, when the player has to pick one. Raw: they hold provider objects. */
     wallets: markRaw([]),
-    /** 'searching' | 'none' | 'choose' | 'connecting' | 'connected' | 'error' */
+    /**
+     * 'searching' | 'none' (no wallet installed) | 'idle' (found, waiting for the player to connect) |
+     * 'connecting' | 'connected' | 'error'
+     */
     walletStatus: 'searching',
     /** The wallet being connected or connected to, for messages. */
     walletName: null,
-    walletError: null
+    walletError: null,
+    /** 'rejected' | 'pending' | 'other' (sdk/chain/wallet.js walletErrorKind) */
+    walletErrorKind: null
   }),
   getters: {
     networkName: (state) => (state.chainId ? chainName(state.chainId) : ''),
@@ -43,7 +64,10 @@ export const useChainStore = defineStore('Chain', {
     blockId: (state) => state.currentBlockId
   },
   actions: {
-    /** Finds the player's wallet and connects to it, unless they need to choose between several. */
+    /**
+     * Finds the player's wallets. A returning player's wallet (already trusting this site) is connected
+     * right away, without a popup; anyone else connects when they choose to (chooseWallet).
+     */
     async initWeb3() {
       this.walletStatus = 'searching'
       const wallets = await discoverWallets()
@@ -51,11 +75,14 @@ export const useChainStore = defineStore('Chain', {
         this.walletStatus = 'none'
         return
       }
-      // Kept even when we connect automatically, so the player can pick again if connecting fails.
       this.wallets = markRaw(wallets)
       const wallet = preferredWallet(wallets)
-      if (wallet) return this.chooseWallet(wallet)
-      this.walletStatus = 'choose'
+      if (wallet && (await isAuthorized(wallet))) return this.chooseWallet(wallet)
+      this.walletStatus = 'idle'
+    },
+    /** The wallet to connect without asking which: the remembered one, or the only one. */
+    defaultWallet() {
+      return preferredWallet(this.wallets)
     },
     /** Connects to the given EIP-6963 wallet; walletStatus tracks how it goes. */
     async chooseWallet(wallet) {
@@ -71,12 +98,19 @@ export const useChainStore = defineStore('Chain', {
       } catch (error) {
         console.error('Wallet connection failed:', error)
         this.walletError = error.shortMessage ?? error.message
+        this.walletErrorKind = walletErrorKind(error)
         this.walletStatus = 'error'
       }
     },
     /** Binds the game contracts on the connected network (addresses arrive through stores/game-bindings.js). */
     async initContracts() {
-      if (await game.bindContracts()) this.contractsLoaded = true
+      this.contractsFailed = false
+      try {
+        if (await game.bindContracts()) this.contractsLoaded = true
+      } catch (error) {
+        console.error('Binding the contracts failed:', error.shortMessage ?? error.message)
+        this.contractsFailed = true
+      }
     },
     /** Polls for new blocks for the rest of the session. Safe to call again: only one poller ever runs. */
     startBlockPolling() {
@@ -97,8 +131,53 @@ export const useChainStore = defineStore('Chain', {
         console.error('Block check failed:', error.message)
       }
     },
-    setPlayerReady() {
-      this.playerReady = true
+    /**
+     * Asks the wallet to switch to one of the game's networks, adding it to the wallet first if the
+     * wallet doesn't know it. The wallet then reloads the page (sdk/chain/wallet.js). Resolves with
+     * null, or a message saying why it didn't happen.
+     */
+    async switchNetwork(chainId) {
+      const network = this.networkData[chainId]
+      if (!network) return 'Unknown network.'
+      try {
+        await walletRequest('wallet_switchEthereumChain', [{ chainId: network.hexId }])
+        return null
+      } catch (error) {
+        // 4902: the wallet doesn't know this network (some wallets nest the code). Anything else,
+        // such as the player declining the switch, isn't a reason to offer adding it.
+        const unknownChain = error.code === 4902 || error.data?.originalError?.code === 4902
+        if (!unknownChain) return switchFailure(error, network.name)
+      }
+      try {
+        await walletRequest('wallet_addEthereumChain', [
+          {
+            chainId: network.hexId,
+            chainName: network.name,
+            nativeCurrency: network.currency,
+            rpcUrls: network.rpc,
+            blockExplorerUrls: network.explorer.length ? network.explorer : undefined
+          }
+        ])
+        return null
+      } catch (error) {
+        return switchFailure(error, network.name)
+      }
+    },
+    /** Asks the wallet to show the Credits token (wallet_watchAsset). */
+    async addCreditsToken() {
+      try {
+        await walletRequest('wallet_watchAsset', {
+          type: 'ERC20',
+          options: {
+            address: this.creditTokenAddress,
+            symbol: 'OBTR8',
+            decimals: 0,
+            image: 'https://orbiter8.com/tokens/orbiter-8-credits.png'
+          }
+        })
+      } catch (error) {
+        console.error('Importing the credits token failed:', error)
+      }
     }
   }
 })

@@ -3,14 +3,20 @@
 // what to show while waiting and on failure.
 import { galaxy, avatars } from '@/sdk/chain/contracts'
 
-/** Registers the connected account as a player. */
-export function createAvatar(name) {
-  return avatars.createAvatar(name)
+/**
+ * Registers the connected account as a player.
+ * @param {{ onSent?: (hash: string) => void }} [options]  onSent: the wallet has sent it (before it's mined)
+ */
+export function createAvatar(name, options) {
+  return avatars.createAvatar(name, options)
 }
 
-/** Builds the player's first ship. */
-export function launchShip(name) {
-  return galaxy.launchShip(name)
+/**
+ * Builds the player's first ship.
+ * @param {{ onSent?: (hash: string) => void }} [options]
+ */
+export function launchShip(name, options) {
+  return galaxy.launchShip(name, options)
 }
 
 /**

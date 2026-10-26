@@ -35,6 +35,9 @@ export function bindStoresToGame(game) {
         chain.shipTokenAddress = state.contracts.shipToken
         chain.creditTokenAddress = state.contracts.creditToken
         break
+      case 'balance':
+        chain.balance = state.balance
+        break
       case 'block':
         chain.currentBlockId = state.blockNumber
         break

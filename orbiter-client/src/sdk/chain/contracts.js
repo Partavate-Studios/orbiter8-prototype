@@ -63,7 +63,34 @@ async function write(contract, method, ...args) {
 async function send(contract, method, args, { onSent } = {}) {
   const tx = await contracts[contract][method](...args)
   onSent?.(tx.hash)
-  return tx.wait()
+  return settle(tx.wait())
+}
+
+/**
+ * A mined transaction's receipt. A transaction the player sped up in their wallet is replaced by one
+ * doing the same thing at a higher price ("repriced"): that counts as success. Cancelled or otherwise
+ * replaced transactions, and reverts, still reject.
+ */
+async function settle(waiting) {
+  try {
+    return await waiting
+  } catch (error) {
+    if (error.code === 'TRANSACTION_REPLACED' && error.reason === 'repriced' && error.receipt?.status === 1) {
+      return error.receipt
+    }
+    throw error
+  }
+}
+
+/**
+ * Waits for a transaction sent earlier (e.g. before a reload) to be mined. Resolves with its receipt,
+ * or rejects if it reverted.
+ * @param {string} hash
+ */
+export async function waitForTransaction(hash) {
+  const receipt = await getSession().provider.waitForTransaction(hash)
+  if (!receipt || receipt.status !== 1) throw new Error('The transaction failed on chain')
+  return receipt
 }
 
 /**
@@ -126,7 +153,8 @@ export async function getNativeBalance() {
 /** The AvatarControls contract: player names. Method names match the ABI. */
 export const avatars = {
   getEvents: () => events('avatars', 'New', 'latest'),
-  createAvatar: (name) => write('avatars', 'createAvatar', name),
+  createAvatar: (name, options) => send('avatars', 'createAvatar', [name], options),
+  getAvatarNameById: (id) => read('avatars', 'getAvatarNameById', id),
   getMyAvatarName: () => read('avatars', 'getMyAvatarName'),
   getAvatarNameByAddress: (owner) => read('avatars', 'getAvatarNameByAddress', owner),
   haveAvatar: () => read('avatars', 'haveAvatar'),
@@ -161,7 +189,7 @@ export const galaxy = {
   renameStation: (planetId, name) => write('game', 'renameStation', planetId, name),
   tradeAtPort: (planetId, equipment, fuel, organics) =>
     write('game', 'tradeAtPort', planetId, equipment, fuel, organics),
-  launchShip: (name) => write('game', 'launchShip', name),
+  launchShip: (name, options) => send('game', 'launchShip', [name], options),
   renameMyShip: (name) => write('game', 'renameMyShip', name),
   addHoldsToShip: (planetId, holds) => write('game', 'addHoldsToShip', planetId, holds)
 }

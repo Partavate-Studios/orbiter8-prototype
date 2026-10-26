@@ -66,7 +66,7 @@ export default class Sound {
     if (this.musicVolume > 0) {
       this.music[song].currentTime = 0
       this.music[song].volume = this.musicVolume
-      this.music[song].play()
+      this.startPlaying(this.music[song])
     }
 
     this.currentMusic = song
@@ -89,8 +89,21 @@ export default class Sound {
   resumeMusic() {
     if (this.currentMusic != '') {
       this.music[this.currentMusic].volume = this.musicVolume
-      this.music[this.currentMusic].play()
+      this.startPlaying(this.music[this.currentMusic])
     }
+  }
+
+  /** Plays, noting when the browser blocks it: audio may only start after the player's first click or key. */
+  startPlaying(audio) {
+    this.blocked = false
+    audio.play()?.catch?.((error) => {
+      if (error.name === 'NotAllowedError') this.blocked = true
+    })
+  }
+
+  /** Call from a click or key press: starts music the browser blocked earlier. */
+  unlock() {
+    if (this.blocked && this.musicVolume > 0) this.resumeMusic()
   }
 
   playEffect(effect) {

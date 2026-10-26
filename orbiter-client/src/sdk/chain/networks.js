@@ -11,7 +11,7 @@
  * @property {string[]} rpc
  * @property {string[]} explorer   Block explorer base URLs, without a trailing slash.
  * @property {{ Orbiter8: string, AvatarControls: string }} contracts
- * @property {{ text: string, url?: string }[]} [funding]  How to get gas money, shown on the preflight screen.
+ * @property {{ text: string, url?: string }[]} [funding]  How to get gas money: shown on the funds step and the Network panel.
  * @property {{ name: string, tokenUrl: string }} [nftMarket]  Where the game's NFTs can be viewed and traded;
  *   `tokenUrl` has {contract} and {id} placeholders. Networks without one show no market link.
  */
@@ -29,7 +29,15 @@ const deployed = [
       Orbiter8: '0xdd86445C07e140f284eE10A4c39dF7C568d88865',
       AvatarControls: '0x1bde28Bf4e0224A72EbC309992B0A5b32262b47A'
     },
-    funding: [{ text: 'Get test ETH from Sepolia Faucet ↗', url: 'https://sepolia-faucet.com/' }],
+    // Checked 2026-10-25. pk910's mines a little in the browser and needs no account; Google's needs a
+    // Google account. (The old sepolia-faucet.com no longer answers.)
+    funding: [
+      { text: 'Sepolia PoW Faucet (no account needed) ↗', url: 'https://sepolia-faucet.pk910.de/' },
+      {
+        text: 'Google Cloud Sepolia Faucet ↗',
+        url: 'https://cloud.google.com/application/web3/faucet/ethereum/sepolia'
+      }
+    ],
     // OpenSea closed its testnets in 2025; Rarible's testnet indexes Sepolia.
     nftMarket: { name: 'Rarible', tokenUrl: 'https://testnet.rarible.com/token/{contract}:{id}' }
   },
@@ -44,7 +52,8 @@ const deployed = [
       Orbiter8: '0x7224299E42180251C90621038bDCC8658589f685',
       AvatarControls: '0xc48E08D9367CbC7ebFA363A9467b3c9da286C99D'
     },
-    funding: [{ text: "Get test BNB from a Binance's Faucet ↗", url: 'https://testnet.binance.org/faucet-smart/' }]
+    // The old testnet.binance.org address now redirects here (checked 2026-10-25).
+    funding: [{ text: 'BNB Chain Testnet Faucet ↗', url: 'https://www.bnbchain.org/en/testnet-faucet' }]
   },
   {
     chainId: 1285,

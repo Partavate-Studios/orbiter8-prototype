@@ -44,6 +44,38 @@ export function preferredWallet(wallets) {
   return wallets.find((wallet) => wallet.info.rdns === remembered) ?? (wallets.length === 1 ? wallets[0] : null)
 }
 
+/**
+ * Whether the wallet already lets this site see an account, asked without a popup (`eth_accounts`).
+ * A returning player's wallet says yes, so the game can connect without asking.
+ */
+export async function isAuthorized(wallet) {
+  try {
+    const accounts = await wallet.provider.request({ method: 'eth_accounts' })
+    return Array.isArray(accounts) && accounts.length > 0
+  } catch {
+    return false
+  }
+}
+
+/**
+ * What went wrong connecting, in terms the player can act on:
+ * 'rejected' (they closed or declined the request), 'pending' (a request is already open in the
+ * wallet), or 'other'.
+ */
+export function walletErrorKind(error) {
+  const code = error?.code ?? error?.info?.error?.code ?? error?.error?.code
+  if (code === 4001 || code === 'ACTION_REJECTED') return 'rejected'
+  if (code === -32002) return 'pending'
+  return 'other'
+}
+
+/** On a phone without a wallet extension: a link that opens this page inside MetaMask's own browser. */
+export function walletAppLink() {
+  const isPhone = navigator.userAgentData?.mobile ?? /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+  if (!isPhone) return null
+  return 'https://metamask.app.link/dapp/' + location.host + location.pathname + location.hash
+}
+
 /** Remembers the chosen wallet so the next visit connects to it without asking. */
 export function rememberWallet(wallet) {
   try {

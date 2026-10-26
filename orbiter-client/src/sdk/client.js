@@ -1,12 +1,17 @@
 // The game client: connects to a wallet, keeps a plain copy of the game state up to date as blocks
 // arrive, and offers every player action. Framework-free; a UI subscribes and draws from the state.
 import { connectWallet } from '@/sdk/chain/wallet'
-import { initContracts, contractAddresses, galaxy, getNativeBalance } from '@/sdk/chain/contracts'
+import { initContracts, contractAddresses, galaxy, getNativeBalance, waitForTransaction } from '@/sdk/chain/contracts'
 import { loadPlayer, loadRecentEvents, loadSystem } from '@/sdk/load'
 import { createBlockWatcher } from '@/sdk/sync'
 import * as actions from '@/sdk/actions'
 import { loadLeaderboard } from '@/sdk/leaderboard'
 import { createExploredMap } from '@/sdk/explored'
+import { loadCallsigns } from '@/sdk/callsigns'
+import { pendingRegistration, rememberPending, forgetPending } from '@/sdk/pending'
+
+// Registrations are remembered while in flight (sdk/pending.js), so a reload can pick up the wait.
+const REGISTRATIONS = { createAvatar: 'callsign', launchShip: 'ship' }
 
 /**
  * @typedef {object} GameState
@@ -25,7 +30,7 @@ import { createExploredMap } from '@/sdk/explored'
 
 /**
  * What changed, passed to subscribers:
- * 'connected' | 'contracts' | 'block' | 'player' | 'events' | 'system' | 'systemProgress' | 'loading', or
+ * 'connected' | 'balance' | 'contracts' | 'block' | 'player' | 'events' | 'system' | 'systemProgress' | 'loading', or
  * { error, what } when a refresh failed (the state keeps its previous value).
  * @typedef {string | { error: Error, what: string }} Change
  */
@@ -80,12 +85,30 @@ export function createGameClient() {
     Object.entries(actions).map(([name, action]) => [
       name,
       async (...args) => {
-        const receipt = await action(...args)
+        const receipt = REGISTRATIONS[name]
+          ? await register(REGISTRATIONS[name], action, ...args)
+          : await action(...args)
         client.refresh()
         return receipt
       }
     ])
   )
+
+  /** Sends a registration (callsign or ship), remembering it until it's mined or fails. */
+  async function register(kind, action, name, options = {}) {
+    const { chainId, account } = state
+    try {
+      return await action(name, {
+        ...options,
+        onSent: (hash) => {
+          rememberPending(chainId, account, { kind, hash, name, sentAt: Date.now() })
+          options.onSent?.(hash)
+        }
+      })
+    } finally {
+      forgetPending(chainId, account)
+    }
+  }
 
   /** Runs a refresh; a failure is reported to subscribers instead of thrown. */
   const attempt = async (what, refresh) => {
@@ -161,6 +184,38 @@ export function createGameClient() {
         leaderboard = { players: await loadLeaderboard(state.contracts), loadedAt: Date.now() }
       }
       return leaderboard
+    },
+
+    /** The callsign or ship registration this player sent and is still waiting on, if any (after a reload). */
+    pendingRegistration() {
+      return state.account ? pendingRegistration(state.chainId, state.account) : null
+    },
+
+    /**
+     * Waits for a registration sent before a reload, then reloads the player. Rejects if it failed on
+     * chain; either way it's no longer pending.
+     */
+    async resumeRegistration() {
+      const pending = client.pendingRegistration()
+      if (!pending) return
+      try {
+        await waitForTransaction(pending.hash)
+      } finally {
+        forgetPending(state.chainId, state.account)
+        await client.refreshPlayer()
+      }
+    },
+
+    /** Every callsign in use, lowercased, or null if there are too many to read (sdk/callsigns.js). */
+    async listCallsigns() {
+      if (!state.contracts) return null
+      return loadCallsigns(state.contracts.avatars)
+    },
+
+    /** Re-reads the player's native balance (for gas). */
+    async refreshBalance() {
+      state.balance = await getNativeBalance()
+      notify('balance')
     },
 
     /** Reloads the player, recent events and the current system. */
