@@ -746,18 +746,32 @@ Notes: the browser only reveals a gamepad after a button is pressed on the page.
 
 ### 2. Heliopause → neighbor-star view (done 2026-10-25)
 
-**Round 2 (Koda, 2026-10-25), in progress. Each step is its own commit; tick it off here when it lands:**
+**Round 3 (Koda, 2026-10-25), in progress. Each step is its own commit; tick it off here when it lands:**
+1. [ ] **The top-right button:**
+   - It shows a plain star until the star is selected; clicking it selects the star, and it becomes the star-nav icon.
+   - Clicking the star-nav icon zooms all the way out into the neighbor view, as if scrolling out.
+   - The old ring menu around the sun goes. Everything that opened it (the card's jump buttons, the gamepad's X) opens the neighbor view instead.
+2. [ ] **An Orbiter 8 ship in the neighbor view:** it pops out from behind the sun as the stars arrive, then orbits at a modest speed, passing behind and in front of the star. The center star gets slightly larger.
+3. [ ] **The jump only plays once the move is on chain:**
+   - After Jump, the view stays open while the wallet and transaction are pending, with the ship circling the sun fast, getting ready to jump.
+   - The jump animation starts once the transaction is mined.
+   - A rejected or failed jump returns to the choice with a message.
+4. [ ] **Verify.**
+
+**Round 2 (Koda, 2026-10-25), done.** The rings settle mid-screen and stretch sideways on wide screens. Verified at 1440×900 and 2000×840.
+
+**Round 2 plan (kept for reference). Each step is its own commit; tick it off here when it lands:**
 1. [x] **Remember explored systems.** `sdk/explored.js` records each visited system's neighbor list, per network, in localStorage. The contracts can't list other systems' neighbors (`getSystemData` is internal), so the outer ring can only show neighbors the player has visited.
    - **Koda (2026-10-25):** a client-side memory isn't a long-term answer, since it keeps growing. His new star-creation algorithm tracks physical positions in space, and that, with the next contracts, should replace this. Keep it for now, and pull it if it causes problems.
    - Capped at the 1,000 most recently visited systems (about 60 KB).
-2. [ ] **The entrance animation:**
+2. [x] **The entrance animation:**
    - The heliopause becomes the star: it starts at the heliopause's on-screen size and position, then shrinks and moves to the center. The real heliopause on the guides canvas is hidden while the view is open.
    - The neighbors fly in from beyond the screen edges instead of bursting out of the center.
-3. [ ] **Hover on a reachable star:** it glows, and its dotted route brightens.
-4. [ ] **The outer ring:**
+3. [x] **Hover on a reachable star:** it glows, and its dotted route brightens.
+4. [x] **The outer ring:**
    - Each explored neighbor's own neighbors appear as small dots, under half the size, with no labels, outside the ring. They're grouped near the neighbor they belong to, never on top of each other, and not interactive.
    - When a neighbor's neighbor is the current system, there's no dot: a second dotted line, curving the opposite way, shows the path back.
-5. [ ] **Verify** with screenshots of the animation frames, hover, and the outer ring after exploring, plus tests.
+5. [x] **Verify** with screenshots of the animation frames, hover, and the outer ring after exploring, plus tests.
 
 **Koda's decisions (2026-10-25):**
 - This is an *additional* way to jump. The existing jump menu stays as it is.
