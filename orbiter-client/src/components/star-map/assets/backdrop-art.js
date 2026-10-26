@@ -134,3 +134,23 @@ export const backdropShapes = [
   { type: 'circle', fill: '#5b1aaa', cx: 955.0, cy: 581.0, r: 3.0 },
   { type: 'circle', fill: '#5b1aaa', cx: 904.0, cy: 507.0, r: 3.0 }
 ]
+
+let backdropPaths = null
+
+/** Paints the art in its own 0–BACKDROP_SIZE space; the caller sets the transform. */
+export function paintBackdrop(ctx) {
+  backdropPaths ??= backdropShapes.map((shape) => (shape.type === 'path' ? new Path2D(shape.d) : null))
+  backdropShapes.forEach((shape, index) => {
+    ctx.fillStyle = shape.fill
+    if (shape.type === 'path') {
+      ctx.fill(backdropPaths[index])
+    } else if (shape.type === 'rect') {
+      ctx.fillRect(0, 0, shape.width, shape.height)
+    } else {
+      ctx.beginPath()
+      if (shape.type === 'circle') ctx.arc(shape.cx, shape.cy, shape.r, 0, Math.PI * 2)
+      else ctx.ellipse(shape.cx, shape.cy, shape.rx, shape.ry, 0, 0, Math.PI * 2)
+      ctx.fill()
+    }
+  })
+}

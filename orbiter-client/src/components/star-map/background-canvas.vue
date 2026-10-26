@@ -15,7 +15,7 @@ import { useUIStore } from '@/stores/ui'
 import { useConfigStore } from '@/stores/config'
 import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
 import { CompositedLayer } from '@/libs/composited-layer'
-import { backdropShapes, BACKDROP_SIZE } from './assets/backdrop-art'
+import { paintBackdrop, BACKDROP_SIZE } from './assets/backdrop-art'
 
 // Pixels drawn beyond each screen edge, so the layers can pan or shrink a little before a redraw.
 const MARGIN = 256
@@ -36,9 +36,6 @@ const backdropScaleFor = (scale) => (Math.sqrt(10 / scale) + 10) / 4
 const starfieldScaleFor = (scale) => (Math.sqrt(12 / scale) + 10) / 4
 // The starfield drifts at 1/20 of the camera's movement (parallax).
 const PARALLAX = 20
-
-// Parsed once; the art never changes.
-const backdropPaths = backdropShapes.map((shape) => (shape.type === 'path' ? new Path2D(shape.d) : null))
 
 function randomStars(count) {
   const stars = []
@@ -143,19 +140,7 @@ export default {
       const s = this.unit() * scale * BACKDROP_SCALE
       ctx.scale(s, s)
       ctx.translate(-BACKDROP_SIZE / 2, -BACKDROP_SIZE / 2)
-      backdropShapes.forEach((shape, index) => {
-        ctx.fillStyle = shape.fill
-        if (shape.type === 'path') {
-          ctx.fill(backdropPaths[index])
-        } else if (shape.type === 'rect') {
-          ctx.fillRect(0, 0, shape.width, shape.height)
-        } else {
-          ctx.beginPath()
-          if (shape.type === 'circle') ctx.arc(shape.cx, shape.cy, shape.r, 0, Math.PI * 2)
-          else ctx.ellipse(shape.cx, shape.cy, shape.rx, shape.ry, 0, 0, Math.PI * 2)
-          ctx.fill()
-        }
-      })
+      paintBackdrop(ctx)
     },
     drawStars() {
       if (!this.showStars) return

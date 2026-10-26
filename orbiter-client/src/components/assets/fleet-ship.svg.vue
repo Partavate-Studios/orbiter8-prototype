@@ -1,20 +1,23 @@
 <template>
-  <!-- One ship of the Orbiter 8 class, nose up, about 9 units across (scale it with a parent transform). -->
-  <g transform="scale(0.002)">
-    <g v-if="engines">
-      <rect
-        v-for="(flame, index) in design.engines"
-        :key="index"
-        :x="flame[0]"
-        :y="flame[1]"
-        :width="flame[2]"
-        :height="flame[3]"
-        rx="200"
-        ry="200"
-        fill="url(#engineGradient)"
-      />
+  <!-- One ship of the Orbiter 8 class, nose up, about 9 units across. A transform passed in lands on the
+       outer group; the inner one scales the art down. -->
+  <g>
+    <g transform="scale(0.002)">
+      <g v-if="engines">
+        <rect
+          v-for="(flame, index) in design.engines"
+          :key="index"
+          :x="flame[0]"
+          :y="flame[1]"
+          :width="flame[2]"
+          :height="flame[3]"
+          rx="200"
+          ry="200"
+          fill="url(#engineGradient)"
+        />
+      </g>
+      <path :transform="design.transform" :d="design.d" :fill="color" />
     </g>
-    <path :transform="design.transform" :d="design.d" :fill="color" />
   </g>
 </template>
 
