@@ -1,4 +1,6 @@
 <template>
+  <!-- The launch pad: the player's new Orbiter 8 on its gantry, a fleet of Orbiter 8-class ships
+       behind it, and smoke while the launch is waiting on the chain. -->
   <div class="ship-scene">
     <svg viewBox="-32 -32 64 64" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
       <g transform="translate(-50 5) scale(5.5)">
@@ -69,10 +71,10 @@
 </template>
 
 <script>
-import Ship from '../star-map/sprites/ship.svg.vue'
+import Ship from '@/components/star-map/sprites/ship.svg.vue'
 
 export default {
-  name: 'ShipScene',
+  name: 'LaunchPad',
   components: {
     Ship
   },
@@ -88,7 +90,8 @@ div.ship-scene {
   height: 128px;
   text-align: center;
   svg {
-    width: 460px;
+    width: 100%;
+    max-width: 460px;
     height: 128px;
   }
 }

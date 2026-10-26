@@ -1,25 +1,12 @@
 <template>
   <svg-defs />
   <gamepad-overlay />
-
-  <div v-if="playerReady" id="app">
-    <div v-if="gameDataLoaded">
-      <router-view />
-    </div>
-
-    <div v-else>Loading...</div>
-  </div>
-
-  <div v-else>
-    <network-select />
+  <div id="app">
+    <router-view />
   </div>
 </template>
 
 <script>
-import { useChainStore } from '@/stores/chain'
-import { useGameStateStore } from '@/stores/gamestate'
-import { mapActions, mapState } from 'pinia'
-import NetworkSelect from '@/components/screens/NetworkSelect'
 import SvgDefs from '@/components/svg-defs.vue'
 import GamepadOverlay from '@/components/gamepad-overlay.vue'
 import router from '@/router/router'
@@ -27,26 +14,17 @@ import router from '@/router/router'
 export default {
   name: 'Orbiter8Game',
   components: {
-    NetworkSelect,
     SvgDefs,
     GamepadOverlay
   },
-  computed: {
-    ...mapState(useChainStore, ['playerReady']),
-    ...mapState(useGameStateStore, ['gameDataLoaded'])
-  },
   created: function () {
-    this.initWeb3()
-    // Always start at the title screen. Vue Router 4 resolves the URL asynchronously,
-    // so wait for it; checking right away always saw '/' and skipped the redirect.
+    // Always start at the title screen, which connects the wallet and loads the game. Vue Router 4
+    // resolves the URL asynchronously, so wait for it; checking right away always saw '/'.
     router.isReady().then(() => {
       if (router.currentRoute.value.path != '/') {
         router.push('/')
       }
     })
-  },
-  methods: {
-    ...mapActions(useChainStore, ['initWeb3'])
   }
 }
 </script>
@@ -58,7 +36,6 @@ export default {
   text-align: center;
 }
 body {
-  @import url('https://fonts.googleapis.com/css?family=Ubuntu');
   font-family: 'Ubuntu', sans-serif;
   margin: 0;
   padding: 0;
@@ -68,40 +45,5 @@ body {
 }
 a {
   color: #aaa;
-}
-.layer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  overflow: hidden;
-}
-
-.button {
-  display: inline-block;
-  background: #ffffff90;
-  color: #310e5c;
-  border: 1px solid #c3b3da;
-  padding: 0.5em 1.5em;
-  margin: 0.5em 1em;
-  border-radius: 0.75em;
-  text-decoration: none;
-}
-.button:hover {
-  background: #c3b3da;
-  border: 1px solid #ffffff;
-  cursor: pointer;
-}
-.btn-big {
-  font-size: 2em;
-  padding: 0.25em 0.75em;
-  font-weight: bold;
-  border-radius: 2em;
 }
 </style>

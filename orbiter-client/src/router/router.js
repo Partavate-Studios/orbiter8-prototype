@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import Game from '@/components/playgame'
-import TitleScreen from '@/components/screens/TitleScreen'
+import TitleScreen from '@/components/title/title-screen.vue'
+import { useGameStateStore } from '@/stores/gamestate'
 
 export default createRouter({
   history: createWebHashHistory(),
@@ -13,7 +14,12 @@ export default createRouter({
     {
       path: '/play',
       name: 'Play',
-      component: Game
+      component: Game,
+      // The game needs a loaded player with a ship; anyone else starts at the title.
+      beforeEnter: () => {
+        const gameState = useGameStateStore()
+        return gameState.gameDataLoaded && gameState.haveShip ? true : '/'
+      }
     }
   ]
 })
