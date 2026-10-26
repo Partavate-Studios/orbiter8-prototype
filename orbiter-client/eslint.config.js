@@ -10,7 +10,7 @@ export default [
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
-      globals: { ...globals.browser }
+      globals: { ...globals.browser, __APP_VERSION__: 'readonly' }
     },
     rules: {
       // Single-word component names (Hud, Grid, Planet…) are this project's convention.
