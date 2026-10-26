@@ -938,7 +938,43 @@ Order (from the walkthrough's list). Tick each when it lands:
 | Audio | Music before any click | n/a (Play was the first click) | **The first click on the title starts the music**, whatever the button is. |
 | Motion | Reduced motion | ✗ | The title animation holds still. |
 
+**Step 1 build plan (Koda signed off, 2026-10-25).** Each step is its own commit; tick it off when it lands:
+1. [ ] **Version.** `package.json` becomes 3.2.0, and Vite bakes it in as `__APP_VERSION__`; dev builds add the commit (`3.2.0-dev+abc1234`). Release builds: `npm version patch`.
+2. [ ] **Art from Enterprise Circuit.** Its ship designs (Orbiter 8, Polygon, Boba, Moonbeam, with engines), the station, and Minerva's badge go into `src/components/assets/`, as small SVG components.
+3. [ ] **The title scene** (`components/title/title-scene.vue`):
+   - The backdrop and stars are drawn once on a canvas (`backdropShapes`). Each moving part is its own layer, animated with CSS `@keyframes` on `transform`, so nothing repaints per frame.
+   - **The sun:** two ray layers turning in opposite directions, with a slow shimmer.
+   - **Ships:** three ships circling the sun, and one ship drifting across the screen.
+   - **The planet and station, featured:** bigger than in Enterprise Circuit. Docked ships are close in size, varied within one class. **Shuttles fly** from each docked ship to the station and back, with short trails and staggered timing.
+   - Everything holds still under "reduce motion".
+4. [ ] **The title menu:**
+   - the dark band for contrast, the logo, and one main button that follows the player (Connect, Begin, Launch, Continue, or a loading state);
+   - Network and Settings buttons, and the version at the bottom left;
+   - **the first click anywhere starts the music** (`08audio.js` retries after a blocked autoplay).
+5. [ ] **The onboarding logic**, kept out of the components:
+   - **`libs/onboarding.js`:** works out the current step from the stores (wallet, network, funds, game data, callsign, ship, a pending transaction), with tests covering the state map above.
+   - **Wallet:** a silent check for returning players (`eth_accounts`); plain messages for 4001 and -32002; a phone link into MetaMask's own browser.
+   - **Transactions:** pending callsign and ship transactions are remembered across reloads; a replaced transaction counts as success; failures come back as a reason.
+   - **SDK:** `listCallsigns()` reads every callsign once (`getAvatarCount` + `getAvatarNameById`, batched), so the "taken" check costs nothing per keystroke. It's a hint only: the contracts allow duplicates.
+6. [ ] **The wizard steps,** in Minerva's panel with step dots and a way back to the title:
+   - **Wallet** and **Network**, including the funds gate with faucets, which moves on by itself when funds arrive.
+   - **Callsign:** a real text box, the pilot card filling in as you type, trimmed to 1–24 characters, and "already taken" shown as you type.
+   - **Ship:** the launch pad with the fleet behind it, and smoke while pending.
+   - **Shared transaction states:** confirm in wallet, transmitting (with an explorer link), success, failed (with the reason, back to the form, name kept).
+   - **Take command:** the welcome-back stats.
+7. [ ] **Network and Settings panels.**
+   - **Network:** the old status report, with contracts and explorer links, import Credits, faucets, and balance. The Sushi link is hidden.
+   - **Settings:** music, effects and graphics.
+8. [ ] **Wiring.** The title is the first screen; the preflight checklist and the old onboarding screens go; `/play` needs a loaded game and a ship. The harness's `capture.sh` follows the new flow (and loses the removed jump-menu steps).
+9. [ ] **Verify:**
+   - harness screenshots of every state on the board, beside Enterprise Circuit's;
+   - a title performance trace against Enterprise Circuit's (0.5 s of raster per 5 s);
+   - lint and tests.
+
 **Ideas for later (Koda, 2026-10-25):**
+- **Engine trails:** ships that jumped recently arrive with fading engine trails.
+- **Owner colors:** each player gets a color derived from their address (a hash to a hue), with no contract change. A later contract could let players choose their own. Uses: faint rings on claimed planets, ship trails, the leaderboard.
+
 - **Shuttle traffic at in-game stations,** especially when selected. Eventually the docked ships would be the players who recently traded there, with shuttles in proportion. Koda wants this kind of living detail in many places.
 - **A Credits swap.** Where to put a pool depends on the launch network. Decide it with the launch.
 
