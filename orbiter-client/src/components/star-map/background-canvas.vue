@@ -1,10 +1,13 @@
 <template>
-  <!-- The bottom layers of the star map, drawn on canvas: the nebula backdrop, the starfield,
-       and (during a jump) the streaking stars. Backdrop and stars are drawn only when the zoom
-       settles or the window resizes; in between, a CSS transform follows the camera. -->
+  <!-- The bottom layers of the star map, drawn on canvas: the nebula backdrop (with the farthest
+       stars, which don't pan), the starfield, a nearer sparse starfield (Luxurious graphics), and
+       (during a jump) the streaking stars. Backdrop and stars are drawn only when the zoom settles or
+       the window resizes; in between, a CSS transform follows the camera. Each starfield pans at its
+       own fraction of the camera's movement, for depth. -->
   <div class="background">
     <canvas ref="backdrop" class="background-canvas" :style="oversizedBox" />
     <canvas v-show="showStars" ref="stars" class="background-canvas" :style="oversizedBox" />
+    <canvas v-show="showNearStars" ref="near" class="background-canvas" :style="oversizedBox" />
     <canvas v-show="jumpAnimationState" ref="jump" class="jump-canvas" />
   </div>
 </template>
@@ -34,19 +37,40 @@ const JUMP_STALL_STOP_MS = 3000
 // These are the original formulas from map.vue.
 const backdropScaleFor = (scale) => (Math.sqrt(10 / scale) + 10) / 4
 const starfieldScaleFor = (scale) => (Math.sqrt(12 / scale) + 10) / 4
-// The starfield drifts at 1/20 of the camera's movement (parallax).
+// The starfield drifts at 1/20 of the camera's movement (parallax); the near starfield at 1/7.
 const PARALLAX = 20
+const NEAR_PARALLAX = 7
+// The near stars grow a little faster than the starfield as the camera zooms in.
+const nearScaleFor = (scale) => starfieldScaleFor(scale) * 1.35
+const NEAR_STAR_COLOR = '#e2d4ff'
+const NEAR_STAR_GLARE_COLOR = '#e2d4ff26'
+// The farthest stars, painted into the backdrop in its own art units (1280 across), so they zoom with
+// it and never pan.
+const DEEP_STAR_COLOR = '#9b78d6'
 
-function randomStars(count) {
+function randomStars(count, { spread = 1500, center = 0, sizeScale = 1 } = {}) {
   const stars = []
   for (let i = 0; i < count; i++) {
     stars.push({
-      x: Math.random() * 1500 - 750,
-      y: Math.random() * 1500 - 750,
-      size: Math.random() * Math.random() * 1.5 + 0.1
+      x: Math.random() * spread - spread / 2 + center,
+      y: Math.random() * spread - spread / 2 + center,
+      size: (Math.random() * Math.random() * 1.5 + 0.1) * sizeScale
     })
   }
   return stars
+}
+
+/** Fills the stars as dots: bright cores first, then the soft glare over them. */
+function paintStars(ctx, stars, layers) {
+  for (const [color, radius] of layers) {
+    ctx.fillStyle = color
+    ctx.beginPath()
+    for (const star of stars) {
+      ctx.moveTo(star.x + star.size * radius, star.y)
+      ctx.arc(star.x, star.y, star.size * radius, 0, Math.PI * 2)
+    }
+    ctx.fill()
+  }
 }
 
 // Non-reactive per-instance drawing state lives on `this` without being declared in data().
@@ -57,6 +81,9 @@ export default {
     ...mapState(useConfigStore, ['graphicsQuality']),
     showStars() {
       return this.graphicsQuality > 1
+    },
+    showNearStars() {
+      return this.graphicsQuality > 2
     },
     oversizedBox() {
       return {
@@ -76,7 +103,9 @@ export default {
     },
     graphicsQuality() {
       this.generateStars()
+      this.drawBackdrop()
       this.drawStars()
+      this.drawNearStars()
     }
   },
   mounted() {
@@ -90,6 +119,7 @@ export default {
     const screen = () => this.screenSize
     this.backdropLayer = new CompositedLayer(this.$refs.backdrop, { margin: MARGIN, mustCover: screen })
     this.starsLayer = new CompositedLayer(this.$refs.stars, { margin: MARGIN, mustCover: screen })
+    this.nearLayer = new CompositedLayer(this.$refs.near, { margin: MARGIN, mustCover: screen })
     this.resize()
     this.stopFrames = onFrame(this.onFrame, FRAME_ORDER.render)
   },
@@ -100,6 +130,14 @@ export default {
     generateStars() {
       // Frozen: positions never change, so Vue doesn't need to track them.
       this.stars = Object.freeze(randomStars(this.graphicsQuality > 2 ? 3200 : 800))
+      // Deep stars sit in the backdrop's art space. The backdrop never pans and is drawn several
+      // screens wide, so only its middle (about 520 of its 1280 units, zoomed all the way out) is ever
+      // on screen: that's where they go.
+      this.deepStars = Object.freeze(
+        randomStars(this.graphicsQuality > 2 ? 2400 : 1200, { spread: 520, center: 640, sizeScale: 0.5 })
+      )
+      // Near stars pan at 1/7 of the camera, so they spread wide enough to cover its whole range.
+      this.nearStars = Object.freeze(randomStars(this.graphicsQuality > 2 ? 1000 : 0, { spread: 2000, sizeScale: 1.7 }))
     },
     /** Pixels per map unit: the map fits 1200 units (viewport.resolution) into the screenSize height. */
     unit() {
@@ -107,7 +145,7 @@ export default {
     },
     resize() {
       const dpr = window.devicePixelRatio || 1
-      for (const ref of ['backdrop', 'stars']) {
+      for (const ref of ['backdrop', 'stars', 'near']) {
         const canvas = this.$refs[ref]
         canvas.width = Math.round((this.screenSize.width + 2 * MARGIN) * dpr)
         canvas.height = Math.round((this.screenSize.height + 2 * MARGIN) * dpr)
@@ -116,6 +154,7 @@ export default {
       this.$refs.jump.height = Math.round(this.screenSize.height * dpr)
       this.drawBackdrop()
       this.drawStars()
+      this.drawNearStars()
     },
     /** A 2D context with its origin at the screen center, in CSS pixels. */
     centeredContext(canvas, margin) {
@@ -141,6 +180,7 @@ export default {
       ctx.scale(s, s)
       ctx.translate(-BACKDROP_SIZE / 2, -BACKDROP_SIZE / 2)
       paintBackdrop(ctx)
+      if (this.showStars) paintStars(ctx, this.deepStars, [[DEEP_STAR_COLOR, 0.35]])
     },
     drawStars() {
       if (!this.showStars) return
@@ -153,18 +193,25 @@ export default {
       ctx.translate(unit * x, unit * y)
       ctx.scale(unit * scale, unit * scale)
       // Bright cores first, then the soft glare over them, as the SVG version drew them.
-      for (const [color, radius] of [
+      paintStars(ctx, this.stars, [
         [STAR_COLOR, 0.15],
         [STAR_GLARE_COLOR, 0.75]
-      ]) {
-        ctx.fillStyle = color
-        ctx.beginPath()
-        for (const star of this.stars) {
-          ctx.moveTo(star.x + star.size * radius, star.y)
-          ctx.arc(star.x, star.y, star.size * radius, 0, Math.PI * 2)
-        }
-        ctx.fill()
-      }
+      ])
+    },
+    drawNearStars() {
+      if (!this.showNearStars) return
+      const scale = nearScaleFor(this.viewport.scale)
+      const x = this.viewport.x / NEAR_PARALLAX
+      const y = this.viewport.y / NEAR_PARALLAX
+      this.drawnNear = { scale, x, y }
+      const ctx = this.centeredContext(this.$refs.near, MARGIN)
+      const unit = this.unit()
+      ctx.translate(unit * x, unit * y)
+      ctx.scale(unit * scale, unit * scale)
+      paintStars(ctx, this.nearStars, [
+        [NEAR_STAR_COLOR, 0.28],
+        [NEAR_STAR_GLARE_COLOR, 0.9]
+      ])
     },
     onFrame(now) {
       if (this.jumpAnimationState) {
@@ -201,6 +248,17 @@ export default {
         originY: centerY + unit * drawn.y
       }
       if (this.starsLayer.update(starsDelta)) this.drawStars()
+
+      if (!this.showNearStars) return
+      const near = this.drawnNear
+      const nearDelta = {
+        scale: nearScaleFor(this.viewport.scale) / near.scale,
+        x: unit * (this.viewport.x / NEAR_PARALLAX - near.x),
+        y: unit * (this.viewport.y / NEAR_PARALLAX - near.y),
+        originX: centerX + unit * near.x,
+        originY: centerY + unit * near.y
+      }
+      if (this.nearLayer.update(nearDelta)) this.drawNearStars()
     },
     /** The jump animation's star streaks, redrawn every frame while jumping. */
     drawJump() {
