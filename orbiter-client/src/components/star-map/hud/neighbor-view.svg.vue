@@ -206,7 +206,7 @@ export default {
       const t = this.phase.morph
       return {
         x: lerp(this.start.x, 0, t),
-        y: lerp(this.start.y, 0, t),
+        y: lerp(this.start.y, this.ringY, t),
         radius: lerp(this.start.radius, STAR_RADIUS, t)
       }
     },
@@ -215,6 +215,19 @@ export default {
     },
     angles() {
       return layoutNeighbors(this.neighborList.map((neighbor) => neighbor.id))
+    },
+    /**
+     * Where the rings settle: midway between the title and the Jump / Cancel row (relative to the
+     * world's star, where the view starts), and how far up or down they can reach from there.
+     */
+    freeSpan() {
+      return { top: this.topMostY + 130, bottom: this.bottomMostY - 230 }
+    },
+    ringY() {
+      return (this.freeSpan.top + this.freeSpan.bottom) / 2 - CENTER_Y
+    },
+    verticalRoom() {
+      return (this.freeSpan.bottom - this.freeSpan.top) / 2 - 40 // a star's label hangs below it
     },
     /** The second ring, in ring radii (see layoutOuterRing). */
     outerRing() {
@@ -228,23 +241,37 @@ export default {
     /** Room for the rings, measured from the star: clear of the title above and the choice below. */
     ringRadius() {
       const sideRoom = (this.rightMostX - this.leftMostX) / 2 - 90
-      const roomAbove = CENTER_Y - this.topMostY - 140 // title and hint, plus a star's label
-      const roomBelow = this.bottomMostY - CENTER_Y - 250 // a star's label, then the Jump / Cancel row
-      const room = Math.min(sideRoom, roomAbove, roomBelow)
+      const room = Math.min(sideRoom, this.verticalRoom)
       // Leave space outside the first ring for the second, if there is one.
       const extent = Math.max(1, ...this.outerRing.dots.map((dot) => Math.hypot(dot.x, dot.y) + 0.06))
       return Math.max(90, room / extent)
+    },
+    /** Screens are wider than tall: spread the rings sideways into an ellipse, up to 1.6x. */
+    stretchX() {
+      const sideRoom = (this.rightMostX - this.leftMostX) / 2 - 90
+      const extent = Math.max(1, ...this.outerRing.dots.map((dot) => Math.hypot(dot.x, dot.y) + 0.06))
+      return Math.min(1.6, Math.max(1, sideRoom / extent / this.ringRadius))
     },
     stars() {
       const distance = this.ringRadius * lerp(FLY_IN_FROM, 1, this.phase.neighbors)
       return this.neighborList.map((neighbor) => {
         const { x, y } = pointAt(this.angles.get(String(neighbor.id)), distance)
-        return { id: Number(neighbor.id), name: neighbor.name, visited: neighbor.name !== UNEXPLORED, x, y }
+        return {
+          id: Number(neighbor.id),
+          name: neighbor.name,
+          visited: neighbor.name !== UNEXPLORED,
+          x: x * this.stretchX,
+          y: y + this.ringY
+        }
       })
     },
     outerDots() {
       const scale = this.ringRadius * lerp(1.6, 1, this.phase.outer)
-      return this.outerRing.dots.map((dot) => ({ id: dot.id, x: dot.x * scale, y: dot.y * scale }))
+      return this.outerRing.dots.map((dot) => ({
+        id: dot.id,
+        x: dot.x * scale * this.stretchX,
+        y: dot.y * scale + this.ringY
+      }))
     },
     returnPaths() {
       const returning = new Set(this.outerRing.returns)
@@ -274,11 +301,12 @@ export default {
     ...mapActions(useGameStateStore, ['moveToSystem']),
     /** Where a straight line from the center to a star leaves the center star and reaches the other. */
     ends(star, startGap, endGap) {
-      const length = Math.hypot(star.x, star.y) || 1
+      const dy = star.y - this.ringY
+      const length = Math.hypot(star.x, dy) || 1
       const ux = star.x / length
-      const uy = star.y / length
+      const uy = dy / length
       return {
-        near: { x: ux * (this.center.radius + startGap), y: uy * (this.center.radius + startGap) },
+        near: { x: ux * (this.center.radius + startGap), y: this.ringY + uy * (this.center.radius + startGap) },
         far: { x: star.x - ux * endGap, y: star.y - uy * endGap }
       }
     },

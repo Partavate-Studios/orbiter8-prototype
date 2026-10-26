@@ -44,7 +44,7 @@ describe('the second ring', () => {
 
   it('shows explored neighbors’ neighbors as dots outside the ring, once each', () => {
     expect(ring.dots.map((dot) => dot.id).sort()).toEqual([20, 21, 30])
-    for (const dot of ring.dots) expect(Math.hypot(dot.x, dot.y)).toBeGreaterThan(1.3)
+    for (const dot of ring.dots) expect(Math.hypot(dot.x, dot.y)).toBeGreaterThan(1.2)
   })
 
   it('draws a path back instead of a dot for the current system, and skips first-ring stars', () => {

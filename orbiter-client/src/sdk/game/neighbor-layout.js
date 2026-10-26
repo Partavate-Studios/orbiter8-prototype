@@ -61,7 +61,7 @@ export function arcPath(from, to, bend = 0.18) {
 }
 
 // Second ring: how far out the dots sit (in ring radii), and how close two may be.
-const OUTER_DISTANCES = [1.42, 1.6]
+const OUTER_DISTANCES = [1.28, 1.42]
 const OUTER_STEP = 9 // degrees between dots that share a neighbor
 const OUTER_MIN_GAP = 0.1 // ring radii between dot centers
 
