@@ -19,9 +19,29 @@ export default class Tween {
   valueAt(time) {
     if (this.method == 'ease') {
       return this.easedValueAt(time)
+    } else if (this.method == 'geometric') {
+      return this.geometricValueAt(time)
     } else {
       return this.linearValueAt(time)
     }
+  }
+
+  /**
+   * Multiply toward the target at a steady rate (eased in and out), as zooming does: each moment
+   * changes the value by the same factor, so a zoom from 0.6 to 420 feels like steady scrolling
+   * instead of rushing through the near range. Origin and target must be positive.
+   */
+  useGeometric() {
+    this.method = 'geometric'
+  }
+
+  geometricValueAt(time) {
+    if (this.isDone(time)) {
+      return this.target
+    }
+    const t = (time - this.start) / this.duration
+    const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+    return this.origin * Math.pow(this.target / this.origin, eased)
   }
 
   useLinear() {

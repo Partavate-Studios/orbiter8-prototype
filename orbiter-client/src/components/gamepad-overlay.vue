@@ -79,8 +79,7 @@ export default {
       'selectNone',
       'openMenu',
       'closeMenu',
-      'jumpMenuOn',
-      'jumpMenuOff',
+      'zoomOutToNeighbors',
       'toggleShowLabels',
       'toggleScope',
       'viewTo',
@@ -97,7 +96,7 @@ export default {
         case 'settings':
           return this.openMenu('settings')
         case 'jump':
-          return this.menuState.jumpMenu ? this.jumpMenuOff() : this.jumpMenuOn()
+          return this.zoomOutToNeighbors()
         case 'previousPlanet':
           return this.stepPlanet(-1)
         case 'nextPlanet':
@@ -124,7 +123,6 @@ export default {
     /** B: undo the most recent thing — close a view or menu, then let go of the selection. */
     back() {
       if (this.neighborView) return this.exitNeighborView()
-      if (this.menuState.jumpMenu) return this.jumpMenuOff()
       if (this.isMenuOn || this.menuState.chatMenu || this.menuState.leaderboardMenu) return this.closeMenu()
       if (this.selected != null) return this.selectNone()
     },

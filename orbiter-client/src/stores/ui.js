@@ -44,7 +44,6 @@ export const useUIStore = defineStore('UI', {
       menuState: {
         menuShowing: false, //should this just be a getter?
 
-        jumpMenu: false,
         planetsMenu: false,
         settingsMenu: false,
         shipsMenu: false,
@@ -68,7 +67,9 @@ export const useUIStore = defineStore('UI', {
     // Whether the Minerva panel (backtick) is open.
     showMinerva: false,
     // Whether the neighbor-star view is showing (zoomed out past the heliopause; see neighbor-view.svg.vue).
-    neighborView: false
+    neighborView: false,
+    // Zooming out toward the neighbor view (zoomOutToNeighbors); it opens when the zoom arrives.
+    neighborViewPending: false
   }),
   getters: {
     /** Screen pixels per map-group unit, before the camera's zoom. */
@@ -103,9 +104,6 @@ export const useUIStore = defineStore('UI', {
     selected: (state) => state.selectedSprite,
     menuState: (state) => state.hud.menuState,
     isMenuOn: (state) => {
-      if (state.hud.menuState.jumpMenu) {
-        return true
-      }
       if (state.hud.menuState.planetsMenu) {
         return true
       }
@@ -186,6 +184,8 @@ export const useUIStore = defineStore('UI', {
       }
     },
     selectSprite(spriteId) {
+      // Choosing something else cancels a zoom out to the neighbor view (zoomOutToNeighbors re-arms it).
+      this.neighborViewPending = false
       if (this.selectedSprite != spriteId) {
         // close old menu
         this.selectedSprite = spriteId
@@ -196,6 +196,7 @@ export const useUIStore = defineStore('UI', {
       }
     },
     selectNone() {
+      this.neighborViewPending = false
       this.selectedSprite = null
       this.viewport.xTween = null
       this.viewport.yTween = null
@@ -223,6 +224,11 @@ export const useUIStore = defineStore('UI', {
         this.viewport.scale = this.viewport.scaleTween.valueAt(time)
         if (this.viewport.scaleTween.isDone(time)) {
           this.viewport.scaleTween = null
+          // zoomOutToNeighbors: arrived at the edge of the system
+          if (this.neighborViewPending) {
+            this.neighborViewPending = false
+            this.enterNeighborView()
+          }
         }
       }
 
@@ -368,20 +374,16 @@ export const useUIStore = defineStore('UI', {
     exitNeighborView() {
       this.neighborView = false
     },
-    jumpMenuOn() {
-      this.selectedSprite = STAR_KEY
-      this.viewport.scaleTween = new Tween(this.viewport.scale, CAMERA.JUMP_MENU_SCALE, CAMERA.JUMP_MENU_TWEEN_MS)
-      this.hud.menuState.jumpMenu = true
-    },
-    jumpMenuOff() {
-      if (this.hud.menuState.jumpMenu) {
-        this.viewport.scaleTween = new Tween(
-          this.viewport.scale,
-          CAMERA.JUMP_MENU_CLOSE_SCALE,
-          CAMERA.JUMP_MENU_TWEEN_MS
-        )
-        this.hud.menuState.jumpMenu = false
-      }
+    /**
+     * The star button's second click (and the card's jump buttons): select the star, zoom all the way
+     * out as if scrolling, then open the neighbor view to choose where to jump.
+     */
+    zoomOutToNeighbors() {
+      if (this.neighborView) return
+      this.selectSprite(STAR_KEY)
+      this.viewport.scaleTween = new Tween(this.viewport.scale, CAMERA.MAX_SCALE, CAMERA.NEIGHBOR_ZOOM_MS)
+      this.viewport.scaleTween.useGeometric()
+      this.neighborViewPending = true
     },
     openMenu(menu) {
       this.hud.menuState.shipsMenu = false
@@ -423,7 +425,6 @@ export const useUIStore = defineStore('UI', {
       this.hud.menuState.shipsMenu = false
       this.hud.menuState.planetsMenu = false
       this.hud.menuState.settingsMenu = false
-      this.hud.menuState.jumpMenu = false
       this.hud.menuState.tradeMenu = false
       this.hud.menuState.shipyardMenu = false
       this.hud.menuState.chatMenu = false

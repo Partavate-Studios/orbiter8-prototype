@@ -74,7 +74,6 @@ export const useGameStateStore = defineStore('GameState', {
     async moveToSystem(system) {
       try {
         useUIStore().jumpAnimationOn()
-        useUIStore().jumpMenuOff()
         await game.actions.moveTo(system)
       } catch (error) {
         console.error('Jump failed:', error.shortMessage ?? error.message)

@@ -15,6 +15,8 @@ export const CAMERA = {
   START_SCALE: 400,
   /** Most zoomed out the camera goes. */
   MAX_SCALE: 420,
+  /** The star button's zoom from the system out to the neighbor view. */
+  NEIGHBOR_ZOOM_MS: 1800,
   /** Wheeling out at or beyond this zoom (near MAX_SCALE) leaves the system for the neighbor-star view. */
   NEIGHBOR_VIEW_FROM_SCALE: 400,
   /** Most zoomed in the camera goes. */
@@ -33,10 +35,6 @@ export const CAMERA = {
   WHEEL_ZOOM_IN: 0.8,
   WHEEL_ZOOM_OUT: 1.25,
   WHEEL_TWEEN_MS: 100,
-  /** Opening the jump menu zooms out to JUMP_MENU_SCALE; closing it zooms to JUMP_MENU_CLOSE_SCALE. */
-  JUMP_MENU_SCALE: 2,
-  JUMP_MENU_CLOSE_SCALE: 1,
-  JUMP_MENU_TWEEN_MS: 1500,
   /** Arriving in a system: zoom to the player's ship, or to the system if they have none. */
   ARRIVAL_SHIP_SCALE: 0.05,
   ARRIVAL_SYSTEM_SCALE: 0.5,

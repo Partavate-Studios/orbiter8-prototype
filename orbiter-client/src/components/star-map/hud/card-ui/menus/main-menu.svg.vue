@@ -72,7 +72,7 @@ export default {
           )
           break
         case 'jump':
-          this.jumpMenuOn()
+          this.zoomOutToNeighbors()
           break
         case 'market': {
           const object = this.systemObjects[this.objectId]
@@ -136,7 +136,7 @@ export default {
       }
     },
     ...mapActions(useGameStateStore, ['claimPlanet', 'buildStation', 'renameAsset']),
-    ...mapActions(useUIStore, ['jumpMenuOn', 'openMenu', 'selectSprite'])
+    ...mapActions(useUIStore, ['zoomOutToNeighbors', 'openMenu', 'selectSprite'])
   }
 }
 </script>

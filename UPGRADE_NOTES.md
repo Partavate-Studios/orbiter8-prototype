@@ -747,7 +747,7 @@ Notes: the browser only reveals a gamepad after a button is pressed on the page.
 ### 2. Heliopause → neighbor-star view (done 2026-10-25)
 
 **Round 3 (Koda, 2026-10-25), in progress. Each step is its own commit; tick it off here when it lands:**
-1. [ ] **The top-right button:**
+1. [x] **The top-right button:**
    - It shows a plain star until the star is selected; clicking it selects the star, and it becomes the star-nav icon.
    - Clicking the star-nav icon zooms all the way out into the neighbor view, as if scrolling out.
    - The old ring menu around the sun goes. Everything that opened it (the card's jump buttons, the gamepad's X) opens the neighbor view instead.

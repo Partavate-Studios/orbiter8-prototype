@@ -109,9 +109,13 @@ describe('HUD', () => {
     expect(problems).toEqual([])
   })
 
-  it('opens the jump menu', async () => {
-    ui.jumpMenuOn()
+  it('the star button selects the star, then zooms out toward the neighbor view', async () => {
+    ui.selectSprite('ship:5')
     await settle()
+    ui.zoomOutToNeighbors()
+    await settle()
+    expect(ui.selected).toBe('star')
+    expect(ui.neighborViewPending).toBe(true)
     expect(problems).toEqual([])
   })
 })

@@ -50,9 +50,6 @@
           <g v-if="jumpAnimationState">
             <jumpAnimation></jumpAnimation>
           </g>
-          <g v-else-if="menuState.jumpMenu" transform="translate(0 -100)">
-            <jumpMenu></jumpMenu>
-          </g>
           <g v-else-if="neighborView">
             <neighbor-view />
           </g>
@@ -78,7 +75,6 @@ import { useUIStore } from '@/stores/ui'
 import { mapActions, mapState } from 'pinia'
 import _ from 'lodash'
 import Hud from './hud/hud.svg'
-import JumpMenu from './hud/jump-menu.svg'
 import JumpAnimation from './hud/jump-animation.svg'
 import NeighborView from './hud/neighbor-view.svg'
 import BackgroundCanvas from './background-canvas.vue'
@@ -97,7 +93,6 @@ export default {
   name: 'StarMap',
   components: {
     Hud,
-    JumpMenu,
     JumpAnimation,
     NeighborView,
     BackgroundCanvas,
@@ -201,7 +196,6 @@ export default {
       'selectNone',
       'selectSprite',
       'scaleAnimateTo',
-      'jumpMenuOff',
       'calculateViewableArea',
       'drawWorldAt',
       'closeMenu'
@@ -233,7 +227,6 @@ export default {
     handleMouseDown() {
       this.selectNone()
       if (this.isMenuOn) {
-        this.jumpMenuOff()
         this.closeMenu()
       } else {
         this.mouseHold = true
@@ -259,7 +252,6 @@ export default {
 
       if (this.mouseHold && minDistance > CAMERA.DRAG_THRESHOLD_PX) {
         this.selectNone()
-        this.jumpMenuOff()
         this.closeMenu()
         let acceleration = this.viewport.scale > 1 ? this.viewport.scale * 0.5 : this.viewport.scale * 0.7
 

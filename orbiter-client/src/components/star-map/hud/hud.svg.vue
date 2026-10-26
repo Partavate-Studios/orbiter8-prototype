@@ -66,8 +66,10 @@
       </g>
 
       <g :transform="'translate(' + (rightMostX - 50) + ' ' + (topMostY + 50) + ')'">
+        <!-- A star until the star is selected; then the star-nav icon, which zooms out to its neighbors. -->
         <a cursor="pointer" @click.prevent="selectStar()">
-          <jump-icon />
+          <jump-icon v-if="starSelected" />
+          <star-icon v-else />
         </a>
       </g>
 
@@ -207,6 +209,7 @@ import AvatarIcon from './icons/avatar-icon.svg'
 import GearIcon from './icons/gear-icon.svg'
 import InfoIcon from './icons/info-icon.svg'
 import JumpIcon from './icons/jump-icon.svg'
+import StarIcon from './icons/star-icon.svg'
 import PlanetsIcon from './icons/planets-icon.svg'
 import ShipsIcon from './icons/ships-icon.svg'
 import SpeakerIcon from './icons/speaker-icon.svg'
@@ -230,6 +233,7 @@ export default {
     GearIcon,
     InfoIcon,
     JumpIcon,
+    StarIcon,
     PlanetsIcon,
     PlanetsMenu,
     SettingsMenu,
@@ -247,6 +251,9 @@ export default {
     ZoomSlider
   },
   computed: {
+    starSelected() {
+      return this.selected === STAR_KEY
+    },
     ...mapState(useUIStore, [
       'showScope',
       'selected',
@@ -292,7 +299,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(useUIStore, ['selectSprite', 'scaleAnimateTo', 'jumpMenuOn', 'toggleShowLabels', 'openMenu']),
+    ...mapActions(useUIStore, ['selectSprite', 'scaleAnimateTo', 'zoomOutToNeighbors', 'toggleShowLabels', 'openMenu']),
     showSettings() {
       this.o8audio.playEffect('click')
       this.openMenu('settings')
@@ -323,7 +330,7 @@ export default {
       if (this.selected != STAR_KEY) {
         this.selectSprite(STAR_KEY)
       } else {
-        this.jumpMenuOn()
+        this.zoomOutToNeighbors()
       }
     }
   }
