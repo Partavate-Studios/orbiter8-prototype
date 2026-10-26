@@ -686,7 +686,7 @@ Notes: the browser only reveals a gamepad after a button is pressed on the page.
 - Once a destination is picked, a dashed, slightly arced path runs from the current star to it, suggesting a curved route through space.
 
 **Build plan** (each step is its own commit; tick it off here when it lands):
-1. [ ] `sdk/game/neighbor-layout.js`: place each neighbor at an angle derived from its id (golden-angle hash), spread out any that overlap, and build the arced path. Pure functions, with tests.
+1. [x] `sdk/game/neighbor-layout.js`: place each neighbor at an angle derived from its id (golden-angle hash), spread out any that overlap, and build the arced path. Pure functions, with tests.
 2. [ ] UI store: `neighborView` state and `enterNeighborView()` / `exitNeighborView()`. Wheeling out while already at the camera's zoom-out limit enters it; wheeling in, Escape, or clicking empty space leaves it.
 3. [ ] `hud/neighbor-view.svg.vue`, drawn over the map while active:
    - the current star in the middle, shrinking in from the heliopause's on-screen size;
