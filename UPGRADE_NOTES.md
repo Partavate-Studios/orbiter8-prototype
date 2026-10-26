@@ -747,7 +747,7 @@ Notes: the browser only reveals a gamepad after a button is pressed on the page.
 ### 2. Heliopause → neighbor-star view (done 2026-10-25)
 
 **Round 2 (Koda, 2026-10-25), in progress. Each step is its own commit; tick it off here when it lands:**
-1. [ ] **Remember explored systems.** `sdk/explored.js` records each visited system's neighbor list, per network, in localStorage. The contracts can't list other systems' neighbors (`getSystemData` is internal), so the outer ring can only show neighbors the player has visited.
+1. [x] **Remember explored systems.** `sdk/explored.js` records each visited system's neighbor list, per network, in localStorage. The contracts can't list other systems' neighbors (`getSystemData` is internal), so the outer ring can only show neighbors the player has visited.
 2. [ ] **The entrance animation:**
    - The heliopause becomes the star: it starts at the heliopause's on-screen size and position, then shrinks and moves to the center. The real heliopause on the guides canvas is hidden while the view is open.
    - The neighbors fly in from beyond the screen edges instead of bursting out of the center.

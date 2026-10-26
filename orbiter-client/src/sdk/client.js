@@ -6,6 +6,7 @@ import { loadPlayer, loadRecentEvents, loadSystem } from '@/sdk/load'
 import { createBlockWatcher } from '@/sdk/sync'
 import * as actions from '@/sdk/actions'
 import { loadLeaderboard } from '@/sdk/leaderboard'
+import { createExploredMap } from '@/sdk/explored'
 
 /**
  * @typedef {object} GameState
@@ -48,6 +49,7 @@ export function createGameClient() {
   // The leaderboard reads every player's holdings, so it's cached for a minute.
   const LEADERBOARD_MAX_AGE_MS = 60 * 1000
   let leaderboard = null
+  let exploredMap = null
   const setLoading = (what, isLoading) => {
     state.loading[what] = isLoading
     notify('loading')
@@ -134,6 +136,21 @@ export function createGameClient() {
     },
 
     /**
+     * The systems this player has visited on this deployment, with their neighbor lists
+     * (sdk/explored.js), or null before the contracts are bound.
+     */
+    explored() {
+      if (!state.contracts) return null
+      if (!exploredMap || exploredMap.chainId !== state.chainId) {
+        exploredMap = {
+          chainId: state.chainId,
+          map: createExploredMap({ chainId: state.chainId, game: state.contracts.game })
+        }
+      }
+      return exploredMap.map
+    },
+
+    /**
      * Every player's planets, ports and credits (see sdk/leaderboard.js), at most a minute old.
      * Rejects if the contracts aren't bound or the node fails.
      */
@@ -178,6 +195,10 @@ export function createGameClient() {
           state.systemProgress = percent
           notify('systemProgress')
         })
+        client.explored()?.record(
+          state.system.id,
+          Object.values(state.system.neighbors).map((neighbor) => neighbor.id)
+        )
         notify('system')
       }).finally(() => setLoading('system', false))
     }
