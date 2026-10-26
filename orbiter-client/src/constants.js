@@ -15,6 +15,8 @@ export const CAMERA = {
   START_SCALE: 400,
   /** Most zoomed out the camera goes. */
   MAX_SCALE: 420,
+  /** The jump animation plays at least this long, even when the new system loads at once. */
+  MIN_JUMP_ANIMATION_MS: 2500,
   /** The star button's zoom from the system out to the neighbor view. */
   NEIGHBOR_ZOOM_MS: 1800,
   /** Wheeling out at or beyond this zoom (near MAX_SCALE) leaves the system for the neighbor-star view. */

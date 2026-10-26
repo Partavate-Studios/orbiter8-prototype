@@ -6,6 +6,10 @@ import { CAMERA, MAP_GROUP_SCALE, MAP_RESOLUTION, WORLD_OFFSET_Y } from '@/const
 // Sprites this far past the screen edge still count as on screen (labels, glows).
 const OFFSCREEN_MARGIN_PX = 100
 
+// When the jump animation started, and its pending end (see jumpAnimationOff).
+let jumpAnimationStartedAt = 0
+let jumpAnimationTimer = null
+
 export const useUIStore = defineStore('UI', {
   state: () => ({
     // The map's HUD and world sit in a group scaled by this much (inside 1200 units per screen height).
@@ -435,12 +439,20 @@ export const useUIStore = defineStore('UI', {
     setSpriteToDisplay(payload) {
       this.hud.spriteToDisplay = payload
     },
+    /** Ends the jump animation, but never before it has played for CAMERA.MIN_JUMP_ANIMATION_MS. */
     jumpAnimationOff() {
-      if (this.hud.jumpAnimationState) {
-        this.hud.jumpAnimationState = false
+      if (!this.hud.jumpAnimationState) return
+      clearTimeout(jumpAnimationTimer)
+      const wait = jumpAnimationStartedAt + CAMERA.MIN_JUMP_ANIMATION_MS - Date.now()
+      if (wait > 0) {
+        jumpAnimationTimer = setTimeout(() => this.jumpAnimationOff(), wait)
+        return
       }
+      this.hud.jumpAnimationState = false
     },
     jumpAnimationOn() {
+      jumpAnimationStartedAt = Date.now()
+      this.neighborView = false
       this.selectedSprite = null
       this.viewport.x = 0
       this.viewport.y = 0

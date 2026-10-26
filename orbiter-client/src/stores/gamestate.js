@@ -70,16 +70,20 @@ export const useGameStateStore = defineStore('GameState', {
     async launchShip(name) {
       await logFailure('Ship launch', game.actions.launchShip(name))
     },
-    /** Jumps the player's ship to a neighboring system, playing the jump animation until the new system loads. */
+    /**
+     * Jumps the player's ship to a neighboring system. The jump animation starts once the move is on
+     * chain (the wallet and the transaction come first) and plays until the new system loads.
+     * Resolves true if the jump went through.
+     */
     async moveToSystem(system) {
       try {
-        useUIStore().jumpAnimationOn()
         await game.actions.moveTo(system)
       } catch (error) {
         console.error('Jump failed:', error.shortMessage ?? error.message)
-        // Otherwise the "traveling" animation never ends (it stops when the new system loads).
-        useUIStore().jumpAnimationOff()
+        return false
       }
+      useUIStore().jumpAnimationOn()
+      return true
     },
     async sendChat(message) {
       await logFailure('Sending chat', game.actions.sendChat(message))

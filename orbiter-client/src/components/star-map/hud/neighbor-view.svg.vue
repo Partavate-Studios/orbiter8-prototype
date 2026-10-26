@@ -68,6 +68,11 @@
         stroke-linecap="round"
       />
 
+      <!-- the player's ship orbiting this star: this copy shows while it's behind the star -->
+      <g ref="shipBehind" display="none">
+        <ship :should-show-engines="jumpState === 'waiting'" />
+      </g>
+
       <!-- this system: its heliopause, shrinking into a star -->
       <g :transform="'translate(' + center.x + ' ' + center.y + ')'">
         <circle cx="0" cy="0" :r="center.radius * 2.2" fill="url(#glowingGradient)" :opacity="phase.morph" />
@@ -91,6 +96,11 @@
         >
           {{ currentStarSystemName }}
         </text>
+      </g>
+
+      <!-- …and this one while it's in front -->
+      <g ref="shipFront" display="none">
+        <ship :should-show-engines="jumpState === 'waiting'" />
       </g>
 
       <g v-for="star in stars" :key="'star-' + star.id" :transform="'translate(' + star.x + ' ' + star.y + ')'">
@@ -133,17 +143,25 @@
       </g>
     </g>
 
-    <!-- the choice -->
+    <!-- the choice; then, while the jump waits for the wallet and the chain, the ship races around the star -->
     <g v-if="chosen" :transform="'translate(0 ' + (bottomMostY - 150) + ')'" text-anchor="middle">
-      <text x="0" y="-48" fill="#ffffffcc" font-size="1em">
-        Jump to {{ chosen.visited ? chosen.name : 'unexplored star #' + chosen.id }}?
-      </text>
-      <g transform="translate(-135 0)">
-        <menu-button :text="'Jump'" @buttonclick="jump" />
-      </g>
-      <g transform="translate(135 0)">
-        <menu-button :text="'Cancel'" @buttonclick="choose(null)" />
-      </g>
+      <template v-if="jumpState === 'waiting'">
+        <text x="0" y="-48" fill="#ffffffcc" font-size="1em">Preparing to jump to {{ chosenName }}…</text>
+        <text x="0" y="-20" fill="#ffffff77" font-size="0.8em"
+          >Confirm in your wallet, then wait for the move to be recorded.</text
+        >
+      </template>
+      <template v-else>
+        <text x="0" y="-48" fill="#ffffffcc" font-size="1em">
+          {{ jumpState === 'failed' ? "The jump didn't go through. Try again?" : 'Jump to ' + chosenName + '?' }}
+        </text>
+        <g transform="translate(-135 0)">
+          <menu-button :text="'Jump'" @buttonclick="jump" />
+        </g>
+        <g transform="translate(135 0)">
+          <menu-button :text="'Cancel'" @buttonclick="choose(null)" />
+        </g>
+      </template>
     </g>
   </g>
 </template>
@@ -156,17 +174,27 @@ import { useUIStore } from '@/stores/ui'
 import { useGameStateStore } from '@/stores/gamestate'
 import { layoutNeighbors, layoutOuterRing, pointAt, arcPath } from '@/sdk/game/neighbor-layout'
 import MenuButton from './menus/menu-button.svg'
+import Ship from '../sprites/ship.svg'
+import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
+import { writeAttribute } from '@/libs/dom-writes'
 
 // The world's star sits this far above the HUD's center (WORLD_OFFSET_Y in group units).
 const CENTER_Y = -100
 // The heliopause's radius in world units (guides-canvas.vue draws it).
 const HELIOPAUSE_RADIUS = 5000
 // The star the heliopause shrinks into, in HUD units.
-const STAR_RADIUS = 7
+const STAR_RADIUS = 10
 // The whole entrance; each part runs in its own slice of it (see `phase`).
 const ENTER_MS = 1300
 // Where the neighbors start, in ring radii: beyond the screen edges.
 const FLY_IN_FROM = 3.2
+// The ship's orbit around the center star: a tilted ellipse (its depth decides which side of the
+// star it's drawn on), one lap every ORBIT_SECONDS, or RACING_ORBIT_SECONDS while a jump is pending.
+const SHIP_SCALE = 0.85
+const ORBIT_GAP = 24
+const ORBIT_TILT = 0.32
+const ORBIT_SECONDS = 7
+const RACING_ORBIT_SECONDS = 0.9
 // The contract's name for a star nobody has visited yet.
 const UNEXPLORED = 'Unexplored Star'
 
@@ -177,7 +205,8 @@ const lerp = (from, to, t) => from + (to - from) * t
 export default {
   name: 'NeighborView',
   components: {
-    MenuButton
+    MenuButton,
+    Ship
   },
   data() {
     return {
@@ -186,6 +215,8 @@ export default {
       progress: 0,
       chosenId: null,
       hoveredId: null,
+      // null, 'waiting' (wallet and chain) or 'failed'
+      jumpState: null,
       // Where the heliopause was on screen when the view opened (set on mount).
       start: { x: 0, y: 0, radius: 60 },
       // Neighbor lists the player has explored, read once when the view opens.
@@ -279,6 +310,10 @@ export default {
     },
     chosen() {
       return this.stars.find((star) => star.id === this.chosenId) ?? null
+    },
+    chosenName() {
+      const star = this.chosen
+      return star ? (star.visited ? star.name : 'unexplored star #' + star.id) : ''
     }
   },
   mounted() {
@@ -292,9 +327,13 @@ export default {
       if (this.progress < 1) this.frame = requestAnimationFrame(step)
     }
     this.frame = requestAnimationFrame(step)
+    // The ship starts behind the star (top of its orbit) and comes out as the neighbors arrive.
+    this.orbit = { angle: -Math.PI / 2 - 0.3, speed: (2 * Math.PI) / ORBIT_SECONDS }
+    this.stopFrames = onFrame(this.moveShip, FRAME_ORDER.render)
   },
   unmounted() {
     cancelAnimationFrame(this.frame)
+    this.stopFrames()
   },
   methods: {
     ...mapActions(useUIStore, ['exitNeighborView']),
@@ -321,14 +360,40 @@ export default {
       return arcPath(far, near)
     },
     choose(star) {
+      if (this.jumpState === 'waiting') return
       if (star) this.o8audio.playEffect('click')
       this.chosenId = star ? star.id : null
+      this.jumpState = null
     },
-    jump() {
-      const destination = this.chosenId
-      this.exitNeighborView()
-      // Same as the jump menu: plays the jump animation until the new system loads.
-      this.moveToSystem(destination)
+    /** Waits here, ship racing, for the wallet and the chain; the jump animation starts once the move is mined. */
+    async jump() {
+      this.jumpState = 'waiting'
+      const jumped = await this.moveToSystem(this.chosenId)
+      if (jumped) this.exitNeighborView()
+      else this.jumpState = 'failed'
+    },
+    /** Each frame: advance the ship around the star, drawing it behind or in front depending on its depth. */
+    moveShip(now) {
+      const seconds = this.lastFrame ? Math.min(0.1, (now - this.lastFrame) / 1000) : 0
+      this.lastFrame = now
+      const target = (2 * Math.PI) / (this.jumpState === 'waiting' ? RACING_ORBIT_SECONDS : ORBIT_SECONDS)
+      this.orbit.speed += (target - this.orbit.speed) * Math.min(1, seconds * 2.5)
+      this.orbit.angle += this.orbit.speed * seconds
+      const { angle } = this.orbit
+      const a = this.center.radius + ORBIT_GAP
+      const b = a * ORBIT_TILT
+      const x = this.center.x + a * Math.cos(angle)
+      const y = this.center.y + b * Math.sin(angle)
+      // Facing along the orbit (the art's nose points up).
+      const heading = (Math.atan2(b * Math.cos(angle), -a * Math.sin(angle)) * 180) / Math.PI + 90
+      const depth = (Math.sin(angle) + 1) / 2 // 0 = far side, 1 = near side
+      const scale = SHIP_SCALE * (0.8 + 0.2 * depth) * this.phase.neighbors
+      const transform = `translate(${x.toFixed(2)} ${y.toFixed(2)}) rotate(${heading.toFixed(1)}) scale(${scale.toFixed(3)})`
+      const behind = Math.sin(angle) < 0
+      writeAttribute(this.$refs.shipBehind, 'transform', transform)
+      writeAttribute(this.$refs.shipFront, 'transform', transform)
+      writeAttribute(this.$refs.shipBehind, 'display', behind && scale > 0 ? 'inline' : 'none')
+      writeAttribute(this.$refs.shipFront, 'display', !behind && scale > 0 ? 'inline' : 'none')
     }
   }
 }
