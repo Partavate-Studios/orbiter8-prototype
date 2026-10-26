@@ -635,7 +635,33 @@ Phase 6:
 
 ## Feature to-dos (Koda, 2026-10-25; next up after Phase 6b and 7)
 
-### 1. Gamepad support (done 2026-10-25; first version)
+### 1. Gamepad support (parked 2026-10-25, after Koda tried the first version)
+
+**Koda's verdict:** it works, but it feels bolted on, and a lot is missing. A good controller experience needs:
+- **a UI designed for a controller from the start**, not a focus ring over a mouse UI;
+- **a way to sign without the wallet popup**, which a controller can't operate.
+
+That's a lot to build, so it's parked, possibly for good.
+
+**What's in the code** (`libs/gamepad/`, `components/gamepad-overlay.vue`): the first version, which does nothing unless a pad is in use. It's harmless to keep, and `git revert` of the gamepad commits removes it.
+
+**What a real version would need, for whenever it's revisited:**
+- **Controller-first UI design.** Every screen built around a focus model: a clear focused state, predictable D-pad paths, menus as lists, big targets, and B always meaning back. The star map would select objects by cycling or radial selection rather than pointing. The current HUD's free-floating SVG buttons and tiny card buttons don't fit.
+- **Signing without the popup.** Options, roughly from simplest:
+  - **An in-app burner wallet:** a local key holding a little test ETH, used only for game actions.
+  - **Session keys:** a key the main wallet authorizes once, scoped to the game's contracts and with a spending cap. Koda's MetaMask account is already an EIP-7702 smart account, which can delegate like this.
+  - **An embedded-wallet service.**
+
+  Any of these is a product and security decision, not just client code.
+- **Text entry:** an on-screen keyboard, generated names, and preset chat messages.
+- **Polish:** button glyphs that match the connected pad, rumble, and a Steam Deck pass.
+- **Platform quirks found so far:**
+  - **Chrome on Linux** needs access to a Bluetooth pad's `hidraw` device (a udev rule).
+  - **Firefox** reported Koda's 8BitDo (as 045e:02e0) with the standard mapping and worked.
+
+**The first version's notes follow.**
+
+#### First version (done 2026-10-25)
 
 **Koda said "let's do the gamepad support" without picking options, so the first version uses the suggested defaults:**
 - The mapping in the table below, including the *(suggested)* rows.
