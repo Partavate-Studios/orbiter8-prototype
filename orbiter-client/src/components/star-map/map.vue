@@ -53,6 +53,9 @@
           <g v-else-if="menuState.jumpMenu" transform="translate(0 -100)">
             <jumpMenu></jumpMenu>
           </g>
+          <g v-else-if="neighborView">
+            <neighbor-view />
+          </g>
           <g v-else>
             <hud></hud>
           </g>
@@ -77,6 +80,7 @@ import _ from 'lodash'
 import Hud from './hud/hud.svg'
 import JumpMenu from './hud/jump-menu.svg'
 import JumpAnimation from './hud/jump-animation.svg'
+import NeighborView from './hud/neighbor-view.svg'
 import BackgroundCanvas from './background-canvas.vue'
 import GuidesCanvas from './guides-canvas.vue'
 import SolarSystem from './_solarsystem.svg'
@@ -95,6 +99,7 @@ export default {
     Hud,
     JumpMenu,
     JumpAnimation,
+    NeighborView,
     BackgroundCanvas,
     GuidesCanvas,
     SolarSystem,
@@ -116,6 +121,7 @@ export default {
   },
   computed: {
     ...mapState(useUIStore, [
+      'neighborView',
       'viewport',
       'screenSize',
       'baseScale',
