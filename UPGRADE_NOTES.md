@@ -1001,6 +1001,14 @@ Order (from the walkthrough's list). Tick each when it lands:
 - **Shuttle traffic at in-game stations,** especially when selected. Eventually the docked ships would be the players who recently traded there, with shuttles in proportion. Koda wants this kind of living detail in many places.
 - **A Credits swap.** Where to put a pool depends on the launch network. Decide it with the launch.
 
+**Steps 2–7 plan (Koda, 2026-10-26: "keep going through the steps as long as you can"; he's away).** Decisions I'm unsure of go into the review doc ([Orbiter 8: Decisions to Review](https://claude.ai/artifact/NFFPZXFd4rvEDW7k3T47wi)). Each step is its own commit; tick it off when it lands:
+- [ ] **2. Network stats.** "N pilots, M star systems" for every network, read before switching (`getAvatarCount` + `getSystemCount`, two calls per network through its public RPC, cached). Shown on the wizard's network step and in the Network panel.
+- [ ] **3. Minimap.** A small map of the current system in the HUD's top right, under the star button: the star, the orbits, the planets, the player's ship, and the camera's view as a box. Clicking it moves the camera there. Drawn on a canvas, redrawn only when something it shows changes.
+- [ ] **4. Parallax star layers.** Two more star layers on the background canvas, at different depths, so panning feels deeper. Each is its own composited layer, like the existing starfield.
+- [ ] **5. Art.** Look at Enterprise Circuit's planet art (bands, rings, named Sol planets), stations and ships against this client's, and bring over what improves the map without changing what the game means. Anything that changes how the game looks for every player is noted for Koda.
+- [ ] **6. UI scale.** A Settings option (75–200%) that scales the HUD, kept between visits.
+- [ ] **7. Later ideas.** The About storyboard (Enterprise Circuit's six panels, story text verbatim) as a "Story" button on the title. The cockpit window stays an idea.
+
 ### 5a. The Bobabeam Portals demo (looked at 2026-10-26)
 
 `/home/koda/dev/orbiter8-multiverse-bobabeam` is a 2022 hackathon one-off (Boba × Moonbeam). Its idea: **flying through a portal is how a ship changes networks**, with the ship NFT bridged between universes. It has a six-panel story, then a screen to send a ship between Moonbase and Bobabase.
