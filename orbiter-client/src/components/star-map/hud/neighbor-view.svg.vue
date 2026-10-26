@@ -126,11 +126,12 @@ export default {
   computed: {
     ...mapState(useStarMapStore, ['neighbors', 'currentStarSystemName']),
     ...mapState(useUIStore, ['leftMostX', 'rightMostX', 'topMostY', 'bottomMostY']),
-    /** Room for the ring of stars: most of the shorter screen side. */
+    /** Room for the ring of stars, measured from the star: clear of the title above, the choice below. */
     ringRadius() {
-      const halfWidth = (this.rightMostX - this.leftMostX) / 2
-      const halfHeight = (this.bottomMostY - this.topMostY) / 2
-      return Math.max(120, Math.min(halfWidth - 90, halfHeight - 150))
+      const sideRoom = (this.rightMostX - this.leftMostX) / 2 - 90
+      const roomAbove = CENTER_Y - this.topMostY - 140 // title and hint, plus a star's label
+      const roomBelow = this.bottomMostY - CENTER_Y - 250 // a star's label, then the Jump / Cancel row
+      return Math.max(120, Math.min(sideRoom, roomAbove, roomBelow))
     },
     /** The system grows from its size at full zoom-out into a star. */
     centerRadius() {

@@ -25,6 +25,11 @@ export default [
     }
   },
   {
+    // Tests mount small throwaway components inline.
+    files: ['**/*.test.js'],
+    rules: { 'vue/one-component-per-file': 'off' }
+  },
+  {
     files: ['dev/**', 'vite.config.js', 'eslint.config.js'],
     languageOptions: { globals: { ...globals.node } }
   },

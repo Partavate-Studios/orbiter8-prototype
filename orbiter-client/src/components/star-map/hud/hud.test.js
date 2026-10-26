@@ -115,3 +115,32 @@ describe('HUD', () => {
     expect(problems).toEqual([])
   })
 })
+
+describe('Neighbor view', () => {
+  it('renders the neighbors and the route to a chosen one', async () => {
+    const { default: NeighborView } = await import('./neighbor-view.svg.vue')
+    const view = createApp({ render: () => h('svg', [h(NeighborView)]) })
+    const pinia = createPinia()
+    view.use(pinia)
+    view.config.globalProperties.o8audio = silentAudio
+    const viewProblems = []
+    view.config.errorHandler = (error) => viewProblems.push(error)
+    view.config.warnHandler = (message) => viewProblems.push(message)
+    useStarMapStore(pinia).neighbors = {
+      0: { id: 1, name: 'Sol' },
+      1: { id: 0, name: 'Unexplored Star' },
+      2: { id: 8, name: 'Unexplored Star' }
+    }
+    const viewRoot = document.createElement('div')
+    view.mount(viewRoot)
+    await settle()
+    const labels = [...viewRoot.querySelectorAll('text')].map((text) => text.textContent.trim())
+    expect(labels).toContain('Sol')
+    expect(labels.filter((label) => label === 'Unexplored')).toHaveLength(1) // id 0 is an empty slot
+    viewRoot.querySelector('a').dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+    await settle()
+    expect(viewRoot.querySelector('.chosen-route')).not.toBe(null)
+    expect(viewProblems).toEqual([])
+    view.unmount()
+  })
+})
