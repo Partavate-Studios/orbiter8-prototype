@@ -667,7 +667,10 @@ Phase 6:
 - suggested names and preset chat messages, so a controller can name things and talk;
 - button glyphs on screen while a pad is in use;
 - rumble;
-- a test with Koda's real controllers in Chrome and Firefox (Firefox reports the standard mapping for fewer controllers).
+- **Chrome on Linux with Bluetooth Xbox-mode pads** (Koda's 8BitDo SN30 Pro+, which reports as 045e:02e0): Chrome showed nothing while Firefox worked.
+  - The pad's raw `hidraw` device is root-only, and Chrome uses it for these pads. Firefox reads the input device, which the desktop user can already access.
+  - The fix is on the machine, not in the game: a udev rule granting the desktop user access, e.g. `KERNEL=="hidraw*", KERNELS=="0005:045E:02E0.*", TAG+="uaccess"`. The `steam-devices` package also ships rules like it.
+- **Firefox (2026-10-25):** works with Koda's 8BitDo, which it reports with the standard mapping.
 
 The original mapping and analysis follow.
 

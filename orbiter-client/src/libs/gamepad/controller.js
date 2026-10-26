@@ -6,7 +6,8 @@ import { nextInDirection, nearestTo } from './spatial-nav'
 
 // Things the D-pad can focus. Sprites in the world layer are left out (there are many, and they
 // move); the right-stick cursor or L1/R1 reach those.
-const FOCUSABLE = 'button, a, .can-click, [role="button"]'
+// The pre-game screens style spans as buttons (.button, .littlebutton, .radioButton; Minerva's .tab).
+const FOCUSABLE = 'button, a, .can-click, [role="button"], .button, .littlebutton, .radioButton, .tab'
 const EXCLUDED_AREA = '.world-layer'
 // Right-stick cursor speed at full tilt, in pixels per second.
 const CURSOR_SPEED = 900
