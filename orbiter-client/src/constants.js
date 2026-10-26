@@ -15,6 +15,8 @@ export const CAMERA = {
   START_SCALE: 400,
   /** Most zoomed out the camera goes. */
   MAX_SCALE: 420,
+  /** Wheeling out at or beyond this zoom (near MAX_SCALE) leaves the system for the neighbor-star view. */
+  NEIGHBOR_VIEW_FROM_SCALE: 400,
   /** Most zoomed in the camera goes. */
   MIN_SCALE: 0.001,
   /** Below this the camera snaps to MIN_SCALE. */

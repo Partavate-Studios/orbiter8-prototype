@@ -26,7 +26,7 @@ export default {
   },
   computed: {
     ...mapState(useGameStateStore, ['haveAvatar', 'haveShip']),
-    ...mapState(useUIStore, ['selected', 'jumpAnimationState']),
+    ...mapState(useUIStore, ['selected', 'jumpAnimationState', 'viewport', 'neighborView']),
     ...mapState(useStarMapStore, ['gameTime', 'systemObjects', 'sprites']),
     ...mapState(useConfigStore, ['tickDelay'])
   },
@@ -84,6 +84,8 @@ export default {
     ...mapActions(useStarMapStore, ['incrementGameTime', 'updateAllTelemtry']),
     ...mapActions(useConfigStore, ['toggleGraphicsQuality']),
     ...mapActions(useUIStore, [
+      'enterNeighborView',
+      'exitNeighborView',
       'toggleMinerva',
       'viewportToTime',
       'setSelectedTelemetry',
@@ -95,12 +97,26 @@ export default {
       'mousewheelAnimateTo'
     ]),
     onWheel(event) {
+      const zoomingOut = event.deltaY > 0
+      // In the neighbor-star view, wheeling in returns to the system; wheeling out does nothing more.
+      if (this.neighborView) {
+        if (!zoomingOut) this.exitNeighborView()
+        return
+      }
+      // Already as far out as the camera goes: the next step out leaves the system for its neighbors.
+      if (zoomingOut && this.viewport.scale >= CAMERA.NEIGHBOR_VIEW_FROM_SCALE) {
+        this.enterNeighborView()
+        return
+      }
       // Wheel up zooms in (smaller scale = closer).
-      const scale = event.deltaY < 0 ? CAMERA.WHEEL_ZOOM_IN : CAMERA.WHEEL_ZOOM_OUT
+      const scale = zoomingOut ? CAMERA.WHEEL_ZOOM_OUT : CAMERA.WHEEL_ZOOM_IN
       this.mousewheelAnimateTo({ scale, time: CAMERA.WHEEL_TWEEN_MS })
     },
     handleKeyPress(event) {
       switch (event.key) {
+        case 'Escape':
+          this.exitNeighborView()
+          break
         case '`':
           this.toggleMinerva()
           break

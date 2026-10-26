@@ -66,7 +66,9 @@ export const useUIStore = defineStore('UI', {
     // Clicking the selected sprite toggles it.
     showScope: true,
     // Whether the Minerva panel (backtick) is open.
-    showMinerva: false
+    showMinerva: false,
+    // Whether the neighbor-star view is showing (zoomed out past the heliopause; see neighbor-view.svg.vue).
+    neighborView: false
   }),
   getters: {
     /** Screen pixels per map-group unit, before the camera's zoom. */
@@ -357,6 +359,14 @@ export const useUIStore = defineStore('UI', {
     },
     clearHistory() {
       this.minerva.terminal.history = []
+    },
+    /** Zoomed out past the heliopause: show the neighboring stars (unless a menu or a jump is in the way). */
+    enterNeighborView() {
+      if (this.isMenuOn || this.hud.jumpAnimationState) return
+      this.neighborView = true
+    },
+    exitNeighborView() {
+      this.neighborView = false
     },
     jumpMenuOn() {
       this.selectedSprite = STAR_KEY
