@@ -1,6 +1,7 @@
 import { markRaw } from 'vue'
 import { orbitAt } from '@/sdk/game/orbits'
 import { SPRITE_TYPES, SHIP_SIZE, STATION_START_ROTATION } from '@/libs/sprite-types'
+import { tunedTime } from '@/libs/tuning'
 
 /**
  * How one game object (sdk/system.js) is drawn: its click target, the zoom the camera moves to when
@@ -30,8 +31,10 @@ export default class Sprite {
     return markRaw(this)
   }
 
-  updateTelemetry(gameTime) {
-    const orbit = orbitAt(this.object.orbit.radius, this.object.orbit.speed, gameTime)
+  /** @param {Record<string, object>} [objects]  the system's objects (the speed slider needs parents' sizes) */
+  updateTelemetry(gameTime, objects) {
+    const time = tunedTime(this.object, objects, gameTime)
+    const orbit = orbitAt(this.object.orbit.radius, this.object.orbit.speed, time)
     this.telemetry.translatex = orbit.x
     this.telemetry.translatey = orbit.y
     // Sprites face along their orbit's radius; stations spin four times as fast, the other way.

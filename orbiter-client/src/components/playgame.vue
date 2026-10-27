@@ -2,6 +2,8 @@
   <div class="playorbiter8">
     <star-map />
     <layer-html />
+    <!-- TEMPORARY: size and speed sliders (dev server only). -->
+    <tuning-sliders v-if="showTuning" />
   </div>
 </template>
 
@@ -16,13 +18,18 @@ import { useConfigStore } from '@/stores/config'
 import starMap from '@/components/star-map/map'
 import layerHtml from '@/components/layer-html/container-html'
 import router from '@/router/router'
+import TuningSliders from '@/components/tuning-sliders.vue'
 import { onFrame } from '@/libs/frame-loop'
 
 export default {
   name: 'Play',
   components: {
     starMap,
-    layerHtml
+    layerHtml,
+    TuningSliders
+  },
+  data() {
+    return { showTuning: import.meta.env.DEV }
   },
   computed: {
     ...mapState(useGameStateStore, ['haveAvatar', 'haveShip']),
