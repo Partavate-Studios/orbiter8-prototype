@@ -1,6 +1,7 @@
 // Everything a player can do, as plain async functions. Each sends a transaction and resolves once
 // it's mined; a rejection carries the revert reason (error.shortMessage). No UI: callers decide
-// what to show while waiting and on failure.
+// what to show while waiting and on failure. Each takes `options` last: `{ onSent(hash) }` hears the
+// moment the wallet has sent it (before it's mined).
 import { galaxy, avatars } from '@/sdk/chain/contracts'
 
 /**
@@ -28,31 +29,31 @@ export function moveTo(systemId, options) {
 }
 
 /** Sends a message to the galaxy-wide chat (a ChatLog event). */
-export function sendChat(message) {
-  return galaxy.sendChat(message)
+export function sendChat(message, options) {
+  return galaxy.sendChat(message, options)
 }
 
 /** Claims an unowned planet in the ship's system and names it. */
-export function claimPlanet(planetId, name) {
-  return galaxy.claimPlanet(String(planetId), String(name))
+export function claimPlanet(planetId, name, options) {
+  return galaxy.claimPlanet(String(planetId), String(name), options)
 }
 
 /** Builds a space station (a trading port) at one of the player's planets. */
-export function buildStation(planetId, name) {
-  return galaxy.buildStation(String(planetId), String(name))
+export function buildStation(planetId, name, options) {
+  return galaxy.buildStation(String(planetId), String(name), options)
 }
 
 /**
  * Trades at the station orbiting `planetId`: positive amounts buy from the port, negative sell to it.
  * @param {{ equipment: number, fuel: number, organics: number }} amounts
  */
-export function trade(planetId, { equipment, fuel, organics }) {
-  return galaxy.tradeAtPort(String(planetId), equipment, fuel, organics)
+export function trade(planetId, { equipment, fuel, organics }, options) {
+  return galaxy.tradeAtPort(String(planetId), equipment, fuel, organics, options)
 }
 
 /** Buys cargo holds at the shipyard of the station orbiting `planetId`. */
-export function buyHolds(planetId, amount) {
-  return galaxy.addHoldsToShip(planetId, amount)
+export function buyHolds(planetId, amount, options) {
+  return galaxy.addHoldsToShip(planetId, amount, options)
 }
 
 /**
@@ -60,17 +61,17 @@ export function buyHolds(planetId, amount) {
  * planet), a station (`objectId` is its planet) or their ship.
  * @param {{ type: 'star' | 'planet' | 'moon' | 'station' | 'ship', objectId?: number, parentId?: number, name: string }} target
  */
-export function rename({ type, objectId, parentId, name }) {
+export function rename({ type, objectId, parentId, name }, options) {
   switch (type) {
     case 'star':
-      return galaxy.renameStar(name)
+      return galaxy.renameStar(name, options)
     case 'planet':
-      return galaxy.renamePlanet(objectId, name)
+      return galaxy.renamePlanet(objectId, name, options)
     case 'moon':
-      return galaxy.renameMoon(parentId, objectId, name)
+      return galaxy.renameMoon(parentId, objectId, name, options)
     case 'station':
-      return galaxy.renameStation(objectId, name)
+      return galaxy.renameStation(objectId, name, options)
     case 'ship':
-      return galaxy.renameMyShip(name)
+      return galaxy.renameMyShip(name, options)
   }
 }

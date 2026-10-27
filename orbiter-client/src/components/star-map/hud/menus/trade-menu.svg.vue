@@ -386,17 +386,25 @@ export default {
   methods: {
     ...mapActions(useGameStateStore, ['tradeAtPort']),
     ...mapActions(useUIStore, ['closeMenu']),
-    doTrade() {
+    async doTrade() {
       this.o8audio.playEffect('click')
       this.pending = true
       let planet = this.systemObjects[this.objectId].orbiting
       let planetId = this.systemObjects[planet].id
-      this.tradeAtPort({
+      const traded = await this.tradeAtPort({
         planetId: planetId,
         equipment: this.equipmentToTrade,
         fuel: this.fuelToTrade,
         organics: this.organicsToTrade
       })
+      // Done: start the next trade from the new cargo. Failed or declined: the same amounts, to try again
+      // (the transaction tray says why).
+      if (traded) {
+        this.equipmentToTrade = 0
+        this.fuelToTrade = 0
+        this.organicsToTrade = 0
+      }
+      this.pending = false
     },
     updateEquipmentToTrade(value) {
       this.equipmentToTrade = clampTradeAmount(value, this.equipmentToTrade, this.predictedEmptyHolds)

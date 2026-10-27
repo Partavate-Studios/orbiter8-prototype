@@ -160,11 +160,16 @@ export default {
   methods: {
     ...mapActions(useGameStateStore, ['addHoldsToShip']),
     ...mapActions(useUIStore, ['closeMenu']),
-    applyUpgrades() {
+    async applyUpgrades() {
       this.o8audio.playEffect('click')
       if (this.holdsToBuy > 0) {
-        this.addHoldsToShip({ planetId: this.systemObjects[this.objectId].id, amount: this.holdsToBuy })
         this.pending = true
+        const bought = await this.addHoldsToShip({
+          planetId: this.systemObjects[this.objectId].id,
+          amount: this.holdsToBuy
+        })
+        if (bought) this.holdsToBuy = 0
+        this.pending = false
       }
     },
     decrementHolds() {

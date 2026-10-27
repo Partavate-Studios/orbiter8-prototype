@@ -1,6 +1,10 @@
 import { defineStore } from 'pinia'
 import { game } from '@/sdk/client'
 import { useUIStore } from '@/stores/ui'
+import { useTransactionsStore } from '@/stores/transactions'
+
+/** Shows a transaction's progress in the tray (stores/transactions.js). */
+const track = (words, send) => useTransactionsStore().track(words, send)
 
 /** Waits for a player action; if it fails, logs why (the revert reason when there is one). */
 async function logFailure(what, action) {
@@ -91,24 +95,43 @@ export const useGameStateStore = defineStore('GameState', {
       }
       return true
     },
-    async sendChat(message) {
-      await logFailure('Sending chat', game.actions.sendChat(message))
+    // The rest show their progress in the transaction tray, and resolve true if they went through.
+    sendChat(message) {
+      return track(
+        { doing: 'Sending your message', done: 'Message sent', failed: "Couldn't send your message" },
+        (options) => game.actions.sendChat(message, options)
+      )
     },
-    async claimPlanet({ planetId, name }) {
-      await logFailure('Claiming the planet', game.actions.claimPlanet(planetId, name))
+    claimPlanet({ planetId, name }) {
+      return track(
+        { doing: 'Claiming ' + name, done: name + ' is yours', failed: "Couldn't claim " + name },
+        (options) => game.actions.claimPlanet(planetId, name, options)
+      )
     },
-    async buildStation({ planetId, name }) {
-      await logFailure('Building the station', game.actions.buildStation(planetId, name))
+    buildStation({ planetId, name }) {
+      return track(
+        { doing: 'Building ' + name, done: name + ' is open for trade', failed: "Couldn't build " + name },
+        (options) => game.actions.buildStation(planetId, name, options)
+      )
     },
-    async tradeAtPort({ planetId, equipment, fuel, organics }) {
-      await logFailure('Trade', game.actions.trade(planetId, { equipment, fuel, organics }))
+    tradeAtPort({ planetId, equipment, fuel, organics }) {
+      return track({ doing: 'Trading', done: 'Trade done', failed: "The trade didn't go through" }, (options) =>
+        game.actions.trade(planetId, { equipment, fuel, organics }, options)
+      )
     },
-    async addHoldsToShip({ planetId, amount }) {
-      await logFailure('Buying cargo holds', game.actions.buyHolds(planetId, amount))
+    addHoldsToShip({ planetId, amount }) {
+      const holds = amount === 1 ? '1 cargo hold' : amount + ' cargo holds'
+      return track(
+        { doing: 'Buying ' + holds, done: holds + ' added', failed: "Couldn't buy the cargo holds" },
+        (options) => game.actions.buyHolds(planetId, amount, options)
+      )
     },
     /** Renames a star, planet, moon, station or the player's ship. `parentId` is a moon's planet. */
-    async renameAsset({ name, type, objectId, parentId }) {
-      await logFailure('Renaming', game.actions.rename({ type, objectId, parentId, name }))
+    renameAsset({ name, type, objectId, parentId }) {
+      return track(
+        { doing: 'Renaming to ' + name, done: 'Renamed to ' + name, failed: "Couldn't rename to " + name },
+        (options) => game.actions.rename({ type, objectId, parentId, name }, options)
+      )
     }
   }
 })

@@ -1081,7 +1081,23 @@ Order (from the walkthrough's list). Tick each when it lands:
    - The keyboard and the gamepad's B and L1/R1 now share the same store actions (`back`, `stepPlanet`).
    - Every HUD button has a tooltip, naming its key where it has one.
    - **Fix:** ship icons in the ships menu were scaled by `NaN` (ships have no `size`), so none was drawn.
-3. [ ] **Every transaction shows its progress.** A small tray shows each action going from waiting for the wallet, to sent, to confirmed, or failed with the reason. Covers claims, stations, renames, trades, holds and chat. Today only jumps show anything; the rest log failures to the console.
+3. [x] **Every transaction shows its progress.** A tray at the top center (`components/transaction-tray.vue`, `stores/transactions.js`) follows each action through four steps:
+   1. "Confirm it in your wallet";
+   2. "Sent: waiting for the network";
+   3. done ("Mars is yours");
+   4. or declined in the wallet, or failed with the contract's reason ("Couldn't claim Barsoom: Must be unclaimed planet.").
+
+   Done and declined entries clear after 4 s; failed ones after 15 s, or with their ×.
+   - **Covers** claims, stations, renames, trades, cargo holds and chat. Jumps keep their own animation; registration keeps the wizard.
+   - **Every SDK action now takes `{ onSent }`,** not just jumps and registrations.
+   - **Fixed:** the trade and shipyard menus said "Transacting..." forever, even after a failure. They now come back:
+     - after a trade, set to zero for the next one;
+     - after a failure, with the same amounts, so the player can try again.
+   - **Checked on the local chain:**
+     - a ship rename showed "Renamed to Rocinante II";
+     - claiming an owned planet showed the revert reason.
+
+     The local chain mines at once, so the two waiting steps only flash by there. `transactions.test.js` covers them.
 4. [ ] **A readable zoomed-out system** (strategic zoom).
    - Orbit rings stay one pixel wide at any zoom. Today their width is in world units, so they vanish when zoomed out.
    - The star and the planets keep a minimum size on screen. Moons and stations fold into their planet when they'd overlap it.

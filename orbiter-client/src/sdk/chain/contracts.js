@@ -45,16 +45,8 @@ async function read(contract, method, ...args) {
 }
 
 /**
- * Sends a transaction and waits for it to be mined. Rejects with the revert reason if it fails.
- * @param {'game' | 'avatars'} contract
- * @param {string} method  the ABI function name
- */
-async function write(contract, method, ...args) {
-  return send(contract, method, args)
-}
-
-/**
- * Like write, but reports the moment the wallet has sent the transaction (it's committed, not yet mined).
+ * Sends a transaction and waits for it to be mined; rejects with the revert reason if it fails.
+ * `onSent` reports the moment the wallet has sent it (it's committed, not yet mined).
  * @param {'game' | 'avatars'} contract
  * @param {string} method
  * @param {unknown[]} args
@@ -179,17 +171,18 @@ export const galaxy = {
   getMyShipId: () => read('game', 'getMyShipId'),
   getMyShip: () => read('game', 'getMyShip'),
 
-  sendChat: (message) => write('game', 'sendChat', message),
+  // Transactions: each takes `options` last ({ onSent }, see send).
+  sendChat: (message, options) => send('game', 'sendChat', [message], options),
   moveToSystem: (systemId, options) => send('game', 'moveToSystem', [systemId], options),
-  renameStar: (name) => write('game', 'renameStar', name),
-  claimPlanet: (planetId, name) => write('game', 'claimPlanet', planetId, name),
-  buildStation: (planetId, name) => write('game', 'buildStation', planetId, name),
-  renamePlanet: (planetId, name) => write('game', 'renamePlanet', planetId, name),
-  renameMoon: (planetId, moonId, name) => write('game', 'renameMoon', planetId, moonId, name),
-  renameStation: (planetId, name) => write('game', 'renameStation', planetId, name),
-  tradeAtPort: (planetId, equipment, fuel, organics) =>
-    write('game', 'tradeAtPort', planetId, equipment, fuel, organics),
+  renameStar: (name, options) => send('game', 'renameStar', [name], options),
+  claimPlanet: (planetId, name, options) => send('game', 'claimPlanet', [planetId, name], options),
+  buildStation: (planetId, name, options) => send('game', 'buildStation', [planetId, name], options),
+  renamePlanet: (planetId, name, options) => send('game', 'renamePlanet', [planetId, name], options),
+  renameMoon: (planetId, moonId, name, options) => send('game', 'renameMoon', [planetId, moonId, name], options),
+  renameStation: (planetId, name, options) => send('game', 'renameStation', [planetId, name], options),
+  tradeAtPort: (planetId, equipment, fuel, organics, options) =>
+    send('game', 'tradeAtPort', [planetId, equipment, fuel, organics], options),
   launchShip: (name, options) => send('game', 'launchShip', [name], options),
-  renameMyShip: (name) => write('game', 'renameMyShip', name),
-  addHoldsToShip: (planetId, holds) => write('game', 'addHoldsToShip', planetId, holds)
+  renameMyShip: (name, options) => send('game', 'renameMyShip', [name], options),
+  addHoldsToShip: (planetId, holds, options) => send('game', 'addHoldsToShip', [planetId, holds], options)
 }

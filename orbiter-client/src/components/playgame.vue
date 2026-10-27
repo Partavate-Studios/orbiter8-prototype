@@ -2,6 +2,7 @@
   <div class="playorbiter8">
     <star-map />
     <layer-html />
+    <transaction-tray />
   </div>
 </template>
 
@@ -15,6 +16,7 @@ import { mapActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 import starMap from '@/components/star-map/map'
 import layerHtml from '@/components/layer-html/container-html'
+import TransactionTray from '@/components/transaction-tray.vue'
 import router from '@/router/router'
 import { onFrame } from '@/libs/frame-loop'
 
@@ -28,7 +30,8 @@ export default {
   name: 'Play',
   components: {
     starMap,
-    layerHtml
+    layerHtml,
+    TransactionTray
   },
   computed: {
     ...mapState(useGameStateStore, ['haveAvatar', 'haveShip']),
