@@ -1182,6 +1182,7 @@ Koda: "please make pretty input boxes for those things", then "look at the two c
      - a name too long for the dialog.
    - **Everything else stays purple and lavender,** buttons included. The dialog's confirm is lavender, like the title's primary buttons. Selection and hover stay white and lavender.
 3. [x] **The star chart's grid removed** (Koda: it made sense when systems were empty and a drag needed something to show movement; now it's clutter). The spokes through the star, the ticks on the axes and the square grid are gone from `guides-canvas.vue`; the background stars still show a drag. **Not a performance problem:** the grid was drawn only when that canvas redraws (zooming, selecting), never while panning.
+4. [x] **The title's departing ship builds up speed the whole time it spins** (Koda: "the idea is that spinning around the sun helps build up the speed to get to another star"). It used to reach full speed in 5 s and hold it. Now its speed rises with the square of the time, from orbit speed to 280°/s as it leaves: about 20 units/s at the start, 90 at 5 s, 220 at 8 s, 370 at the slingshot. The spin lasts 8 to 11.7 s so the exit still lines up; the slingshot's own speed-up is 1.9× (was 3×), so its top speed is what it was.
 
 ## Sizes and speeds: history
 

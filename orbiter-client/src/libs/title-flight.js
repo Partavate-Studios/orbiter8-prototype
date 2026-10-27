@@ -14,16 +14,20 @@ export const SLOTS = [0, 120, 240]
 const ORBIT_RADIUS = 112
 const TIGHT_RADIUS = 76
 const LAP_SPEED = 360 / ORBIT_S
-const SPIN_SPEED = 180
-/** Speeding up and closing in on the sun, then a few fast laps (lengthened slightly to line up the exit). */
-const RAMP_S = 5
-const HOLD_S = 4
+/**
+ * The spin: closing in on the sun over CLOSE_IN_S while it speeds up the whole time, faster and faster,
+ * from orbit speed to SPIN_SPEED (degrees per second) as it leaves. It lasts at least SPIN_S, a little
+ * more so the slingshot lines up (see planFlight).
+ */
+const SPIN_SPEED = 280
+const CLOSE_IN_S = 5
+const SPIN_S = 8
 /** The slingshot leaves just left of the sun's top, heading right, a little upward. */
 const EXIT = 265
 /** It comes back up the sun's upper left side into its place. */
 const JOIN = 240
 /** It leaves the screen this many times faster than it left the orbit. */
-const ESCAPE_SPEED_UP = 3
+const ESCAPE_SPEED_UP = 1.9
 const WAIT_OUT_S = 4
 const FLYBY_S = 9
 const WAIT_BACK_S = 3
@@ -49,6 +53,15 @@ const unit = (a) => times(a, 1 / length(a))
 const tangent = (angle) => ({ x: -Math.sin(rad(angle)), y: Math.cos(rad(angle)) })
 /** The CSS rotation that points the ship art (nose up) along `direction`. */
 const heading = (direction) => (Math.atan2(direction.y, direction.x) * 180) / Math.PI + 90
+
+/**
+ * How far the spinning ship has turned (degrees) `t` seconds into a spin of `spinS`. Its speed rises
+ * from LAP_SPEED to SPIN_SPEED with the square of the time, so it gains faster and faster.
+ */
+function spinTurn(t, spinS) {
+  const x = t / spinS
+  return LAP_SPEED * t + ((SPIN_SPEED - LAP_SPEED) * spinS * x * x * x) / 3
+}
 
 /** A cubic Bézier walked by distance, so a speed can be put on it. */
 function curve(p0, p1, p2, p3) {
@@ -128,15 +141,15 @@ export function planFlight(scene, slot) {
     to: { x: -halfWidth - 450, y: halfHeight + 300 }
   }
 
-  // The fast laps run a little longer (`extra`, under one lap's worth) so that the slingshot leaves at
-  // EXIT and the ship arrives back at JOIN just as its place in the orbit gets there.
+  // The spin runs a little longer than SPIN_S (by under one lap's worth of its gain on the orbit) so
+  // that the slingshot leaves at EXIT and the ship arrives back at JOIN just as its place in the orbit
+  // gets there. Over a spin of S seconds the ship gains (SPIN_SPEED - LAP_SPEED) * S / 3 degrees on
+  // its place (spinTurn).
   const afterSpin = escapeS + WAIT_OUT_S + FLYBY_S + WAIT_BACK_S + returnS
-  const rampTurn = ((LAP_SPEED + SPIN_SPEED) / 2) * RAMP_S
-  const gap = EXIT - JOIN - rampTurn - SPIN_SPEED * HOLD_S + LAP_SPEED * (RAMP_S + HOLD_S + afterSpin)
-  const extra = mod(gap, 360) / (SPIN_SPEED - LAP_SPEED)
-  const holdS = HOLD_S + extra
-  const startAngle = mod(EXIT - rampTurn - SPIN_SPEED * holdS, 360)
-  const spinS = RAMP_S + holdS
+  const gainPerS = (SPIN_SPEED - LAP_SPEED) / 3
+  const gap = EXIT - JOIN + LAP_SPEED * afterSpin - gainPerS * SPIN_S
+  const spinS = SPIN_S + mod(gap, 360) / gainPerS
+  const startAngle = mod(EXIT - spinTurn(spinS, spinS), 360)
   const busyS = spinS + afterSpin
   const firstSpinOf = (from) => mod((startAngle - from) / LAP_SPEED - FIRST_SPIN_AFTER_S, ORBIT_S) + FIRST_SPIN_AFTER_S
   slot ??= SLOTS.reduce((best, from) => (firstSpinOf(from) < firstSpinOf(best) ? from : best))
@@ -184,17 +197,10 @@ export function flightPose(plan, seconds) {
   let t = mod(seconds - plan.firstSpin, plan.periodS)
   if (t >= plan.busyS) return inOrbit(slotAngle(plan, seconds))
 
-  // Speeding up and closing in, then fast laps.
+  // Closing in, and speeding up faster and faster.
   if (t < plan.spinS) {
-    let angle, radius
-    if (t < RAMP_S) {
-      const x = t / RAMP_S
-      angle = plan.startAngle + LAP_SPEED * t + (SPIN_SPEED - LAP_SPEED) * RAMP_S * (x * x * x - (x * x * x * x) / 2)
-      radius = ORBIT_RADIUS + (TIGHT_RADIUS - ORBIT_RADIUS) * smoothstep(x)
-    } else {
-      angle = plan.startAngle + ((LAP_SPEED + SPIN_SPEED) / 2) * RAMP_S + SPIN_SPEED * (t - RAMP_S)
-      radius = TIGHT_RADIUS
-    }
+    const angle = plan.startAngle + spinTurn(t, plan.spinS)
+    const radius = ORBIT_RADIUS + (TIGHT_RADIUS - ORBIT_RADIUS) * smoothstep(Math.min(1, t / CLOSE_IN_S))
     return {
       ...plus(plan.sun, along(angle, radius)),
       rotation: angle + 180,
