@@ -6,7 +6,8 @@ import {
   moonOrbitRadius,
   stationOrbitRadius,
   shipOrbitRadius,
-  shipOrbitSpeed,
+  shipOrbitPhases,
+  SHIP_ORBIT_SPEED,
   planetOrbitSpeed,
   moonOrbitSpeed,
   stationOrbitSpeed,
@@ -43,7 +44,7 @@ export function objectKey(type, { id, planet }) {
  * @property {string} ownerName
  * @property {boolean} isMine  owned by the connected player
  * @property {string | null} orbiting  key of what it orbits (null for the star)
- * @property {{ radius: number, speed: number }} orbit  see sdk/game/orbits orbitAt()
+ * @property {{ radius: number, speed: number, phase?: number }} orbit  see sdk/game/orbits orbitAt()
  *
  * Plus, by type:
  * - star: size, birth
@@ -173,9 +174,17 @@ export function buildSystem(system, playerAccount) {
       ownerName: ownerName(ship.owner, 'Unknown'),
       isMine: String(ship.owner) == String(playerAccount),
       orbiting,
-      orbit: { radius, speed: shipOrbitSpeed(ship.id) }
+      orbit: { radius, speed: SHIP_ORBIT_SPEED, phase: 0 }
     })
     keys.ships.push(shipObject.key)
+  }
+
+  // Ships sharing an orbit are spread round it.
+  const shipsAround = {}
+  for (const key of keys.ships) (shipsAround[objects[key].orbiting] ??= []).push(objects[key])
+  for (const ships of Object.values(shipsAround)) {
+    const phases = shipOrbitPhases(ships.map((ship) => ship.id))
+    for (const ship of ships) ship.orbit.phase = phases.get(String(ship.id))
   }
 
   return { objects, keys }

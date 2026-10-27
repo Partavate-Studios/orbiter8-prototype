@@ -41,10 +41,11 @@ export function stationOrbitSpeed(planetSize) {
  * @param {number} distance  orbit radius
  * @param {number} speed  orbit speed (see ORBIT_SPEED_SCALE)
  * @param {number} gameTime  milliseconds
+ * @param {number} [phase]  degrees ahead of an orbit that starts at angle 0
  * @returns {{ x: number, y: number, angle: number }}  angle in degrees, the direction from the origin
  */
-export function orbitAt(distance, speed, gameTime) {
-  const theta = (gameTime * speed * ORBIT_SPEED_SCALE) % (Math.PI * 2)
+export function orbitAt(distance, speed, gameTime, phase = 0) {
+  const theta = ((gameTime * speed * ORBIT_SPEED_SCALE) % (Math.PI * 2)) + (phase * Math.PI) / 180
   const x = distance * Math.cos(theta)
   const y = distance * Math.sin(theta)
   return { x, y, angle: (Math.atan2(y, x) * 180) / Math.PI }
@@ -73,10 +74,23 @@ export function shipOrbitRadius(planetSize) {
 }
 
 /**
- * Ships get a speed from their id, so ships at one planet don't move in lockstep: 2,000-3,000 at
- * first, Enterprise Circuit's 8 times that, and halfway (√8 times) now: about 5,660-8,480.
+ * Every ship goes round at the same speed, so ships sharing an orbit keep their distance (see
+ * shipOrbitPhases). It's the middle of what ships had before: 2,000-3,000 at first, Enterprise
+ * Circuit's 8 times that, and halfway (√8 times).
  */
-export function shipOrbitSpeed(shipId) {
-  const original = ((shipId * 25.25) % 10) * 100 + 2000
-  return halfway(original, 8 * original)
+export const SHIP_ORBIT_SPEED = halfway(2500, 8 * 2500)
+
+/**
+ * Where each of the ships sharing an orbit sits round it (degrees), so they don't overlap: spread
+ * evenly in id order, then each nudged by up to a fifth of the gap (by its id), so it doesn't look
+ * arranged.
+ * @param {Array<number | string>} shipIds
+ * @returns {Map<string, number>}  by id (as a string)
+ */
+export function shipOrbitPhases(shipIds) {
+  const ids = [...shipIds].map(String).sort((a, b) => Number(a) - Number(b))
+  const gap = 360 / Math.max(ids.length, 1)
+  // A fraction in [-1, 1) from the id, fixed for each ship.
+  const nudge = (id) => ((Number(id) * 0.6180339887) % 1) * 2 - 1
+  return new Map(ids.map((id, index) => [id, index * gap + (ids.length > 1 ? nudge(id) * gap * 0.2 : 0)]))
 }

@@ -5,7 +5,7 @@ import {
   moonOrbitRadius,
   stationOrbitRadius,
   shipOrbitRadius,
-  shipOrbitSpeed,
+  shipOrbitPhases,
   planetOrbitSpeed,
   ORBIT_SPEED_SCALE
 } from './orbits'
@@ -52,12 +52,18 @@ describe('orbit radii and speeds', () => {
     expect(shipOrbitRadius(10)).toBe(11)
   })
 
-  it('ship speeds spread between about 5,660 and 8,480 by id', () => {
-    expect(shipOrbitSpeed(1)).toBeCloseTo(2525 * Math.sqrt(8), 6)
-    for (let id = 1; id < 50; id++) {
-      expect(shipOrbitSpeed(id)).toBeGreaterThanOrEqual(5656)
-      expect(shipOrbitSpeed(id)).toBeLessThan(8485)
+  it('spreads the ships sharing an orbit round it, unevenly but never close', () => {
+    for (const ids of [[7], [3, 9], [1, 2, 3, 4, 5], [12, 40, 41, 77, 103, 104, 250, 251]]) {
+      const phases = shipOrbitPhases(ids)
+      const angles = [...phases.values()].sort((a, b) => a - b)
+      const evenGap = 360 / ids.length
+      angles.forEach((angle, i) => {
+        const next = i + 1 < angles.length ? angles[i + 1] : angles[0] + 360
+        if (ids.length > 1) expect(next - angle).toBeGreaterThan(evenGap * 0.6)
+      })
     }
+    // The same ships get the same places, in whatever order they come.
+    expect(shipOrbitPhases([5, 2, 9])).toEqual(shipOrbitPhases([9, 5, 2]))
   })
 
   it("planets go around halfway between the original pace and Enterprise Circuit's: Sol's Mercury in about 19 minutes (84 at first, 4.1 in Enterprise Circuit), outer ones slower", () => {
