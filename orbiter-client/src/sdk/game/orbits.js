@@ -7,27 +7,33 @@ export const ORBIT_SPEED_SCALE = 0.000000005
 /** Ships that aren't at a planet circle the star at this distance. */
 export const SHIP_ORBIT_RADIUS_AROUND_STAR = 50
 
-// Speeds follow Enterprise Circuit's (adopted 2026-10-27; the formulas before are in UPGRADE_NOTES.md,
-// "Sizes and speeds: history"). Its speeds are "periods" times 1e-7 radians per millisecond; this
-// one's are speeds times ORBIT_SPEED_SCALE, so its values are multiplied by EC_SPEED to convert.
+// Speeds are halfway between the game's original ones and Enterprise Circuit's (Koda, 2026-10-27:
+// Enterprise Circuit's looked good but made things hard to click). Halfway is the geometric mean, as
+// on the tuning sliders: each step looks like the same amount of change. The formulas' history is in
+// UPGRADE_NOTES.md, "Sizes and speeds: history". Enterprise Circuit's speeds are "periods" times 1e-7
+// radians per millisecond; this one's are speeds times ORBIT_SPEED_SCALE, so its values are
+// multiplied by EC_SPEED to convert.
 const EC_SPEED = 1e-7 / ORBIT_SPEED_SCALE
+const halfway = (original, enterpriseCircuit) => Math.sqrt(original * enterpriseCircuit)
 
 /**
  * A planet's orbit speed, from its contract speed and orbital position (0 = innermost): outer planets
  * slower, with a floor so the outermost still visibly move.
  */
 export function planetOrbitSpeed(contractSpeed, orbitalPosition) {
-  return EC_SPEED * (Number(contractSpeed) / (Number(orbitalPosition) + 1) + 5)
+  const v = Number(contractSpeed)
+  return halfway(Math.max(v, 1), EC_SPEED * (v / (Number(orbitalPosition) + 1) + 5))
 }
 
-/** A moon's orbit speed, from its contract speed and orbital position around its planet. */
-export function moonOrbitSpeed(contractSpeed, moonPosition) {
-  return EC_SPEED * ((Number(contractSpeed) * 4) / (Number(moonPosition) + 1) + 100)
+/** A moon's orbit speed, from its contract speed, its orbital position and its orbit's radius. */
+export function moonOrbitSpeed(contractSpeed, moonPosition, radius) {
+  const v = Number(contractSpeed)
+  return halfway(Math.max(v, 1) * radius, EC_SPEED * ((v * 4) / (Number(moonPosition) + 1) + 100))
 }
 
 /** A space station's orbit speed: slower around bigger planets. */
 export function stationOrbitSpeed(planetSize) {
-  return EC_SPEED * Math.max(50, (50 - Number(planetSize)) * 10 + 150)
+  return halfway(3000, EC_SPEED * Math.max(50, (50 - Number(planetSize)) * 10 + 150))
 }
 
 /**
@@ -67,9 +73,10 @@ export function shipOrbitRadius(planetSize) {
 }
 
 /**
- * Ships get a speed from their id, so ships at one planet don't move in lockstep: 16,000-23,200,
- * around Enterprise Circuit's 20,000 for every ship.
+ * Ships get a speed from their id, so ships at one planet don't move in lockstep: 2,000-3,000 at
+ * first, Enterprise Circuit's 8 times that, and halfway (√8 times) now: about 5,660-8,480.
  */
 export function shipOrbitSpeed(shipId) {
-  return 8 * (((shipId * 25.25) % 10) * 100 + 2000)
+  const original = ((shipId * 25.25) % 10) * 100 + 2000
+  return halfway(original, 8 * original)
 }

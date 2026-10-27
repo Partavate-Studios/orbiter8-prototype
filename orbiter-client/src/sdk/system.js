@@ -147,7 +147,7 @@ export function buildSystem(system, playerAccount) {
         ownerName: planetOwnerName,
         isMine,
         orbiting: planetObject.key,
-        orbit: { radius, speed: moonOrbitSpeed(moon.orbitSpeed, moonPosition) }
+        orbit: { radius, speed: moonOrbitSpeed(moon.orbitSpeed, moonPosition, radius) }
       })
       keys.moons.push(moonObject.key)
       planetObject.moons.push({ moonId: moonObject.key, moonName: moon.name })

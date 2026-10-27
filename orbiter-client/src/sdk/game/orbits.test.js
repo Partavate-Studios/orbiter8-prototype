@@ -52,17 +52,17 @@ describe('orbit radii and speeds', () => {
     expect(shipOrbitRadius(10)).toBe(11)
   })
 
-  it('ship speeds spread between 16,000 and 23,200 by id', () => {
-    expect(shipOrbitSpeed(1)).toBeCloseTo(20200, 6)
+  it('ship speeds spread between about 5,660 and 8,480 by id', () => {
+    expect(shipOrbitSpeed(1)).toBeCloseTo(2525 * Math.sqrt(8), 6)
     for (let id = 1; id < 50; id++) {
-      expect(shipOrbitSpeed(id)).toBeGreaterThanOrEqual(16000)
-      expect(shipOrbitSpeed(id)).toBeLessThan(24000)
+      expect(shipOrbitSpeed(id)).toBeGreaterThanOrEqual(5656)
+      expect(shipOrbitSpeed(id)).toBeLessThan(8485)
     }
   })
 
-  it("planets go around at Enterprise Circuit's pace: Sol's Mercury in about 4 minutes, outer ones slower", () => {
+  it("planets go around halfway between the original pace and Enterprise Circuit's: Sol's Mercury in about 19 minutes (84 at first, 4.1 in Enterprise Circuit), outer ones slower", () => {
     const minutesPerOrbit = (speed) => (2 * Math.PI) / (speed * ORBIT_SPEED_SCALE) / 60000
-    expect(minutesPerOrbit(planetOrbitSpeed(250, 0))).toBeCloseTo(4.1, 1)
+    expect(minutesPerOrbit(planetOrbitSpeed(250, 0))).toBeCloseTo(Math.sqrt(83.8 * 4.1), 0)
     expect(planetOrbitSpeed(50, '2')).toBeLessThan(planetOrbitSpeed(250, 0))
     expect(planetOrbitSpeed(1, 8)).toBeGreaterThan(0) // the floor: Pluto still moves
   })

@@ -1218,6 +1218,17 @@ Koda: "please make pretty input boxes for those things", then "look at the two c
 | Ship | `2000–2900` by id | 8 × that (`16,000–23,200`), around Enterprise Circuit's 20,000, kept varied so ships at one planet don't move in lockstep |
 | Sol's Mercury / Earth / Pluto, one orbit | 84 min / 7 h / 14.5 days | 4.1 min / 48 min / 3.4 h |
 
+**2026-10-27, later: speeds halfway back** (Koda: Enterprise Circuit's speeds "look good, real good, but now it's hard to click on things because they move so fast... go with a speed halfway between the current and the original"). Halfway is the geometric mean of the two formulas, `√(original × Enterprise Circuit)`, the same "halfway" as step 3 on the tuning sliders. Sizes are unchanged.
+
+| | Original | Enterprise Circuit | Now (halfway) |
+| --- | --- | --- | --- |
+| Sol's Mercury, one orbit | 84 min | 4.1 min | 18.5 min |
+| Sol's Earth, one orbit | 7 h | 48 min | about 2.4 h |
+| Sol's Pluto, one orbit | 14.5 days | 3.4 h | about 34 h |
+| Ships | 2,000–3,000 | 8× | √8× (about 5,660–8,480) |
+
+A planet or moon whose contract speed is 0 used to stand still. Its original speed counts as 1 here, so it still moves.
+
 ## Contract wish list (next contracts iteration)
 
 - **A neighbor summary:** a read like `getSystemSummary(systemId)` returning a system's name, planet count, port count and the number of ships there. The neighbor view could then show what each jump leads to (UI review step 5).
