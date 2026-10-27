@@ -36,6 +36,9 @@ const MARGIN = 128
 export default {
   name: 'GuidesCanvas',
   computed: {
+    screenDimensions() {
+      return this.screenSize.width + 'x' + this.screenSize.height
+    },
     ...mapState(useUIStore, [
       'viewport',
       'screenSize',
@@ -56,11 +59,10 @@ export default {
     }
   },
   watch: {
-    screenSize: {
-      handler() {
-        this.$nextTick(this.resize)
-      },
-      deep: true
+    // Only the window's size: screenSize also holds the mouse position, and a deep watch redrew
+    // (and cleared) this canvas on every mouse move.
+    screenDimensions() {
+      this.$nextTick(this.resize)
     }
   },
   mounted() {

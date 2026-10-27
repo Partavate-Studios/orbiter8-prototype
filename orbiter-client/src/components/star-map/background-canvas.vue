@@ -77,6 +77,9 @@ function paintStars(ctx, stars, layers) {
 export default {
   name: 'BackgroundCanvas',
   computed: {
+    screenDimensions() {
+      return this.screenSize.width + 'x' + this.screenSize.height
+    },
     ...mapState(useUIStore, ['viewport', 'screenSize', 'jumpAnimationState', 'jumpStall']),
     ...mapState(useConfigStore, ['graphicsQuality']),
     showStars() {
@@ -95,11 +98,10 @@ export default {
     }
   },
   watch: {
-    screenSize: {
-      handler() {
-        this.$nextTick(this.resize)
-      },
-      deep: true
+    // Only the window's size: screenSize also holds the mouse position, and a deep watch redrew
+    // (and cleared) this canvas on every mouse move.
+    screenDimensions() {
+      this.$nextTick(this.resize)
     },
     graphicsQuality() {
       this.generateStars()
