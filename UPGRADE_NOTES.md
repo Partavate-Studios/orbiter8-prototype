@@ -1053,6 +1053,46 @@ Order (from the walkthrough's list). Tick each when it lands:
 - **The contracts are a starting point for portals** in a future contract iteration. They're tied to Boba's bridge, and Bobabase's RPC no longer answers.
 - **An idea for later:** the wizard's network step could present networks as portals to other universes. That ties network choice to the game's fiction.
 
+### 6. UI review: seven improvements (Koda, 2026-10-27)
+
+**The review, in short.** Orbiter's top-down command view is the right model. Sins of a Solar Empire, Stellaris, Supreme Commander, KSP's map view and Dark Forest all converged on it for games where you give orders rather than pilot. Zooming straight out of the system into the neighbor view is rare and good. A chase camera would be wrong here, because the ship moves only when a transaction goes through. The gaps are in what the map shows at each zoom level, and where the controls sit.
+
+**Koda's notes (2026-10-27):**
+- All seven sound great.
+- The game was built to work on phones. The card's popup from the bottom must keep working there.
+- He wants to see the side-panel concept. It will touch the ships list, the leaderboard and chat too.
+- **Correction to the review:** Trade at Port and Dock at Shipyards do work. `enabled: false` only dims a card button's label; I misread `menu-button`'s check as `card-button`'s.
+
+**Build plan** (each step is its own commit; tick it off here when it lands):
+1. [ ] **Map handling.**
+   - The wheel zooms toward the cursor. While the camera follows a selection, it still zooms around that selection.
+   - Dragging moves the map 1:1 with the pointer. Today it moves at about half the pointer's speed.
+   - Touch: one finger pans, two fingers pinch to zoom (pointer events).
+   - Every object can be clicked within about 14 px, however small it's drawn.
+2. [ ] **Keyboard and tooltips.**
+   - Esc backs out one level: the open menu, then the card, then the selection, then the neighbor view.
+   - Space goes to my ship; Tab and Shift+Tab (or `]` and `[`) step through the planets.
+   - Every HUD button gets a tooltip.
+   - Fix: ship icons in the ships menu were scaled by `NaN` (ships have no `size`).
+3. [ ] **Every transaction shows its progress.** A small tray shows each action going from waiting for the wallet, to sent, to confirmed, or failed with the reason. Covers claims, stations, renames, trades, holds and chat. Today only jumps show anything; the rest log failures to the console.
+4. [ ] **A readable zoomed-out system** (strategic zoom).
+   - Orbit rings stay one pixel wide at any zoom. Today their width is in world units, so they vanish when zoomed out.
+   - The star and the planets keep a minimum size on screen. Moons and stations fold into their planet when they'd overlap it.
+   - Labels are drawn at screen size, not world size. Planet names show when zoomed out; the labels button shows every name.
+   - My ship is marked.
+5. [ ] **The neighbor view helps choose a jump.** Each star shows what's known about it (its name, planets, ports and pilots) and marks the star I came from.
+6. [ ] **A side panel** (the outliner) for the system's planets, moons and stations and the ships here. Hover a row and the object lights up on the map; click it and the camera flies there. On phones it becomes a bottom sheet. The leaderboard and chat can move into it later.
+7. [ ] **One inspector instead of two cards.**
+   - Wide screens: the selected object's card docks at the side, with its information and actions in one panel.
+   - Phones keep the popup from the bottom.
+   - Text prompts become fields in the panel.
+   - The disabled placeholder buttons (Attack, Build Infrastructure) stop showing first in the list.
+
+**After these, to walk through with Koda** (his ideas, 2026-10-27):
+- other players' ships fly from orbit to orbit when they move, instead of jumping;
+- my ship sets off at once toward whatever I select, client-side only, and flies back to its real place when I deselect;
+- Bobabeam's pink and yellow as sparing accent colors.
+
 ## Sizes and speeds: history
 
 **2026-10-27: Enterprise Circuit's proportions and speeds adopted** (Koda: "let's go with the overall EC settings for size and speed").
