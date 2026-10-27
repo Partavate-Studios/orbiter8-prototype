@@ -7,8 +7,28 @@ export const ORBIT_SPEED_SCALE = 0.000000005
 /** Ships that aren't at a planet circle the star at this distance. */
 export const SHIP_ORBIT_RADIUS_AROUND_STAR = 50
 
-/** Space stations all circle their planet at this speed. */
-export const STATION_ORBIT_SPEED = 3000
+// Speeds follow Enterprise Circuit's (adopted 2026-10-27; the formulas before are in UPGRADE_NOTES.md,
+// "Sizes and speeds: history"). Its speeds are "periods" times 1e-7 radians per millisecond; this
+// one's are speeds times ORBIT_SPEED_SCALE, so its values are multiplied by EC_SPEED to convert.
+const EC_SPEED = 1e-7 / ORBIT_SPEED_SCALE
+
+/**
+ * A planet's orbit speed, from its contract speed and orbital position (0 = innermost): outer planets
+ * slower, with a floor so the outermost still visibly move.
+ */
+export function planetOrbitSpeed(contractSpeed, orbitalPosition) {
+  return EC_SPEED * (Number(contractSpeed) / (Number(orbitalPosition) + 1) + 5)
+}
+
+/** A moon's orbit speed, from its contract speed and orbital position around its planet. */
+export function moonOrbitSpeed(contractSpeed, moonPosition) {
+  return EC_SPEED * ((Number(contractSpeed) * 4) / (Number(moonPosition) + 1) + 100)
+}
+
+/** A space station's orbit speed: slower around bigger planets. */
+export function stationOrbitSpeed(planetSize) {
+  return EC_SPEED * Math.max(50, (50 - Number(planetSize)) * 10 + 150)
+}
 
 /**
  * Position on a circular orbit around the origin at `gameTime`.
@@ -46,7 +66,10 @@ export function shipOrbitRadius(planetSize) {
   return planetSize * 0.5 + 6
 }
 
-/** Ships get a speed from their id, so ships at one planet don't move in lockstep (2000-2900). */
+/**
+ * Ships get a speed from their id, so ships at one planet don't move in lockstep: 16,000-23,200,
+ * around Enterprise Circuit's 20,000 for every ship.
+ */
 export function shipOrbitSpeed(shipId) {
-  return ((shipId * 25.25) % 10) * 100 + 2000
+  return 8 * (((shipId * 25.25) % 10) * 100 + 2000)
 }

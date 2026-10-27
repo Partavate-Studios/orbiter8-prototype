@@ -1,4 +1,5 @@
 // Per-type settings for the objects in a star system.
+import { planetOrbitRadius } from '@/sdk/game/orbits'
 
 /**
  * @typedef {object} SpriteType
@@ -22,9 +23,48 @@ export const SHIP_SIZE = 10
 /** Stations start a little turned, so they don't all line up with their planet. */
 export const STATION_START_ROTATION = -15
 
-/** How much a sprite of this size is scaled up from its artwork (world units per sprite unit). */
-export function spriteScale(size) {
-  return size * 0.02 + 0.1
+// Sizes follow Enterprise Circuit's proportions (adopted 2026-10-27; the formulas before, and how
+// these were derived, are in UPGRADE_NOTES.md, "Sizes and speeds: history"). Planets and the star
+// are sized against the whole system (Enterprise Circuit's is SYSTEM_RATIO times this one's);
+// moons, stations and ships against their orbit around their planet. Each formula gives the world
+// units per sprite unit for that sprite's artwork.
+const SYSTEM_RATIO = planetOrbitRadius(8) / (500 + 480 * 8)
+// The artwork's size at scale 1 (sprites/*.svg.vue): a disc's radius, or a ship's length.
+const ART = { star: 130, planet: 10, moon: 2, station: 7.25, ship: 11.5 }
+
+/**
+ * How much a sprite is scaled up from its artwork (world units per sprite unit).
+ * @param {import('@/sdk/system').GameObject} object
+ * @param {Record<string, import('@/sdk/system').GameObject>} objects  the system (for the parent planet's size)
+ */
+export function spriteScaleOf(object, objects) {
+  const size = Number(object.size)
+  const parent = objects?.[object.orbiting]
+  const planetSize = parent?.type === 'planet' ? Number(parent.size) : null
+  const orbit = object.orbit?.radius ?? 0
+  switch (object.type) {
+    case 'star':
+      // A radius of 13 x (size + 0.5) in Enterprise Circuit's units.
+      return (SYSTEM_RATIO * 13 * (size + 0.5)) / ART.star
+    case 'planet':
+      // A radius of 10 x (size / 16 + 0.5): small planets get a floor, so they don't vanish.
+      return (SYSTEM_RATIO * 10 * (size / 16 + 0.5)) / ART.planet
+    case 'moon': {
+      const position = Number(object.orbitalPosition)
+      const radius = 4 * (size / 12 + 0.5)
+      return ((radius / (65 + 30 * position + 1.5 * (planetSize ?? 0))) * orbit) / ART.moon
+    }
+    case 'station': {
+      const radius = 290 * (size / 1000 + 0.02)
+      return ((radius / (40 + 1.5 * (planetSize ?? 0))) * orbit) / ART.station
+    }
+    case 'ship': {
+      // 9.2 long, orbiting 12 + 1.5 x the planet's size out (or 240 from the star).
+      const ecOrbit = planetSize === null ? 240 : 12 + 1.5 * planetSize
+      return ((9.2 / ecOrbit) * orbit) / ART.ship
+    }
+  }
+  return 1
 }
 
 // On-screen radius (pixels) below which an orbit ring is hidden, and above which it's fully shown.

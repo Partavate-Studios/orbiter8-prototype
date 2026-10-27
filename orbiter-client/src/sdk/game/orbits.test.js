@@ -5,7 +5,9 @@ import {
   moonOrbitRadius,
   stationOrbitRadius,
   shipOrbitRadius,
-  shipOrbitSpeed
+  shipOrbitSpeed,
+  planetOrbitSpeed,
+  ORBIT_SPEED_SCALE
 } from './orbits'
 
 // The formulas as they were written in Sprite.updateTelemetry and the star map import.
@@ -50,11 +52,18 @@ describe('orbit radii and speeds', () => {
     expect(shipOrbitRadius(10)).toBe(11)
   })
 
-  it('ship speeds spread between 2000 and 2900 by id', () => {
-    expect(shipOrbitSpeed(1)).toBeCloseTo(2525, 9)
+  it('ship speeds spread between 16,000 and 23,200 by id', () => {
+    expect(shipOrbitSpeed(1)).toBeCloseTo(20200, 6)
     for (let id = 1; id < 50; id++) {
-      expect(shipOrbitSpeed(id)).toBeGreaterThanOrEqual(2000)
-      expect(shipOrbitSpeed(id)).toBeLessThan(3000)
+      expect(shipOrbitSpeed(id)).toBeGreaterThanOrEqual(16000)
+      expect(shipOrbitSpeed(id)).toBeLessThan(24000)
     }
+  })
+
+  it("planets go around at Enterprise Circuit's pace: Sol's Mercury in about 4 minutes, outer ones slower", () => {
+    const minutesPerOrbit = (speed) => (2 * Math.PI) / (speed * ORBIT_SPEED_SCALE) / 60000
+    expect(minutesPerOrbit(planetOrbitSpeed(250, 0))).toBeCloseTo(4.1, 1)
+    expect(planetOrbitSpeed(50, '2')).toBeLessThan(planetOrbitSpeed(250, 0))
+    expect(planetOrbitSpeed(1, 8)).toBeGreaterThan(0) // the floor: Pluto still moves
   })
 })

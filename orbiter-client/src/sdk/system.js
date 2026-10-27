@@ -7,8 +7,10 @@ import {
   stationOrbitRadius,
   shipOrbitRadius,
   shipOrbitSpeed,
-  SHIP_ORBIT_RADIUS_AROUND_STAR,
-  STATION_ORBIT_SPEED
+  planetOrbitSpeed,
+  moonOrbitSpeed,
+  stationOrbitSpeed,
+  SHIP_ORBIT_RADIUS_AROUND_STAR
 } from '@/sdk/game/orbits'
 
 /** The star at the center of every system has a fixed key. */
@@ -103,7 +105,10 @@ export function buildSystem(system, playerAccount) {
       ownerName: planetOwnerName,
       isMine,
       orbiting: STAR_KEY,
-      orbit: { radius: planetOrbitRadius(orbitalPosition), speed: planet.orbitSpeed },
+      orbit: {
+        radius: planetOrbitRadius(orbitalPosition),
+        speed: planetOrbitSpeed(planet.orbitSpeed, orbitalPosition)
+      },
       hasStation: planet.hasStation,
       moons: []
     })
@@ -118,7 +123,7 @@ export function buildSystem(system, playerAccount) {
         ownerName: planetOwnerName,
         isMine,
         orbiting: planetObject.key,
-        orbit: { radius: stationOrbitRadius(planet.size), speed: STATION_ORBIT_SPEED },
+        orbit: { radius: stationOrbitRadius(planet.size), speed: stationOrbitSpeed(planet.size) },
         orbitalPosition: 0,
         inventory: planet.station.inventory,
         prices: planet.station.prices
@@ -142,8 +147,7 @@ export function buildSystem(system, playerAccount) {
         ownerName: planetOwnerName,
         isMine,
         orbiting: planetObject.key,
-        // The contract's moon speed is per unit of distance.
-        orbit: { radius, speed: moon.orbitSpeed * radius }
+        orbit: { radius, speed: moonOrbitSpeed(moon.orbitSpeed, moonPosition) }
       })
       keys.moons.push(moonObject.key)
       planetObject.moons.push({ moonId: moonObject.key, moonName: moon.name })

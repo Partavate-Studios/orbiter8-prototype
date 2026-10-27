@@ -1041,6 +1041,40 @@ Order (from the walkthrough's list). Tick each when it lands:
 - **The contracts are a starting point for portals** in a future contract iteration. They're tied to Boba's bridge, and Bobabase's RPC no longer answers.
 - **An idea for later:** the wizard's network step could present networks as portals to other universes. That ties network choice to the game's fiction.
 
+## Sizes and speeds: history
+
+**2026-10-27: Enterprise Circuit's proportions and speeds adopted** (Koda: "let's go with the overall EC settings for size and speed").
+- **How it was chosen:** temporary sliders (`b5e4f3f`, reverted in `e492b73`) went from a half step below the old look (1) through the old look (2) and halfway (3) to Enterprise Circuit's (4) and a half step beyond (5). Koda picked 4 for both. To try other values again, bring the sliders back with `git show b5e4f3f`.
+- **Orbit distances didn't change** (`sdk/game/orbits.js`: planets `150 + 50p + 15p²`, moons, stations and ships as before). Only body sizes and orbit speeds changed.
+- **Sizes match Enterprise Circuit's proportions, not its raw units.** Its system is about 2.9× larger (Pluto's orbit 4,340 against 1,510), so:
+  - planets and the star are sized against the whole system;
+  - moons, stations and ships against their orbit around their planet.
+  The code is `spriteScaleOf()` in `libs/sprite-types.js`.
+
+**Sizes** (world units per sprite unit; the art's radius is 130 for the star, 10 for planets, 2 for moons, 7.25 for stations, and a ship is 11.5 long):
+
+| | Before | After (Enterprise Circuit's proportions) |
+| --- | --- | --- |
+| Every type | `0.02 × size + 0.1` (ships: size 10) | One formula per type, below |
+| Star | radius `130 × (0.02s + 0.1)`: 15.6 (size 1) to 28.6 (size 6) | radius `R × 13 × (s + 0.5)`: 6.8 (size 1) to 29.4 (size 6) |
+| Planet | radius `0.2s + 1` (Earth 3.4, Pluto 1.2) | radius `R × 10 × (s/16 + 0.5)` (Earth 4.35, Pluto 1.96) |
+| Moon | radius `2 × (0.02s + 0.1)` | `4(s/12 + 0.5) / (65 + 30m + 1.5·planet)` of its orbit (about 2.5× bigger) |
+| Station | radius `7.25 × (0.02s + 0.1)` | `290(s/1000 + 0.02) / (40 + 1.5·planet)` of its orbit (about 1.3×) |
+| Ship | length 3.45 | `9.2 / (12 + 1.5·planet)` of its orbit, or `9.2 / 240` around the star (about the same at planets; half around the star) |
+
+- `R` is `1510 / 4340`, Pluto's orbit here over Enterprise Circuit's.
+- The range of star sizes widened a lot: the biggest is now 4.3× the smallest, where it was 1.8×. Most stars got smaller; Sol (size 4) is 0.87×.
+
+**Speeds** (units: radians per game ms divided by `ORBIT_SPEED_SCALE`, 5e-9; Enterprise Circuit's "periods" are radians per ms divided by 1e-7, hence the factor of 20):
+
+| | Before | After |
+| --- | --- | --- |
+| Planet | the contract speed `v` | `20 × (v / (position + 1) + 5)`: outer planets slower, with a floor |
+| Moon | `v × orbit radius` (outer moons faster) | `20 × (4v / (position + 1) + 100)` (outer moons slower) |
+| Station | 3,000 | `20 × max(50, (50 − planet size) × 10 + 150)` |
+| Ship | `2000–2900` by id | 8 × that (`16,000–23,200`), around Enterprise Circuit's 20,000, kept varied so ships at one planet don't move in lockstep |
+| Sol's Mercury / Earth / Pluto, one orbit | 84 min / 7 h / 14.5 days | 4.1 min / 48 min / 3.4 h |
+
 ## Contract wish list (next contracts iteration)
 
 - Events for every game action (claim, build station, jump, rename, trade…), so the client can update from events instead of reloading.
