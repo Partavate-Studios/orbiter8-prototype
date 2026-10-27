@@ -1152,6 +1152,19 @@ Order (from the walkthrough's list). Tick each when it lands:
      - Is the left the right side for it?
      - The card's sprite art and the dotted lines from card to object aren't in the panel. The map shows the object itself.
 
+**Checks after all seven (2026-10-27):**
+- **`capture.sh` on a fresh chain:** the whole new-player flow and every screen, with no console errors.
+- **Pan and zoom, before and after the seven steps** (the same 10 s scripted session on the dev server, two runs each):
+
+  | | Before | After |
+  |---|---|---|
+  | fps | 59.5 / 59.7 | 59.6 / 60.0 |
+  | Script | 1,186–1,288 ms | 1,310–1,371 ms |
+  | Paint | 132–135 ms | 173–182 ms |
+  | Raster | 736–757 ms | 865–903 ms |
+
+  The frame rate is unchanged. Paint and raster rose about 20–30%, because rings and names that used to be invisible are now drawn. Script time rose slightly, mostly from the label layout (every 150 ms).
+
 **After these, to walk through with Koda** (his ideas, 2026-10-27):
 - other players' ships fly from orbit to orbit when they move, instead of jumping;
 - my ship sets off at once toward whatever I select, client-side only, and flies back to its real place when I deselect;
