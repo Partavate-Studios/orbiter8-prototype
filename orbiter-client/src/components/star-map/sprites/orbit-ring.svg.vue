@@ -8,7 +8,7 @@
     :r="r"
     stroke="#c3b3da"
     stroke-dasharray="0.5 1"
-    :stroke-width="selected ? 0.05 : 0.01"
+    :stroke-width="width"
     :opacity="opacity"
     fill="none"
   />
@@ -17,7 +17,7 @@
 <script>
 import { mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
-import { ringOpacity } from '@/libs/sprite-types'
+import { ringOpacity, ringWidth } from '@/libs/sprite-types'
 
 export default {
   name: 'OrbitRing',
@@ -31,6 +31,9 @@ export default {
     ...mapState(useUIStore, ['drawnPixelsPerUnit']),
     opacity() {
       return ringOpacity(this.r * this.drawnPixelsPerUnit)
+    },
+    width() {
+      return ringWidth(this.selected, this.drawnPixelsPerUnit)
     }
   }
 }

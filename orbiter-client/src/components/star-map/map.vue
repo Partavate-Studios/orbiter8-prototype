@@ -84,9 +84,12 @@ import ConnectionStatus from './hud/connection-status.svg'
 import LoadingBar from './hud/loading-bar.svg'
 import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
 import { CompositedLayer } from '@/libs/composited-layer'
+import { placeOfferedLabels } from '@/libs/label-layout'
 
 // Pixels of world drawn beyond each screen edge, so the camera can pan a little before a redraw.
 const WORLD_MARGIN = 256
+// How often the names on the map are laid out again (libs/label-layout.js), in ms.
+const LABEL_LAYOUT_MS = 150
 
 export default {
   name: 'StarMap',
@@ -199,7 +202,8 @@ export default {
       'scaleAnimateTo',
       'calculateViewableArea',
       'drawWorldAt',
-      'closeMenu'
+      'closeMenu',
+      'setLabelPlacements'
     ]),
     resizeHandler() {
       this.calculateViewableArea({ x: window.innerWidth, y: window.innerHeight })
@@ -210,8 +214,12 @@ export default {
       this.drawWorldAt(this.viewport)
     },
     /** Each frame: show the drawn world at the live camera's position and zoom, redrawing when needed. */
-    followCamera() {
+    followCamera(now) {
       if (!this.worldLayer) return
+      if (!(now - this.labelsLaidOutAt < LABEL_LAYOUT_MS)) {
+        this.labelsLaidOutAt = now
+        this.setLabelPlacements(placeOfferedLabels())
+      }
       const drawn = this.drawnView
       const live = this.viewport
       // Where the group origin sits in the (oversized) world element.

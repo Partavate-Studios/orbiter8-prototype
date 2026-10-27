@@ -30,7 +30,7 @@ export const STATION_START_ROTATION = -15
 // units per sprite unit for that sprite's artwork.
 const SYSTEM_RATIO = planetOrbitRadius(8) / (500 + 480 * 8)
 // The artwork's size at scale 1 (sprites/*.svg.vue): a disc's radius, or a ship's length.
-const ART = { star: 130, planet: 10, moon: 2, station: 7.25, ship: 11.5 }
+export const ART = { star: 130, planet: 10, moon: 2, station: 7.25, ship: 11.5 }
 
 /**
  * How much a sprite is scaled up from its artwork (world units per sprite unit).
@@ -70,6 +70,14 @@ export function spriteScaleOf(object, objects) {
 // On-screen radius (pixels) below which an orbit ring is hidden, and above which it's fully shown.
 const RING_HIDDEN_BELOW = 6
 const RING_SHOWN_ABOVE = 24
+
+/**
+ * An orbit ring's line width in world units: thin in the world (thicker for the selection), but never
+ * under a pixel (two for the selection), so rings don't vanish when zoomed out.
+ */
+export function ringWidth(selected, pixelsPerUnit) {
+  return selected ? Math.max(0.05, 2 / pixelsPerUnit) : Math.max(0.01, 1 / pixelsPerUnit)
+}
 
 /** How visible an orbit ring is at this on-screen radius: tiny rings fade out instead of piling up. */
 export function ringOpacity(radiusPixels) {

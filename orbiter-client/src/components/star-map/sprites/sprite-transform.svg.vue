@@ -29,12 +29,23 @@
           />
         </a>
       </g>
+      <!-- Zoomed out, my ship wears a ring that stays the same size on screen, so it's easy to find. -->
+      <circle
+        v-if="isMyShip && isTiny"
+        cx="0"
+        cy="0"
+        :r="MARKER_RADIUS_PX / drawnPixelsPerUnit"
+        fill="none"
+        stroke="#e6dcf5"
+        :stroke-width="1.25 / drawnPixelsPerUnit"
+        opacity="0.85"
+      />
       <g>
         <text
-          v-if="(isSelected && !showScope) || showLabels || (hover && !isSelected)"
+          v-if="showLabel && labelPlacement !== 'hidden'"
           x="0"
-          :y="sprite.size / 4 + 4"
-          font-size="0.1em"
+          :y="labelPlacement === 'above' ? -(visualRadius + labelSize * 0.6) : visualRadius + labelSize * 0.9"
+          :font-size="labelSize"
           fill="#ffffff66"
           stroke="#00000000"
           stroke-width="4"
@@ -52,7 +63,8 @@ import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
 import { mapActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
-import { spriteScaleOf } from '@/libs/sprite-types'
+import { ART, spriteScaleOf } from '@/libs/sprite-types'
+import { offerLabel, withdrawLabel } from '@/libs/label-layout'
 import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
 import { writeAttribute } from '@/libs/dom-writes'
 import Star from './star.svg'
@@ -70,6 +82,18 @@ const DETAILED_WHEN_TINY = ['planet', 'star']
 // Planets and the star can be clicked this many pixels from their center, however small they're drawn.
 // (Not the moons, stations and ships around a planet: drawn after it, they'd take its clicks.)
 const MIN_HIT_RADIUS_PX = 14
+// Zoomed out, planets and the star are never drawn smaller than this (their body's radius, pixels), so
+// the system stays readable (as in strategy games' map views); zoomed in, they're their true size.
+const MIN_RADIUS_PX = { planet: 4, star: 7 }
+// Planets and the star show their names by themselves until they're this big on screen (radius, pixels).
+const NAMED_BELOW_PX = { planet: 40, star: 60 }
+// What orbits a planet is hidden while it would sit inside the planet as drawn, plus this margin
+// (pixels): zoomed out, a planet stands for everything around it.
+const FOLD_MARGIN_PX = 3
+// Names scale with the world, but stay between these sizes on screen (pixels). The size in the world
+// is what labels always had: 0.1em of the 16px default.
+const LABEL_PX = { min: 12, max: 20, world: 1.6 }
+const MARKER_RADIUS_PX = 8
 
 export default {
   name: 'SpriteTransform',
@@ -107,16 +131,75 @@ export default {
   },
   data() {
     return {
-      hover: false
+      hover: false,
+      MARKER_RADIUS_PX
     }
   },
   computed: {
     ...mapState(useStarMapStore, ['sprites', 'systemObjects']),
-    ...mapState(useUIStore, ['selected', 'showLabels', 'isMenuOn', 'drawnPixelsPerUnit', 'isOnScreen', 'showScope']),
+    ...mapState(useUIStore, [
+      'selected',
+      'showLabels',
+      'isMenuOn',
+      'drawnPixelsPerUnit',
+      'isOnScreen',
+      'showScope',
+      'labelPlacements'
+    ]),
     ...mapState(useConfigStore, ['graphicsQuality']),
-    /** The sprite's group scale (world units per sprite unit). */
+    /** The sprite's group scale (world units per sprite unit): its true size, or bigger when zoomed out (MIN_RADIUS_PX). */
     spriteScale() {
+      return this.trueScale * this.zoomedOutBoost
+    },
+    trueScale() {
       return spriteScaleOf(this.sprite.object, this.systemObjects)
+    },
+    /** How much bigger than its true size a planet or the star is drawn, to stay MIN_RADIUS_PX across. */
+    zoomedOutBoost() {
+      const minimum = MIN_RADIUS_PX[this.type]
+      if (!minimum) return 1
+      return Math.max(1, minimum / this.trueRadiusPx)
+    },
+    /** The body's true radius on screen, in pixels. */
+    trueRadiusPx() {
+      return (ART[this.type] ?? this.sprite.selectorSize) * this.trueScale * this.drawnPixelsPerUnit
+    },
+    isMyShip() {
+      return this.type === 'ship' && this.sprite.object.isMine
+    },
+    /**
+     * Hidden inside its planet: a moon, station or ship whose orbit is inside the planet as drawn.
+     * (Never the selection or my ship.)
+     */
+    folded() {
+      if (this.frameOf !== 'parent' || this.isSelected || this.isMyShip) return false
+      const planet = this.sprites[this.sprite.orbiting]
+      if (!planet) return false
+      const pixels = this.drawnPixelsPerUnit
+      const trueRadius = ART.planet * spriteScaleOf(planet.object, this.systemObjects) * pixels
+      const drawnRadius = Math.max(trueRadius, MIN_RADIUS_PX.planet)
+      return this.sprite.object.orbit.radius * pixels < drawnRadius + FOLD_MARGIN_PX
+    },
+    showLabel() {
+      if ((this.isSelected && !this.showScope) || this.showLabels || (this.hover && !this.isSelected)) return true
+      // Zoomed out: the planets', the star's and my ship's names show by themselves.
+      return this.trueRadiusPx < (NAMED_BELOW_PX[this.type] ?? 0) || (this.isMyShip && this.isTiny)
+    },
+    labelPlacement() {
+      return this.labelPlacements[this.objectIndex] ?? 'below'
+    },
+    /** Whose name wins when names would overlap (libs/label-layout.js). */
+    labelPriority() {
+      if (this.isSelected || this.hover) return 100
+      if (this.type === 'star') return 90
+      if (this.isMyShip) return 80
+      if (this.type === 'planet') return 50 + Number(this.sprite.object.size) / 10
+      return 10
+    },
+    /** The label's font size, in world units. */
+    labelSize() {
+      const pixels = this.drawnPixelsPerUnit
+      return Math.min(LABEL_PX.max, Math.max(LABEL_PX.min, LABEL_PX.world * pixels)) / pixels
     },
     /** Roughly how far the sprite reaches from its center, in world units. */
     visualRadius() {
@@ -171,16 +254,32 @@ export default {
   },
   unmounted() {
     this.stopFrames()
+    withdrawLabel(this.objectIndex)
   },
   methods: {
+    /** Offers this frame's name to the label layout (libs/label-layout.js), or withdraws it. */
+    offerName(visible, x, y) {
+      if (!visible || !this.showLabel) return withdrawLabel(this.objectIndex)
+      const pixels = this.drawnPixelsPerUnit
+      const fontPixels = this.labelSize * pixels
+      offerLabel(this.objectIndex, {
+        x: x * pixels,
+        y: y * pixels,
+        radius: this.visualRadius * pixels,
+        width: String(this.sprite.object.name).length * fontPixels * 0.55 + 4,
+        height: fontPixels * 1.3,
+        priority: this.labelPriority
+      })
+    },
     ...mapActions(useUIStore, ['toggleScope', 'selectSprite']),
     /** Moves, turns, and shows or hides the sprite for this frame. */
     writeFrame() {
       const placed = this.$refs.placed
-      if (!placed) return
       const { x, y } = this.sprite.position
-      // Off screen: hidden, so it costs nothing to draw. (The label hangs below the sprite.)
-      const visible = this.isSelected || this.isOnScreen(x, y, this.visualRadius + 10)
+      // Off screen or folded into its planet: hidden, so it costs nothing to draw. (The label hangs below the sprite.)
+      const visible = placed && !this.folded && (this.isSelected || this.isOnScreen(x, y, this.visualRadius + 10))
+      this.offerName(visible, x, y)
+      if (!placed) return
       writeAttribute(placed, 'display', visible ? 'inline' : 'none')
       if (!visible) return
       writeAttribute(placed, 'transform', this.placement(x, y))

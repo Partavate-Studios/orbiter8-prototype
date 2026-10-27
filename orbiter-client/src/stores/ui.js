@@ -81,7 +81,10 @@ export const useUIStore = defineStore('UI', {
     jumpStall: null,
     // A wheel zoom with nothing selected keeps this world point under this screen point (pixels from the
     // screen's center) while its zoom tween runs: { screenX, screenY, x, y }.
-    zoomAnchor: null
+    zoomAnchor: null,
+    // Where each shown name goes so names don't overlap: sprite key → 'below' | 'above' | 'hidden'
+    // (libs/label-layout.js; laid out by the map a few times a second).
+    labelPlacements: {}
   }),
   getters: {
     /** Screen pixels per map-group unit, before the camera's zoom. */
@@ -411,6 +414,12 @@ export const useUIStore = defineStore('UI', {
       this.viewport.scaleTween = null
       this.viewport.scale = Math.min(CAMERA.MAX_SCALE, Math.max(CAMERA.MIN_SCALE, scale))
       this.keepUnder({ screenX, screenY, x, y })
+    },
+    setLabelPlacements(placements) {
+      const changed = (key) => this.labelPlacements[key] !== placements[key]
+      if (Object.keys(placements).some(changed) || Object.keys(this.labelPlacements).some(changed)) {
+        this.labelPlacements = placements
+      }
     },
     setMouse(payload) {
       this.screenSize.mouse.x = payload.x

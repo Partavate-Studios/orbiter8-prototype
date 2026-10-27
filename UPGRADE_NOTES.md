@@ -1098,11 +1098,19 @@ Order (from the walkthrough's list). Tick each when it lands:
      - claiming an owned planet showed the revert reason.
 
      The local chain mines at once, so the two waiting steps only flash by there. `transactions.test.js` covers them.
-4. [ ] **A readable zoomed-out system** (strategic zoom).
-   - Orbit rings stay one pixel wide at any zoom. Today their width is in world units, so they vanish when zoomed out.
-   - The star and the planets keep a minimum size on screen. Moons and stations fold into their planet when they'd overlap it.
-   - Labels are drawn at screen size, not world size. Planet names show when zoomed out; the labels button shows every name.
-   - My ship is marked.
+4. [x] **A readable zoomed-out system** (strategic zoom).
+   - **Orbit rings** are never thinner than a pixel (two when selected). Their width was in world units, so they vanished when zoomed out.
+     - **For Koda:** at middle zooms, rings that used to fade to near-invisible hairlines now show as clean one-pixel dotted paths.
+     - Close in, they look as before.
+   - **Minimum sizes.** Planets are never drawn smaller than a 4 px radius, and the star never smaller than 7 px. Above that they're their true size.
+   - **Folding.** A moon, station or ship whose orbit would sit inside its planet as drawn is hidden. My ship and the selection never fold.
+   - **Names.**
+     - They scale with the world as before, but stay between 12 and 20 px on screen.
+     - Planets and the star show their names by themselves until they're 40 or 60 px across.
+     - My ship shows its name and a ring when zoomed out.
+     - The labels button still shows every name.
+   - **Names never overlap.** Every sprite showing a name offers it to `libs/label-layout.js`. Several times a second the map places them, most important first: the selection or hover, then the star, my ship, then planets by size. Each goes below its sprite if there's room, else above, else it waits until there's room. Tested in `label-layout.test.js`.
+   - **Before and after** at whole-system zoom: a few dozen unlabeled dots with no rings, against nine labeled planets on visible rings.
 5. [ ] **The neighbor view helps choose a jump.** Each star shows what's known about it (its name, planets, ports and pilots) and marks the star I came from.
 6. [ ] **A side panel** (the outliner) for the system's planets, moons and stations and the ships here. Hover a row and the object lights up on the map; click it and the camera flies there. On phones it becomes a bottom sheet. The leaderboard and chat can move into it later.
 7. [ ] **One inspector instead of two cards.**

@@ -15,7 +15,7 @@ import { useConfigStore } from '@/stores/config'
 import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
 import { WORLD_OFFSET_Y } from '@/constants'
 import { writeStyle } from '@/libs/dom-writes'
-import { ringOpacity } from '@/libs/sprite-types'
+import { ringOpacity, ringWidth } from '@/libs/sprite-types'
 
 const GUIDE_COLOR = '#c3b3da'
 // A dim glow around the star (normal and high graphics).
@@ -221,7 +221,7 @@ export default {
         const opacity = ringOpacity(radius * pixels)
         if (opacity === 0) continue
         const isSelected = key === this.selected
-        ctx.lineWidth = isSelected ? 0.05 : 0.01
+        ctx.lineWidth = ringWidth(isSelected, pixels)
         if ((DOT_ON + DOT_OFF) * pixels >= MIN_DOT_PERIOD_PX) {
           ctx.globalAlpha = opacity
           ctx.setLineDash([DOT_ON, DOT_OFF])
