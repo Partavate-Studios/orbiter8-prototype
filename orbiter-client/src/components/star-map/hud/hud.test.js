@@ -5,7 +5,6 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { createApp, h, nextTick } from 'vue'
 import { createPinia } from 'pinia'
 import Hud from './hud.svg.vue'
-import Outliner from '@/components/outliner.vue'
 import { useStarMapStore } from '@/stores/starmap'
 import { useGameStateStore } from '@/stores/gamestate'
 import { useUIStore } from '@/stores/ui'
@@ -27,8 +26,7 @@ let app, root, problems, ui
 beforeEach(() => {
   problems = []
   const pinia = createPinia()
-  // The HUD, and the side panel its planets and ships buttons open.
-  app = createApp({ render: () => h('div', [h('svg', [h(Hud)]), h(Outliner)]) })
+  app = createApp({ render: () => h('svg', [h(Hud)]) })
   app.use(pinia)
   app.config.globalProperties.o8audio = silentAudio
   app.config.errorHandler = (error) => problems.push(error)
@@ -91,7 +89,7 @@ describe('HUD', () => {
     })
   }
 
-  it("lists each planet's port in the side panel", async () => {
+  it("lists each planet's port in the planets menu", async () => {
     ui.openMenu('planets')
     await settle()
     expect(root.textContent).toContain('New Station')
