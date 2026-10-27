@@ -31,6 +31,7 @@ import { mapState } from 'pinia'
 import uniqueId from 'lodash/uniqueId'
 
 import { useUIStore } from '@/stores/ui'
+import { YELLOW } from '@/libs/palette'
 export default {
   name: 'MenuSlotContainer',
   props: {
@@ -52,8 +53,9 @@ export default {
       return '#00000044'
     },
     slotBorder() {
+      // Highlighted rows are the player's own (libs/palette.js).
       if (this.highlight) {
-        return '#ffffff88'
+        return YELLOW + 'bb'
       } else if (this.hover) {
         return '#ffffff66'
       }

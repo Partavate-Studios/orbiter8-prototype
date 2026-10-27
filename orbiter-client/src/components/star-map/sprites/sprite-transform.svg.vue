@@ -29,14 +29,15 @@
           />
         </a>
       </g>
-      <!-- Zoomed out, my ship wears a ring that stays the same size on screen, so it's easy to find. -->
+      <!-- Zoomed out, my ship wears a ring that stays the same size on screen, so it's easy to find.
+           Yellow, as everything of mine is (libs/palette.js). -->
       <circle
         v-if="isMyShip && isTiny"
         cx="0"
         cy="0"
         :r="MARKER_RADIUS_PX / drawnPixelsPerUnit"
         fill="none"
-        stroke="#e6dcf5"
+        :stroke="YELLOW"
         :stroke-width="1.25 / drawnPixelsPerUnit"
         opacity="0.85"
       />
@@ -46,7 +47,7 @@
           x="0"
           :y="labelPlacement === 'above' ? -(visualRadius + labelSize * 0.6) : visualRadius + labelSize * 0.9"
           :font-size="labelSize"
-          fill="#ffffff66"
+          :fill="sprite.object.isMine ? MY_LABEL_FILL : '#ffffff66'"
           stroke="#00000000"
           stroke-width="4"
           text-anchor="middle"
@@ -67,6 +68,7 @@ import { ART, spriteScaleOf } from '@/libs/sprite-types'
 import { offerLabel, withdrawLabel } from '@/libs/label-layout'
 import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
 import { writeAttribute } from '@/libs/dom-writes'
+import { YELLOW, YELLOW_LIGHT } from '@/libs/palette'
 import Star from './star.svg'
 import Ship from './ship.svg'
 import Station from './station.svg'
@@ -94,6 +96,8 @@ const FOLD_MARGIN_PX = 3
 // is what labels always had: 0.1em of the 16px default.
 const LABEL_PX = { min: 12, max: 20, world: 1.6 }
 const MARKER_RADIUS_PX = 8
+// The names of my ship and of what I own.
+const MY_LABEL_FILL = YELLOW_LIGHT + 'aa'
 
 export default {
   name: 'SpriteTransform',
@@ -132,7 +136,9 @@ export default {
   data() {
     return {
       hover: false,
-      MARKER_RADIUS_PX
+      MARKER_RADIUS_PX,
+      MY_LABEL_FILL,
+      YELLOW
     }
   },
   computed: {

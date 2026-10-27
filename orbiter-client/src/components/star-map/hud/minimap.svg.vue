@@ -74,6 +74,7 @@ import { useUIStore } from '@/stores/ui'
 import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
 import { writeAttribute } from '@/libs/dom-writes'
 import { WORLD_OFFSET_Y } from '@/constants'
+import { YELLOW } from '@/libs/palette'
 
 // The box is 2 * HALF HUD units across. The outermost orbit, plus a margin, fills a radius of FIT.
 const HALF = 55
@@ -124,7 +125,7 @@ export default {
         .map((sprite) => {
           const mine = sprite.type === 'ship' && sprite.object.isMine
           const style = DOT_STYLE[sprite.type]
-          return { key: sprite.key, r: mine ? 2.4 : style.r, fill: mine ? '#ffffff' : style.fill }
+          return { key: sprite.key, r: mine ? 2.4 : style.r, fill: mine ? YELLOW : style.fill }
         })
     }
   },

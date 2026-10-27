@@ -200,7 +200,7 @@ input:focus {
   border-color: #ffffffaa;
 }
 input[aria-invalid='true'] {
-  border-color: #ffb3c1;
+  border-color: var(--o8-pink-light);
 }
 .hint {
   margin: -0.3em 0 0;
@@ -208,7 +208,7 @@ input[aria-invalid='true'] {
   color: #c3b3da;
 }
 .hint.problem {
-  color: #ffb3c1;
+  color: var(--o8-pink-light);
 }
 .buttons {
   display: flex;
@@ -241,14 +241,16 @@ input[aria-invalid='true'] {
   color: #ffffff66;
   cursor: default;
 }
-/* The dialog's one action (see palette.js). */
+/* The dialog's action, lavender like the title's primary buttons (.o8-button.primary). */
 .card-pill.accent:not(:disabled) {
-  background: var(--o8-pink);
-  border-color: var(--o8-pink);
+  background: #c3b3da;
+  border-color: #c3b3da;
+  color: #1c0838;
+  text-shadow: none;
 }
 .card-pill.accent:hover:not(:disabled) {
-  background: transparent;
-  color: var(--o8-pink-light);
+  background: #e6dcf5;
+  border-color: #e6dcf5;
 }
 .dialog-enter-active,
 .dialog-leave-active {

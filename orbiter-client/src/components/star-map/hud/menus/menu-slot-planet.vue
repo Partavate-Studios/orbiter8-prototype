@@ -42,7 +42,10 @@
         <g v-if="portForPlanet(planetId)" :transform="'translate(' + slotWidth * 0.37 + ' 22)'">
           <g transform="scale(0.9)"><station /></g>
           <text x="12" y="4" fill="#ffffff" font-size="0.8em" text-anchor="start">
-            [{{ getPortType }}] {{ systemObjects[portForPlanet(planetId)].name }}
+            [<tspan v-for="code in portCode" :key="code.good" :fill="code.wanted ? YELLOW : undefined">{{
+              code.letter
+            }}</tspan
+            >] {{ systemObjects[portForPlanet(planetId)].name }}
           </text>
         </g>
         <g :transform="'translate(' + slotWidth * 0.95 + ' 20)'">
@@ -87,7 +90,10 @@
         <g v-if="portForPlanet(planetId)" :transform="'translate(' + slotWidth * 0.54 + ' 46)'">
           <g transform="scale(0.9)"><station /></g>
           <text x="12" y="4" fill="#ffffff" font-size="0.8em" text-anchor="left">
-            [{{ getPortType }}]{{ systemObjects[portForPlanet(planetId)].name }}
+            [<tspan v-for="code in portCode" :key="code.good" :fill="code.wanted ? YELLOW : undefined">{{
+              code.letter
+            }}</tspan
+            >]{{ systemObjects[portForPlanet(planetId)].name }}
           </text>
         </g>
       </g>
@@ -110,7 +116,10 @@
         <g v-if="portForPlanet(planetId)" :transform="'translate(' + slotWidth * 0.38 + ' 46)'">
           <g transform="scale(0.9)"><station /></g>
           <text x="12" y="4" fill="#ffffff" font-size="0.8em" text-anchor="left">
-            [{{ getPortType }}]{{ systemObjects[portForPlanet(planetId)].name }}
+            [<tspan v-for="code in portCode" :key="code.good" :fill="code.wanted ? YELLOW : undefined">{{
+              code.letter
+            }}</tspan
+            >]{{ systemObjects[portForPlanet(planetId)].name }}
           </text>
         </g>
       </g>
@@ -129,6 +138,9 @@ import Ship from '@/components/star-map/sprites/ship.svg'
 import Station from '@/components/star-map/sprites/station.svg'
 import Moon from '@/components/star-map/sprites/moon.svg'
 import { planetTypeName } from '@/sdk/game/planet-types'
+import { YELLOW } from '@/libs/palette'
+
+const GOODS = ['equipment', 'fuel', 'organics']
 
 export default {
   name: 'PlanetsMenu',
@@ -145,6 +157,9 @@ export default {
       default: null
     }
   },
+  data() {
+    return { YELLOW }
+  },
   computed: {
     ...mapState(useUIStore, ['viewport']),
     ...mapState(useStarMapStore, [
@@ -159,32 +174,16 @@ export default {
     slotWidth() {
       return Math.min(this.viewport.width - 100, 700)
     },
-    getPortType() {
-      let type = ''
-      if (this.systemObjects[this.portForPlanet(this.planetId)].inventory.equipment > 0) {
-        type += 'S'
-      } else if (this.systemObjects[this.portForPlanet(this.planetId)].inventory.equipment < 0) {
-        type += 'B'
-      } else {
-        type += '-'
-      }
-
-      if (this.systemObjects[this.portForPlanet(this.planetId)].inventory.fuel > 0) {
-        type += 'S'
-      } else if (this.systemObjects[this.portForPlanet(this.planetId)].inventory.fuel < 0) {
-        type += 'B'
-      } else {
-        type += '-'
-      }
-
-      if (this.systemObjects[this.portForPlanet(this.planetId)].inventory.organics > 0) {
-        type += 'S'
-      } else if (this.systemObjects[this.portForPlanet(this.planetId)].inventory.organics < 0) {
-        type += 'B'
-      } else {
-        type += '-'
-      }
-      return type
+    /**
+     * The port's trade code, one letter per good (equipment, fuel, organics): S selling, B buying,
+     * - neither. A B is wanted when the port buys something my ship carries (yellow, libs/palette.js).
+     */
+    portCode() {
+      const inventory = this.systemObjects[this.portForPlanet(this.planetId)].inventory
+      return GOODS.map((good) => {
+        const letter = inventory[good] > 0 ? 'S' : inventory[good] < 0 ? 'B' : '-'
+        return { good, letter, wanted: letter === 'B' && this.avatar.ship[good] > 0 }
+      })
     },
     planet() {
       return this.systemObjects[this.planetId]

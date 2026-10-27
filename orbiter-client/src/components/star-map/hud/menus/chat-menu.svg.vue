@@ -13,6 +13,7 @@
                 :name="getName(event.returnValues._sender)"
                 :message="event.returnValues._message"
                 :block-id="blockId - event.blockNumber"
+                :mine="isMine(event.returnValues._sender)"
               >
               </chat-slot-container>
             </g>
@@ -46,7 +47,7 @@ export default {
   },
   props: {},
   computed: {
-    ...mapState(useChainStore, ['blockId']),
+    ...mapState(useChainStore, ['blockId', 'account']),
     ...mapState(useGameStateStore, ['events']),
     ...mapState(useStarMapStore, ['players']),
     chatEvents() {
@@ -67,6 +68,9 @@ export default {
       if (message) {
         this.sendChat(message)
       }
+    },
+    isMine(address) {
+      return String(address).toLowerCase() === String(this.account).toLowerCase()
     },
     getName(address) {
       let name = address.substr(0, 6) + '...' + address.substr(address.length - 5)

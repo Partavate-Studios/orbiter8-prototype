@@ -107,14 +107,16 @@ export default {
   height: 10px;
   border-radius: 50%;
 }
-/* Waiting: a turning ring. Sent: the ring turns faster. */
+/* Waiting for the wallet: a turning ring, pink because it needs the player (libs/palette.js).
+   Sent: lavender, turning faster; only the network is left. */
 .wallet .mark,
 .sent .mark {
   border: 2px solid #c3b3da44;
-  border-top-color: #e6dcf5;
+  border-top-color: var(--o8-pink-light);
   animation: turn 1.2s linear infinite;
 }
 .sent .mark {
+  border-top-color: #e6dcf5;
   animation-duration: 0.7s;
 }
 .done .mark {
@@ -122,10 +124,10 @@ export default {
 }
 .failed .mark,
 .declined .mark {
-  background: #ffb3c1;
+  background: var(--o8-pink-light);
 }
 .failed {
-  border-color: #ffb3c166;
+  border-color: #ff6fb066;
 }
 .dismiss {
   flex: none;

@@ -1166,22 +1166,21 @@ Koda: "please make pretty input boxes for those things", then "look at the two c
    - **Keys:** Enter confirms, Escape cancels. While the dialog is open, keys and the wheel don't reach the map.
    - **Two typos fixed** in the notes' wording: "coloinists" and "prouction".
    - `stores/dialog.js` (`ask`, `tell`) and `components/game-dialog.vue`.
-2. [ ] **The accents** (`libs/palette.js`; CSS variables in `App.vue`). Moonbeam's pink `#e1177c` and Boba's yellow `#ccff00`, the pair the storyboard's last panel uses. Each color gets one meaning, so it stays rare and readable:
-   - **Pink is action:** the one button to press on a screen, and your move while it's under way.
-     - the dialog's confirm button;
-     - Make Trade and Upgrade, once a trade or upgrade is ready;
-     - Send Broadcast;
-     - Jump in the neighbor view, and the route to the star you chose;
-     - the title's main button;
-     - the transaction tray's spinner, while your transaction is waiting or on its way.
-   - **Yellow is you:** your ship, what you own, where you are and have been.
+2. [x] **The accents** (`libs/palette.js`; CSS variables in `App.vue`). Moonbeam's pink `#e1177c` and Boba's yellow `#ccff00`, the pair the storyboard's last panel uses. Each color gets one meaning, so it stays rare and readable.
+   - **First try, corrected by Koda:** pink was the action color (Make Trade, Upgrade, Send Broadcast, Jump, the title's main button, the dialog's confirm). Koda: on Make Trade it reads as **red, which feels like danger or overspending, on a button that makes you money**. So pink is never a button now, and the buttons keep the game's purples.
+   - **Yellow is you, and what's good for you:**
      - the ring round your ship when zoomed out, and your dot on the minimap;
      - the names on the map of your ship and of what you own;
      - "Mine" on a card;
      - your row in the leaderboard, and the planet you're orbiting in the planets list;
      - your name on your own broadcasts;
-     - in the neighbor view, the route back to where you came from.
-   - **Everything else stays purple and lavender.** Selection and hover stay white and lavender.
+     - in the neighbor view, the route back to where you came from;
+     - **Koda's idea:** in the planets list, a port's **B** is yellow when it buys something your ship carries.
+   - **Pink needs you:**
+     - the tray's spinner while a transaction waits for your wallet (lavender once it's sent);
+     - a failed transaction;
+     - a name too long for the dialog.
+   - **Everything else stays purple and lavender,** buttons included. The dialog's confirm is lavender, like the title's primary buttons. Selection and hover stay white and lavender.
 
 ## Sizes and speeds: history
 

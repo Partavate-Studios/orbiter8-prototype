@@ -20,7 +20,9 @@
       />
 
       <g :clip-path="'url(#' + clipId + ')'">
-        <text :x="slotWidth - 15" y="20" fill="#ffffff88" text-anchor="end" font-size="0.75em">-{{ name }} </text>
+        <text :x="slotWidth - 15" y="20" :fill="mine ? YELLOW_LIGHT : '#ffffff88'" text-anchor="end" font-size="0.75em"
+          >-{{ name }}
+        </text>
         <text :x="slotWidth - 25" y="33" fill="#ffffff88" text-anchor="end" font-size="0.55em"
           >{{ blockId }} blocks old</text
         >
@@ -35,17 +37,21 @@ import { mapState } from 'pinia'
 import uniqueId from 'lodash/uniqueId'
 
 import { useUIStore } from '@/stores/ui'
+import { YELLOW_LIGHT } from '@/libs/palette'
 export default {
   name: 'ChatSlotContainer',
   props: {
     name: { type: String, default: '' },
     /** How many blocks ago the message was sent. */
     blockId: { type: Number, default: 0 },
-    message: { type: String, default: '' }
+    message: { type: String, default: '' },
+    /** Sent by the player. */
+    mine: { type: Boolean, default: false }
   },
   data() {
     return {
       hover: false,
+      YELLOW_LIGHT,
       // Unique per instance: the clip's shape depends on this component's size.
       clipId: uniqueId('menu-slot-clip-')
     }

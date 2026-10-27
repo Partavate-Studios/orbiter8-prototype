@@ -45,13 +45,14 @@
         :opacity="0.8 * phase.outer"
       />
 
-      <!-- routes to the neighbors: faint, brighter on hover, animated for the chosen one -->
+      <!-- routes to the neighbors: faint, brighter on hover, yellow back to where you came from,
+           animated to the one chosen -->
       <path
         v-for="star in stars"
         :key="'route-' + star.id"
         :d="routeTo(star)"
         fill="none"
-        :stroke="star.id === hoveredId ? '#ffffff' : '#c3b3da'"
+        :stroke="star.id === hoveredId ? '#ffffff' : star.cameFrom ? YELLOW : '#c3b3da'"
         :stroke-width="star.id === hoveredId ? 1.6 : 1"
         stroke-dasharray="2 6"
         stroke-linecap="round"
@@ -183,6 +184,7 @@ import MenuButton from './menus/menu-button.svg'
 import Ship from '../sprites/ship.svg'
 import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
 import { writeAttribute } from '@/libs/dom-writes'
+import { YELLOW } from '@/libs/palette'
 
 // The world's star sits this far above the HUD's center (WORLD_OFFSET_Y in group units).
 const CENTER_Y = -100
@@ -216,6 +218,7 @@ export default {
   data() {
     return {
       CENTER_Y,
+      YELLOW,
       // 0 → 1 over the entrance
       progress: 0,
       chosenId: null,

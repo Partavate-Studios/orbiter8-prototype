@@ -31,7 +31,7 @@
       <text x="120" y="0" text-anchor="end" fill="#ffffff" font-size="0.5em"> #{{ systemObjects[objectId].id }}</text>
 
       <g v-if="systemObjects[objectId].isMine">
-        <text x="65" y="0" text-anchor="middle" font-size="0.8em"> Mine </text>
+        <text x="65" y="0" text-anchor="middle" font-size="0.8em" :fill="YELLOW"> Mine </text>
       </g>
       <rect x="5" y="4" width="120" height="2" fill="#ffffff" opacity="0.1" />
 
@@ -158,12 +158,16 @@ import { mapState } from 'pinia'
 import { useStarMapStore } from '@/stores/starmap'
 
 import { planetTypeName } from '@/sdk/game/planet-types'
+import { YELLOW } from '@/libs/palette'
 
 export default {
   name: 'SpriteInfo',
   props: {
     /** The selected object's key (see sdk/system.js objectKey). */
     objectId: { type: String, default: null }
+  },
+  data() {
+    return { YELLOW }
   },
   computed: {
     ...mapState(useStarMapStore, ['systemObjects', 'players']),
