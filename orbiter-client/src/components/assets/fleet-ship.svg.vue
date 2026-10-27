@@ -3,17 +3,17 @@
        outer group; the inner one scales the art down. -->
   <g>
     <g transform="scale(0.002)">
-      <g v-if="engines">
+      <g v-if="engines" class="flames">
         <rect
-          v-for="(flame, index) in design.engines"
+          v-for="(plume, index) in design.engines"
           :key="index"
-          :x="flame[0]"
-          :y="flame[1]"
-          :width="flame[2]"
-          :height="flame[3]"
+          :x="plume[0]"
+          :y="plume[1]"
+          :width="plume[2]"
+          :height="plume[3]"
           rx="200"
           ry="200"
-          fill="url(#engineGradient)"
+          :fill="'url(#' + flame + ')'"
         />
       </g>
       <path :transform="design.transform" :d="design.d" :fill="color" />
@@ -35,6 +35,11 @@ export default {
     engines: {
       type: Boolean,
       default: false
+    },
+    /** The gradient (svg-defs.vue) the engine flames are filled with. */
+    flame: {
+      type: String,
+      default: 'engineGradient'
     },
     color: {
       type: String,

@@ -94,6 +94,12 @@
         <stop offset="3%" stop-color="#ff88ff" stop-opacity="0.1" />
         <stop offset="100%" stop-color="#ff00ff" stop-opacity="0" />
       </linearGradient>
+      <!-- A stronger plume, for ships drawn small that still need to read as under thrust -->
+      <linearGradient id="engineTrailGradient" gradientTransform="rotate(90)" x1="0%" y1="0%" x2="100%" y2="0">
+        <stop offset="0%" stop-color="#ffe0ff" stop-opacity="1" />
+        <stop offset="12%" stop-color="#ff99ff" stop-opacity="0.6" />
+        <stop offset="100%" stop-color="#ff00ff" stop-opacity="0" />
+      </linearGradient>
 
       <!-- HUD icon buttons -->
       <clipPath id="icon-clip">

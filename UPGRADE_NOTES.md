@@ -995,6 +995,18 @@ Order (from the walkthrough's list). Tick each when it lands:
 - **For Koda:**
   - **Continue goes straight into the game.** The old welcome-back screen's stats moved onto the title, under the button.
   - **The station:** four ship designs docked nose-in, eight shuttles, the port turning once every 150 s. Positions and timings are constants at the top of `title-scene.vue`.
+- **The departing ship (Koda, 2026-10-27):** replaces the separate drifting ship. Code in `libs/title-flight.js`, with its timings at the top of the file.
+  - **The loop.** One of the three orbiting ships leaves and comes back:
+    1. It lights its engines, speeds up and closes in on the sun.
+    2. It makes about three fast laps, then slingshots off the top right.
+    3. It flies past the viewer: far off at the top right, close at the lower left.
+    4. It comes back in from the left and slides into its old place.
+
+    The loop repeats every 90 s, and the first departure comes 8–23 s after the page opens.
+  - **How it's driven.** The other two ships still turn with CSS. The departing ship is placed each frame from that same CSS animation's clock, and the whole loop is a pure function of that clock, so it always rejoins its own empty place. It never drifts out of step, even after the tab was hidden. The fast laps run up to 2 s longer as needed, so the slingshot always leaves from the top of the sun, heading right.
+  - **The flyby is in perspective.** It closes at a steady speed in depth, so on screen it speeds up as it nears; before, it moved at a steady pace and seemed to slow down. Crossing the logo, it fades behind the menu's dark band, like smoked glass, and comes out bright and close below it.
+  - **Engine flames show again.** Copying the ship designs from Enterprise Circuit lost the flames' widths (all 0), so no ship ever showed them. The departing ship uses a stronger plume (`engineTrailGradient`), so the trail reads even at orbit size.
+  - **Tests:** `title-flight.test.js` checks that the ship never jumps while on screen, that it leaves from and returns to its own place, and that the first departure comes soon after the page opens.
 
 **Ideas for later (Koda, 2026-10-25):**
 - **Engine trails:** ships that jumped recently arrive with fading engine trails.

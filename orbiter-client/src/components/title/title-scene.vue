@@ -1,16 +1,13 @@
 <template>
-  <!-- The title's backdrop: a sun with ships circling it, a ship flying past, and a busy space port by a
-       planet. The backdrop is painted once on a canvas; every moving part is its own small layer
-       animated with CSS transforms, so the browser moves them on the GPU without repainting anything.
-       Positions are in scene units (--u): 1600 x 900 of them fit any screen, centered. -->
+  <!-- The title's backdrop: a sun with ships circling it and a busy space port by a planet. Every so
+       often one of the ships leaves (libs/title-flight.js). The backdrop is painted once on a canvas;
+       every moving part is its own small layer moved with CSS transforms, so the browser moves them on
+       the GPU without repainting anything. Positions are in scene units (--u): 1600 x 900 of them fit
+       any screen, centered. -->
   <div class="title-scene" aria-hidden="true">
     <canvas ref="backdrop" class="backdrop"></canvas>
 
-    <div class="anchor drifter">
-      <svg viewBox="-30 -30 60 60"><fleet-ship type="orbiter8" engines transform="scale(4)" /></svg>
-    </div>
-
-    <div class="anchor sun">
+    <div ref="sun" class="anchor sun">
       <svg class="part turn-slow" viewBox="-160 -160 320 320">
         <ellipse
           v-for="n in 9"
@@ -37,10 +34,10 @@
         <circle r="70" fill="url(#glowingGradient)" />
         <circle r="28" fill="url(#starGradient)" stroke="#ffffff" stroke-width="0.4" />
       </svg>
-      <!-- three ships circling the sun, noses along their orbit -->
-      <svg class="part orbit" viewBox="-160 -160 320 320">
-        <g v-for="n in 3" :key="n" :transform="'rotate(' + n * 120 + ') translate(112 0) rotate(180)'">
-          <fleet-ship type="orbiter8" engines transform="scale(1.6)" />
+      <!-- ships circling the sun, noses along their orbit; the third, the one that leaves, is the runner -->
+      <svg ref="orbit" class="part orbit" viewBox="-160 -160 320 320">
+        <g v-for="slot in stayingSlots" :key="slot" :transform="'rotate(' + slot + ') translate(112 0) rotate(180)'">
+          <fleet-ship type="orbiter8" transform="scale(1.6)" />
         </g>
       </svg>
     </div>
@@ -77,12 +74,21 @@
         </div>
       </div>
     </div>
+
+    <!-- Placed every frame by fly(), from the orbit's own clock. -->
+    <div ref="runner" class="anchor runner">
+      <svg viewBox="-30 -30 60 60">
+        <fleet-ship type="orbiter8" engines flame="engineTrailGradient" transform="scale(1.6)" />
+      </svg>
+    </div>
   </div>
 </template>
 
 <script>
 import FleetShip from '@/components/assets/fleet-ship.svg'
 import { paintBackdrop, BACKDROP_SIZE } from '@/components/star-map/assets/backdrop-art'
+import { onFrame } from '@/libs/frame-loop'
+import { flightPose, planFlight, SLOTS } from '@/libs/title-flight'
 
 // The station's outline (the same art as the game's station sprite), about 580 units across.
 const STATION_PATH =
@@ -106,9 +112,13 @@ export default {
   name: 'TitleScene',
   components: { FleetShip },
   data() {
-    return { stationPath: STATION_PATH }
+    return { stationPath: STATION_PATH, runnerSlot: null }
   },
   computed: {
+    /** The two ships that stay in orbit; the runner is drawn on its own. */
+    stayingSlots() {
+      return SLOTS.filter((slot) => slot !== this.runnerSlot)
+    },
     docks() {
       return DOCKS.map((dock) => ({
         ...dock,
@@ -143,17 +153,69 @@ export default {
   },
   mounted() {
     this.paint()
+    this.measure()
+    this.flames = this.$refs.runner.querySelector('.flames')
+    this.stopFrames = onFrame(() => this.fly())
     this.onResize = () => {
       cancelAnimationFrame(this.resizeFrame)
-      this.resizeFrame = requestAnimationFrame(() => this.paint())
+      this.resizeFrame = requestAnimationFrame(() => {
+        this.paint()
+        this.measure()
+      })
     }
     window.addEventListener('resize', this.onResize)
   },
   unmounted() {
     window.removeEventListener('resize', this.onResize)
     cancelAnimationFrame(this.resizeFrame)
+    this.stopFrames()
   },
   methods: {
+    /** Plans the runner's loop for this screen: where the sun is and how big the screen is, in scene units. */
+    measure() {
+      const sun = this.$refs.sun.getBoundingClientRect()
+      const unit = sun.width / 320
+      this.unit = unit
+      this.plan = planFlight(
+        {
+          sun: {
+            x: (sun.left + sun.width / 2 - window.innerWidth / 2) / unit,
+            y: (sun.top + sun.height / 2 - window.innerHeight / 2) / unit
+          },
+          halfWidth: window.innerWidth / 2 / unit,
+          halfHeight: window.innerHeight / 2 / unit
+        },
+        this.runnerSlot ?? undefined
+      )
+      this.runnerSlot = this.plan.slot
+    },
+    /** Places the runner for this frame, on the clock of the orbit it leaves and rejoins. */
+    fly() {
+      // No orbit animation (reduced motion): the runner just keeps its place.
+      const orbit = this.$refs.orbit.getAnimations()[0]
+      const pose = flightPose(this.plan, orbit ? orbit.currentTime / 1000 : 0)
+      const x = pose.x * this.unit
+      const y = pose.y * this.unit
+      const runner = this.$refs.runner.style
+      runner.transform = `translate(${x}px, ${y}px) rotate(${pose.rotation}deg) scale(${pose.scale})`
+      // Flying past, it fades behind the menu's dark band like smoked glass, so it doesn't crowd the logo.
+      const behind = pose.scale === 1 ? 0 : this.behindBand(window.innerWidth / 2 + x, window.innerHeight / 2 + y)
+      runner.opacity = pose.opacity * (1 - 0.6 * behind)
+      this.flames.style.opacity = pose.engines
+      if (!orbit) this.stopFrames()
+    },
+    /** How far the point (in pixels) is behind the title menu's dark band: 0 clear of it, 1 behind its darkest part. */
+    behindBand(x, y) {
+      if (!this.band?.isConnected) this.band = this.$el.parentElement?.querySelector('.band')
+      if (!this.band) return 0
+      const { left, top, width, bottom } = this.band.getBoundingClientRect()
+      const across = (x - left) / width
+      const clamp = (value) => Math.min(1, Math.max(0, value))
+      // The band's gradient (title-screen.vue): clear to 12% across, darkest from 30% to 70%, clear from 86%.
+      const sideways = clamp(Math.min((across - 0.12) / 0.18, (0.86 - across) / 0.16))
+      const upright = clamp(Math.min(y - top, bottom - y) / 30)
+      return sideways * upright
+    },
     /** Paints the backdrop art and the stars, covering the screen. Only on mount and resize. */
     paint() {
       const canvas = this.$refs.backdrop
@@ -236,11 +298,10 @@ export default {
   --y: 150;
   --size: 280;
 }
-.drifter {
+.runner {
   --x: 0;
   --y: 0;
   --size: 60;
-  animation: drift 80s cubic-bezier(0.6, 0, 0.9, 0.6) infinite;
 }
 
 .turn-slow {
@@ -317,15 +378,6 @@ export default {
     transform: translateX(calc(var(--u) * var(--to))) scaleX(var(--dir));
   }
 }
-/* A ship far off to the upper right comes toward us and passes off the lower left. */
-@keyframes drift {
-  from {
-    transform: translate(calc(var(--u) * 900), calc(var(--u) * -560)) rotate(-122deg) scale(0.06);
-  }
-  to {
-    transform: translate(calc(var(--u) * -980), calc(var(--u) * 640)) rotate(-122deg) scale(5);
-  }
-}
 
 /* Portrait screens: the scene is laid out for 900 x 1600 units, with the port below the menu. */
 @media (max-aspect-ratio: 1/1) {
@@ -352,9 +404,6 @@ export default {
   }
   .shuttle {
     opacity: 0.8;
-  }
-  .drifter {
-    display: none;
   }
 }
 </style>
