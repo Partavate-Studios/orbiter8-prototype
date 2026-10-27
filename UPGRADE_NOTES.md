@@ -1152,7 +1152,36 @@ Order (from the walkthrough's list). Tick each when it lands:
 **After these, to walk through with Koda** (his ideas, 2026-10-27):
 - other players' ships fly from orbit to orbit when they move, instead of jumping;
 - my ship sets off at once toward whatever I select, client-side only, and flies back to its real place when I deselect;
-- Bobabeam's pink and yellow as sparing accent colors.
+- Bobabeam's pink and yellow as sparing accent colors (started below, as step 7).
+
+### 7. In-game dialogs, and the Portals demo's two accents (Koda, 2026-10-27)
+
+Koda: "please make pretty input boxes for those things", then "look at the two colors I mentioned from the Portal demo... take a shot at how they should be used... and make corrections from there".
+
+1. [x] **An in-game dialog instead of the browser's boxes.**
+   - **Covers:** claiming a planet, building a station, renaming, and sending a broadcast. It also replaces the five "coming in a later demo" notes (factories, moon defences, port upgrades, transfers, attacking).
+   - **Look:** drawn like the selection card: the striped purple frame, the wide rounded corners and the name pill. The buttons are the card's pills.
+   - **Names follow the callsign rules:** up to 24 characters, trimmed, with a hint as you type. The confirm button stays off while a name is empty or too long. Broadcasts are capped at 120 characters.
+   - **Claiming** now asks once (the name, with Claim or Cancel), instead of a yes/no box followed by a name box. **Renaming** starts with the current name selected.
+   - **Keys:** Enter confirms, Escape cancels. While the dialog is open, keys and the wheel don't reach the map.
+   - **Two typos fixed** in the notes' wording: "coloinists" and "prouction".
+   - `stores/dialog.js` (`ask`, `tell`) and `components/game-dialog.vue`.
+2. [ ] **The accents** (`libs/palette.js`; CSS variables in `App.vue`). Moonbeam's pink `#e1177c` and Boba's yellow `#ccff00`, the pair the storyboard's last panel uses. Each color gets one meaning, so it stays rare and readable:
+   - **Pink is action:** the one button to press on a screen, and your move while it's under way.
+     - the dialog's confirm button;
+     - Make Trade and Upgrade, once a trade or upgrade is ready;
+     - Send Broadcast;
+     - Jump in the neighbor view, and the route to the star you chose;
+     - the title's main button;
+     - the transaction tray's spinner, while your transaction is waiting or on its way.
+   - **Yellow is you:** your ship, what you own, where you are and have been.
+     - the ring round your ship when zoomed out, and your dot on the minimap;
+     - the names on the map of your ship and of what you own;
+     - "Mine" on a card;
+     - your row in the leaderboard, and the planet you're orbiting in the planets list;
+     - your name on your own broadcasts;
+     - in the neighbor view, the route back to where you came from.
+   - **Everything else stays purple and lavender.** Selection and hover stay white and lavender.
 
 ## Sizes and speeds: history
 

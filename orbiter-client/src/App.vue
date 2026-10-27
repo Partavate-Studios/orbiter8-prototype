@@ -30,6 +30,13 @@ export default {
 </script>
 
 <style lang="scss">
+/* The accents, as in libs/palette.js. */
+:root {
+  --o8-pink: #e1177c;
+  --o8-pink-light: #ff6fb0;
+  --o8-yellow: #ccff00;
+  --o8-yellow-light: #ebff99;
+}
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

@@ -3,6 +3,7 @@
     <star-map />
     <layer-html />
     <transaction-tray />
+    <game-dialog />
   </div>
 </template>
 
@@ -17,6 +18,7 @@ import { useConfigStore } from '@/stores/config'
 import starMap from '@/components/star-map/map'
 import layerHtml from '@/components/layer-html/container-html'
 import TransactionTray from '@/components/transaction-tray.vue'
+import GameDialog from '@/components/game-dialog.vue'
 import router from '@/router/router'
 import { onFrame } from '@/libs/frame-loop'
 
@@ -31,7 +33,8 @@ export default {
   components: {
     starMap,
     layerHtml,
-    TransactionTray
+    TransactionTray,
+    GameDialog
   },
   computed: {
     ...mapState(useGameStateStore, ['haveAvatar', 'haveShip']),
@@ -111,6 +114,8 @@ export default {
       'selectSprite'
     ]),
     onWheel(event) {
+      // Over the dialog, the wheel isn't the map's.
+      if (event.target instanceof Element && event.target.closest('[data-own-scroll]')) return
       const zoomingOut = event.deltaY > 0
       // In the neighbor-star view, wheeling in returns to the system; wheeling out does nothing more.
       if (this.neighborView) {

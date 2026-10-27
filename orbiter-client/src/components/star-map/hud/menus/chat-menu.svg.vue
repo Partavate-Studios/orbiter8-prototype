@@ -32,6 +32,7 @@ import { useChainStore } from '@/stores/chain'
 import { useGameStateStore } from '@/stores/gamestate'
 import { mapActions, mapState } from 'pinia'
 import { useStarMapStore } from '@/stores/starmap'
+import { useDialogStore } from '@/stores/dialog'
 import MenuContainer from './menu-container/_menu-container.svg'
 import MenuButton from './menu-button.svg'
 import ChatSlotContainer from './menu-container/chat-slot-container.svg'
@@ -55,8 +56,13 @@ export default {
   },
   methods: {
     ...mapActions(useGameStateStore, ['sendChat']),
-    broadcast() {
-      const message = prompt('Send a message?')
+    ...mapActions(useDialogStore, ['ask']),
+    async broadcast() {
+      const message = await this.ask({
+        title: 'Send a Broadcast',
+        input: { label: 'Your message', kind: 'message' },
+        confirm: 'Send'
+      })
       // null when the player cancels
       if (message) {
         this.sendChat(message)

@@ -17,6 +17,7 @@ import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
 import { mapActions, mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
+import { useDialogStore } from '@/stores/dialog'
 import { cardMenu } from './card-menu'
 import { marketTokenUrl, networkFor } from '@/sdk/chain/networks'
 import CardBackground from '../card-background.svg'
@@ -42,18 +43,20 @@ export default {
     }
   },
   methods: {
-    buttonAction(option) {
+    async buttonAction(option) {
       this.o8audio.playEffect('click')
+      const object = this.systemObjects[this.objectId]
       switch (option.command) {
         case 'build':
-          switch (this.systemObjects[this.objectId].type) {
+          switch (object.type) {
             case 'planet':
-              alert(
-                'In Demo 3, you will be able to build factories on planets. You will first need raw materials and coloinists. You will also be able to build orbiting space ports.'
+              this.tell(
+                'Factories',
+                'In Demo 3, you will be able to build factories on planets. You will first need raw materials and colonists. You will also be able to build orbiting space ports.'
               )
               break
             case 'moon':
-              alert('In Demo 4, you will be able to build defences on your moons.')
+              this.tell('Moon Defences', 'In Demo 4, you will be able to build defences on your moons.')
               break
           }
           break
@@ -64,44 +67,48 @@ export default {
           this.openMenu('shipyard')
           break
         case 'upgrade':
-          alert('Once built, ports will be upgradable to expand commerce.')
+          this.tell('Port Upgrades', 'Once built, ports will be upgradable to expand commerce.')
           break
         case 'transfer':
-          alert(
-            'When this feature is enabled, to build on the planet surface you will first need to drop off enough materials and colonists. Once prouction begins, you will be able to pick up newly manufactured goods.'
+          this.tell(
+            'Transfers',
+            'When this feature is enabled, to build on the planet surface you will first need to drop off enough materials and colonists. Once production begins, you will be able to pick up newly manufactured goods.'
           )
           break
         case 'jump':
           this.zoomOutToNeighbors()
           break
         case 'market': {
-          const object = this.systemObjects[this.objectId]
           const contract = object.type === 'ship' ? this.shipTokenAddress : this.planetTokenAddress
           const url = marketTokenUrl(this.chainId, contract, object.id)
           if (url) window.open(url, '_blank', 'noopener')
           break
         }
-        case 'claim':
-          if (confirm('Claim planet #' + option.value + ' as your own?')) {
-            let name = prompt('What will you name your planet:', '')
-            if (name !== null && name !== '') {
-              this.claimPlanet({ planetId: option.value, name: name })
-            }
-          }
+        case 'claim': {
+          const name = await this.ask({
+            title: 'Claim ' + object.name,
+            message: 'Make planet #' + option.value + ' your own, and give it a name.',
+            input: { label: "Your planet's name", kind: 'name' },
+            confirm: 'Claim Planet'
+          })
+          if (name) this.claimPlanet({ planetId: option.value, name })
           break
+        }
         case 'buildStation':
           if (this.avatar.credits > 10000) {
-            let name = prompt(
-              'It cost 10,000 credits to build a space station. You will have ' +
+            const name = await this.ask({
+              title: 'Build a Space Station',
+              message:
+                'It costs 10,000 credits to build a space station. You will have ' +
                 (this.avatar.credits - 10000).toLocaleString('en-US') +
-                ' credits remaining. What will you name your station:',
-              ''
-            )
-            if (name !== null && name !== '') {
-              this.buildStation({ planetId: option.value, name: name })
-            }
+                ' credits remaining.',
+              input: { label: "Your station's name", kind: 'name' },
+              confirm: 'Build Station'
+            })
+            if (name) this.buildStation({ planetId: option.value, name })
           } else {
-            alert(
+            this.tell(
+              'Not Enough Credits',
               'You need 10,000 credits to build a space station. You are ' +
                 (10000 - this.avatar.credits).toLocaleString('en-US') +
                 ' credits short. Try trading at more space ports.'
@@ -109,32 +116,32 @@ export default {
           }
           break
         case 'visitStation':
-          this.selectSprite(this.systemObjects[this.objectId].stationKey)
+          this.selectSprite(object.stationKey)
           break
         case 'visitPlanet':
-          this.selectSprite(this.systemObjects[this.objectId].orbiting)
+          this.selectSprite(object.orbiting)
           break
         case 'visitMoon':
           this.$emit('moon-menu')
           break
         case 'attack':
-          alert("Attacking: You won't be able to attack anything until demo 4.")
+          this.tell('Attacking', "You won't be able to attack anything until demo\u00a04.")
           break
         case 'rename': {
-          let name = prompt('New ' + this.systemObjects[this.objectId].type + ' name:', '')
-          let type = this.systemObjects[this.objectId].type
-          let objectId = this.systemObjects[this.objectId].objectId
-          let parentId
-          if (type == 'moon' || type == 'station') {
-            parentId = this.systemObjects[this.objectId].planet
-          }
-          if (name !== null && name !== '') {
-            this.renameAsset({ objectId: objectId, parentId: parentId, name: name, type: type })
-          }
+          const { type, objectId } = object
+          const name = await this.ask({
+            title: 'Rename ' + object.name,
+            input: { label: 'New ' + type + ' name', value: object.name, kind: 'name' },
+            confirm: 'Rename'
+          })
+          // Moons and stations are named through their planet.
+          const parentId = type === 'moon' || type === 'station' ? object.planet : undefined
+          if (name && name !== object.name) this.renameAsset({ objectId, parentId, name, type })
           break
         }
       }
     },
+    ...mapActions(useDialogStore, ['ask', 'tell']),
     ...mapActions(useGameStateStore, ['claimPlanet', 'buildStation', 'renameAsset']),
     ...mapActions(useUIStore, ['zoomOutToNeighbors', 'openMenu', 'selectSprite'])
   }
