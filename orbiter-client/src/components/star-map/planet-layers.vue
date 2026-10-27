@@ -24,7 +24,7 @@
             v-for="childIndex in childrenOf(planetIndex)"
             :key="'ring-' + childIndex"
             :r="systemObjects[childIndex].orbit.radius"
-            :selected="childIndex === selected"
+            :selected="childIndex === selected || childIndex === hovered"
           />
           <sprite-transform :sprite="sprites[planetIndex]" :object-index="planetIndex" type="planet" frame-of="self" />
           <sprite-transform
@@ -70,7 +70,7 @@ export default {
   },
   computed: {
     ...mapState(useStarMapStore, ['systemObjects', 'sprites', 'spriteIds']),
-    ...mapState(useUIStore, ['selected']),
+    ...mapState(useUIStore, ['selected', 'hovered']),
     /** Pixels per world unit at the drawn zoom. */
     pixelsPerUnit() {
       return this.unit / this.drawnView.scale

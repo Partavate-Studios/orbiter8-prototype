@@ -4,6 +4,9 @@ import { STAR_KEY } from '@/sdk/system'
 import { CAMERA, MAP_GROUP_SCALE, MAP_RESOLUTION, WORLD_OFFSET_Y } from '@/constants'
 import { useConfigStore } from '@/stores/config'
 
+// Camera zooms this long or longer are flights (arrivals, selections), not wheel steps (ms).
+const CAMERA_FLIGHT_MS = 500
+
 // Sprites this far past the screen edge still count as on screen (labels, glows).
 const OFFSCREEN_MARGIN_PX = 100
 
@@ -84,7 +87,9 @@ export const useUIStore = defineStore('UI', {
     zoomAnchor: null,
     // Where each shown name goes so names don't overlap: sprite key → 'below' | 'above' | 'hidden'
     // (libs/label-layout.js; laid out by the map a few times a second).
-    labelPlacements: {}
+    labelPlacements: {},
+    // The sprite under the pointer (its key), so its orbit ring can be drawn bright.
+    hovered: null
   }),
   getters: {
     /** Screen pixels per map-group unit, before the camera's zoom. */
@@ -113,6 +118,8 @@ export const useUIStore = defineStore('UI', {
         return dx - r < halfWidth && dy - r < halfHeight
       }
     },
+    /** A long camera zoom is under way (arriving in a system, flying to a selection), not a wheel step. */
+    cameraFlying: (state) => (state.viewport.scaleTween?.duration ?? 0) >= CAMERA_FLIGHT_MS,
     minervaHistory: (state) => state.minerva.terminal.history,
     spriteToDisplay: (state) => state.hud.spriteToDisplay,
     jumpAnimationState: (state) => state.hud.jumpAnimationState,
@@ -362,6 +369,12 @@ export const useUIStore = defineStore('UI', {
       }
     },
     mousewheelAnimateTo({ scale, time }) {
+      // A wheel step during a camera flight (arriving in a system, flying to a selection, zooming out
+      // to the neighbors) takes the zoom over from where it is, instead of bending the flight's curve.
+      if (this.cameraFlying) {
+        this.viewport.scaleTween = null
+        this.neighborViewPending = false
+      }
       if (this.viewport.scaleTween == null) {
         this.viewport.scaleTween = new Tween(
           this.viewport.scale,
@@ -414,6 +427,11 @@ export const useUIStore = defineStore('UI', {
       this.viewport.scaleTween = null
       this.viewport.scale = Math.min(CAMERA.MAX_SCALE, Math.max(CAMERA.MIN_SCALE, scale))
       this.keepUnder({ screenX, screenY, x, y })
+    },
+    /** The pointer moved onto a sprite (its key), or off one (null, with the key it left). */
+    hoverSprite(key, leaving = null) {
+      if (key != null) this.hovered = key
+      else if (this.hovered === leaving) this.hovered = null
     },
     setLabelPlacements(placements) {
       const changed = (key) => this.labelPlacements[key] !== placements[key]

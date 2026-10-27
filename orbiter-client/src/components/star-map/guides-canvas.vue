@@ -15,7 +15,7 @@ import { useConfigStore } from '@/stores/config'
 import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
 import { WORLD_OFFSET_Y } from '@/constants'
 import { writeStyle } from '@/libs/dom-writes'
-import { ringOpacity, ringWidth } from '@/libs/sprite-types'
+import { RING_COLOR, RING_FAINT, ringOpacity, ringWidth } from '@/libs/sprite-types'
 
 const GUIDE_COLOR = '#c3b3da'
 // A dim glow around the star (normal and high graphics).
@@ -44,6 +44,7 @@ export default {
       'screenSize',
       'groupPixels',
       'selected',
+      'hovered',
       'jumpAnimationState',
       'neighborView'
     ]),
@@ -92,6 +93,7 @@ export default {
         drawn &&
         drawn.scale === scale &&
         drawn.selected === this.selected &&
+        drawn.hovered === this.hovered &&
         drawn.quality === this.graphicsQuality &&
         drawn.objects === this.systemObjects &&
         drawn.neighborView === this.neighborView
@@ -123,6 +125,7 @@ export default {
         y,
         scale,
         selected: this.selected,
+        hovered: this.hovered,
         quality: this.graphicsQuality,
         objects: this.systemObjects,
         neighborView: this.neighborView
@@ -214,14 +217,14 @@ export default {
     },
     /** Orbit rings centered on the star: the planets', and those of ships orbiting the star itself. */
     drawStarOrbits(ctx, pixels) {
-      ctx.strokeStyle = GUIDE_COLOR
       for (const [key, object] of Object.entries(this.systemObjects)) {
         if (object.orbiting !== 'star') continue
         const radius = object.orbit.radius
-        const opacity = ringOpacity(radius * pixels)
+        const emphasized = key === this.selected || key === this.hovered
+        const opacity = ringOpacity(radius * pixels) * (emphasized ? 1 : RING_FAINT)
         if (opacity === 0) continue
-        const isSelected = key === this.selected
-        ctx.lineWidth = ringWidth(isSelected, pixels)
+        ctx.strokeStyle = emphasized ? RING_COLOR.bright : RING_COLOR.faint
+        ctx.lineWidth = ringWidth(emphasized, pixels)
         if ((DOT_ON + DOT_OFF) * pixels >= MIN_DOT_PERIOD_PX) {
           ctx.globalAlpha = opacity
           ctx.setLineDash([DOT_ON, DOT_OFF])

@@ -21,12 +21,17 @@
 
       <section v-else class="band" aria-label="Orbiter 8">
         <h1 class="logo"><orbiter8-logo role="img" aria-label="Orbiter 8" /></h1>
-        <button type="button" class="o8-button main" :disabled="!titleAction.enabled" @click="start">
-          {{ titleAction.label }}
+        <!-- The button's label only changes once the new one has held for a moment, and its size never
+             does, so brief in-between states don't make the band jump. -->
+        <button type="button" class="o8-button main" :disabled="!buttonEnabled" @click="start">
+          {{ shownAction.label }}
         </button>
-        <p v-if="step === 'ready'" class="welcome">
-          Welcome back, {{ avatar.name }}. {{ gameState.avatarCount }} pilots have discovered
-          {{ gameState.starSystemCount }} star systems.
+        <!-- Its line is always there, so the band keeps its height when the welcome arrives. -->
+        <p class="welcome" :class="{ shown: step === 'ready' }">
+          <template v-if="step === 'ready'">
+            Welcome back, {{ avatar.name }}. {{ gameState.avatarCount }} pilots have discovered
+            {{ gameState.starSystemCount }} star systems.
+          </template>
         </p>
         <div class="secondary">
           <button type="button" class="o8-button" @click="openPanel('settings')">Settings</button>
@@ -50,11 +55,19 @@ import OnboardingWizard from './onboarding-wizard.vue'
 import NetworkPanel from './network-panel.vue'
 import SettingsPanel from './settings-panel.vue'
 
+// The main button's label waits this long before following a change (ms), so a state that only
+// lasts a moment (a quick reconnect) never flashes on it.
+const SETTLE_MS = 400
+
 export default {
   name: 'TitleScreen',
   components: { TitleScene, OnboardingWizard, NetworkPanel, SettingsPanel, Orbiter8Logo },
   data() {
-    return { version: __APP_VERSION__ }
+    return {
+      version: __APP_VERSION__,
+      // What the main button shows: titleAction, once it has held for SETTLE_MS.
+      shownAction: null
+    }
   },
   computed: {
     ...mapState(useChainStore, [
@@ -70,12 +83,24 @@ export default {
     ...mapState(useGameStateStore, ['avatar', 'gameState']),
     ...mapState(useOnboardingStore, ['step', 'titleAction']),
     ...mapWritableState(useOnboardingStore, ['wizardOpen', 'panel']),
+    /** Clickable only when what it shows is what it would do. */
+    buttonEnabled() {
+      return this.titleAction.enabled && this.shownAction.label === this.titleAction.label
+    },
     shortAccount() {
       const account = String(this.account ?? '')
       return account.length > 10 ? account.slice(0, 6) + '…' + account.slice(-4) : account
     }
   },
   watch: {
+    titleAction: {
+      immediate: true,
+      handler(action) {
+        clearTimeout(this.settleTimer)
+        if (!this.shownAction) this.shownAction = action
+        else this.settleTimer = setTimeout(() => (this.shownAction = action), SETTLE_MS)
+      }
+    },
     // Connected to a network the game is on: bind its contracts.
     account: {
       immediate: true,
@@ -100,6 +125,7 @@ export default {
   },
   beforeUnmount() {
     this.o8audio.stopMusic()
+    clearTimeout(this.settleTimer)
   },
   methods: {
     ...mapActions(useChainStore, ['initWeb3', 'initContracts', 'chooseWallet', 'defaultWallet', 'startBlockPolling']),
@@ -158,6 +184,11 @@ export default {
   box-sizing: border-box;
   background: linear-gradient(90deg, #0000 12%, #0000008c 30%, #0000008c 70%, #0000 86%);
   border-block: 1px solid #ffffff14;
+  /* Fixed line heights: the band is the same size before and after the Ubuntu font arrives. */
+  line-height: 1.4;
+}
+.band .o8-button {
+  line-height: 1.2;
 }
 .logo {
   margin: 0;
@@ -171,14 +202,26 @@ export default {
 }
 .o8-button.main {
   font-size: 1.9em;
-  min-width: 9em;
+  width: 9em;
   padding: 0.35em 1em;
 }
 .welcome {
   margin: -0.3em 0 0;
+  min-height: 1.6em;
   color: #c3b3da;
   text-align: center;
   max-width: 34em;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.welcome.shown {
+  opacity: 1;
+}
+/* Narrow screens: the welcome takes two lines; keep room for both. */
+@media (max-width: 640px) {
+  .welcome {
+    min-height: 3.2em;
+  }
 }
 .secondary {
   display: flex;

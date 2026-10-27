@@ -16,7 +16,7 @@
           <g transform="rotate(180)"><ship v-if="type === 'ship'" :should-show-engines="true" /></g>
           <star v-if="type === 'star'" />
         </template>
-        <a cursor="pointer" @mouseover="hover = true" @mouseleave="hover = false" @click.prevent="spriteAction()">
+        <a cursor="pointer" @mouseover="pointerOn(true)" @mouseleave="pointerOn(false)" @click.prevent="spriteAction()">
           <circle v-if="hitRadius > sprite.selectorSize" cx="0" cy="0" :r="hitRadius" fill="#ffffff00" />
           <circle
             cx="0"
@@ -145,7 +145,8 @@ export default {
       'isOnScreen',
       'showScope',
       'labelPlacements',
-      'neighborView'
+      'neighborView',
+      'cameraFlying'
     ]),
     ...mapState(useConfigStore, ['graphicsQuality']),
     /** The sprite's group scale (world units per sprite unit): its true size, or bigger when zoomed out (MIN_RADIUS_PX). */
@@ -185,7 +186,9 @@ export default {
       // The neighbor view covers the system: its names would show through.
       if (this.neighborView) return false
       if ((this.isSelected && !this.showScope) || this.showLabels || (this.hover && !this.isSelected)) return true
-      // Zoomed out: the planets', the star's and my ship's names show by themselves.
+      // Zoomed out: the planets', the star's and my ship's names show by themselves, once the camera has
+      // settled (during a flight they'd flicker in and out as the zoom sweeps past their sizes).
+      if (this.cameraFlying) return false
       return this.trueRadiusPx < (NAMED_BELOW_PX[this.type] ?? 0) || (this.isMyShip && this.isTiny)
     },
     labelPlacement() {
@@ -258,6 +261,7 @@ export default {
   unmounted() {
     this.stopFrames()
     withdrawLabel(this.objectIndex)
+    this.hoverSprite(null, this.objectIndex)
   },
   methods: {
     /** Offers this frame's name to the label layout (libs/label-layout.js), or withdraws it. */
@@ -274,7 +278,7 @@ export default {
         priority: this.labelPriority
       })
     },
-    ...mapActions(useUIStore, ['toggleScope', 'selectSprite']),
+    ...mapActions(useUIStore, ['toggleScope', 'selectSprite', 'hoverSprite']),
     /** Moves, turns, and shows or hides the sprite for this frame. */
     writeFrame() {
       const placed = this.$refs.placed
@@ -303,6 +307,11 @@ export default {
         return 'translate(' + (snap(x) - snap(parent.x)) + ',' + (snap(y) - snap(parent.y)) + ')'
       }
       return 'translate(' + snap(x) + ',' + snap(y) + ')'
+    },
+    /** The pointer moved onto or off the sprite: its name and selector ring show, and its orbit brightens. */
+    pointerOn(over) {
+      this.hover = over
+      this.hoverSprite(over ? this.objectIndex : null, this.objectIndex)
     },
     spriteAction: function () {
       if (this.isSelected) {

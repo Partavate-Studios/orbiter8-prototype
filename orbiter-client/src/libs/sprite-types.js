@@ -72,11 +72,19 @@ const RING_HIDDEN_BELOW = 6
 const RING_SHOWN_ABOVE = 24
 
 /**
- * An orbit ring's line width in world units: thin in the world (thicker for the selection), but never
- * under a pixel (two for the selection), so rings don't vanish when zoomed out.
+ * Orbit rings: ordinary ones stay faint, so they don't compete with the bodies on them; the ring of
+ * what's selected or under the pointer is drawn bright and thick, so it shows which path is whose.
  */
-export function ringWidth(selected, pixelsPerUnit) {
-  return selected ? Math.max(0.05, 2 / pixelsPerUnit) : Math.max(0.01, 1 / pixelsPerUnit)
+export const RING_COLOR = { faint: '#c3b3da', bright: '#e6dcf5' }
+/** An ordinary ring's opacity, next to the selected or hovered one's (1). */
+export const RING_FAINT = 0.4
+
+/**
+ * An orbit ring's line width in world units: thin in the world (thicker when emphasized), but never
+ * under 0.6 of a pixel (two when emphasized), so rings don't vanish when zoomed out.
+ */
+export function ringWidth(emphasized, pixelsPerUnit) {
+  return emphasized ? Math.max(0.05, 2 / pixelsPerUnit) : Math.max(0.01, 0.6 / pixelsPerUnit)
 }
 
 /** How visible an orbit ring is at this on-screen radius: tiny rings fade out instead of piling up. */
