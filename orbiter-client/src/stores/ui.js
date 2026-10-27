@@ -78,7 +78,10 @@ export const useUIStore = defineStore('UI', {
     // A jump's transaction has been sent and the new system hasn't loaded yet (GameState moveToSystem).
     jumpPending: false,
     // A sent jump that failed: { at: ms timestamp, reason }. The jump animation stalls (jump-animation.svg.vue).
-    jumpStall: null
+    jumpStall: null,
+    // A wheel zoom with nothing selected keeps this world point under this screen point (pixels from the
+    // screen's center) while its zoom tween runs: { screenX, screenY, x, y }.
+    zoomAnchor: null
   }),
   getters: {
     /** Screen pixels per map-group unit, before the camera's zoom. */
@@ -197,6 +200,7 @@ export const useUIStore = defineStore('UI', {
     selectSprite(spriteId) {
       // Choosing something else cancels a zoom out to the neighbor view (zoomOutToNeighbors re-arms it).
       this.neighborViewPending = false
+      this.zoomAnchor = null
       if (this.selectedSprite != spriteId) {
         // close old menu
         this.selectedSprite = spriteId
@@ -233,8 +237,10 @@ export const useUIStore = defineStore('UI', {
     viewportToTime(time) {
       if (this.viewport.scaleTween != null) {
         this.viewport.scale = this.viewport.scaleTween.valueAt(time)
+        if (this.zoomAnchor) this.keepUnder(this.zoomAnchor)
         if (this.viewport.scaleTween.isDone(time)) {
           this.viewport.scaleTween = null
+          this.zoomAnchor = null
           // zoomOutToNeighbors: arrived at the edge of the system
           if (this.neighborViewPending) {
             this.neighborViewPending = false
@@ -365,6 +371,47 @@ export const useUIStore = defineStore('UI', {
       }
     },
 
+    /** The world point under a screen point (pixels from the screen's center), for the live camera. */
+    worldAt(screenX, screenY) {
+      const pixels = this.livePixelsPerUnit
+      return {
+        x: screenX / pixels - this.viewport.x,
+        y: (screenY - WORLD_OFFSET_Y * this.groupPixels) / pixels - this.viewport.y
+      }
+    },
+    /** Moves the camera so the world point { x, y } sits under { screenX, screenY } at the current zoom. */
+    keepUnder({ screenX, screenY, x, y }) {
+      const pixels = this.livePixelsPerUnit
+      this.viewport.x = screenX / pixels - x
+      this.viewport.y = (screenY - WORLD_OFFSET_Y * this.groupPixels) / pixels - y
+    },
+    /**
+     * One wheel step toward or away from a screen point (pixels from the center), like a map: the spot
+     * under the cursor stays put. While the camera follows a selection, it zooms around the selection.
+     */
+    wheelZoomAt({ screenX, screenY, factor, time }) {
+      this.mousewheelAnimateTo({ scale: factor, time })
+      if (this.selectedSprite != null) return
+      this.viewport.xTween = null
+      this.viewport.yTween = null
+      this.zoomAnchor = { screenX, screenY, ...this.worldAt(screenX, screenY) }
+    },
+    /** Drags the map by a pointer's movement in pixels: the world moves exactly with the pointer. */
+    panBy(dx, dy) {
+      const pixels = this.livePixelsPerUnit
+      this.zoomAnchor = null
+      this.viewport.xTween = null
+      this.viewport.yTween = null
+      this.viewport.x += dx / pixels
+      this.viewport.y += dy / pixels
+    },
+    /** A pinch: zoom to `scale` with the world point { x, y } under { screenX, screenY }. */
+    pinchTo({ scale, screenX, screenY, x, y }) {
+      this.zoomAnchor = null
+      this.viewport.scaleTween = null
+      this.viewport.scale = Math.min(CAMERA.MAX_SCALE, Math.max(CAMERA.MIN_SCALE, scale))
+      this.keepUnder({ screenX, screenY, x, y })
+    },
     setMouse(payload) {
       this.screenSize.mouse.x = payload.x
       this.screenSize.mouse.y = payload.y

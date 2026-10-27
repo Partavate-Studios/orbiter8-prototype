@@ -94,7 +94,7 @@ export default {
       'moveLeft',
       'moveRight',
       'scaleBy',
-      'mousewheelAnimateTo'
+      'wheelZoomAt'
     ]),
     onWheel(event) {
       const zoomingOut = event.deltaY > 0
@@ -109,8 +109,12 @@ export default {
         return
       }
       // Wheel up zooms in (smaller scale = closer).
-      const scale = zoomingOut ? CAMERA.WHEEL_ZOOM_OUT : CAMERA.WHEEL_ZOOM_IN
-      this.mousewheelAnimateTo({ scale, time: CAMERA.WHEEL_TWEEN_MS })
+      this.wheelZoomAt({
+        screenX: event.clientX - window.innerWidth / 2,
+        screenY: event.clientY - window.innerHeight / 2,
+        factor: zoomingOut ? CAMERA.WHEEL_ZOOM_OUT : CAMERA.WHEEL_ZOOM_IN,
+        time: CAMERA.WHEEL_TWEEN_MS
+      })
     },
     handleKeyPress(event) {
       switch (event.key) {

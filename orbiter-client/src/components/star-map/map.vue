@@ -24,10 +24,10 @@
               width="4000"
               height="2000"
               fill="#ffffff00"
-              @mousedown="handleMouseDown"
-              @mouseup="handleMouseUp"
-              @mousemove="handleMouseMove"
-              @mouseleave="handleMouseLeave"
+              @pointerdown="pointerDown"
+              @pointermove="pointerMove"
+              @pointerup="pointerUp"
+              @pointercancel="pointerUp"
             />
             <g :transform="worldTransform">
               <solar-system />
@@ -73,7 +73,6 @@ import { STAR_KEY } from '@/sdk/system'
 import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
 import { mapActions, mapState } from 'pinia'
-import _ from 'lodash'
 import Hud from './hud/hud.svg'
 import JumpAnimation from './hud/jump-animation.svg'
 import NeighborView from './hud/neighbor-view.svg'
@@ -106,10 +105,6 @@ export default {
     return {
       //these should be in UI store
       mouseHold: false,
-      prevMouseX: 0,
-      prevMouseY: 0,
-      mouseXThreshold: 0,
-      mouseYThreshold: 0,
       worldMargin: WORLD_MARGIN,
       worldOffsetY: WORLD_OFFSET_Y
     }
@@ -173,6 +168,9 @@ export default {
   },
   created() {
     this.selectSprite(this.myShipId)
+    // Pointers down on the map (id → last position), and the drag or pinch they make. Not reactive.
+    this.pointers = new Map()
+    this.gesture = null
   },
   mounted() {
     this.drawWorld()
@@ -192,7 +190,10 @@ export default {
   methods: {
     ...mapActions(useUIStore, [
       'setMouse',
-      'viewTo',
+      'panBy',
+      'pinchTo',
+      'worldAt',
+      'enterNeighborView',
       'selectNone',
       'selectSprite',
       'scaleAnimateTo',
@@ -224,58 +225,84 @@ export default {
       }
       if (this.worldLayer.update(delta)) this.drawWorld()
     },
-    handleMouseDown() {
+    /** Pixels from the screen's center. */
+    fromCenter(point) {
+      return { screenX: point.x - this.screenSize.width / 2, screenY: point.y - this.screenSize.height / 2 }
+    },
+    pointerDown(event) {
+      if (event.pointerType === 'mouse' && event.button !== 0) return
       this.selectNone()
       if (this.isMenuOn) {
         this.closeMenu()
-      } else {
-        this.mouseHold = true
-        this.mouseXThreshold = this.prevMouseX
-        this.mouseYThreshold = this.prevMouseY
-      }
-    },
-    handleMouseUp() {
-      this.mouseHold = false
-    },
-    handleMouseMove: _.throttle(function (event) {
-      if (this.isMenuOn) {
-        this.mouseHold = false
         return
       }
-      let screenX = event.pageX
-      let screenY = event.pageY
-      this.setMouse({ x: screenX, y: screenY })
-      let x = this.viewport.x
-      let y = this.viewport.y
+      event.currentTarget.setPointerCapture(event.pointerId)
+      this.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY })
+      this.mouseHold = true
+      this.startGesture()
+    },
+    /**
+     * One pointer drags once it has moved past CAMERA.DRAG_THRESHOLD_PX (a smaller move is a click).
+     * Two pinch: the world point between the fingers stays between them as they spread or close.
+     */
+    startGesture() {
+      const points = [...this.pointers.values()]
+      if (points.length === 1) {
+        this.gesture = { type: 'drag', start: points[0], dragging: false }
+      } else if (points.length === 2) {
+        const middle = { x: (points[0].x + points[1].x) / 2, y: (points[0].y + points[1].y) / 2 }
+        const center = this.fromCenter(middle)
+        this.gesture = {
+          type: 'pinch',
+          distance: Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y) || 1,
+          scale: this.viewport.scale,
+          world: this.worldAt(center.screenX, center.screenY)
+        }
+      }
+    },
+    pointerMove(event) {
+      this.setMouse({ x: event.clientX, y: event.clientY })
+      const previous = this.pointers.get(event.pointerId)
+      if (!previous || !this.gesture) return
+      const point = { x: event.clientX, y: event.clientY }
+      this.pointers.set(event.pointerId, point)
 
-      let minDistance = Math.max(Math.abs(screenX - this.mouseXThreshold), Math.abs(screenY - this.mouseYThreshold))
-
-      if (this.mouseHold && minDistance > CAMERA.DRAG_THRESHOLD_PX) {
-        this.selectNone()
-        this.closeMenu()
-        let acceleration = this.viewport.scale > 1 ? this.viewport.scale * 0.5 : this.viewport.scale * 0.7
-
-        if (screenX < this.prevMouseX) {
-          x -= Math.abs(this.prevMouseX - screenX) * acceleration
+      if (this.gesture.type === 'drag') {
+        const { start } = this.gesture
+        if (!this.gesture.dragging) {
+          if (Math.max(Math.abs(point.x - start.x), Math.abs(point.y - start.y)) <= CAMERA.DRAG_THRESHOLD_PX) return
+          this.gesture.dragging = true
+          this.closeMenu()
+          // Catch up on the move below the threshold, so the map stays exactly under the pointer.
+          this.panBy(point.x - start.x, point.y - start.y)
+          return
         }
-        if (screenX > this.prevMouseX) {
-          x += Math.abs(this.prevMouseX - screenX) * acceleration
-        }
-        if (screenY < this.prevMouseY) {
-          y -= Math.abs(this.prevMouseY - screenY) * acceleration
-        }
-        if (screenY > this.prevMouseY) {
-          y += Math.abs(this.prevMouseY - screenY) * acceleration
-        }
-        this.viewTo({ x, y })
+        this.panBy(point.x - previous.x, point.y - previous.y)
+        return
       }
 
-      this.prevMouseX = screenX
-      this.prevMouseY = screenY
-    }, 4),
-    handleMouseLeave({ clientX, clientY }) {
-      if (clientX <= 0 || clientY <= 0 || clientX >= window.innerWidth || clientY >= window.innerHeight) {
+      const [a, b] = [...this.pointers.values()]
+      const distance = Math.hypot(a.x - b.x, a.y - b.y) || 1
+      const scale = (this.gesture.scale * this.gesture.distance) / distance
+      // Pinching out past the edge of the system opens the neighbor view, as the wheel does.
+      if (scale > CAMERA.MAX_SCALE * 1.25) {
+        this.pointers.clear()
+        this.gesture = null
         this.mouseHold = false
+        this.enterNeighborView()
+        return
+      }
+      this.pinchTo({ scale, ...this.fromCenter({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }), ...this.gesture.world })
+    },
+    pointerUp(event) {
+      if (!this.pointers.delete(event.pointerId)) return
+      if (this.pointers.size === 0) {
+        this.gesture = null
+        this.mouseHold = false
+      } else {
+        // A finger lifted mid-pinch: the other one carries on as a drag.
+        this.startGesture()
+        if (this.gesture) this.gesture.dragging = true
       }
     }
   }
@@ -286,6 +313,8 @@ export default {
 <style scoped lang="scss">
 .star-map {
   display: block;
+  /* The map handles its own drags and pinches; the page never scrolls or zooms under them. */
+  touch-action: none;
 }
 .map-layer {
   position: absolute;

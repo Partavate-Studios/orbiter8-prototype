@@ -17,6 +17,7 @@
           <star v-if="type === 'star'" />
         </template>
         <a cursor="pointer" @mouseover="hover = true" @mouseleave="hover = false" @click.prevent="spriteAction()">
+          <circle v-if="hitRadius > sprite.selectorSize" cx="0" cy="0" :r="hitRadius" fill="#ffffff00" />
           <circle
             cx="0"
             cy="0"
@@ -66,6 +67,9 @@ const ROTATION_STEP = 0.25
 // Ships, moons and stations smaller than this many pixels across are drawn as a dot.
 const TINY_DIAMETER = 6
 const DETAILED_WHEN_TINY = ['planet', 'star']
+// Planets and the star can be clicked this many pixels from their center, however small they're drawn.
+// (Not the moons, stations and ships around a planet: drawn after it, they'd take its clicks.)
+const MIN_HIT_RADIUS_PX = 14
 
 export default {
   name: 'SpriteTransform',
@@ -122,6 +126,11 @@ export default {
       if (DETAILED_WHEN_TINY.includes(this.type)) return false
       // Drawn scale, not live: between redraws the layer's CSS transform handles the zoom.
       return 2 * this.visualRadius * this.drawnPixelsPerUnit < TINY_DIAMETER
+    },
+    /** How far from its center the sprite takes a click, in sprite units. */
+    hitRadius() {
+      if (!DETAILED_WHEN_TINY.includes(this.type)) return this.sprite.selectorSize
+      return Math.max(this.sprite.selectorSize, MIN_HIT_RADIUS_PX / (this.drawnPixelsPerUnit * this.spriteScale))
     },
     /** Half the sprite's size, but never under one pixel (in sprite units). */
     dotRadius() {

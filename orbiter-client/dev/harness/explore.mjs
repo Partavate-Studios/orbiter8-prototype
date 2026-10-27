@@ -142,6 +142,41 @@ for (const step of steps) {
       await page.mouse.wheel({ deltaY })
       await new Promise((r) => setTimeout(r, 30))
     }
+  } else if (kind === 'wheelat') {
+    // wheelat:<x>,<y>:<deltaY>:<times> scrolls the mouse wheel over a screen point.
+    const [at, deltaY, times] = arg.split(':')
+    const [x, y] = at.split(',').map(Number)
+    await page.mouse.move(x, y)
+    for (let i = 0; i < (Number(times) || 1); i++) {
+      await page.mouse.wheel({ deltaY: Number(deltaY) })
+      await new Promise((r) => setTimeout(r, 30))
+    }
+  } else if (kind === 'drag') {
+    // drag:<x1>,<y1>,<x2>,<y2> drags the mouse between two screen points in small steps.
+    const [x1, y1, x2, y2] = arg.split(',').map(Number)
+    await page.mouse.move(x1, y1)
+    await page.mouse.down()
+    await page.mouse.move(x2, y2, { steps: 20 })
+    await page.mouse.up()
+  } else if (kind === 'pinch') {
+    // pinch:<x>,<y>,<from>,<to> two fingers around a screen point, spreading (or closing) from one
+    // distance apart to another, in pixels.
+    const [x, y, from, to] = arg.split(',').map(Number)
+    const cdp = await page.createCDPSession()
+    await cdp.send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 2 })
+    const fingers = (d) => [
+      { x: x - d / 2, y, id: 1 },
+      { x: x + d / 2, y, id: 2 }
+    ]
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: fingers(from) })
+    for (let i = 1; i <= 20; i++) {
+      await cdp.send('Input.dispatchTouchEvent', {
+        type: 'touchMove',
+        touchPoints: fingers(from + ((to - from) * i) / 20)
+      })
+      await new Promise((r) => setTimeout(r, 16))
+    }
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
   } else if (kind === 'paintflash') {
     // paintflash:on|off toggles Chrome's paint-flashing overlay (green = repainted).
     const cdp = await page.createCDPSession()

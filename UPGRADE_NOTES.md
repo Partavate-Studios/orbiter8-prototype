@@ -1064,11 +1064,15 @@ Order (from the walkthrough's list). Tick each when it lands:
 - **Correction to the review:** Trade at Port and Dock at Shipyards do work. `enabled: false` only dims a card button's label; I misread `menu-button`'s check as `card-button`'s.
 
 **Build plan** (each step is its own commit; tick it off here when it lands):
-1. [ ] **Map handling.**
+1. [x] **Map handling.**
    - The wheel zooms toward the cursor. While the camera follows a selection, it still zooms around that selection.
-   - Dragging moves the map 1:1 with the pointer. Today it moves at about half the pointer's speed.
-   - Touch: one finger pans, two fingers pinch to zoom (pointer events).
-   - Every object can be clicked within about 14 px, however small it's drawn.
+   - Dragging moves the map 1:1 with the pointer. It used to move at about half the pointer's speed.
+   - Touch: one finger pans, two fingers pinch to zoom (pointer events). Pinching out past the system's edge opens the neighbor view, as the wheel does.
+   - **Bigger click areas, for planets and the star only:** about 14 px, however small they're drawn. Moons, stations and ships are drawn after their planet, so a bigger area for them would steal the planet's clicks when zoomed out; step 4 folds them into the planet instead.
+   - **Checked in the harness** (new steps `wheelat:`, `drag:`, `pinch:`):
+     - the world point under the cursor stays put through a wheel zoom;
+     - after a drag, the point that was under the pointer is still under it;
+     - a pinch zooms by the fingers' spread and keeps the point between them in place.
 2. [ ] **Keyboard and tooltips.**
    - Esc backs out one level: the open menu, then the card, then the selection, then the neighbor view.
    - Space goes to my ship; Tab and Shift+Tab (or `]` and `[`) step through the planets.
