@@ -52,7 +52,6 @@ import { useUIStore } from '@/stores/ui'
 import { mapActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 import { spriteScale } from '@/libs/sprite-types'
-import { sizeFactor } from '@/libs/tuning'
 import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
 import { writeAttribute } from '@/libs/dom-writes'
 import Star from './star.svg'
@@ -108,13 +107,12 @@ export default {
     }
   },
   computed: {
-    ...mapState(useStarMapStore, ['sprites', 'systemObjects']),
+    ...mapState(useStarMapStore, ['sprites']),
     ...mapState(useUIStore, ['selected', 'showLabels', 'isMenuOn', 'drawnPixelsPerUnit', 'isOnScreen', 'showScope']),
     ...mapState(useConfigStore, ['graphicsQuality']),
     /** The sprite's group scale (world units per sprite unit). */
     spriteScale() {
-      // TEMPORARY size slider (libs/tuning.js); 1 at its default.
-      return spriteScale(this.sprite.size) * sizeFactor(this.sprite.object, this.systemObjects)
+      return spriteScale(this.sprite.size)
     },
     /** Roughly how far the sprite reaches from its center, in world units. */
     visualRadius() {

@@ -93,7 +93,7 @@ export const useStarMapStore = defineStore('StarMap', {
         const sprite = new Sprite(object)
         const previous = this.starId == blockData.id ? this.sprites[sprite.key] : null
         if (previous) sprite.carryOver(previous)
-        if (this.gameTime > 0) sprite.updateTelemetry(this.gameTime, objects)
+        if (this.gameTime > 0) sprite.updateTelemetry(this.gameTime)
         sprites[sprite.key] = sprite
       }
       this.starId = blockData.id
@@ -118,7 +118,7 @@ export const useStarMapStore = defineStore('StarMap', {
     updateAllTelemtry() {
       const sprites = Object.values(this.sprites)
       for (const sprite of sprites) {
-        sprite.updateTelemetry(this.gameTime, this.systemObjects)
+        sprite.updateTelemetry(this.gameTime)
       }
       // One level of nesting: moons, stations and ships orbit a planet; planets orbit the star at the origin.
       for (const sprite of sprites) {
