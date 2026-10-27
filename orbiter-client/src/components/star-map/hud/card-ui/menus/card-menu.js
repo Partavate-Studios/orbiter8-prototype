@@ -95,12 +95,12 @@ export function cardMenu(object, { marketName } = {}) {
     case 'station':
       menu.push({
         text: 'Trade at Port',
-        enabled: true,
+        enabled: false,
         command: 'trade'
       })
       menu.push({
         text: 'Dock at Shipyards',
-        enabled: true,
+        enabled: false,
         command: 'shipyards'
       })
       menu.push({

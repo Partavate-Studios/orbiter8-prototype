@@ -164,9 +164,8 @@
 
     <g v-if="showScope" transform="translate(0 -100)">
       <!-- selected sprite menu -->
-      <!-- Wide screens show the selection in the inspector, docked at the left (components/inspector.vue). -->
       <g v-if="selected != null">
-        <card-ui v-if="viewRatio <= 1" :object-id="selected" />
+        <card-ui :object-id="selected" />
       </g>
       <g v-else>
         <scope />

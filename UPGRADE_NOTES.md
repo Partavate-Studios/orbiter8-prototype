@@ -1135,22 +1135,11 @@ Order (from the walkthrough's list). Tick each when it lands:
    **For Koda:**
    - The HUD's planets and ships buttons (and the gamepad's Y) open the panel instead of the full-screen menus. The old menus (`planets-menu.svg.vue`, `ships-menu.svg.vue`) are no longer opened, but I've kept them in case you prefer them. Delete them if the panel stays.
    - The leaderboard and chat could become tabs here later.
-7. [x] **One inspector instead of two cards** (`components/inspector.vue`).
-   - **Wide screens:** the selection's details and actions sit in one panel docked at the left, under the profile card. With the side panel on the right, the middle of the map stays clear around the selection.
-   - **Phones keep the card that pops up from the bottom,** unchanged.
-   - **Details:**
-     - owner;
-     - a planet's class, size, rings and orbit;
-     - what a station is buying and selling;
-     - my ship's captain, location and cargo.
-   - **Nearby:** the "Visit Planet / Station / Moon" buttons only moved the camera. Here they're chips for the planet it orbits, and a planet's station and moons. Pointing at a chip rings that object on the map.
-   - **Naming happens in the panel:** claiming, building a station and renaming open a small form instead of the browser's `prompt()` and `alert()` boxes. Building shows the cost and what you'd have left, and can't be sent when you're short. Esc or Cancel backs out.
-   - **Placeholders** (Attack, Build Infrastructure) aren't buttons any more. A muted line at the bottom says "Coming in a later demo: …". They only ever showed an alert.
-   - **Trade at Port and Dock at Shipyards** are marked enabled in `card-menu.js`, so the phone card stops dimming them.
-   - **Tests:** the HUD tests check the inspector on a wide screen, and the card's moons menu on a phone-sized one.
-   - **For Koda:**
-     - Is the left the right side for it?
-     - The card's sprite art and the dotted lines from card to object aren't in the panel. The map shows the object itself.
+7. [ ] **One inspector instead of two cards.**
+   - Wide screens: the selected object's card docks at the side, with its information and actions in one panel.
+   - Phones keep the popup from the bottom.
+   - Text prompts become fields in the panel.
+   - The disabled placeholder buttons (Attack, Build Infrastructure) stop showing first in the list.
 
 **Checks after all seven (2026-10-27):**
 - **`capture.sh` on a fresh chain:** the whole new-player flow and every screen, with no console errors.

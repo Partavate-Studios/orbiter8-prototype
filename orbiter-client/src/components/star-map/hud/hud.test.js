@@ -6,7 +6,6 @@ import { createApp, h, nextTick } from 'vue'
 import { createPinia } from 'pinia'
 import Hud from './hud.svg.vue'
 import Outliner from '@/components/outliner.vue'
-import Inspector from '@/components/inspector.vue'
 import { useStarMapStore } from '@/stores/starmap'
 import { useGameStateStore } from '@/stores/gamestate'
 import { useUIStore } from '@/stores/ui'
@@ -28,8 +27,8 @@ let app, root, problems, ui
 beforeEach(() => {
   problems = []
   const pinia = createPinia()
-  // The HUD, the side panel its planets and ships buttons open, and the inspector wide screens show.
-  app = createApp({ render: () => h('div', [h('svg', [h(Hud)]), h(Outliner), h(Inspector)]) })
+  // The HUD, and the side panel its planets and ships buttons open.
+  app = createApp({ render: () => h('div', [h('svg', [h(Hud)]), h(Outliner)]) })
   app.use(pinia)
   app.config.globalProperties.o8audio = silentAudio
   app.config.errorHandler = (error) => problems.push(error)
@@ -99,30 +98,15 @@ describe('HUD', () => {
     expect(problems).toEqual([])
   })
 
-  it("opens a planet's moons menu from its card (phones)", async () => {
-    ui.calculateViewableArea({ x: 390, y: 844 }) // phones keep the card; its menu opens from a button
+  it("opens a planet's moons menu from its card", async () => {
+    ui.calculateViewableArea({ x: 1440, y: 900 }) // the card menu shows beside the card on a landscape screen
     ui.selectSprite('planet:2')
-    await settle()
-    root.querySelector('[data-card-menu]').dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
     await settle()
     const visitMoon = [...root.querySelectorAll('text')].find((text) => text.textContent.trim() === 'Visit Moon')
     // A card button's text sits beside its transparent click target, an <a> in the same group.
     visitMoon.parentNode.querySelector('a').dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
     await settle()
     expect([...root.querySelectorAll('text')].some((text) => text.textContent.trim() === 'Moonie')).toBe(true)
-    expect(problems).toEqual([])
-  })
-
-  it('shows the selection in the inspector on wide screens, with its moons a click away', async () => {
-    ui.calculateViewableArea({ x: 1440, y: 900 })
-    ui.selectSprite('planet:2')
-    await settle()
-    const inspector = root.querySelector('.inspector')
-    expect(inspector.textContent).toContain('Planet')
-    const moon = [...inspector.querySelectorAll('.chip')].find((chip) => chip.textContent.trim() === 'Moonie')
-    moon.click()
-    await settle()
-    expect(ui.selected).toBe('moon:2:0')
     expect(problems).toEqual([])
   })
 
