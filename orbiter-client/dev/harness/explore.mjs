@@ -19,6 +19,11 @@ await page.setViewport({
   height: Number(process.env.VH || 900),
   deviceScaleFactor: Number(process.env.DPR || 1)
 })
+// CPU_THROTTLE=4: slow the page's CPU this many times (Chrome's throttling), to show costs a fast machine hides.
+if (process.env.CPU_THROTTLE) {
+  const cdp = await page.createCDPSession()
+  await cdp.send('Emulation.setCPUThrottlingRate', { rate: Number(process.env.CPU_THROTTLE) })
+}
 // INJECT=0: rely on the app's own dev wallet (dev builds) instead of the injected test wallet.
 if (process.env.INJECT !== '0') {
   if (process.env.ACCOUNT) await page.evaluateOnNewDocument(`window.__TEST_ACCOUNT = '${process.env.ACCOUNT}'`)

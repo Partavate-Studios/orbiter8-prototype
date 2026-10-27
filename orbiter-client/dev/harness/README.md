@@ -11,6 +11,8 @@ the upgrade fixed. Use them to check that a change looks the same and isn't slow
 - Python 3 with Pillow, for `diff.py`.
 - Firefox installed as a snap can only use a profile folder inside `~/snap/firefox/common/`; pass one there to `ffps.mjs` and `ffjitter.mjs`.
 
+`CPU_THROTTLE=4` slows the page's CPU four times (Chrome's throttling) for `explore.mjs`, which shows costs a fast machine hides.
+
 Every script takes the game URL. With the dev server, use `?account=N` and `INJECT=0` (the app's own
 dev wallet). For a production build, leave `INJECT` unset: `provider.js` injects a test wallet for
 the address in `ACCOUNT`. `npm run build:local` builds a production bundle that knows the local chain.
