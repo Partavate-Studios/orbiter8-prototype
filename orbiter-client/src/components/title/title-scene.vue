@@ -57,22 +57,26 @@
       </svg>
     </div>
 
-    <!-- The space port: ships of the Orbiter 8 class docked side-on (as in the trade menu's art),
-         shuttles running between them and the station. -->
-    <div class="anchor port">
-      <div class="part spin">
+    <!-- The space port: ships of the Orbiter 8 class docked side-on at the station's pads (as in the
+         trade menu's art), and now and then a visitor that flies in, docks and leaves
+         (libs/title-visitor.js). -->
+    <div ref="port" class="anchor port">
+      <div ref="spin" class="part spin">
         <svg class="part" viewBox="-130 -130 260 260">
-          <g v-for="dock in docks" :key="dock.angle" :transform="dock.transform">
+          <g v-for="dock in docks" :key="dock.pad" :transform="dock.transform">
             <fleet-ship :type="dock.type" />
           </g>
           <g transform="scale(0.125) translate(-290 -301)">
             <path fill="#ffffff" fill-rule="evenodd" :d="stationPath" />
           </g>
         </svg>
-        <div v-for="lane in lanes" :key="lane.key" class="lane" :style="{ transform: 'rotate(' + lane.angle + 'deg)' }">
-          <span v-for="shuttle in lane.shuttles" :key="shuttle.key" class="shuttle" :style="shuttle.style"></span>
-        </div>
       </div>
+      <!-- The visitor doesn't turn with the station: fly() places it every frame. -->
+      <svg class="part" viewBox="-130 -130 260 260">
+        <g ref="visitor" opacity="0">
+          <fleet-ship type="orbiter8" engines flame="engineTrailGradient" />
+        </g>
+      </svg>
     </div>
 
     <!-- Placed every frame by fly(), from the orbit's own clock. -->
@@ -89,23 +93,12 @@ import FleetShip from '@/components/assets/fleet-ship.svg'
 import { paintBackdrop, BACKDROP_SIZE } from '@/components/star-map/assets/backdrop-art'
 import { onFrame } from '@/libs/frame-loop'
 import { flightPose, planFlight, SLOTS } from '@/libs/title-flight'
+import { DOCKED, dockTransform, visitorPose, VISITOR_SCALE } from '@/libs/title-visitor'
 
 // The station's outline (the same art as the game's station sprite), about 580 units across.
 const STATION_PATH =
   'M291 0l61 35 15 -25 139 80 -15 25 61 36 0 71 28 0 0 160 -28 0 0 70 -63 36 14 24 -139 80 -14 -24 -59 34 -63 -37 -15 26 -139 -80 15 -26 -59 -33 0 -73 -30 0 0 -160 30 0 0 -68 62 -36 -15 -26 139 -81 15 27 60 -35zm83 196c47,36 64,100 42,155l-98 -57 56 -98zm22 188c-36,47 -99,63 -154,42l56 -99 98 57zm-188 22c-46,-36 -63,-100 -41,-154l98 56 -57 98zm-22 -188c37,-46 100,-63 155,-41l-57 98 -98 -57z'
 
-// Docked ships, one per side of the station: same class, a little different in size.
-const DOCK_DISTANCE = 84
-const DOCKS = [
-  { angle: 0, type: 'orbiter8', scale: 3.3 },
-  { angle: 90, type: 'polygon', scale: 3.5 },
-  { angle: 180, type: 'boba', scale: 3.9 },
-  { angle: 270, type: 'moonbeam', scale: 3.6 }
-]
-// Shuttles run along each dock's line, a little to either side, between the hull (STATION_EDGE) and
-// the docked ship's side (SHIP_SIDE), in scene units from the station's center.
-const STATION_EDGE = 40
-const SHIP_SIDE = 66
 const STARS = 260
 
 export default {
@@ -120,41 +113,14 @@ export default {
       return SLOTS.filter((slot) => slot !== this.runnerSlot)
     },
     docks() {
-      return DOCKS.map((dock) => ({
-        ...dock,
-        // Nose up in the art, so side-on to the station as it is.
-        transform: `rotate(${dock.angle}) translate(${DOCK_DISTANCE} 0) scale(${dock.scale})`
-      }))
-    },
-    lanes() {
-      return DOCKS.map((dock, index) => ({
-        key: dock.angle,
-        angle: dock.angle,
-        shuttles: [
-          { outbound: true, offset: -6 },
-          { outbound: false, offset: 6 }
-        ].map(({ outbound, offset }, j) => {
-          const duration = 5.2 + ((index + j) % 3) * 1.1
-          return {
-            key: j,
-            style: {
-              '--from': outbound ? STATION_EDGE : SHIP_SIDE,
-              '--to': outbound ? SHIP_SIDE : STATION_EDGE,
-              '--dir': outbound ? 1 : -1,
-              '--offset': offset,
-              // Negative delays start the scene mid-traffic.
-              animationDuration: duration + 's',
-              animationDelay: -(index * 1.7 + j * 2.9) + 's'
-            }
-          }
-        })
-      }))
+      return DOCKED.map((ship) => ({ ...ship, transform: dockTransform(ship.pad, ship.scale) }))
     }
   },
   mounted() {
     this.paint()
     this.measure()
     this.flames = this.$refs.runner.querySelector('.flames')
+    this.visitorFlames = this.$refs.visitor.querySelector('.flames')
     this.stopFrames = onFrame(() => this.fly())
     this.onResize = () => {
       cancelAnimationFrame(this.resizeFrame)
@@ -188,6 +154,9 @@ export default {
         this.runnerSlot ?? undefined
       )
       this.runnerSlot = this.plan.slot
+      // The visitor's units: the port's viewBox, 260 across. It comes from and goes beyond the screen.
+      const port = this.$refs.port.getBoundingClientRect()
+      this.portReach = Math.hypot(window.innerWidth, window.innerHeight) / (port.width / 260) + 40
     },
     /** Places the runner for this frame, on the clock of the orbit it leaves and rejoins. */
     fly() {
@@ -202,7 +171,21 @@ export default {
       const behind = pose.scale === 1 ? 0 : this.behindBand(window.innerWidth / 2 + x, window.innerHeight / 2 + y)
       runner.opacity = pose.opacity * (1 - 0.6 * behind)
       this.flames.style.opacity = pose.engines
+      this.visit()
       if (!orbit) this.stopFrames()
+    },
+    /** Places the port's visitor for this frame, on the clock of the station it docks at. */
+    visit() {
+      const spin = this.$refs.spin.getAnimations()[0]
+      const pose = spin ? visitorPose(spin.currentTime / 1000, this.portReach) : { opacity: 0 }
+      const visitor = this.$refs.visitor
+      visitor.setAttribute('opacity', pose.opacity)
+      if (!pose.opacity) return
+      visitor.setAttribute(
+        'transform',
+        `translate(${pose.x} ${pose.y}) rotate(${pose.rotation}) scale(${VISITOR_SCALE})`
+      )
+      this.visitorFlames.style.opacity = pose.engines
     },
     /** How far the point (in pixels) is behind the title menu's dark band: 0 clear of it, 1 behind its darkest part. */
     behindBand(x, y) {
@@ -319,34 +302,8 @@ export default {
   animation: turn 45s linear infinite;
 }
 .spin {
-  animation: turn 150s linear infinite;
-}
-
-.lane {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 0;
-  height: 0;
-}
-.shuttle {
-  position: absolute;
-  left: calc(var(--u) * -12);
-  top: calc(var(--u) * (var(--offset) - 1.5));
-  width: calc(var(--u) * 14);
-  height: calc(var(--u) * 3);
-  border-radius: calc(var(--u) * 1.5);
-  /* a bright head with a fading trail behind it */
-  background:
-    radial-gradient(
-      circle at calc(100% - var(--u) * 1.5) 50%,
-      #ffffff calc(var(--u) * 1.4),
-      #0000 calc(var(--u) * 1.6)
-    ),
-    linear-gradient(90deg, #e6dcf500, #e6dcf599 80%, #e6dcf5);
-  opacity: 0;
-  transform: translateX(calc(var(--u) * var(--from))) scaleX(var(--dir));
-  animation: shuttle 6s ease-in-out infinite;
+  /* Slower than the ships round the sun (libs/title-visitor.js SPIN_S). */
+  animation: turn 240s linear infinite;
 }
 
 @keyframes turn {
@@ -363,21 +320,6 @@ export default {
   }
 }
 /* Out to the docked ship (or in to the station), then out of sight until the next trip. */
-@keyframes shuttle {
-  0% {
-    opacity: 0;
-    transform: translateX(calc(var(--u) * var(--from))) scaleX(var(--dir));
-  }
-  8%,
-  48% {
-    opacity: 1;
-  }
-  55%,
-  100% {
-    opacity: 0;
-    transform: translateX(calc(var(--u) * var(--to))) scaleX(var(--dir));
-  }
-}
 
 /* Portrait screens: the scene is laid out for 900 x 1600 units, with the port below the menu. */
 @media (max-aspect-ratio: 1/1) {
@@ -401,9 +343,6 @@ export default {
 @media (prefers-reduced-motion: reduce) {
   .title-scene * {
     animation: none !important;
-  }
-  .shuttle {
-    opacity: 0.8;
   }
 }
 </style>

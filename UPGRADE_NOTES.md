@@ -1199,7 +1199,12 @@ Koda: Orbiter 8s "shouldn't orbit touching one another... they should be spread 
 
 - **The idea:** a ship that traded at a port is drawn docked at its station. Only the **last 3** to trade there are docked; the others orbit the planet.
 - **The data is there:** the contract emits `PortTrade(sender, planetId, …)` on every trade, and `sdk/load.js` already loads recent ones (`events.tradeEvents`, back `EVENT_LOOKBACK_BLOCKS`). A ship whose last trade is older than that would orbit instead.
-- **Decided (Koda): side-on,** as in the trade menu's art. The title screen's docked ships were nose-first; they're side-on now, with the shuttles running to their sides.
+- **Decided (Koda): side-on,** as in the trade menu's art.
+- **The title's space port now docks that way** (`libs/title-visitor.js`). Koda's notes on the first try were: the ships sat too far out (orbiting, not docked), they flew backwards as the station turned, four ships on a six-sided station sat two on sides and two on corners, and the station turned too fast.
+  - Four ships sit flush against four of the station's six docking pads (the raised middle of each side), side-on, noses the way the station turns.
+  - The station turns once in 240 s (was 150), slower than the ships round the sun.
+  - **A visitor:** every 80 s, an Orbiter 8 flies in from off screen, slows to a stop alongside a free pad, stays 24 s turning with the station, then pulls away and curves off. It uses whichever free pad faces right, so it never crosses the title. Tested: it never jumps, and it appears and goes off screen.
+  - The shuttles that ran between the hull and the ships are gone; with the ships against the pads there was no room for them.
 - **Work:** docking points on the station art; a docked ship turns with the station; it undocks into the orbit (gliding, as above) when it's pushed out by a fourth trader or leaves.
 
 ### Stashed: the compass (2026-10-27)
