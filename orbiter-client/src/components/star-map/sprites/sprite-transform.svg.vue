@@ -30,9 +30,10 @@
         </a>
       </g>
       <!-- Zoomed out, my ship wears a ring that stays the same size on screen, so it's easy to find.
+           Not during camera flights, when it would flicker as it resizes.
            Yellow, as everything of mine is (libs/palette.js). -->
       <circle
-        v-if="isMyShip && isTiny"
+        v-if="isMyShip && isTiny && !cameraFlying"
         cx="0"
         cy="0"
         :r="MARKER_RADIUS_PX / drawnPixelsPerUnit"

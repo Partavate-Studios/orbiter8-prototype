@@ -78,7 +78,7 @@ export function cardMenu(object, { marketName } = {}) {
     case 'ship':
       if (object.isMine) {
         menu.push({
-          text: 'Visit Star',
+          text: 'Jump To Neighbor Star',
           enabled: true,
           command: 'jump'
         })
