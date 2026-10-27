@@ -1,6 +1,6 @@
 <template>
   <!-- Everything centered on the star that's far bigger than the screen: the glow, the heliopause
-       circle, the grid, and the orbit rings of whatever circles the star. Drawn on canvas, slightly
+       circle, and the orbit rings of whatever circles the star. Drawn on canvas, slightly
        larger than the screen: a camera move just shifts it (a whole-pixel CSS translate, which costs
        nothing to composite), and anything else (zoom, selection) redraws it for the live camera.
        It's never stretched, so unlike the world layer it never shows an edge. -->
@@ -17,7 +17,6 @@ import { WORLD_OFFSET_Y } from '@/constants'
 import { writeStyle } from '@/libs/dom-writes'
 import { RING_COLOR, RING_FAINT, ringOpacity, ringWidth } from '@/libs/sprite-types'
 
-const GUIDE_COLOR = '#c3b3da'
 // A dim glow around the star (normal and high graphics).
 const GLOW_RADIUS = 2500
 const GLOW_INNER = 'rgba(49, 14, 92, 0.25)' // #310e5c
@@ -138,16 +137,7 @@ export default {
       const originX = MARGIN + this.screenSize.width / 2 + x * pixels
       const originY = MARGIN + this.screenSize.height / 2 + WORLD_OFFSET_Y * this.groupPixels + y * pixels
       ctx.setTransform(dpr * pixels, 0, 0, dpr * pixels, dpr * originX, dpr * originY)
-      // The world rectangle the canvas covers, for skipping lines that can't be seen.
-      const view = {
-        left: -originX / pixels,
-        right: (this.screenSize.width + 2 * MARGIN - originX) / pixels,
-        top: -originY / pixels,
-        bottom: (this.screenSize.height + 2 * MARGIN - originY) / pixels
-      }
-
       if (this.graphicsQuality > 1) this.drawGlow(ctx)
-      this.drawGrid(ctx, scale, view)
       // In the neighbor view, the heliopause becomes that view's star (neighbor-view.svg.vue).
       if (!this.neighborView) this.drawHeliopause(ctx)
       this.drawStarOrbits(ctx, pixels)
@@ -167,53 +157,6 @@ export default {
       ctx.beginPath()
       ctx.arc(0, 0, HELIOPAUSE_RADIUS, 0, Math.PI * 2)
       ctx.stroke()
-    },
-    /** The star chart: spokes through the star, then finer squares the further in you zoom. */
-    drawGrid(ctx, scale, view) {
-      ctx.strokeStyle = GUIDE_COLOR
-      const lines = (width, segments) => {
-        ctx.lineWidth = width
-        ctx.beginPath()
-        for (const [x1, y1, x2, y2] of segments) {
-          ctx.moveTo(x1, y1)
-          ctx.lineTo(x2, y2)
-        }
-        ctx.stroke()
-      }
-      lines(0.01 + 0.03 * scale, [
-        [-2000, 0, 2000, 0],
-        [0, -2000, 0, 2000],
-        [-1050, -1050, 1050, 1050],
-        [-1050, 1050, 1050, -1050],
-        [-1050, -500, 1050, 500],
-        [-1050, 500, 1050, -500],
-        [-500, -1050, 500, 1050],
-        [-500, 1050, 500, -1050]
-      ])
-      if (this.graphicsQuality < 2 || scale >= 0.5) return
-
-      // Tick marks every 100 along the axes.
-      const ticks = []
-      for (let n = -5; n <= 5; n++) {
-        if (n === 0) continue
-        ticks.push([-50, n * 100, 50, n * 100], [n * 100, -50, n * 100, 50])
-      }
-      lines(0.05, ticks)
-      lines(0.02, this.gridLines(100, 100, 10500, view))
-      if (scale < 0.2) lines(0.005, this.gridLines(10, 1000, 10500, view))
-    },
-    /** Horizontal and vertical lines every `spacing` units (±count of them, skipping 0), on screen only. */
-    gridLines(spacing, count, length, view) {
-      const segments = []
-      const first = (low) => Math.max(-count, Math.ceil(low / spacing))
-      const last = (high) => Math.min(count, Math.floor(high / spacing))
-      for (let n = first(view.top); n <= last(view.bottom); n++) {
-        if (n !== 0) segments.push([-length, n * spacing, length, n * spacing])
-      }
-      for (let n = first(view.left); n <= last(view.right); n++) {
-        if (n !== 0) segments.push([n * spacing, -length, n * spacing, length])
-      }
-      return segments
     },
     /** Orbit rings centered on the star: the planets', and those of ships orbiting the star itself. */
     drawStarOrbits(ctx, pixels) {

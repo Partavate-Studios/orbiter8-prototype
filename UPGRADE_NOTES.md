@@ -1181,6 +1181,7 @@ Koda: "please make pretty input boxes for those things", then "look at the two c
      - a failed transaction;
      - a name too long for the dialog.
    - **Everything else stays purple and lavender,** buttons included. The dialog's confirm is lavender, like the title's primary buttons. Selection and hover stay white and lavender.
+3. [x] **The star chart's grid removed** (Koda: it made sense when systems were empty and a drag needed something to show movement; now it's clutter). The spokes through the star, the ticks on the axes and the square grid are gone from `guides-canvas.vue`; the background stars still show a drag. **Not a performance problem:** the grid was drawn only when that canvas redraws (zooming, selecting), never while panning.
 
 ## Sizes and speeds: history
 
