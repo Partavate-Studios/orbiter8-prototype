@@ -97,6 +97,8 @@ const FOLD_MARGIN_PX = 3
 // is what labels always had: 0.1em of the 16px default.
 const LABEL_PX = { min: 12, max: 20, world: 1.6 }
 const MARKER_RADIUS_PX = 8
+// A moon's, station's or ship's name shows once its orbit is this wide on screen (pixels).
+const NAMED_ORBIT_PX = 36
 // The names of my ship and of what I own.
 const MY_LABEL_FILL = YELLOW_LIGHT + 'aa'
 
@@ -146,7 +148,6 @@ export default {
     ...mapState(useStarMapStore, ['sprites', 'systemObjects']),
     ...mapState(useUIStore, [
       'selected',
-      'showLabels',
       'isMenuOn',
       'drawnPixelsPerUnit',
       'isOnScreen',
@@ -189,10 +190,18 @@ export default {
       const drawnRadius = Math.max(trueRadius, MIN_RADIUS_PX.planet)
       return this.sprite.object.orbit.radius * pixels < drawnRadius + FOLD_MARGIN_PX
     },
+    /** Circles its planet so tightly on screen that its name would sit on top of the planet's. */
+    crowdsItsPlanet() {
+      return this.frameOf === 'parent' && this.sprite.object.orbit.radius * this.drawnPixelsPerUnit < NAMED_ORBIT_PX
+    },
     showLabel() {
       // The neighbor view covers the system: its names would show through.
       if (this.neighborView) return false
-      if ((this.isSelected && !this.showScope) || this.showLabels || (this.hover && !this.isSelected)) return true
+      // Folded into its planet, it isn't drawn, so neither is its name (even with every name on). Just
+      // outside it, its name would pile up on the planet's: it waits until its orbit opens up.
+      if (this.folded) return false
+      if (this.crowdsItsPlanet && !this.isSelected && !this.hover && !this.isMyShip) return false
+      if ((this.isSelected && !this.showScope) || (this.hover && !this.isSelected)) return true
       // Zoomed out: the planets', the star's and my ship's names show by themselves, once the camera has
       // settled (during a flight they'd flicker in and out as the zoom sweeps past their sizes).
       if (this.cameraFlying) return false

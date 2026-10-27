@@ -154,13 +154,6 @@
           </g>
         </a>
       </g>
-
-      <g :transform="corner(rightMostX, -50, bottomMostY, -50)">
-        <a cursor="pointer" @click.prevent="toggleShowLabels()">
-          <title>Show or hide names</title>
-          <info-icon />
-        </a>
-      </g>
     </g>
 
     <!-- The selection's cards. (The compass that showed here with nothing selected is stashed: see
@@ -213,7 +206,6 @@ import CardUi from './card-ui/card-ui.svg'
 // import MyShipIcon from './icons/my-ship-icon.svg'
 import AvatarIcon from './icons/avatar-icon.svg'
 import GearIcon from './icons/gear-icon.svg'
-import InfoIcon from './icons/info-icon.svg'
 import JumpIcon from './icons/jump-icon.svg'
 import StarIcon from './icons/star-icon.svg'
 import Minimap from './minimap.svg'
@@ -238,7 +230,6 @@ export default {
     CardUi,
     CurrentSystem,
     GearIcon,
-    InfoIcon,
     JumpIcon,
     StarIcon,
     Minimap,
@@ -308,7 +299,7 @@ export default {
       const scale = this.hudScale
       return `translate(${edgeX + offsetX * scale} ${edgeY + offsetY * scale}) scale(${scale * extraScale})`
     },
-    ...mapActions(useUIStore, ['selectSprite', 'scaleAnimateTo', 'zoomOutToNeighbors', 'toggleShowLabels', 'openMenu']),
+    ...mapActions(useUIStore, ['selectSprite', 'scaleAnimateTo', 'zoomOutToNeighbors', 'openMenu']),
     showSettings() {
       this.o8audio.playEffect('click')
       this.openMenu('settings')

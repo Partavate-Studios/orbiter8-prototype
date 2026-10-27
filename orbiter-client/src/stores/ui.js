@@ -67,7 +67,6 @@ export const useUIStore = defineStore('UI', {
         history: []
       }
     },
-    showLabels: false,
     // Whether the selected sprite's info card (or, with nothing selected, the scope) is shown.
     // Clicking the selected sprite toggles it.
     showScope: true,
@@ -192,9 +191,6 @@ export const useUIStore = defineStore('UI', {
     },
     toggleMinerva() {
       this.showMinerva = !this.showMinerva
-    },
-    toggleShowLabels() {
-      this.showLabels = !this.showLabels
     },
     drawWorldAt(view) {
       // Draw for a camera position on the device-pixel grid. Every layer and sprite then rounds

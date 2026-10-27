@@ -95,7 +95,6 @@ export default {
       'openMenu',
       'closeMenu',
       'zoomOutToNeighbors',
-      'toggleShowLabels',
       'toggleScope',
       'viewTo',
       'scaleBy',
@@ -120,8 +119,6 @@ export default {
           return this.stepPlanet({ planets: this.spriteIds.planets, step: 1 })
         case 'myShip':
           return this.selectSprite(this.myShipId)
-        case 'labels':
-          return this.toggleShowLabels()
         case 'scope':
           return this.toggleScope()
         case 'zoomOutPressed':

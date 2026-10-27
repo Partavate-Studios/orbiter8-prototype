@@ -21,7 +21,6 @@ const BUTTON_COMMANDS = {
   [BUTTON.R1]: 'nextPlanet',
   [BUTTON.START]: 'myShip',
   [BUTTON.SELECT]: 'settings',
-  [BUTTON.L3]: 'labels',
   [BUTTON.R3]: 'scope',
   [BUTTON.L2]: 'zoomOutPressed',
   [BUTTON.R2]: 'zoomInPressed'
