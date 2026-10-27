@@ -2,6 +2,7 @@
   <div class="playorbiter8">
     <star-map />
     <layer-html />
+    <outliner />
     <transaction-tray />
   </div>
 </template>
@@ -17,13 +18,19 @@ import { useConfigStore } from '@/stores/config'
 import starMap from '@/components/star-map/map'
 import layerHtml from '@/components/layer-html/container-html'
 import TransactionTray from '@/components/transaction-tray.vue'
+import Outliner from '@/components/outliner.vue'
 import router from '@/router/router'
 import { onFrame } from '@/libs/frame-loop'
 
-/** Whether a key went to a text field (chat, names), not the map. */
+/**
+ * Whether a key belongs to what has focus rather than to the map: typing in a text field, or Tab,
+ * Space and Enter on a focused button or link (the side panel).
+ */
 function isTyping(event) {
   const target = event.target
-  return target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))
+  if (!(target instanceof HTMLElement)) return false
+  if (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)) return true
+  return /^(Tab| |Enter)$/.test(event.key) && /^(BUTTON|A)$/.test(target.tagName)
 }
 
 export default {
@@ -31,7 +38,8 @@ export default {
   components: {
     starMap,
     layerHtml,
-    TransactionTray
+    TransactionTray,
+    Outliner
   },
   computed: {
     ...mapState(useGameStateStore, ['haveAvatar', 'haveShip']),
@@ -111,6 +119,8 @@ export default {
       'selectSprite'
     ]),
     onWheel(event) {
+      // Over a panel that scrolls by itself (the side panel), the wheel scrolls it, not the map.
+      if (event.target instanceof Element && event.target.closest('[data-own-scroll]')) return
       const zoomingOut = event.deltaY > 0
       // In the neighbor-star view, wheeling in returns to the system; wheeling out does nothing more.
       if (this.neighborView) {

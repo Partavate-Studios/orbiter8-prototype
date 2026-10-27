@@ -1121,7 +1121,20 @@ Order (from the walkthrough's list). Tick each when it lands:
    - **Where the history lives:** your visits are remembered on this device (`sdk/explored.js`). The visit before the latest one is where you came from, even after a reload.
    - **Fix:** the world's new automatic names (step 4) showed faintly through the neighbor view; they're hidden there now.
    - **Checked:** a real jump from Sol to #2 on the local chain; the neighbor view there marked Sol as where you came from. Tested in `explored.test.js`.
-6. [ ] **A side panel** (the outliner) for the system's planets, moons and stations and the ships here. Hover a row and the object lights up on the map; click it and the camera flies there. On phones it becomes a bottom sheet. The leaderboard and chat can move into it later.
+6. [x] **A side panel** (the outliner, `components/outliner.vue`), with two tabs:
+   - **Planets:** each planet's class and owner, a "You" badge where my ship is, and its station and moons as chips (stations outlined brighter).
+   - **Ships:** mine first, with owner and location.
+
+   **How it works:**
+   - Pointing at a row (mouse or keyboard focus) rings that object on the map. A moon folded into its planet unfolds while pointed at.
+   - Choosing a row selects the object, and the camera flies there.
+   - **Where it sits:** wide screens get a 300 px panel on the right, clear of the minimap and the right-hand HUD buttons. Phones get a bottom sheet up to 45% of the screen tall, and choosing a row there closes it, so the map shows.
+   - **Input:** the wheel scrolls the panel instead of zooming the map. Tab and Space work on its buttons instead of stepping through planets. Esc closes it (after any menu, before the selection).
+   - The hover / selection ring now never shrinks below a 10 px radius, so a highlight is visible at any zoom.
+
+   **For Koda:**
+   - The HUD's planets and ships buttons (and the gamepad's Y) open the panel instead of the full-screen menus. The old menus (`planets-menu.svg.vue`, `ships-menu.svg.vue`) are no longer opened, but I've kept them in case you prefer them. Delete them if the panel stays.
+   - The leaderboard and chat could become tabs here later.
 7. [ ] **One inspector instead of two cards.**
    - Wide screens: the selected object's card docks at the side, with its information and actions in one panel.
    - Phones keep the popup from the bottom.
