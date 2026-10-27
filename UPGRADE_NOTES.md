@@ -1121,12 +1121,20 @@ Order (from the walkthrough's list). Tick each when it lands:
    - **Where the history lives:** your visits are remembered on this device (`sdk/explored.js`). The visit before the latest one is where you came from, even after a reload.
    - **Fix:** the world's new automatic names (step 4) showed faintly through the neighbor view; they're hidden there now.
    - **Checked:** a real jump from Sol to #2 on the local chain; the neighbor view there marked Sol as where you came from. Tested in `explored.test.js`.
-6. [ ] **A side panel** (the outliner) for the system's planets, moons and stations and the ships here. Hover a row and the object lights up on the map; click it and the camera flies there. On phones it becomes a bottom sheet. The leaderboard and chat can move into it later.
-7. [ ] **One inspector instead of two cards.**
-   - Wide screens: the selected object's card docks at the side, with its information and actions in one panel.
-   - Phones keep the popup from the bottom.
-   - Text prompts become fields in the panel.
-   - The disabled placeholder buttons (Attack, Build Infrastructure) stop showing first in the list.
+6. [ ] **A side panel** (an outliner beside the map). **Built (`62bbca1`), then reverted at Koda's request (`e3e3750`).**
+7. [ ] **One inspector instead of two cards.** **Built (`09a8e23`), then reverted at Koda's request (`975a3a0`).**
+
+   **Koda's verdict (2026-10-27):** the new panels looked far worse than the originals.
+   - **Ports lost their trade codes.** The three letters (e.g. BBS) that say what a port buys and sells were gone.
+   - **The left card is meant to look like a playing card,** tying in with ships and planets being NFTs. That was lost.
+   - **The game is menu driven.** "The buttons are the game"; it isn't an action game, so big menus make sense.
+
+   **Restored:** his cards and the planets and ships menus, as they were.
+   **Kept:**
+   - Trade at Port and Dock at Shipyards marked enabled, so they aren't drawn dimmed. They always worked.
+   - The trade and shipyard menus no longer stuck on "Transacting..." (step 3).
+
+   **For the future:** keep his card and menu art. Change placement or behavior, not the look, and only with his go-ahead.
 
 **Checks after all seven (2026-10-27):**
 - **`capture.sh` on a fresh chain:** the whole new-player flow and every screen, with no console errors.
