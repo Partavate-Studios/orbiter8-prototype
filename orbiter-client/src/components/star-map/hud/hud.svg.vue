@@ -110,7 +110,8 @@
 
       <zoom-slider :transform="corner(0, 0, bottomMostY, -50, 1.5)" />
 
-      <scope-toggle :transform="corner(0, 0, bottomMostY, -100)" />
+      <!-- Shows or hides the selection's card, so only there when something is selected. -->
+      <scope-toggle v-if="selected != null" :transform="corner(0, 0, bottomMostY, -100)" />
 
       <g :transform="corner(leftMostX, 50, bottomMostY, -50)">
         <a cursor="pointer" @click.prevent="showSettings()">

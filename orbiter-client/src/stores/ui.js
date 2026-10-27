@@ -185,7 +185,9 @@ export const useUIStore = defineStore('UI', {
       this.screenSize.width = parseInt(x)
       this.screenSize.height = parseInt(y)
     },
+    /** Shows or hides the selection's card (nothing to show or hide with nothing selected). */
     toggleScope() {
+      if (this.selectedSprite == null) return
       this.showScope = !this.showScope
     },
     toggleMinerva() {
