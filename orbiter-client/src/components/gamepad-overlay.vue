@@ -35,7 +35,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(useUIStore, ['selected', 'viewport', 'neighborView', 'menuState', 'isMenuOn', 'livePixelsPerUnit']),
+    ...mapState(useUIStore, ['selected', 'viewport', 'neighborView', 'isMenuOn', 'livePixelsPerUnit']),
     ...mapState(useStarMapStore, ['mapDataLoaded', 'spriteIds', 'myShipId']),
     ring() {
       void this.frameCount
@@ -100,7 +100,9 @@ export default {
       'viewTo',
       'scaleBy',
       'enterNeighborView',
-      'exitNeighborView'
+      'exitNeighborView',
+      'back',
+      'stepPlanet'
     ]),
     run(command, detail) {
       if (command === 'back') return this.back()
@@ -113,9 +115,9 @@ export default {
         case 'jump':
           return this.zoomOutToNeighbors()
         case 'previousPlanet':
-          return this.stepPlanet(-1)
+          return this.stepPlanet({ planets: this.spriteIds.planets, step: -1 })
         case 'nextPlanet':
-          return this.stepPlanet(1)
+          return this.stepPlanet({ planets: this.spriteIds.planets, step: 1 })
         case 'myShip':
           return this.selectSprite(this.myShipId)
         case 'labels':
@@ -134,19 +136,6 @@ export default {
         case 'zoom':
           return this.zoom(detail)
       }
-    },
-    /** B: undo the most recent thing — close a view or menu, then let go of the selection. */
-    back() {
-      if (this.neighborView) return this.exitNeighborView()
-      if (this.isMenuOn || this.menuState.chatMenu || this.menuState.leaderboardMenu) return this.closeMenu()
-      if (this.selected != null) return this.selectNone()
-    },
-    stepPlanet(step) {
-      const planets = this.spriteIds.planets
-      if (planets.length === 0) return
-      const index = planets.indexOf(this.selected)
-      const next = index === -1 ? (step > 0 ? 0 : planets.length - 1) : (index + step + planets.length) % planets.length
-      this.selectSprite(planets[next])
     },
     /** Left stick: look around, like dragging the map (which also lets go of the selection). */
     pan({ x, y, seconds }) {

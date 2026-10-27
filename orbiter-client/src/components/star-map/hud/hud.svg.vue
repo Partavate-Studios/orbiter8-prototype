@@ -61,6 +61,7 @@
 
       <g :transform="corner(leftMostX, 50, topMostY, 50)">
         <a cursor="pointer" @click.prevent="selectMyShip()">
+          <title>My ship (Space)</title>
           <avatar-icon />
         </a>
       </g>
@@ -70,6 +71,7 @@
       <g :transform="corner(rightMostX, -50, topMostY, 50)">
         <!-- A star until the star is selected; then the star-nav icon, which zooms out to its neighbors. -->
         <a cursor="pointer" @click.prevent="selectStar()">
+          <title>{{ starSelected ? 'Neighboring stars' : 'The star' }}</title>
           <jump-icon v-if="starSelected" />
           <star-icon v-else />
         </a>
@@ -83,12 +85,14 @@
 
       <g :transform="corner(leftMostX, 50, bottomMostY, -250)">
         <a cursor="pointer" @click.prevent="showLeaderboard()">
+          <title>Leaderboard</title>
           <trophy-icon />
         </a>
       </g>
 
       <g :transform="corner(leftMostX, 50, bottomMostY, -150)">
         <a cursor="pointer" @click.prevent="showChat()">
+          <title>Chat</title>
           <broadcast-icon />
           <g v-if="chatEventsCount">
             <circle cx="-25" cy="20" fill="#230b41" stroke="#ffffff88" stroke-width="0.5" r="10" />
@@ -110,12 +114,14 @@
 
       <g :transform="corner(leftMostX, 50, bottomMostY, -50)">
         <a cursor="pointer" @click.prevent="showSettings()">
+          <title>Settings</title>
           <gear-icon />
         </a>
       </g>
 
       <g :transform="corner(rightMostX, -50, bottomMostY, -150)">
         <a cursor="pointer" @click.prevent="showShips()">
+          <title>Ships in this system</title>
           <ships-icon />
           <g v-if="shipCount">
             <circle cx="25" cy="20" fill="#230b41" stroke="#ffffff88" stroke-width="0.5" r="10" />
@@ -132,6 +138,7 @@
       </g>
       <g :transform="corner(rightMostX, -50, bottomMostY, -250)">
         <a cursor="pointer" @click.prevent="showPlanets()">
+          <title>Planets (Tab and Shift+Tab step through them)</title>
           <planets-icon />
           <g>
             <circle cx="25" cy="20" fill="#230b41" stroke="#ffffff88" stroke-width="0.5" r="10" />
@@ -149,6 +156,7 @@
 
       <g :transform="corner(rightMostX, -50, bottomMostY, -50)">
         <a cursor="pointer" @click.prevent="toggleShowLabels()">
+          <title>Show or hide names</title>
           <info-icon />
         </a>
       </g>

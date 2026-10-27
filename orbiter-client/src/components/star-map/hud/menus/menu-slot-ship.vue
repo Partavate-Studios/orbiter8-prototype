@@ -1,7 +1,7 @@
 <template>
   <g>
     <menu-slot-container>
-      <g :transform="'translate(' + slotWidth * 0.1 + ' 35) rotate(45) scale(' + (ship.size / 5 + 1.75) + ')'">
+      <g :transform="'translate(' + slotWidth * 0.1 + ' 35) rotate(45) scale(2)'">
         <ship :ship="systemObjects[shipId]" />
       </g>
       <g v-if="slotWidth > 450">

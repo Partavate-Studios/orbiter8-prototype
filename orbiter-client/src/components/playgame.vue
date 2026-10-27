@@ -18,6 +18,12 @@ import layerHtml from '@/components/layer-html/container-html'
 import router from '@/router/router'
 import { onFrame } from '@/libs/frame-loop'
 
+/** Whether a key went to a text field (chat, names), not the map. */
+function isTyping(event) {
+  const target = event.target
+  return target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))
+}
+
 export default {
   name: 'Play',
   components: {
@@ -27,7 +33,7 @@ export default {
   computed: {
     ...mapState(useGameStateStore, ['haveAvatar', 'haveShip']),
     ...mapState(useUIStore, ['selected', 'jumpAnimationState', 'viewport', 'neighborView']),
-    ...mapState(useStarMapStore, ['gameTime', 'systemObjects', 'sprites']),
+    ...mapState(useStarMapStore, ['gameTime', 'systemObjects', 'sprites', 'spriteIds', 'myShipId']),
     ...mapState(useConfigStore, ['tickDelay'])
   },
   watch: {
@@ -46,6 +52,7 @@ export default {
   beforeCreate() {},
   created() {
     window.addEventListener('keyup', this.handleKeyPress)
+    window.addEventListener('keydown', this.handleKeyDown)
     window.addEventListener('wheel', this.onWheel)
     if (!this.haveAvatar || !this.haveShip) {
       router.push('/')
@@ -60,6 +67,7 @@ export default {
   },
   unmounted() {
     window.removeEventListener('keyup', this.handleKeyPress)
+    window.removeEventListener('keydown', this.handleKeyDown)
     window.removeEventListener('wheel', this.onWheel)
     this.stopFrames()
   },
@@ -94,7 +102,10 @@ export default {
       'moveLeft',
       'moveRight',
       'scaleBy',
-      'wheelZoomAt'
+      'wheelZoomAt',
+      'back',
+      'stepPlanet',
+      'selectSprite'
     ]),
     onWheel(event) {
       const zoomingOut = event.deltaY > 0
@@ -116,11 +127,33 @@ export default {
         time: CAMERA.WHEEL_TWEEN_MS
       })
     },
-    handleKeyPress(event) {
+    /** Keys that act as soon as they're pressed (and would otherwise move focus or scroll the page). */
+    handleKeyDown(event) {
+      if (isTyping(event) || event.ctrlKey || event.metaKey || event.altKey) return
       switch (event.key) {
         case 'Escape':
-          this.exitNeighborView()
+          this.back()
           break
+        case ' ':
+          this.selectSprite(this.myShipId)
+          break
+        case 'Tab':
+          this.stepPlanet({ planets: this.spriteIds.planets, step: event.shiftKey ? -1 : 1 })
+          break
+        case ']':
+          this.stepPlanet({ planets: this.spriteIds.planets, step: 1 })
+          break
+        case '[':
+          this.stepPlanet({ planets: this.spriteIds.planets, step: -1 })
+          break
+        default:
+          return
+      }
+      event.preventDefault()
+    },
+    handleKeyPress(event) {
+      if (isTyping(event)) return
+      switch (event.key) {
         case '`':
           this.toggleMinerva()
           break

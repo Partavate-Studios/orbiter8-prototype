@@ -443,6 +443,20 @@ export const useUIStore = defineStore('UI', {
       this.viewport.scaleTween.useGeometric()
       this.neighborViewPending = true
     },
+    /** Backs out one level (Esc, the gamepad's B): the neighbor view, then an open menu, then the selection. */
+    back() {
+      const menus = this.hud.menuState
+      if (this.neighborView) return this.exitNeighborView()
+      if (this.isMenuOn || menus.chatMenu || menus.leaderboardMenu) return this.closeMenu()
+      if (this.selectedSprite != null) return this.selectNone()
+    },
+    /** Selects the next (`step` 1) or previous (-1) of `planets` (keys), from the selected one or from an end. */
+    stepPlanet({ planets, step }) {
+      if (planets.length === 0) return
+      const index = planets.indexOf(this.selectedSprite)
+      const next = index === -1 ? (step > 0 ? 0 : planets.length - 1) : (index + step + planets.length) % planets.length
+      this.selectSprite(planets[next])
+    },
     /** Back from the neighbor view (clicking its star) or a stalled jump: select the star and zoom in to the system. */
     zoomInToStar() {
       this.neighborViewPending = false

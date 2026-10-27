@@ -1073,11 +1073,14 @@ Order (from the walkthrough's list). Tick each when it lands:
      - the world point under the cursor stays put through a wheel zoom;
      - after a drag, the point that was under the pointer is still under it;
      - a pinch zooms by the fingers' spread and keeps the point between them in place.
-2. [ ] **Keyboard and tooltips.**
-   - Esc backs out one level: the open menu, then the card, then the selection, then the neighbor view.
-   - Space goes to my ship; Tab and Shift+Tab (or `]` and `[`) step through the planets.
-   - Every HUD button gets a tooltip.
-   - Fix: ship icons in the ships menu were scaled by `NaN` (ships have no `size`).
+2. [x] **Keyboard and tooltips.**
+   - **Esc backs out one level:** the neighbor view, then an open menu, then the selection. It skips "hide the card": hiding it would also hide the card for every later selection.
+   - **Space** selects my ship.
+   - **Tab and Shift+Tab** (or `]` and `[`) step through the planets.
+   - These keys do nothing while you type in a text field.
+   - The keyboard and the gamepad's B and L1/R1 now share the same store actions (`back`, `stepPlanet`).
+   - Every HUD button has a tooltip, naming its key where it has one.
+   - **Fix:** ship icons in the ships menu were scaled by `NaN` (ships have no `size`), so none was drawn.
 3. [ ] **Every transaction shows its progress.** A small tray shows each action going from waiting for the wallet, to sent, to confirmed, or failed with the reason. Covers claims, stations, renames, trades, holds and chat. Today only jumps show anything; the rest log failures to the console.
 4. [ ] **A readable zoomed-out system** (strategic zoom).
    - Orbit rings stay one pixel wide at any zoom. Today their width is in world units, so they vanish when zoomed out.

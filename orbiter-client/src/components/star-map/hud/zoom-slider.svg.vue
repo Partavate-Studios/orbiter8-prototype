@@ -27,9 +27,11 @@
       <text x="64" y="4.5" font-size="1em" fill="#000000" text-anchor="middle">+</text>
 
       <a cursor="pointer" @click.prevent="zoomBy(2)">
+        <title>Zoom out (or scroll)</title>
         <circle cx="-64" cy="0" r="10" stroke="#ffffff00" fill="#c3b3da00"></circle
       ></a>
       <a cursor="pointer" @click.prevent="zoomBy(0.5)">
+        <title>Zoom in (or scroll)</title>
         <circle cx="64" cy="0" r="10" stroke="#ffffff00" fill="#c3b3da00"></circle
       ></a>
     </g>

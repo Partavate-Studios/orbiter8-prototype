@@ -2,6 +2,7 @@
   <g>
     <g :transform="'scale(' + buttonScale + ')'">
       <a cursor="pointer" @click.prevent="toggleScope()" @mouseout="setSpriteToDisplay(null)">
+        <title>Show or hide the selection's card</title>
         <g v-if="showScope">
           <text x="0" y="12" font-size="2.5em" fill="#ffffff" text-anchor="middle" alignment-baseline="central">-</text>
         </g>
