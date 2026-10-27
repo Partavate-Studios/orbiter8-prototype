@@ -21,9 +21,9 @@
           <circle
             cx="0"
             cy="0"
-            :r="sprite.selectorSize * ringGrowth"
-            :stroke-dasharray="2 * ringGrowth + ' ' + ringGrowth"
-            :stroke-width="0.2 * ringGrowth"
+            :r="sprite.selectorSize"
+            stroke-dasharray="2 1"
+            stroke-width="0.2"
             :stroke="selectionStroke"
             fill="#ffffff00"
           />
@@ -94,9 +94,6 @@ const FOLD_MARGIN_PX = 3
 // is what labels always had: 0.1em of the 16px default.
 const LABEL_PX = { min: 12, max: 20, world: 1.6 }
 const MARKER_RADIUS_PX = 8
-// The dashed ring around what's hovered, selected or pointed at in the side panel is never smaller than
-// this (radius, pixels).
-const MIN_RING_RADIUS_PX = 10
 
 export default {
   name: 'SpriteTransform',
@@ -148,8 +145,7 @@ export default {
       'isOnScreen',
       'showScope',
       'labelPlacements',
-      'neighborView',
-      'highlighted'
+      'neighborView'
     ]),
     ...mapState(useConfigStore, ['graphicsQuality']),
     /** The sprite's group scale (world units per sprite unit): its true size, or bigger when zoomed out (MIN_RADIUS_PX). */
@@ -169,19 +165,15 @@ export default {
     trueRadiusPx() {
       return (ART[this.type] ?? this.sprite.selectorSize) * this.trueScale * this.drawnPixelsPerUnit
     },
-    /** Pointed at in the side panel (components/outliner.vue). */
-    isHighlighted() {
-      return this.highlighted === this.objectIndex
-    },
     isMyShip() {
       return this.type === 'ship' && this.sprite.object.isMine
     },
     /**
      * Hidden inside its planet: a moon, station or ship whose orbit is inside the planet as drawn.
-     * (Never the selection, my ship, or what the side panel points at.)
+     * (Never the selection or my ship.)
      */
     folded() {
-      if (this.frameOf !== 'parent' || this.isSelected || this.isMyShip || this.isHighlighted) return false
+      if (this.frameOf !== 'parent' || this.isSelected || this.isMyShip) return false
       const planet = this.sprites[this.sprite.orbiting]
       if (!planet) return false
       const pixels = this.drawnPixelsPerUnit
@@ -193,7 +185,6 @@ export default {
       // The neighbor view covers the system: its names would show through.
       if (this.neighborView) return false
       if ((this.isSelected && !this.showScope) || this.showLabels || (this.hover && !this.isSelected)) return true
-      if (this.isHighlighted) return true
       // Zoomed out: the planets', the star's and my ship's names show by themselves.
       return this.trueRadiusPx < (NAMED_BELOW_PX[this.type] ?? 0) || (this.isMyShip && this.isTiny)
     },
@@ -202,7 +193,7 @@ export default {
     },
     /** Whose name wins when names would overlap (libs/label-layout.js). */
     labelPriority() {
-      if (this.isSelected || this.hover || this.isHighlighted) return 100
+      if (this.isSelected || this.hover) return 100
       if (this.type === 'star') return 90
       if (this.isMyShip) return 80
       if (this.type === 'planet') return 50 + Number(this.sprite.object.size) / 10
@@ -222,10 +213,6 @@ export default {
       // Drawn scale, not live: between redraws the layer's CSS transform handles the zoom.
       return 2 * this.visualRadius * this.drawnPixelsPerUnit < TINY_DIAMETER
     },
-    /** How much the hover / selection ring grows past its usual size, to stay MIN_RING_RADIUS_PX across. */
-    ringGrowth() {
-      return Math.max(1, MIN_RING_RADIUS_PX / (this.sprite.selectorSize * this.spriteScale * this.drawnPixelsPerUnit))
-    },
     /** How far from its center the sprite takes a click, in sprite units. */
     hitRadius() {
       if (!DETAILED_WHEN_TINY.includes(this.type)) return this.sprite.selectorSize
@@ -243,8 +230,7 @@ export default {
       return false
     },
     selectionStroke: function () {
-      const pointedAt = this.hover || this.isHighlighted
-      if ((!this.isSelected && pointedAt) || (this.isSelected && !this.showScope)) {
+      if ((!this.isSelected && this.hover) || (this.isSelected && !this.showScope)) {
         return '#ffffffff'
       }
       return 'none'

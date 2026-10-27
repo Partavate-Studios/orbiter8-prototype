@@ -84,11 +84,7 @@ export const useUIStore = defineStore('UI', {
     zoomAnchor: null,
     // Where each shown name goes so names don't overlap: sprite key → 'below' | 'above' | 'hidden'
     // (libs/label-layout.js; laid out by the map a few times a second).
-    labelPlacements: {},
-    // The side panel listing this system (components/outliner.vue): null, 'planets' or 'ships'.
-    outliner: null,
-    // A sprite key the outliner's pointer is over: the map rings that sprite.
-    highlighted: null
+    labelPlacements: {}
   }),
   getters: {
     /** Screen pixels per map-group unit, before the camera's zoom. */
@@ -456,28 +452,12 @@ export const useUIStore = defineStore('UI', {
       this.viewport.scaleTween.useGeometric()
       this.neighborViewPending = true
     },
-    /**
-     * Backs out one level (Esc, the gamepad's B): the neighbor view, then an open menu, then the side
-     * panel, then the selection.
-     */
+    /** Backs out one level (Esc, the gamepad's B): the neighbor view, then an open menu, then the selection. */
     back() {
       const menus = this.hud.menuState
       if (this.neighborView) return this.exitNeighborView()
       if (this.isMenuOn || menus.chatMenu || menus.leaderboardMenu) return this.closeMenu()
-      if (this.outliner) return this.closeOutliner()
       if (this.selectedSprite != null) return this.selectNone()
-    },
-    /** Opens the side panel at a tab ('planets' or 'ships'); asking for the open tab again closes it. */
-    openOutliner(tab) {
-      this.outliner = this.outliner === tab ? null : tab
-      this.highlighted = null
-    },
-    closeOutliner() {
-      this.outliner = null
-      this.highlighted = null
-    },
-    highlight(key) {
-      this.highlighted = key
     },
     /** Selects the next (`step` 1) or previous (-1) of `planets` (keys), from the selected one or from an end. */
     stepPlanet({ planets, step }) {
@@ -503,10 +483,11 @@ export const useUIStore = defineStore('UI', {
       this.hud.menuState.chatMenu = false
       this.hud.menuState.leaderboardMenu = false
       switch (menu) {
-        // The planets and ships lists live in the side panel now, beside the map.
         case 'planets':
+          this.hud.menuState.planetsMenu = true
+          break
         case 'ships':
-          this.openOutliner(menu)
+          this.hud.menuState.shipsMenu = true
           break
         case 'settings':
           this.hud.menuState.settingsMenu = true
