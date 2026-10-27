@@ -46,7 +46,6 @@ export const useUIStore = defineStore('UI', {
       }
     },
     hud: {
-      spriteToDisplay: null,
       jumpAnimationState: false,
 
       menuState: {
@@ -121,7 +120,6 @@ export const useUIStore = defineStore('UI', {
     /** A long camera zoom is under way (arriving in a system, flying to a selection), not a wheel step. */
     cameraFlying: (state) => (state.viewport.scaleTween?.duration ?? 0) >= CAMERA_FLIGHT_MS,
     minervaHistory: (state) => state.minerva.terminal.history,
-    spriteToDisplay: (state) => state.hud.spriteToDisplay,
     jumpAnimationState: (state) => state.hud.jumpAnimationState,
     selected: (state) => state.selectedSprite,
     menuState: (state) => state.hud.menuState,
@@ -539,9 +537,6 @@ export const useUIStore = defineStore('UI', {
     },
     // unevaluated
 
-    setSpriteToDisplay(payload) {
-      this.hud.spriteToDisplay = payload
-    },
     /** Ends the jump animation, but never before it has played for CAMERA.MIN_JUMP_ANIMATION_MS. */
     jumpAnimationOff() {
       // A stalled jump stays on screen until the player has read why (jumpRecover).

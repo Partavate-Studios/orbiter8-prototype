@@ -1184,6 +1184,13 @@ Koda: "please make pretty input boxes for those things", then "look at the two c
 3. [x] **The star chart's grid removed** (Koda: it made sense when systems were empty and a drag needed something to show movement; now it's clutter). The spokes through the star, the ticks on the axes and the square grid are gone from `guides-canvas.vue`; the background stars still show a drag. **Not a performance problem:** the grid was drawn only when that canvas redraws (zooming, selecting), never while panning.
 4. [x] **The title's departing ship builds up speed the whole time it spins** (Koda: "the idea is that spinning around the sun helps build up the speed to get to another star"). It used to reach full speed in 5 s and hold it. Now its speed rises with the square of the time, from orbit speed to 280°/s as it leaves: about 20 units/s at the start, 90 at 5 s, 220 at 8 s, 370 at the slingshot. The spin lasts 8 to 11.7 s so the exit still lines up; the slingshot's own speed-up is 1.9× (was 3×), so its top speed is what it was.
 
+### Stashed: the compass (2026-10-27)
+
+The compass showed in the middle of the screen when nothing was selected. It pointed to each planet and your ship, and hovering a marker named it.
+- **Koda:** "I love the compass... it's unique, informative, and sci-fi... the way it updates as you move around is extremely satisfying... but... it gets in the way... it's there when you don't want it... and I rarely use it." Stash it, and maybe bring something like it back **near the minimap** later.
+- **Removed in the commit after `40a5130`.** To restore the components: `git checkout 40a5130 -- orbiter-client/src/components/star-map/hud/scope`. Then mount `<scope />` in `hud.svg.vue` where nothing is selected, and bring back the ui store's `spriteToDisplay` (`hud.spriteToDisplay`, its getter and `setSpriteToDisplay`), which the markers' hover used.
+- **What made it work:** each marker is rotated to the bearing from the camera to the object, and fades with distance (`markerOpacity`). Near the minimap, it could become a ring of edge markers round the minimap, or round the screen's edge.
+
 ## Sizes and speeds: history
 
 **2026-10-27: Enterprise Circuit's proportions and speeds adopted** (Koda: "let's go with the overall EC settings for size and speed").

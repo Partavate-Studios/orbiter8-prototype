@@ -162,14 +162,10 @@
       </g>
     </g>
 
-    <g v-if="showScope" transform="translate(0 -100)">
-      <!-- selected sprite menu -->
-      <g v-if="selected != null">
-        <card-ui :object-id="selected" />
-      </g>
-      <g v-else>
-        <scope />
-      </g>
+    <!-- The selection's cards. (The compass that showed here with nothing selected is stashed: see
+         UPGRADE_NOTES.md, "Stashed: the compass".) -->
+    <g v-if="showScope && selected != null" transform="translate(0 -100)">
+      <card-ui :object-id="selected" />
     </g>
 
     <g>
@@ -208,7 +204,6 @@ import { mapActions, mapState } from 'pinia'
 import CurrentSystem from './current-system/system.svg'
 
 import ScopeToggle from './toggles/scope-toggle.svg'
-import Scope from './scope/scope.svg'
 import ZoomSlider from './zoom-slider.svg'
 import CardUi from './card-ui/card-ui.svg'
 // import SpriteInfo from './scope/sprite-info-box.svg'
@@ -256,7 +251,6 @@ export default {
     ShipsMenu,
     SpeakerIcon,
     BroadcastIcon,
-    Scope,
     ScopeToggle,
     TradeMenu,
     ShipyardMenu,
