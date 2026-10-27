@@ -144,7 +144,8 @@ export default {
       'drawnPixelsPerUnit',
       'isOnScreen',
       'showScope',
-      'labelPlacements'
+      'labelPlacements',
+      'neighborView'
     ]),
     ...mapState(useConfigStore, ['graphicsQuality']),
     /** The sprite's group scale (world units per sprite unit): its true size, or bigger when zoomed out (MIN_RADIUS_PX). */
@@ -181,6 +182,8 @@ export default {
       return this.sprite.object.orbit.radius * pixels < drawnRadius + FOLD_MARGIN_PX
     },
     showLabel() {
+      // The neighbor view covers the system: its names would show through.
+      if (this.neighborView) return false
       if ((this.isSelected && !this.showScope) || this.showLabels || (this.hover && !this.isSelected)) return true
       // Zoomed out: the planets', the star's and my ship's names show by themselves.
       return this.trueRadiusPx < (NAMED_BELOW_PX[this.type] ?? 0) || (this.isMyShip && this.isTiny)

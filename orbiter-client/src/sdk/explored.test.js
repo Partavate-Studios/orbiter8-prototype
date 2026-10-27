@@ -35,4 +35,14 @@ describe('explored map', () => {
     map.record(1, [2])
     expect(map.neighborsOf(1)).toEqual([2])
   })
+
+  it('knows where the player came from, even after reloading in the same system', () => {
+    const map = createExploredMap({ chainId: 1, game: '0x1' }, memoryStorage())
+    expect(map.previousVisit()).toBe(null)
+    map.record(1, [2])
+    map.record(2, [1, 3])
+    expect(map.previousVisit()).toBe(1)
+    map.record(2, [1, 3]) // a reload records the same system again
+    expect(map.previousVisit()).toBe(1)
+  })
 })

@@ -55,7 +55,7 @@
         :stroke-width="star.id === hoveredId ? 1.6 : 1"
         stroke-dasharray="2 6"
         stroke-linecap="round"
-        :opacity="(star.id === hoveredId ? 0.9 : 0.25) * phase.outer"
+        :opacity="(star.id === hoveredId ? 0.9 : star.cameFrom ? 0.55 : 0.25) * phase.outer"
       />
       <path
         v-if="chosen"
@@ -145,7 +145,7 @@
             >{{ star.visited ? star.name : 'Unexplored' }}</text
           >
           <text x="0" y="46" text-anchor="middle" fill="#ffffff55" font-size="0.6em" :opacity="phase.neighbors">
-            #{{ star.id }}
+            #{{ star.id }} · {{ star.status }}
           </text>
         </a>
       </g>
@@ -293,14 +293,21 @@ export default {
       const distance = this.ringRadius * lerp(FLY_IN_FROM, 1, this.phase.neighbors)
       return this.neighborList.map((neighbor) => {
         const { x, y } = pointAt(this.angles.get(String(neighbor.id)), distance)
-        return {
-          id: Number(neighbor.id),
-          name: neighbor.name,
-          visited: neighbor.name !== UNEXPLORED,
-          x: x * this.stretchX,
-          y: y + this.ringY
-        }
+        const id = Number(neighbor.id)
+        const visited = neighbor.name !== UNEXPLORED
+        const cameFrom = id === this.cameFromId
+        // What the player knows of it: only its name is on chain, and whether they've been there is
+        // remembered on this device (sdk/explored.js).
+        let status = 'be the first to arrive'
+        if (cameFrom) status = 'where you came from'
+        else if (this.explored?.neighborsOf(id)) status = "you've been here"
+        else if (visited) status = 'already charted'
+        return { id, name: neighbor.name, visited, cameFrom, status, x: x * this.stretchX, y: y + this.ringY }
       })
+    },
+    /** The star the player jumped here from, if it's one of the neighbors. */
+    cameFromId() {
+      return this.explored?.previousVisit() ?? null
     },
     outerDots() {
       const scale = this.ringRadius * lerp(1.6, 1, this.phase.outer)

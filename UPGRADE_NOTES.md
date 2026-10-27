@@ -1111,7 +1111,16 @@ Order (from the walkthrough's list). Tick each when it lands:
      - The labels button still shows every name.
    - **Names never overlap.** Every sprite showing a name offers it to `libs/label-layout.js`. Several times a second the map places them, most important first: the selection or hover, then the star, my ship, then planets by size. Each goes below its sprite if there's room, else above, else it waits until there's room. Tested in `label-layout.test.js`.
    - **Before and after** at whole-system zoom: a few dozen unlabeled dots with no rings, against nine labeled planets on visible rings.
-5. [ ] **The neighbor view helps choose a jump.** Each star shows what's known about it (its name, planets, ports and pilots) and marks the star I came from.
+5. [x] **The neighbor view helps choose a jump.** Under each star's name, a status:
+   - "where you came from", with its route drawn a little brighter;
+   - "you've been here";
+   - "already charted" (named by someone);
+   - "be the first to arrive".
+
+   - **Less than planned:** the contracts only describe the system you're in. A neighbor is just an id and a name, so its planets, ports and pilots can't be shown. That needs a contract read like `getSystemSummary(id)` (added to the wish list below).
+   - **Where the history lives:** your visits are remembered on this device (`sdk/explored.js`). The visit before the latest one is where you came from, even after a reload.
+   - **Fix:** the world's new automatic names (step 4) showed faintly through the neighbor view; they're hidden there now.
+   - **Checked:** a real jump from Sol to #2 on the local chain; the neighbor view there marked Sol as where you came from. Tested in `explored.test.js`.
 6. [ ] **A side panel** (the outliner) for the system's planets, moons and stations and the ships here. Hover a row and the object lights up on the map; click it and the camera flies there. On phones it becomes a bottom sheet. The leaderboard and chat can move into it later.
 7. [ ] **One inspector instead of two cards.**
    - Wide screens: the selected object's card docks at the side, with its information and actions in one panel.
@@ -1160,6 +1169,7 @@ Order (from the walkthrough's list). Tick each when it lands:
 
 ## Contract wish list (next contracts iteration)
 
+- **A neighbor summary:** a read like `getSystemSummary(systemId)` returning a system's name, planet count, port count and the number of ships there. The neighbor view could then show what each jump leads to (UI review step 5).
 - Events for every game action (claim, build station, jump, rename, trade…), so the client can update from events instead of reloading.
 - Access control on the admin setters (see Bugs, "Found, not fixed").
 - A public `getSystemData(id)` (or `getSystemNeighbors(id)`), for the neighbor-star view's outer ring and a "systems discovered" leaderboard column.

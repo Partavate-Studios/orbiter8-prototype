@@ -45,6 +45,11 @@ export function createExploredMap(where, storage = defaultStorage()) {
     /** A system's neighbors, if the player has been there; otherwise null. */
     neighborsOf(systemId) {
       return systems.get(Number(systemId)) ?? null
+    },
+    /** The system visited before the most recent one (where the player came from), or null. */
+    previousVisit() {
+      const visits = [...systems.keys()]
+      return visits.length > 1 ? visits[visits.length - 2] : null
     }
   }
 }
