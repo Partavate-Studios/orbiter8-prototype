@@ -57,8 +57,8 @@
       </svg>
     </div>
 
-    <!-- The space port: ships of the Orbiter 8 class docked nose-in, shuttles running between them and
-         the station. -->
+    <!-- The space port: ships of the Orbiter 8 class docked side-on (as in the trade menu's art),
+         shuttles running between them and the station. -->
     <div class="anchor port">
       <div class="part spin">
         <svg class="part" viewBox="-130 -130 260 260">
@@ -103,9 +103,9 @@ const DOCKS = [
   { angle: 270, type: 'moonbeam', scale: 3.6 }
 ]
 // Shuttles run along each dock's line, a little to either side, between the hull (STATION_EDGE) and
-// the docked ship's nose (SHIP_NOSE), in scene units from the station's center.
+// the docked ship's side (SHIP_SIDE), in scene units from the station's center.
 const STATION_EDGE = 40
-const SHIP_NOSE = 66
+const SHIP_SIDE = 66
 const STARS = 260
 
 export default {
@@ -122,8 +122,8 @@ export default {
     docks() {
       return DOCKS.map((dock) => ({
         ...dock,
-        // Nose up in the art; turned to point at the station.
-        transform: `rotate(${dock.angle}) translate(${DOCK_DISTANCE} 0) rotate(-90) scale(${dock.scale})`
+        // Nose up in the art, so side-on to the station as it is.
+        transform: `rotate(${dock.angle}) translate(${DOCK_DISTANCE} 0) scale(${dock.scale})`
       }))
     },
     lanes() {
@@ -138,8 +138,8 @@ export default {
           return {
             key: j,
             style: {
-              '--from': outbound ? STATION_EDGE : SHIP_NOSE,
-              '--to': outbound ? SHIP_NOSE : STATION_EDGE,
+              '--from': outbound ? STATION_EDGE : SHIP_SIDE,
+              '--to': outbound ? SHIP_SIDE : STATION_EDGE,
               '--dir': outbound ? 1 : -1,
               '--offset': offset,
               // Negative delays start the scene mid-traffic.

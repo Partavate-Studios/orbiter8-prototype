@@ -1184,6 +1184,10 @@ Koda: "please make pretty input boxes for those things", then "look at the two c
 3. [x] **The star chart's grid removed** (Koda: it made sense when systems were empty and a drag needed something to show movement; now it's clutter). The spokes through the star, the ticks on the axes and the square grid are gone from `guides-canvas.vue`; the background stars still show a drag. **Not a performance problem:** the grid was drawn only when that canvas redraws (zooming, selecting), never while panning.
 4. [x] **The title's departing ship builds up speed the whole time it spins** (Koda: "the idea is that spinning around the sun helps build up the speed to get to another star"). It used to reach full speed in 5 s and hold it. Now its speed rises with the square of the time, from orbit speed to 280°/s as it leaves: about 20 units/s at the start, 90 at 5 s, 220 at 8 s, 370 at the slingshot. The spin lasts 8 to 11.7 s so the exit still lines up; the slingshot's own speed-up is 1.9× (was 3×), so its top speed is what it was.
 
+### The card's switch stays as it always was (Koda, 2026-10-27)
+
+The card's X and the circle at the bottom flip one switch, which hides the card for every selection until it's flipped back. This was the same on `demo3` and in the 2023 build. Koda chose to keep it. Two changes: with nothing selected, the circle is hidden and the switch does nothing (the compass it also showed is stashed).
+
 ### Ships at a planet spread out (2026-10-27)
 
 Koda: Orbiter 8s "shouldn't orbit touching one another... they should be spread out... maybe not perfectly, because that will look contrived".
@@ -1195,7 +1199,7 @@ Koda: Orbiter 8s "shouldn't orbit touching one another... they should be spread 
 
 - **The idea:** a ship that traded at a port is drawn docked at its station. Only the **last 3** to trade there are docked; the others orbit the planet.
 - **The data is there:** the contract emits `PortTrade(sender, planetId, …)` on every trade, and `sdk/load.js` already loads recent ones (`events.tradeEvents`, back `EVENT_LOOKBACK_BLOCKS`). A ship whose last trade is older than that would orbit instead.
-- **To decide first:** which way ships dock. The title screen's docked ships are nose-first, while the trade menu's art shows the ship docked side-on. Pick one and make the other match.
+- **Decided (Koda): side-on,** as in the trade menu's art. The title screen's docked ships were nose-first; they're side-on now, with the shuttles running to their sides.
 - **Work:** docking points on the station art; a docked ship turns with the station; it undocks into the orbit (gliding, as above) when it's pushed out by a fourth trader or leaves.
 
 ### Stashed: the compass (2026-10-27)
