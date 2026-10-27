@@ -14,7 +14,7 @@
         <info :object-id="objectId" />
 
         <g transform="translate(45 120) scale(0.4)">
-          <a v-if="viewRatio <= 1" cursor="pointer" @click.prevent="selectMainMenu()">
+          <a v-if="viewRatio <= 1" cursor="pointer" data-card-menu @click.prevent="selectMainMenu()">
             <hamburger-icon :selected="menuShouldDisplay" />
           </a>
         </g>

@@ -2,6 +2,7 @@
   <div class="playorbiter8">
     <star-map />
     <layer-html />
+    <inspector />
     <outliner />
     <transaction-tray />
   </div>
@@ -19,6 +20,7 @@ import starMap from '@/components/star-map/map'
 import layerHtml from '@/components/layer-html/container-html'
 import TransactionTray from '@/components/transaction-tray.vue'
 import Outliner from '@/components/outliner.vue'
+import Inspector from '@/components/inspector.vue'
 import router from '@/router/router'
 import { onFrame } from '@/libs/frame-loop'
 
@@ -39,7 +41,8 @@ export default {
     starMap,
     layerHtml,
     TransactionTray,
-    Outliner
+    Outliner,
+    Inspector
   },
   computed: {
     ...mapState(useGameStateStore, ['haveAvatar', 'haveShip']),
