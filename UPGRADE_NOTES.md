@@ -1208,7 +1208,7 @@ Koda: Orbiter 8s "shouldn't orbit touching one another... they should be spread 
   - Four ships sit flush against four of the station's six docking pads (the raised middle of each side), side-on, noses the way the station turns.
   - The station turns once in 240 s (was 150), slower than the ships round the sun.
   - **A visitor:** every 80 s, an Orbiter 8 flies in from off screen, slows to a stop alongside a free pad, stays 24 s turning with the station, then pulls away and curves off. It uses whichever free pad faces right, so it never crosses the title. Tested: it never jumps, and it appears and goes off screen.
-  - The shuttles that ran between the hull and the ships are gone; with the ships against the pads there was no room for them.
+  - **The shuttles are back** (Koda liked them). Each ship sits a short way off its pad on a docking tube, two thin lines like the trade menu's art. The shuttles run behind the station and the ships, so they're seen only in the tubes, coming out from under one and going in under the other. The visitor gets a tube while it's docked.
 - **Work:** docking points on the station art; a docked ship turns with the station; it undocks into the orbit (gliding, as above) when it's pushed out by a fourth trader or leaves.
 
 ### Stashed: the compass (2026-10-27)

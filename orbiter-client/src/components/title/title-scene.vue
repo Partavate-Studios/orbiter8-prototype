@@ -58,11 +58,26 @@
     </div>
 
     <!-- The space port: ships of the Orbiter 8 class docked side-on at the station's pads (as in the
-         trade menu's art), and now and then a visitor that flies in, docks and leaves
-         (libs/title-visitor.js). -->
+         trade menu's art), shuttles running between them and the station, and now and then a visitor
+         that flies in, docks and leaves (libs/title-visitor.js). -->
     <div ref="port" class="anchor port">
       <div ref="spin" class="part spin">
+        <!-- Behind the station and ships: the shuttles show only crossing the docking tubes. -->
+        <div v-for="lane in lanes" :key="lane.key" class="lane" :style="{ transform: 'rotate(' + lane.angle + 'deg)' }">
+          <span v-for="shuttle in lane.shuttles" :key="shuttle.key" class="shuttle" :style="shuttle.style"></span>
+        </div>
         <svg class="part" viewBox="-130 -130 260 260">
+          <g
+            v-for="dock in docks"
+            :key="'tube-' + dock.pad"
+            :transform="'rotate(' + dock.pad + ')'"
+            stroke="#e6dcf5"
+            stroke-width="0.8"
+            stroke-opacity="0.75"
+          >
+            <line :x1="TUBE.from" y1="-4" :x2="TUBE.to" y2="-4" />
+            <line :x1="TUBE.from" y1="4" :x2="TUBE.to" y2="4" />
+          </g>
           <g v-for="dock in docks" :key="dock.pad" :transform="dock.transform">
             <fleet-ship :type="dock.type" />
           </g>
@@ -73,6 +88,11 @@
       </div>
       <!-- The visitor doesn't turn with the station: fly() places it every frame. -->
       <svg class="part" viewBox="-130 -130 260 260">
+        <!-- Its tube to the pad, while it's docked. -->
+        <g ref="visitorTube" class="visitor-tube" stroke="#e6dcf5" stroke-width="0.8" stroke-opacity="0.75">
+          <line :x1="TUBE.from" y1="-4" :x2="TUBE.to" y2="-4" />
+          <line :x1="TUBE.from" y1="4" :x2="TUBE.to" y2="4" />
+        </g>
         <g ref="visitor" opacity="0">
           <fleet-ship type="orbiter8" engines flame="engineTrailGradient" />
         </g>
@@ -93,19 +113,24 @@ import FleetShip from '@/components/assets/fleet-ship.svg'
 import { paintBackdrop, BACKDROP_SIZE } from '@/components/star-map/assets/backdrop-art'
 import { onFrame } from '@/libs/frame-loop'
 import { flightPose, planFlight, SLOTS } from '@/libs/title-flight'
-import { DOCKED, dockTransform, visitorPose, VISITOR_SCALE } from '@/libs/title-visitor'
+import { DOCKED, TUBE, dockRadius, dockTransform, visitorPose, VISITOR_SCALE } from '@/libs/title-visitor'
 
 // The station's outline (the same art as the game's station sprite), about 580 units across.
 const STATION_PATH =
   'M291 0l61 35 15 -25 139 80 -15 25 61 36 0 71 28 0 0 160 -28 0 0 70 -63 36 14 24 -139 80 -14 -24 -59 34 -63 -37 -15 26 -139 -80 15 -26 -59 -33 0 -73 -30 0 0 -160 30 0 0 -68 62 -36 -15 -26 139 -81 15 27 60 -35zm83 196c47,36 64,100 42,155l-98 -57 56 -98zm22 188c-36,47 -99,63 -154,42l56 -99 98 57zm-188 22c-46,-36 -63,-100 -41,-154l98 56 -57 98zm-22 -188c37,-46 100,-63 155,-41l-57 98 -98 -57z'
 
 const STARS = 260
+// Shuttles run along each docked ship's tube, one each way, from inside the station to the middle of the
+// ship: drawn behind both, they show only in the tube. In scene units from the
+// station's center; the port's viewBox is 260 of its units across 280 scene units.
+const PORT_UNIT = 280 / 260
+const SHUTTLE_FROM = 28
 
 export default {
   name: 'TitleScene',
   components: { FleetShip },
   data() {
-    return { stationPath: STATION_PATH, runnerSlot: null }
+    return { stationPath: STATION_PATH, TUBE, runnerSlot: null }
   },
   computed: {
     /** The two ships that stay in orbit; the runner is drawn on its own. */
@@ -114,6 +139,33 @@ export default {
     },
     docks() {
       return DOCKED.map((ship) => ({ ...ship, transform: dockTransform(ship.pad, ship.scale) }))
+    },
+    lanes() {
+      return DOCKED.map((ship, index) => {
+        const shipMiddle = dockRadius(ship.scale) * PORT_UNIT
+        return {
+          key: ship.pad,
+          angle: ship.pad,
+          shuttles: [
+            { outbound: true, offset: -1.8 },
+            { outbound: false, offset: 1.8 }
+          ].map(({ outbound, offset }, j) => {
+            const duration = 5.2 + ((index + j) % 3) * 1.1
+            return {
+              key: j,
+              style: {
+                '--from': outbound ? SHUTTLE_FROM : shipMiddle,
+                '--to': outbound ? shipMiddle : SHUTTLE_FROM,
+                '--dir': outbound ? 1 : -1,
+                '--offset': offset,
+                // Negative delays start the scene mid-traffic.
+                animationDuration: duration + 's',
+                animationDelay: -(index * 1.7 + j * 2.9) + 's'
+              }
+            }
+          })
+        }
+      })
     }
   },
   mounted() {
@@ -180,6 +232,10 @@ export default {
       const pose = spin ? visitorPose(spin.currentTime / 1000, this.portReach) : { opacity: 0 }
       const visitor = this.$refs.visitor
       visitor.setAttribute('opacity', pose.opacity)
+      // Docked, its rotation is the pad's angle plus 180 (libs/title-visitor.js dockTransform).
+      const tube = this.$refs.visitorTube
+      tube.classList.toggle('shown', Boolean(pose.docked))
+      if (pose.docked) tube.setAttribute('transform', `rotate(${pose.rotation - 180})`)
       if (!pose.opacity) return
       visitor.setAttribute(
         'transform',
@@ -306,9 +362,50 @@ export default {
   animation: turn 240s linear infinite;
 }
 
+.visitor-tube {
+  opacity: 0;
+  transition: opacity 0.6s;
+}
+.visitor-tube.shown {
+  opacity: 1;
+}
+.lane {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+}
+.shuttle {
+  position: absolute;
+  left: calc(var(--u) * -8);
+  top: calc(var(--u) * (var(--offset) - 1.1));
+  width: calc(var(--u) * 9);
+  height: calc(var(--u) * 2.2);
+  border-radius: calc(var(--u) * 1.1);
+  /* a bright head with a fading trail behind it */
+  background:
+    radial-gradient(circle at calc(100% - var(--u) * 1.1) 50%, #ffffff calc(var(--u) * 1), #0000 calc(var(--u) * 1.2)),
+    linear-gradient(90deg, #e6dcf500, #e6dcf599 80%, #e6dcf5);
+  transform: translateX(calc(var(--u) * var(--from))) scaleX(var(--dir));
+  animation: shuttle 6s ease-in-out infinite;
+}
+
 @keyframes turn {
   to {
     transform: rotate(360deg);
+  }
+}
+/* Out from under the station or the ship, along the tube, and in under the other; it waits there a while. */
+@keyframes shuttle {
+  0% {
+    opacity: 1;
+    transform: translateX(calc(var(--u) * var(--from))) scaleX(var(--dir));
+  }
+  55%,
+  100% {
+    opacity: 1;
+    transform: translateX(calc(var(--u) * var(--to))) scaleX(var(--dir));
   }
 }
 @keyframes shimmer {

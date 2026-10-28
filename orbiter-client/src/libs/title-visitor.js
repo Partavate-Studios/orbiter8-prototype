@@ -13,7 +13,8 @@ export const PADS = [0, 60, 120, 180, 240, 300]
 const PAD_FACE = 36.3
 /** A ship's width, nose up, at scale 1 (fleet-ship.svg.vue): it docks with its side to the pad. */
 const SHIP_WIDTH = 9.2
-const GAP = 0.6
+// The docking tube's length, between the pad and the ship's side (the trade menu's art has one too).
+const GAP = 10
 
 /** The ships that stay docked, and the pads the visitor can use. */
 export const DOCKED = [
@@ -39,6 +40,9 @@ const plus = (a, b) => ({ x: a.x + b.x, y: a.y + b.y })
 const times = (a, k) => ({ x: a.x * k, y: a.y * k })
 /** The CSS rotation that points the ship art (nose up) along a direction. */
 const heading = (direction) => (Math.atan2(direction.y, direction.x) * 180) / Math.PI + 90
+
+/** A docking tube's ends, from the station's center: just inside the pad's face and the ship's side. */
+export const TUBE = { from: PAD_FACE - 1, to: PAD_FACE + GAP + 1 }
 
 /** How far from the station's center a ship docked at a pad sits. */
 export function dockRadius(scale) {
