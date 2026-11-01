@@ -1,5 +1,5 @@
 import { markRaw } from 'vue'
-import { orbitAt } from '@/sdk/game/orbits'
+import { orbitAt, shipOrbitRadius, SHIP_ORBIT_SPEED } from '@/sdk/game/orbits'
 import { SPRITE_TYPES, SHIP_SIZE, STATION_START_ROTATION, ART, spriteScaleOf } from '@/libs/sprite-types'
 
 /** How fast a ship slides round its orbit to a new place among the ships sharing it. */
@@ -60,6 +60,8 @@ export default class Sprite {
     this.docking = this.dock ? 1 : 0
     // Flying from the planet it was at to a new one (ships; see carryOver and fly).
     this.transit = null
+    // My ship, in my own view only: the planet it has flown to because I selected it (see visitPlanet).
+    this.visit = null
     // Telemetry changes every frame; the frame loop updates it and components read it per frame.
     return markRaw(this)
   }
@@ -159,6 +161,31 @@ export default class Sprite {
       // Reloaded mid-flight (the game reloads again right after a move): the flight carries on.
       this.transit = previous.transit
     }
+    this.visit = previous.visit
+  }
+
+  /**
+   * My ship sets off for another planet in my own view (null: back to where it really is), from where
+   * it's shown now. Nothing is sent to the chain; the real ship stays where it is.
+   * @param {string | null} planetKey
+   * @param {{ x: number, y: number, rotation: number }} shown  where it was drawn last frame
+   */
+  visitPlanet(planetKey, shown) {
+    this.visit = planetKey
+    this.transit = { from: { x: shown.x, y: shown.y }, facing: shown.rotation, start: null }
+  }
+
+  /**
+   * While visiting: puts the ship in orbit round the visited planet, where it would be if it were
+   * really there (fly then eases it there). Its telemetry stays relative to the planet it's really at.
+   */
+  placeAtVisit(planet, home, gameTime) {
+    const orbit = orbitAt(shipOrbitRadius(planet.object.size), SHIP_ORBIT_SPEED, gameTime, this.phase)
+    this.position.x = planet.position.x + orbit.x
+    this.position.y = planet.position.y + orbit.y
+    this.telemetry.translatex = this.position.x - home.position.x
+    this.telemetry.translatey = this.position.y - home.position.y
+    this.telemetry.rotation = orbit.angle
   }
 
   /**

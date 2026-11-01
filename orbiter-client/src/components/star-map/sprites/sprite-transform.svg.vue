@@ -312,7 +312,8 @@ export default {
       writeAttribute(placed, 'transform', this.placement(x, y))
       const rotation = Math.round(this.sprite.telemetry.rotation / ROTATION_STEP) * ROTATION_STEP
       writeAttribute(this.$refs.turned, 'transform', 'scale(' + this.spriteScale + ') rotate(' + rotation + ')')
-      if (this.$refs.tube) writeAttribute(this.$refs.tube, 'opacity', this.sprite.docking === 1 ? 1 : 0)
+      const atPad = this.sprite.docking === 1 && !this.sprite.transit && !this.sprite.visit
+      if (this.$refs.tube) writeAttribute(this.$refs.tube, 'opacity', atPad ? 1 : 0)
     },
     /** The translate that puts the sprite at (x, y), snapped to the device-pixel grid of the drawn world. */
     placement(x, y) {

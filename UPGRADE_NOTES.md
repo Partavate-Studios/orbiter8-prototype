@@ -1242,7 +1242,10 @@ The compass showed in the middle of the screen when nothing was selected. It poi
 ### 8. Before the contracts (Koda, 2026-11-01)
 
 Koda: "Do 1, 2, 4, 5... and then get back to 3". Each step is its own commit; tick it here when it lands.
-1. [ ] **Your ship flies to the planet you select,** in your own view only, turning toward a new selection mid-flight, and flying back to where it really is when you deselect.
+1. [x] **Your ship flies to the planet you select,** in your own view only, turning toward a new selection mid-flight, and flying back to where it really is when you deselect.
+   - Selecting a planet, or a moon or station at one, sends it there; selecting your own ship keeps its course; anything else (the star, another ship) or deselecting brings it home. Its own planet: it stays put (docked, if it is).
+   - It uses the planet-to-planet flight (`Sprite.visitPlanet`, `placeAtVisit`; `starmap.followSelection`), starting from where it's drawn, so a new choice mid-flight turns it smoothly. At the planet it orbits as a ship there would. Nothing goes to the chain.
+   - **Checked** on the local chain: Jupiter, then Mars mid-flight, then deselected; it settled at Mars and flew home to its pad, with no jumps.
 2. [ ] **Ships arriving from or leaving for other systems** warp in and out instead of popping.
 3. [ ] **A lost-connection notice** when the network stops answering, and "All systems nominal" when it's back.
 4. [ ] **A Story button on the title:** the Portals demo's storyboard panels 1–3, told with the website's backstory (`docs/backstory.md`).

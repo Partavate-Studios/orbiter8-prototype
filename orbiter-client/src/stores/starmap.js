@@ -15,6 +15,8 @@ export const useStarMapStore = defineStore('StarMap', {
     systemObjects: {},
     // Ships flying to another planet (Sprite.fly), by key: drawn in the world layer until they arrive.
     inTransit: {},
+    // Key of my ship in this system, or null.
+    myShipKey: null,
     // How each of them is drawn (libs/sprite.js), by the same keys.
     sprites: {},
     spriteIds: {
@@ -109,9 +111,10 @@ export const useStarMapStore = defineStore('StarMap', {
       this.systemObjects = markRaw(objects)
       this.sprites = markRaw(sprites)
       // Ships flying to another planet are drawn in the world layer until they arrive (see Sprite.fly).
+      this.myShipKey = Object.values(objects).find((object) => object.type === 'ship' && object.isMine)?.key ?? null
       this.inTransit = Object.fromEntries(
         Object.values(sprites)
-          .filter((sprite) => sprite.transit)
+          .filter((sprite) => sprite.transit || sprite.visit)
           .map((sprite) => [sprite.key, true])
       )
       this.spriteIds = keys
@@ -128,6 +131,9 @@ export const useStarMapStore = defineStore('StarMap', {
     /** Advances every orbit to the current game time. Sprites are raw objects, so this triggers no re-renders by itself. */
     updateAllTelemtry() {
       const sprites = Object.values(this.sprites)
+      // My ship as it was drawn last frame, before its orbit moves on: where a flight to my selection starts.
+      const mine = this.sprites[this.myShipKey]
+      const shown = mine && { x: mine.position.x, y: mine.position.y, rotation: mine.telemetry.rotation }
       for (const sprite of sprites) {
         sprite.updateTelemetry(this.gameTime)
       }
@@ -137,10 +143,34 @@ export const useStarMapStore = defineStore('StarMap', {
         sprite.position.x = sprite.telemetry.translatex + (parent ? parent.telemetry.translatex : 0)
         sprite.position.y = sprite.telemetry.translatey + (parent ? parent.telemetry.translatey : 0)
       }
+      if (mine) this.followSelection(mine, shown)
       for (const key in this.inTransit) {
         const sprite = this.sprites[key]
-        if (!sprite?.transit || sprite.fly(this.gameTime)) delete this.inTransit[key]
+        // A ship visiting a planet in my view stays in the world layer until it's home.
+        if ((!sprite?.transit || sprite.fly(this.gameTime)) && !sprite?.visit) delete this.inTransit[key]
       }
+    },
+    /**
+     * In my own view, my ship flies to the planet I select (or the planet of a moon or station I
+     * select), turns for a new one mid-flight, and flies back to where it really is when I deselect
+     * or choose something elsewhere. Selecting my ship itself keeps its course. Nothing goes to the chain.
+     */
+    followSelection(mine, shown) {
+      const selected = useUIStore().selectedSprite
+      let planet = null
+      if (selected === mine.key) planet = mine.visit
+      else {
+        const object = this.systemObjects[selected]
+        if (object?.type === 'planet') planet = selected
+        else if (object?.type === 'moon' || object?.type === 'station') planet = object.orbiting
+      }
+      // Its own planet: it's already there.
+      if (planet === mine.orbiting) planet = null
+      if (planet !== mine.visit) {
+        mine.visitPlanet(planet, shown)
+        this.inTransit[mine.key] = true
+      }
+      if (mine.visit) mine.placeAtVisit(this.sprites[mine.visit], this.sprites[mine.orbiting], this.gameTime)
     }
   }
 })
