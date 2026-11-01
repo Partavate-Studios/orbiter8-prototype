@@ -1251,7 +1251,9 @@ Koda: "Do 1, 2, 4, 5... and then get back to 3". Each step is its own commit; ti
    - **Arriving:** a streak shoots in along its heading, then a flash where the ship fades in (1 s).
    - Other pilots' ships only (yours has the jump animation), and never on the first load or on arriving in a new system.
    - **Checked** with two pilots on the local chain: one jumped into Sol and later out of it while the other watched; both warps played.
-3. [ ] **A lost-connection notice** when the network stops answering, and "All systems nominal" when it's back.
+3. [x] **A lost-connection notice** when the network stops answering, and "All systems nominal" when it's back.
+   - After 3 failed block checks in a row (about 6 s), the tray at the top shows "Lost contact with the network", in pink, until a check works again; then "Back in contact" for 4 s, and Minerva says "All systems nominal" (the twelfth voice line). `stores/chain.js` `connectionLost`.
+   - **Checked** by cutting the page's network for 9 s (a new harness step, `offline:on` / `offline:off`).
 4. [ ] **A Story button on the title:** the Portals demo's storyboard panels 1–3, told with the website's backstory (`docs/backstory.md`).
 5. [ ] **A real play session,** with two goals: max out the cargo holds, and build a station. Along the way, **notes on cost**: gas per kind of move and moves per goal, for estimating what the game costs to play on different networks.
 
@@ -1284,7 +1286,7 @@ Koda had a folder of Minerva voice lines (Amazon Polly) that the game never used
 | Minerva console online | the Minerva console opens (the backtick key) |
 
 - **A "Minerva's voice" volume** in both settings screens, off to 3, starting at 2. A new line cuts off the one playing, and a line isn't repeated within 30 s.
-- **Waiting for features:** red alert (attacks), black hole, pulsar, wormhole and dimensional portal detected, and "all systems nominal" (the game has no lost-connection state for it to answer). Two filename typos ("intersteller", "wormhold") were fixed for the one copied; the rest stay in Koda's folder.
+- **Waiting for features:** red alert (attacks), black hole, pulsar, wormhole and dimensional portal detected. ("All systems nominal" now answers a lost connection coming back.) Two filename typos ("intersteller", "wormhold") were fixed for the one copied; the rest stay in Koda's folder.
 - **Checked in the game** by logging what played: every line above but incoming transmission, upgrade complete and priority alert, which need another pilot, credits or a failure; those are covered by the logic and a unit test for repeats and the off setting.
 
 ### The HUD's bottom corners (2026-10-31)

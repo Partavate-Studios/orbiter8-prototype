@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { gameAudio } from '@/libs/08audio'
 import { markRaw } from 'vue'
 import {
   discoverWallets,
@@ -21,6 +22,10 @@ function switchFailure(error, networkName) {
   if (kind === 'pending') return 'Your wallet already has a request open: click its icon in the toolbar.'
   return `Your wallet couldn't switch to ${networkName}: ${error.shortMessage ?? error.message}`
 }
+
+// Block checks that failed in a row, and how many mean the connection is lost.
+let blockCheckFailures = 0
+const LOST_AFTER_FAILURES = 3
 
 export const useChainStore = defineStore('Chain', {
   state: () => ({
@@ -48,7 +53,11 @@ export const useChainStore = defineStore('Chain', {
     walletName: null,
     walletError: null,
     /** 'rejected' | 'pending' | 'other' (sdk/chain/wallet.js walletErrorKind) */
-    walletErrorKind: null
+    walletErrorKind: null,
+    /** The network has stopped answering (several block checks in a row failed); see checkForNewBlock. */
+    connectionLost: false,
+    /** When contact came back (Date.now()), for the tray's brief "back in contact". */
+    reconnectedAt: 0
   }),
   getters: {
     networkName: (state) => (state.chainId ? chainName(state.chainId) : ''),
@@ -127,8 +136,16 @@ export const useChainStore = defineStore('Chain', {
     async checkForNewBlock() {
       try {
         await game.checkForNewBlock()
+        blockCheckFailures = 0
+        if (this.connectionLost) {
+          this.connectionLost = false
+          this.reconnectedAt = Date.now()
+          gameAudio().speak('reconnected')
+        }
       } catch (error) {
         console.error('Block check failed:', error.message)
+        // One failure can be a hiccup; a few in a row (about six seconds) means the network is gone.
+        if (++blockCheckFailures >= LOST_AFTER_FAILURES) this.connectionLost = true
       }
     },
     /**

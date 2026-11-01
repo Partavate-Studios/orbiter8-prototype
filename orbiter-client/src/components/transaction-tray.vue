@@ -3,6 +3,18 @@
        what's sent and waiting for the network, and what went through or failed, and why. -->
   <div class="transaction-tray" aria-live="polite">
     <TransitionGroup name="tray">
+      <!-- The network stopped answering (stores/chain.js), and briefly when it's back. -->
+      <div v-if="connectionLost" key="connection" class="transaction failed" role="status">
+        <span class="mark" aria-hidden="true"></span>
+        <span class="words">
+          <span class="headline">Lost contact with the network</span>
+          <span class="detail">Still trying. The map will catch up when it's back.</span>
+        </span>
+      </div>
+      <div v-else-if="justReconnected" key="reconnected" class="transaction done" role="status">
+        <span class="mark" aria-hidden="true"></span>
+        <span class="words"><span class="headline">Back in contact</span></span>
+      </div>
       <div v-for="item in items" :key="item.id" class="transaction" :class="item.status">
         <span class="mark" aria-hidden="true"></span>
         <span class="words">
@@ -26,11 +38,30 @@
 <script>
 import { mapActions, mapState } from 'pinia'
 import { useTransactionsStore } from '@/stores/transactions'
+import { useChainStore } from '@/stores/chain'
+
+// How long "back in contact" shows.
+const RECONNECTED_MS = 4000
 
 export default {
   name: 'TransactionTray',
+  data() {
+    return { justReconnected: false }
+  },
   computed: {
-    ...mapState(useTransactionsStore, ['items'])
+    ...mapState(useTransactionsStore, ['items']),
+    ...mapState(useChainStore, ['connectionLost', 'reconnectedAt'])
+  },
+  watch: {
+    reconnectedAt(at) {
+      if (!at) return
+      this.justReconnected = true
+      clearTimeout(this.reconnectedTimer)
+      this.reconnectedTimer = setTimeout(() => (this.justReconnected = false), RECONNECTED_MS)
+    }
+  },
+  unmounted() {
+    clearTimeout(this.reconnectedTimer)
   },
   methods: {
     ...mapActions(useTransactionsStore, ['dismiss']),

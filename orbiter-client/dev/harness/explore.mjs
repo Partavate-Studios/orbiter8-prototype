@@ -110,6 +110,7 @@ for (const step of steps) {
     await page.type(sel, val)
   } else if (kind === 'wait') await new Promise((r) => setTimeout(r, Number(arg)))
   else if (kind === 'key') await page.keyboard.press(arg)
+  else if (kind === 'offline') await page.setOfflineMode(arg === 'on')
   else if (kind === 'eval') logs.push('[eval] ' + JSON.stringify(await page.evaluate(arg)))
   else if (kind === 'text') logs.push('[text] ' + (await page.evaluate(() => document.body.innerText)).slice(0, 1500))
   else if (kind === 'commit') {

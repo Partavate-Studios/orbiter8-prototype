@@ -7,7 +7,7 @@ export const LEVELS = 3
 /**
  * Minerva's voice lines (public/audio/voice), by what they announce. Loaded on first use.
  * Some lines in the original set wait for features that don't exist yet: red alert (attacks),
- * black holes, pulsars, wormholes and portals, and "all systems nominal" (a lost connection coming back).
+ * black holes, pulsars, wormholes and portals.
  */
 export const VOICE_LINES = {
   greetings: 'greetings-i-am-minerva',
@@ -20,6 +20,7 @@ export const VOICE_LINES = {
   transmission: 'incoming-transmission',
   upgraded: 'upgrade-complete',
   failed: 'priority-alert',
+  reconnected: 'all-systems-nominal',
   console: 'minerva-console-online'
 }
 /** A line isn't repeated sooner than this (ms), so a burst of chat or failures speaks once. */
