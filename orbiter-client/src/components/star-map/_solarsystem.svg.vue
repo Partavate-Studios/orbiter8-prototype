@@ -13,6 +13,7 @@
       >
       </sprite-transform>
     </template>
+    <warp-effects />
   </g>
 </template>
 
@@ -21,11 +22,13 @@ import { mapState } from 'pinia'
 
 import { useStarMapStore } from '@/stores/starmap'
 import SpriteTransform from './sprites/sprite-transform.svg'
+import WarpEffects from './warp-effects.svg.vue'
 
 export default {
   name: 'SolarSystem',
   components: {
-    SpriteTransform
+    SpriteTransform,
+    WarpEffects
   },
   computed: {
     ...mapState(useStarMapStore, ['currentStarSystemId', 'systemObjects', 'sprites', 'inTransit'])

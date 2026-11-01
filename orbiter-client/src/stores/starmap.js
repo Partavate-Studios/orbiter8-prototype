@@ -3,8 +3,11 @@ import { game } from '@/sdk/client'
 import { useUIStore } from '@/stores/ui'
 import { markRaw } from 'vue'
 import Sprite from '@/libs/sprite.js'
+import { spriteScaleOf } from '@/libs/sprite-types'
 import { buildSystem, STAR_KEY } from '@/sdk/system'
 import { gameAudio } from '@/libs/08audio'
+
+let nextWarp = 1
 
 export const useStarMapStore = defineStore('StarMap', {
   state: () => ({
@@ -15,6 +18,8 @@ export const useStarMapStore = defineStore('StarMap', {
     systemObjects: {},
     // Ships flying to another planet (Sprite.fly), by key: drawn in the world layer until they arrive.
     inTransit: {},
+    // Ships warping out of or into this system (warp-effects.svg.vue).
+    warps: [],
     // Key of my ship in this system, or null.
     myShipKey: null,
     // How each of them is drawn (libs/sprite.js), by the same keys.
@@ -95,9 +100,35 @@ export const useStarMapStore = defineStore('StarMap', {
     importStarMapBlockData({ blockData, playerAccount }) {
       const { objects, keys } = buildSystem(blockData, playerAccount)
 
+      // Other pilots' ships that jumped out of this system since the last load, or in from another,
+      // warp out and in (warp-effects.svg.vue). Not on the first load, nor on arriving in a new system.
+      const sameSystem = this.starId == blockData.id && Object.keys(this.sprites).length > 0
+      if (sameSystem) {
+        const now = Date.now()
+        for (const [key, sprite] of Object.entries(this.sprites)) {
+          if (sprite.type !== 'ship' || objects[key] || sprite.object.isMine) continue
+          this.warps.push({
+            id: nextWarp++,
+            kind: 'out',
+            x: sprite.position.x,
+            y: sprite.position.y,
+            rotation: sprite.telemetry.rotation,
+            scale: spriteScaleOf(sprite.object, this.systemObjects),
+            start: now
+          })
+        }
+        for (const key of keys.ships) {
+          if (this.sprites[key] || objects[key].isMine) continue
+          this.warps.push({ id: nextWarp++, kind: 'in', key, start: now })
+        }
+      }
+
       const sprites = {}
       for (const object of Object.values(objects)) {
         const sprite = new Sprite(object, objects)
+        if (sameSystem && object.type === 'ship' && !this.sprites[object.key] && !object.isMine) {
+          sprite.warpIn = Date.now()
+        }
         const previous = this.starId == blockData.id ? this.sprites[sprite.key] : null
         if (previous) sprite.carryOver(previous)
         if (this.gameTime > 0) sprite.updateTelemetry(this.gameTime)
@@ -127,6 +158,10 @@ export const useStarMapStore = defineStore('StarMap', {
 
       this.isLoading = false
       this.mapDataLoaded = true
+    },
+    /** Warps that have played out (warp-effects.svg.vue). */
+    endWarps(ids) {
+      this.warps = this.warps.filter((warp) => !ids.includes(warp.id))
     },
     /** Advances every orbit to the current game time. Sprites are raw objects, so this triggers no re-renders by itself. */
     updateAllTelemtry() {

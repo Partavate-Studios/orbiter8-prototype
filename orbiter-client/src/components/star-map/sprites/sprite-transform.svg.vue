@@ -81,6 +81,7 @@ import { ART, spriteScaleOf } from '@/libs/sprite-types'
 import { offerLabel, withdrawLabel } from '@/libs/label-layout'
 import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
 import { writeAttribute } from '@/libs/dom-writes'
+import { WARP_IN_MS } from '../warp-effects.svg.vue'
 import { YELLOW, YELLOW_LIGHT } from '@/libs/palette'
 import Star from './star.svg'
 import Ship from './ship.svg'
@@ -310,6 +311,11 @@ export default {
       writeAttribute(placed, 'display', visible ? 'inline' : 'none')
       if (!visible) return
       writeAttribute(placed, 'transform', this.placement(x, y))
+      // Just warped in from another system: it appears as the warp's flash lands (warp-effects.svg.vue).
+      const sinceWarp = this.sprite.warpIn ? Date.now() - this.sprite.warpIn : Infinity
+      if (sinceWarp < WARP_IN_MS * 1.5) {
+        writeAttribute(placed, 'opacity', Math.min(1, Math.max(0, (sinceWarp / WARP_IN_MS - 0.4) / 0.3)))
+      }
       const rotation = Math.round(this.sprite.telemetry.rotation / ROTATION_STEP) * ROTATION_STEP
       writeAttribute(this.$refs.turned, 'transform', 'scale(' + this.spriteScale + ') rotate(' + rotation + ')')
       const atPad = this.sprite.docking === 1 && !this.sprite.transit && !this.sprite.visit

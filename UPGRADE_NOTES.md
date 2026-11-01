@@ -1246,7 +1246,11 @@ Koda: "Do 1, 2, 4, 5... and then get back to 3". Each step is its own commit; ti
    - Selecting a planet, or a moon or station at one, sends it there; selecting your own ship keeps its course; anything else (the star, another ship) or deselecting brings it home. Its own planet: it stays put (docked, if it is).
    - It uses the planet-to-planet flight (`Sprite.visitPlanet`, `placeAtVisit`; `starmap.followSelection`), starting from where it's drawn, so a new choice mid-flight turns it smoothly. At the planet it orbits as a ship there would. Nothing goes to the chain.
    - **Checked** on the local chain: Jupiter, then Mars mid-flight, then deselected; it settled at Mars and flew home to its pad, with no jumps.
-2. [ ] **Ships arriving from or leaving for other systems** warp in and out instead of popping.
+2. [x] **Ships arriving from or leaving for other systems** warp in and out instead of popping (`warp-effects.svg.vue`, `starmap.warps`).
+   - **Leaving:** a ghost of the ship pulls ahead, stretches into a streak and is gone, leaving a flash (1.3 s).
+   - **Arriving:** a streak shoots in along its heading, then a flash where the ship fades in (1 s).
+   - Other pilots' ships only (yours has the jump animation), and never on the first load or on arriving in a new system.
+   - **Checked** with two pilots on the local chain: one jumped into Sol and later out of it while the other watched; both warps played.
 3. [ ] **A lost-connection notice** when the network stops answering, and "All systems nominal" when it's back.
 4. [ ] **A Story button on the title:** the Portals demo's storyboard panels 1–3, told with the website's backstory (`docs/backstory.md`).
 5. [ ] **A real play session,** with two goals: max out the cargo holds, and build a station. Along the way, **notes on cost**: gas per kind of move and moves per goal, for estimating what the game costs to play on different networks.

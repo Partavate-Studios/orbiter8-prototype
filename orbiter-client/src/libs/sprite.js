@@ -62,6 +62,8 @@ export default class Sprite {
     this.transit = null
     // My ship, in my own view only: the planet it has flown to because I selected it (see visitPlanet).
     this.visit = null
+    // When it warped into this system from another (Date.now()), if it just did.
+    this.warpIn = null
     // Telemetry changes every frame; the frame loop updates it and components read it per frame.
     return markRaw(this)
   }
@@ -162,6 +164,8 @@ export default class Sprite {
       this.transit = previous.transit
     }
     this.visit = previous.visit
+    // Still fading in after warping into the system (warp-effects.svg.vue).
+    this.warpIn = previous.warpIn
   }
 
   /**
