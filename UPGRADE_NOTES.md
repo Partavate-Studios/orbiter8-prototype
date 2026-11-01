@@ -1260,7 +1260,9 @@ Koda: "Do 1, 2, 4, 5... and then get back to 3". Each step is its own commit; ti
      2. "Still bound to our sun, we've continued our longing for the stars." The view pulls back to the heliopause; a ship circles just inside it.
      3. "That was until today! The first starships have arrived." A ship breaks out past the heliopause, which flashes as it crosses; then "Liberta Galactica!".
    - Back, Next and Done; arrow keys and Escape; on phones the lines flow as one paragraph. Checked at desktop and phone sizes.
-5. [ ] **A real play session,** with two goals: max out the cargo holds, and build a station. Along the way, **notes on cost**: gas per kind of move and moves per goal, for estimating what the game costs to play on different networks.
+5. [x] **A real play session,** with two goals: max out the cargo holds, and build a station. Along the way, **notes on cost**: gas per kind of move and moves per goal, for estimating what the game costs to play on different networks.
+   - **Both goals reached** by a fresh pilot on the local chain, playing through the client's own actions (`dev/harness/play-bot.js`): 250 holds after 47 trades and 25 hold purchases, then a jump to an unexplored star, a claimed planet and a station.
+   - **The write-up is `docs/cost-estimates.md`:** gas per move, the goals in gas, the cost on Ethereum, rollups, BNB Chain and Polygon under quiet, typical and busy conditions, the load on RPC nodes, and what playing showed about the economy.
 
 ### Ships fly from planet to planet (Koda's idea; built 2026-10-31)
 
@@ -1344,6 +1346,9 @@ With the names button gone, the bottom-right corner was empty. The ships button 
 A planet or moon whose contract speed is 0 used to stand still. Its original speed counts as 1 here, so it still moves.
 
 ## Contract wish list (next contracts iteration)
+
+- **Check that the ship is at the port** in `tradeAtPort` and `addHoldsToShip` (found in the play session, 2026-11-01: today a player could trade at any port in the galaxy from anywhere; only the client prevents it).
+- **Faster port restocking, or margins that differ by good:** one pilot drained Sol's ports in about 70 trades, since ports restock one unit every 2 minutes (see `docs/cost-estimates.md`).
 
 - **A neighbor summary:** a read like `getSystemSummary(systemId)` returning a system's name, planet count, port count and the number of ships there. The neighbor view could then show what each jump leads to (UI review step 5).
 - Events for every game action (claim, build station, jump, rename, trade…), so the client can update from events instead of reloading.
