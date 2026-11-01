@@ -1239,6 +1239,15 @@ The compass showed in the middle of the screen when nothing was selected. It poi
 - **Link previews: done.** `index.html` has Open Graph and Twitter card tags, using orbiter8.com's own preview image (`https://orbiter8.com/img/orbiter8-og.png`, the logo on violet). Previews need an absolute URL, and any domain works.
 - **Every full build has its own version:** `npm run build` bumps the build number first (`prebuild`); `build:local` doesn't. The two GitHub Pages builds before this both showed 3.2.0.
 
+### 8. Before the contracts (Koda, 2026-11-01)
+
+Koda: "Do 1, 2, 4, 5... and then get back to 3". Each step is its own commit; tick it here when it lands.
+1. [ ] **Your ship flies to the planet you select,** in your own view only, turning toward a new selection mid-flight, and flying back to where it really is when you deselect.
+2. [ ] **Ships arriving from or leaving for other systems** warp in and out instead of popping.
+3. [ ] **A lost-connection notice** when the network stops answering, and "All systems nominal" when it's back.
+4. [ ] **A Story button on the title:** the Portals demo's storyboard panels 1–3, told with the website's backstory (`docs/backstory.md`).
+5. [ ] **A real play session,** with two goals: max out the cargo holds, and build a station. Along the way, **notes on cost**: gas per kind of move and moves per goal, for estimating what the game costs to play on different networks.
+
 ### Ships fly from planet to planet (Koda's idea; built 2026-10-31)
 
 A ship's place is wherever its pilot last made a move, so a trade at another planet's port used to make it vanish and reappear there. Now, when a reload shows a ship at a different planet, it flies there (`Sprite.fly` in `libs/sprite.js`):
