@@ -139,6 +139,7 @@ export default {
     start() {
       this.o8audio.playEffect('click')
       if (this.step === 'ready') {
+        this.o8audio.speak('welcomeBack')
         this.$router.push('/play')
         return
       }

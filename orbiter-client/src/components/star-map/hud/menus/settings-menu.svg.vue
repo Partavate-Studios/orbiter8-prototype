@@ -130,6 +130,25 @@
       </g>
 
       <text
+        x="-100"
+        y="-40"
+        font-size="1em"
+        text-anchor="end"
+        font-style="normal"
+        fill="#ffffff"
+        stroke-width="0"
+        stroke="#00000000"
+      >
+        Voice
+      </text>
+
+      <g v-for="index in 4" :key="'voice' + index" :transform="'translate(' + (index * 60 - 100) + ' -45)'">
+        <a cursor="pointer" @click.prevent="setVoiceVolume(index - 1)">
+          <menu-checkbox :checked="o8audio.levels.voice == index - 1" />
+        </a>
+      </g>
+
+      <text
         x="0"
         y="0"
         font-size="1em"
@@ -173,6 +192,10 @@ export default {
     },
     setEffectsVolume(level) {
       this.o8audio.setEffectsLevel(level)
+      this.o8audio.playEffect('click')
+    },
+    setVoiceVolume(level) {
+      this.o8audio.setVoiceLevel(level)
       this.o8audio.playEffect('click')
     }
   }

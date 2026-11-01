@@ -167,9 +167,10 @@ export default {
     },
     'registration.status': {
       immediate: true,
-      handler(status) {
+      handler(status, before) {
         clearTimeout(this.slowTimer)
         this.slow = false
+        if (status === 'done' && before) this.o8audio.speak(this.kind === 'callsign' ? 'registered' : 'launched')
         if (status === 'sent') this.slowTimer = setTimeout(() => (this.slow = true), SLOW_MS)
       }
     },
@@ -186,6 +187,8 @@ export default {
   },
   mounted() {
     this.$refs.input?.focus()
+    // Minerva introduces herself as the new pilot's introduction opens.
+    if (this.kind === 'callsign' && !this.introDone && !this.registration) this.o8audio.speak('greetings')
   },
   unmounted() {
     clearTimeout(this.slowTimer)

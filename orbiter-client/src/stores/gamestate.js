@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { game } from '@/sdk/client'
 import { useUIStore } from '@/stores/ui'
 import { useTransactionsStore } from '@/stores/transactions'
+import { gameAudio } from '@/libs/08audio'
 
 /** Shows a transaction's progress in the tray (stores/transactions.js). */
 const track = (words, send) => useTransactionsStore().track(words, send)
@@ -83,7 +84,12 @@ export const useGameStateStore = defineStore('GameState', {
       const ui = useUIStore()
       ui.jumpPending = true
       try {
-        await game.actions.moveTo(system, { onSent: () => ui.jumpAnimationOn() })
+        await game.actions.moveTo(system, {
+          onSent: () => {
+            gameAudio().speak('jumpStarting')
+            ui.jumpAnimationOn()
+          }
+        })
       } catch (error) {
         ui.jumpPending = false
         const reason = error.shortMessage ?? error.message
@@ -119,12 +125,14 @@ export const useGameStateStore = defineStore('GameState', {
         game.actions.trade(planetId, { equipment, fuel, organics }, options)
       )
     },
-    addHoldsToShip({ planetId, amount }) {
+    async addHoldsToShip({ planetId, amount }) {
       const holds = amount === 1 ? '1 cargo hold' : amount + ' cargo holds'
-      return track(
+      const added = await track(
         { doing: 'Buying ' + holds, done: holds + ' added', failed: "Couldn't buy the cargo holds" },
         (options) => game.actions.buyHolds(planetId, amount, options)
       )
+      if (added) gameAudio().speak('upgraded')
+      return added
     },
     /** Renames a star, planet, moon, station or the player's ship. `parentId` is a moon's planet. */
     renameAsset({ name, type, objectId, parentId }) {

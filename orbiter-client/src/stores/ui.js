@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { gameAudio } from '@/libs/08audio'
 import Tween from '@/libs/tween'
 import { STAR_KEY } from '@/sdk/system'
 import { CAMERA, MAP_GROUP_SCALE, MAP_RESOLUTION, WORLD_OFFSET_Y } from '@/constants'
@@ -191,6 +192,7 @@ export const useUIStore = defineStore('UI', {
     },
     toggleMinerva() {
       this.showMinerva = !this.showMinerva
+      if (this.showMinerva) gameAudio().speak('console')
     },
     drawWorldAt(view) {
       // Draw for a camera position on the device-pixel grid. Every layer and sprite then rounds

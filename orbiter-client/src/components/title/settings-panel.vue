@@ -1,5 +1,5 @@
 <template>
-  <!-- The title's Settings panel: music, sound effects and graphics. -->
+  <!-- The title's Settings panel: music, sound effects, Minerva's voice and graphics. -->
   <section class="side-panel" aria-labelledby="settings-panel-title">
     <h2 id="settings-panel-title">Settings</h2>
 
@@ -79,7 +79,8 @@ export default {
     volumeSettings() {
       return [
         { id: 'music', label: 'Music', set: (level) => this.setLevel('music', level) },
-        { id: 'effects', label: 'Sound effects', set: (level) => this.setLevel('effects', level) }
+        { id: 'effects', label: 'Sound effects', set: (level) => this.setLevel('effects', level) },
+        { id: 'voice', label: "Minerva's voice", set: (level) => this.setLevel('voice', level) }
       ]
     }
   },
@@ -91,6 +92,7 @@ export default {
     },
     setLevel(which, level) {
       if (which === 'music') this.o8audio.setMusicLevel(level)
+      else if (which === 'voice') this.o8audio.setVoiceLevel(level)
       else this.o8audio.setEffectsLevel(level)
       this.o8audio.playEffect('click')
     },

@@ -4,6 +4,7 @@
 // longer so the reason can be read.
 import { defineStore } from 'pinia'
 import { walletErrorKind } from '@/sdk/chain/wallet'
+import { gameAudio } from '@/libs/08audio'
 
 export const SHOWN_MS = { done: 4000, declined: 4000, failed: 15000 }
 
@@ -51,6 +52,8 @@ export const useTransactionsStore = defineStore('Transactions', {
         console.error(words.failed + ':', reason)
         const declined = walletErrorKind(error) === 'rejected'
         update(declined ? { status: 'declined' } : { status: 'failed', reason: plainReason(reason) })
+        // Declining was the player's own choice; a failure needs their attention.
+        if (!declined) gameAudio().speak('failed')
         this.dismissLater(id, declined ? SHOWN_MS.declined : SHOWN_MS.failed)
         return false
       }

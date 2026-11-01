@@ -4,6 +4,7 @@ import { useUIStore } from '@/stores/ui'
 import { markRaw } from 'vue'
 import Sprite from '@/libs/sprite.js'
 import { buildSystem, STAR_KEY } from '@/sdk/system'
+import { gameAudio } from '@/libs/08audio'
 
 export const useStarMapStore = defineStore('StarMap', {
   state: () => ({
@@ -60,6 +61,8 @@ export const useStarMapStore = defineStore('StarMap', {
     importSystem(system, playerAccount) {
       const isNewSystem = system.id != this.starId
       const ui = useUIStore()
+      // Arrived by jumping (not the first load, nor a change of network): Minerva says so.
+      if (isNewSystem && this.starId && (ui.jumpPending || ui.jumpAnimationState)) gameAudio().speak('jumpComplete')
       // Arrived before the jump's transaction reported back: play the jump animation now (briefly).
       if (isNewSystem && ui.jumpPending) {
         ui.jumpPending = false

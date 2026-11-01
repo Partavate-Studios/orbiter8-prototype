@@ -4,6 +4,27 @@ import { reactive } from 'vue'
 /** Volume settings are steps: 0 (off) to LEVELS (full). */
 export const LEVELS = 3
 
+/**
+ * Minerva's voice lines (public/audio/voice), by what they announce. Loaded on first use.
+ * Some lines in the original set wait for features that don't exist yet: red alert (attacks),
+ * black holes, pulsars, wormholes and portals, and "all systems nominal" (a lost connection coming back).
+ */
+export const VOICE_LINES = {
+  greetings: 'greetings-i-am-minerva',
+  registered: 'registration-complete',
+  launched: 'welcome-to-the-frontier',
+  welcomeBack: 'welcome-back',
+  jumpStarting: 'fusion-engines-primed-initiating-interstellar-jump',
+  jumpComplete: 'interstellar-jump-complete',
+  neighborsScanned: 'lidar-scan-complete',
+  transmission: 'incoming-transmission',
+  upgraded: 'upgrade-complete',
+  failed: 'priority-alert',
+  console: 'minerva-console-online'
+}
+/** A line isn't repeated sooner than this (ms), so a burst of chat or failures speaks once. */
+const VOICE_REPEAT_MS = 30000
+
 /** A saved volume (a fraction, as a string from the cookie) as the nearest step; `fallback` if unset. */
 function savedLevel(cookie, fallback) {
   const volume = Number(Cookies.get(cookie))
@@ -15,7 +36,11 @@ export default class Sound {
   constructor() {
     this.currentMusic = ''
     // Reactive, so settings controls redraw when a level changes.
-    this.levels = reactive({ music: savedLevel('musicVolume', 1), effects: savedLevel('effectsVolume', 1) })
+    this.levels = reactive({
+      music: savedLevel('musicVolume', 1),
+      effects: savedLevel('effectsVolume', 1),
+      voice: savedLevel('voiceVolume', 2)
+    })
 
     this.music = []
 
@@ -30,6 +55,10 @@ export default class Sound {
 
     this.effects = []
     this.effects['click'] = new Audio('./audio/effects/beep.mp3')
+
+    this.voices = {}
+    this.voiceSpoken = {}
+    this.speaking = null
   }
 
   get musicVolume() {
@@ -38,6 +67,10 @@ export default class Sound {
 
   get effectsVolume() {
     return this.levels.effects / LEVELS
+  }
+
+  get voiceVolume() {
+    return this.levels.voice / LEVELS
   }
 
   /** @param {number} level  0 (off) to LEVELS */
@@ -56,6 +89,32 @@ export default class Sound {
   setEffectsLevel(level) {
     this.levels.effects = Math.max(0, Math.min(LEVELS, Math.round(level)))
     Cookies.set('effectsVolume', this.effectsVolume, { expires: 30 })
+  }
+
+  /** @param {number} level  0 (off) to LEVELS */
+  setVoiceLevel(level) {
+    this.levels.voice = Math.max(0, Math.min(LEVELS, Math.round(level)))
+    Cookies.set('voiceVolume', this.voiceVolume, { expires: 30 })
+    if (this.levels.voice == 0) this.speaking?.pause()
+  }
+
+  /**
+   * Minerva says one of VOICE_LINES. A new line cuts off the one she's saying; the same line isn't
+   * repeated within VOICE_REPEAT_MS. Lines the browser blocks (before the first click) are skipped.
+   * @param {keyof typeof VOICE_LINES} line
+   */
+  speak(line) {
+    if (this.voiceVolume === 0 || !VOICE_LINES[line]) return
+    const now = Date.now()
+    if (now - (this.voiceSpoken[line] ?? -Infinity) < VOICE_REPEAT_MS) return
+    this.voiceSpoken[line] = now
+    this.voices[line] ??= new Audio(`./audio/voice/${VOICE_LINES[line]}.mp3`)
+    const voice = this.voices[line]
+    if (this.speaking && this.speaking !== voice) this.speaking.pause()
+    this.speaking = voice
+    voice.currentTime = 0
+    voice.volume = this.voiceVolume
+    voice.play()?.catch?.(() => {})
   }
 
   playMusic(song) {
@@ -112,4 +171,10 @@ export default class Sound {
       this.effects[effect].play()
     }
   }
+}
+
+/** The game's one sound player: components reach it as `this.o8audio`, stores import it. */
+let shared = null
+export function gameAudio() {
+  return (shared ??= new Sound())
 }

@@ -341,6 +341,8 @@ export default {
     const step = (now) => {
       this.progress = clamp01((now - begin) / ENTER_MS)
       if (this.progress < 1) this.frame = requestAnimationFrame(step)
+      // The neighboring stars are charted.
+      else this.o8audio.speak('neighborsScanned')
     }
     this.frame = requestAnimationFrame(step)
     // The ship starts behind the star (top of its orbit) and comes out as the neighbors arrive.

@@ -16,9 +16,11 @@ const silentAudio = {
   stopMusic() {},
   silenceMusic() {},
   resumeMusic() {},
-  levels: { music: 1, effects: 1 },
+  speak() {},
+  levels: { music: 1, effects: 1, voice: 2 },
   setMusicLevel() {},
-  setEffectsLevel() {}
+  setEffectsLevel() {},
+  setVoiceLevel() {}
 }
 
 let app, root, problems, ui

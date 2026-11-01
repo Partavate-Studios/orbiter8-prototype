@@ -1238,6 +1238,28 @@ The compass showed in the middle of the screen when nothing was selected. It poi
 - **Anything that needs contract changes waits for the next demo** (Demo 4), factories included. The factories note in the game says Demo 4 now. Contract wishes go in the "Contract wish list" below.
 - **Every full build has its own version:** `npm run build` bumps the build number first (`prebuild`); `build:local` doesn't. The two GitHub Pages builds before this both showed 3.2.0.
 
+### Minerva's voice (2026-10-31)
+
+Koda had a folder of Minerva voice lines (Amazon Polly) that the game never used. 11 of the 17 fit what the game does now (`public/audio/voice`, `libs/08audio.js` `speak`):
+
+| Line | When |
+|---|---|
+| Greetings, I am Minerva | the new pilot's introduction opens |
+| Registration complete | the callsign is registered |
+| Welcome to the frontier | the new ship has launched |
+| Welcome back | a returning pilot presses Continue |
+| Fusion engines primed, initiating interstellar jump | the jump is sent |
+| Interstellar jump complete | the new system loads after a jump |
+| Lidar scan complete | the neighbor view has opened |
+| Incoming transmission | a broadcast from another pilot arrives |
+| Upgrade complete | cargo holds bought |
+| Priority alert | a transaction failed (not one the player declined) |
+| Minerva console online | the Minerva console opens (the backtick key) |
+
+- **A "Minerva's voice" volume** in both settings screens, off to 3, starting at 2. A new line cuts off the one playing, and a line isn't repeated within 30 s.
+- **Waiting for features:** red alert (attacks), black hole, pulsar, wormhole and dimensional portal detected, and "all systems nominal" (the game has no lost-connection state for it to answer). Two filename typos ("intersteller", "wormhold") were fixed for the one copied; the rest stay in Koda's folder.
+- **Checked in the game** by logging what played: every line above but incoming transmission, upgrade complete and priority alert, which need another pilot, credits or a failure; those are covered by the logic and a unit test for repeats and the off setting.
+
 ### The HUD's bottom corners (2026-10-31)
 
 With the names button gone, the bottom-right corner was empty. The ships button moved down into it, and the planets button above it.

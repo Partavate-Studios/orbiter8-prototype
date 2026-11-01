@@ -4,11 +4,30 @@
 import { useChainStore } from '@/stores/chain'
 import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
+import { gameAudio } from '@/libs/08audio'
 
 const FAILURE_MESSAGES = {
   player: 'Loading game state failed:',
   events: 'Loading recent events failed:',
   system: 'Loading the star map failed:'
+}
+
+// Broadcasts already heard of: the first load only fills it, so only new ones are announced.
+let heardBroadcasts = null
+
+/** Minerva announces a broadcast from another pilot that arrived since the last load. */
+function announceBroadcasts(chatEvents, account) {
+  if (!chatEvents) return
+  const keys = chatEvents.map((event) => event.transactionHash)
+  const fresh = heardBroadcasts
+    ? chatEvents.filter(
+        (event) =>
+          !heardBroadcasts.has(event.transactionHash) &&
+          String(event.returnValues._sender).toLowerCase() !== String(account).toLowerCase()
+      )
+    : []
+  heardBroadcasts = new Set([...(heardBroadcasts ?? []), ...keys])
+  if (fresh.length) gameAudio().speak('transmission')
 }
 
 /** @param {ReturnType<import('@/sdk/client').createGameClient>} game */
@@ -50,6 +69,7 @@ export function bindStoresToGame(game) {
         break
       case 'events':
         gameState.events = state.events
+        announceBroadcasts(state.events.chatEvents, chain.account)
         break
       case 'systemProgress':
         starMap.loadProgress = state.systemProgress
