@@ -36,11 +36,14 @@
         <div class="secondary">
           <button type="button" class="o8-button" @click="openPanel('settings')">Settings</button>
           <button type="button" class="o8-button" @click="openPanel('network')">Network</button>
+          <button type="button" class="o8-button" @click="openStory">Story</button>
         </div>
       </section>
     </div>
 
     <p class="version">Version {{ version }}</p>
+
+    <story-scene v-if="storyOpen" @close="closeStory" />
   </div>
 </template>
 
@@ -54,6 +57,7 @@ import TitleScene from './title-scene.vue'
 import OnboardingWizard from './onboarding-wizard.vue'
 import NetworkPanel from './network-panel.vue'
 import SettingsPanel from './settings-panel.vue'
+import StoryScene from './story-scene.vue'
 
 // The main button's label waits this long before following a change (ms), so a state that only
 // lasts a moment (a quick reconnect) never flashes on it.
@@ -61,12 +65,13 @@ const SETTLE_MS = 400
 
 export default {
   name: 'TitleScreen',
-  components: { TitleScene, OnboardingWizard, NetworkPanel, SettingsPanel, Orbiter8Logo },
+  components: { TitleScene, OnboardingWizard, NetworkPanel, SettingsPanel, StoryScene, Orbiter8Logo },
   data() {
     return {
       version: __APP_VERSION__,
       // What the main button shows: titleAction, once it has held for SETTLE_MS.
-      shownAction: null
+      shownAction: null,
+      storyOpen: false
     }
   },
   computed: {
@@ -150,6 +155,14 @@ export default {
         if (wallet) this.chooseWallet(wallet)
       }
       this.openWizard()
+    },
+    openStory() {
+      this.o8audio.playEffect('click')
+      this.storyOpen = true
+    },
+    closeStory() {
+      this.o8audio.playEffect('click')
+      this.storyOpen = false
     },
     openPanel(panel) {
       this.o8audio.playEffect('click')

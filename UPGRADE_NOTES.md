@@ -1254,7 +1254,12 @@ Koda: "Do 1, 2, 4, 5... and then get back to 3". Each step is its own commit; ti
 3. [x] **A lost-connection notice** when the network stops answering, and "All systems nominal" when it's back.
    - After 3 failed block checks in a row (about 6 s), the tray at the top shows "Lost contact with the network", in pink, until a check works again; then "Back in contact" for 4 s, and Minerva says "All systems nominal" (the twelfth voice line). `stores/chain.js` `connectionLost`.
    - **Checked** by cutting the page's network for 9 s (a new harness step, `offline:on` / `offline:off`).
-4. [ ] **A Story button on the title:** the Portals demo's storyboard panels 1–3, told with the website's backstory (`docs/backstory.md`).
+4. [x] **A Story button on the title:** the Portals demo's storyboard panels 1–3, told with the website's backstory (`docs/backstory.md`). `title/story-scene.vue`.
+   - Minerva narrates in a box with her emblem, a line at a time, over a CSS-animated scene, like Enterprise Circuit's About:
+     1. "It is the year 2140. Civilization has spread to encompass the whole of the solar system." The solar system fades in as the view pulls back.
+     2. "Still bound to our sun, we've continued our longing for the stars." The view pulls back to the heliopause; a ship circles just inside it.
+     3. "That was until today! The first starships have arrived." A ship breaks out past the heliopause, which flashes as it crosses; then "Liberta Galactica!".
+   - Back, Next and Done; arrow keys and Escape; on phones the lines flow as one paragraph. Checked at desktop and phone sizes.
 5. [ ] **A real play session,** with two goals: max out the cargo holds, and build a station. Along the way, **notes on cost**: gas per kind of move and moves per goal, for estimating what the game costs to play on different networks.
 
 ### Ships fly from planet to planet (Koda's idea; built 2026-10-31)
