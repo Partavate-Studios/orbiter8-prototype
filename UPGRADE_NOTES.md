@@ -1232,7 +1232,7 @@ The compass showed in the middle of the screen when nothing was selected. It poi
 
 ### Up next, and later (Koda, 2026-10-31)
 
-- **A Story button on the title,** showing the storyboard. Soon. Which panels to use is still his call (see step 7 of "The best of Enterprise Circuit").
+- **A Story button on the title,** showing the storyboard. Soon. Which panels to use is still his call (see step 7 of "The best of Enterprise Circuit"). The website's backstory, which should inform it, is in `docs/backstory.md`; it doesn't all need telling.
 - **A real play session** with Claude, with a goal Koda will set, to learn the trade-and-holds loop first-hand.
 - **Koda's old design doc,** with many future ideas, once this work is finished.
 - **Anything that needs contract changes waits for the next demo** (Demo 4), factories included. The factories note in the game says Demo 4 now. Contract wishes go in the "Contract wish list" below.
