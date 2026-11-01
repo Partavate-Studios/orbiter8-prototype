@@ -120,7 +120,7 @@
         </a>
       </g>
 
-      <g :transform="corner(rightMostX, -50, bottomMostY, -150)">
+      <g :transform="corner(rightMostX, -50, bottomMostY, -50)">
         <a cursor="pointer" @click.prevent="showShips()">
           <title>Ships in this system</title>
           <ships-icon />
@@ -137,7 +137,7 @@
           </g>
         </a>
       </g>
-      <g :transform="corner(rightMostX, -50, bottomMostY, -250)">
+      <g :transform="corner(rightMostX, -50, bottomMostY, -150)">
         <a cursor="pointer" @click.prevent="showPlanets()">
           <title>Planets (Tab and Shift+Tab step through them)</title>
           <planets-icon />
