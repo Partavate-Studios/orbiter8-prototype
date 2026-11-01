@@ -1236,6 +1236,10 @@ The compass showed in the middle of the screen when nothing was selected. It poi
 - **A real play session** with Claude, with a goal Koda will set, to learn the trade-and-holds loop first-hand.
 - **Koda's design doc** (post Demo 3, a work in progress) is now `docs/design.md`, the working copy for future features.
 - **Anything that needs contract changes waits for the next demo** (Demo 4), factories included. The factories note in the game says Demo 4 now. Contract wishes go in the "Contract wish list" below.
+- **A link preview image** (Koda, 2026-10-31), so a link to the game posted on social media shows a picture. Notes for when it's built:
+  - Open Graph and Twitter card tags in `index.html`: `og:title`, `og:description`, `og:image`, and `twitter:card` set to `summary_large_image`.
+  - The image is 1200 × 630, for example the title screen with its logo, sun and space port.
+  - `og:image` must be an absolute URL (for example `https://partavate-studios.github.io/orbiter8-demo3-client/preview.png`), although the build uses relative paths everywhere else (`base: './'`). Previews don't follow relative links.
 - **Every full build has its own version:** `npm run build` bumps the build number first (`prebuild`); `build:local` doesn't. The two GitHub Pages builds before this both showed 3.2.0.
 
 ### Minerva's voice (2026-10-31)
