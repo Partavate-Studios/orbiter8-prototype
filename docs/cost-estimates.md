@@ -60,6 +60,31 @@ PoS 30 / 100 / 500 gwei. Typical first, then the quiet to busy range.
 - Moonriver and Moonbeam, where the game has run, aren't priced here.
 - On Ethereum mainnet, the grind alone (about 72 moves) costs tens of dollars on a typical day and hundreds on a busy one. On any of the cheaper networks, a whole progression costs well under a dollar.
 
+## Base, Arbitrum One and Polkadot Hub (added 2026-11-01)
+
+Base and Arbitrum One are the busiest rollups; Polkadot Hub is Polkadot's own smart-contract chain
+(Revive, live since January 2026), which runs EVM bytecode unmodified.
+
+Assumptions: ETH $2,300 and DOT $0.955.
+- **Base:** 0.005 / 0.008 / 0.1 gwei. 0.005 gwei is the minimum base fee. Base charges the Ethereum data fee separately, which adds about $0.0001–$0.0003 a move on a normal day.
+- **Arbitrum One:** 0.01 / 0.02 / 0.1 gwei. 0.02 gwei is the floor since January 2026, and governance can move it between 0.01 and 0.10. Arbitrum's gas already includes the Ethereum data fee.
+- **Polkadot Hub:** no published fees for contract calls yet. Its docs estimate a plain transfer at 0.00147 DOT, which is scaled here by gas (a plain transfer is 21,000 gas), at half / one / five times that for quiet / typical / busy. **This is the roughest estimate here:** Polkadot Hub prices by weight and transaction length, not EVM gas, and holds a refundable deposit for new storage. That deposit could add noticeably to moves that create storage, such as a ship launch or a jump into an unexplored star (which writes a whole new system).
+
+| | Base | Arbitrum One | Polkadot Hub |
+|---|---|---|---|
+| Sign-up | $0.009 ($0.006–$0.11) | $0.022 ($0.011–$0.11) | $0.032 ($0.016–$0.16) |
+| One trade | $0.002 ($0.001–$0.027) | $0.005 ($0.003–$0.027) | $0.008 ($0.004–$0.039) |
+| Buy holds | $0.0015 ($0.001–$0.019) | $0.004 ($0.002–$0.019) | $0.006 ($0.003–$0.028) |
+| Jump, charted | $0.0015 ($0.001–$0.019) | $0.004 ($0.002–$0.019) | $0.005 ($0.003–$0.027) |
+| Jump, unexplored | $0.046 ($0.029–$0.57) | $0.12 ($0.057–$0.57) | $0.17 ($0.083–$0.83) |
+| Claim / build | about $0.003 each | about $0.008 each | about $0.012 each |
+| **Sign-up to 250 holds** | **$0.15 ($0.09–$1.86)** | **$0.37 ($0.19–$1.86)** | **$0.54 ($0.27–$2.70)** |
+| **Then a station** | **$0.05 ($0.03–$0.65)** | **$0.13 ($0.07–$0.65)** | **$0.19 ($0.10–$0.95)** |
+
+**To firm up Polkadot Hub,** deploy a copy of the contracts to Polkadot Hub's testnet and run the play bot there: it would give the real fees, deposits included.
+
+**Moonbeam, Moonriver and Moonbase Alpha have shut down** (maintenance mode from 2026-08-01; transactions are rejected). The client still lists Moonriver and Moonbase Alpha.
+
 ## Load on the network's nodes (RPC)
 
 Reads are free in gas, but they count against the node provider's limits (Infura, Alchemy, a public
