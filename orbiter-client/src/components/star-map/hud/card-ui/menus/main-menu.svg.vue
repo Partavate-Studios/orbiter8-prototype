@@ -52,7 +52,7 @@ export default {
             case 'planet':
               this.tell(
                 'Factories',
-                'In Demo 3, you will be able to build factories on planets. You will first need raw materials and colonists. You will also be able to build orbiting space ports.'
+                'In Demo 4, you will be able to build factories on planets. You will first need raw materials and colonists. You will also be able to build orbiting space ports.'
               )
               break
             case 'moon':

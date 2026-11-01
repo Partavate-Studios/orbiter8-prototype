@@ -5,8 +5,9 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
 /**
- * The version shown on the title: 3 (demo 3 contracts) . 2 (this client) . build, from package.json
- * (`npm version patch` before each release build). Dev servers add the commit, e.g. 3.2.0-dev+e1e7f61.
+ * The version shown on the title: 3 (demo 3 contracts) . 2 (this client) . build, from package.json.
+ * Every `npm run build` bumps the build number first (the prebuild script), so each full build has its
+ * own version; `build:local` doesn't. Dev servers add the commit, e.g. 3.2.4-dev+e1e7f61.
  */
 function appVersion(command) {
   const { version } = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8'))

@@ -1,6 +1,6 @@
 {
   "name": "Orbiter8",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "A decentralized space game for EVM.",
   "repository": {
     "type": "git",
@@ -18,6 +18,7 @@
   "private": true,
   "scripts": {
     "dev": "vite",
+    "prebuild": "npm version patch --no-git-tag-version --silent",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint .",
