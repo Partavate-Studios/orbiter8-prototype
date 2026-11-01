@@ -265,7 +265,7 @@ Also found:
    - **The starfield** has 800 stars, or 3,200 on the high tier, each with its glare.
    - Both are drawn only when the zoom settles or the window resizes. In between, a composited CSS transform follows the camera, including the starfield's 1/20 parallax.
    - **The jump animation's star streaks** draw on a third canvas every frame, from a pre-rendered streak sprite.
-2. **World layer.** The grid, the star, the planets' rings around the star, and ships orbiting the star.
+2. **World layer.** The grid (removed 2026-10-27), the star, the planets' rings around the star, and ships orbiting the star.
    - It's drawn for one camera (`drawnView`) with a 256 px margin.
    - Each frame `libs/composited-layer.js` maps it onto the live camera with a CSS `translate` and `scale`, rounded to device pixels, with no repaint.
    - It's redrawn sharp when a zoom settles (about 100 ms still), when the zoom drifts past 15% (so long zoom animations re-sharpen as they go), or when a pan nears the margin.
@@ -891,12 +891,14 @@ Koda wants the best parts of Enterprise Circuit (`/home/koda/dev/enterprise-circ
 
 Order (from the walkthrough's list). Tick each when it lands:
 1. [x] **Onboarding:** Minerva's voice, the callsign card, the ship launch pad, and the title button that follows the player's progress.
-2. [ ] **Network stats** on the connect screen ("N players exploring M star systems").
-3. [ ] **Minimap.**
-4. [ ] **Parallax star layers** on the canvas background.
-5. [ ] **Art:** planet types with bands and rings, ship designs, stations, Minerva.
-6. [ ] **UI scale setting.**
-7. [ ] **Later ideas:** the About storyboard and the cockpit window.
+2. [x] **Network stats** on the connect screen ("N players exploring M star systems").
+3. [x] **Minimap.**
+4. [x] **Parallax star layers** on the canvas background.
+5. [x] **Art:** planet types with bands and rings, ship designs, stations, Minerva.
+6. [x] **UI scale setting.**
+7. [ ] **Later ideas:** the About storyboard and the cockpit window. **The storyboard is next** (see "Up next" below).
+
+(Each step's details are in the numbered list further down.)
 
 **Step 1 decisions so far (Koda, 2026-10-25):**
 - **Enterprise Circuit's title screen replaces the preflight checklist as the first screen.** Onboarding becomes a wizard, one step at a time.
@@ -1227,6 +1229,18 @@ The compass showed in the middle of the screen when nothing was selected. It poi
 - **Koda:** "I love the compass... it's unique, informative, and sci-fi... the way it updates as you move around is extremely satisfying... but... it gets in the way... it's there when you don't want it... and I rarely use it." Stash it, and maybe bring something like it back **near the minimap** later.
 - **Removed in the commit after `40a5130`.** To restore the components: `git checkout 40a5130 -- orbiter-client/src/components/star-map/hud/scope`. Then mount `<scope />` in `hud.svg.vue` where nothing is selected, and bring back the ui store's `spriteToDisplay` (`hud.spriteToDisplay`, its getter and `setSpriteToDisplay`), which the markers' hover used.
 - **What made it work:** each marker is rotated to the bearing from the camera to the object, and fades with distance (`markerOpacity`). Near the minimap, it could become a ring of edge markers round the minimap, or round the screen's edge.
+
+### Up next, and later (Koda, 2026-10-31)
+
+- **A Story button on the title,** showing the storyboard. Soon. Which panels to use is still his call (see step 7 of "The best of Enterprise Circuit").
+- **A real play session** with Claude, with a goal Koda will set, to learn the trade-and-holds loop first-hand.
+- **Koda's old design doc,** with many future ideas, once this work is finished.
+- **Anything that needs contract changes waits for the next demo** (Demo 4), factories included. The factories note in the game says Demo 4 now. Contract wishes go in the "Contract wish list" below.
+- **Every full build has its own version:** `npm run build` bumps the build number first (`prebuild`); `build:local` doesn't. The two GitHub Pages builds before this both showed 3.2.0.
+
+### The HUD's bottom corners (2026-10-31)
+
+With the names button gone, the bottom-right corner was empty. The ships button moved down into it, and the planets button above it.
 
 ## Sizes and speeds: history
 
