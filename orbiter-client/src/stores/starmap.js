@@ -13,6 +13,8 @@ export const useStarMapStore = defineStore('StarMap', {
     neighbors: [],
     // Game objects (sdk/system.js) by stable key, in drawing order.
     systemObjects: {},
+    // Ships flying to another planet (Sprite.fly), by key: drawn in the world layer until they arrive.
+    inTransit: {},
     // How each of them is drawn (libs/sprite.js), by the same keys.
     sprites: {},
     spriteIds: {
@@ -106,6 +108,12 @@ export const useStarMapStore = defineStore('StarMap', {
       // Raw: replaced wholesale on each load, never changed in place.
       this.systemObjects = markRaw(objects)
       this.sprites = markRaw(sprites)
+      // Ships flying to another planet are drawn in the world layer until they arrive (see Sprite.fly).
+      this.inTransit = Object.fromEntries(
+        Object.values(sprites)
+          .filter((sprite) => sprite.transit)
+          .map((sprite) => [sprite.key, true])
+      )
       this.spriteIds = keys
 
       // A selection that no longer exists (e.g. a ship that left) is cleared rather than left dangling.
@@ -128,6 +136,10 @@ export const useStarMapStore = defineStore('StarMap', {
         const parent = sprite.orbiting ? this.sprites[sprite.orbiting] : null
         sprite.position.x = sprite.telemetry.translatex + (parent ? parent.telemetry.translatex : 0)
         sprite.position.y = sprite.telemetry.translatey + (parent ? parent.telemetry.translatey : 0)
+      }
+      for (const key in this.inTransit) {
+        const sprite = this.sprites[key]
+        if (!sprite?.transit || sprite.fly(this.gameTime)) delete this.inTransit[key]
       }
     }
   }

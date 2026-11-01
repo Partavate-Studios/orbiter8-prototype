@@ -1,11 +1,12 @@
 <template>
   <!-- The bodies that live in the world SVG: the star and anything orbiting it directly. Planets
-       and everything orbiting them are drawn in their own layers (planet-layers.vue); the orbit
+       and everything orbiting them are drawn in their own layers (planet-layers.vue), except ships
+       flying from one planet to another (Sprite.fly), which are drawn here until they arrive; the orbit
        rings around the star are on the guides canvas, under every body. -->
   <g v-if="currentStarSystemId > 0">
     <template v-for="(object, key) in systemObjects" :key="'sprite-' + key">
       <sprite-transform
-        v-if="object.type !== 'planet' && !orbitsPlanet(object)"
+        v-if="object.type !== 'planet' && (!orbitsPlanet(object) || inTransit[key])"
         :sprite="sprites[key]"
         :object-index="key"
         :type="object.type"
@@ -27,7 +28,7 @@ export default {
     SpriteTransform
   },
   computed: {
-    ...mapState(useStarMapStore, ['currentStarSystemId', 'systemObjects', 'sprites'])
+    ...mapState(useStarMapStore, ['currentStarSystemId', 'systemObjects', 'sprites', 'inTransit'])
   },
   methods: {
     orbitsPlanet(object) {

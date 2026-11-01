@@ -1239,6 +1239,16 @@ The compass showed in the middle of the screen when nothing was selected. It poi
 - **Link previews: done.** `index.html` has Open Graph and Twitter card tags, using orbiter8.com's own preview image (`https://orbiter8.com/img/orbiter8-og.png`, the logo on violet). Previews need an absolute URL, and any domain works.
 - **Every full build has its own version:** `npm run build` bumps the build number first (`prebuild`); `build:local` doesn't. The two GitHub Pages builds before this both showed 3.2.0.
 
+### Ships fly from planet to planet (Koda's idea; built 2026-10-31)
+
+A ship's place is wherever its pilot last made a move, so a trade at another planet's port used to make it vanish and reappear there. Now, when a reload shows a ship at a different planet, it flies there (`Sprite.fly` in `libs/sprite.js`):
+- **The path** spirals round the star, from where it was to its new orbit, easing in and out. It takes about 220 world units per second, between 3 and 10 s.
+- **The nose** follows the spiral's direction, turning from the way it faced as it sets off and into its new orbit's facing as it arrives. Engines on; if it's going to dock, it arrives docked.
+- **Where it's drawn:** a ship belongs to its planet's layer, which is cropped to that planet's neighborhood, so while it flies it's drawn in the world layer (`starmap.inTransit`).
+- **A reload mid-flight** (the game reloads again right after a move) carries the flight on.
+- **Checked** on the local chain with real trades between Earth, Mercury and Venus, sampling the ship's position and facing every 100 ms: no jumps, and the nose turns smoothly.
+- **Not covered:** ships arriving from or leaving for another system still appear and disappear; the jump has its own animation only for your ship.
+
 ### Minerva's voice (2026-10-31)
 
 Koda had a folder of Minerva voice lines (Amazon Polly) that the game never used. 11 of the 17 fit what the game does now (`public/audio/voice`, `libs/08audio.js` `speak`):

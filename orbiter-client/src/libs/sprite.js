@@ -11,7 +11,17 @@ const DOCK_TUBE = 0.25
 /** How far out the station art's pads are, as a share of its radius. */
 const PAD_FACE = 1.0
 
+/**
+ * A ship moving to another planet flies at about this speed (world units per second), taking at least
+ * TRANSIT_MIN_S and at most TRANSIT_MAX_S.
+ */
+const TRANSIT_SPEED = 220
+const TRANSIT_MIN_S = 3
+const TRANSIT_MAX_S = 10
+
 const rad = (degrees) => (degrees * Math.PI) / 180
+/** The difference between two angles in degrees, the short way round (-180 to 180). */
+const turn = (from, to) => ((((to - from) % 360) + 540) % 360) - 180
 const smoothstep = (x) => x * x * (3 - 2 * x)
 
 /**
@@ -48,6 +58,8 @@ export default class Sprite {
     // Docked at a station (ships): 0 in orbit, 1 at the pad, between while flying from one to the other.
     this.dock = this.dockGeometry(object, objects)
     this.docking = this.dock ? 1 : 0
+    // Flying from the planet it was at to a new one (ships; see carryOver and fly).
+    this.transit = null
     // Telemetry changes every frame; the frame loop updates it and components read it per frame.
     return markRaw(this)
   }
@@ -71,7 +83,7 @@ export default class Sprite {
         const k = smoothstep(this.docking)
         x += (pad.x - x) * k
         y += (pad.y - y) * k
-        rotation += (((((pad.rotation - rotation) % 360) + 540) % 360) - 180) * k
+        rotation += turn(rotation, pad.rotation) * k
       }
     }
     this.telemetry.translatex = x
@@ -134,5 +146,66 @@ export default class Sprite {
     // Undocking flies back from the pad it was at; docking flies in from where it was.
     this.docking = previous.docking ?? this.docking
     if (!this.dock && previous.dock) this.lastDock = previous.dock
+    // At another planet now (a ship's place is wherever its pilot last made a move): it flies there,
+    // from wherever it was, instead of jumping. It arrives already docked, or in its orbit.
+    if (this.type === 'ship' && previous.orbiting !== this.orbiting) {
+      this.transit = {
+        from: { ...previous.position },
+        facing: previous.telemetry.rotation,
+        start: null
+      }
+      this.docking = this.dock ? 1 : 0
+    } else if (previous.transit) {
+      // Reloaded mid-flight (the game reloads again right after a move): the flight carries on.
+      this.transit = previous.transit
+    }
+  }
+
+  /**
+   * Moves a ship along its flight to a new planet, this frame. Called after its position has been
+   * worked out as usual (where it's headed); replaces that with where it is on the way. The flight
+   * spirals round the star, from where it set off to where it's headed, easing in and out, nose along
+   * its path. Returns true when it has arrived.
+   */
+  fly(gameTime) {
+    const flight = this.transit
+    const target = { x: this.position.x, y: this.position.y }
+    const parent = { x: target.x - this.telemetry.translatex, y: target.y - this.telemetry.translatey }
+    if (flight.start == null) {
+      flight.start = gameTime
+      const seconds = Math.hypot(target.x - flight.from.x, target.y - flight.from.y) / TRANSIT_SPEED
+      flight.duration = Math.min(TRANSIT_MAX_S, Math.max(TRANSIT_MIN_S, seconds)) * 1000
+    }
+    const x = (gameTime - flight.start) / flight.duration
+    if (x >= 1) {
+      this.transit = null
+      return true
+    }
+    const k = smoothstep(x)
+    const r0 = Math.hypot(flight.from.x, flight.from.y)
+    const r1 = Math.hypot(target.x, target.y)
+    const a0 = Math.atan2(flight.from.y, flight.from.x)
+    const a1 = Math.atan2(target.y, target.x)
+    const r = r0 + (r1 - r0) * k
+    const sweep = rad(turn((a0 * 180) / Math.PI, (a1 * 180) / Math.PI))
+    const a = a0 + sweep * k
+    const position = { x: r * Math.cos(a), y: r * Math.sin(a) }
+
+    // Nose along its path (the art is drawn turned 180°, so its nose points 90° past its rotation),
+    // turning from the way it faced as it sets off, and into its new orbit's facing as it arrives.
+    // The path's direction here (its derivative along the spiral), so the nose doesn't twitch with the
+    // destination circling its planet.
+    const dx = (r1 - r0) * Math.cos(a) - r * sweep * Math.sin(a)
+    const dy = (r1 - r0) * Math.sin(a) + r * sweep * Math.cos(a)
+    const heading = Math.hypot(dx, dy) > 1e-9 ? (Math.atan2(dy, dx) * 180) / Math.PI - 90 : flight.facing
+    let rotation = flight.facing + turn(flight.facing, heading) * Math.min(1, x / 0.1)
+    rotation += turn(rotation, this.telemetry.rotation) * Math.max(0, (x - 0.85) / 0.15)
+
+    this.position.x = position.x
+    this.position.y = position.y
+    this.telemetry.translatex = position.x - parent.x
+    this.telemetry.translatey = position.y - parent.y
+    this.telemetry.rotation = rotation
+    return false
   }
 }

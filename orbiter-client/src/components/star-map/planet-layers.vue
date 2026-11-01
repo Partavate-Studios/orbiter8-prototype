@@ -69,7 +69,7 @@ export default {
     originY: { type: Number, required: true }
   },
   computed: {
-    ...mapState(useStarMapStore, ['systemObjects', 'sprites', 'spriteIds']),
+    ...mapState(useStarMapStore, ['systemObjects', 'sprites', 'spriteIds', 'inTransit']),
     ...mapState(useUIStore, ['selected', 'hovered']),
     /** Pixels per world unit at the drawn zoom. */
     pixelsPerUnit() {
@@ -78,6 +78,8 @@ export default {
     childIndexes() {
       const children = {}
       for (const [key, object] of Object.entries(this.systemObjects)) {
+        // Ships flying in from another planet join their new planet's layer once they arrive.
+        if (this.inTransit[key]) continue
         if (object.type !== 'planet' && this.systemObjects[object.orbiting]?.type === 'planet') {
           ;(children[object.orbiting] ??= []).push(key)
         }
