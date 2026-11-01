@@ -7,8 +7,11 @@ such as *FUEL* and *VALUABLE THING*, and puts the land rush in the early 2100s r
 It informs the title's Story scene, built from the Multiverse Portals demo's storyboard (see
 UPGRADE_NOTES.md, "Up next"). The scene doesn't need to tell all of it.
 
-The text is as published. Two lines between paragraphs on the website, "Planets Menu" and "space",
-were image captions and are left out.
+The text is as published, with one typo fixed ("Obiter" for "Orbiter"). Two lines between
+paragraphs on the website, "Planets Menu" and "space", were image captions and are left out.
+
+**Why 2140:** it's about when the last bitcoin is expected to be mined. The block reward halves
+every 210,000 blocks (about four years), and it reaches zero around 2140.
 
 ---
 
@@ -20,7 +23,7 @@ As the initial surge of colonization faded into decades of vicious trade wars, p
 
 Yet again, it seemed that another plateau was reached. We worried that a second Regrettion was imminent and that maybe we were just too fragile to expand past the barrier of our sun, which, after all, provides all the energy that sustains every form of life we know. Leaving our planet was the tiniest of steps compared with leaving our sun. Once again it seemed that there were no new worlds to explore and no new empires to build. That is no longer true today.
 
-In just the last few decades, we’ve seen rapid improvements in Obiter technology, drastically reducing travel times between planets. This technology recently crossed a whole new threshold with the successful interstellar test of the Orbiter 8 spacecraft. We are no longer confined to our solar system, the whole of the galaxy now awaits our arrival. The first line of interstellar Orbiters are being assembled right now and will be on sale soon. Liberta Galactica!
+In just the last few decades, we’ve seen rapid improvements in Orbiter technology, drastically reducing travel times between planets. This technology recently crossed a whole new threshold with the successful interstellar test of the Orbiter 8 spacecraft. We are no longer confined to our solar system, the whole of the galaxy now awaits our arrival. The first line of interstellar Orbiters are being assembled right now and will be on sale soon. Liberta Galactica!
 
 ---
 

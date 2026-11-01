@@ -1234,7 +1234,7 @@ The compass showed in the middle of the screen when nothing was selected. It poi
 
 - **A Story button on the title,** showing the storyboard. Soon. Which panels to use is still his call (see step 7 of "The best of Enterprise Circuit"). The website's backstory, which should inform it, is in `docs/backstory.md`; it doesn't all need telling.
 - **A real play session** with Claude, with a goal Koda will set, to learn the trade-and-holds loop first-hand.
-- **Koda's old design doc,** with many future ideas, once this work is finished.
+- **Koda's design doc** (post Demo 3, a work in progress) is now `docs/design.md`, the working copy for future features.
 - **Anything that needs contract changes waits for the next demo** (Demo 4), factories included. The factories note in the game says Demo 4 now. Contract wishes go in the "Contract wish list" below.
 - **Every full build has its own version:** `npm run build` bumps the build number first (`prebuild`); `build:local` doesn't. The two GitHub Pages builds before this both showed 3.2.0.
 
