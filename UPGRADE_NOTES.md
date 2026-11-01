@@ -1199,7 +1199,17 @@ Koda: Orbiter 8s "shouldn't orbit touching one another... they should be spread 
 - **Now:** ships sharing an orbit all move at one speed (`SHIP_ORBIT_SPEED`, the middle of the old range). Each has a place round the ring (`shipOrbitPhases` in `sdk/game/orbits.js`): spread evenly in id order, then nudged by up to a fifth of the gap, fixed per ship, so it doesn't look arranged. They're never closer than 60% of an even gap (tested).
 - **When a ship arrives or leaves,** the others slide round to their new places at 30°/s (`Sprite.glidePhase`), instead of jumping.
 
-### To do: ships dock at the station they trade at (Koda, 2026-10-27)
+### Ships dock at the station they trade at (Koda, 2026-10-27; built 2026-10-31)
+
+**Built, with no contract changes.** When a system loads, the client also reads the last 950 blocks of `PortTrade` events (`sdk/load.js`; a failure just means nobody is drawn docked). `sdk/game/docking.js` decides who's docked, tested in `docking.test.js`:
+- Only a pilot's latest trade counts, and only at a planet with a station.
+- The ship must still be at that planet.
+- At most 3 per station, the newest traders first; the rest orbit (spread out, as below).
+- Each docked ship gets a pad from its id, or the next free one, so it keeps its pad while the others docked there stay the same.
+
+**Drawn** (`libs/sprite.js`): side-on, wing pod to the pad, nose the way the station turns, on a docking tube like the title's. It turns with the station, with its engines off. A ship flies from its orbit to the pad, or back, over 3 s. The tube appears once it's there.
+
+**Original note:**
 
 - **The idea:** a ship that traded at a port is drawn docked at its station. Only the **last 3** to trade there are docked; the others orbit the planet.
 - **The data is there:** the contract emits `PortTrade(sender, planetId, …)` on every trade, and `sdk/load.js` already loads recent ones (`events.tradeEvents`, back `EVENT_LOOKBACK_BLOCKS`). A ship whose last trade is older than that would orbit instead.

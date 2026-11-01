@@ -13,7 +13,19 @@
           <planet v-if="type === 'planet'" :sprite="sprite" />
           <moon v-if="type === 'moon'" />
           <station v-if="type === 'station'" />
-          <g transform="rotate(180)"><ship v-if="type === 'ship'" :should-show-engines="true" /></g>
+          <!-- Docked: a tube from the ship's side to the station's pad, shown once it's there. -->
+          <g
+            v-if="type === 'ship' && sprite.dock"
+            ref="tube"
+            opacity="0"
+            stroke="#e6dcf5"
+            stroke-opacity="0.75"
+            stroke-width="0.35"
+          >
+            <line :x1="sprite.dock.tube.from" y1="-1.6" :x2="sprite.dock.tube.to" y2="-1.6" />
+            <line :x1="sprite.dock.tube.from" y1="1.6" :x2="sprite.dock.tube.to" y2="1.6" />
+          </g>
+          <g transform="rotate(180)"><ship v-if="type === 'ship'" :should-show-engines="!sprite.object.dock" /></g>
           <star v-if="type === 'star'" />
         </template>
         <a cursor="pointer" @mouseover="pointerOn(true)" @mouseleave="pointerOn(false)" @click.prevent="spriteAction()">
@@ -308,6 +320,7 @@ export default {
       writeAttribute(placed, 'transform', this.placement(x, y))
       const rotation = Math.round(this.sprite.telemetry.rotation / ROTATION_STEP) * ROTATION_STEP
       writeAttribute(this.$refs.turned, 'transform', 'scale(' + this.spriteScale + ') rotate(' + rotation + ')')
+      if (this.$refs.tube) writeAttribute(this.$refs.tube, 'opacity', this.sprite.docking === 1 ? 1 : 0)
     },
     /** The translate that puts the sprite at (x, y), snapped to the device-pixel grid of the drawn world. */
     placement(x, y) {

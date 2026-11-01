@@ -90,7 +90,7 @@ export const useStarMapStore = defineStore('StarMap', {
 
       const sprites = {}
       for (const object of Object.values(objects)) {
-        const sprite = new Sprite(object)
+        const sprite = new Sprite(object, objects)
         const previous = this.starId == blockData.id ? this.sprites[sprite.key] : null
         if (previous) sprite.carryOver(previous)
         if (this.gameTime > 0) sprite.updateTelemetry(this.gameTime)

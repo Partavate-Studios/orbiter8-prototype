@@ -54,6 +54,8 @@ export const TIMING = {
   LOW_TIER_TICK_MS: 32,
   /** Recent ship launches and trades: blocks to look back. */
   EVENT_LOOKBACK_BLOCKS: 10,
+  /** Trades that decide which ships are drawn docked at stations (sdk/game/docking.js): blocks to look back. */
+  DOCKING_LOOKBACK_BLOCKS: 950,
   /** Chat history: blocks to look back. */
   CHAT_LOOKBACK_BLOCKS: 950
 }

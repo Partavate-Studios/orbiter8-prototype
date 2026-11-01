@@ -68,6 +68,25 @@ export async function loadRecentEvents(blockNumber) {
 }
 
 /**
+ * Recent trades at ports, oldest first, for drawing who's docked where (sdk/game/docking.js). Only for
+ * looks, so a failure (some RPCs limit how far back logs go) just means nobody is drawn docked.
+ * @returns {Promise<Array<{ sender: string, planetId: number }>>}
+ */
+async function loadRecentTrades() {
+  try {
+    const blockNumber = await getSession().provider.getBlockNumber()
+    const trades = await galaxy.getEvents('PortTrade', blockNumber - TIMING.DOCKING_LOOKBACK_BLOCKS)
+    return trades.map((trade) => ({
+      sender: String(trade.returnValues._sender).toLowerCase(),
+      planetId: Number(trade.returnValues._planetId)
+    }))
+  } catch (error) {
+    console.warn("Couldn't load recent trades for docking:", error.shortMessage ?? error.message)
+    return []
+  }
+}
+
+/**
  * Everything in the star system the player's ship is in: the star, its neighbors, its planets (with
  * their stations and moons), the ships there, and the names of everyone who owns any of it.
  * Planets are keyed by orbital position, ships by id.
@@ -89,7 +108,8 @@ export async function loadSystem(onProgress = () => {}) {
     planets: {},
     shipIds: system.shipIds,
     ships: {},
-    avatarNames: {}
+    avatarNames: {},
+    recentTrades: []
   }
   // Owner addresses → avatar names, each looked up once.
   const addOwnerName = async (owner) => {
@@ -119,6 +139,9 @@ export async function loadSystem(onProgress = () => {}) {
     }
     onProgress(Math.min(75, 25 + Number(key)))
   }
+  onProgress(78)
+
+  data.recentTrades = await loadRecentTrades()
   onProgress(80)
 
   // A planet's index in planetIds is its orbital position (the contract's systems[id].planets[orbitalId]).

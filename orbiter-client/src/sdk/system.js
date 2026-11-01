@@ -13,6 +13,7 @@ import {
   stationOrbitSpeed,
   SHIP_ORBIT_RADIUS_AROUND_STAR
 } from '@/sdk/game/orbits'
+import { dockedShips } from '@/sdk/game/docking'
 
 /** The star at the center of every system has a fixed key. */
 export const STAR_KEY = 'star'
@@ -45,6 +46,7 @@ export function objectKey(type, { id, planet }) {
  * @property {boolean} isMine  owned by the connected player
  * @property {string | null} orbiting  key of what it orbits (null for the star)
  * @property {{ radius: number, speed: number, phase?: number }} orbit  see sdk/game/orbits orbitAt()
+ * @property {{ station: string, pad: number } | null} [dock]  ships: the station it's docked at, and which pad (degrees)
  *
  * Plus, by type:
  * - star: size, birth
@@ -179,9 +181,27 @@ export function buildSystem(system, playerAccount) {
     keys.ships.push(shipObject.key)
   }
 
-  // Ships sharing an orbit are spread round it.
+  // The last few to trade at a station, still at its planet, are docked there (sdk/game/docking.js).
+  const planetIdOf = (key) => (objects[key]?.type === 'planet' ? objects[key].id : null)
+  const docked = dockedShips(
+    system.recentTrades ?? [],
+    keys.ships.map((key) => ({
+      id: objects[key].id,
+      owner: objects[key].owner,
+      planetId: planetIdOf(objects[key].orbiting)
+    })),
+    keys.planets.filter((key) => objects[key].hasStation).map((key) => objects[key].id)
+  )
+  for (const key of keys.ships) {
+    const dock = docked.get(String(objects[key].id))
+    objects[key].dock = dock ? { station: objectKey('station', { id: dock.planetId }), pad: dock.pad } : null
+  }
+
+  // The other ships sharing an orbit are spread round it.
   const shipsAround = {}
-  for (const key of keys.ships) (shipsAround[objects[key].orbiting] ??= []).push(objects[key])
+  for (const key of keys.ships) {
+    if (!objects[key].dock) (shipsAround[objects[key].orbiting] ??= []).push(objects[key])
+  }
   for (const ships of Object.values(shipsAround)) {
     const phases = shipOrbitPhases(ships.map((ship) => ship.id))
     for (const ship of ships) ship.orbit.phase = phases.get(String(ship.id))
