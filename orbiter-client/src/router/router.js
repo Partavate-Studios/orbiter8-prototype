@@ -1,11 +1,14 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import Game from '@/components/playgame'
 import TitleScreen from '@/components/title/title-screen.vue'
+import GalaxyView from '@/components/galaxy/galaxy-view.vue'
 import { useGameStateStore } from '@/stores/gamestate'
 
 export default createRouter({
   history: createWebHashHistory(),
   routes: [
+    // Demo 4's galaxy (docs/demo4-plan.md); joins the title and onboarding in milestone 5.
+    { path: '/galaxy', name: 'Galaxy', component: GalaxyView },
     {
       path: '/',
       name: 'Title Screen',

@@ -19,7 +19,7 @@ library ScanRules {
     /// @param have neighbors that already hold a star or black hole
     /// @param originCrowd how many of the origin's neighbors held stars (7: no origin, e.g. Sol)
     function newStars(bytes32 rnd, int256 density, uint256 open, uint256 have, uint256 originCrowd)
-        internal
+        public
         pure
         returns (uint256)
     {

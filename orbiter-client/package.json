@@ -27,7 +27,9 @@
     "chain": "hardhat --config dev/hardhat.config.cjs node",
     "deploy:local": "node dev/deploy-local.js",
     "format": "prettier --write .",
-    "build:local": "VITE_LOCAL_NETWORK=1 vite build --outDir dist-local"
+    "build:local": "VITE_LOCAL_NETWORK=1 vite build --outDir dist-local",
+    "local4": "node dev/local4.js",
+    "abi4": "node dev/abi4.js"
   },
   "dependencies": {
     "ethers": "^6.17.0",

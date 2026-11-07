@@ -21,7 +21,9 @@ export default {
     // Always start at the title screen, which connects the wallet and loads the game. Vue Router 4
     // resolves the URL asynchronously, so wait for it; checking right away always saw '/'.
     router.isReady().then(() => {
-      if (router.currentRoute.value.path != '/') {
+      // Demo 4's galaxy (/galaxy) connects by itself (docs/demo4-plan.md, milestone 1).
+      const path = router.currentRoute.value.path
+      if (path != '/' && path != '/galaxy') {
         router.push('/')
       }
     })

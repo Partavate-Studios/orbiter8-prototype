@@ -279,17 +279,17 @@ impossible or needs a design call goes back to Koda; everything else is decided 
 ### 11. Milestones and steps (each step is a commit; each milestone ends with the play bot playing it on the local Polkadot node, D32)
 
 **Milestone 0: setup**
-- [ ] A `contracts-v4/` Foundry project with OpenZeppelin upgradeable contracts.
-- [ ] The local Polkadot Hub node built and scripted (start, deploy, reset), next to the existing Hardhat setup.
-- [ ] A smoke test: a UUPS module deployed, upgraded and its storage checked on both chains (the research's test 1).
+- [x] A `contracts-v4/` Foundry project with OpenZeppelin upgradeable contracts.
+- [ ] The local Polkadot Hub node built and scripted (start, deploy, reset), next to the existing Hardhat setup. *Scripted (`contracts-v4/polkadot-node.sh`); waiting for Koda to run it (B3).*
+- [ ] A smoke test: a UUPS module deployed, upgraded and its storage checked on both chains (the research's test 1). *Passes on Foundry's chain; Polkadot waits on B3.*
 
 **Milestone 1: foundation and galaxy**
-- [ ] Roles, the module registry, and the event conventions.
-- [ ] Hex math, the spiral, and derived star and planet traits, in Solidity and JS, cross-checked against each other.
-- [ ] drand verification (`Randomness`), with fuzz tests and gas measured.
-- [ ] `Galaxy`: cells, jumps, arrivals, scans, black hole pairs, discoverers, renames, region and system views.
-- [ ] The client SDK's new chain layer (RPC transport first), and the galaxy map view with regions loading as you pan.
-- [ ] The play bot explores; gas and deposits per arrival measured.
+- [x] Roles, the module registry, and the event conventions. *Registry deferred to milestone 2 (B11).*
+- [x] Hex math, the spiral, and derived star and planet traits, in Solidity and JS, cross-checked against each other. *Star traits are client-only (D8, D9); planet traits arrive with planets in milestone 3.*
+- [x] drand verification (`Randomness`), with fuzz tests and gas measured.
+- [x] `Galaxy`: cells, jumps, arrivals, scans, black hole pairs, discoverers, renames, region and system views. *System views arrive with planets.*
+- [x] The client SDK's new chain layer (RPC transport first), and the galaxy map view with regions loading as you pan. *`npm run local4`, then `/#/galaxy`.*
+- [x] The play bot explores; gas and deposits per arrival measured. *`dev/harness/explore-bot4.mjs`; gas in B13; Polkadot deposits wait on B3.*
 
 **Milestone 2: pilots and trade**
 - [ ] `Pilots`: call signs, the ship NFT, location, the bays and weapon mounts (D59), range, damage fields.
@@ -342,4 +342,9 @@ when you're done, let me know about any of those decisions I should review").
 | B7 | Milestone 1 | **A scan's outcome depends on which neighbors are already decided when it's resolved,** as in the prototype. Two neighboring scans resolved in a different order can come out differently. | Fixing every input at arrival time would cost a lot more storage. Nobody can steer it usefully, since the drand value is unknown until the round is published. |
 | B8 | Milestone 1 | **Name rules (call signs, ships, stars):** 3–24 characters (stars 1–24); letters, digits, spaces, `-`, `_`, `.`; no leading, trailing or double spaces; call signs unique regardless of case. | The plan said "length, characters"; this is the common-sense set. |
 | B9 | Milestone 1 | **Measured: a first arrival plus its scan is about 540,000 gas** (142,559 for the jump, 397,074 for the scan, of which drand verification is 163,000), against 2,494,254 in Demo 3: about 4.6 times cheaper, not the 15–20 times estimated before drand was chosen. | For the record; deposits on Polkadot still to be measured (B3). |
+| B10 | Milestone 1 | **Drand, Spiral and ScanRules are deployed as separate, linked libraries.** | Galaxy came to 35.7 KB, over the 24.6 KB contract limit. Now Galaxy is 14.4 KB, Drand 18.9 KB, Pilots 8.0 KB. Calls into them cost a little extra gas. `forge build --sizes` checks the limit. |
+| B11 | Milestone 1 | **No module registry contract yet.** Each module stores the addresses of the modules it calls, set when it's deployed. A registry comes in milestone 2, when `Market` makes three modules. | With two modules, a registry would only add a lookup to every call. |
+| B12 | Milestone 1 | **`forge lint` runs on demand, not on every build.** | Its notes on type conversions (each checked by hand) buried the compiler's own messages. |
+| B13 | Milestone 1 | **Measured by the exploring bot (26 moves, local chain):** a jump to a new star costs about 125,000 gas. Carrying one scan proof brings it to about 508,000, two to about 827,000. Going through a black hole costs 55,000–80,000. Writing two scans without moving costs 795,000. Each move carries at most 3 proofs. | The scan, mostly drand's check, is three quarters of the cost. A later saving: one drand check could cover several scans that share a round. |
+| B14 | Milestone 1 | **The galaxy map opens at 1.5× zoom.** The star card sits top right, or along the bottom on a phone held upright. The scan preview counts only stars it charts for the first time. | Seen in screenshots, desktop and phone. |
 

@@ -44,7 +44,7 @@ library Drand {
 
     /// The randomness of `round`, after checking `signature` (64 bytes, the G1 point) is drand's.
     /// Reverts with BadRoundSignature if it isn't.
-    function verify(uint64 round, bytes memory signature) internal view returns (bytes32) {
+    function verify(uint64 round, bytes memory signature) public view returns (bytes32) {
         if (signature.length != 64) revert BadRoundSignature(round);
         BLS.PointG1 memory sig = BLS.g1Unmarshal(signature);
         if (!BLS.isValidPointG1(sig)) revert BadRoundSignature(round);

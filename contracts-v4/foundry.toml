@@ -8,12 +8,19 @@ evm_version = "prague"
 optimizer = true
 optimizer_runs = 200
 via_ir = true
+# The deploy script records addresses in deployments/<chainId>.json, and may write nowhere else.
+fs_permissions = [{ access = "read-write", path = "./deployments" }]
 remappings = [
   "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
   "@openzeppelin/contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/",
   "forge-std/=lib/forge-std/src/",
   "bls-solidity/=lib/bls-solidity/src/",
 ]
+
+[lint]
+# `forge lint` runs on demand; on every build its typecast notes (all checked by hand: indices and
+# fixed-point values that fit) drown the compiler's own messages.
+lint_on_build = false
 
 [fuzz]
 runs = 512

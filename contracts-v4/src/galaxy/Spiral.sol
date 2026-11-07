@@ -76,7 +76,7 @@ library Spiral {
     }
 
     /// 1 on an arm, falling toward 0 in the void between arms: e^(-½(d/width)²).
-    function density(Params memory p, int256 x, int256 y) internal pure returns (int256) {
+    function density(Params memory p, int256 x, int256 y) public pure returns (int256) {
         int256 d = Fixed.div(distance(p, x, y), p.width);
         return Fixed.expNeg(Fixed.mul(d, d) / 2);
     }
