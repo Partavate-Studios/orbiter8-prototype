@@ -62,6 +62,12 @@ design doc), [`design-ideas.md`](design-ideas.md) (Koda's working doc), [`cost-e
 | D41 | **Session keys:** one approval per play session creates a browser key that can make game moves only, for a few hours, funded with a little gas money in the same approval; whatever is left can be sent back. Built into the game contracts (Polkadot has nothing built in that's safe for this), so it works on any network. | 2026-11-06 |
 | D42 | **The local Polkadot Hub node is the main integration target:** each milestone's play-bot run and gas and deposit measurements happen there. Foundry's chain stays for fast unit tests, so the contracts are checked on both and stay portable. | 2026-11-06 |
 | D43 | **Avoid RPC nodes where possible.** On Polkadot: reads through the smoldot light client and PAPI (data from the network's own nodes, peer to peer, with proofs); moves signed by the session key and sent through smoldot too. Only the session-starting approval goes through MetaMask's RPC. The client's chain access is one swappable layer: plain RPC for local development and other EVM chains, smoldot for Polkadot, proven on Polkadot's testnet in the final milestone (the light-client path is young). **Keep calls to a minimum:** whole regions and systems per view call; cache what never changes once loaded (decided cells, derived planets), refresh the rest from events; keep the cache's memory bounded. | 2026-11-06 |
+| D44 | **How a siege runs:** an armed ship at a planet starts it with one transaction; it shows on every map and in a public siege feed. The attackers wear down the defenses while the defenses damage the attackers' systems, worked out lazily from the start time and both sides' loadouts. It ends when the defenses reach zero (worn down), the attacker can no longer attack, or the attacker leaves. | 2026-11-06 |
+| D45 | **Defending:** the owner builds defenses in advance and can add more mid-siege; other armed ships at the planet join the defense; **the owner's ship defends automatically if it's anywhere in the same star system.** **Repair bots** restore destroyed defenses during a siege; ships can carry repair bots too, but fewer and slower than a planet's. A worn-down planet can still be saved during the 24-hour claim wait. | 2026-11-06 |
+| D46 | **Ship damage:** armor absorbs first; then weapons are disabled one by one (with none left, the ship can't attack), engines lose 1 range per hit (never below 1), cargo bay hits make holds unusable. **Before a ship would be destroyed, it retreats automatically** to orbit its system's star. A shipyard repair restores everything. Ships are never destroyed in this run. | 2026-11-06 |
+| D47 | **The winner:** a besieged planet stops producing; worn down, its defenses are gone but its buildings stay; a successful claim takes the planet and its buildings, minus one tech level. | 2026-11-06 |
+| D48 | **Weapons:** railguns, missiles, point defense, **drones** (swarms of small craft), and, for planets only, the **BFG** (working name: a huge punch with a small chance to hit) and **orbital weapons platforms**. Armor and repair bots alongside. A counter table set by simulation. | 2026-11-06 |
+| D49 | **Sol's Federation planets can't be attacked** in this demo: the game simply refuses. Later, the Federation should come and punish anyone who tries (consider next). | 2026-11-06 |
 
 ## Features: this run and consider next (proposed, for Koda to choose)
 
@@ -90,7 +96,7 @@ hard to add later because it shapes the data, low-hanging, or the battle minimum
 
 ### Consider next (proposed)
 
-- **Battle, more:** overheating, experience, booby traps, ship-to-ship combat, asteroid attacks
+- **Battle, more:** the Federation punishing attacks on its planets (D49), overheating, experience, booby traps, ship-to-ship combat, asteroid attacks
 - **Social:** corporations, corporate law, protected zones, pirates and bands, bounties
 - **Economy and building:** supply routes, crafting, builders (probes, autofactories), negotiated prices, branching tech tree
 - **Fleets:** several ships per pilot, with remote control (signal lag, relays); refine first (D26)
@@ -102,7 +108,7 @@ hard to add later because it shapes the data, low-hanging, or the battle minimum
 
 Rounds 1–5 answered, except Q25 (contract tooling), which waits for the research. Next: the research's findings (the engine question is settled by D33).
 
-**Research done (D34).** Rounds 6–7 answered (D35–D43). Round 8 (asked 2026-11-06): battle details.
+**Research done (D34).** Rounds 6–8 answered (D35–D49). Round 9 (asked 2026-11-06): the BFG's hit chance, orbital platforms, what counters drones, the retreat threshold.
 
 ## Plan (draft, 2026-11-06; for Koda's review)
 
