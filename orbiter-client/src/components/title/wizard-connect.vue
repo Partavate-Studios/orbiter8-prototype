@@ -60,7 +60,7 @@
         </li>
       </ul>
       <p v-if="switchError" class="problem" role="alert">{{ switchError }}</p>
-      <p class="hint">Your wallet will ask you to approve the switch. Sepolia is the main test galaxy.</p>
+      <p class="hint">Your wallet will ask you to approve the switch.</p>
     </template>
 
     <template v-else-if="step === 'loading'">
