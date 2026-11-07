@@ -315,6 +315,44 @@ impossible or needs a design call goes back to Koda; everything else is decided 
 - [x] The on-chain SVG `tokenURI` from the same pieces.
 - [x] Sol's preset content, onboarding on the new contracts, and polish. *Sol's nine planets and stations (unclaimable, D49), the I.S.S.'s yard and armory, a self-ticking first-steps card. Bringing the Demo 3 menus' look to the new panels is open (B25).*
 
+**Milestone 5b: everything Demo 3 has, on the new contracts** (Koda, 2026-11-07: "this demo was supposed to include everything from the previous demo and build on top of it")
+
+Milestones 1–5 built the new rules on a separate `/galaxy` screen with plain panels, so Demo 3's game (entering a star system, the card menus, the HUD) didn't run on Demo 4 at all. That was a mistake: B25 logged a dropped feature as a call. Demo 4 is Demo 3's client, on the new contracts, with the new features added to its screens. Done means every box below works in the real UI, reached the way a player reaches it.
+
+*Contracts: what Demo 3 did that the new ones can't yet*
+- [ ] Galaxy chat (Demo 3's `sendChat`): a broadcast event, sent by the pilot or the session key.
+- [ ] Moons, derived from the planet's seed (no storage, D9), in `SystemGen` and its JS mirror, cross-checked.
+- [ ] Names for planets, moons and stations, set by the planet's owner (Demo 3's renames); derived names otherwise.
+
+*The client: Demo 3's SDK shape on Demo 4*
+- [ ] `sdk/v4/client.js`: the same interface as `sdk/client.js` (state, subscribe, refresh, actions), so Demo 3's stores and screens draw Demo 4 unchanged where the rules are the same.
+- [ ] The network list knows Demo 4 deployments (the local chain first); the app picks the client by deployment.
+
+*Demo 3's screens, each working on Demo 4*
+- [ ] Title screen: story scene, network panel (local Demo 4 chain listed and answering), Minerva panel, settings panel, pilot card, launch pad.
+- [ ] Onboarding wizard: connect a wallet (the dev wallet locally), register a call sign and ship (one transaction in Demo 4).
+- [ ] Entering a star system: the star, planets on their orbits with rings and moons, stations, other pilots' ships, your ship, docking.
+- [ ] The card UI: select any object, its info, and its menu (claim, build, trade, shipyard, rename, visit station, planet, moons, jump, market link).
+- [ ] Trade menu with Demo 4's eight goods and per-unit prices (sliders, cargo, transfer tabs).
+- [ ] Shipyard menu: bays and range (Demo 4's yard).
+- [ ] Planets menu, ships menu, settings menu, chat menu, leaderboard menu.
+- [ ] Jumping: the galaxy hex map takes the neighbor view's place (D: "the galaxy map replaces the neighbor view"), with the jump animation, warp effects and scans.
+- [ ] Minimap, zoom slider, connection status, loading bar, scope toggle.
+- [ ] Minerva's layer (terminal, profile, sprites, debug), the transaction tray, game dialogs.
+- [ ] Audio (music and Minerva's voice), keyboard controls, gamepad overlay, phone layouts (the bottom card).
+
+*Demo 4's features, in Demo 3's screens and art* (the card menu's own placeholders: "Port Upgrades", "Transfers", "Attacking … until demo 4")
+- [ ] Session keys: start, end, and the status in the HUD.
+- [ ] Planets: claims with the discoverer's window, colonists (recruit, land, board), buildings and the tech tree, production and collecting, the Autofactory.
+- [ ] Ship loadout: the armory, fitting and unloading parts, the ship's picture, damage and repairs.
+- [ ] Battle: attack, join the defense, sieges shown in the system and on the map, claims, the siege feed.
+- [ ] Black holes: orbit, leave, or go through.
+- [ ] First steps for new pilots.
+
+*Then*
+- [ ] Play-tested end to end through the real UI at desktop and phone sizes: start at the title screen, register, trade at Sol, upgrade, jump, claim and build, fit weapons, siege.
+- [ ] The separate `/galaxy` screen retired once everything it does lives in the game.
+
 **Milestone 6: testnets and the decision**
 - [ ] Deploy to Polkadot Hub's testnet and an L2 testnet.
 - [ ] The research's test list on Polkadot (UUPS, drand cost, the read path through smoldot and through RPC, wallets).
@@ -357,7 +395,7 @@ when you're done, let me know about any of those decisions I should review").
 | B22 | Milestone 2 | **Restocking fixed:** the stored clock moves on only by the time the regrown units took. | Found by the simulator: rounding down at each trade meant a busy port never restocked. |
 | B23 | Milestone 2 | **The client sends each trade line with a 2% price limit** around the price it showed. **A session lasts 4 hours** and is sent 0.2 of the network's coin for gas (local chain; real amounts set per network in milestone 6). Its key is kept in the browser's storage. | Room for another pilot's trade landing first, without filling at a surprise price. |
 | B24 | Milestone 2 | **Measured by the trading bot (60 moves through a session key, local chain):** a trade (selling and buying) costs about 180,000 gas, against 118,000 in Demo 3. Bays cost 96,000; registering plus the ship 290,000 (Demo 3: 480,000); starting a session 114,000; ending one 33,000. | Trades cost more for the calls between modules: the session-key lookup, cargo and credits, and the events. A later saving: Market could hold cargo itself. |
-| B25 | Milestone 2 | **The docks panel is new, plain UI** on the galaxy map, not the Demo 3 trade menus. | The old menus are bound to Demo 3's contracts. Milestone 5's graphics and polish pass is the place to bring their look over. |
+| B25 | Milestone 2 | ~~**The docks panel is new, plain UI** on the galaxy map, not the Demo 3 trade menus.~~ **Wrong (Koda, 2026-11-07):** dropping Demo 3's screens was never a call to make. Replaced by milestone 5b. | The old menus are bound to Demo 3's contracts. |
 | B26 | Milestone 3 | **Planets are derived:** 2 to 8 per star, class 0–9 at even odds, size 1–16 (gas giants 16–63). **People per unit of size by class** (Terrestrial 1,000, Oceanic 800, Swamp 600, Rocky and Desert 300, Ice and Ferrous 200, the rest 100). A planet's name is its star's plus a letter (b, c, …). | The plan said "derived" without the numbers. |
 | B27 | Milestone 3 | **Claiming costs 2,000 credits,** more than a new pilot's 1,000, so a claim comes after some trading. **Colonists cost 10 credits each** at Earth. | A claim should be a first goal, not a reflex. |
 | B28 | Milestone 3 | **Growth:** the gap to the cap shrinks by about 63% every 8 hours, starting when the Citadel is finished. **Production:** 20 units an hour of each good the class sells, scaled by people over the cap, up to 5,000 stored. **A Colony needs 90% of the cap** (D57's "held its cap for a while"). | Simple to work out lazily, and a Colony comes about a day after founding. |

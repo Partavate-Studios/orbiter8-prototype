@@ -121,6 +121,7 @@ contract Pilots is ModuleBase {
     event DamageChanged(address indexed pilot, uint8 rangeLost, uint16 baysLost);
     event SessionStarted(address indexed pilot, address indexed key, uint64 expiry);
     event SessionEnded(address indexed pilot, address indexed key);
+    event Broadcast(address indexed pilot, string message);
 
     error AlreadyRegistered();
     error NotRegistered();
@@ -303,6 +304,15 @@ contract Pilots is ModuleBase {
     function renameStar(uint256 cell, string calldata name, ScanProof[] calldata proofs) external {
         _resolve(proofs);
         _p().galaxy.rename(actorOf(msg.sender), cell, name);
+    }
+
+    /// Sends a message to the whole galaxy (Demo 3's chat). Only an event: nothing is stored.
+    function broadcast(string calldata message) external {
+        address pilot = actorOf(msg.sender);
+        if (!_p().pilots[pilot].registered) revert NotRegistered();
+        uint256 length = bytes(message).length;
+        if (length == 0 || length > 280) revert BadName(message);
+        emit Broadcast(pilot, message);
     }
 
     /// Resolves pending scans without moving (anyone may, e.g. to see a new neighborhood written).

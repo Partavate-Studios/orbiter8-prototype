@@ -105,6 +105,45 @@
   },
   {
     "type": "function",
+    "name": "NAME_MOON",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "NAME_PLANET",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "NAME_STATION",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "PORT",
     "inputs": [],
     "outputs": [
@@ -447,6 +486,25 @@
   },
   {
     "type": "function",
+    "name": "namesOf",
+    "inputs": [
+      {
+        "name": "id",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "names",
+        "type": "string[10]",
+        "internalType": "string[10]"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "ownerOf",
     "inputs": [
       {
@@ -571,6 +629,29 @@
         "name": "count",
         "type": "uint256",
         "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "rename",
+    "inputs": [
+      {
+        "name": "id",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "part",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "internalType": "string"
       }
     ],
     "outputs": [],
@@ -1047,6 +1128,31 @@
   },
   {
     "type": "event",
+    "name": "Named",
+    "inputs": [
+      {
+        "name": "planet",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "part",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "uint8"
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
     "name": "PeopleMoved",
     "inputs": [
       {
@@ -1341,6 +1447,11 @@
   },
   {
     "type": "error",
+    "name": "BadName",
+    "inputs": []
+  },
+  {
+    "type": "error",
     "name": "Busy",
     "inputs": [
       {
@@ -1417,6 +1528,22 @@
         "name": "needed",
         "type": "uint256",
         "internalType": "uint256"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "NoSuchMoon",
+    "inputs": [
+      {
+        "name": "planet",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "orbit",
+        "type": "uint8",
+        "internalType": "uint8"
       }
     ]
   },

@@ -12,7 +12,9 @@ export default createRouter({
     {
       path: '/',
       name: 'Title Screen',
-      component: TitleScreen
+      component: TitleScreen,
+      // `npm run local4` serves only the new contracts, so its front door is the galaxy.
+      ...(import.meta.env.VITE_DEMO4 ? { redirect: '/galaxy' } : {})
     },
     {
       path: '/play',

@@ -90,6 +90,7 @@ contract Planets is ModuleBase {
         mapping(uint256 => mapping(uint256 => uint256)) stock; // planet → good → units
         mapping(uint8 => Cost) costs; // building → cost
         Tuning tuning;
+        mapping(uint256 => mapping(uint8 => string)) names; // planet → part (NAME_PLANET, NAME_STATION, NAME_MOON + orbit) → name
     }
 
     // keccak256(abi.encode(uint256(keccak256("orbiter8.planets")) - 1)) & ~bytes32(uint256(0xff))
@@ -102,6 +103,7 @@ contract Planets is ModuleBase {
     event BuildingStarted(uint256 indexed planet, uint8 building, uint40 readyAt);
     event CostSet(uint8 indexed building, Cost cost);
     event TuningSet(Tuning tuning);
+    event Named(uint256 indexed planet, uint8 part, string name);
     event PlanetSeized(uint256 indexed planet, address indexed from, address indexed to, uint8 level);
 
     error NoSuchPlanet(uint256 planet);
@@ -116,6 +118,8 @@ contract Planets is ModuleBase {
     error NeedsPeople(uint256 needed);
     error NotEnoughStock(uint256 good, uint256 have);
     error StorageFull(uint256 good, uint256 room);
+    error BadName();
+    error NoSuchMoon(uint256 planet, uint8 orbit);
 
     function _s() internal pure returns (PlanetsStorage storage s) {
         assembly {
@@ -215,6 +219,40 @@ contract Planets is ModuleBase {
         planet.settledAt = uint40(block.timestamp);
         s.deeds.mint(pilot, id);
         emit Claimed(id, pilot);
+    }
+
+    // ── names (Demo 3's renames) ────────────────────────────────────────────────────────────────
+
+    /// The parts of a planet that carry a name: the planet, its station, and moons by orbit.
+    uint8 public constant NAME_PLANET = 0;
+    uint8 public constant NAME_STATION = 1;
+    uint8 public constant NAME_MOON = 2; // + the moon's orbit, 0–7
+
+    /// The owner names their planet, its station or one of its moons. Until then the client shows
+    /// derived names. Sol's keep theirs.
+    function rename(uint256 id, uint8 part, string calldata name) external {
+        PlanetsStorage storage s = _s();
+        address pilot = s.pilots.actorOf(msg.sender);
+        _derive(id);
+        if (id >> 8 == 0) revert FederationPlanet(id);
+        if (s.planets[id].owner != pilot) revert NotYours(id);
+        if (part >= NAME_MOON) {
+            uint8 orbit = part - NAME_MOON;
+            if (orbit >= 8 || (SystemGen.moonSlots(_seed(), id >> 8, id & 0xff) >> orbit) & 1 == 0) {
+                revert NoSuchMoon(id, orbit);
+            }
+        }
+        uint256 length = bytes(name).length;
+        if (length == 0 || length > 24) revert BadName();
+        s.names[id][part] = name;
+        emit Named(id, part, name);
+    }
+
+    /// The names an owner has given: the planet, its station, then moons by orbit ("" where unnamed).
+    function namesOf(uint256 id) external view returns (string[10] memory names) {
+        for (uint8 part = 0; part < 10; part++) {
+            names[part] = _s().names[id][part];
+        }
     }
 
     // ── people (D57) ────────────────────────────────────────────────────────────────────────────

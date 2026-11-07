@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { planetCount, planet, DEMO_SEED } from './system'
+import { planetCount, planet, moonSlots, looks, DEMO_SEED } from './system'
 
 describe('derived planets match the contracts', () => {
   it('reproduces the Solidity values (contracts-v4/test/vectors/SystemVectors.t.sol)', () => {
@@ -15,6 +15,26 @@ describe('derived planets match the contracts', () => {
       expect([a.class, a.size, b.class, b.size]).toEqual([c0, s0, c1, s1])
       expect(b.surface).toBe(surface)
     }
+  })
+
+  it('places the same moons (SystemVectors.t.sol, test_printMoonVectors)', () => {
+    const expected = [
+      [1, 129, 4],
+      [7, 128, 32],
+      [400, 0, 0],
+      [12345, 33, 8]
+    ]
+    for (const [cell, a, b] of expected) {
+      expect([moonSlots(DEMO_SEED, cell, 0), moonSlots(DEMO_SEED, cell, 1)]).toEqual([a, b])
+    }
+  })
+
+  it("draws Sol's moons where Demo 3 had them", () => {
+    expect(looks(DEMO_SEED, 0, 2).moons.map((m) => m.name)).toEqual(['Luna'])
+    expect(looks(DEMO_SEED, 0, 5)).toMatchObject({ rings: 10, stationSize: 10 })
+    expect(looks(DEMO_SEED, 0, 5).moons).toHaveLength(6)
+    const elsewhere = looks(DEMO_SEED, 12345, 0)
+    expect(elsewhere.moons.map((m) => m.orbit)).toEqual([0, 5])
   })
 
   it('keeps Sol as it was', () => {

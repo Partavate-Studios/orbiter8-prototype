@@ -18,4 +18,12 @@ contract SystemVectors is Test {
             console.logBytes32(surface);
         }
     }
+
+    function test_printMoonVectors() public pure {
+        bytes32 seed = keccak256("orbiter8 demo 4");
+        uint256[4] memory cells = [uint256(1), 7, 400, 12345];
+        for (uint256 i = 0; i < 4; i++) {
+            console.log(cells[i], SystemGen.moonSlots(seed, cells[i], 0), SystemGen.moonSlots(seed, cells[i], 1));
+        }
+    }
 }

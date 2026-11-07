@@ -347,6 +347,17 @@ contract NamesAndShipsTest is GameFixture {
         assertEq(credits.balanceOf(ada), 1_000 - pilots.SHIP_NAME_FEE());
     }
 
+    function test_pilotsBroadcastToTheGalaxy() public {
+        vm.expectEmit(address(pilots));
+        emit Pilots.Broadcast(ada, "Hello from Sol");
+        vm.prank(ada);
+        pilots.broadcast("Hello from Sol");
+
+        vm.prank(bo); // not registered
+        vm.expectRevert(Pilots.NotRegistered.selector);
+        pilots.broadcast("Hi");
+    }
+
     function test_shipsCannotChangeHands() public {
         vm.prank(ada);
         vm.expectRevert(Ships.ShipsAreBound.selector);

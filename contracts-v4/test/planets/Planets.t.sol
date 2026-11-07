@@ -261,6 +261,45 @@ contract PlanetsTest is PlanetsFixture {
         deeds.transferFrom(ada, bo, home);
     }
 
+    function test_ownersNameTheirPlanetStationAndMoons() public {
+        _go(ada, star);
+        _claim(ada, home);
+        uint8 slots = SystemGen.moonSlots(keccak256("test universe"), star, 0);
+        uint8 moon = planets.NAME_MOON(); // (read first: a call after expectRevert would take it)
+        vm.startPrank(ada);
+        planets.rename(home, planets.NAME_PLANET(), "Haven");
+        planets.rename(home, planets.NAME_STATION(), "Haven Dock");
+        for (uint8 orbit = 0; orbit < 8; orbit++) {
+            if ((slots >> orbit) & 1 == 1) {
+                planets.rename(home, moon + orbit, "Little One");
+                assertEq(planets.namesOf(home)[2 + orbit], "Little One");
+            } else {
+                vm.expectRevert(abi.encodeWithSelector(Planets.NoSuchMoon.selector, home, orbit));
+                planets.rename(home, moon + orbit, "Nothing");
+            }
+        }
+        vm.expectRevert(Planets.BadName.selector);
+        planets.rename(home, 0, "");
+        vm.stopPrank();
+        assertEq(planets.namesOf(home)[0], "Haven");
+        assertEq(planets.namesOf(home)[1], "Haven Dock");
+
+        vm.prank(bo);
+        pilots.register("Bodo", "Raider");
+        vm.prank(bo);
+        vm.expectRevert(abi.encodeWithSelector(Planets.NotYours.selector, home));
+        planets.rename(home, 0, "Mine Now");
+        vm.prank(ada);
+        vm.expectRevert(abi.encodeWithSelector(Planets.FederationPlanet.selector, EARTH));
+        planets.rename(EARTH, 0, "Ada's Earth");
+    }
+
+    function test_solHasItsMoons() public pure {
+        bytes32 seed = keccak256("orbiter8 demo 4");
+        assertEq(SystemGen.moonSlots(seed, 0, 2), 0x02, "Luna");
+        assertEq(SystemGen.moonSlots(seed, 0, 5), 0x3f, "Saturn's six");
+    }
+
     function test_planetsMatchTheClientVectors() public view {
         // Printed for orbiter-client sdk/v4/system.test.js.
         bytes32 seed = keccak256("test universe");

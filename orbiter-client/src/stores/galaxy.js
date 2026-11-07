@@ -111,7 +111,10 @@ export const useGalaxyStore = defineStore('Galaxy', {
           return
         }
         const wallets = await discoverWallets()
-        const wallet = preferredWallet(wallets) ?? wallets[0]
+        // Dev builds' own wallet (src/dev/dev-wallet.js) wins over MetaMask and the like: it's the one
+        // with the local chain's test accounts.
+        const devWallet = wallets.find((w) => w.info.rdns === 'com.orbiter8.devwallet')
+        const wallet = devWallet ?? preferredWallet(wallets) ?? wallets[0]
         if (!wallet) throw new Error('No wallet found')
         const session = await connectWallet(wallet)
         game = markRaw(createGame(session.signer, where.contracts))

@@ -71,8 +71,8 @@ writeFileSync(
   JSON.stringify({ chainId, rpc: RPC, contracts: addresses }, null, 2) + '\n'
 )
 
-console.log('\nOpen http://localhost:8080/#/galaxy (add ?account=2, ?account=3 … to play as other pilots).\n')
-spawn('npx', ['vite'], { stdio: 'inherit', env: { ...env, VITE_DEV_WALLET: '1' } }).on('exit', () => {
+console.log('\nOpen http://localhost:8080/ (it goes straight to the galaxy; add ?account=2, ?account=3 … to play as other pilots).\n')
+spawn('npx', ['vite'], { stdio: 'inherit', env: { ...env, VITE_DEV_WALLET: '1', VITE_DEMO4: '1' } }).on('exit', () => {
   stopAll()
   process.exit(0)
 })
