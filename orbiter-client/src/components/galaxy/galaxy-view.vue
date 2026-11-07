@@ -30,7 +30,8 @@
       <span class="title">Orbiter 8 · Demo 4</span>
       <span v-if="galaxy.pilot">
         <b>{{ galaxy.pilot.callsign }}</b> aboard <b>{{ galaxy.pilot.ship.name }}</b> · range
-        {{ galaxy.pilot.ship.range }} · bays {{ galaxy.pilot.ship.cargo }}/{{ galaxy.pilot.ship.bays }} ·
+        {{ galaxy.pilot.ship.range }} · bays {{ galaxy.pilot.ship.bays - galaxy.freeBays }}/{{ galaxy.pilot.ship.bays }}
+        <template v-if="galaxy.pilot.ship.colonists">({{ galaxy.pilot.ship.colonists }} people)</template> ·
         <b class="credits">{{ galaxy.credits.toLocaleString() }} cr</b>
       </span>
       <span v-if="galaxy.pilot" class="session">
@@ -68,12 +69,21 @@
     </form>
 
     <star-card v-if="galaxy.selected !== null && galaxy.status === 'ready'" :cell="galaxy.selected" />
-    <docks-panel v-if="docksOpen && galaxy.ports.length && galaxy.pilot" @close="docksOpen = false" />
+    <docks-panel v-if="open === 'docks' && galaxy.ports.length && galaxy.pilot" @close="open = null" />
+    <planets-panel
+      v-if="open === 'planets' && galaxy.planets.length && galaxy.pilot"
+      @close="open = null"
+      @tech-tree="techTree = true"
+    />
+    <tech-tree v-if="techTree" @close="techTree = false" />
 
     <footer class="controls">
       <button class="o8-button small" @click="centerOnShip">My ship</button>
-      <button v-if="galaxy.pilot && galaxy.ports.length" class="o8-button small" @click="toggleDocks">
+      <button v-if="galaxy.pilot && galaxy.ports.length" class="o8-button small" @click="toggle('docks')">
         Docks ({{ galaxy.ports.length }})
+      </button>
+      <button v-if="galaxy.pilot && galaxy.planets.length" class="o8-button small" @click="toggle('planets')">
+        Planets ({{ galaxy.planets.length }})
       </button>
       <button class="o8-button small" @click="showNames = !showNames">{{ showNames ? 'Hide' : 'Show' }} names</button>
     </footer>
@@ -87,6 +97,8 @@ import { starTraits, anomalyName } from '@/sdk/v4/traits'
 import FleetShip from '@/components/assets/fleet-ship.svg'
 import StarCard from './star-card.vue'
 import DocksPanel from './docks-panel.vue'
+import PlanetsPanel from './planets-panel.vue'
+import TechTree from './tech-tree.vue'
 
 // Pixels between neighboring stars at zoom 1, and the isometric squash (the prototype's look).
 const SPACING = 64
@@ -94,7 +106,7 @@ const FLAT = 0.7
 
 export default {
   name: 'GalaxyView',
-  components: { FleetShip, StarCard, DocksPanel },
+  components: { FleetShip, StarCard, DocksPanel, PlanetsPanel, TechTree },
   data() {
     return {
       galaxy: useGalaxyStore(),
@@ -105,7 +117,9 @@ export default {
       showNames: true,
       callsign: '',
       shipName: '',
-      docksOpen: false,
+      /** the side panel showing: 'docks' | 'planets' | null */
+      open: null,
+      techTree: false,
       now: Date.now()
     }
   },
@@ -155,7 +169,11 @@ export default {
         resolve: 'Recording scans…',
         trade: 'Trading…',
         yard: 'At the yard…',
-        session: 'Waiting for the wallet…'
+        session: 'Waiting for the wallet…',
+        claim: 'Claiming…',
+        people: 'Moving people…',
+        cargo: 'Moving cargo…',
+        build: 'Ordering…'
       }[this.galaxy.busy]
     },
     sessionLeft() {
@@ -198,16 +216,16 @@ export default {
       this.camera.x = x
       this.camera.y = y
     },
-    toggleDocks() {
-      this.docksOpen = !this.docksOpen
-      // On a phone held upright the docks take the bottom of the screen, where the star card sits.
-      if (this.docksOpen && this.width <= 600) this.galaxy.select(null)
+    toggle(panel) {
+      this.open = this.open === panel ? null : panel
+      // On a phone held upright the panels take the bottom of the screen, where the star card sits.
+      if (this.open && this.width <= 600) this.galaxy.select(null)
     },
     async register() {
       await this.galaxy.register(this.callsign.trim(), this.shipName.trim())
     },
     onDown(event) {
-      if (event.target.closest('.panel, .controls, .star-card, .docks, .hud')) return
+      if (event.target.closest('.panel, .controls, .star-card, .docks, .planets, .backdrop, .hud')) return
       this.drag = { x: event.clientX, y: event.clientY, cx: this.camera.x, cy: this.camera.y, moved: false }
     },
     onMove(event) {
@@ -226,7 +244,7 @@ export default {
       else this.galaxy.select(null)
     },
     onWheel(event) {
-      if (event.target.closest('.docks, .star-card')) return // let panels scroll
+      if (event.target.closest('.docks, .planets, .backdrop, .star-card')) return // let panels scroll
       event.preventDefault()
       const factor = event.deltaY > 0 ? 1 / 1.15 : 1.15
       this.camera.zoom = Math.min(3, Math.max(0.15, this.camera.zoom * factor))

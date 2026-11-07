@@ -5,6 +5,8 @@ import GalaxyAbi from './abi/Galaxy.json'
 import PilotsAbi from './abi/Pilots.json'
 import MarketAbi from './abi/Market.json'
 import CreditsAbi from './abi/Credits.json'
+import PlanetsAbi from './abi/Planets.json'
+import FactoryAbi from './abi/Factory.json'
 import { fetchRound } from './drand'
 
 export const STATE = { UNDECIDED: 0, EMPTY: 1, STAR: 2, BLACK_HOLE: 3 }
@@ -41,6 +43,31 @@ function toPort(p) {
   }
 }
 
+/** A planet from `Planets.system` / `planetView`, as plain data. */
+function toPlanet(p) {
+  return {
+    id: Number(p.id),
+    body: Number(p.id) % 256,
+    class: Number(p.class),
+    size: Number(p.size),
+    cap: Number(p.cap),
+    owner: p.owner === ZERO ? null : p.owner.toLowerCase(),
+    level: Number(p.level),
+    autofactory: p.autofactory,
+    building: Number(p.building),
+    readyAt: Number(p.readyAt),
+    population: Number(p.population),
+    stock: p.stock.map(Number)
+  }
+}
+
+const toCost = (c) => ({
+  credits: Number(c.credits),
+  time: Number(c.time),
+  people: Number(c.people),
+  goods: c.amounts.map((a, i) => [Number(c.goods[i]), Number(a)]).filter(([, a]) => a > 0)
+})
+
 /**
  * @param {import('ethers').ContractRunner} runner
  * @param {{ galaxy: string, pilots: string, market: string, credits: string }} addresses
@@ -50,6 +77,8 @@ export function createGame(runner, addresses) {
   const pilots = new Contract(addresses.pilots, PilotsAbi, runner)
   const market = new Contract(addresses.market, MarketAbi, runner)
   const credits = new Contract(addresses.credits, CreditsAbi, runner)
+  const planets = new Contract(addresses.planets, PlanetsAbi, runner)
+  const factory = new Contract(addresses.factory, FactoryAbi, runner)
 
   const game = {
     galaxy,
@@ -73,7 +102,8 @@ export function createGame(runner, addresses) {
           cell: Number(p.ship.cell),
           range: Number(p.ship.range),
           bays: Number(p.ship.bays),
-          cargo: Number(p.ship.cargo)
+          cargo: Number(p.ship.cargo),
+          colonists: Number(p.ship.colonists)
         },
         session: p.sessionKey === ZERO ? null : { key: p.sessionKey.toLowerCase(), expiry: Number(p.sessionExpiry) }
       }
@@ -104,6 +134,45 @@ export function createGame(runner, addresses) {
           rangePrices: tuning.rangePrices.map(Number)
         },
         capacity: Number(capacity)
+      }
+    },
+
+    /** Every planet at a star, as it stands now, with `goods` stock entries. */
+    async system(cell, goods) {
+      return (await planets.system(cell, goods)).map(toPlanet)
+    },
+
+    /** What planets cost: buildings 1–7, the claim fee and the colonist price; the Autofactory's parts. */
+    async planetRules() {
+      const [tuning, parts, ...costs] = await Promise.all([
+        planets.tuning(),
+        factory.parts(),
+        ...[1, 2, 3, 4, 5, 6, 7].map((b) => planets.costOf(b))
+      ])
+      return {
+        claimFee: Number(tuning.claimFee),
+        colonistPrice: Number(tuning.colonistPrice),
+        growthTime: Number(tuning.growthTime),
+        producePerHour: Number(tuning.producePerHour),
+        storageCap: Number(tuning.storageCap),
+        colonyShare: Number(tuning.colonyShare),
+        buildings: [null, ...costs.map(toCost)],
+        parts: parts.map((p) => ({
+          name: p.name,
+          credits: Number(p.credits),
+          time: Number(p.time),
+          planetOnly: p.planetOnly,
+          goods: p.amounts.map((a, i) => [Number(p.goods[i]), Number(a)]).filter(([, a]) => a > 0)
+        }))
+      }
+    },
+
+    /** A planet's Autofactory: orders still building, and finished parts by id. */
+    async factoryAt(planet) {
+      const [queue, stored] = await Promise.all([factory.queueOf(planet), factory.storedAt(planet)])
+      return {
+        queue: queue.map((o) => ({ part: Number(o.part), count: Number(o.count), readyAt: Number(o.readyAt) })),
+        stored: stored.map(Number)
       }
     },
 
@@ -176,6 +245,30 @@ export function createGame(runner, addresses) {
     },
     async endSession() {
       return (await pilots.endSession()).wait()
+    },
+    async claim(planet) {
+      return (await planets.claim(planet)).wait()
+    },
+    async recruit(count) {
+      return (await planets.recruit(count)).wait()
+    },
+    async land(planet, count) {
+      return (await planets.land(planet, count)).wait()
+    },
+    async board(planet, count) {
+      return (await planets.board(planet, count)).wait()
+    },
+    async deliver(planet, good, units) {
+      return (await planets.deliver(planet, good, units)).wait()
+    },
+    async collect(planet, good, units) {
+      return (await planets.collect(planet, good, units)).wait()
+    },
+    async build(planet, building) {
+      return (await planets.build(planet, building)).wait()
+    },
+    async order(planet, part, count) {
+      return (await factory.order(planet, part, count)).wait()
     }
   }
   return game

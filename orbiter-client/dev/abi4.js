@@ -8,7 +8,9 @@ const CONTRACTS = {
   Galaxy: 'Galaxy.sol/Galaxy.json',
   Pilots: 'Pilots.sol/Pilots.json',
   Market: 'Market.sol/Market.json',
-  Credits: 'Credits.sol/Credits.json'
+  Credits: 'Credits.sol/Credits.json',
+  Planets: 'Planets.sol/Planets.json',
+  Factory: 'Factory.sol/Factory.json'
 }
 
 mkdirSync(DEST, { recursive: true })

@@ -14,6 +14,19 @@
   },
   {
     "type": "function",
+    "name": "COLONISTS_PER_BAY",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "DEFAULT_ADMIN_ROLE",
     "inputs": [],
     "outputs": [
@@ -234,6 +247,24 @@
       },
       {
         "name": "units",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "addColonists",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "count",
         "type": "uint256",
         "internalType": "uint256"
       }
@@ -522,6 +553,11 @@
                 "name": "cargo",
                 "type": "uint16",
                 "internalType": "uint16"
+              },
+              {
+                "name": "colonists",
+                "type": "uint32",
+                "internalType": "uint32"
               }
             ]
           },
@@ -587,6 +623,24 @@
       },
       {
         "name": "units",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "removeColonists",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "count",
         "type": "uint256",
         "internalType": "uint256"
       }
@@ -761,6 +815,11 @@
             "name": "cargo",
             "type": "uint16",
             "internalType": "uint16"
+          },
+          {
+            "name": "colonists",
+            "type": "uint32",
+            "internalType": "uint32"
           }
         ]
       }
@@ -916,6 +975,25 @@
       },
       {
         "name": "units",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "ColonistsChanged",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "colonists",
         "type": "uint256",
         "indexed": false,
         "internalType": "uint256"
@@ -1326,6 +1404,17 @@
         "type": "uint256",
         "internalType": "uint256"
       },
+      {
+        "name": "have",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "NotEnoughColonists",
+    "inputs": [
       {
         "name": "have",
         "type": "uint256",

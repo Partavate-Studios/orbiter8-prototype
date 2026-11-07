@@ -300,9 +300,9 @@ impossible or needs a design call goes back to Koda; everything else is decided 
 - [x] The simulator's first version, with the economy tuned to D29's targets (for Koda's approval). *[`demo4-tuning.md`](demo4-tuning.md).*
 
 **Milestone 3: planets**
-- [ ] `Planets`: claims with the discoverer's window, the tech tree, populations (D57), production, the Autofactory queue and planet storage (D58), moving drones and weapons between ship and planet (D55, D56).
-- [ ] The client's planet screens, building, the Autofactory queue, and the **tech tree reference screen** (D60).
-- [ ] Tuning of building costs and times.
+- [x] `Planets`: claims with the discoverer's window, the tech tree, populations (D57), production, the Autofactory queue and planet storage (D58), moving drones and weapons between ship and planet (D55, D56). *Moving parts comes with ship mounts in milestone 4.*
+- [x] The client's planet screens, building, the Autofactory queue, and the **tech tree reference screen** (D60).
+- [ ] Tuning of building costs and times. *Starting values in place (B29); simulated with battle.*
 
 **Milestone 4: battle**
 - [ ] Weapons, armor, shields, repair bots and platforms as parts and buildings.
@@ -358,4 +358,10 @@ when you're done, let me know about any of those decisions I should review").
 | B23 | Milestone 2 | **The client sends each trade line with a 2% price limit** around the price it showed. **A session lasts 4 hours** and is sent 0.2 of the network's coin for gas (local chain; real amounts set per network in milestone 6). Its key is kept in the browser's storage. | Room for another pilot's trade landing first, without filling at a surprise price. |
 | B24 | Milestone 2 | **Measured by the trading bot (60 moves through a session key, local chain):** a trade (selling and buying) costs about 180,000 gas, against 118,000 in Demo 3. Bays cost 96,000; registering plus the ship 290,000 (Demo 3: 480,000); starting a session 114,000; ending one 33,000. | Trades cost more for the calls between modules: the session-key lookup, cargo and credits, and the events. A later saving: Market could hold cargo itself. |
 | B25 | Milestone 2 | **The docks panel is new, plain UI** on the galaxy map, not the Demo 3 trade menus. | The old menus are bound to Demo 3's contracts. Milestone 5's graphics and polish pass is the place to bring their look over. |
+| B26 | Milestone 3 | **Planets are derived:** 2 to 8 per star, class 0–9 at even odds, size 1–16 (gas giants 16–63). **People per unit of size by class** (Terrestrial 1,000, Oceanic 800, Swamp 600, Rocky and Desert 300, Ice and Ferrous 200, the rest 100). A planet's name is its star's plus a letter (b, c, …). | The plan said "derived" without the numbers. |
+| B27 | Milestone 3 | **Claiming costs 2,000 credits,** more than a new pilot's 1,000, so a claim comes after some trading. **Colonists cost 10 credits each** at Earth. | A claim should be a first goal, not a reflex. |
+| B28 | Milestone 3 | **Growth:** the gap to the cap shrinks by about 63% every 8 hours, starting when the Citadel is finished. **Production:** 20 units an hour of each good the class sells, scaled by people over the cap, up to 5,000 stored. **A Colony needs 90% of the cap** (D57's "held its cap for a while"). | Simple to work out lazily, and a Colony comes about a day after founding. |
+| B29 | Milestone 3 | **Building costs and part costs are starting values,** not yet simulated (in the tech tree, `docs/demo4-plan.md` section 5's line). Buildings can be ordered from anywhere; their goods must already be in the planet's storage. One building at a time per planet. | The simulator covers trade; extending it to planets fits best after battle, when parts have a use. |
+| B30 | Milestone 3 | **Planet NFTs (`Deeds`) can't be traded by players;** the game moves them when a siege's claim succeeds. A seized planet's port and yard follow the level it keeps. | As with ships (B15): one owner path while sieges are new. |
+| B31 | Milestone 3 | **The planets panel and tech tree are plain UI** on the galaxy map, like the docks (B25). | Milestone 5 brings over the old look. |
 

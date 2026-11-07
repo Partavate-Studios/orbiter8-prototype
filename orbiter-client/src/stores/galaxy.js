@@ -49,11 +49,21 @@ export const useGalaxyStore = defineStore('Galaxy', {
     /** the ports at the ship's star */
     ports: [],
     /** the live session key, or null: { key, expiry } */
-    session: null
+    session: null,
+    /** the planets at the ship's star (see sdk/v4/game.js toPlanet) */
+    planets: [],
+    /** building costs, the claim fee, colonist price and the Autofactory's parts (planetRules) */
+    rules: null,
+    /** planet id → its Autofactory's queue and finished parts */
+    factories: {}
   }),
   getters: {
     shipCell: (state) => (state.pilot ? state.pilot.ship.cell : null),
-    freeBays: (state) => (state.pilot ? state.pilot.ship.bays - state.pilot.ship.cargo : 0),
+    freeBays: (state) => {
+      if (!state.pilot) return 0
+      const { bays, cargo, colonists } = state.pilot.ship
+      return bays - cargo - Math.ceil(colonists / 100)
+    },
     sessionLive: (state) => Boolean(state.session && state.session.expiry * 1000 > Date.now() + 60_000),
     cellAt: (state) => (n) => state.cells.get(n) ?? null,
     /** Can the ship jump to `n` now? */
@@ -82,6 +92,7 @@ export const useGalaxyStore = defineStore('Galaxy', {
         this.account = session.account.toLowerCase()
         this.universe = await game.universe()
         this.economy = await game.economy()
+        this.rules = await game.planetRules()
         await this.refreshPilot()
         this.resumeSession()
         await this.loadAround(this.pilot ? this.pilot.ship.cell : 0, true)
@@ -96,13 +107,18 @@ export const useGalaxyStore = defineStore('Galaxy', {
     async refreshPilot() {
       this.pilot = (await game.pilot(this.account)) ?? false
       if (!this.pilot) return
-      const [credits, cargo, ports, economy] = await Promise.all([
+      const cell = this.pilot.ship.cell
+      const goods = this.economy.goods.length
+      const [credits, cargo, ports, economy, planets] = await Promise.all([
         game.balance(this.account),
-        game.cargo(this.account, this.economy.goods.length),
-        game.portsAt(this.pilot.ship.cell),
-        game.economy()
+        game.cargo(this.account, goods),
+        game.portsAt(cell),
+        game.economy(),
+        game.system(cell, goods)
       ])
-      Object.assign(this, { credits, cargo, ports, economy })
+      Object.assign(this, { credits, cargo, ports, economy, planets })
+      const mine = planets.filter((p) => p.owner === this.account && (p.autofactory || p.building === 7))
+      for (const p of mine) this.factories[p.id] = await game.factoryAt(p.id)
     },
     /** Picks up a session key this browser started earlier, if it's still the pilot's live one. */
     resumeSession() {
@@ -243,6 +259,51 @@ export const useGalaxyStore = defineStore('Galaxy', {
     },
     buyRange(port) {
       return this.move('yard', (proofs, by) => by.buyRange(port.port, this.rangeQuote()))
+    },
+
+    // ── planets (milestone 3) ─────────────────────────────────────────────────────────────────
+
+    claim(planet) {
+      return this.move('claim', (proofs, by) => by.claim(planet))
+    },
+    recruit(count) {
+      return this.move('people', (proofs, by) => by.recruit(count))
+    },
+    land(planet, count) {
+      return this.move('people', (proofs, by) => by.land(planet, count))
+    },
+    board(planet, count) {
+      return this.move('people', (proofs, by) => by.board(planet, count))
+    },
+    deliver(planet, good, units) {
+      return this.move('cargo', (proofs, by) => by.deliver(planet, good, units))
+    },
+    collect(planet, good, units) {
+      return this.move('cargo', (proofs, by) => by.collect(planet, good, units))
+    },
+    build(planet, building) {
+      return this.move('build', (proofs, by) => by.build(planet, building))
+    },
+    order(planet, part, count) {
+      return this.move('build', (proofs, by) => by.order(planet, part, count))
+    },
+    /** What stands between a planet and a building: [] when it can be started now. */
+    missingFor(planet, building) {
+      const cost = this.rules.buildings[building]
+      const missing = []
+      if (planet.building) missing.push('another building under way')
+      if (building <= 6 && building !== planet.level + 1)
+        missing.push(`a ${['', 'Citadel', 'Colony', 'Station', 'Port', 'Yards'][building - 1]} first`)
+      if (building === 7 && (planet.level < 2 || planet.autofactory))
+        missing.push(planet.autofactory ? 'already built' : 'a Colony first')
+      const people = building === 2 ? Math.ceil((planet.cap * cost.people) / 100) : cost.people
+      if (planet.population < people) missing.push(`${people.toLocaleString()} people`)
+      for (const [good, amount] of cost.goods) {
+        if ((planet.stock[good] ?? 0) < amount)
+          missing.push(`${amount} ${this.economy.goods[good].name.toLowerCase()} in storage`)
+      }
+      if (this.credits < cost.credits) missing.push(`${cost.credits.toLocaleString()} credits`)
+      return missing
     },
 
     // ── session keys (D41) ────────────────────────────────────────────────────────────────────

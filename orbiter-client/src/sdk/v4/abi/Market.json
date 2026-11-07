@@ -357,14 +357,19 @@
         "internalType": "uint8"
       },
       {
-        "name": "yard",
-        "type": "bool",
-        "internalType": "bool"
-      },
-      {
         "name": "owner",
         "type": "address",
         "internalType": "address"
+      },
+      {
+        "name": "opensAt",
+        "type": "uint40",
+        "internalType": "uint40"
+      },
+      {
+        "name": "yardAt",
+        "type": "uint40",
+        "internalType": "uint40"
       }
     ],
     "outputs": [],
@@ -857,16 +862,22 @@
         "internalType": "uint8"
       },
       {
-        "name": "yard",
-        "type": "bool",
-        "indexed": false,
-        "internalType": "bool"
-      },
-      {
         "name": "owner",
         "type": "address",
         "indexed": false,
         "internalType": "address"
+      },
+      {
+        "name": "opensAt",
+        "type": "uint40",
+        "indexed": false,
+        "internalType": "uint40"
+      },
+      {
+        "name": "yardAt",
+        "type": "uint40",
+        "indexed": false,
+        "internalType": "uint40"
       }
     ],
     "anonymous": false
