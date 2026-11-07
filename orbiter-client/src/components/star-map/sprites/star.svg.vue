@@ -1,5 +1,5 @@
 <template>
-  <!-- Demo 4's black holes (D17): a dark disk, its accretion ring, and a faint glow -->
+  <!-- Black holes (D17): a dark disk, its accretion ring, and a faint glow -->
   <g v-if="blackHole">
     <circle cx="0" cy="0" r="150" fill="none" stroke="#c3b3da" stroke-width="6" stroke-opacity="0.8" />
     <circle cx="0" cy="0" r="175" fill="none" stroke="#c3b3da" stroke-width="2" stroke-opacity="0.35" />
@@ -29,7 +29,7 @@ import { useConfigStore } from '@/stores/config'
 export default {
   name: 'Star',
   props: {
-    /** Demo 4: draw a black hole instead of a star. */
+    /** Draw a black hole instead of a star. */
     blackHole: { type: Boolean, default: false }
   },
   computed: {

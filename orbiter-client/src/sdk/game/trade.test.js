@@ -7,15 +7,13 @@ import {
   isValidTrade,
   maxTradable,
   clampTradeAmount,
-  maxHoldsToBuy,
   canAfford,
-  cargoLines,
-  MAX_CARGO_HOLDS
+  cargoLines
 } from './trade'
-import { buyCost, sellProceeds, fee } from '@/sdk/v4/market'
+import { buyCost, sellProceeds, fee } from '@/sdk/market'
 
 const ship = { holds: 10, usedHolds: 6, cargo: [2, 1, 3] }
-// Demo 3's flat prices
+// flat prices, to keep the arithmetic plain
 const goods = [
   { id: 0, name: 'Equipment', mode: 'sells', stock: 10, price: 50, curve: null },
   { id: 1, name: 'Fuel Ore', mode: 'sells', stock: 1, price: 20, curve: null },
@@ -27,13 +25,7 @@ describe('cargo', () => {
     expect(emptyHolds(ship)).toBe(4)
   })
 
-  it("lists Demo 3's three goods always, and Demo 4's only when aboard", () => {
-    expect(cargoLines(ship, ['Equipment', 'Fuel Ore', 'Organics'])).toEqual([
-      { name: 'Equipment', units: 2 },
-      { name: 'Fuel Ore', units: 1 },
-      { name: 'Organics', units: 3 }
-    ])
-    const names = ['Water ice', 'Metals', 'Rare elements', 'Helium-3', 'Organics', 'Silicon', 'Equipment', 'Electronics']
+  it('lists the goods aboard', () => {    const names = ['Water ice', 'Metals', 'Rare elements', 'Helium-3', 'Organics', 'Silicon', 'Equipment', 'Electronics']
     expect(cargoLines({ holds: 5, usedHolds: 4, cargo: [0, 0, 0, 0, 4, 0, 0, 0] }, names)).toEqual([
       { name: 'Organics', units: 4 }
     ])
@@ -50,7 +42,7 @@ describe('trading', () => {
     expect(emptyHoldsAfterTrade(ship, sell)).toBe(7)
   })
 
-  it("prices Demo 4's goods by the unit, fee included", () => {
+  it('prices goods by the unit, fee included', () => {
     const curve = { base: 100, spread: 30, capacity: 300, shortfall: 40, feeBps: 200 }
     const good = { id: 4, mode: 'sells', stock: 260, price: 0, curve }
     const cost = buyCost(100, 30, 300, 40, 5)
@@ -91,9 +83,4 @@ describe('shipyard', () => {
     expect(canAfford(99, 100)).toBe(false)
   })
 
-  it('limits holds to the contract maximum and to what the player can pay', () => {
-    expect(maxHoldsToBuy(1000, 10, 100)).toBe(10)
-    expect(maxHoldsToBuy(1e9, MAX_CARGO_HOLDS - 5, 1)).toBe(5)
-    expect(maxHoldsToBuy(150, 10, 100)).toBe(1)
-  })
 })

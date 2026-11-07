@@ -44,7 +44,7 @@
           <text text-anchor="end" transform="translate(70 11)">Credits:</text>
           <text text-anchor="start" transform="translate(75 11)" fill="#ffffff">{{ avatar.credits }}&cent;</text>
 
-          <!-- Three goods and the empty holds, two by two (Demo 3's three always; Demo 4's aboard) -->
+          <!-- Up to three goods aboard and the empty holds, two by two -->
           <g font-size="0.9em">
             <g v-for="(slot, index) in cargoSlots" :key="index" :transform="cargoSlotAt(index)">
               <text text-anchor="end" fill="#ffffff">{{ slot.units }}</text>
@@ -78,17 +78,17 @@
         </a>
       </g>
 
-      <!-- Demo 4: the siege feed, ringed in pink while a siege is running -->
-      <g v-if="demo4.active" :transform="corner(leftMostX, 50, bottomMostY, -350)">
+      <!-- The siege feed, ringed in pink while a siege is running -->
+      <g :transform="corner(leftMostX, 50, bottomMostY, -350)">
         <a cursor="pointer" @click.prevent="openMenu('feed')">
           <title>Siege feed</title>
-          <circle v-if="demo4.besiegedCells.size" r="27" fill="none" :stroke="PINK_LIGHT" stroke-width="2" />
+          <circle v-if="player.besiegedCells.size" r="27" fill="none" :stroke="PINK_LIGHT" stroke-width="2" />
           <sieges-icon />
         </a>
       </g>
-      <!-- Demo 4: the session key's time left (yellow: yours) -->
+      <!-- The session key's time left (yellow: yours) -->
       <text
-        v-if="demo4.active && sessionLeft"
+        v-if="sessionLeft"
         :transform="corner(leftMostX, 105, topMostY, 125)"
         font-size="0.8em"
         :fill="YELLOW_LIGHT"
@@ -196,7 +196,6 @@
       <g v-if="menuState.leaderboardMenu">
         <leaderboard-menu />
       </g>
-      <!-- Demo 4's -->
       <g v-if="menuState.colonyMenu">
         <colony-menu :object-id="selected" />
       </g>
@@ -236,7 +235,7 @@ import SiegeMenu from './menus/siege-menu.svg'
 import FeedMenu from './menus/feed-menu.svg'
 import SiegesIcon from './icons/sieges-icon.svg'
 import { PINK_LIGHT, YELLOW_LIGHT } from '@/libs/palette'
-import { useDemo4Store } from '@/stores/demo4'
+import { usePlayerStore } from '@/stores/player'
 // import SpriteInfo from './scope/sprite-info-box.svg'
 // import SpriteMenu from './scope/sprite-menu.svg'
 //Icons
@@ -310,12 +309,12 @@ export default {
     ]),
     ...mapState(useStarMapStore, ['myShipId', 'spriteIds', 'mapDataLoaded']),
     ...mapState(useGameStateStore, ['avatar', 'events', 'goods']),
-    demo4() {
-      return useDemo4Store()
+    player() {
+      return usePlayerStore()
     },
     /** The session key's time left, or null when there's no live session. */
     sessionLeft() {
-      const d = this.demo4
+      const d = this.player
       if (!d.sessionLive) return null
       const seconds = Math.max(0, d.session.expiry - d.now / 1000)
       const h = Math.floor(seconds / 3600)
@@ -326,7 +325,7 @@ export default {
     YELLOW_LIGHT: () => YELLOW_LIGHT,
     /** Up to three goods aboard, then the empty holds; more than three goods aboard share the third slot. */
     cargoSlots() {
-      // The left column is wide, the right narrow (Demo 3: Equipment | Fuel, Organics | Empty).
+      // The left column is wide, the right narrow.
       const lines = cargoLines(this.avatar.ship, this.goods).map((line, index) => ({
         ...line,
         name: shortGoodName(line.name, index % 2 === 0)
@@ -361,11 +360,11 @@ export default {
     }
   },
   mounted() {
-    // Demo 4's timers (sessions, buildings, sieges) count down by this clock.
-    this.demo4Clock = setInterval(() => useDemo4Store().tick(), 15_000)
+    // Timers (sessions, buildings, sieges) count down by this clock.
+    this.clock = setInterval(() => usePlayerStore().tick(), 15_000)
   },
   unmounted() {
-    clearInterval(this.demo4Clock)
+    clearInterval(this.clock)
   },
   methods: {
     /** Where cargo slot `index` sits: two columns, the empty holds always last on the right. */

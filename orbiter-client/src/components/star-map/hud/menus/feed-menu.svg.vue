@@ -1,11 +1,11 @@
 <template>
-  <!-- The public siege feed (Demo 4, D44): every siege started, joined, worn down, claimed and ended,
+  <!-- The public siege feed (D44): every siege started, joined, worn down, claimed and ended,
        newest first, from the Battle contract's events. Live ones in pink: they need someone. -->
   <g>
     <menu-container>
       <g :transform="'translate(0 -400) scale(' + scale + ')'" fill="#ffffff" dominant-baseline="middle">
         <text x="0" y="5" text-anchor="middle" fill="#ffffff88" font-size="1.5em">Siege Feed</text>
-        <text v-if="!demo4.feed.length" x="0" y="50" text-anchor="middle" font-size="0.85em" fill="#ffffff88">
+        <text v-if="!player.feed.length" x="0" y="50" text-anchor="middle" font-size="0.85em" fill="#ffffff88">
           Quiet across the galaxy. No sieges yet.
         </text>
         <g v-for="(e, i) in shown" :key="i" :transform="'translate(0 ' + (45 + i * 22) + ')'" font-size="0.8em">
@@ -22,9 +22,9 @@ import { mapState } from 'pinia'
 import { game } from '@/sdk/client'
 import { useUIStore } from '@/stores/ui'
 import { useStarMapStore } from '@/stores/starmap'
-import { useDemo4Store } from '@/stores/demo4'
-import { starTraits } from '@/sdk/v4/traits'
-import { planetName } from '@/sdk/v4/system'
+import { usePlayerStore } from '@/stores/player'
+import { starTraits } from '@/sdk/traits'
+import { planetName } from '@/sdk/system-gen'
 import { PINK_LIGHT } from '@/libs/palette'
 import MenuContainer from './menu-container/_menu-container.svg'
 
@@ -32,7 +32,7 @@ export default {
   name: 'FeedMenu',
   components: { MenuContainer },
   data() {
-    return { demo4: useDemo4Store(), PINK_LIGHT }
+    return { player: usePlayerStore(), PINK_LIGHT }
   },
   computed: {
     ...mapState(useUIStore, ['viewport']),
@@ -42,7 +42,7 @@ export default {
     },
     /** As many as fit, newest first. */
     shown() {
-      return this.demo4.feed.slice(0, 20)
+      return this.player.feed.slice(0, 20)
     }
   },
   methods: {
@@ -51,13 +51,13 @@ export default {
       const here = useStarMapStore().systemObjects['planet:' + planet]
       if (here) return here.name
       const cell = Math.floor(planet / 256)
-      const state = game.demo4.state
+      const state = game.state
       const star = state.names[cell] || starTraits(state.universe.seed, cell).name
       return planetName(star, cell, planet % 256)
     },
     who(address) {
       if (!address) return 'someone'
-      return address === this.demo4.account ? 'You' : address.slice(0, 6) + '…'
+      return address === this.player.account ? 'You' : address.slice(0, 6) + '…'
     },
     words(e) {
       const where = this.place(e.planet)

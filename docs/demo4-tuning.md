@@ -62,8 +62,8 @@ A unit's margin, from a full selling port to a needy buying port, is 1.2 × its 
 # Battle (milestone 4)
 
 **For Koda's approval** (D30, D53). Played with the contracts' own rounds:
-`forge test --match-contract Scenarios -vv` in `contracts-v4/`
-([`test/battle/Scenarios.t.sol`](../contracts-v4/test/battle/Scenarios.t.sol)).
+`forge test --match-contract Scenarios -vv` in `contracts/`
+([`test/battle/Scenarios.t.sol`](../contracts/test/battle/Scenarios.t.sol)).
 
 ## The numbers
 

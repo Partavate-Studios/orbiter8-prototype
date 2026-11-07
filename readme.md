@@ -51,21 +51,20 @@ https://www.youtube.com/watch?v=cL30sFMYi6A
 
 ## Technologies Used:
 
- - Truffle Stack 5: https://github.com/trufflesuite/truffle
- - Eth-Vue Truffle Box: https://truffleframework.com/boxes/eth-vue
- - Vue.js 2: https://vuejs.org/
- - Solidity 5
- - Node.js v8 (will not compile with newer versions)
- - Metamask browser plugin: https://metamask.io/
+ - Solidity 0.8 contracts, built and tested with Foundry: https://getfoundry.sh/
+ - OpenZeppelin's upgradeable contracts (UUPS proxies)
+ - drand's public randomness beacon, for scans: https://drand.love/
+ - Vue 3, Pinia and Vite for the client, with ethers 6
+ - Any EVM wallet (MetaMask and the like); locally, a built-in dev wallet
 
 
 ## Project Setup
 
 1. Clone the git repository
   > git clone git@gitlab.com:partavate/prototype.git
-2. To setup the truffle stack stuff, from /prototype
-  > npm install
-3. To setup the client stuff, from /prototype/orbiter-client (Node 24, see `.nvmrc`)
+2. The contracts, from `contracts/` (needs Foundry; installs the libraries)
+  > ./setup.sh
+3. The client, from `orbiter-client/` (Node 24, see `.nvmrc`)
   > npm install
 
 ### Play locally (no wallet extension or testnet needed)
@@ -78,7 +77,7 @@ npm run local
 
 This starts a fresh local chain, deploys the contracts to it, and opens the dev server at http://localhost:8080 with a built-in dev wallet. Add `?account=2`, `?account=3` … to the URL to play as other pilots (account 0 deployed the contracts). Stopping it resets the chain.
 
-Other client scripts: `npm run dev` (dev server, uses your browser wallet), `npm run build`, `npm run preview`, `npm run lint`.
+Other client scripts: `npm run dev` (dev server, uses your browser wallet), `npm run build`, `npm run preview`, `npm run lint`, `npm test`, and `npm run abi` (copies the contracts' ABIs into the client after an interface change).
 
 
 ## Design Goals
@@ -92,54 +91,19 @@ Dynamically generated game board (galaxy) democratizing the cost of recording th
 
 ## Common Commands While Developing:
 
-### Truffle
+From `contracts/` (see its README):
 
 ``` bash
-# Check Contract Size
-truffle run contract-size
-
-# Start Truffle Dev Environment
-truffle develop
-
-# Optionally monitor RPC activity while the dev environment is running:
-truffle develop --log
-
-# Redeploy contracts
-migrate --reset
-
-# Get a contracts address
-AvatarControls.address
-
-# Getting the Galaxy Up and Running
-AvatarControls.deployed().then(function(instance){return instance.createAvatar('The Federation');})
-Orbiter8.deployed().then(function(instance){return instance.genesis();})
-Orbiter8.deployed().then(function(instance){return instance.makeSolarSystem();})
-
-# Run smart contract tests
-test
-
-# Verify contracts
-truffle run verify Orbiter8 AvatarControls AvatarLibrary PresetLibrary StarSystemLibrary PlanetLibrary ShipTokens PlanetTokens Credits --network arbitrumTest
-
+forge build --sizes   # build, and check each contract fits the 24 KB limit
+forge test            # the contract tests
 ```
 
-### Node Client
-
-From the orbiter-client diretory:
+From `orbiter-client/`:
 
 ``` bash
-Inpm install
-
-# Serve with hot reload at localhost:8080 (donno the difference)
-npm run serve
-
-# Build for production with minification
-npm run build
-
-# Build for production and view the bundle analyzer report
-npm run build --report
-
-# There are no client tests
+npm run local   # local chain, contracts and the game
+npm test        # the client tests
+npm run lint
 ```
 
 
@@ -153,8 +117,7 @@ https://cryptozombies.io/
 
 Running smart contracts requires some kind of Ethereum wallet. This project assumes you use the metamask wallet available as a plugin for both Firefox and Chrome Web browsers.
 
-Note: You will also need to configure Metamask to work with your local development
-environment. Truffle provides 10 private keys to accounts with 100 Ethereum to use for development and testing.
+Locally, `npm run local` gives the client a built-in dev wallet over the local chain's test accounts, so no extension is needed.
 
 --
 

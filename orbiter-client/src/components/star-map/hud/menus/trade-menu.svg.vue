@@ -206,8 +206,8 @@
           </g>
         </g>
 
-        <!-- Demo 4's ports trade more goods: what they sell (Buy) and what they buy (Sell), a page each -->
-        <g v-if="pages.length > 1" :transform="'translate(0 ' + tabsY + ')'" font-size="0.8em">
+        <!-- What the port sells (Buy) and what it buys (Sell), a page each -->
+        <g :transform="'translate(0 ' + tabsY + ')'" font-size="0.8em">
           <g
             v-for="(tab, index) in pages"
             :key="tab.key"
@@ -283,7 +283,7 @@ export default {
     return {
       /** What the player is trading: units by good id (negative sells). */
       amounts: {},
-      /** Demo 4's page: 'buy' (what the port sells) or 'sell' (what it buys). */
+      /** The page: 'buy' (what the port sells) or 'sell' (what it buys). */
       page: 'buy',
       pending: false
     }
@@ -292,16 +292,13 @@ export default {
     ...mapState(useStarMapStore, ['systemObjects']),
     ...mapState(useGameStateStore, ['avatar']),
     ...mapState(useUIStore, ['viewport']),
-    /** The station's goods (sdk/game/trade.js StationGood): Demo 3's three, or Demo 4's mix. */
+    /** The station's goods (sdk/game/trade.js StationGood). */
     stationGoods() {
       return this.systemObjects[this.objectId].goods
     },
-    /** Demo 3: one page of its three goods. Demo 4: what the port sells, and what it buys. */
+    /** What the port sells (Buy), and what it buys (Sell): a page each. */
     pages() {
       const traded = this.stationGoods.filter((good) => good.mode !== 'none')
-      if (this.stationGoods.length <= 3 && !traded.some((good) => good.curve)) {
-        return [{ key: 'all', label: 'Trade', goods: this.stationGoods }]
-      }
       return [
         { key: 'buy', label: 'Buy', goods: traded.filter((good) => good.mode === 'sells') },
         { key: 'sell', label: 'Sell', goods: traded.filter((good) => good.mode === 'buys') }
@@ -385,7 +382,7 @@ export default {
     carried(good) {
       return this.avatar.ship.cargo?.[good.id] ?? 0
     },
-    /** The widgets' sign convention (Demo 3's inventory): positive the port sells, negative it buys. */
+    /** The widgets' sign convention: positive the port sells, negative it buys. */
     signedStock(good) {
       return good.mode === 'buys' ? -good.stock : good.mode === 'sells' ? good.stock : 0
     },

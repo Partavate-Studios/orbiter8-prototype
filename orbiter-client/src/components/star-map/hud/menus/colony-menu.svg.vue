@@ -1,5 +1,5 @@
 <template>
-  <!-- A planet of the player's (Demo 4, docs/demo4-plan.md milestone 3): its people, its storage, the
+  <!-- A planet of the player's (docs/demo4-plan.md, milestone 3): its people, its storage, the
        building line and its Autofactory and defenses, in the trade menu's style. -->
   <g v-if="object && planet">
     <menu-container>
@@ -91,7 +91,7 @@
             >
           </g>
           <text x="0" y="98" text-anchor="middle" font-size="0.7em" fill="#ffffff88">
-            Holds up to {{ demo4.rules.storageCap.toLocaleString('en-US') }} of each good
+            Holds up to {{ player.rules.storageCap.toLocaleString('en-US') }} of each good
           </text>
           <g v-if="good != null" transform="translate(0 135)">
             <amount-dial v-model:value="deliver" :label="'Deliver ' + goodName(good)" :max="maxDeliver" />
@@ -154,7 +154,7 @@
             fill="#ffffffaa"
             font-size="0.9em"
           >
-            {{ o.count }} × {{ demo4.rules.parts[o.part].name }} · ready {{ readyWords(o.readyAt) }}
+            {{ o.count }} × {{ player.rules.parts[o.part].name }} · ready {{ readyWords(o.readyAt) }}
           </text>
           <g :transform="'translate(0 ' + (40 + factory.queue.length * 14) + ')'">
             <text x="0" y="0" text-anchor="middle">Finished parts</text>
@@ -196,10 +196,10 @@ import { mapState } from 'pinia'
 import { useStarMapStore } from '@/stores/starmap'
 import { useGameStateStore } from '@/stores/gamestate'
 import { useUIStore } from '@/stores/ui'
-import { useDemo4Store } from '@/stores/demo4'
+import { usePlayerStore } from '@/stores/player'
 import { useDialogStore } from '@/stores/dialog'
 import { planetTypeName } from '@/sdk/game/planet-types'
-import { BUILDING_NAMES } from '@/sdk/v4/client'
+import { BUILDING_NAMES } from '@/sdk/client'
 import { YELLOW, PINK } from '@/libs/palette'
 import MenuContainer from './menu-container/_menu-container.svg'
 import MenuButton from './menu-button.svg'
@@ -226,7 +226,7 @@ export default {
   },
   data() {
     return {
-      demo4: useDemo4Store(),
+      player: usePlayerStore(),
       page: 'people',
       land: 0,
       board: 0,
@@ -245,9 +245,9 @@ export default {
     object() {
       return this.systemObjects[this.objectId]
     },
-    /** The planet as Demo 4 has it now (sdk/v4/game.js toPlanet). */
+    /** The planet as the contracts have it now (sdk/contracts.js toPlanet). */
     planet() {
-      return this.demo4.planetById(this.object?.id) ?? this.object?.v4 ?? null
+      return this.player.planetById(this.object?.id) ?? this.object?.info ?? null
     },
     scale() {
       const width = Math.min(this.viewport.width - 100, 700)
@@ -268,13 +268,13 @@ export default {
       return BUILDING_NAMES[this.planet.level] + (this.planet.autofactory ? ' with an Autofactory' : '')
     },
     siege() {
-      return this.demo4.siegeAt(this.planet.id)
+      return this.player.siegeAt(this.planet.id)
     },
     aboard() {
-      return this.demo4.ship?.colonists ?? 0
+      return this.player.ship?.colonists ?? 0
     },
     maxBoard() {
-      return Math.min(this.planet.population, this.demo4.freeBays * 100)
+      return Math.min(this.planet.population, this.player.freeBays * 100)
     },
     storage() {
       return this.goods.map((name, good) => ({
@@ -286,12 +286,12 @@ export default {
     },
     maxDeliver() {
       if (this.good == null) return 0
-      const room = this.demo4.rules.storageCap - (this.planet.stock[this.good] ?? 0)
+      const room = this.player.rules.storageCap - (this.planet.stock[this.good] ?? 0)
       return Math.max(0, Math.min(this.avatar.ship.cargo?.[this.good] ?? 0, room))
     },
     maxCollect() {
       if (this.good == null) return 0
-      return Math.min(this.planet.stock[this.good] ?? 0, this.demo4.freeBays)
+      return Math.min(this.planet.stock[this.good] ?? 0, this.player.freeBays)
     },
     nextBuildings() {
       const p = this.planet
@@ -300,20 +300,20 @@ export default {
       if (p.level >= 2 && !p.autofactory) list.push(7)
       return list.map((building) => ({
         building,
-        cost: this.demo4.rules.buildings[building],
-        missing: this.demo4.missingFor(p, building)
+        cost: this.player.rules.buildings[building],
+        missing: this.player.missingFor(p, building)
       }))
     },
     factory() {
-      return this.demo4.factories[this.planet.id] ?? { queue: [], stored: [] }
+      return this.player.factories[this.planet.id] ?? { queue: [], stored: [] }
     },
     finished() {
       return (this.factory.stored ?? [])
-        .map((count, part) => ({ part, count, name: this.demo4.rules.parts[part].name }))
+        .map((count, part) => ({ part, count, name: this.player.rules.parts[part].name }))
         .filter((row) => row.count > 0)
     },
     defenseRows() {
-      const d = this.demo4.defenses[this.planet.id]
+      const d = this.player.defenses[this.planet.id]
       if (!d) return []
       return DEFENSES.filter(([key]) => d[key] > 0).map(([key, name]) => ({ name, count: d[key] }))
     }
@@ -328,50 +328,50 @@ export default {
       this.deliver = this.collect = 0
     },
     readyWords(at) {
-      const minutes = Math.ceil((at * 1000 - this.demo4.now) / 60_000)
+      const minutes = Math.ceil((at * 1000 - this.player.now) / 60_000)
       if (minutes <= 0) return 'now'
       return minutes < 60 ? `in ${minutes} min` : `in ${(minutes / 60).toFixed(1)} h`
     },
     costWords(cost) {
       const parts = [`${cost.credits.toLocaleString('en-US')}¢`]
       for (const [good, amount] of cost.goods) parts.push(`${amount} ${this.goods[good].toLowerCase()}`)
-      if (cost.people) parts.push(`${cost.people}${cost === this.demo4.rules.buildings[2] ? '% full' : ' people'}`)
+      if (cost.people) parts.push(`${cost.people}${cost === this.player.rules.buildings[2] ? '% full' : ' people'}`)
       const hours = cost.time / 3600
       parts.push(hours < 1 ? `${Math.round(cost.time / 60)} min` : `${hours} h`)
       return parts.join(' · ')
     },
     async doLand() {
       this.o8audio.playEffect('click')
-      if (await this.demo4.land(this.planet.id, this.land, this.object.name)) this.land = 0
+      if (await this.player.land(this.planet.id, this.land, this.object.name)) this.land = 0
     },
     async doBoard() {
       this.o8audio.playEffect('click')
-      if (await this.demo4.board(this.planet.id, this.board)) this.board = 0
+      if (await this.player.board(this.planet.id, this.board)) this.board = 0
     },
     async doDeliver() {
       this.o8audio.playEffect('click')
-      if (await this.demo4.deliver(this.planet.id, this.good, this.deliver, this.goodName(this.good))) this.deliver = 0
+      if (await this.player.deliver(this.planet.id, this.good, this.deliver, this.goodName(this.good))) this.deliver = 0
     },
     async doCollect() {
       this.o8audio.playEffect('click')
-      if (await this.demo4.collect(this.planet.id, this.good, this.collect, this.goodName(this.good))) this.collect = 0
+      if (await this.player.collect(this.planet.id, this.good, this.collect, this.goodName(this.good))) this.collect = 0
     },
     doBuild(building) {
       this.o8audio.playEffect('click')
-      this.demo4.build(this.planet.id, building, this.object.name)
+      this.player.build(this.planet.id, building, this.object.name)
     },
     doFitPlanet(row) {
       this.o8audio.playEffect('click')
-      this.demo4.fitPlanet(this.planet.id, row.part, row.count)
+      this.player.fitPlanet(this.planet.id, row.part, row.count)
     },
     doFitShip(row) {
       this.o8audio.playEffect('click')
-      this.demo4.fitShip(this.planet.id, row.part, 1)
+      this.player.fitShip(this.planet.id, row.part, 1)
     },
     async doOrder() {
       this.o8audio.playEffect('click')
       const dialog = useDialogStore()
-      const parts = this.demo4.rules.parts
+      const parts = this.player.rules.parts
       const list = parts.map((p, i) => `${i + 1} ${p.name} (${p.credits.toLocaleString('en-US')}¢)`).join(', ')
       const which = await dialog.ask({
         title: 'Order Parts',
@@ -387,7 +387,7 @@ export default {
         input: { label: 'How many', kind: 'number', min: 1, max: 99, value: '1' },
         confirm: 'Order'
       })
-      if (count) this.demo4.order(this.planet.id, part, count)
+      if (count) this.player.order(this.planet.id, part, count)
     },
     openTechTree() {
       this.o8audio.playEffect('click')

@@ -4,7 +4,7 @@
 import { useChainStore } from '@/stores/chain'
 import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
-import { useDemo4Store } from '@/stores/demo4'
+import { usePlayerStore } from '@/stores/player'
 import { gameAudio } from '@/libs/08audio'
 
 const FAILURE_MESSAGES = {
@@ -42,12 +42,10 @@ export function bindStoresToGame(game) {
       console.error(FAILURE_MESSAGES[change.what], change.error)
       return
     }
-    // Demo 4's own state (sessions, planets, battle) follows every change.
-    if (game.version === 4) {
-      const demo4 = useDemo4Store()
-      demo4.sync()
-      if (change === 'cells') demo4.cellsVersion++
-    }
+    // The pilot's own state (sessions, planets, battle) follows every change.
+    const player = usePlayerStore()
+    player.sync()
+    if (change === 'cells') player.cellsVersion++
     switch (change) {
       case 'connected':
         chain.chainId = state.chainId

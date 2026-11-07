@@ -1,5 +1,5 @@
 <template>
-  <!-- A siege as it stands now (Demo 4, docs/demo4-plan.md section 6): both sides' layers, played up to
+  <!-- A siege as it stands now (docs/demo4-plan.md, section 6): both sides' layers, played up to
        now by the contract's own preview, and what the player can do about it. Pink: it needs someone. -->
   <g v-if="object && siege">
     <menu-container>
@@ -56,7 +56,7 @@
 import { mapState } from 'pinia'
 import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
-import { useDemo4Store } from '@/stores/demo4'
+import { usePlayerStore } from '@/stores/player'
 import { PINK_LIGHT } from '@/libs/palette'
 import MenuContainer from './menu-container/_menu-container.svg'
 import MenuButton from './menu-button.svg'
@@ -69,7 +69,7 @@ export default {
     objectId: { type: String, default: null }
   },
   data() {
-    return { demo4: useDemo4Store(), PINK_LIGHT }
+    return { player: usePlayerStore(), PINK_LIGHT }
   },
   computed: {
     ...mapState(useStarMapStore, ['systemObjects', 'players']),
@@ -78,14 +78,14 @@ export default {
       return this.systemObjects[this.objectId]
     },
     siege() {
-      return this.demo4.siegeAt(this.object?.objectId)
+      return this.player.siegeAt(this.object?.objectId)
     },
     scale() {
       const width = Math.min(this.viewport.width - 100, 700)
       return Math.min(width > 450 ? 1.5 : 1, (this.viewport.height - 160) / 440)
     },
     mine() {
-      return this.siege.attacker === this.demo4.account
+      return this.siege.attacker === this.player.account
     },
     attackerName() {
       if (this.mine) return 'You are'
@@ -119,7 +119,7 @@ export default {
       return ['The planet is holding.']
     },
     actions() {
-      const d = this.demo4
+      const d = this.player
       const id = this.object.objectId
       const name = this.object.name
       const list = []
@@ -153,12 +153,12 @@ export default {
       return parts.map(([n, name]) => `${n} ${name}${n > 1 && name !== 'point defense' && name !== 'BFG' ? 's' : ''}`).join(', ')
     },
     ago(t) {
-      const minutes = Math.round((this.demo4.now / 1000 - t) / 60)
+      const minutes = Math.round((this.player.now / 1000 - t) / 60)
       if (minutes < 1) return 'just now'
       return minutes < 60 ? `${minutes} min ago` : `${(minutes / 60).toFixed(1)} h ago`
     },
     when(t) {
-      const minutes = Math.round((t - this.demo4.now / 1000) / 60)
+      const minutes = Math.round((t - this.player.now / 1000) / 60)
       return minutes <= 0 ? 'now' : minutes < 60 ? `in ${minutes} min` : `in ${(minutes / 60).toFixed(1)} h`
     }
   }

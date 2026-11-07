@@ -1,5 +1,5 @@
 <template>
-  <!-- An armory (Demo 4): Sol's I.S.S. at twice a part's cost, a pilot's Armory at one and a half (paid
+  <!-- An armory: Sol's I.S.S. at twice a part's cost, a pilot's Armory at one and a half (paid
        to its owner). Parts are bought and fitted to the ship in one move. -->
   <g v-if="object">
     <menu-container>
@@ -7,7 +7,7 @@
         <text x="0" y="5" text-anchor="middle" fill="#ffffff88" font-size="1.5em">{{ object.name }} Armory</text>
         <text x="0" y="32" text-anchor="middle" font-size="0.8em" fill="#ffffffaa">
           Credits {{ avatar.credits.toLocaleString('en-US') }}&cent; · mounts {{ mounts }} of 6 · free holds
-          {{ demo4.freeBays }}
+          {{ player.freeBays }}
         </text>
 
         <g transform="translate(0 70)" font-size="0.8em">
@@ -53,11 +53,11 @@ import { mapActions, mapState } from 'pinia'
 import { useStarMapStore } from '@/stores/starmap'
 import { useGameStateStore } from '@/stores/gamestate'
 import { useUIStore } from '@/stores/ui'
-import { useDemo4Store } from '@/stores/demo4'
+import { usePlayerStore } from '@/stores/player'
 import MenuContainer from './menu-container/_menu-container.svg'
 import MenuButton from './menu-button.svg'
 import AmountDial from './widgets/amount-dial.svg'
-import { SHIP_PARTS, mountsUsed } from '@/sdk/v4/parts'
+import { SHIP_PARTS, mountsUsed } from '@/sdk/parts'
 
 export default {
   name: 'ArmoryMenu',
@@ -67,7 +67,7 @@ export default {
     objectId: { type: String, default: null }
   },
   data() {
-    return { demo4: useDemo4Store(), part: null, count: 1 }
+    return { player: usePlayerStore(), part: null, count: 1 }
   },
   computed: {
     ...mapState(useStarMapStore, ['systemObjects']),
@@ -79,7 +79,7 @@ export default {
     },
     /** The loadout, for noticing a purchase went through. */
     loadoutNow() {
-      return JSON.stringify(this.demo4.ship?.loadout)
+      return JSON.stringify(this.player.ship?.loadout)
     },
     port() {
       return this.object.objectId
@@ -89,28 +89,28 @@ export default {
       return Math.min(width > 450 ? 1.5 : 1, (this.viewport.height - 160) / 440)
     },
     mounts() {
-      return mountsUsed(this.demo4.ship.loadout)
+      return mountsUsed(this.player.ship.loadout)
     },
     parts() {
       return SHIP_PARTS.map((p) => ({
         id: p.id,
-        name: this.demo4.rules.parts[p.id].name,
+        name: this.player.rules.parts[p.id].name,
         space: p.space,
-        price: this.demo4.partPrice(this.port, p.id, 1)
+        price: this.player.partPrice(this.port, p.id, 1)
       }))
     },
     partName() {
-      return this.demo4.rules.parts[this.part].name
+      return this.player.rules.parts[this.part].name
     },
     total() {
-      return this.demo4.partPrice(this.port, this.part, this.count)
+      return this.player.partPrice(this.port, this.part, this.count)
     },
     affordable() {
       return this.total <= this.avatar.credits
     }
   },
   watch: {
-    // Done: the menu closes, as Demo 3's trade and shipyard menus do once their purchase lands.
+    // Done: the menu closes, as the trade and shipyard menus do once their purchase lands.
     loadoutNow(now, before) {
       if (now !== before) this.closeMenu()
     }
@@ -124,7 +124,7 @@ export default {
     },
     async buy() {
       this.o8audio.playEffect('click')
-      if (await this.demo4.buyParts(this.port, this.part, this.count)) this.count = 1
+      if (await this.player.buyParts(this.port, this.part, this.count)) this.count = 1
     }
   }
 }

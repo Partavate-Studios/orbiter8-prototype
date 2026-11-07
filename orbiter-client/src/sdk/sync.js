@@ -1,6 +1,6 @@
 // Notices when the game changes on chain. The contracts emit events for only a few actions, so for
 // now "changed" means a new block contains a transaction to one of the game's contracts.
-import { getBlockNumber, gameChangedBetween } from '@/sdk/chain/contracts'
+import { getBlockNumber, gameChangedBetween } from '@/sdk/chain/rpc'
 
 /**
  * @param {object} options

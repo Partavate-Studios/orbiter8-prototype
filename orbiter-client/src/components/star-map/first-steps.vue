@@ -14,9 +14,9 @@
 
 <script>
 import { game } from '@/sdk/client'
-import { useDemo4Store } from '@/stores/demo4'
+import { usePlayerStore } from '@/stores/player'
 
-const KEY = 'o8.v4.firstStepsDismissed'
+const KEY = 'o8.info.firstStepsDismissed'
 
 export default {
   name: 'FirstSteps',
@@ -27,14 +27,14 @@ export default {
     } catch {
       // storage refused: show it
     }
-    return { demo4: useDemo4Store(), dismissed }
+    return { player: usePlayerStore(), dismissed }
   },
   computed: {
     steps() {
-      const d = this.demo4
+      const d = this.player
       const ship = d.pilot.ship
       void d.cellsVersion
-      const visitedElsewhere = [...game.demo4.state.cells.values()].some(
+      const visitedElsewhere = [...game.state.cells.values()].some(
         (c) => c.cell !== 0 && c.discoverer === d.account
       )
       return [
@@ -52,7 +52,7 @@ export default {
       ]
     },
     show() {
-      return this.demo4.active && !this.dismissed && this.demo4.pilot && this.steps.some((s) => !s.done)
+      return !this.dismissed && this.player.pilot && this.steps.some((s) => !s.done)
     }
   },
   methods: {

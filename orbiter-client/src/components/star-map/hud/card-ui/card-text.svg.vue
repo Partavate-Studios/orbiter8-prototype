@@ -100,7 +100,7 @@
       </g>
 
       <g v-else-if="systemObjects[objectId].type == 'station'">
-        <!-- What the port sells and buys: Demo 3's three goods, or Demo 4's mix (tighter when there are more) -->
+        <!-- What the port sells and buys (tighter when there are more than three) -->
         <g
           v-for="(good, index) in stationGoods"
           :key="good.id"
@@ -162,7 +162,7 @@ export default {
     emptyHolds() {
       return emptyHolds(this.avatar.ship)
     },
-    /** The cargo rows: Demo 3's three goods, or Demo 4's aboard (three at most, the rest summed). */
+    /** The cargo rows: the goods aboard (three at most, the rest summed). */
     cargoRows() {
       const lines = cargoLines(this.avatar.ship, this.goods)
       if (lines.length <= 3) return lines
@@ -189,7 +189,7 @@ export default {
   methods: {
     planetTypeName,
     shortGoodName,
-    /** Rows from y 25, 10 apart (Demo 3's three); more goods start higher and sit closer. */
+    /** Rows from y 25, 10 apart for three; more goods start higher and sit closer. */
     stationRowY(index) {
       return this.stationGoods.length > 3 ? 13 + index * 8 : 25 + index * 10
     }

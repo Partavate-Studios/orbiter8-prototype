@@ -1,4 +1,4 @@
-// A star system as loadStarMap assembles it from contract reads.
+// A star system as the game client assembles it from contract reads (sdk/client.js loadSystem).
 export function blockData({ withStation = false, withShip = true } = {}) {
   const planet = (id, extra = {}) => ({
     id: String(id),
@@ -25,7 +25,21 @@ export function blockData({ withStation = false, withShip = true } = {}) {
     planets: {
       0: planet(
         1,
-        withStation ? { hasStation: true, station: { name: 'New Station', size: 3, inventory: {}, prices: {} } } : {}
+        withStation
+          ? {
+              hasStation: true,
+              station: {
+                name: 'New Station',
+                size: 3,
+                yard: true,
+                armory: true,
+                goods: [
+                  { id: 4, name: 'Organics', mode: 'sells', stock: 300, price: 56, curve: null },
+                  { id: 1, name: 'Metals', mode: 'buys', stock: 300, price: 119, curve: null }
+                ]
+              }
+            }
+          : {}
       ),
       1: planet(2, { hasMoons: true, moons: { 0: { name: 'Moonie', size: 2, class: 0, orbitSpeed: 300 } } })
     },

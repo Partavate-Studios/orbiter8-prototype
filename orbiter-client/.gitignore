@@ -20,4 +20,4 @@ selenium-debug.log
 # Written by `npm run local` / `npm run deploy:local`
 /dev/local-deployment.json
 dev/harness/snapshot.id
-dev/local-deployment-v4*.json
+dev/local-deployment*.json

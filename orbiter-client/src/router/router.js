@@ -6,8 +6,6 @@ import { useGameStateStore } from '@/stores/gamestate'
 export default createRouter({
   history: createWebHashHistory(),
   routes: [
-    // Demo 4's separate galaxy screen now lives in the game (docs/demo4-plan.md, milestone 5b).
-    { path: '/galaxy', redirect: '/' },
     {
       path: '/',
       name: 'Title Screen',

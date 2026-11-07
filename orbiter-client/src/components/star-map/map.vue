@@ -50,10 +50,8 @@
           <g v-if="jumpAnimationState">
             <jumpAnimation></jumpAnimation>
           </g>
-          <!-- Demo 4 draws its galaxy map over the game instead (components/star-map/galaxy-map.vue) -->
-          <g v-else-if="neighborView">
-            <neighbor-view v-if="!demo4Active" />
-          </g>
+          <!-- the galaxy map draws over the game (components/star-map/galaxy-map.vue) -->
+          <g v-else-if="neighborView" />
           <g v-else>
             <hud></hud>
           </g>
@@ -68,7 +66,6 @@
 </template>
 
 <script>
-import { useDemo4Store } from '@/stores/demo4'
 import { CAMERA, WORLD_OFFSET_Y } from '@/constants'
 import { STAR_KEY } from '@/sdk/system'
 
@@ -77,7 +74,6 @@ import { useUIStore } from '@/stores/ui'
 import { mapActions, mapState } from 'pinia'
 import Hud from './hud/hud.svg'
 import JumpAnimation from './hud/jump-animation.svg'
-import NeighborView from './hud/neighbor-view.svg'
 import BackgroundCanvas from './background-canvas.vue'
 import GuidesCanvas from './guides-canvas.vue'
 import SolarSystem from './_solarsystem.svg'
@@ -98,7 +94,6 @@ export default {
   components: {
     Hud,
     JumpAnimation,
-    NeighborView,
     BackgroundCanvas,
     GuidesCanvas,
     SolarSystem,
@@ -115,7 +110,6 @@ export default {
     }
   },
   computed: {
-    ...mapState(useDemo4Store, { demo4Active: 'active' }),
     ...mapState(useUIStore, [
       'neighborView',
       'viewport',

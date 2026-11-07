@@ -1,16 +1,16 @@
 <template>
-  <!-- The player's Orbiter 8 (Demo 4, D59): drawn from what it carries (the NFT's own picture), its
+  <!-- The player's Orbiter 8 (D59): drawn from what it carries (the NFT's own picture), its
        mounts and bays, what's out of action, and unloading parts at the player's planet. -->
   <g v-if="ship">
     <menu-container>
       <g :transform="'translate(0 -400) scale(' + scale + ')'" fill="#ffffff" dominant-baseline="middle">
         <text x="0" y="5" text-anchor="middle" fill="#ffffff88" font-size="1.5em">{{ ship.name }}</text>
 
-        <!-- The NFT's own picture (sdk/v4/ship-art.js), as an image -->
+        <!-- The NFT's own picture (sdk/ship-art.js), as an image -->
         <image x="-75" y="25" width="150" height="150" :href="art" />
 
         <text x="0" y="185" text-anchor="middle" font-size="0.8em" fill="#ffffffaa">
-          Mounts {{ mounts }} of 6 · holds {{ ship.bays - demo4.freeBays }} of {{ ship.bays }} used · range
+          Mounts {{ mounts }} of 6 · holds {{ ship.bays - player.freeBays }} of {{ ship.bays }} used · range
           {{ Math.max(1, ship.range - ship.rangeLost) }}
         </text>
         <text v-if="condition?.retreated" x="0" y="203" text-anchor="middle" font-size="0.8em" :fill="PINK">
@@ -52,25 +52,25 @@
 <script>
 import { mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
-import { useDemo4Store } from '@/stores/demo4'
-import { shipSvg } from '@/sdk/v4/ship-art'
+import { usePlayerStore } from '@/stores/player'
+import { shipSvg } from '@/sdk/ship-art'
 import { PINK } from '@/libs/palette'
 import MenuContainer from './menu-container/_menu-container.svg'
-import { SHIP_PARTS, mountsUsed } from '@/sdk/v4/parts'
+import { SHIP_PARTS, mountsUsed } from '@/sdk/parts'
 
 export default {
   name: 'LoadoutMenu',
   components: { MenuContainer },
   data() {
-    return { demo4: useDemo4Store(), PINK }
+    return { player: usePlayerStore(), PINK }
   },
   computed: {
     ...mapState(useUIStore, ['viewport']),
     ship() {
-      return this.demo4.ship
+      return this.player.ship
     },
     condition() {
-      return this.demo4.condition
+      return this.player.condition
     },
     scale() {
       const width = Math.min(this.viewport.width - 100, 700)
@@ -85,7 +85,7 @@ export default {
       return mountsUsed(this.ship.loadout)
     },
     docked() {
-      const left = (this.condition?.dockedUntil ?? 0) - this.demo4.now / 1000
+      const left = (this.condition?.dockedUntil ?? 0) - this.player.now / 1000
       return left > 0 ? `in ${Math.ceil(left / 60)} min` : null
     },
     fitted() {
@@ -93,7 +93,7 @@ export default {
       const off = this.condition?.off ?? []
       return SHIP_PARTS.filter((p) => l[p.field] > 0).map((p) => ({
         part: p.id,
-        name: this.demo4.rules.parts[p.id].name,
+        name: this.player.rules.parts[p.id].name,
         count: l[p.field],
         off: p.off === undefined ? 0 : off[p.off],
         space: p.space
@@ -101,13 +101,13 @@ export default {
     },
     /** One of the player's planets at this star, to unload parts to. */
     myPlanetHere() {
-      return this.demo4.planets.find((p) => p.owner === this.demo4.account) ?? null
+      return this.player.planets.find((p) => p.owner === this.player.account) ?? null
     }
   },
   methods: {
     unload(row) {
       this.o8audio.playEffect('click')
-      this.demo4.unloadShip(this.myPlanetHere.id, row.part, row.count)
+      this.player.unloadShip(this.myPlanetHere.id, row.part, row.count)
     }
   }
 }

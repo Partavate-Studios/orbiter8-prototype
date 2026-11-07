@@ -1,8 +1,8 @@
-// Cargo, trading at a port and buying cargo holds at a shipyard, for either demo. Goods are lists:
-// a station's `goods` are [{ id, name, mode: 'sells' | 'buys', stock, price, curve }] (sdk/system.js,
-// sdk/v4/client.js), and the ship carries `cargo` (units by good id) with `usedHolds` in use. Demo 3's
-// prices are flat (`curve` null); Demo 4's move with every unit (`curve`, sdk/v4/market.js).
-import { buyCost, sellProceeds, fee } from '@/sdk/v4/market'
+// Cargo, trading at a port and buying cargo holds at a shipyard. A station's `goods` are
+// [{ id, name, mode: 'sells' | 'buys', stock, price, curve }] (sdk/client.js), and the ship carries
+// `cargo` (units by good id) with `usedHolds` in use. Prices move with every unit (`curve`,
+// sdk/market.js); a good without a curve has a flat price.
+import { buyCost, sellProceeds, fee } from '@/sdk/market'
 
 /**
  * @typedef {{ holds: number, usedHolds: number, cargo: number[] }} ShipCargo
@@ -98,42 +98,24 @@ export function clampTradeAmount(requested, current, freeHolds) {
   return current + Math.min(freeHolds, requested - current)
 }
 
-/**
- * Cargo holds the player can buy at a flat price (Demo 3): limited by MAX_CARGO_HOLDS and by credits.
- * @param {number} credits
- * @param {number} currentHolds
- * @param {number} holdPrice
- */
-export function maxHoldsToBuy(credits, currentHolds, holdPrice) {
-  return Math.min(MAX_CARGO_HOLDS - currentHolds, Math.floor(credits / holdPrice))
-}
-
 /** Whether the player has enough credits for a purchase. */
 export function canAfford(credits, cost) {
   return credits >= cost
 }
 
 /**
- * What the ship carries, for the HUD and the ship's card: the goods aboard (all of them when there
- * are few, as in Demo 3), by name, and the free holds.
+ * What the ship carries, for the HUD and the ship's card: the goods aboard, by name.
  * @param {ShipCargo} ship
  * @param {string[]} names  goods by id
  * @returns {Array<{ name: string, units: number }>}
  */
 export function cargoLines(ship, names) {
   const cargo = ship.cargo ?? []
-  const lines = names.length <= 3 ? names.map((name, id) => ({ name, units: cargo[id] ?? 0 })) : []
-  if (names.length > 3) {
-    names.forEach((name, id) => {
-      if ((cargo[id] ?? 0) > 0) lines.push({ name, units: cargo[id] })
-    })
-  }
-  return lines
+  return names.map((name, id) => ({ name, units: cargo[id] ?? 0 })).filter((line) => line.units > 0)
 }
 
-/** Short names for the HUD's narrow columns (Demo 3 showed "Fuel"); other names are short already. */
+/** Short names for the HUD's narrow columns; other names are short already. */
 const SHORT_NAMES = {
-  'Fuel Ore': 'Fuel',
   'Water ice': 'Ice',
   'Rare elements': 'Rares',
   'Helium-3': 'He-3',

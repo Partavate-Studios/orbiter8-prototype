@@ -31,10 +31,9 @@
           >
 
           <g transform="translate(0 400)" fill="#ffffff">
-            <text v-if="shipMax > 0 && risingPrices" font-size="0.9em"
+            <text v-if="shipMax > 0" font-size="0.9em"
               >Install cargo holds from {{ costOf(1) }}&cent; each (each one dearer).</text
             >
-            <text v-else-if="shipMax > 0" font-size="0.9em">Install cargo holds for {{ holdPrice }}&cent; each.</text>
             <text v-else font-size="0.9em">You are at max capcity.</text>
 
             <g transform="translate(0 20)">
@@ -92,13 +91,13 @@
             <menu-button :enabled="canUpgrade" text="Upgrade" @buttonclick="applyUpgrades" />
           </g>
 
-          <!-- Demo 4: engines, for the range of a jump -->
-          <g v-if="demo4.active" transform="translate(0 700)" fill="#ffffff">
+          <!-- Engines, for the range of a jump -->
+          <g transform="translate(0 700)" fill="#ffffff">
             <text v-if="rangePrice != null" font-size="0.9em"
-              >Engines: jump range {{ demo4.ship.range }} → {{ demo4.ship.range + 1 }} for
+              >Engines: jump range {{ player.ship.range }} → {{ player.ship.range + 1 }} for
               {{ rangePrice.toLocaleString('en-US') }}&cent;</text
             >
-            <text v-else font-size="0.9em" fill="#ffffff88">Engines at full range ({{ demo4.ship.range }}).</text>
+            <text v-else font-size="0.9em" fill="#ffffff88">Engines at full range ({{ player.ship.range }}).</text>
             <g v-if="rangePrice != null" transform="translate(0 50)">
               <menu-button
                 :enabled="avatar.credits >= rangePrice"
@@ -114,13 +113,13 @@
 </template>
 
 <script>
-import { canAfford, maxHoldsToBuy, MAX_CARGO_HOLDS } from '@/sdk/game/trade'
+import { canAfford, MAX_CARGO_HOLDS } from '@/sdk/game/trade'
 
 import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
 import { mapActions, mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
-import { useDemo4Store } from '@/stores/demo4'
+import { usePlayerStore } from '@/stores/player'
 import MenuContainer from './menu-container/_menu-container.svg'
 import MenuButton from './menu-button.svg'
 import Arrow from './widgets/arrow.svg'
@@ -142,34 +141,26 @@ export default {
     return {
       holdsToBuy: 0,
       pending: false,
-      demo4: useDemo4Store()
+      player: usePlayerStore()
     }
   },
   computed: {
     ...mapState(useStarMapStore, ['systemObjects']),
     ...mapState(useGameStateStore, ['avatar']),
-    /** Demo 4's holds cost more the more a ship has (Market.sol baysCost); Demo 3's are flat. */
-    risingPrices() {
-      return this.demo4.active
-    },
     totalCost() {
       return this.costOf(this.holdsToBuy)
     },
     maxHoldsAvailable() {
-      if (!this.risingPrices) return maxHoldsToBuy(this.avatar.credits, this.avatar.ship.holds, this.holdPrice)
       let n = this.shipMax
       while (n > 0 && this.costOf(n) > this.avatar.credits) n--
       return n
     },
     rangePrice() {
-      return this.demo4.active ? this.demo4.rangeQuote() : null
+      return this.player.rangeQuote()
     },
     /** Holds this ship can still add before reaching the contract's maximum. */
     shipMax() {
       return MAX_CARGO_HOLDS - this.avatar.ship.holds
-    },
-    holdPrice() {
-      return this.systemObjects[this.objectId].holdPrice
     },
     canAfford() {
       return canAfford(this.avatar.credits, this.totalCost)
@@ -208,12 +199,13 @@ export default {
     },
     costOf(count) {
       if (count <= 0) return 0
-      return this.risingPrices ? this.demo4.baysQuote(count) : count * this.holdPrice
+      // Each hold costs more the more a ship has (Market.sol baysCost).
+      return this.player.baysQuote(count)
     },
     async upgradeRange() {
       this.o8audio.playEffect('click')
       this.pending = true
-      const upgraded = await this.demo4.buyRange(this.systemObjects[this.objectId].id)
+      const upgraded = await this.player.buyRange(this.systemObjects[this.objectId].id)
       if (upgraded) this.o8audio.speak('upgraded')
       this.pending = false
     },

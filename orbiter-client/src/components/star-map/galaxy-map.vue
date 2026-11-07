@@ -1,7 +1,7 @@
 <template>
   <!-- Demo 4's galaxy map, in the neighbor view's place (docs/demo4-plan.md section 8: "the galaxy map
        replaces the neighbor view"): the hex grid's charted stars, your ship, what's in range, scans and
-       sieges. Choose a star in range to jump; the jump plays Demo 3's animation. Regions load as you pan. -->
+       sieges. Choose a star in range to jump; the jump plays the jump animation. Regions load as you pan. -->
   <div class="galaxy-map" @pointerdown="onDown" @pointermove="onMove" @pointerup="onUp" @wheel="onWheel">
     <svg class="map" :viewBox="`0 0 ${width} ${height}`">
       <g
@@ -59,11 +59,11 @@
 <script>
 import { mapActions } from 'pinia'
 import { game } from '@/sdk/client'
-import { STATE } from '@/sdk/v4/client'
-import { position, cellAt, distance, neighbors } from '@/sdk/v4/hex'
-import { starTraits, anomalyName } from '@/sdk/v4/traits'
-import { timeOf } from '@/sdk/v4/drand'
-import { useDemo4Store } from '@/stores/demo4'
+import { STATE } from '@/sdk/client'
+import { position, cellAt, distance, neighbors } from '@/sdk/hex'
+import { starTraits, anomalyName } from '@/sdk/traits'
+import { timeOf } from '@/sdk/drand'
+import { usePlayerStore } from '@/stores/player'
 import { useGameStateStore } from '@/stores/gamestate'
 import { useUIStore } from '@/stores/ui'
 import FleetShip from '@/components/assets/fleet-ship.svg'
@@ -77,7 +77,7 @@ export default {
   components: { FleetShip },
   data() {
     return {
-      demo4: useDemo4Store(),
+      player: usePlayerStore(),
       width: window.innerWidth,
       height: window.innerHeight,
       camera: { x: 0, y: 0, zoom: 1.5 },
@@ -90,20 +90,20 @@ export default {
   },
   computed: {
     client() {
-      return game.demo4.state
+      return game.state
     },
     scale() {
       return SPACING * this.camera.zoom
     },
     shipCell() {
-      return this.demo4.ship?.cell ?? 0
+      return this.player.ship?.cell ?? 0
     },
     range() {
-      const ship = this.demo4.ship
+      const ship = this.player.ship
       return ship ? Math.max(1, ship.range - ship.rangeLost) : 1
     },
     drawn() {
-      void this.demo4.cellsVersion
+      void this.player.cellsVersion
       const seed = this.client.universe?.seed
       if (!seed) return []
       const out = []
@@ -123,7 +123,7 @@ export default {
           visited: c.visited,
           pending: c.visited && !c.scanned,
           reachable: steps > 0 && steps <= this.range,
-          besieged: this.demo4.besiegedCells.has(c.cell),
+          besieged: this.player.besiegedCells.has(c.cell),
           name: this.nameOf(c.cell)
         })
       }
@@ -138,7 +138,7 @@ export default {
       return this.nameOf(this.shipCell)
     },
     chosenCell() {
-      void this.demo4.cellsVersion
+      void this.player.cellsVersion
       return this.chosen === null ? null : (this.client.cells.get(this.chosen) ?? null)
     },
     chosenName() {
@@ -155,11 +155,11 @@ export default {
       return this.distanceAway > 0 && this.distanceAway <= this.range
     },
     besieged() {
-      return this.demo4.besiegedCells.has(this.chosen)
+      return this.player.besiegedCells.has(this.chosen)
     },
     discovererName() {
       const who = this.chosenCell.discoverer
-      return who === this.demo4.account ? 'you' : who.slice(0, 6) + '…' + who.slice(-4)
+      return who === this.player.account ? 'you' : who.slice(0, 6) + '…' + who.slice(-4)
     },
     scanWords() {
       const c = this.chosenCell
@@ -178,7 +178,7 @@ export default {
     }
     window.addEventListener('resize', this.onResize)
     this.centerOnShip()
-    game.demo4.loadAround(this.shipCell)
+    game.loadAround(this.shipCell)
   },
   unmounted() {
     window.removeEventListener('resize', this.onResize)
@@ -223,7 +223,7 @@ export default {
         this.timer = setTimeout(() => this.loadPreview(), wait + 1500)
         return
       }
-      const outcome = await game.demo4.previewScan(c.cell)?.catch(() => null)
+      const outcome = await game.previewScan(c.cell)?.catch(() => null)
       if (!outcome) {
         this.timer = setTimeout(() => this.loadPreview(), 3000)
         return
@@ -267,7 +267,7 @@ export default {
       if (!this.drag) return
       const moved = this.drag.moved
       this.drag = null
-      if (moved) game.demo4.loadAround(cellAt(this.camera.x, this.camera.y))
+      if (moved) game.loadAround(cellAt(this.camera.x, this.camera.y))
     },
     onWheel(event) {
       if (event.target.closest('.card')) return
@@ -275,7 +275,7 @@ export default {
       event.stopPropagation()
       const factor = event.deltaY > 0 ? 1 / 1.15 : 1.15
       this.camera.zoom = Math.min(3, Math.max(0.15, this.camera.zoom * factor))
-      game.demo4.loadAround(cellAt(this.camera.x, this.camera.y))
+      game.loadAround(cellAt(this.camera.x, this.camera.y))
     }
   }
 }

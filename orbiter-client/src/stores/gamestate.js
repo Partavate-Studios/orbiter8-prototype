@@ -49,8 +49,8 @@ export const useGameStateStore = defineStore('GameState', {
   }),
   getters: {
     avatar: (state) => state.gameState.avatar,
-    /** The goods' names, by id: Demo 3's three or Demo 4's eight. */
-    goods: (state) => state.gameState.goods ?? ['Equipment', 'Fuel Ore', 'Organics']
+    /** The goods' names, by id. */
+    goods: (state) => state.gameState.goods ?? []
   },
   actions: {
     /** Reloads the player's avatar, ship and credits; the result arrives through importPlayer. */

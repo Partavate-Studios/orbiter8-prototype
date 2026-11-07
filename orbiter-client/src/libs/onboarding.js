@@ -1,6 +1,5 @@
 // Where a player is in getting started, worked out from the wallet and game state alone, so the title
 // screen and the onboarding wizard always agree and a reload lands on the right step.
-import { normalizeName } from '@/sdk/callsigns'
 
 /**
  * The wizard's steps, in order. Funds and loading are shown as part of the network step.
@@ -92,4 +91,9 @@ export function nameProblem(name, { taken = null } = {}) {
   if (clean.length > NAME_MAX_LENGTH) return 'too long'
   if (taken?.has(clean.toLowerCase())) return 'taken'
   return null
+}
+
+/** A name as the game compares them: trimmed, inner runs of spaces collapsed. */
+export function normalizeName(name) {
+  return String(name).trim().replace(/\s+/g, ' ')
 }

@@ -1,7 +1,7 @@
 <template>
   <g>
     <icon>
-      <!-- Two crossed blades: Demo 4's sieges -->
+      <!-- Two crossed blades: sieges -->
       <g fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round">
         <path d="M -12 -12 L 9 9" />
         <path d="M 12 -12 L -9 9" />

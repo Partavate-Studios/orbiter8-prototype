@@ -38,7 +38,7 @@ export default {
       type: Number,
       default: 0
     },
-    /** The line's credits, signed (negative paid), when prices move per unit (Demo 4); else price × quantity. */
+    /** The line's credits, signed (negative paid): prices move per unit, so it's given; else price × quantity. */
     total: {
       type: Number,
       default: null

@@ -46,8 +46,8 @@
 </template>
 
 <script>
-import { useDemo4Store } from '@/stores/demo4'
-import { BUILDINGS } from '@/sdk/v4/system'
+import { usePlayerStore } from '@/stores/player'
+import { BUILDINGS } from '@/sdk/system-gen'
 
 const UNLOCKS = {
   1: 'People start to grow toward the planet’s cap, and it produces the goods its class sells.',
@@ -63,7 +63,7 @@ export default {
   name: 'TechTree',
   emits: ['close'],
   data() {
-    return { galaxy: useDemo4Store() }
+    return { galaxy: usePlayerStore() }
   },
   computed: {
     rules() {

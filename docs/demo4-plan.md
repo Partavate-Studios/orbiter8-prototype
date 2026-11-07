@@ -279,8 +279,8 @@ impossible or needs a design call goes back to Koda; everything else is decided 
 ### 11. Milestones and steps (each step is a commit; each milestone ends with the play bot playing it on the local Polkadot node, D32)
 
 **Milestone 0: setup**
-- [x] A `contracts-v4/` Foundry project with OpenZeppelin upgradeable contracts.
-- [ ] The local Polkadot Hub node built and scripted (start, deploy, reset), next to the existing Hardhat setup. *Scripted (`contracts-v4/polkadot-node.sh`); waiting for Koda to run it (B3).*
+- [x] A `contracts/` Foundry project with OpenZeppelin upgradeable contracts.
+- [ ] The local Polkadot Hub node built and scripted (start, deploy, reset), next to the existing Hardhat setup. *Scripted (`contracts/polkadot-node.sh`); waiting for Koda to run it (B3).*
 - [ ] A smoke test: a UUPS module deployed, upgraded and its storage checked on both chains (the research's test 1). *Passes on Foundry's chain; Polkadot waits on B3.*
 
 **Milestone 1: foundation and galaxy**
@@ -353,6 +353,27 @@ Milestones 1–5 built the new rules on a separate `/galaxy` screen with plain p
 - [x] Play-tested end to end through the real UI at desktop and phone sizes: start at the title screen, register, trade at Sol, upgrade, jump, claim and build, fit weapons, siege. *Two pilots on a local chain, 2026-11-07: every step above through the UI, at 1440 × 900 and 390 × 844.*
 - [x] The separate `/galaxy` screen retired once everything it does lives in the game. *(B51)*
 
+**Milestone 5c: playing it** (Koda, 2026-11-07, after playing: "I see no new generation of any kind happening")
+
+*One project, one set of contracts.* The client works only with the current contracts. The old contracts, their Truffle setup and the client's path for them leave the repo (they're in git history and on older branches). No "Demo 4" stamps in names, labels or code: a demo is a release.
+- [x] Remove the old contracts (`contracts/`, `migrations/`, `test/`, Truffle), the old client path and the old networks; `npm run local` starts the local chain; the `v4` and `demo4` names go. *The new contracts now live in `contracts/`.*
+
+*New stars appear.*
+- [ ] Bug: the client never re-read the map after a move, so it never sent pending scans and nothing was charted. It re-reads after every move.
+- [ ] A scan is recorded as soon as its drand round is out (about 30 s after arriving): silently with a session key, with one wallet approval without. Until then the system view and the map show "Scanning…" with a countdown.
+
+*Star names.*
+- [ ] New stars are unnamed and show as "Star 1234" (the cell). Genesis stars (Sol's ring) get real nearby-star names.
+- [ ] Who may name a star: the discoverer, until the star has an owner. A pilot holding all its planets, which makes them the owner. The owner, any time. Once owned, a pilot holding a majority of its planets, which makes them the owner (the old owner keeps it until then). And while unnamed, the pilot with the most planets there (not on a tie), without becoming the owner.
+- [ ] Naming costs about a Station (50,000 credits), filed with Minerva and burned.
+
+*The map, in Orbiter 8's colors* (purple, with the red and yellow highlights; a small palette for it)
+- [ ] The hex prototype's hover: hovering your star draws dashed lines to every star you can jump to; hovering a star in range draws its line; a tooltip names the star and says where it stands ("you are here", "visited · in range"…); the jump-range outline.
+- [ ] Black hole partners are joined by a line. At a black hole, choosing its partner offers "Enter the black hole", with an animation: the ship's nose stretches into the hole ahead of its tail, then the tail catches up.
+
+*Jumps*
+- [ ] A jump takes at least as long as its sounds, so Minerva's lines finish.
+
 **Milestone 6: testnets and the decision**
 - [ ] Deploy to Polkadot Hub's testnet and an L2 testnet.
 - [ ] The research's test list on Polkadot (UUPS, drand cost, the read path through smoldot and through RPC, wallets).
@@ -372,8 +393,8 @@ when you're done, let me know about any of those decisions I should review").
 | # | Where | The call | Why |
 |---|---|---|---|
 | B1 | Milestone 0 | **Solidity 0.8.38** (the latest), with the **Prague** EVM target rather than Osaka. | Osaka's new instruction isn't on every L2 yet; Polkadot Hub's REVM supports both. Portability first. |
-| B2 | Milestone 0 | **Libraries fetched by `contracts-v4/setup.sh`** at pinned tags (OpenZeppelin 5.7.0, forge-std 1.17.0), not committed and not git submodules. | Foundry's package manager (Soldeer) failed here; submodules complicate the repo. |
-| B3 | Milestone 0 | **The local Polkadot Hub runs the live runtime** (Fellowship v2.5.2) in Parity's omni node, instead of building `revive-dev-node`. **Needs Koda:** downloading and running Parity's binaries was blocked by the safety check, so `contracts-v4/polkadot-node.sh install` is for Koda to run (it verifies every download). Until then, contract work uses Foundry's chain, and the Polkadot measurements wait. | Closer to mainnet than the dev node, and no 30-minute build. |
+| B2 | Milestone 0 | **Libraries fetched by `contracts/setup.sh`** at pinned tags (OpenZeppelin 5.7.0, forge-std 1.17.0), not committed and not git submodules. | Foundry's package manager (Soldeer) failed here; submodules complicate the repo. |
+| B3 | Milestone 0 | **The local Polkadot Hub runs the live runtime** (Fellowship v2.5.2) in Parity's omni node, instead of building `revive-dev-node`. **Needs Koda:** downloading and running Parity's binaries was blocked by the safety check, so `contracts/polkadot-node.sh install` is for Koda to run (it verifies every download). Until then, contract work uses Foundry's chain, and the Polkadot measurements wait. | Closer to mainnet than the dev node, and no 30-minute build. |
 | B4 | Milestone 1 | **Solidity's IR pipeline (`via_ir`) is on.** | The galaxy's math overflows the compiler's stack otherwise; the output is ordinary EVM code. |
 | B5 | Milestone 1 | **A scan's drand round is 30 seconds after the arrival** (`scanDelay`, set at deployment). | Long enough to be safely in the future on Polkadot Hub, whose clock moves in 24-second steps; short enough not to feel slow. |
 | B6 | Milestone 1 | **Black-hole partners:** 4 candidate cells sampled 8–24 steps away, each undecided with no star or black hole within 2 steps; the lowest spiral density wins. If none qualifies, the new star stays an ordinary star. | Checking the band cell by cell is too costly on chain; a rare fallback keeps scans from failing. |

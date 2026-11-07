@@ -173,7 +173,7 @@ export default {
       return Math.min(this.viewport.width - 100, 700)
     },
     /**
-     * The port's trade code, one letter per good (Demo 3's three, Demo 4's eight): S selling, B buying,
+     * The port's trade code, one letter per good: S selling, B buying,
      * - neither. A B is wanted when the port buys something my ship carries (yellow, libs/palette.js).
      */
     portCode() {

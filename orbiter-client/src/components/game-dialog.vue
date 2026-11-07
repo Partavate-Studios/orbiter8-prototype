@@ -71,7 +71,7 @@ export default {
     isName() {
       return !['message', 'number'].includes(this.open?.input?.kind)
     },
-    /** A count (Demo 4: colonists, units, parts): whole numbers from min (1) to max. */
+    /** A count (colonists, units, parts): whole numbers from min (1) to max. */
     isNumber() {
       return this.open?.input?.kind === 'number'
     },
