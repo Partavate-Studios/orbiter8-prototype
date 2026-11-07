@@ -94,7 +94,8 @@ contract MarketTest is GameFixture {
     function test_buyThenSellAcrossSol() public {
         Market.Good[] memory goods = market.goods();
         Market.Tuning memory t = market.tuning();
-        uint256 cost = Pricing.buyCost(goods[ORGANICS].base, goods[ORGANICS].spread, t.capacity, 0, 5);
+        uint256 cap = market.capacity();
+        uint256 cost = Pricing.buyCost(goods[ORGANICS].base, goods[ORGANICS].spread, cap, 0, 5);
         cost += Pricing.fee(cost, t.feeBps);
         uint256 supply = credits.totalSupply();
 
@@ -106,7 +107,7 @@ contract MarketTest is GameFixture {
         assertEq(pilots.shipOf(ada).cargo, 5);
         assertEq(market.portView(EARTH).quotes[ORGANICS].shortfall, 5);
 
-        uint256 proceeds = Pricing.sellProceeds(goods[ORGANICS].base, goods[ORGANICS].spread, t.capacity, 0, 5);
+        uint256 proceeds = Pricing.sellProceeds(goods[ORGANICS].base, goods[ORGANICS].spread, cap, 0, 5);
         proceeds -= Pricing.fee(proceeds, t.feeBps);
         vm.prank(ada);
         market.trade(MERCURY, _line(ORGANICS, -5, proceeds));
@@ -156,7 +157,7 @@ contract MarketTest is GameFixture {
     function test_aPurchaseMaySpendTheExactBalance() public {
         Market.Good memory g = market.goods()[ORGANICS];
         Market.Tuning memory t = market.tuning();
-        uint256 cost = Pricing.buyCost(g.base, g.spread, t.capacity, 0, 3);
+        uint256 cost = Pricing.buyCost(g.base, g.spread, market.capacity(), 0, 3);
         cost += Pricing.fee(cost, t.feeBps);
         vm.prank(ada);
         credits.transfer(bo, 1_000 - cost);
@@ -172,8 +173,8 @@ contract MarketTest is GameFixture {
         market.trade(EARTH, _line(ORGANICS, 100, type(uint256).max));
         vm.stopPrank();
         Market.Tuning memory t = market.tuning();
-        skip(t.refill / 8); // a quarter of 400 regrows in an eighth of the refill: 50
-        assertEq(market.portView(EARTH).quotes[ORGANICS].shortfall, 50);
+        skip(t.refill / 4); // a quarter of the capacity regrows in a quarter of the refill
+        assertEq(market.portView(EARTH).quotes[ORGANICS].shortfall, 100 - market.capacity() / 4);
         skip(t.refill);
         assertEq(market.portView(EARTH).quotes[ORGANICS].shortfall, 0);
     }
@@ -184,7 +185,7 @@ contract MarketTest is GameFixture {
         market.buyBays(EARTH, 245, type(uint256).max);
         market.trade(EARTH, _line(ORGANICS, 250, type(uint256).max));
         market.trade(MERCURY, _line(ORGANICS, -250, 0));
-        market.trade(EARTH, _line(ORGANICS, 150, type(uint256).max));
+        market.trade(EARTH, _line(ORGANICS, int256(market.capacity()) - 250, type(uint256).max));
         vm.expectRevert(abi.encodeWithSelector(Market.PortFull.selector, ORGANICS, 0));
         market.trade(EARTH, _line(ORGANICS, 1, type(uint256).max));
         vm.stopPrank();
@@ -203,10 +204,11 @@ contract MarketTest is GameFixture {
         vm.expectRevert(abi.encodeWithSelector(Pilots.TooManyBays.selector, 250));
         market.buyBays(EARTH, 236, type(uint256).max);
 
-        market.buyRange(EARTH, 20_000);
+        uint256 price = market.tuning().rangePrices[0];
+        market.buyRange(EARTH, price);
         assertEq(pilots.shipOf(ada).range, 2);
         vm.expectPartialRevert(Market.PriceLimit.selector);
-        market.buyRange(EARTH, 20_000);
+        market.buyRange(EARTH, price);
         vm.stopPrank();
     }
 
@@ -216,12 +218,21 @@ contract MarketTest is GameFixture {
         market.openPort(port, 0, false, bo); // Terrestrial
         Market.Good memory g = market.goods()[ORGANICS];
         Market.Tuning memory t = market.tuning();
-        uint256 cost = Pricing.buyCost(g.base, g.spread, t.capacity, 0, 5);
+        uint256 cost = Pricing.buyCost(g.base, g.spread, market.capacity(), 0, 5);
         uint256 cut = Pricing.fee(cost, t.feeBps);
         vm.prank(ada);
         market.trade(port, _line(ORGANICS, 5, cost + cut));
         assertEq(credits.balanceOf(bo), cut);
         assertEq(credits.balanceOf(ada), 1_000 - cost - cut);
+    }
+
+    function test_portsGrowWithThePopulation() public {
+        assertEq(market.capacity(), 300);
+        for (uint256 i = 0; i < 4; i++) {
+            vm.prank(makeAddr(string.concat("pilot", vm.toString(i))));
+            pilots.register(string.concat("Pilot", vm.toString(i)), "Hull");
+        }
+        assertEq(market.capacity(), 5 * 220);
     }
 
     function test_onlyTheAdminTunes() public {
@@ -372,6 +383,15 @@ contract PricingTest is Test {
     function test_marginIsASpreadAndAFifth() public pure {
         // A full selling port to a needy buying port, one unit: (base + bias + spread) - (base - bias).
         assertEq(Pricing.sellProceeds(60, 40, 400, 0, 1) - Pricing.buyCost(60, 40, 400, 0, 1), 48);
+    }
+
+    /// Trading every few seconds doesn't stop a port restocking.
+    function test_restockKeepsPartialUnits() public pure {
+        (uint256 shortfall, uint256 updated) = (100, 0);
+        for (uint256 t = 15; t <= 3600; t += 15) {
+            (shortfall, updated) = Pricing.restock(shortfall, updated, t, 400, 21600);
+        }
+        assertEq(shortfall, 100 - 66); // 400 an hour over 6 hours: 66 and two thirds in an hour
     }
 
     function test_restocking() public pure {

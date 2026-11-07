@@ -292,12 +292,12 @@ impossible or needs a design call goes back to Koda; everything else is decided 
 - [x] The play bot explores; gas and deposits per arrival measured. *`dev/harness/explore-bot4.mjs`; gas in B13; Polkadot deposits wait on B3.*
 
 **Milestone 2: pilots and trade**
-- [ ] `Pilots`: call signs, the ship NFT, location, the bays and weapon mounts (D59), range, damage fields.
-- [ ] Session keys, and the client's session flow.
-- [ ] `Market`: the goods registry, ports, trade with price limits and a location check, sales of holds and range.
-- [ ] Credits and fees as sinks.
+- [ ] `Pilots`: call signs, the ship NFT, location, the bays and weapon mounts (D59), range, damage fields. *Done except mounts and damage, which come with battle (milestone 4).*
+- [ ] Session keys, and the client's session flow. *Contracts done.*
+- [x] `Market`: the goods registry, ports, trade with price limits and a location check, sales of holds and range.
+- [x] Credits and fees as sinks.
 - [ ] The client's trading, upgrade and pilot screens, on the new SDK.
-- [ ] The simulator's first version, with the economy tuned to D29's targets (for Koda's approval).
+- [x] The simulator's first version, with the economy tuned to D29's targets (for Koda's approval). *[`demo4-tuning.md`](demo4-tuning.md).*
 
 **Milestone 3: planets**
 - [ ] `Planets`: claims with the discoverer's window, the tech tree, populations (D57), production, the Autofactory queue and planet storage (D58), moving drones and weapons between ship and planet (D55, D56).
@@ -347,4 +347,12 @@ when you're done, let me know about any of those decisions I should review").
 | B12 | Milestone 1 | **`forge lint` runs on demand, not on every build.** | Its notes on type conversions (each checked by hand) buried the compiler's own messages. |
 | B13 | Milestone 1 | **Measured by the exploring bot (26 moves, local chain):** a jump to a new star costs about 125,000 gas. Carrying one scan proof brings it to about 508,000, two to about 827,000. Going through a black hole costs 55,000–80,000. Writing two scans without moving costs 795,000. Each move carries at most 3 proofs. | The scan, mostly drand's check, is three quarters of the cost. A later saving: one drand check could cover several scans that share a round. |
 | B14 | Milestone 1 | **The galaxy map opens at 1.5× zoom.** The star card sits top right, or along the bottom on a phone held upright. The scan preview counts only stars it charts for the first time. | Seen in screenshots, desktop and phone. |
+| B15 | Milestone 2 | **Ships can't change hands in this run** (the NFT reverts transfers). | A pilot flies exactly one ship (D26); a transfer would strand the pilot without one. Fleets and ship trading come later. |
+| B16 | Milestone 2 | **Credits have no decimals;** pilots start with **1,000 credits and 5 bays**; a call sign change costs 2,000 and a ship rename 500, both burned. Star renames stay free for the discoverer. | Demo 3's 100 starting credits bought one unit. The fees are sinks of the plan's "name fees". |
+| B17 | Milestone 2 | **Session keys last at most 12 hours.** A key can't be a pilot, can't register, and can't start sessions or change the call sign. Credits stay in the wallet. Ending a session clears the key; the client then sends the key's leftover gas money back. | D41's "a few hours", with room for a long evening. |
+| B18 | Milestone 2 | **Trade happens at the star, not the planet:** the ship must be at the port's star. Moving between planets is drawn by the client and costs nothing. | One move per trade, as in Demo 3. Storing an orbit would add a move per planet. |
+| B19 | Milestone 2 | **Sol's nine Federation stations are the ports**, each trading by its planet's class (Demo 3's classes). The class mixes are chosen so every good is both sold and bought at Sol. **Earth's I.S.S. is the yard.** Claimed planets open more ports in milestone 3. | The plan named Sol's ports without saying which. |
+| B20 | Milestone 2 | **Every unit moves the price** (a trade pays the average over its units), not one price per trade. **Goods have different margins** (1.2 × spread: 36 to 156 credits). | The play session found every good paid the same, and one big trade drained a port at the opening price. |
+| B21 | Milestone 2 | **The economy's numbers, from the simulator,** are in [`demo4-tuning.md`](demo4-tuning.md), for Koda's approval. Among them: **Federation ports grow with the number of registered pilots** (220 units of each good per pilot), and **"a day" of D29 is read as 2 hours of play**. | With fixed stock, one pilot reached range 4 in under an hour and 40 pilots mostly never did. |
+| B22 | Milestone 2 | **Restocking fixed:** the stored clock moves on only by the time the regrown units took. | Found by the simulator: rounding down at each trade meant a busy port never restocked. |
 

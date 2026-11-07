@@ -41,7 +41,8 @@ contract Market is ModuleBase {
 
     /// Numbers the simulator tunes (D29); the admin sets them.
     struct Tuning {
-        uint32 capacity; // units of each good a port holds (or wants) when full
+        uint32 capacity; // units of each good a port holds (or wants) when full, at least
+        uint32 capacityPerPilot; // and this many more per registered pilot, so shares hold as Sol fills
         uint32 refill; // seconds to restock from empty
         uint16 feeBps; // the fee on trades, in hundredths of a percent
         uint32 bayBase; // the first bay's price
@@ -144,7 +145,8 @@ contract Market is ModuleBase {
         _setMix(7, 0x42, 0x19); // Ferrous: metals, equipment; buys water, He-3, organics
         _setMix(8, 0x24, 0xC1); // Lava: rare, silicon; buys water, equipment, electronics
         _setMix(9, 0x10, 0xC2); // Swamp: organics; buys metals, equipment, electronics
-        _setTuning(Tuning(400, 6 hours, 200, 200, 4, [uint64(20_000), 400_000, 6_000_000]));
+        // From the simulator (orbiter-client/dev/sim4/economy.mjs, docs/demo4-tuning.md).
+        _setTuning(Tuning(300, 220, 2 hours, 200, 200, 8, [uint64(15_000), 150_000, 600_000]));
     }
 
     // ── admin: data, not code (D27) ─────────────────────────────────────────────────────────────
@@ -209,10 +211,17 @@ contract Market is ModuleBase {
         return Mode.None;
     }
 
-    function _shortfall(uint256 port, uint256 good) internal view returns (uint256) {
-        Stock memory s = _m().stock[port][good];
+    /// How much of each good a port holds (or wants) when full: more as more pilots register.
+    function capacity() public view returns (uint256) {
         Tuning storage t = _m().tuning;
-        return Pricing.restocked(s.shortfall, block.timestamp - s.updated, t.capacity, t.refill);
+        uint256 scaled = uint256(t.capacityPerPilot) * _m().pilots.pilotCount();
+        return scaled > t.capacity ? scaled : t.capacity;
+    }
+
+    /// The good's stock at the port now, restocked, and the time to store with it.
+    function _stock(uint256 port, uint256 good, uint256 cap) internal view returns (uint256 shortfall, uint256 updated) {
+        Stock memory s = _m().stock[port][good];
+        return Pricing.restock(s.shortfall, s.updated, block.timestamp, cap, _m().tuning.refill);
     }
 
     /// The pilot acting (wallet or session key), after checking their ship is at the port's star.
@@ -230,12 +239,15 @@ contract Market is ModuleBase {
     function trade(uint256 port, Line[] calldata lines) external {
         (address pilot,) = _pilotAt(port);
         (uint8 class,, address owner) = _port(port);
+        uint256 cap = capacity();
         for (uint256 i = 0; i < lines.length; i++) {
-            _tradeLine(pilot, port, class, owner, lines[i]);
+            _tradeLine(pilot, port, class, owner, cap, lines[i]);
         }
     }
 
-    function _tradeLine(address pilot, uint256 port, uint8 class, address owner, Line calldata line) internal {
+    function _tradeLine(address pilot, uint256 port, uint8 class, address owner, uint256 cap, Line calldata line)
+        internal
+    {
         MarketStorage storage m = _m();
         if (line.good >= m.goods.length) revert NotTraded(line.good);
         Good storage good = m.goods[line.good];
@@ -246,13 +258,13 @@ contract Market is ModuleBase {
         if (mode != (buying ? Mode.Sells : Mode.Buys)) revert NotTraded(line.good);
 
         Tuning storage t = m.tuning;
-        uint256 shortfall = _shortfall(port, line.good);
-        if (shortfall + units > t.capacity) revert PortFull(line.good, t.capacity - shortfall);
-        m.stock[port][line.good] = Stock(uint32(shortfall + units), uint40(block.timestamp));
+        (uint256 shortfall, uint256 updated) = _stock(port, line.good, cap);
+        if (shortfall + units > cap) revert PortFull(line.good, cap - shortfall);
+        m.stock[port][line.good] = Stock(uint32(shortfall + units), uint40(updated));
 
         Credits credits_ = m.credits;
         if (buying) {
-            uint256 cost = Pricing.buyCost(good.base, good.spread, t.capacity, shortfall, units);
+            uint256 cost = Pricing.buyCost(good.base, good.spread, cap, shortfall, units);
             uint256 cut = Pricing.fee(cost, t.feeBps);
             if (cost + cut > line.limit) revert PriceLimit(line.good, cost + cut);
             m.pilots.addCargo(pilot, line.good, units);
@@ -261,7 +273,7 @@ contract Market is ModuleBase {
             else credits_.move(pilot, owner, cut);
             emit Traded(pilot, port, line.good, line.units, cost + cut);
         } else {
-            uint256 proceeds = Pricing.sellProceeds(good.base, good.spread, t.capacity, shortfall, units);
+            uint256 proceeds = Pricing.sellProceeds(good.base, good.spread, cap, shortfall, units);
             uint256 cut = Pricing.fee(proceeds, t.feeBps);
             if (proceeds - cut < line.limit) revert PriceLimit(line.good, proceeds - cut);
             m.pilots.removeCargo(pilot, line.good, units);
@@ -326,16 +338,16 @@ contract Market is ModuleBase {
         (v.class, v.yard, v.owner) = _port(port);
         v.port = port;
         MarketStorage storage m = _m();
-        Tuning storage t = m.tuning;
+        uint256 cap = capacity();
         v.quotes = new Quote[](m.goods.length);
         for (uint256 g = 0; g < m.goods.length; g++) {
             Mode mode = _mode(v.class, g);
             if (mode == Mode.None) continue;
-            uint256 shortfall = _shortfall(port, g);
+            (uint256 shortfall,) = _stock(port, g, cap);
             Good storage good = m.goods[g];
             uint256 price = mode == Mode.Sells
-                ? Pricing.buyCost(good.base, good.spread, t.capacity, shortfall, 1)
-                : Pricing.sellProceeds(good.base, good.spread, t.capacity, shortfall, 1);
+                ? Pricing.buyCost(good.base, good.spread, cap, shortfall, 1)
+                : Pricing.sellProceeds(good.base, good.spread, cap, shortfall, 1);
             v.quotes[g] = Quote(mode, shortfall, price);
         }
     }

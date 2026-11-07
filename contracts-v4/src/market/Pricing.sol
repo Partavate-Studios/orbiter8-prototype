@@ -52,6 +52,19 @@ library Pricing {
         return regrown >= shortfall ? 0 : shortfall - regrown;
     }
 
+    /// Restocks a stored shortfall up to `now`, and the time to store with it. The clock moves on only
+    /// by the time the regrown whole units took, so a port traded every few seconds still restocks
+    /// (rounding down at each trade would otherwise lose every partial unit).
+    function restock(uint256 shortfall, uint256 updated, uint256 now_, uint256 capacity, uint256 refill)
+        internal
+        pure
+        returns (uint256 newShortfall, uint256 newUpdated)
+    {
+        uint256 regrown = ((now_ - updated) * capacity) / refill;
+        if (regrown >= shortfall) return (0, now_);
+        return (shortfall - regrown, updated + (regrown * refill) / capacity);
+    }
+
     /// Credits for `count` bays when the ship has `have`: bay i costs `base + step × i`.
     function baysCost(uint256 base, uint256 step, uint256 have, uint256 count) internal pure returns (uint256) {
         return count * base + step * (count * have + (count * (count - 1)) / 2);
