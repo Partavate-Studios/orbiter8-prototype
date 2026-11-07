@@ -372,7 +372,7 @@ Milestones 1–5 built the new rules on a separate `/galaxy` screen with plain p
 - [ ] Black hole partners are joined by a line. At a black hole, choosing its partner offers "Enter the black hole", with an animation: the ship's nose stretches into the hole ahead of its tail, then the tail catches up.
 
 *Jumps*
-- [ ] A jump takes at least as long as its sounds, so Minerva's lines finish.
+- [x] A jump takes at least as long as its sounds, so Minerva's lines finish. *4.5 s; "jump complete" is said when the animation ends.*
 
 **Milestone 6: testnets and the decision**
 - [ ] Deploy to Polkadot Hub's testnet and an L2 testnet.

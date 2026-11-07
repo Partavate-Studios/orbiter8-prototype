@@ -493,6 +493,8 @@ export const useUIStore = defineStore('UI', {
         return
       }
       this.hud.jumpAnimationState = false
+      // Arrived: said now, not when the new system loaded, so it doesn't cut off "initiating jump".
+      gameAudio().speak('jumpComplete')
     },
     /** A jump that was already under way failed: stall the jump animation and say why. */
     jumpStalled(reason) {
