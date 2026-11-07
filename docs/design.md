@@ -2,7 +2,7 @@
 
 **Post Demo 3:** This design doc is written to expand on the existing features in Demo 3. Therefore, this document does not discuss the details of features which are already implemented including dynamic galaxy generation and basic trade mechanics.
 
-> The working copy, converted from the PDF "O8 Design - Post D3" on 2026-10-31. Edit it here.
+> The working copy, converted from the PDF "O8 Design - Post D3" on 2026-10-31. Edit it here. Ideas and decisions that build on it are in [`design-ideas.md`](design-ideas.md).
 
 - [Trade System](#trade-system)
 - [Build System](#build-system)
