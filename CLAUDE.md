@@ -4,8 +4,9 @@ Koda's on-chain space trading game: explore a hex galaxy, trade, claim and build
 weapons, lay sieges. Solidity contracts in `contracts/` (Foundry), and a Vue 3 client in
 `orbiter-client/` (Pinia, Vite, ethers 6, Vitest, SVG graphics).
 
-**New to this repo? Read `docs/handoff.md` first:** where things stand, how to run and see the game,
-and what to look at.
+**New to this repo? Read `docs/handoff.md` first, all of it.** It lists the docs to read, in order,
+before touching anything; it says how to work without Koda (log decisions in `docs/review.md` instead of
+asking him); and it gives where things stand, how to run and see the game, and what to focus on.
 
 ## Commands
 
@@ -29,7 +30,8 @@ and what to look at.
   is a bug, never a design call.
 - **Keep the card and menu art.** The selection card looks like an NFT playing card; menus are big and
   menu-driven ("the buttons are the game"); ports show three-letter trade codes. Change behavior and
-  placement, not the art. Before restyling an existing screen, show Koda a mockup.
+  placement, not the art. Before restyling an existing screen, Koda approves a mockup (working on
+  your own: save the mockup under `docs/mockups/` and log it).
 - **Accent colors** (`orbiter-client/src/libs/palette.js`): yellow means you and what's good for you;
   pink means it needs your attention (waiting on the wallet, failures, sieges). Never pink on a
   profitable or positive button. Buttons stay in the game's purples and lavenders.
@@ -40,8 +42,9 @@ and what to look at.
   HUD's render smoke tests. Don't chase coverage.
 - **Commit, never push.** Koda pushes. Commit messages explain what and why. Never commit keys,
   mnemonics, RPC keys or `.env` files.
-- Ask Koda before dropping a feature, replacing a library, changing networks, or making visible
-  changes beyond "faster and sharper". No testnet deploys until Koda chooses the network.
+- Don't drop a feature, replace a library, change networks, or make visible changes beyond "faster
+  and sharper" without Koda. No testnet deploys until Koda chooses the network. When working on your
+  own, don't stop to ask: log these in `docs/review.md` for him (see `docs/handoff.md`).
 
 ## Where things are documented
 

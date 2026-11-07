@@ -1,7 +1,43 @@
 # Handoff: where Orbiter 8 stands (2026-11-07)
 
-For a Claude Code session picking up from the one that built the current release. Read `CLAUDE.md`
-first (Koda's standing rules and the commands); this is the state of play and how to look at it.
+For a Claude Code session picking up from the one that built the current release.
+
+## Before anything else: read these, in order, in full
+
+1. `CLAUDE.md`: Koda's standing rules and the commands.
+2. This file, to the end: how you'll work, and your focus areas.
+3. `docs/demo4-plan.md`: the goals, decisions D1–D60 (Koda's), the plan, the milestones and what's
+   ticked, and calls B1–B54 (guesses made while building; struck-through ones were overruled).
+4. `docs/design.md` and `docs/design-ideas.md`: Koda's design intent, and ideas for later.
+5. `docs/backstory.md`: the lore and Minerva's world. Its text is Koda's: don't change it.
+6. `docs/demo4-tuning.md`: the economy and battle numbers.
+7. `docs/cost-estimates.md`, the sections from "Demo 4, measured locally" on: gas and money per move.
+8. `readme.md`, `contracts/README.md` and `orbiter-client/dev/harness/README.md`: setup and tools.
+9. `docs/original-code-review.md`: the client's old patterns and why they were replaced.
+10. Skim, for history only: `UPGRADE_NOTES.md` (the client's modernization, written against the old
+    contracts), `docs/enterprise-circuit-walkthrough.md`, and `docs/research/polkadot-hub-2026-11.md`.
+
+Then read the code you'll touch before changing it (the map under "Where the code is" below), and
+`git log` for why things are the way they are: every commit message says what and why.
+
+## How you'll work: on your own
+
+Koda wants you to work without asking him questions. Where you'd ask, decide and log it instead:
+
+- **Keep a review log in `docs/review.md`.** Write it for Koda to read later. It holds what you found,
+  what you changed and why, and every judgment call you made in his place. Add a short "for Koda to
+  decide" list at the end for what you chose not to do without him.
+- **Things `CLAUDE.md` says to ask Koda first:** don't do them. Log them instead. That covers dropping a
+  feature, replacing a library, changing networks, testnet deploys, and visible changes beyond "faster
+  and sharper" to his art.
+- **Restyling his existing art** (the cards, his menus, the title screen, the sprites) needs his
+  mockup approval. Make the mockup instead: an SVG or a screenshot of a scratch build, saved under
+  `docs/mockups/` and linked from the log. Leave the game's art as it is, and carry on with other work.
+- **Findings for focus areas 1 and 3 below:** write them in the log first, as a list. Then act on the
+  ones that are clearly bugs or clearly within his style. Leave the taste calls listed for Koda.
+- Commit as you go, in small commits with messages that say what and why. Run `npm test`, `npm run
+  lint` and the contract tests before each commit. Don't push.
+- Keep going through the focus areas until they're done; don't stop to check in.
 
 ## What the game is now
 
@@ -97,6 +133,33 @@ Known gaps:
 - Gamepad and audio weren't tried in the last pass.
 - `docs/baseline/` screenshots predate these screens.
 - Testnets wait on Koda (milestone 6).
+
+## Focus areas, in this order
+
+1. **A first-time player's eyes.** Play from the title screen as someone who knows nothing about the
+   game. Do it in one long session, at desktop size, then again at phone size (`VW=390 VH=844`). Note
+   every moment of "what do I do now?" or "what does this mean?", with a screenshot. The builder knew
+   how everything worked and couldn't see these. This is the most valuable part of the review.
+2. **Leftovers of the old game.** Two bugs on 2026-11-07 came from assumptions of the previous
+   contracts: star ids starting at 1 (Sol is 0, and "no star" was 0), and exactly three goods. Hunt for
+   more of that kind:
+   - `> 0` or truthiness checks on ids, cells, planets (Mercury is planet 0) or orbits;
+   - fixed goods (`equipment`, `fuel`, `organics`), and old field names (`holds` vs bays,
+     `inventory`, `prices`);
+   - avatar, Orbiter8 or AvatarControls wording;
+   - code paths that can no longer happen.
+3. **Consistency across menus.** The newer menus (Colony, Armory, Loadout, Siege, Feed, the galaxy
+   map, the black-hole entry) were built quickly beside Koda's originals (trade, shipyard, planets,
+   ships, settings, the cards). Compare spacing, type sizes, alignment, button use, colors and wording.
+   List the mismatches, then bring the new ones in line with his.
+4. **Player-facing wording.** Shorten long dialogs (sessions, attack, star naming, claiming). Keep
+   Minerva's voice consistent with `docs/backstory.md` and her existing lines. Plain words, short
+   sentences. Don't change the backstory.
+5. **Touch and phones.** Tap targets on the new menus and on the galaxy map, where hover doesn't exist
+   on touch. Readability at 390 px wide, and portrait layouts (the bottom card).
+6. **An independent code review** of `src/sdk/client.js` and `src/stores/player.js`, the two biggest
+   new files: correctness, races between refreshes and moves, error handling, and anything that would
+   break with many pilots. Fix what's clearly wrong; add a test only where it earns its keep.
 
 ## Don't
 
