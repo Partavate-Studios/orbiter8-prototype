@@ -320,38 +320,38 @@ impossible or needs a design call goes back to Koda; everything else is decided 
 Milestones 1–5 built the new rules on a separate `/galaxy` screen with plain panels, so Demo 3's game (entering a star system, the card menus, the HUD) didn't run on Demo 4 at all. That was a mistake: B25 logged a dropped feature as a call. Demo 4 is Demo 3's client, on the new contracts, with the new features added to its screens. Done means every box below works in the real UI, reached the way a player reaches it.
 
 *Contracts: what Demo 3 did that the new ones can't yet*
-- [ ] Galaxy chat (Demo 3's `sendChat`): a broadcast event, sent by the pilot or the session key.
-- [ ] Moons, derived from the planet's seed (no storage, D9), in `SystemGen` and its JS mirror, cross-checked.
-- [ ] Names for planets, moons and stations, set by the planet's owner (Demo 3's renames); derived names otherwise.
+- [x] Galaxy chat (Demo 3's `sendChat`): a broadcast event, sent by the pilot or the session key. *`Pilots.broadcast` (B44).*
+- [x] Moons, derived from the planet's seed (no storage, D9), in `SystemGen` and its JS mirror, cross-checked. *`SystemGen.moonSlots`, vectors in `SystemVectors.t.sol` (B42).*
+- [x] Names for planets, moons and stations, set by the planet's owner (Demo 3's renames); derived names otherwise. *`Planets.rename`/`namesOf` (B43).*
 
 *The client: Demo 3's SDK shape on Demo 4*
-- [ ] `sdk/v4/client.js`: the same interface as `sdk/client.js` (state, subscribe, refresh, actions), so Demo 3's stores and screens draw Demo 4 unchanged where the rules are the same.
-- [ ] The network list knows Demo 4 deployments (the local chain first); the app picks the client by deployment.
+- [x] `sdk/v4/client.js`: the same interface as `sdk/client.js` (state, subscribe, refresh, actions), so Demo 3's stores and screens draw Demo 4 unchanged where the rules are the same.
+- [x] The network list knows Demo 4 deployments (the local chain first); the app picks the client by deployment. *Demo 3's networks still play Demo 3 (B54).*
 
 *Demo 3's screens, each working on Demo 4*
-- [ ] Title screen: story scene, network panel (local Demo 4 chain listed and answering), Minerva panel, settings panel, pilot card, launch pad.
-- [ ] Onboarding wizard: connect a wallet (the dev wallet locally), register a call sign and ship (one transaction in Demo 4).
-- [ ] Entering a star system: the star, planets on their orbits with rings and moons, stations, other pilots' ships, your ship, docking.
-- [ ] The card UI: select any object, its info, and its menu (claim, build, trade, shipyard, rename, visit station, planet, moons, jump, market link).
-- [ ] Trade menu with Demo 4's eight goods and per-unit prices (sliders, cargo, transfer tabs).
-- [ ] Shipyard menu: bays and range (Demo 4's yard).
-- [ ] Planets menu, ships menu, settings menu, chat menu, leaderboard menu.
-- [ ] Jumping: the galaxy hex map takes the neighbor view's place (D: "the galaxy map replaces the neighbor view"), with the jump animation, warp effects and scans.
-- [ ] Minimap, zoom slider, connection status, loading bar, scope toggle.
-- [ ] Minerva's layer (terminal, profile, sprites, debug), the transaction tray, game dialogs.
-- [ ] Audio (music and Minerva's voice), keyboard controls, gamepad overlay, phone layouts (the bottom card).
+- [x] Title screen: story scene, network panel (local Demo 4 chain listed and answering), Minerva panel, settings panel, pilot card, launch pad.
+- [x] Onboarding wizard: connect a wallet (the dev wallet locally), register a call sign and ship (one transaction in Demo 4). *(B41)*
+- [x] Entering a star system: the star, planets on their orbits with rings and moons, stations, other pilots' ships, your ship, docking. *Docking from the last trade (B50); black holes drawn as such (B53).*
+- [x] The card UI: select any object, its info, and its menu (claim, build, trade, shipyard, rename, visit station, planet, moons, jump, market link).
+- [x] Trade menu with Demo 4's eight goods and per-unit prices (sliders, cargo, transfer tabs). *Buy and Sell pages (B45).*
+- [x] Shipyard menu: bays and range (Demo 4's yard).
+- [x] Planets menu, ships menu, settings menu, chat menu, leaderboard menu.
+- [x] Jumping: the galaxy hex map takes the neighbor view's place (D: "the galaxy map replaces the neighbor view"), with the jump animation, warp effects and scans. *(B47)*
+- [x] Minimap, zoom slider, connection status, loading bar, scope toggle.
+- [x] Minerva's layer (terminal, profile, sprites, debug), the transaction tray, game dialogs.
+- [ ] Audio (music and Minerva's voice), keyboard controls, gamepad overlay, phone layouts (the bottom card). *Unchanged from Demo 3 and shared by both demos; keyboard checked (Tab steps planets), audio and the gamepad not tried in this pass (the harness mutes audio and has no gamepad).*
 
 *Demo 4's features, in Demo 3's screens and art* (the card menu's own placeholders: "Port Upgrades", "Transfers", "Attacking … until demo 4")
-- [ ] Session keys: start, end, and the status in the HUD.
-- [ ] Planets: claims with the discoverer's window, colonists (recruit, land, board), buildings and the tech tree, production and collecting, the Autofactory.
-- [ ] Ship loadout: the armory, fitting and unloading parts, the ship's picture, damage and repairs.
-- [ ] Battle: attack, join the defense, sieges shown in the system and on the map, claims, the siege feed.
-- [ ] Black holes: orbit, leave, or go through.
-- [ ] First steps for new pilots.
+- [x] Session keys: start, end, and the status in the HUD.
+- [x] Planets: claims with the discoverer's window, colonists (recruit, land, board), buildings and the tech tree, production and collecting, the Autofactory. *The Colony menu (B48).*
+- [x] Ship loadout: the armory, fitting and unloading parts, the ship's picture, damage and repairs.
+- [x] Battle: attack, join the defense, sieges shown in the system and on the map, claims, the siege feed.
+- [x] Black holes: orbit, leave, or go through.
+- [x] First steps for new pilots.
 
 *Then*
-- [ ] Play-tested end to end through the real UI at desktop and phone sizes: start at the title screen, register, trade at Sol, upgrade, jump, claim and build, fit weapons, siege.
-- [ ] The separate `/galaxy` screen retired once everything it does lives in the game.
+- [x] Play-tested end to end through the real UI at desktop and phone sizes: start at the title screen, register, trade at Sol, upgrade, jump, claim and build, fit weapons, siege. *Two pilots on a local chain, 2026-11-07: every step above through the UI, at 1440 × 900 and 390 × 844.*
+- [x] The separate `/galaxy` screen retired once everything it does lives in the game. *(B51)*
 
 **Milestone 6: testnets and the decision**
 - [ ] Deploy to Polkadot Hub's testnet and an L2 testnet.
@@ -411,4 +411,18 @@ when you're done, let me know about any of those decisions I should review").
 | B38 | Milestone 4 | **Measured (Foundry gas report):** laying siege about 280,000 gas; recording rounds 180,000–575,000 (up to 64 rounds); completing a claim 380,000–550,000; buying and fitting parts about 220,000; a repair 175,000. Every jump pays about 10,000 for the move hook, more when a siege at the star needs its rounds recorded. | For the record; deposits on Polkadot still wait on B3. |
 | B39 | Milestone 4 | **The ship panel, siege box and siege feed are plain UI** like the docks (B25). Besieged stars get a pink ring on the map, and the Sieges button turns pink while any siege runs. The feed reads the Battle contract's events from the last 50,000 blocks. | Milestone 5 brings over the old look; a long-lived feed may want an indexer later. |
 | B40 | Milestone 5 | **The ship's picture is Koda's Orbiter 8 hull with its parts drawn over it**, in the hull's own coordinates: railgun barrels, missile racks, point-defense turrets, drone chevrons, repair-bot pods, cargo pods (one per 50 bays), armor as a heavier outline, a shield shimmer, and scorch marks after damage. `ShipArt.sol` draws it for the NFT's `tokenURI`; `sdk/v4/ship-art.js` draws the identical string for the client (pinned by hashes). The map keeps the plain ship icon. | D25's "simpler than before, fancier later". |
+| B41 | Milestone 5b | **Registration keeps Demo 3's two wizard steps:** the call sign is checked free and held in the browser, then sent with the ship's name in Demo 4's one `register` move. | Demo 3's screens and Minerva's lines stay; one wallet approval. |
+| B42 | Milestone 5b | **Moons are derived, never stored:** `SystemGen.moonSlots` places Sol's real moons (Demo 3's preset) and elsewhere gives each of eight orbits a moon with Demo 3's odds, (3 + body / 4) in 25. Rings, orbit speeds and moons' sizes and classes are drawn by the client only (`sdk/v4/system.js looks`), Sol's from Demo 3's preset. | D9: only what players change is stored; the contract needs moons only to accept their names. |
+| B43 | Milestone 5b | **An owner names their planet, its station and its moons, for free;** unnamed ones read "Kara-412 b", "Kara-412 b Station", "Kara-412 b II". Sol's keep Demo 3's names and belong to "The Federation" (B52). | Demo 3's renames; a ship's new name still costs 500 (B16). |
+| B44 | Milestone 5b | **Chat is `Pilots.broadcast`:** up to 280 bytes, registered pilots or their session key, an event only. | Demo 3's `ChatLog`, stored nowhere. |
+| B45 | Milestone 5b | **The trade menu shows a Demo 4 port in two pages:** Buy (what it sells, at most 3) and Sell (what it buys, at most 4), each in Demo 3's three-dial layout; one trade can mix both. The HUD and the ship's card list the goods aboard (Demo 3's always shows its three), with short names in narrow columns ("Rares", "He-3"). Port codes have one letter per good: eight on Demo 4. | Demo 4 ports trade 4–7 of 8 goods; Demo 3's layout fits three. |
+| B46 | Milestone 5b | **Demo 4's bays are called "holds" on screen,** as Demo 3 called them. | Demo 3's word; the contracts keep "bays". |
+| B47 | Milestone 5b | **On Demo 4, "Jump To Neighbor Star" opens the hex galaxy map** over the game; choosing a star in range jumps with Demo 3's animation. Demo 3's networks keep Demo 3's neighbor view. | The plan's "the galaxy map replaces the neighbor view"; Demo 4 ships reach up to 4 steps. |
+| B48 | Milestone 5b | **Demo 4's features open menus drawn like Demo 3's** (the trade menu's container, buttons and sliders): Colony (people, storage, building, Autofactory, defenses), Armory, Loadout, Siege and the Siege Feed (a new HUD button, crossed blades, ringed pink while a siege runs). The session's time left shows under the pilot panel, in yellow. | Koda's menu art; Demo 3's card menu already promised attacks, transfers and upgrades for Demo 4. |
+| B49 | Milestone 5b | **The ships at a star are read from every registered pilot's ship** each refresh. | Fine at demo scale; an on-chain index per star, or an indexer, if pilots number in the hundreds. |
+| B50 | Milestone 5b | **A ship is drawn docked at the station where its pilot last traded,** while it stays at that star. | B18: Demo 4 keeps no orbit on chain; Demo 3 drew docking from recent trades too. |
+| B51 | Milestone 5b | **The separate `/galaxy` screen is retired;** its route goes to the title screen. | Everything it did is in the game. |
+| B52 | Milestone 5b | **Sol's planets show "The Federation" as owner** and can't be claimed (D49). | Demo 3 gave them to a house account of that name. |
+| B53 | Milestone 5b | **A black hole's system draws a dark disk with its ring,** and its card says Black Hole. | Demo 3 had no black holes; D17. |
+| B54 | Milestone 5b | **The client plays both demos:** `sdk/client.js` uses Demo 3's client or Demo 4's (`sdk/v4/client.js`, the same interface) by the network's deployment, so Demo 3's networks still play Demo 3. Under `npm run local4` only the local Demo 4 chain is listed. | Nothing of Demo 3 dropped. |
 
