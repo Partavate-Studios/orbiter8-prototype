@@ -9,5 +9,5 @@ OpenZeppelin's upgradeable contracts (UUPS proxies, ERC-7201 namespaced storage)
   under it by calling the heavy libraries (Drand, Spiral, ScanRules) as separately deployed, linked
   libraries; the deploy script deploys them first.
 - **Lint:** `forge lint` (off during builds).
-- **Local game:** `npm run local4` in `orbiter-client/` starts anvil, deploys, and serves the client at `/#/galaxy`.
+- **Local game:** `npm run local4` in `orbiter-client/` starts anvil, deploys, and serves the game at `http://localhost:8080/` (`?account=N` picks a test pilot).
 - **EVM target:** Prague, so the contracts run on L2s that haven't adopted Osaka yet as well as on Polkadot Hub's REVM.

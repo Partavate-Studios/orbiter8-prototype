@@ -78,6 +78,23 @@
         </a>
       </g>
 
+      <!-- Demo 4: the siege feed, ringed in pink while a siege is running -->
+      <g v-if="demo4.active" :transform="corner(leftMostX, 50, bottomMostY, -350)">
+        <a cursor="pointer" @click.prevent="openMenu('feed')">
+          <title>Siege feed</title>
+          <circle v-if="demo4.besiegedCells.size" r="27" fill="none" :stroke="PINK_LIGHT" stroke-width="2" />
+          <sieges-icon />
+        </a>
+      </g>
+      <!-- Demo 4: the session key's time left (yellow: yours) -->
+      <text
+        v-if="demo4.active && sessionLeft"
+        :transform="corner(leftMostX, 105, topMostY, 125)"
+        font-size="0.8em"
+        :fill="YELLOW_LIGHT"
+        >Session · {{ sessionLeft }} left</text
+      >
+
       <g :transform="corner(leftMostX, 50, bottomMostY, -250)">
         <a cursor="pointer" @click.prevent="showLeaderboard()">
           <title>Leaderboard</title>
@@ -192,6 +209,9 @@
       <g v-if="menuState.siegeMenu">
         <siege-menu :object-id="selected" />
       </g>
+      <g v-if="menuState.feedMenu">
+        <feed-menu />
+      </g>
     </g>
   </g>
 </template>
@@ -213,6 +233,9 @@ import ColonyMenu from './menus/colony-menu.svg'
 import ArmoryMenu from './menus/armory-menu.svg'
 import LoadoutMenu from './menus/loadout-menu.svg'
 import SiegeMenu from './menus/siege-menu.svg'
+import FeedMenu from './menus/feed-menu.svg'
+import SiegesIcon from './icons/sieges-icon.svg'
+import { PINK_LIGHT, YELLOW_LIGHT } from '@/libs/palette'
 import { useDemo4Store } from '@/stores/demo4'
 // import SpriteInfo from './scope/sprite-info-box.svg'
 // import SpriteMenu from './scope/sprite-menu.svg'
@@ -264,7 +287,9 @@ export default {
     ColonyMenu,
     ArmoryMenu,
     LoadoutMenu,
-    SiegeMenu
+    SiegeMenu,
+    FeedMenu,
+    SiegesIcon
   },
   computed: {
     starSelected() {
@@ -285,6 +310,20 @@ export default {
     ]),
     ...mapState(useStarMapStore, ['myShipId', 'spriteIds', 'mapDataLoaded']),
     ...mapState(useGameStateStore, ['avatar', 'events', 'goods']),
+    demo4() {
+      return useDemo4Store()
+    },
+    /** The session key's time left, or null when there's no live session. */
+    sessionLeft() {
+      const d = this.demo4
+      if (!d.sessionLive) return null
+      const seconds = Math.max(0, d.session.expiry - d.now / 1000)
+      const h = Math.floor(seconds / 3600)
+      const m = Math.floor((seconds % 3600) / 60)
+      return h ? `${h}h ${m}m` : `${m}m`
+    },
+    PINK_LIGHT: () => PINK_LIGHT,
+    YELLOW_LIGHT: () => YELLOW_LIGHT,
     /** Up to three goods aboard, then the empty holds; more than three goods aboard share the third slot. */
     cargoSlots() {
       // The left column is wide, the right narrow (Demo 3: Equipment | Fuel, Organics | Empty).

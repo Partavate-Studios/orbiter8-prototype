@@ -4,6 +4,7 @@
     <layer-html />
     <transaction-tray />
     <galaxy-map v-if="neighborView && demo4.active && !jumpAnimationState" />
+    <first-steps v-if="demo4.active && !neighborView && selected == null" />
     <tech-tree v-if="techTreeOpen" class="tech-tree-over" @close="techTreeOpen = false" />
     <game-dialog />
   </div>
@@ -21,8 +22,9 @@ import starMap from '@/components/star-map/map'
 import layerHtml from '@/components/layer-html/container-html'
 import TransactionTray from '@/components/transaction-tray.vue'
 import GameDialog from '@/components/game-dialog.vue'
-import TechTree from '@/components/galaxy/tech-tree.vue'
+import TechTree from '@/components/star-map/tech-tree.vue'
 import GalaxyMap from '@/components/star-map/galaxy-map.vue'
+import FirstSteps from '@/components/star-map/first-steps.vue'
 import { useDemo4Store } from '@/stores/demo4'
 import router from '@/router/router'
 import { onFrame } from '@/libs/frame-loop'
@@ -41,7 +43,8 @@ export default {
     TransactionTray,
     GameDialog,
     TechTree,
-    GalaxyMap
+    GalaxyMap,
+    FirstSteps
   },
   data() {
     return { demo4: useDemo4Store() }

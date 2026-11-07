@@ -23,6 +23,8 @@ export const useDemo4Store = defineStore('Demo4', {
     pilot: null,
     credits: 0,
     cargo: [],
+    /** the pilot owns a planet somewhere */
+    ownsPlanets: false,
     ports: [],
     /** the planets at the ship's star (sdk/v4/game.js toPlanet) */
     planets: [],
@@ -75,6 +77,7 @@ export const useDemo4Store = defineStore('Demo4', {
         pilot: s.pilot,
         credits: s.credits,
         cargo: s.cargo,
+        ownsPlanets: s.deeds > 0,
         ports: s.ports,
         planets: s.planets,
         sieges: s.sieges,

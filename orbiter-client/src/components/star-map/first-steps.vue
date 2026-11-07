@@ -1,6 +1,6 @@
 <template>
   <!-- Onboarding on the new contracts (docs/demo4-plan.md, milestone 5): a short list of first goals
-       that ticks itself off from the pilot's own state, until it's done or dismissed. -->
+       that ticks itself off from the pilot's own state, until it's done or dismissed. Over the game. -->
   <aside v-if="show" class="first-steps">
     <header>
       <h4>First steps</h4>
@@ -13,7 +13,8 @@
 </template>
 
 <script>
-import { useGalaxyStore } from '@/stores/galaxy'
+import { game } from '@/sdk/client'
+import { useDemo4Store } from '@/stores/demo4'
 
 const KEY = 'o8.v4.firstStepsDismissed'
 
@@ -26,29 +27,32 @@ export default {
     } catch {
       // storage refused: show it
     }
-    return { galaxy: useGalaxyStore(), dismissed }
+    return { demo4: useDemo4Store(), dismissed }
   },
   computed: {
     steps() {
-      const g = this.galaxy
-      const ship = g.pilot.ship
-      const visitedElsewhere = [...g.cells.values()].some((c) => c.cell !== 0 && c.discoverer === g.account)
+      const d = this.demo4
+      const ship = d.pilot.ship
+      void d.cellsVersion
+      const visitedElsewhere = [...game.demo4.state.cells.values()].some(
+        (c) => c.cell !== 0 && c.discoverer === d.account
+      )
       return [
-        { text: 'Start a session: one approval, then no wallet popups for 4 hours.', done: g.sessionLive },
+        { text: 'Start a session (your ship’s menu): one approval, then no wallet popups for 4 hours.', done: d.sessionLive },
         {
-          text: 'Open the Docks: buy where it’s cheap, sell where a yellow B shows.',
-          done: g.credits > 1000 || ship.cargo > 0
+          text: 'Trade at a port: buy where it’s cheap, sell where the port code shows a yellow B.',
+          done: d.credits > 1000 || ship.cargo > 0
         },
-        { text: 'Fit more bays at the I.S.S. shipyard.', done: ship.bays > 5 },
+        { text: 'Fit more holds at the I.S.S. shipyard, orbiting Earth.', done: ship.bays > 5 },
         { text: 'Jump to a neighboring star and chart what’s around it.', done: visitedElsewhere },
         {
-          text: 'Claim a planet (2,000 credits) and found a Citadel: see the Tech tree.',
-          done: g.planets.some((p) => p.owner === g.account)
+          text: 'Claim a planet (2,000 credits) and found a Citadel from its Colony menu.',
+          done: d.ownsPlanets
         }
       ]
     },
     show() {
-      return !this.dismissed && this.galaxy.pilot && this.steps.some((s) => !s.done)
+      return this.demo4.active && !this.dismissed && this.demo4.pilot && this.steps.some((s) => !s.done)
     }
   },
   methods: {
@@ -66,9 +70,10 @@ export default {
 
 <style scoped>
 .first-steps {
-  position: absolute;
+  position: fixed;
+  z-index: 20;
   right: 16px;
-  bottom: 64px;
+  top: 220px;
   width: min(86vw, 18em);
   background: #12052ae6;
   border: 1px solid var(--o8-yellow-light);
@@ -112,8 +117,8 @@ ol {
     left: 8px;
     right: 8px;
     width: auto;
-    top: 96px;
-    bottom: auto;
+    top: auto;
+    bottom: 120px;
   }
 }
 </style>

@@ -288,7 +288,7 @@ impossible or needs a design call goes back to Koda; everything else is decided 
 - [x] Hex math, the spiral, and derived star and planet traits, in Solidity and JS, cross-checked against each other. *Star traits are client-only (D8, D9); planet traits arrive with planets in milestone 3.*
 - [x] drand verification (`Randomness`), with fuzz tests and gas measured.
 - [x] `Galaxy`: cells, jumps, arrivals, scans, black hole pairs, discoverers, renames, region and system views. *System views arrive with planets.*
-- [x] The client SDK's new chain layer (RPC transport first), and the galaxy map view with regions loading as you pan. *`npm run local4`, then `/#/galaxy`.*
+- [x] The client SDK's new chain layer (RPC transport first), and the galaxy map view with regions loading as you pan. *`npm run local4`. Now the game's galaxy map (milestone 5b).*
 - [x] The play bot explores; gas and deposits per arrival measured. *`dev/harness/explore-bot4.mjs`; gas in B13; Polkadot deposits wait on B3.*
 
 **Milestone 2: pilots and trade**

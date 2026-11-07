@@ -94,6 +94,8 @@ export function createGameClientV4() {
     pilot: null,
     credits: 0,
     cargo: [],
+    /** planets the pilot owns, anywhere (their deeds) */
+    deeds: 0,
     ports: [],
     planets: [],
     sieges: [],
@@ -231,12 +233,13 @@ export function createGameClientV4() {
     }
     releaseCallsign()
     const goods = state.economy.goods.length
-    const [credits, cargo, condition] = await Promise.all([
+    const [credits, cargo, condition, deeds] = await Promise.all([
       game.balance(state.account),
       game.cargo(state.account, goods),
-      game.condition(state.account)
+      game.condition(state.account),
+      game.deedCount(state.account)
     ])
-    Object.assign(state, { credits, cargo, condition })
+    Object.assign(state, { credits, cargo, condition, deeds })
     resumeSession()
   }
 
