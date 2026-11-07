@@ -41,6 +41,38 @@ export function usedBays(ship) {
   return ship.cargo + Math.ceil(ship.colonists / 100) + parts + ship.baysLost
 }
 
+/** Holds at a yard: each costs more the more a ship has (Market.sol baysCost). */
+export const baysQuoteFor = (tuning, bays, count) => baysCost(tuning.bayBase, tuning.bayStep, bays, count)
+
+/** The next range upgrade's price, or null at full range. */
+export const rangeQuoteFor = (tuning, range) => (range >= 4 ? null : tuning.rangePrices[range - 1])
+
+/** Parts at an armory: Sol's I.S.S. (port 2) at twice their cost, a pilot's Armory at one and a half. */
+export const partPriceFor = (rules, port, part, count) => {
+  const unit = rules.parts[part].credits
+  return Number(port) === 2 ? unit * 2 * count : Math.floor((unit * 3 * count) / 2)
+}
+
+/**
+ * What stands between a planet (sdk/v4/game.js toPlanet) and a building: [] when it can start now.
+ * @param {{ rules: object, economy: object, credits: number }} context
+ */
+export function missingFor({ rules, economy, credits }, planet, building) {
+  const cost = rules.buildings[building]
+  const missing = []
+  if (planet.building) missing.push('another building under way')
+  if (building <= 6 && building !== planet.level + 1) missing.push(`a ${BUILDING_NAMES[building - 1]} first`)
+  if (building === 7 && (planet.level < 2 || planet.autofactory))
+    missing.push(planet.autofactory ? 'already built' : 'a Colony first')
+  const people = building === 2 ? Math.ceil((planet.cap * cost.people) / 100) : cost.people
+  if (planet.population < people) missing.push(`${people.toLocaleString()} people`)
+  for (const [good, amount] of cost.goods) {
+    if ((planet.stock[good] ?? 0) < amount) missing.push(`${amount} ${economy.goods[good].name.toLowerCase()} in storage`)
+  }
+  if (credits < cost.credits) missing.push(`${cost.credits.toLocaleString()} credits`)
+  return missing
+}
+
 export function createGameClientV4() {
   const state = {
     version: 4,
@@ -438,19 +470,9 @@ export function createGameClientV4() {
     if (!port) throw new Error('There is no port there')
     return port
   }
-  const baysQuote = (count) => {
-    const t = state.economy.tuning
-    return baysCost(t.bayBase, t.bayStep, ship().bays, count)
-  }
-  const rangeQuote = () => {
-    const range = ship().range
-    return range >= 4 ? null : state.economy.tuning.rangePrices[range - 1]
-  }
-  /** Parts at an armory: Sol's I.S.S. at twice their cost, a player's Armory at one and a half. */
-  const partPrice = (port, part, count) => {
-    const unit = state.rules.parts[part].credits
-    return Number(port) === 2 ? unit * 2 * count : Math.floor((unit * 3 * count) / 2)
-  }
+  const baysQuote = (count) => baysQuoteFor(state.economy.tuning, ship().bays, count)
+  const rangeQuote = () => rangeQuoteFor(state.economy.tuning, ship().range)
+  const partPrice = (port, part, count) => partPriceFor(state.rules, port, part, count)
 
   const actions = {
     // Demo 3's
@@ -789,22 +811,8 @@ export function createGameClientV4() {
     rangeQuote,
     partPrice,
     usedBays,
-    /** What stands between a planet (sdk/v4/game.js toPlanet) and a building: [] when it can start now. */
     missingFor(planet, building) {
-      const cost = state.rules.buildings[building]
-      const missing = []
-      if (planet.building) missing.push('another building under way')
-      if (building <= 6 && building !== planet.level + 1) missing.push(`a ${BUILDING_NAMES[building - 1]} first`)
-      if (building === 7 && (planet.level < 2 || planet.autofactory))
-        missing.push(planet.autofactory ? 'already built' : 'a Colony first')
-      const people = building === 2 ? Math.ceil((planet.cap * cost.people) / 100) : cost.people
-      if (planet.population < people) missing.push(`${people.toLocaleString()} people`)
-      for (const [good, amount] of cost.goods) {
-        if ((planet.stock[good] ?? 0) < amount)
-          missing.push(`${amount} ${state.economy.goods[good].name.toLowerCase()} in storage`)
-      }
-      if (state.credits < cost.credits) missing.push(`${cost.credits.toLocaleString()} credits`)
-      return missing
+      return missingFor(state, planet, building)
     },
     /** How many planets circle a star, and each one's derived traits (for the map's previews). */
     planetsOf(cell) {

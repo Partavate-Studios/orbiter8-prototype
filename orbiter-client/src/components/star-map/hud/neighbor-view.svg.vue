@@ -251,7 +251,8 @@ export default {
       }
     },
     neighborList() {
-      return Object.values(this.neighbors ?? {}).filter((neighbor) => Number(neighbor.id) > 0)
+      // Demo 3 marks empty slots with id 0; Demo 4's neighbors all exist (and Sol is cell 0).
+      return Object.values(this.neighbors ?? {}).filter((neighbor) => neighbor.exists ?? Number(neighbor.id) > 0)
     },
     angles() {
       return layoutNeighbors(this.neighborList.map((neighbor) => neighbor.id))

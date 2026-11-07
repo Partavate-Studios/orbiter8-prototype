@@ -6,7 +6,7 @@ import { defineStore } from 'pinia'
 import { markRaw } from 'vue'
 import { game } from '@/sdk/client'
 import { useTransactionsStore } from '@/stores/transactions'
-import { BUILDING_NAMES } from '@/sdk/v4/client'
+import { BUILDING_NAMES, baysQuoteFor, rangeQuoteFor, partPriceFor, missingFor, usedBays } from '@/sdk/v4/client'
 
 const track = (words, send) => useTransactionsStore().track(words, send)
 const v4 = () => game.demo4
@@ -42,7 +42,7 @@ export const useDemo4Store = defineStore('Demo4', {
   getters: {
     sessionLive: (state) => Boolean(state.session && state.session.expiry * 1000 > state.now + 60_000),
     ship: (state) => (state.pilot ? state.pilot.ship : null),
-    freeBays: (state) => (state.pilot ? Math.max(0, state.pilot.ship.bays - v4().usedBays(state.pilot.ship)) : 0),
+    freeBays: (state) => (state.pilot ? Math.max(0, state.pilot.ship.bays - usedBays(state.pilot.ship)) : 0),
     /** What the ship can fire now (its loadout less what's out of action). */
     armed: (state) => {
       if (!state.pilot) return false
@@ -89,18 +89,18 @@ export const useDemo4Store = defineStore('Demo4', {
       this.now = Date.now()
     },
 
-    // ── prices and rules (sdk/v4/client.js) ─────────────────────────────────────────────────────
+    // ── prices and rules (sdk/v4/client.js), from this store's own copy of the state ─────────────
     baysQuote(count) {
-      return v4().baysQuote(count)
+      return baysQuoteFor(this.economy.tuning, this.pilot.ship.bays, count)
     },
     rangeQuote() {
-      return v4().rangeQuote()
+      return rangeQuoteFor(this.economy.tuning, this.pilot.ship.range)
     },
     partPrice(port, part, count) {
-      return v4().partPrice(port, part, count)
+      return partPriceFor(this.rules, port, part, count)
     },
     missingFor(planet, building) {
-      return v4().missingFor(planet, building)
+      return missingFor(this, planet, building)
     },
 
     // ── moves, each shown in the transaction tray ───────────────────────────────────────────────
