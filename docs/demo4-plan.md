@@ -20,12 +20,86 @@ design doc), [`design-ideas.md`](design-ideas.md) (Koda's working doc), [`cost-e
 | # | Decision | Date |
 |---|---|---|
 | D1 | **Jump range is a ship upgrade.** The prototype's range setting (how many stars away you can jump) becomes an upgrade that lets a ship jump further. It gets a sci-fi name and in-world reason later. It's the design doc's "Engine Upgrade". | 2026-11-06 |
+| D2 | **A fresh universe.** Demo 4 starts a new galaxy on new contracts; nothing migrates from Demo 3, which stays where it is. | 2026-11-06 |
+| D3 | **Rewrite the contracts from scratch in the latest Solidity.** Demo 3's contracts were written while learning and have bugs; reuse their rules, not their code. **They must be upgradeable,** so future releases don't need a new universe. (Koda once planned the Diamond pattern; the approach is chosen in the next round.) | 2026-11-06 |
+| D4 | **Network-neutral until decided otherwise.** Fable researches Polkadot's very latest features and whether to consider moving; the findings are documented in `docs/research/` and inform the choice. | 2026-11-06 |
+| D5 | **Internal milestones, no public release until critical mass.** The dev cycle has milestones; the public release waits until enough of the game is in (what counts is decided below). | 2026-11-06 |
+| D6 | **Generation mixes several aspects of the player and the world**, and resists manipulation, including by whoever controls the order transactions are recorded in. | 2026-11-06 |
+| D7 | **Two-step exploration if it's clean** (commit, then arrive using randomness nobody could know at commit time), **and only ordinary wallets may play, if that can be enforced.** | 2026-11-06 |
+| D8 | **The map can be read anywhere, any time:** the contracts have view methods for any region. **Stars are jittered off the grid** for display, as in the prototype, so the map reads as a star field rather than a lattice. The spiral arms will be revised. | 2026-11-06 |
+| D9 | **Store as little on chain as possible.** Defaults come from seeds; only what players change is stored. The same principle drives a new idea, **planet terraforming**: each planet's surface is a map generated from a seed (no storage), and the structures players place are stored on top of it, like Minecraft. | 2026-11-06 |
+
+## Feature inventory (proposed tiers, for Koda to correct)
+
+Every idea from [`design.md`](design.md) (D), [`design-ideas.md`](design-ideas.md) (I), the contract
+wish list in `UPGRADE_NOTES.md` (W) and the play session in [`cost-estimates.md`](cost-estimates.md)
+(P), sorted by how settled it is and how much it's needed. **Proposed, not decided.**
+
+### Tier 1: foundations (needed by everything else)
+
+| Feature | From | Why it's here |
+|---|---|---|
+| Upgradeable contract architecture, admin roles, access control | D3, I (review) | Every later release depends on it; the review's High finding is unprotected setters |
+| Hex galaxy: two-step exploration, seeded spiral, black holes, region views | decided, I | Decided |
+| Jump range upgrade | D1 | Decided |
+| Pilots: unique call signs with on-chain name rules, name-change fee | D, W | Long wanted; the client can't check uniqueness at scale |
+| **Fleets: several ships per pilot, one active** (switching rules below) | D, I (Leaning) | The NFT-trading problem; Demo 3 has `boardShip` groundwork |
+| Trade fixes: the ship must be at the port, a price limit per trade (the late-transaction problem), restocking and margins retuned | D, W, P | Found broken or weak in play |
+| More goods (5–12; the working doc proposes 8) | D, I | Long wanted; needed by the tech tree and crafting |
+| Events for every action | W, I (siege feed) | Lets the client update without reloading; feeds a public siege feed |
+| Batched reads: a whole system or region in one call | W, P | About 130 reads per reload today |
+| Credit sinks: claim fee, name fees, repairs, buildings; owner cut as a transfer, not new credits | I (Economy) | The economy inflates without them |
+| On-chain SVG ship NFTs, drawn from upgrades | I (Koda: wants soon) | Visible, self-contained, no server |
+| Session keys: sign once per session | I (Platform) | Cost and wallet popups; also unblocks gamepad play |
+
+### Tier 2: the headline, battle (principle 3: "Battle is Demo 4's headline feature")
+
+| Feature | From | Notes |
+|---|---|---|
+| Planet tech tree: Citadel → Colony → Station → Port → Yards → Armory (linear first) | D | Branching after Colony is the stated direction (I) |
+| Colonists and planet production (lazy, by timestamp) | D | Production rate follows population |
+| Planet defenses (weapons on planets and moons) | D | |
+| Ship weapons with counters (railguns, missiles, drones, point defense) and armor | D, I (Leaning) | Bring the right weapons, not more |
+| Slow, public sieges; damage to ship systems instead of a reset; repair at a shipyard before attacking again | D, I (Leaning) | Fixes "the richer player always wins" |
+| Claims through Minerva after a siege, with waiting periods and limits on repeats | D, I | |
+| Overheating (push your luck), radiators as an upgrade | I (Leaning) | Needs fair randomness: the same commit-reveal |
+| Experience from building and battle (not trade) | D | |
+
+### Tier 3: social
+
+| Feature | From | Notes |
+|---|---|---|
+| Corporations: membership, a shared credit account, shared ships and planets | D | |
+| Corporate law: what each corporation allows or punishes | I (Leaning) | Open: whose law applies in a fight |
+| Protected zones and NPC patrols near home systems | I (Exploring) | A safe start for new players |
+| Pirates: bands that mirror corporations, refusing corporate alliance | D, I (Leaning) | |
+| Bounties | I | |
+
+### Tier 4: stretch (substantial, less settled)
+
+| Feature | From |
+|---|---|
+| Supply routes: automated recurring shipments, delivered lazily | I (Leaning) |
+| Crafting: raw → primitives → modules at autofactories; items as ERC-1155 | D, I (Exploring) |
+| Planet terraforming: seeded surface maps, structures placed on top | D9 (new) |
+| Digital pilots ("cubes"): signal lag, subspace relays, escape pods, cube hunting | I (Leaning / Exploring) |
+| Ship-to-ship combat | D, I (undefined) |
+| Booby traps, sweeping scanners | I (Exploring) |
+| Tractor beams and ship trains | D |
+| Negotiated prices at ports | D |
+| Builders: AMI probes / roamers, auto factories | D |
+| Asteroid attacks | D |
+
+### Parked (not in Demo 4 unless pulled in)
+
+Portals and parallel universes; new ship types and aliens; tokenized goods as ERC-20s; hidden
+information with zero-knowledge proofs; invite-only cubes; star-system weapons; Minerva's hidden
+agenda; planet maintenance; vanity upgrades; alignment; corporate taxes; custom soundtrack folders,
+re-skinning and ENS names (client features, any time).
 
 ## Open questions
 
-Round 1 (asked 2026-11-06, awaiting answers): fresh universe; rewrite in Solidity 0.8; network-neutral
-contracts with the network chosen later; milestones; what the player contributes to generation;
-re-rolling exploration; seeded spiral arms; star cosmetics derived rather than stored.
+Round 2 (asked 2026-11-06): see the conversation; answers are recorded above as they arrive.
 
 ## Plan
 
