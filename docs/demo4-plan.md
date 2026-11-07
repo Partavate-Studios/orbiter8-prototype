@@ -68,6 +68,10 @@ design doc), [`design-ideas.md`](design-ideas.md) (Koda's working doc), [`cost-e
 | D47 | **The winner:** a besieged planet stops producing; worn down, its defenses are gone but its buildings stay; a successful claim takes the planet and its buildings, minus one tech level. | 2026-11-06 |
 | D48 | **Weapons:** railguns, missiles, point defense, **drones** (swarms of small craft), and, for planets only, the **BFG** (working name: a huge punch with a small chance to hit) and **orbital weapons platforms**. Armor and repair bots alongside. A counter table set by simulation. | 2026-11-06 |
 | D49 | **Sol's Federation planets can't be attacked** in this demo: the game simply refuses. Later, the Federation should come and punish anyone who tries (consider next). | 2026-11-06 |
+| D50 | **The BFG always hits, with a long recharge** (not a chance to miss, for now; missing may be explored later). So battle needs no dice in this run. | 2026-11-06 |
+| D51 | **Orbital weapons platforms** carry extra weapon slots beyond the planet's own and take hits first, shielding the planet's defenses until destroyed; an Armory-tier building, repairable by bots. **Shields** for planets and ships: they absorb hits and regenerate slowly on their own (armor doesn't). | 2026-11-06 |
+| D52 | **The ship retreats automatically** to orbit its system's star when its armor and shields are both gone, even with weapons left, or when all its weapons are disabled. It can't attack again until repaired. | 2026-11-06 |
+| D53 | **Proposed balance** (for Koda's confirmation with the plan): three attack types, each beaten by one defense: railguns beat armor and are stopped by shields; missiles beat shields and orbital platforms and are stopped by point defense; drones beat point defense and are stopped by armor and orbital platforms. The BFG beats anything but recharges slowly and hits one target per shot. Exact numbers by simulation. | 2026-11-06 |
 
 ## Features: this run and consider next (proposed, for Koda to choose)
 
@@ -108,7 +112,7 @@ hard to add later because it shapes the data, low-hanging, or the battle minimum
 
 Rounds 1–5 answered, except Q25 (contract tooling), which waits for the research. Next: the research's findings (the engine question is settled by D33).
 
-**Research done (D34).** Rounds 6–8 answered (D35–D49). Round 9 (asked 2026-11-06): the BFG's hit chance, orbital platforms, what counters drones, the retreat threshold.
+**Research done (D34).** All rounds answered (D1–D53). D53's balance table is a proposal to confirm with the finished plan.
 
 ## Plan (draft, 2026-11-06; for Koda's review)
 
