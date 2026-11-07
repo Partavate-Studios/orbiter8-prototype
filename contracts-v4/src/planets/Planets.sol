@@ -61,6 +61,7 @@ contract Planets is ModuleBase {
         uint32 population;
         uint40 settledAt;
         uint16 producedMilli; // thousandths of a unit carried between settlements
+        bool besieged; // under siege: no production (D47)
     }
 
     struct PlanetView {
@@ -338,7 +339,7 @@ contract Planets is ModuleBase {
         if (planet.level < CITADEL) return planet; // nobody grows or works before a Citadel
         uint256 grown = _grow(before, cap, elapsed);
         planet.population = uint32(grown);
-        _produce(id, planet, class, cap, (before + grown) / 2, elapsed);
+        if (!planet.besieged) _produce(id, planet, class, cap, (before + grown) / 2, elapsed);
     }
 
     /// People after `elapsed` seconds: the gap to the cap shrinks by e every growth time.
@@ -373,6 +374,11 @@ contract Planets is ModuleBase {
     function useStock(uint256 id, uint256 good, uint256 units) external onlyRole(GAME_MODULE) {
         _settle(id);
         _takeStock(id, good, units);
+    }
+
+    /// Starts or ends a siege's hold on production (Battle).
+    function setBesieged(uint256 id, bool on) external onlyRole(GAME_MODULE) {
+        _settle(id).besieged = on;
     }
 
     /// Hands a planet to a new owner a tech level down (a siege's successful claim, D47).
@@ -434,6 +440,10 @@ contract Planets is ModuleBase {
             v.stock[g] = _s().stock[id][g];
         }
         if (p.owner == address(0) || p.level < CITADEL || block.timestamp <= p.settledAt) return v;
+        if (p.besieged) {
+            v.population = _grow(p.population, v.cap, block.timestamp - p.settledAt);
+            return v;
+        }
         uint256 elapsed = block.timestamp - p.settledAt;
         v.population = _grow(p.population, v.cap, elapsed);
         uint256 people = (p.population + v.population) / 2;

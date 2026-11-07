@@ -11,6 +11,8 @@ import {Ships} from "../src/tokens/Ships.sol";
 import {Deeds} from "../src/tokens/Deeds.sol";
 import {Planets} from "../src/planets/Planets.sol";
 import {Factory} from "../src/planets/Factory.sol";
+import {Battle} from "../src/battle/Battle.sol";
+import {Armory} from "../src/battle/Armory.sol";
 
 /// Deploys every game module behind its proxy and wires them together. The deployer is the admin
 /// and upgrader (a multisig takes these over for a public release, D14).
@@ -24,6 +26,8 @@ library Deployment {
         Deeds deeds;
         Planets planets;
         Factory factory;
+        Battle battle;
+        Armory armory;
     }
 
     function _proxy(address implementation, bytes memory init) private returns (address) {
@@ -59,6 +63,18 @@ library Deployment {
                 abi.encodeCall(Factory.initialize, (admin, game.pilots, game.planets, game.credits))
             )
         );
+        game.battle = Battle(
+            _proxy(address(new Battle()), abi.encodeCall(Battle.initialize, (admin, game.pilots, game.planets)))
+        );
+        game.armory = Armory(
+            _proxy(
+                address(new Armory()),
+                abi.encodeCall(
+                    Armory.initialize,
+                    (admin, game.pilots, game.planets, game.factory, game.market, game.credits, game.battle)
+                )
+            )
+        );
     }
 
     /// Grants the modules the roles they need on each other (run by the admin).
@@ -75,6 +91,14 @@ library Deployment {
         game.market.grantRole(role, address(game.planets));
         game.deeds.grantRole(role, address(game.planets));
         game.planets.grantRole(role, address(game.factory));
+        game.battle.grantRole(role, address(game.pilots));
+        game.battle.grantRole(role, address(game.armory));
+        game.pilots.grantRole(role, address(game.battle));
+        game.pilots.grantRole(role, address(game.armory));
+        game.planets.grantRole(role, address(game.battle));
+        game.factory.grantRole(role, address(game.armory));
+        game.credits.grantRole(role, address(game.armory));
+        game.pilots.setBattle(game.battle);
     }
 }
 
@@ -99,6 +123,8 @@ contract Deploy is Script {
         vm.serializeAddress(json, "deeds", address(game.deeds));
         vm.serializeAddress(json, "planets", address(game.planets));
         vm.serializeAddress(json, "factory", address(game.factory));
+        vm.serializeAddress(json, "battle", address(game.battle));
+        vm.serializeAddress(json, "armory", address(game.armory));
         string memory out = vm.serializeAddress(json, "pilots", address(game.pilots));
         vm.writeJson(out, string.concat("deployments/", vm.toString(block.chainid), ".json"));
     }

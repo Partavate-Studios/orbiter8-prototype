@@ -6,6 +6,11 @@ import {Galaxy} from "../galaxy/Galaxy.sol";
 import {Credits} from "../tokens/Credits.sol";
 import {Ships} from "../tokens/Ships.sol";
 
+/// Battle hears about every move, to bring sieges at the stars involved up to date first.
+interface IMoveHook {
+    function onMove(address pilot, uint256 from, uint256 to) external;
+}
+
 /// @title Pilots and their ships (docs/demo4-plan.md, section 3)
 /// @notice One pilot per wallet, with a unique call sign, flying one ship (D26), an NFT in `Ships`.
 /// The ship's record lives here: where it is, its range, its bays and the cargo in them.
@@ -29,6 +34,11 @@ contract Pilots is ModuleBase {
     uint256 public constant SHIP_NAME_FEE = 500;
     uint256 public constant MAX_SESSION = 12 hours;
     uint256 public constant COLONISTS_PER_BAY = 100;
+    // The Orbiter 8's limits (D59): 6 weapon mounts; bays for drones (2), repair bots (5), armor
+    // levels (10, up to 5) and shield levels (20, up to 3).
+    uint256 public constant MOUNTS = 6;
+    uint256 public constant MAX_ARMOR = 5;
+    uint256 public constant MAX_SHIELDS = 3;
 
     struct Ship {
         string name;
@@ -37,6 +47,20 @@ contract Pilots is ModuleBase {
         uint16 bays; // internal space bought, up to 250 (D59)
         uint16 cargo; // units of cargo aboard, one bay each
         uint32 colonists; // people aboard, 100 to a bay (D57, D59)
+        Loadout loadout;
+        uint8 rangeLost; // engine hits (D46): range never drops below 1
+        uint16 baysLost; // cargo bay hits: bays that can't be used until repaired
+    }
+
+    /// What's fitted (D59). Point defense takes 1 mount, railguns and missile racks 2 each.
+    struct Loadout {
+        uint16 drones;
+        uint8 repairBots;
+        uint8 pointDefense;
+        uint8 railguns;
+        uint8 missiles;
+        uint8 armor;
+        uint8 shields;
     }
 
     struct Pilot {
@@ -78,6 +102,7 @@ contract Pilots is ModuleBase {
         mapping(address => Session) sessions; // session key → its pilot and expiry
         mapping(address => address) sessionKeyOf; // pilot → current session key
         uint256 count;
+        IMoveHook battle;
     }
 
     // keccak256(abi.encode(uint256(keccak256("orbiter8.pilots")) - 1)) & ~bytes32(uint256(0xff))
@@ -92,6 +117,8 @@ contract Pilots is ModuleBase {
     event ColonistsChanged(address indexed pilot, uint256 colonists);
     event BaysAdded(address indexed pilot, uint16 bays);
     event RangeChanged(address indexed pilot, uint8 range);
+    event LoadoutChanged(address indexed pilot, Loadout loadout);
+    event DamageChanged(address indexed pilot, uint8 rangeLost, uint16 baysLost);
     event SessionStarted(address indexed pilot, address indexed key, uint64 expiry);
     event SessionEnded(address indexed pilot, address indexed key);
 
@@ -106,6 +133,7 @@ contract Pilots is ModuleBase {
     error BadRange(uint8 range);
     error BadSession();
     error SendFailed();
+    error BadLoadout();
 
     function _p() internal pure returns (PilotsStorage storage p) {
         assembly {
@@ -159,7 +187,8 @@ contract Pilots is ModuleBase {
         pilot.callsign = callsign;
         pilot.registered = true;
         pilot.shipId = shipId;
-        p.ships[shipId] = Ship(shipName, 0, START_RANGE, START_BAYS, 0, 0);
+        Ship storage ship = p.ships[shipId];
+        (ship.name, ship.range, ship.bays) = (shipName, START_RANGE, START_BAYS);
         p.shipTokens.mint(who, shipId);
         p.credits.mint(who, START_CREDITS);
         emit Registered(who, shipId, callsign, shipName);
@@ -240,9 +269,22 @@ contract Pilots is ModuleBase {
         address who = actorOf(msg.sender);
         Ship storage ship = _ship(who);
         uint256 from = ship.cell;
-        bool discovered = _p().galaxy.arrive(who, from, to, ship.range);
+        uint8 range = ship.range > ship.rangeLost + 1 ? ship.range - ship.rangeLost : 1;
+        bool discovered = _p().galaxy.arrive(who, from, to, range);
+        _moved(who, from, to);
         ship.cell = to;
         emit Jumped(who, from, to, discovered);
+    }
+
+    /// Lets Battle bring sieges at both stars up to date before the ship goes.
+    function _moved(address who, uint256 from, uint256 to) internal {
+        IMoveHook hook = _p().battle;
+        if (address(hook) != address(0)) hook.onMove(who, from, to);
+    }
+
+    /// The module told of every move (Battle). Admin only.
+    function setBattle(IMoveHook battle_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _p().battle = battle_;
     }
 
     /// Goes through the black hole the ship is at, to its partner.
@@ -252,6 +294,7 @@ contract Pilots is ModuleBase {
         Ship storage ship = _ship(who);
         uint256 hole = ship.cell;
         (uint256 exit, bool discovered) = _p().galaxy.traverse(who, hole);
+        _moved(who, hole, exit);
         ship.cell = exit;
         emit Traversed(who, hole, exit, discovered);
     }
@@ -322,7 +365,32 @@ contract Pilots is ModuleBase {
     }
 
     function _freeBays(Ship storage ship) internal view returns (uint256) {
-        return ship.bays - ship.cargo - _baysForColonists(ship.colonists);
+        uint256 used = uint256(ship.cargo) + _baysForColonists(ship.colonists) + _loadoutBays(ship.loadout) + ship.baysLost;
+        return used >= ship.bays ? 0 : ship.bays - used;
+    }
+
+    function _loadoutBays(Loadout memory l) internal pure returns (uint256) {
+        return uint256(l.drones) * 2 + uint256(l.repairBots) * 5 + uint256(l.armor) * 10 + uint256(l.shields) * 20;
+    }
+
+    /// Replaces what's fitted (the Armory and Battle). Reverts with BadLoadout past the mounts or
+    /// the armor and shield limits, or NoRoom past the free bays.
+    function setLoadout(address pilot, Loadout calldata loadout) external onlyRole(GAME_MODULE) {
+        Ship storage ship = _ship(pilot);
+        uint256 mounts = uint256(loadout.pointDefense) + 2 * uint256(loadout.railguns) + 2 * uint256(loadout.missiles);
+        if (mounts > MOUNTS || loadout.armor > MAX_ARMOR || loadout.shields > MAX_SHIELDS) revert BadLoadout();
+        uint256 free = _freeBays(ship) + _loadoutBays(ship.loadout);
+        uint256 needed = _loadoutBays(loadout);
+        if (needed > free && needed > _loadoutBays(ship.loadout)) revert NoRoom(free);
+        ship.loadout = loadout;
+        emit LoadoutChanged(pilot, loadout);
+    }
+
+    /// Battle damage to engines and bays (D46), or 0, 0 after a repair.
+    function setDamage(address pilot, uint8 rangeLost, uint16 baysLost) external onlyRole(GAME_MODULE) {
+        Ship storage ship = _ship(pilot);
+        (ship.rangeLost, ship.baysLost) = (rangeLost, baysLost);
+        emit DamageChanged(pilot, rangeLost, baysLost);
     }
 
     function addBays(address pilot, uint16 bays) external onlyRole(GAME_MODULE) {
