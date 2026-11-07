@@ -445,5 +445,5 @@ when you're done, let me know about any of those decisions I should review").
 | B51 | Milestone 5b | **The separate `/galaxy` screen is retired;** its route goes to the title screen. | Everything it did is in the game. |
 | B52 | Milestone 5b | **Sol's planets show "The Federation" as owner** and can't be claimed (D49). | Demo 3 gave them to a house account of that name. |
 | B53 | Milestone 5b | **A black hole's system draws a dark disk with its ring,** and its card says Black Hole. | Demo 3 had no black holes; D17. |
-| B54 | Milestone 5b | **The client plays both demos:** `sdk/client.js` uses Demo 3's client or Demo 4's (`sdk/v4/client.js`, the same interface) by the network's deployment, so Demo 3's networks still play Demo 3. Under `npm run local4` only the local Demo 4 chain is listed. | Nothing of Demo 3 dropped. |
+| B54 | Milestone 5b | ~~**The client plays both demos.**~~ **Replaced (Koda, 2026-11-07):** one project, one set of contracts. The client works only with the current contracts; the old contracts and networks left the repo (milestone 5c). | Demo 3 is a past release, not a second game. |
 
