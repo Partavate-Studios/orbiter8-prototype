@@ -22,7 +22,8 @@
 
         <g transform="translate(0 235)" font-size="0.85em">
           <text v-if="!fitted.length" x="0" y="0" text-anchor="middle" fill="#ffffff88">
-            Nothing fitted: no weapons, armor or shields. The I.S.S. armory sells them.
+            <tspan x="0" y="0">Nothing fitted: no weapons, armor or shields.</tspan>
+            <tspan x="0" y="22">The I.S.S. armory sells them.</tspan>
           </text>
           <g v-for="(row, i) in fitted" :key="row.part" :transform="'translate(0 ' + i * 24 + ')'">
             <text x="-170" y="0">{{ row.count }} × {{ row.name }}</text>

@@ -47,6 +47,9 @@
           <text x="0" y="20" text-anchor="middle" font-size="0.75em" fill="#ffffff88">
             {{ aboard.toLocaleString('en-US') }} colonists aboard · 100 to a hold
           </text>
+          <text v-if="!aboard && !planet.population" x="0" y="36" text-anchor="middle" font-size="0.7em" fill="#ffffff88">
+            Recruit colonists at Earth's hiring hall, in Sol.
+          </text>
           <g transform="translate(0 60)">
             <amount-dial v-model:value="land" label="Land colonists" :max="aboard" :step="10" />
           </g>

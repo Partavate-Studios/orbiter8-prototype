@@ -1,6 +1,6 @@
 // The game's contracts, read and written through ethers (docs/demo4-plan.md, section 8). No Vue: the
 // stores decide what to do with the results. `runner` is a signer (to move) or a provider (to read).
-import { Contract } from 'ethers'
+import { Contract, Interface } from 'ethers'
 import GalaxyAbi from './abi/Galaxy.json'
 import PilotsAbi from './abi/Pilots.json'
 import MarketAbi from './abi/Market.json'
@@ -10,6 +10,7 @@ import FactoryAbi from './abi/Factory.json'
 import BattleAbi from './abi/Battle.json'
 import ArmoryAbi from './abi/Armory.json'
 import { fetchRound } from './drand'
+import { describeRevert } from './reverts'
 
 export const STATE = { UNDECIDED: 0, EMPTY: 1, STAR: 2, BLACK_HOLE: 3 }
 /** Cells per region read; the contracts cap it at 10. */
@@ -91,9 +92,28 @@ const toSiege = (planet, s) => ({
   side: toSide(s.planet)
 })
 
-/** Sends a move, tells `options.onSent` its hash, and resolves with the receipt once mined. */
+/** The game's ABIs, for putting a refused move into words (sdk/reverts.js). */
+const INTERFACES = [GalaxyAbi, PilotsAbi, MarketAbi, CreditsAbi, PlanetsAbi, FactoryAbi, BattleAbi, ArmoryAbi].map(
+  (abi) => new Interface(abi)
+)
+
+/**
+ * Sends a move, tells `options.onSent` its hash, and resolves with the receipt once mined. A move
+ * the contracts refuse throws with `shortMessage` in plain words (the tray and the wizard show it).
+ */
 async function sent(transaction, options) {
-  const tx = await transaction
+  let tx
+  try {
+    tx = await transaction
+  } catch (error) {
+    const words = describeRevert(error, INTERFACES)
+    if (!words) throw error
+    const refused = new Error(words, { cause: error })
+    refused.shortMessage = words
+    refused.reason = words
+    refused.code = error.code
+    throw refused
+  }
   options?.onSent?.(tx.hash)
   return tx.wait()
 }

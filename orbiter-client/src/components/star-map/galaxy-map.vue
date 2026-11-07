@@ -86,7 +86,11 @@
 
     <header class="title">
       <h2>Galaxy Map</h2>
-      <p>
+      <p v-if="touch">
+        Tap a star for its path; tap your star for every jump you can make ({{ range }}
+        {{ range === 1 ? 'step' : 'steps' }}). Drag to look around.
+      </p>
+      <p v-else>
         Hover your star to see every jump you can make ({{ range }} {{ range === 1 ? 'step' : 'steps' }}). Drag to look
         around.
       </p>
@@ -155,6 +159,8 @@ export default {
       now: Date.now(),
       /** the star under the pointer, and where the pointer is (for the tooltip) */
       hover: null,
+      /** no hover: a touch screen (the hint says to tap) */
+      touch: window.matchMedia?.('(hover: none)').matches ?? false,
       pointer: { x: 0, y: 0 },
       MAP
     }
@@ -255,7 +261,8 @@ export default {
     },
     /** The hovered star's name and where it stands. */
     tip() {
-      if (this.hover === null || this.drag?.moved) return null
+      // A mouse thing: on touch the tapped star's card names it, and there's no pointer to sit beside.
+      if (this.touch || this.hover === null || this.drag?.moved) return null
       const c = this.client.cells.get(this.hover)
       if (!c) return null
       const steps = distance(this.shipCell, this.hover)
@@ -316,7 +323,8 @@ export default {
     },
     discovererName() {
       const who = this.chosenCell.discoverer
-      return who === this.player.account ? 'you' : who.slice(0, 6) + '…' + who.slice(-4)
+      if (who === this.player.account) return 'you'
+      return game.callsignOf(who) ?? who.slice(0, 6) + '…' + who.slice(-4)
     },
     scanWords() {
       const c = this.chosenCell

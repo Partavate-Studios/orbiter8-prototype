@@ -78,16 +78,20 @@ export function titleAction(step, input) {
 export const cleanName = normalizeName
 
 export const NAME_MAX_LENGTH = 24
+/** Call signs and ship names are at least this long (Pilots.sol MIN_NAME); other names may be shorter. */
+export const PILOT_NAME_MIN_LENGTH = 3
 
 /**
- * Why a name can't be used yet, or null if it can. The contracts accept any string, so these rules
- * are the client's own.
+ * Why a name can't be used yet, or null if it can: the contracts' own length rules (Pilots.sol,
+ * Planets.sol), checked before anything is sent.
  * @param {string} name  as typed
- * @param {{ taken?: Set<string> | null }} [options]  known callsigns, lowercased (null: unknown)
+ * @param {{ taken?: Set<string> | null, minLength?: number }} [options]  known callsigns, lowercased
+ *   (null: unknown), and the shortest name allowed (1 when not given)
  */
-export function nameProblem(name, { taken = null } = {}) {
+export function nameProblem(name, { taken = null, minLength = 1 } = {}) {
   const clean = cleanName(name)
   if (clean.length === 0) return 'empty'
+  if (clean.length < minLength) return 'too short'
   if (clean.length > NAME_MAX_LENGTH) return 'too long'
   if (taken?.has(clean.toLowerCase())) return 'taken'
   return null

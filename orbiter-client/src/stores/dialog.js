@@ -7,7 +7,8 @@ import { defineStore } from 'pinia'
  * @typedef {object} DialogInput
  * @property {string} label
  * @property {string} [value]  filled in to start with
- * @property {'name' | 'message' | 'number'} [kind]  names follow the callsign rules (libs/onboarding.js nameProblem)
+ * @property {'name' | 'message' | 'number'} [kind]  names follow the contracts' rules (libs/onboarding.js nameProblem)
+ * @property {number} [minLength]  for names (1 when not given; call signs and ship names need 3)
  * @property {number} [maxLength]  for messages
  * @property {number} [min]  for numbers (1 when not given)
  * @property {number} [max]  for numbers

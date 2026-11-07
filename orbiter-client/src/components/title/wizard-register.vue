@@ -96,7 +96,7 @@ import { mapState } from 'pinia'
 import { useChainStore } from '@/stores/chain'
 import { useGameStateStore } from '@/stores/gamestate'
 import { useOnboardingStore } from '@/stores/onboarding'
-import { cleanName, nameProblem, NAME_MAX_LENGTH } from '@/libs/onboarding'
+import { cleanName, nameProblem, NAME_MAX_LENGTH, PILOT_NAME_MIN_LENGTH } from '@/libs/onboarding'
 import LaunchPad from './launch-pad.vue'
 import PilotCard from './pilot-card.vue'
 
@@ -129,13 +129,14 @@ export default {
       return cleanName(this.name)
     },
     problem() {
-      return nameProblem(this.name, { taken: this.kind === 'callsign' ? this.callsigns : null })
+      return nameProblem(this.name, { taken: this.kind === 'callsign' ? this.callsigns : null, minLength: PILOT_NAME_MIN_LENGTH })
     },
     hint() {
       if (this.problem === 'too long') return `That's ${this.cleaned.length} characters; ${NAME_MAX_LENGTH} at most.`
+      if (this.problem === 'too short') return `At least ${PILOT_NAME_MIN_LENGTH} characters.`
       if (this.problem === 'taken') return `A pilot already flies as ${this.cleaned}. Pick another call sign.`
-      if (this.kind === 'callsign') return `Up to ${NAME_MAX_LENGTH} characters. Other pilots will see it.`
-      return `Up to ${NAME_MAX_LENGTH} characters.`
+      if (this.kind === 'callsign') return `${PILOT_NAME_MIN_LENGTH} to ${NAME_MAX_LENGTH} characters. Other pilots will see it.`
+      return `${PILOT_NAME_MIN_LENGTH} to ${NAME_MAX_LENGTH} characters.`
     },
     lowBalance() {
       return Number(this.balance) > 0 && Number(this.balance) < LOW_BALANCE
@@ -155,7 +156,7 @@ export default {
     },
     /** The name can't be sent as it is (an empty name only focuses the box). */
     blocked() {
-      return this.problem === 'taken' || this.problem === 'too long'
+      return this.problem === 'taken' || this.problem === 'too long' || this.problem === 'too short'
     }
   },
   watch: {

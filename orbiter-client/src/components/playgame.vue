@@ -5,7 +5,7 @@
     <transaction-tray />
     <galaxy-map v-if="neighborView && !jumpAnimationState" />
     <black-hole-entry />
-    <first-steps v-if="!neighborView && selected == null" />
+    <first-steps v-if="!neighborView && selected == null && !isMenuOn" />
     <tech-tree v-if="techTreeOpen" class="tech-tree-over" @close="techTreeOpen = false" />
     <game-dialog />
   </div>
@@ -54,7 +54,7 @@ export default {
   },
   computed: {
     ...mapState(useGameStateStore, ['haveAvatar', 'haveShip']),
-    ...mapState(useUIStore, ['selected', 'jumpAnimationState', 'viewport', 'neighborView']),
+    ...mapState(useUIStore, ['selected', 'jumpAnimationState', 'viewport', 'neighborView', 'isMenuOn']),
     techTreeOpen: {
       get() {
         return useUIStore().techTreeOpen

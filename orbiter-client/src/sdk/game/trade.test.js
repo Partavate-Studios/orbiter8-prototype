@@ -29,6 +29,11 @@ describe('cargo', () => {
     expect(cargoLines({ holds: 5, usedHolds: 4, cargo: [0, 0, 0, 0, 4, 0, 0, 0] }, names)).toEqual([
       { name: 'Organics', units: 4 }
     ])
+    // colonists ride along as a line of their own
+    expect(cargoLines({ holds: 5, usedHolds: 5, cargo: [0, 0, 0, 0, 4, 0, 0, 0], colonists: 100 }, names)).toEqual([
+      { name: 'Organics', units: 4 },
+      { name: 'Colonists', units: 100 }
+    ])
   })
 })
 

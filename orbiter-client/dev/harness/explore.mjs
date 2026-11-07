@@ -1,5 +1,5 @@
 // Step through the app interactively: node explore.mjs <url> <outdir> [step...]
-// Each step: "shot:name", "click:text", "type:selector=value", "wait:ms", "key:k", "eval:js"
+// Each step: "shot:name", "click:text", "clickxy:x,y", "move:x,y", "type:selector=value", "wait:ms", "key:k", "eval:js"
 import puppeteer from 'puppeteer-core'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -14,10 +14,12 @@ const browser = await puppeteer.launch({
   args: ['--window-size=1440,900', '--autoplay-policy=no-user-gesture-required', '--mute-audio']
 })
 const page = await browser.newPage()
+// TOUCH=1: a touch screen with no hover (phones), so `(hover: none)` holds and taps are touches.
 await page.setViewport({
   width: Number(process.env.VW || 1440),
   height: Number(process.env.VH || 900),
-  deviceScaleFactor: Number(process.env.DPR || 1)
+  deviceScaleFactor: Number(process.env.DPR || 1),
+  hasTouch: process.env.TOUCH === '1'
 })
 // CPU_THROTTLE=4: slow the page's CPU this many times (Chrome's throttling), to show costs a fast machine hides.
 if (process.env.CPU_THROTTLE) {
@@ -189,6 +191,10 @@ for (const step of steps) {
     await cdp.send('DOM.enable')
     await cdp.send('Overlay.enable')
     await cdp.send('Overlay.setShowPaintRects', { result: arg === 'on' })
+  } else if (kind === 'move') {
+    // move:<x>,<y> moves the mouse to a screen point (hover effects, tooltips).
+    const [x, y] = arg.split(',').map(Number)
+    await page.mouse.move(x, y, { steps: 5 })
   } else if (kind === 'clickxy') {
     const [x, y] = arg.split(',').map(Number)
     await page.mouse.click(x, y)

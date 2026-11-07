@@ -55,7 +55,8 @@ export default {
     },
     who(address) {
       if (!address) return 'someone'
-      return address === this.player.account ? 'You' : address.slice(0, 6) + '…'
+      if (address === this.player.account) return 'You'
+      return game.callsignOf(address) ?? address.slice(0, 6) + '…'
     },
     words(e) {
       const where = this.place(e.planet)

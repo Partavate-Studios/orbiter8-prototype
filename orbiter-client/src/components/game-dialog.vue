@@ -34,10 +34,10 @@
               autocomplete="off"
               spellcheck="false"
               :maxlength="maxLength"
-              :aria-invalid="problem === 'too long' || problem === 'out of range' ? 'true' : 'false'"
+              :aria-invalid="problem === 'too long' || problem === 'too short' || problem === 'out of range' ? 'true' : 'false'"
               aria-describedby="dialog-hint"
             />
-            <p id="dialog-hint" class="hint" :class="{ problem: problem === 'too long' }" aria-live="polite">
+            <p id="dialog-hint" class="hint" :class="{ problem: problem === 'too long' || problem === 'too short' }" aria-live="polite">
               {{ hint }}
             </p>
           </template>
@@ -87,7 +87,7 @@ export default {
         const { min = 1, max = Infinity } = this.open.input
         return Number.isInteger(n) && n >= min && n <= max ? null : 'out of range'
       }
-      if (this.isName) return nameProblem(this.text)
+      if (this.isName) return nameProblem(this.text, { minLength: this.open.input.minLength ?? 1 })
       return this.text.trim() ? null : 'empty'
     },
     hint() {
@@ -101,7 +101,9 @@ export default {
       }
       if (this.problem === 'too long')
         return `That's ${cleanName(this.text).length} characters; ${NAME_MAX_LENGTH} at most.`
-      return `Up to ${NAME_MAX_LENGTH} characters. Other pilots will see it.`
+      const min = this.open.input.minLength ?? 1
+      if (this.problem === 'too short') return `At least ${min} characters.`
+      return `${min > 1 ? `${min} to ${NAME_MAX_LENGTH}` : `Up to ${NAME_MAX_LENGTH}`} characters. Other pilots will see it.`
     }
   },
   watch: {

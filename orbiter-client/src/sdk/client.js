@@ -113,7 +113,9 @@ export function createGameClient() {
     /** the galaxy map: cell number → cell, and star names by cell */
     cells: new Map(),
     names: {},
-    loadedCenters: []
+    loadedCenters: [],
+    /** call signs by address (lowercase), for everyone met so far: discoverers, owners, attackers */
+    callsigns: {}
   }
   const listeners = new Set()
   const notify = (change) => listeners.forEach((listener) => listener(change, state))
@@ -149,6 +151,14 @@ export function createGameClient() {
   }
 
   const sessionLive = () => Boolean(state.session && state.session.expiry * 1000 > Date.now() + 60_000)
+
+  /** Reads the call signs of `addresses` not yet known, into state.callsigns. */
+  async function learnCallsigns(addresses) {
+    const unknown = [...new Set(addresses.filter((a) => a && !(a in state.callsigns)))]
+    if (!unknown.length) return
+    const found = await game.callsigns(unknown)
+    for (const a of unknown) state.callsigns[a] = found[a] || ''
+  }
   /** Who signs moves: the session key while it's live, otherwise the wallet. */
   const mover = () => (sessionLive() && keyGame ? keyGame : game)
   const proofs = () => game.proofsFor([...state.cells.values()])
@@ -312,11 +322,13 @@ export function createGameClient() {
     state.cells = next
     if (!covered) state.loadedCenters.push(center)
     // Names change (Planets.nameStar), so a forced read fetches the named stars' names again.
-    await Promise.all(
-      cells
+    await Promise.all([
+      ...cells
         .filter((c) => c.named && (force || !(c.cell in state.names)))
-        .map(async (c) => (state.names[c.cell] = await game.nameOf(c.cell)))
-    )
+        .map(async (c) => (state.names[c.cell] = await game.nameOf(c.cell))),
+      // and the discoverers' call signs, for the map's card
+      learnCallsigns(cells.map((c) => c.discoverer))
+    ])
     notify('cells')
   }
 
@@ -364,6 +376,7 @@ export function createGameClient() {
     if (star?.discoverer && !(star.discoverer in avatarNames)) owners.push(star.discoverer)
     if (keeper && keeper !== network.contracts.galaxy.toLowerCase() && !(keeper in avatarNames)) owners.push(keeper)
     Object.assign(avatarNames, await game.callsigns(owners))
+    for (const [a, name] of Object.entries(avatarNames)) if (name) state.callsigns[a] = name
 
     const name = starName(cell)
     const data = {
@@ -828,6 +841,7 @@ export function createGameClient() {
         state.events = await loadEvents()
         notify('events')
         state.feed = await game.siegeFeed().catch(() => state.feed)
+        await learnCallsigns(state.feed.map((e) => e.who)).catch(() => {})
         notify('feed')
       })
     },
@@ -861,6 +875,10 @@ export function createGameClient() {
     /** Reads the galaxy map's region around `center` (the map view calls this as the player pans). */
     loadAround,
     starName,
+    /** A pilot's call sign, if the client has met them, else null. */
+    callsignOf(address) {
+      return state.callsigns[address] || null
+    },
     previewScan(cell) {
       const c = state.cells.get(cell)
       if (!c || !c.visited || c.scanned) return null

@@ -104,14 +104,17 @@ export function canAfford(credits, cost) {
 }
 
 /**
- * What the ship carries, for the HUD and the ship's card: the goods aboard, by name.
- * @param {ShipCargo} ship
+ * What the ship carries, for the HUD and the ship's card: the goods aboard, by name, then the
+ * colonists (they ride 100 to a hold, D57).
+ * @param {ShipCargo & { colonists?: number }} ship
  * @param {string[]} names  goods by id
  * @returns {Array<{ name: string, units: number }>}
  */
 export function cargoLines(ship, names) {
   const cargo = ship.cargo ?? []
-  return names.map((name, id) => ({ name, units: cargo[id] ?? 0 })).filter((line) => line.units > 0)
+  const lines = names.map((name, id) => ({ name, units: cargo[id] ?? 0 })).filter((line) => line.units > 0)
+  if (ship.colonists > 0) lines.push({ name: 'Colonists', units: ship.colonists })
+  return lines
 }
 
 /** Short names for the HUD's narrow columns; other names are short already. */

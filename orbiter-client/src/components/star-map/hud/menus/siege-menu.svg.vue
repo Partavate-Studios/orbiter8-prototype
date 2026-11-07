@@ -37,7 +37,7 @@
           :y="192 + i * 18"
           text-anchor="middle"
           font-size="0.85em"
-          :fill="siege.wornAt ? PINK_LIGHT : '#ffffffaa'"
+          :fill="siege.wornAt || defenceless ? PINK_LIGHT : '#ffffffaa'"
         >
           {{ line }}
         </text>
@@ -58,6 +58,7 @@ import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
 import { usePlayerStore } from '@/stores/player'
 import { PINK_LIGHT } from '@/libs/palette'
+import { game } from '@/sdk/client'
 import MenuContainer from './menu-container/_menu-container.svg'
 import MenuButton from './menu-button.svg'
 
@@ -89,18 +90,26 @@ export default {
     },
     attackerName() {
       if (this.mine) return 'You are'
-      return (this.players[this.siege.attacker] ?? this.siege.attacker.slice(0, 6) + '…') + ' is'
+      const who = this.siege.attacker
+      return (this.players[who] ?? game.callsignOf(who) ?? who.slice(0, 6) + '…') + ' is'
     },
     planetBars() {
       const s = this.siege.side
+      // Platforms are 150 each (up to 3); the hull is 60 per tech level. A layer the planet never had
+      // isn't a bar.
       return [
-        { name: 'Platforms', value: s.platforms, max: Math.max(s.platforms, 450) },
+        { name: 'Platforms', value: s.platforms, max: 450 },
         { name: 'Shield', value: s.shield, max: s.shieldMax },
         { name: 'Armor', value: s.armor, max: s.armorMax },
-        { name: 'Hull', value: s.hull, max: Math.max(s.hull, 360) }
+        { name: 'Hull', value: s.hull, max: 360 }
       ]
-        .filter((b) => b.max > 0)
-        .map((b) => ({ ...b, part: b.value / b.max }))
+        .filter((b) => b.max > 0 && b.value > 0)
+        .map((b) => ({ ...b, part: Math.min(1, b.value / b.max) }))
+    },
+    /** Nothing stands between the attacker and the planet. */
+    defenceless() {
+      const s = this.siege.side
+      return s.platforms === 0 && s.shield === 0 && s.armor === 0 && s.hull === 0
     },
     shipBars() {
       const s = this.siege.ship
@@ -116,6 +125,7 @@ export default {
       if (this.siege.claimAt)
         return [`Claim filed with Minerva: completes ${this.when(this.siege.claimAt)},`, 'unless the defenses come back.']
       if (this.siege.wornAt) return [`Worn down ${this.ago(this.siege.wornAt)}:`, 'production has stopped.']
+      if (this.defenceless) return ['Undefended: worn down', 'when the next round is recorded.']
       return ['The planet is holding.']
     },
     actions() {
@@ -149,7 +159,7 @@ export default {
         [s.drones, 'drone'],
         [s.bfg, 'BFG']
       ].filter(([n]) => n > 0)
-      if (!parts.length) return 'No weapons left'
+      if (!parts.length) return s === this.siege.side && this.defenceless ? 'No defenses' : 'No weapons left'
       return parts.map(([n, name]) => `${n} ${name}${n > 1 && name !== 'point defense' && name !== 'BFG' ? 's' : ''}`).join(', ')
     },
     ago(t) {

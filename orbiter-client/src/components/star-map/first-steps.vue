@@ -112,13 +112,13 @@ ol {
   color: #c3b3da88;
   text-decoration: line-through;
 }
+/* A portrait phone: under the profile card, over the map, clear of the HUD's buttons below. */
 @media (max-width: 600px) and (orientation: portrait) {
   .first-steps {
     left: 8px;
     right: 8px;
     width: auto;
-    top: auto;
-    bottom: 120px;
+    top: 200px;
   }
 }
 </style>

@@ -77,5 +77,8 @@ describe('names', () => {
     expect(nameProblem('x'.repeat(25))).toBe('too long')
     expect(nameProblem(' Vega ', { taken: new Set(['vega']) })).toBe('taken')
     expect(nameProblem('Vega', { taken: null })).toBe(null)
+    // call signs and ship names need 3 characters (Pilots.MIN_NAME); planet names may be shorter
+    expect(nameProblem('Bo', { minLength: 3 })).toBe('too short')
+    expect(nameProblem('Bo')).toBe(null)
   })
 })

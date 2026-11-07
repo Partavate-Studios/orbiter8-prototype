@@ -21,6 +21,7 @@ import { useDialogStore } from '@/stores/dialog'
 import { usePlayerStore } from '@/stores/player'
 import { cardMenu } from './card-menu'
 import { marketTokenUrl, networkFor } from '@/sdk/chain/networks'
+import { PILOT_NAME_MIN_LENGTH } from '@/libs/onboarding'
 import CardBackground from '../card-background.svg'
 import CardButton from '../card-button.svg'
 
@@ -171,7 +172,12 @@ export default {
           const name = await this.ask({
             title: 'Rename ' + object.name,
             message: fee ? `A new name for your ship costs ${fee.toLocaleString('en-US')} credits.` : undefined,
-            input: { label: 'New ' + type + ' name', value: object.name, kind: 'name' },
+            input: {
+              label: 'New ' + type + ' name',
+              value: object.name,
+              kind: 'name',
+              minLength: type === 'ship' ? PILOT_NAME_MIN_LENGTH : 1
+            },
             confirm: 'Rename'
           })
           // Moons and stations are named through their planet.

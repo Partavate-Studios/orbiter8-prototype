@@ -239,6 +239,8 @@ export default {
 }
 .secondary {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 1em;
 }
 .secondary .o8-button {

@@ -93,7 +93,8 @@ export function buildSystem(system, playerAccount) {
     birth: system.birthTime,
     owner: system.discoveredBy,
     ownerName: system.avatarNames[system.discoveredBy],
-    isMine: String(playerAccount) == String(system.discoveredBy),
+    // "Mine" on the card: the star's owner (the keeper, by its planets), not its discoverer
+    isMine: Boolean(system.keeper) && system.keeper !== 'federation' && String(playerAccount) == String(system.keeper),
     // a black hole, with a partner to go through to
     blackHole: system.blackHole ?? false,
     // its owner ('federation', an address or null), and whether the player may name it (Planets.mayNameStar)

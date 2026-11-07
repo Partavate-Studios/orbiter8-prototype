@@ -1,5 +1,5 @@
 <template>
-  <g :transform="'translate(' + cardUiTranslate + ')'">
+  <g v-if="sprite?.position" :transform="'translate(' + cardUiTranslate + ')'">
     <g :transform="'scale(' + cardUiScale + ')'">
       <slot />
     </g>

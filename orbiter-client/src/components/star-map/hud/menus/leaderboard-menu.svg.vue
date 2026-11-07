@@ -39,7 +39,7 @@
           >
             <text v-if="row.gapBefore" x="0" y="-2" fill="#ffffff66">⋯</text>
             <menu-slot-container :highlight="row.isMe">
-              <g font-size="1.1em" :fill="row.isMe ? '#ffffff' : '#ffffffcc'">
+              <g :font-size="rowFontSize" :fill="row.isMe ? '#ffffff' : '#ffffffcc'">
                 <text :x="columns.rank" y="36">{{ row.rank }}</text>
                 <text :x="columns.name" y="36" text-anchor="start">{{ pilotName(row.player) }}</text>
                 <text :x="columns.planets" y="36">{{ row.player.planets }}</text>
@@ -102,7 +102,13 @@ export default {
     /** Column positions inside a row, in the slot's coordinates. */
     columns() {
       const width = this.slotWidth
+      // On a phone the slot is about 290 wide: the counts move left so the credits have room.
+      if (width < 400) return { rank: 22, name: 42, planets: width * 0.5, ports: width * 0.64, credits: width - 14 }
       return { rank: 30, name: 60, planets: width * 0.58, ports: width * 0.72, credits: width - 30 }
+    },
+    /** Rows shrink a little on a phone, so "298,979¢" fits beside the counts. */
+    rowFontSize() {
+      return this.slotWidth < 400 ? '0.95em' : '1.1em'
     },
     ranked() {
       const me = String(this.account).toLowerCase()
