@@ -43,7 +43,11 @@ export function bindStoresToGame(game) {
       return
     }
     // Demo 4's own state (sessions, planets, battle) follows every change.
-    if (game.version === 4) useDemo4Store().sync()
+    if (game.version === 4) {
+      const demo4 = useDemo4Store()
+      demo4.sync()
+      if (change === 'cells') demo4.cellsVersion++
+    }
     switch (change) {
       case 'connected':
         chain.chainId = state.chainId

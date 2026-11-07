@@ -50,8 +50,9 @@
           <g v-if="jumpAnimationState">
             <jumpAnimation></jumpAnimation>
           </g>
+          <!-- Demo 4 draws its galaxy map over the game instead (components/star-map/galaxy-map.vue) -->
           <g v-else-if="neighborView">
-            <neighbor-view />
+            <neighbor-view v-if="!demo4Active" />
           </g>
           <g v-else>
             <hud></hud>
@@ -67,6 +68,7 @@
 </template>
 
 <script>
+import { useDemo4Store } from '@/stores/demo4'
 import { CAMERA, WORLD_OFFSET_Y } from '@/constants'
 import { STAR_KEY } from '@/sdk/system'
 
@@ -113,6 +115,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(useDemo4Store, { demo4Active: 'active' }),
     ...mapState(useUIStore, [
       'neighborView',
       'viewport',
