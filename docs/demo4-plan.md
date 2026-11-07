@@ -28,6 +28,9 @@ design doc), [`design-ideas.md`](design-ideas.md) (Koda's working doc), [`cost-e
 | D7 | **Two-step exploration if it's clean** (commit, then arrive using randomness nobody could know at commit time), **and only ordinary wallets may play, if that can be enforced.** | 2026-11-06 |
 | D8 | **The map can be read anywhere, any time:** the contracts have view methods for any region. **Stars are jittered off the grid** for display, as in the prototype, so the map reads as a star field rather than a lattice. The spiral arms will be revised. | 2026-11-06 |
 | D9 | **Store as little on chain as possible.** Defaults come from seeds; only what players change is stored. The same principle drives a new idea, **planet terraforming**: each planet's surface is a map generated from a seed (no storage), and the structures players place are stored on top of it, like Minecraft. | 2026-11-06 |
+| D10 | **Range is a straight-line leap.** A ship can jump to any charted, existing star within range on the hex grid, crossing empty cells; no chain of stars is needed (as the prototype's `recomputeReach` does). | 2026-11-06 |
+| D11 | **Range starts at 1, and each upgrade adds 1, up to 4.** Each level costs progressively more **in time to earn**, not just in credits: getting from 1 to 2 should take far less play than 3 to 4. The prices must account for a pilot's profit rate rising as they add holds (in the play session, profit per trade grew from about 300 credits at 5 holds to about 15,000 at 250). | 2026-11-06 |
+| D12 | **Range never reveals stars.** It only reaches stars already charted. New stars appear only around a star someone arrives at for the first time: its 6 neighbors, never more. | 2026-11-06 |
 
 ## Feature inventory (proposed tiers, for Koda to correct)
 
@@ -99,7 +102,7 @@ re-skinning and ENS names (client features, any time).
 
 ## Open questions
 
-Round 2 (asked 2026-11-06): see the conversation; answers are recorded above as they arrive.
+Round 2 (asked 2026-11-06): Fable's research; how contracts upgrade; wallet-only play; the exploration commit-reveal; what counts as critical mass; the feature tiers; revising the spiral; region views; terraforming's place.
 
 ## Plan
 
