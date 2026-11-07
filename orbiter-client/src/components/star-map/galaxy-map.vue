@@ -31,7 +31,7 @@
     <header class="title">
       <h2>Galaxy Map</h2>
       <p>Stars within {{ range }} {{ range === 1 ? 'jump' : 'jumps' }} are ringed. Drag to look around.</p>
-      <p v-if="scanWords" class="scanning-now">{{ scanWords }}</p>
+      <p v-if="scanningNow" class="scanning-now">{{ scanningNow }}</p>
     </header>
 
     <aside v-if="chosen !== null" class="card">
@@ -157,7 +157,7 @@ export default {
       return this.distanceAway > 0 && this.distanceAway <= this.range
     },
     /** The pilot's scan in progress: "Scanning Lulin-851… 23 s", or null. */
-    scanWords() {
+    scanningNow() {
       const scan = this.player.scan
       if (!scan) return null
       const where = this.nameOf(scan.cell)
