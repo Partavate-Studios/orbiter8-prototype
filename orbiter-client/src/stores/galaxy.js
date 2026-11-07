@@ -55,7 +55,15 @@ export const useGalaxyStore = defineStore('Galaxy', {
     /** building costs, the claim fee, colonist price and the Autofactory's parts (planetRules) */
     rules: null,
     /** planet id → its Autofactory's queue and finished parts */
-    factories: {}
+    factories: {},
+    /** sieges at the ship's star, played up to now */
+    sieges: [],
+    /** the ship's state between battles */
+    condition: null,
+    /** planet id → fitted defenses (the player's planets at the ship's star) */
+    defenses: {},
+    /** the siege feed, newest first */
+    feed: []
   }),
   getters: {
     shipCell: (state) => (state.pilot ? state.pilot.ship.cell : null),
@@ -63,6 +71,22 @@ export const useGalaxyStore = defineStore('Galaxy', {
       if (!state.pilot) return 0
       const { bays, cargo, colonists } = state.pilot.ship
       return bays - cargo - Math.ceil(colonists / 100)
+    },
+    /** Stars with a siege running, from the feed: for the map. */
+    besiegedCells: (state) => {
+      const live = new Set()
+      for (const e of [...state.feed].reverse()) {
+        if (e.event === 'SiegeStarted') live.add(e.planet)
+        if (e.event === 'SiegeEnded') live.delete(e.planet)
+      }
+      return new Set([...live].map((p) => Math.floor(p / 256)))
+    },
+    /** What the ship can fire now (its loadout less what's out of action). */
+    armed: (state) => {
+      if (!state.pilot) return false
+      const l = state.pilot.ship.loadout
+      const off = state.condition?.off ?? [0, 0, 0, 0, 0]
+      return l.railguns - off[1] + l.missiles - off[2] + l.drones - off[3] > 0
     },
     sessionLive: (state) => Boolean(state.session && state.session.expiry * 1000 > Date.now() + 60_000),
     cellAt: (state) => (n) => state.cells.get(n) ?? null,
@@ -119,6 +143,14 @@ export const useGalaxyStore = defineStore('Galaxy', {
       Object.assign(this, { credits, cargo, ports, economy, planets })
       const mine = planets.filter((p) => p.owner === this.account && (p.autofactory || p.building === 7))
       for (const p of mine) this.factories[p.id] = await game.factoryAt(p.id)
+      const [sieges, condition] = await Promise.all([game.siegesAt(cell), game.condition(this.account)])
+      Object.assign(this, { sieges, condition })
+      for (const p of planets.filter((p) => p.owner === this.account)) this.defenses[p.id] = await game.defenses(p.id)
+      this.loadFeed()
+    },
+    /** The siege feed (and with it, which stars have sieges running). */
+    async loadFeed() {
+      this.feed = await game.siegeFeed().catch(() => this.feed)
     },
     /** Picks up a session key this browser started earlier, if it's still the pilot's live one. */
     resumeSession() {
@@ -287,6 +319,47 @@ export const useGalaxyStore = defineStore('Galaxy', {
     order(planet, part, count) {
       return this.move('build', (proofs, by) => by.order(planet, part, count))
     },
+    // ── battle (milestone 4) ──────────────────────────────────────────────────────────────────
+
+    attack(planet) {
+      return this.move('battle', (proofs, by) => by.attack(planet))
+    },
+    joinDefense(planet) {
+      return this.move('battle', (proofs, by) => by.joinDefense(planet))
+    },
+    advanceSiege(planet) {
+      return this.move('battle', (proofs, by) => by.advance(planet))
+    },
+    fileClaim(planet) {
+      return this.move('battle', (proofs, by) => by.fileClaim(planet))
+    },
+    completeClaim(planet) {
+      return this.move('battle', (proofs, by) => by.completeClaim(planet))
+    },
+    withdraw(planet) {
+      return this.move('battle', (proofs, by) => by.withdraw(planet))
+    },
+    fitShip(planet, part, count) {
+      return this.move('fit', (proofs, by) => by.fitShip(planet, part, count))
+    },
+    unloadShip(planet, part, count) {
+      return this.move('fit', (proofs, by) => by.unloadShip(planet, part, count))
+    },
+    fitPlanet(planet, part, count) {
+      return this.move('fit', (proofs, by) => by.fitPlanet(planet, part, count))
+    },
+    /** Parts at an armory: Sol's I.S.S. at twice their cost, a player's Armory at one and a half. */
+    partPrice(port, part, count) {
+      const unit = this.rules.parts[part].credits
+      return port === 2 ? unit * 2 * count : Math.floor((unit * 3 * count) / 2)
+    },
+    buyParts(port, part, count) {
+      return this.move('fit', (proofs, by) => by.buyParts(port, part, count, this.partPrice(port, part, count)))
+    },
+    repair(port) {
+      return this.move('yard', (proofs, by) => by.repair(port))
+    },
+
     /** What stands between a planet and a building: [] when it can be started now. */
     missingFor(planet, building) {
       const cost = this.rules.buildings[building]

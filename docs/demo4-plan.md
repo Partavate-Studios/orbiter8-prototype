@@ -307,7 +307,7 @@ impossible or needs a design call goes back to Koda; everything else is decided 
 **Milestone 4: battle**
 - [x] Weapons, armor, shields, repair bots and platforms as parts and buildings.
 - [x] `Battle`: sieges, lazy resolution, counters, the BFG, damage and retreat, repairs, claims, and the siege feed.
-- [ ] The client's battle views, loadouts and the siege feed.
+- [x] The client's battle views, loadouts and the siege feed.
 - [x] The simulator plays sieges; battle numbers tuned to D30's timings (for Koda's approval). *One target needs several attackers (B32).*
 
 **Milestone 5: graphics, NFTs and polish**
@@ -370,4 +370,6 @@ when you're done, let me know about any of those decisions I should review").
 | B35 | Milestone 4 | **Repair bots restore armor only.** A ship's shields are full again after each battle. Destroyed weapons stay out of action until a shipyard repair (3,000 credits, then 3 hours in the yard). A planet's losses carry over: destroyed parts are gone. | D45 and D46 without a parts-repair system. |
 | B36 | Milestone 4 | **Sol's I.S.S. sells ship parts at twice their cost,** so pilots can arm before anyone has an Autofactory. A player's Armory sells from its store at 1.5 times, to its owner. | D58 named the Armory as the shop; Sol needed one to start battle at all. |
 | B37 | Milestone 4 | **Ships can't change their loadout while attacking,** and planets can't take parts off during a siege; planets can add defenses mid-siege (D45). | Keeps a siege's sides from shifting except in the ways D45 allows. |
+| B38 | Milestone 4 | **Measured (Foundry gas report):** laying siege about 280,000 gas; recording rounds 180,000–575,000 (up to 64 rounds); completing a claim 380,000–550,000; buying and fitting parts about 220,000; a repair 175,000. Every jump pays about 10,000 for the move hook, more when a siege at the star needs its rounds recorded. | For the record; deposits on Polkadot still wait on B3. |
+| B39 | Milestone 4 | **The ship panel, siege box and siege feed are plain UI** like the docks (B25). Besieged stars get a pink ring on the map, and the Sieges button turns pink while any siege runs. The feed reads the Battle contract's events from the last 50,000 blocks. | Milestone 5 brings over the old look; a long-lived feed may want an indexer later. |
 

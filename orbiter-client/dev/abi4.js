@@ -10,7 +10,9 @@ const CONTRACTS = {
   Market: 'Market.sol/Market.json',
   Credits: 'Credits.sol/Credits.json',
   Planets: 'Planets.sol/Planets.json',
-  Factory: 'Factory.sol/Factory.json'
+  Factory: 'Factory.sol/Factory.json',
+  Battle: 'Battle.sol/Battle.json',
+  Armory: 'Armory.sol/Armory.json'
 }
 
 mkdirSync(DEST, { recursive: true })

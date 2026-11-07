@@ -13,6 +13,7 @@
       >
         <circle v-if="star.reachable" :r="star.r + 7" class="reach" />
         <circle v-if="star.pending" :r="star.r + 4" class="scanning" />
+        <circle v-if="star.besieged" :r="star.r + 10" class="besieged" />
         <template v-if="star.blackHole">
           <circle :r="star.r + 2" class="hole-ring" />
           <circle :r="star.r" fill="#05010d" />
@@ -75,6 +76,8 @@
       @close="open = null"
       @tech-tree="techTree = true"
     />
+    <ship-panel v-if="open === 'ship' && galaxy.pilot" @close="open = null" />
+    <siege-feed v-if="open === 'feed'" @close="open = null" />
     <tech-tree v-if="techTree" @close="techTree = false" />
 
     <footer class="controls">
@@ -84,6 +87,17 @@
       </button>
       <button v-if="galaxy.pilot && galaxy.planets.length" class="o8-button small" @click="toggle('planets')">
         Planets ({{ galaxy.planets.length }})
+      </button>
+      <button
+        v-if="galaxy.pilot"
+        class="o8-button small"
+        :class="{ alert: galaxy.condition?.retreated }"
+        @click="toggle('ship')"
+      >
+        Ship
+      </button>
+      <button class="o8-button small" :class="{ alert: galaxy.besiegedCells.size }" @click="toggle('feed')">
+        Sieges
       </button>
       <button class="o8-button small" @click="showNames = !showNames">{{ showNames ? 'Hide' : 'Show' }} names</button>
     </footer>
@@ -99,6 +113,8 @@ import StarCard from './star-card.vue'
 import DocksPanel from './docks-panel.vue'
 import PlanetsPanel from './planets-panel.vue'
 import TechTree from './tech-tree.vue'
+import ShipPanel from './ship-panel.vue'
+import SiegeFeed from './siege-feed.vue'
 
 // Pixels between neighboring stars at zoom 1, and the isometric squash (the prototype's look).
 const SPACING = 64
@@ -106,7 +122,7 @@ const FLAT = 0.7
 
 export default {
   name: 'GalaxyView',
-  components: { FleetShip, StarCard, DocksPanel, PlanetsPanel, TechTree },
+  components: { FleetShip, StarCard, DocksPanel, PlanetsPanel, TechTree, ShipPanel, SiegeFeed },
   data() {
     return {
       galaxy: useGalaxyStore(),
@@ -149,6 +165,7 @@ export default {
           visited: c.visited,
           pending: c.visited && !c.scanned,
           reachable: this.galaxy.canJumpTo(c.cell),
+          besieged: this.galaxy.besiegedCells.has(c.cell),
           name: this.galaxy.names[c.cell] || (blackHole ? anomalyName(c.cell) : traits.name)
         })
       }
@@ -173,7 +190,9 @@ export default {
         claim: 'Claiming…',
         people: 'Moving people…',
         cargo: 'Moving cargo…',
-        build: 'Ordering…'
+        build: 'Ordering…',
+        battle: 'Signalling the fleet…',
+        fit: 'Fitting…'
       }[this.galaxy.busy]
     },
     sessionLeft() {
@@ -225,7 +244,8 @@ export default {
       await this.galaxy.register(this.callsign.trim(), this.shipName.trim())
     },
     onDown(event) {
-      if (event.target.closest('.panel, .controls, .star-card, .docks, .planets, .backdrop, .hud')) return
+      if (event.target.closest('.panel, .controls, .star-card, .docks, .planets, .ship-panel, .feed, .backdrop, .hud'))
+        return
       this.drag = { x: event.clientX, y: event.clientY, cx: this.camera.x, cy: this.camera.y, moved: false }
     },
     onMove(event) {
@@ -244,7 +264,7 @@ export default {
       else this.galaxy.select(null)
     },
     onWheel(event) {
-      if (event.target.closest('.docks, .planets, .backdrop, .star-card')) return // let panels scroll
+      if (event.target.closest('.docks, .planets, .ship-panel, .feed, .backdrop, .star-card')) return // let panels scroll
       event.preventDefault()
       const factor = event.deltaY > 0 ? 1 / 1.15 : 1.15
       this.camera.zoom = Math.min(3, Math.max(0.15, this.camera.zoom * factor))
@@ -305,6 +325,16 @@ export default {
   stroke-width: 1.5;
   stroke-dasharray: 4 4;
   animation: scan 2s linear infinite;
+}
+.besieged {
+  fill: none;
+  stroke: var(--o8-pink-light);
+  stroke-width: 2;
+  stroke-dasharray: 3 3;
+}
+.controls .alert {
+  border-color: var(--o8-pink-light);
+  color: var(--o8-pink-light);
 }
 .hole-ring {
   fill: none;

@@ -53,6 +53,19 @@
   },
   {
     "type": "function",
+    "name": "MAX_ARMOR",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "MAX_BAYS",
     "inputs": [],
     "outputs": [
@@ -105,7 +118,33 @@
   },
   {
     "type": "function",
+    "name": "MAX_SHIELDS",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "MIN_NAME",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "MOUNTS",
     "inputs": [],
     "outputs": [
       {
@@ -558,6 +597,58 @@
                 "name": "colonists",
                 "type": "uint32",
                 "internalType": "uint32"
+              },
+              {
+                "name": "loadout",
+                "type": "tuple",
+                "internalType": "struct Pilots.Loadout",
+                "components": [
+                  {
+                    "name": "drones",
+                    "type": "uint16",
+                    "internalType": "uint16"
+                  },
+                  {
+                    "name": "repairBots",
+                    "type": "uint8",
+                    "internalType": "uint8"
+                  },
+                  {
+                    "name": "pointDefense",
+                    "type": "uint8",
+                    "internalType": "uint8"
+                  },
+                  {
+                    "name": "railguns",
+                    "type": "uint8",
+                    "internalType": "uint8"
+                  },
+                  {
+                    "name": "missiles",
+                    "type": "uint8",
+                    "internalType": "uint8"
+                  },
+                  {
+                    "name": "armor",
+                    "type": "uint8",
+                    "internalType": "uint8"
+                  },
+                  {
+                    "name": "shields",
+                    "type": "uint8",
+                    "internalType": "uint8"
+                  }
+                ]
+              },
+              {
+                "name": "rangeLost",
+                "type": "uint8",
+                "internalType": "uint8"
+              },
+              {
+                "name": "baysLost",
+                "type": "uint16",
+                "internalType": "uint16"
               }
             ]
           },
@@ -759,6 +850,97 @@
   },
   {
     "type": "function",
+    "name": "setBattle",
+    "inputs": [
+      {
+        "name": "battle_",
+        "type": "address",
+        "internalType": "contract IMoveHook"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setDamage",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "rangeLost",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "baysLost",
+        "type": "uint16",
+        "internalType": "uint16"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setLoadout",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "loadout",
+        "type": "tuple",
+        "internalType": "struct Pilots.Loadout",
+        "components": [
+          {
+            "name": "drones",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "repairBots",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "pointDefense",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "railguns",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "missiles",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "armor",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "shields",
+            "type": "uint8",
+            "internalType": "uint8"
+          }
+        ]
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "setRange",
     "inputs": [
       {
@@ -820,6 +1002,58 @@
             "name": "colonists",
             "type": "uint32",
             "internalType": "uint32"
+          },
+          {
+            "name": "loadout",
+            "type": "tuple",
+            "internalType": "struct Pilots.Loadout",
+            "components": [
+              {
+                "name": "drones",
+                "type": "uint16",
+                "internalType": "uint16"
+              },
+              {
+                "name": "repairBots",
+                "type": "uint8",
+                "internalType": "uint8"
+              },
+              {
+                "name": "pointDefense",
+                "type": "uint8",
+                "internalType": "uint8"
+              },
+              {
+                "name": "railguns",
+                "type": "uint8",
+                "internalType": "uint8"
+              },
+              {
+                "name": "missiles",
+                "type": "uint8",
+                "internalType": "uint8"
+              },
+              {
+                "name": "armor",
+                "type": "uint8",
+                "internalType": "uint8"
+              },
+              {
+                "name": "shields",
+                "type": "uint8",
+                "internalType": "uint8"
+              }
+            ]
+          },
+          {
+            "name": "rangeLost",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "baysLost",
+            "type": "uint16",
+            "internalType": "uint16"
           }
         ]
       }
@@ -1003,6 +1237,31 @@
   },
   {
     "type": "event",
+    "name": "DamageChanged",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "rangeLost",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "uint8"
+      },
+      {
+        "name": "baysLost",
+        "type": "uint16",
+        "indexed": false,
+        "internalType": "uint16"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
     "name": "Initialized",
     "inputs": [
       {
@@ -1041,6 +1300,62 @@
         "type": "bool",
         "indexed": false,
         "internalType": "bool"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "LoadoutChanged",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "loadout",
+        "type": "tuple",
+        "indexed": false,
+        "internalType": "struct Pilots.Loadout",
+        "components": [
+          {
+            "name": "drones",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "repairBots",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "pointDefense",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "railguns",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "missiles",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "armor",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "shields",
+            "type": "uint8",
+            "internalType": "uint8"
+          }
+        ]
       }
     ],
     "anonymous": false
@@ -1318,6 +1633,11 @@
   {
     "type": "error",
     "name": "AlreadyRegistered",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "BadLoadout",
     "inputs": []
   },
   {

@@ -38,6 +38,8 @@
         {{ className(chosen.class) }}, size {{ chosen.size }} · room for {{ chosen.cap.toLocaleString() }} people
       </p>
 
+      <siege-box v-if="siege" :siege="siege" :owner="chosen.owner" />
+
       <template v-if="!chosen.owner">
         <p v-if="galaxy.shipCell === 0" class="sub">The Federation's: Sol's planets can't be claimed.</p>
         <button
@@ -47,6 +49,19 @@
           @click="galaxy.claim(chosen.id)"
         >
           Claim · {{ rules.claimFee.toLocaleString() }} cr
+        </button>
+      </template>
+
+      <template v-else-if="chosen.owner !== galaxy.account">
+        <p class="sub">Owned by {{ chosen.owner.slice(0, 6) }}… · {{ levelName(chosen) }}</p>
+        <button
+          v-if="!siege && galaxy.shipCell !== 0"
+          class="o8-button small"
+          :disabled="!galaxy.armed || galaxy.condition?.retreated || Boolean(galaxy.busy)"
+          :title="galaxy.armed ? 'Start a siege: public, worked out every 30 minutes' : 'Fit weapons first'"
+          @click="galaxy.attack(chosen.id)"
+        >
+          Lay siege
         </button>
       </template>
 
@@ -126,12 +141,31 @@
           </button>
         </div>
 
+        <p v-if="defenseWords" class="sub">Defenses: {{ defenseWords }}</p>
+
         <div v-if="factory" class="factory">
           <h4>Autofactory</h4>
           <p v-for="(o, i) in factory.queue" :key="i" class="sub">
             {{ o.count }} × {{ rules.parts[o.part].name }} · ready {{ readyWords(o.readyAt) }}
           </p>
-          <p v-if="finished.length" class="sub">Finished: {{ finished.join(', ') }}</p>
+          <div v-for="row in finishedParts" :key="row.part" class="row">
+            <span>{{ row.count }} {{ row.name }}</span>
+            <button
+              class="o8-button small"
+              :disabled="Boolean(galaxy.busy)"
+              @click="galaxy.fitPlanet(chosen.id, row.part, row.count)"
+            >
+              Fit to planet
+            </button>
+            <button
+              v-if="row.part < 7"
+              class="o8-button small"
+              :disabled="Boolean(galaxy.busy)"
+              @click="galaxy.fitShip(chosen.id, row.part, 1)"
+            >
+              Fit one to ship
+            </button>
+          </div>
           <p class="row">
             <select v-model.number="part" aria-label="Part">
               <option v-for="(p, i) in rules.parts" :key="i" :value="i">{{ p.name }}</option>
@@ -156,9 +190,11 @@ import { useGalaxyStore } from '@/stores/galaxy'
 import { planetTypeName } from '@/sdk/game/planet-types'
 import { starTraits } from '@/sdk/v4/traits'
 import { planetName, BUILDINGS } from '@/sdk/v4/system'
+import SiegeBox from './siege-box.vue'
 
 export default {
   name: 'PlanetsPanel',
+  components: { SiegeBox },
   emits: ['close', 'tech-tree'],
   data() {
     return { galaxy: useGalaxyStore(), chosenId: null, recruits: 100, people: 100, part: 0, parts: 1, now: Date.now() }
@@ -194,8 +230,43 @@ export default {
     factory() {
       return this.chosen?.autofactory ? (this.galaxy.factories[this.chosen.id] ?? { queue: [], stored: [] }) : null
     },
-    finished() {
-      return (this.factory?.stored ?? []).map((n, i) => (n ? `${n} ${this.rules.parts[i].name}` : null)).filter(Boolean)
+    finishedParts() {
+      return (this.factory?.stored ?? [])
+        .map((count, part) => ({ part, count, name: this.rules.parts[part].name }))
+        .filter((r) => r.count > 0)
+    },
+    siege() {
+      return this.galaxy.sieges.find((s) => s.planet === this.chosen?.id) ?? null
+    },
+    defenseWords() {
+      const d = this.galaxy.defenses[this.chosen?.id]
+      if (!d) return ''
+      const names = [
+        'point defense',
+        'railguns',
+        'missile racks',
+        'drones',
+        'repair bots',
+        'armor plates',
+        'shield levels',
+        'platforms',
+        'BFG'
+      ]
+      const counts = [
+        d.pointDefense,
+        d.railguns,
+        d.missiles,
+        d.drones,
+        d.repairBots,
+        d.armor,
+        d.shields,
+        d.platforms,
+        d.bfg
+      ]
+      return counts
+        .map((n, i) => (n ? `${n} ${names[i]}` : null))
+        .filter(Boolean)
+        .join(', ')
     }
   },
   mounted() {

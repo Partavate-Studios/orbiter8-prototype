@@ -7,6 +7,8 @@ import MarketAbi from './abi/Market.json'
 import CreditsAbi from './abi/Credits.json'
 import PlanetsAbi from './abi/Planets.json'
 import FactoryAbi from './abi/Factory.json'
+import BattleAbi from './abi/Battle.json'
+import ArmoryAbi from './abi/Armory.json'
 import { fetchRound } from './drand'
 
 export const STATE = { UNDECIDED: 0, EMPTY: 1, STAR: 2, BLACK_HOLE: 3 }
@@ -61,6 +63,34 @@ function toPlanet(p) {
   }
 }
 
+/** A ship's or planet's side in a siege (Combat.Side), as plain data. */
+const toSide = (s) => ({
+  platforms: Number(s.platforms),
+  shield: Number(s.shield),
+  shieldMax: Number(s.shieldMax),
+  armor: Number(s.armor),
+  armorMax: Number(s.armorMax),
+  hull: Number(s.hull),
+  pointDefense: Number(s.pointDefense),
+  railguns: Number(s.railguns),
+  missiles: Number(s.missiles),
+  drones: Number(s.drones),
+  repairBots: Number(s.repairBots),
+  bfg: Number(s.bfg),
+  retreated: s.retreated
+})
+
+const toSiege = (planet, s) => ({
+  planet,
+  attacker: s.attacker.toLowerCase(),
+  started: Number(s.started),
+  checkpoint: Number(s.checkpoint),
+  wornAt: Number(s.wornAt),
+  claimAt: Number(s.claimAt),
+  ship: toSide(s.ship),
+  side: toSide(s.planet)
+})
+
 const toCost = (c) => ({
   credits: Number(c.credits),
   time: Number(c.time),
@@ -79,11 +109,14 @@ export function createGame(runner, addresses) {
   const credits = new Contract(addresses.credits, CreditsAbi, runner)
   const planets = new Contract(addresses.planets, PlanetsAbi, runner)
   const factory = new Contract(addresses.factory, FactoryAbi, runner)
+  const battle = new Contract(addresses.battle, BattleAbi, runner)
+  const armory = new Contract(addresses.armory, ArmoryAbi, runner)
 
   const game = {
     galaxy,
     pilots,
     market,
+    battle,
 
     async universe() {
       const [seed, , scanDelay] = await galaxy.universe()
@@ -103,7 +136,18 @@ export function createGame(runner, addresses) {
           range: Number(p.ship.range),
           bays: Number(p.ship.bays),
           cargo: Number(p.ship.cargo),
-          colonists: Number(p.ship.colonists)
+          colonists: Number(p.ship.colonists),
+          rangeLost: Number(p.ship.rangeLost),
+          baysLost: Number(p.ship.baysLost),
+          loadout: {
+            drones: Number(p.ship.loadout.drones),
+            repairBots: Number(p.ship.loadout.repairBots),
+            pointDefense: Number(p.ship.loadout.pointDefense),
+            railguns: Number(p.ship.loadout.railguns),
+            missiles: Number(p.ship.loadout.missiles),
+            armor: Number(p.ship.loadout.armor),
+            shields: Number(p.ship.loadout.shields)
+          }
         },
         session: p.sessionKey === ZERO ? null : { key: p.sessionKey.toLowerCase(), expiry: Number(p.sessionExpiry) }
       }
@@ -174,6 +218,63 @@ export function createGame(runner, addresses) {
         queue: queue.map((o) => ({ part: Number(o.part), count: Number(o.count), readyAt: Number(o.readyAt) })),
         stored: stored.map(Number)
       }
+    },
+
+    /** Sieges at a star, each played up to now (Battle.preview). */
+    async siegesAt(cell) {
+      const planets = (await battle.siegesAt(cell)).map(Number)
+      return Promise.all(planets.map(async (p) => toSiege(p, await battle.preview(p))))
+    },
+
+    /** A ship's state between battles: what's out of action, retreat, time in the yard. */
+    async condition(address) {
+      const c = await battle.conditionOf(address)
+      return {
+        armorLost: Number(c.armorLost),
+        off: [
+          Number(c.pointDefenseOff),
+          Number(c.railgunsOff),
+          Number(c.missilesOff),
+          Number(c.dronesOff),
+          Number(c.botsOff)
+        ],
+        retreated: c.retreated,
+        dockedUntil: Number(c.dockedUntil)
+      }
+    },
+
+    /** A planet's fitted defenses. */
+    async defenses(planet) {
+      const d = await battle.defensesOf(planet)
+      return {
+        pointDefense: Number(d.pointDefense),
+        railguns: Number(d.railguns),
+        missiles: Number(d.missiles),
+        drones: Number(d.drones),
+        repairBots: Number(d.repairBots),
+        armor: Number(d.armor),
+        shields: Number(d.shields),
+        platforms: Number(d.platforms),
+        bfg: Number(d.bfg)
+      }
+    },
+
+    /** The siege feed: Battle's events from the last `blocks` blocks, newest first. */
+    async siegeFeed(blocks = 50_000) {
+      const provider = battle.runner.provider ?? battle.runner
+      const latest = await provider.getBlockNumber()
+      const logs = await battle.queryFilter('*', Math.max(0, latest - blocks), latest)
+      const wanted = ['SiegeStarted', 'DefenderJoined', 'WornDown', 'ClaimFiled', 'ClaimFailed', 'SiegeEnded']
+      return logs
+        .filter((l) => wanted.includes(l.fragment?.name))
+        .map((l) => ({
+          event: l.fragment.name,
+          planet: Number(l.args[0]),
+          who: typeof l.args[1] === 'string' ? l.args[1].toLowerCase() : null,
+          args: l.args.map((a) => (typeof a === 'bigint' ? Number(a) : a)),
+          block: l.blockNumber
+        }))
+        .reverse()
     },
 
     /** Every port at a star, with stock and next-unit prices. */
@@ -269,6 +370,39 @@ export function createGame(runner, addresses) {
     },
     async order(planet, part, count) {
       return (await factory.order(planet, part, count)).wait()
+    },
+    async attack(planet) {
+      return (await battle.attack(planet)).wait()
+    },
+    async joinDefense(planet) {
+      return (await battle.joinDefense(planet)).wait()
+    },
+    async advance(planet) {
+      return (await battle.advance(planet)).wait()
+    },
+    async fileClaim(planet) {
+      return (await battle.fileClaim(planet)).wait()
+    },
+    async completeClaim(planet) {
+      return (await battle.completeClaim(planet)).wait()
+    },
+    async withdraw(planet) {
+      return (await battle.withdraw(planet)).wait()
+    },
+    async fitShip(planet, part, count) {
+      return (await armory.fitShip(planet, part, count)).wait()
+    },
+    async unloadShip(planet, part, count) {
+      return (await armory.unloadShip(planet, part, count)).wait()
+    },
+    async fitPlanet(planet, part, count) {
+      return (await armory.fitPlanet(planet, part, count)).wait()
+    },
+    async buyParts(port, part, count, maxCost) {
+      return (await armory.buy(port, part, count, maxCost)).wait()
+    },
+    async repair(port) {
+      return (await armory.repair(port)).wait()
     }
   }
   return game
