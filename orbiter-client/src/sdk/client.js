@@ -18,11 +18,13 @@ import { starTraits } from './traits'
 import { planet as derivePlanet, planetCount, looks, moonName, planetName } from './system-gen'
 import { portNames, buyCost, sellProceeds, fee, baysCost, MODE } from './market'
 import { SESSION_HOURS, loadKey, saveKey, forgetKey, newKey, keySigner, sweep } from './session-key'
+import { createEventLog } from './event-log'
 
 /** A trade line's price limit allows this much movement since the prices were read (B23). */
 export const SLIPPAGE = 0.02
-/** How far back events are read: recent trades (docking), chat, registrations. */
+/** How far back events are kept: recent trades (docking), chat, registrations; and the siege feed. */
 const LOOKBACK_BLOCKS = 20_000
+const FEED_LOOKBACK_BLOCKS = 50_000
 /** Where an unregistered player's view sits: Sol. */
 const SOL = 0
 /** Planets.sol's name parts. */
@@ -128,8 +130,10 @@ export function createGameClient() {
   let game = null // the wallet's
   let keyGame = null // the session key's
   let keyWallet = null
+  /** Rolling windows of events (sdk/event-log.js): read in chunks, then only what's new. */
+  let logs = null
   let pilots = [] // every registered pilot's address
-  let pilotsBlock = -1 // the block the registrations were read up to
+  let pilotsBlock = -1 // the block the registrations were read up to (the deployment's, less one, to start)
   let discovered = 0 // stars discovered so far, galaxy-wide (plus Sol: the count the title shows)
   let discoveredBlock = -1
   let leaderboard = null
@@ -385,7 +389,7 @@ export function createGameClient() {
       game.portsAt(cell),
       game.siegesAt(cell),
       game.shipsAt(cell, pilots),
-      game.recentTrades(LOOKBACK_BLOCKS),
+      game.blockNumber().then((latest) => logs.trades.update(latest)),
       game.keeperOf(cell),
       state.pilot ? game.mayNameStar(cell, state.account) : { may: false, becomesOwner: false }
     ])
@@ -533,9 +537,10 @@ export function createGameClient() {
   }
 
   async function loadEvents() {
+    const latest = await game.blockNumber()
     const [registrations, broadcasts] = await Promise.all([
-      game.registrations(LOOKBACK_BLOCKS),
-      game.broadcasts(LOOKBACK_BLOCKS)
+      logs.registrations.update(latest),
+      logs.broadcasts.update(latest)
     ])
     return {
       avatarEvents: registrations.map((r) => asEvent(r.hash, r.block, { _owner: r.pilot, _name: r.callsign })),
@@ -837,6 +842,14 @@ export function createGameClient() {
       if ((await provider.getCode(network.contracts.pilots)) === '0x') return false
       game = createGame(signer, network.contracts)
       state.contracts = { ...network.contracts }
+      const startBlock = network.startBlock ?? 0
+      pilotsBlock = discoveredBlock = startBlock - 1
+      logs = {
+        trades: createEventLog({ read: game.trades, lookback: LOOKBACK_BLOCKS, startBlock }),
+        broadcasts: createEventLog({ read: game.broadcasts, lookback: LOOKBACK_BLOCKS, startBlock }),
+        registrations: createEventLog({ read: game.registrations, lookback: LOOKBACK_BLOCKS, startBlock }),
+        feed: createEventLog({ read: game.siegeEvents, lookback: FEED_LOOKBACK_BLOCKS, startBlock })
+      }
       ;[state.universe, state.economy, state.rules] = await Promise.all([
         game.universe(),
         game.economy(),
@@ -936,7 +949,11 @@ export function createGameClient() {
       return attempt('events', async () => {
         state.events = await loadEvents()
         notify('events')
-        state.feed = await game.siegeFeed().catch(() => state.feed)
+        // newest first
+        state.feed = await logs.feed
+          .update(await game.blockNumber())
+          .then((events) => [...events].reverse())
+          .catch(() => state.feed)
         await learnCallsigns(state.feed.map((e) => e.who)).catch(() => {})
         notify('feed')
       })

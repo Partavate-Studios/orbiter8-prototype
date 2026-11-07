@@ -11,6 +11,7 @@ import BattleAbi from './abi/Battle.json'
 import ArmoryAbi from './abi/Armory.json'
 import { fetchRound } from './drand'
 import { parseRevert } from './reverts'
+import { queryChunked } from './event-log'
 
 export const STATE = { UNDECIDED: 0, EMPTY: 1, STAR: 2, BLACK_HOLE: 3 }
 /** Cells per region read; the contracts cap it at 10. */
@@ -143,16 +144,11 @@ export function createGame(runner, addresses) {
   const armory = new Contract(addresses.armory, ArmoryAbi, runner)
   const deeds = addresses.deeds ? new Contract(addresses.deeds, DEEDS_ABI, runner) : null
   const provider = runner.provider ?? runner
-  /** Events from the last `blocks` blocks (all of them on a young chain). */
-  const recent = async (contract, filter, blocks) => {
-    const latest = await provider.getBlockNumber()
-    return contract.queryFilter(filter, Math.max(0, latest - blocks), latest)
-  }
   /** Events after `fromBlock` (exclusive) up to the latest block, and that block: for reading only what's new. */
   const since = async (contract, filter, fromBlock) => {
     const latest = await provider.getBlockNumber()
     if (latest <= fromBlock) return { logs: [], toBlock: fromBlock }
-    return { logs: await contract.queryFilter(filter, fromBlock + 1, latest), toBlock: latest }
+    return { logs: await queryChunked(contract, filter, fromBlock + 1, latest), toBlock: latest }
   }
 
   const game = {
@@ -307,11 +303,9 @@ export function createGame(runner, addresses) {
       }
     },
 
-    /** The siege feed: Battle's events from the last `blocks` blocks, newest first. */
-    async siegeFeed(blocks = 50_000) {
-      const provider = battle.runner.provider ?? battle.runner
-      const latest = await provider.getBlockNumber()
-      const logs = await battle.queryFilter('*', Math.max(0, latest - blocks), latest)
+    /** The siege feed's events in a block range, oldest first (sdk/event-log.js keeps the window). */
+    async siegeEvents(fromBlock, toBlock) {
+      const logs = await queryChunked(battle, '*', fromBlock, toBlock)
       const wanted = ['SiegeStarted', 'DefenderJoined', 'WornDown', 'ClaimFiled', 'ClaimFailed', 'SiegeEnded']
       return logs
         .filter((l) => wanted.includes(l.fragment?.name))
@@ -322,7 +316,11 @@ export function createGame(runner, addresses) {
           args: l.args.map((a) => (typeof a === 'bigint' ? Number(a) : a)),
           block: l.blockNumber
         }))
-        .reverse()
+    },
+
+    /** The latest block number. */
+    blockNumber() {
+      return provider.getBlockNumber()
     },
 
     /** Stars discovered after `fromBlock` (Galaxy's Discovered events): how many, and the block read up to. */
@@ -357,21 +355,22 @@ export function createGame(runner, addresses) {
       return owner === ZERO ? null : owner.toLowerCase()
     },
 
-    /** Trades in the last `blocks` blocks, oldest first: [{ sender, port, good, units, hash }]. */
-    async recentTrades(blocks) {
-      const logs = await recent(market, market.filters.Traded(), blocks)
+    /** Trades in a block range, oldest first: [{ sender, port, good, units, hash, block }]. */
+    async trades(fromBlock, toBlock) {
+      const logs = await queryChunked(market, market.filters.Traded(), fromBlock, toBlock)
       return logs.map((l) => ({
         sender: l.args[0].toLowerCase(),
         port: Number(l.args[1]),
         good: Number(l.args[2]),
         units: Number(l.args[3]),
-        hash: l.transactionHash
+        hash: l.transactionHash,
+        block: l.blockNumber
       }))
     },
 
-    /** Galaxy chat in the last `blocks` blocks, oldest first: [{ sender, message, hash, block }]. */
-    async broadcasts(blocks) {
-      const logs = await recent(pilots, pilots.filters.Broadcast(), blocks)
+    /** Galaxy chat in a block range, oldest first: [{ sender, message, hash, block }]. */
+    async broadcasts(fromBlock, toBlock) {
+      const logs = await queryChunked(pilots, pilots.filters.Broadcast(), fromBlock, toBlock)
       return logs.map((l) => ({
         sender: l.args[0].toLowerCase(),
         message: l.args[1],
@@ -380,9 +379,9 @@ export function createGame(runner, addresses) {
       }))
     },
 
-    /** Registrations in the last `blocks` blocks: [{ pilot, shipId, callsign, shipName, hash, block }]. */
-    async registrations(blocks) {
-      const logs = await recent(pilots, pilots.filters.Registered(), blocks)
+    /** Registrations in a block range: [{ pilot, shipId, callsign, shipName, hash, block }]. */
+    async registrations(fromBlock, toBlock) {
+      const logs = await queryChunked(pilots, pilots.filters.Registered(), fromBlock, toBlock)
       return logs.map((l) => ({
         pilot: l.args[0].toLowerCase(),
         shipId: Number(l.args[1]),

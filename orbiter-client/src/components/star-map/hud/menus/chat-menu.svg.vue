@@ -34,6 +34,7 @@ import { useGameStateStore } from '@/stores/gamestate'
 import { mapActions, mapState } from 'pinia'
 import { useStarMapStore } from '@/stores/starmap'
 import { useDialogStore } from '@/stores/dialog'
+import { game } from '@/sdk/client'
 import MenuContainer from './menu-container/_menu-container.svg'
 import MenuButton from './menu-button.svg'
 import ChatSlotContainer from './menu-container/chat-slot-container.svg'
@@ -73,11 +74,8 @@ export default {
       return String(address).toLowerCase() === String(this.account).toLowerCase()
     },
     getName(address) {
-      let name = address.substr(0, 6) + '...' + address.substr(address.length - 5)
-      if (typeof this.players[address.toLowerCase()] !== 'undefined') {
-        name = this.players[address.toLowerCase()]
-      }
-      return name
+      const key = address.toLowerCase()
+      return this.players[key] ?? game.callsignOf(key) ?? address.substr(0, 6) + '...' + address.substr(address.length - 5)
     }
   }
 }

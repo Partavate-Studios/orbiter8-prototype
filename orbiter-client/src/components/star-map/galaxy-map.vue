@@ -10,6 +10,7 @@
     @pointerdown="onDown"
     @pointermove="onMove"
     @pointerup="onUp"
+    @pointercancel="onUp"
     @wheel="onWheel"
   >
     <svg class="map" :viewBox="`0 0 ${width} ${height}`">
@@ -109,21 +110,21 @@
       <p v-if="besieged" class="alert">A siege is under way here.</p>
       <p v-if="failed" class="alert">That didn't go through: the transaction tray says why.</p>
       <div class="actions">
-        <button v-if="isPartnerHere" class="o8-button primary" :disabled="waiting" @click="enterBlackHole">
+        <button v-if="isPartnerHere" class="card-pill accent" :disabled="waiting" @click="enterBlackHole">
           {{ waiting ? 'Entering…' : 'Enter the black hole' }}
         </button>
-        <button v-else-if="canJump" class="o8-button primary" :disabled="waiting" @click="jump">
+        <button v-else-if="canJump" class="card-pill accent" :disabled="waiting" @click="jump">
           {{ waiting ? 'Waiting for the jump…' : 'Jump to ' + chosenName }}
         </button>
         <p v-else-if="distanceAway > range" class="sub">Out of range: upgrade the engines at a shipyard.</p>
-        <button class="o8-button small" :disabled="waiting" @click="choose(null)">Cancel</button>
+        <button class="card-pill" :disabled="waiting" @click="choose(null)">Cancel</button>
       </div>
       </div>
     </aside>
 
     <footer class="controls">
-      <button class="o8-button" :disabled="waiting" @click="back">Back to {{ hereName }}</button>
-      <button class="o8-button small" @click="centerOnShip">My ship</button>
+      <button class="card-pill" :disabled="waiting" @click="back">Back to {{ hereName }}</button>
+      <button class="card-pill" @click="centerOnShip">My ship</button>
     </footer>
   </div>
 </template>
@@ -154,7 +155,9 @@ export default {
       width: window.innerWidth,
       height: window.innerHeight,
       camera: { x: 0, y: 0, zoom: 1.5 },
+      /** one pointer's drag: where it started and the camera then; two pointers' pinch: the zoom and the world point between them */
       drag: null,
+      pinch: null,
       chosen: null,
       preview: null,
       waiting: false,
@@ -339,6 +342,10 @@ export default {
       return `Long-range scan: ${this.preview.stars} new ${this.preview.stars === 1 ? 'star' : 'stars'}${holes} found. It's recorded with your next move.`
     }
   },
+  created() {
+    // Pointers down on the map (id → position). Not reactive.
+    this.pointers = new Map()
+  },
   mounted() {
     this.onResize = () => {
       this.width = window.innerWidth
@@ -442,31 +449,78 @@ export default {
       this.o8audio.playEffect('click')
       this.zoomInToStar()
     },
+    /** The galaxy's point (in cells) under a screen point, for the camera as it is. */
+    worldAt(sx, sy) {
+      return { x: this.camera.x + (sx - this.width / 2) / this.scale, y: this.camera.y + (sy - this.height / 2) / (this.scale * FLAT) }
+    },
+    /** Zooms to `zoom` keeping the galaxy point `world` under the screen point (sx, sy). */
+    zoomTo(zoom, world, sx, sy) {
+      this.camera.zoom = Math.min(3, Math.max(0.15, zoom))
+      this.camera.x = world.x - (sx - this.width / 2) / this.scale
+      this.camera.y = world.y - (sy - this.height / 2) / (this.scale * FLAT)
+    },
     onDown(event) {
       if (event.target.closest('.card, .controls, .title')) return
-      this.drag = { x: event.clientX, y: event.clientY, cx: this.camera.x, cy: this.camera.y, moved: false }
+      this.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY })
+      this.startGesture()
+      // Two fingers are never a tap: hold both pointers, so the pinch carries on past the stars.
+      if (this.pinch) for (const id of this.pointers.keys()) this.$el.setPointerCapture?.(id)
+    },
+    /** One pointer drags; two pinch, the point between the fingers staying between them. */
+    startGesture() {
+      const points = [...this.pointers.values()]
+      this.drag = this.pinch = null
+      if (points.length === 1) {
+        this.drag = { x: points[0].x, y: points[0].y, cx: this.camera.x, cy: this.camera.y, moved: false }
+      } else if (points.length === 2) {
+        const mid = { x: (points[0].x + points[1].x) / 2, y: (points[0].y + points[1].y) / 2 }
+        this.pinch = {
+          distance: Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y) || 1,
+          zoom: this.camera.zoom,
+          world: this.worldAt(mid.x, mid.y)
+        }
+      }
     },
     onMove(event) {
       this.pointer = { x: event.clientX, y: event.clientY }
+      if (!this.pointers.has(event.pointerId)) return
+      this.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY })
+      if (this.pinch) {
+        const [a, b] = [...this.pointers.values()]
+        const distance = Math.hypot(a.x - b.x, a.y - b.y) || 1
+        this.zoomTo((this.pinch.zoom * distance) / this.pinch.distance, this.pinch.world, (a.x + b.x) / 2, (a.y + b.y) / 2)
+        return
+      }
       if (!this.drag) return
       const dx = event.clientX - this.drag.x
       const dy = event.clientY - this.drag.y
-      if (Math.hypot(dx, dy) > 4) this.drag.moved = true
+      if (!this.drag.moved && Math.hypot(dx, dy) > 4) {
+        this.drag.moved = true
+        // A drag, not a tap: hold the pointer so the drag carries on outside the map.
+        this.$el.setPointerCapture?.(event.pointerId)
+      }
       this.camera.x = this.drag.cx - dx / this.scale
       this.camera.y = this.drag.cy - dy / (this.scale * FLAT)
     },
-    onUp() {
-      if (!this.drag) return
-      const moved = this.drag.moved
-      this.drag = null
-      if (moved) game.loadAround(cellAt(this.camera.x, this.camera.y))
+    onUp(event) {
+      if (!this.pointers.delete(event.pointerId)) return
+      const moved = this.drag?.moved || Boolean(this.pinch)
+      if (this.pointers.size) {
+        // A finger lifted mid-pinch: the other carries on as a drag.
+        this.startGesture()
+        if (this.drag) this.drag.moved = true
+      } else {
+        this.drag = this.pinch = null
+      }
+      if (moved && !this.pointers.size) game.loadAround(cellAt(this.camera.x, this.camera.y))
     },
     onWheel(event) {
       if (event.target.closest('.card')) return
       event.preventDefault()
       event.stopPropagation()
       const factor = event.deltaY > 0 ? 1 / 1.15 : 1.15
-      this.camera.zoom = Math.min(3, Math.max(0.15, this.camera.zoom * factor))
+      // Like a map: the spot under the cursor stays put.
+      this.zoomTo(this.camera.zoom * factor, this.worldAt(event.clientX, event.clientY), event.clientX, event.clientY)
       game.loadAround(cellAt(this.camera.x, this.camera.y))
     }
   }
@@ -548,6 +602,7 @@ export default {
   margin: 0;
   font-weight: 400;
   font-size: 1.5em;
+  color: #ffffff88;
 }
 .title p {
   margin: 0.3em 0 0;
@@ -618,6 +673,10 @@ export default {
   display: flex;
   justify-content: center;
   gap: 0.6em;
+}
+.controls .card-pill,
+.actions .card-pill {
+  font-size: 0.95em;
 }
 .tip {
   position: absolute;

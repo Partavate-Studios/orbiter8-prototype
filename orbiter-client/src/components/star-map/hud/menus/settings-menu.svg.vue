@@ -148,18 +148,9 @@
         </a>
       </g>
 
-      <text
-        x="0"
-        y="0"
-        font-size="1em"
-        text-anchor="middle"
-        font-style="normal"
-        fill="#ffffff"
-        stroke-width="0"
-        stroke="#00000000"
-      >
-        Back to title screen, licensing information, how to play, about developers.
-      </text>
+      <g transform="translate(0 40)">
+        <menu-button text="Back to Title" @buttonclick="backToTitle" />
+      </g>
     </menu-container>
   </g>
 </template>
@@ -168,20 +159,28 @@
 import { mapActions, mapState } from 'pinia'
 
 import { useConfigStore } from '@/stores/config'
+import { useUIStore } from '@/stores/ui'
 import MenuContainer from './menu-container/_menu-container.svg'
 import MenuCheckbox from './menu-checkbox.svg'
+import MenuButton from './menu-button.svg'
 
 export default {
   name: 'SettingsMenu',
   components: {
     MenuContainer,
-    MenuCheckbox
+    MenuCheckbox,
+    MenuButton
   },
   computed: {
     ...mapState(useConfigStore, ['graphicsQuality'])
   },
   methods: {
     ...mapActions(useConfigStore, ['setGraphicsQuality']),
+    ...mapActions(useUIStore, ['closeMenu']),
+    backToTitle() {
+      this.closeMenu()
+      this.$router.push('/')
+    },
     chooseGraphicsQuality(quality) {
       this.o8audio.playEffect('click')
       this.setGraphicsQuality(quality)

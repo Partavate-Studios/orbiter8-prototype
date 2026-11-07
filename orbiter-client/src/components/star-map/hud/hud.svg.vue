@@ -18,7 +18,7 @@
             x="0"
             y="-40"
             width="200"
-            height="100"
+            :height="profileHeight"
             fill="url(#profileGradient)"
             stroke="#ffffff22"
             rx="10"
@@ -29,7 +29,7 @@
             x="4"
             y="-36"
             width="192"
-            height="92"
+            :height="profileHeight - 8"
             fill="#00000088"
             stroke="#000000"
             rx="8"
@@ -42,9 +42,9 @@
           <text text-anchor="end" transform="translate(70 -04)">Starship:</text>
           <text text-anchor="start" transform="translate(75 -04)" fill="#ffffff">{{ avatar.ship.name }}</text>
           <text text-anchor="end" transform="translate(70 11)">Credits:</text>
-          <text text-anchor="start" transform="translate(75 11)" fill="#ffffff">{{ avatar.credits }}&cent;</text>
+          <text text-anchor="start" transform="translate(75 11)" fill="#ffffff">{{ avatar.credits.toLocaleString('en-US') }}&cent;</text>
 
-          <!-- Up to three goods aboard and the empty holds, two by two -->
+          <!-- Every good aboard and the empty holds, two by two (the card grows past four) -->
           <g font-size="0.9em">
             <g v-for="(slot, index) in cargoSlots" :key="index" :transform="cargoSlotAt(index)">
               <text text-anchor="end" fill="#ffffff">{{ slot.units }}</text>
@@ -347,18 +347,26 @@ export default {
     },
     PINK_LIGHT: () => PINK_LIGHT,
     YELLOW_LIGHT: () => YELLOW_LIGHT,
-    /** Up to three goods aboard, then the empty holds; more than three goods aboard share the third slot. */
+    /**
+     * Every good aboard, then the empty holds, in two columns (the left wide, the right narrow). A
+     * portrait phone has no room under the card for more than three rows: past five goods the rest
+     * share a slot ("+N more"), and the ship's card lists them all.
+     */
     cargoSlots() {
-      // The left column is wide, the right narrow.
       const lines = cargoLines(this.avatar.ship, this.goods).map((line, index) => ({
         ...line,
         name: shortGoodName(line.name, index % 2 === 0)
       }))
+      const room = this.viewRatio <= 1 ? 5 : Infinity
       const shown =
-        lines.length > 3
-          ? [...lines.slice(0, 2), { name: `+${lines.length - 2} more`, units: lines.slice(2).reduce((a, l) => a + l.units, 0) }]
+        lines.length > room
+          ? [...lines.slice(0, room - 1), { name: `+${lines.length - room + 1} more`, units: lines.slice(room - 1).reduce((a, l) => a + l.units, 0) }]
           : lines
       return [...shown, { name: 'Empty', units: emptyHolds(this.avatar.ship) }]
+    },
+    /** The profile card's height: 100 for up to four slots, 15 more for each further row of two. */
+    profileHeight() {
+      return 100 + Math.max(0, Math.ceil(this.cargoSlots.length / 2) - 2) * 15
     },
     /** Where the profile card sits from the top left corner: under the avatar button on portrait screens. */
     profileOffset() {
@@ -395,11 +403,12 @@ export default {
     clearInterval(this.seconds)
   },
   methods: {
-    /** Where cargo slot `index` sits: two columns, the empty holds always last on the right. */
+    /** Where cargo slot `index` sits: two columns, rows 15 apart, the empty holds last on the right. */
     cargoSlotAt(index) {
       const last = index === this.cargoSlots.length - 1
-      const at = last ? 3 : index
-      return `translate(${at % 2 ? 140 : 40} ${at < 2 ? 30 : 45})`
+      // The last slot takes the right column of its row (an odd count leaves the left one empty).
+      const at = last && index % 2 === 0 ? index + 1 : index
+      return `translate(${at % 2 ? 140 : 40} ${30 + Math.floor(at / 2) * 15})`
     },
     /**
      * Places a corner control (offset from a screen edge) at the player's interface size: the

@@ -36,7 +36,7 @@
       <rect x="5" y="4" width="120" height="2" fill="#ffffff" opacity="0.1" />
 
       <g v-if="systemObjects[objectId].type == 'ship'">
-        <text x="65" y="85" text-anchor="middle" font-size="0.9em">
+        <text x="65" y="88" text-anchor="middle" font-size="0.9em">
           Orbiting: {{ systemObjects[systemObjects[objectId].orbiting].name }}</text
         >
 
@@ -50,8 +50,14 @@
 
             <text x="16" y="18" text-anchor="middle"> {{ emptyHolds }} Empty</text>
 
-            <g v-for="(line, index) in cargoRows" :key="line.name" :transform="'translate(0 ' + (2 + index * 8) + ')'">
-              <text x="52" y="0" text-anchor="start"> {{ line.name }}</text>
+            <!-- Every good aboard (nine rows at most, with colonists): closer rows past six -->
+            <g
+              v-for="(line, index) in cargoRows"
+              :key="line.name"
+              :transform="'translate(0 ' + (2 + index * cargoRowGap) + ')'"
+              :font-size="cargoRows.length > 6 ? '0.85em' : '1em'"
+            >
+              <text x="52" y="0" text-anchor="start"> {{ shortGoodName(line.name, true) }}</text>
               <text x="50" y="0" text-anchor="end"> {{ line.units }}</text>
             </g>
           </g>
@@ -166,12 +172,13 @@ export default {
     emptyHolds() {
       return emptyHolds(this.avatar.ship)
     },
-    /** The cargo rows: the goods aboard (three at most, the rest summed). */
+    /** The cargo rows: every good aboard, and the colonists. */
     cargoRows() {
-      const lines = cargoLines(this.avatar.ship, this.goods)
-      if (lines.length <= 3) return lines
-      const rest = lines.slice(2)
-      return [...lines.slice(0, 2), { name: `+${rest.length} more`, units: rest.reduce((a, l) => a + l.units, 0) }]
+      return cargoLines(this.avatar.ship, this.goods)
+    },
+    /** Rows 8 apart up to six; nine rows (all eight goods and colonists) still end above the Orbiting line. */
+    cargoRowGap() {
+      return this.cargoRows.length > 6 ? 6.5 : 8
     },
     stationGoods() {
       return (this.systemObjects[this.objectId].goods ?? []).filter((good) => good.mode !== 'none')

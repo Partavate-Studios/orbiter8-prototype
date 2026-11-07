@@ -32,7 +32,7 @@
 
           <g transform="translate(0 400)" fill="#ffffff">
             <text v-if="shipMax > 0" font-size="0.9em"
-              >Install cargo holds from {{ costOf(1) }}&cent; each (each one dearer).</text
+              >Install cargo holds from {{ costOf(1).toLocaleString('en-US') }}&cent; each (each one dearer).</text
             >
             <text v-else font-size="0.9em">You are at max capcity.</text>
 

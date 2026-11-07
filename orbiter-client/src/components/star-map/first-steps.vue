@@ -69,11 +69,12 @@ export default {
 </script>
 
 <style scoped>
+/* Landscape: bottom right, clear of the HUD's buttons at the right edge and of the open card above. */
 .first-steps {
   position: fixed;
   z-index: 20;
-  right: 16px;
-  top: 220px;
+  right: 120px;
+  bottom: 16px;
   width: min(86vw, 18em);
   background: #12052ae6;
   border: 1px solid var(--o8-yellow-light);
@@ -119,6 +120,7 @@ ol {
     right: 8px;
     width: auto;
     top: 200px;
+    bottom: auto;
   }
 }
 </style>

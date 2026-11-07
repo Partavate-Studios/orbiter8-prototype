@@ -271,15 +271,52 @@ Found and left (for Koda, or for the testnet milestone):
   one thing to watch is `besiegedCells`, which replays the whole feed on every sync; fine at the
   feed's size.
 
+## Koda's decisions (2026-11-07), and what was done
+
+Koda answered the list below in one sitting. Each answer, and the change it led to:
+
+- **F13, the first arrival:** "Show first steps beside the open card." On landscape screens the
+  first-steps card sits at the bottom right, clear of the open card and the HUD's buttons, whether
+  or not something is selected; on a portrait phone it still shows only with nothing selected,
+  where the card would cover it.
+- **F14, the settings footer:** "Replace it with a Back to Title button." Done, a menu button.
+- **F15, thousands separators:** "Yes, separators everywhere." The HUD, the trade menu's balance
+  boxes and tabs, the port's prices and the shipyard's first-hold price.
+- **F16 / L10, the cargo lists:** "Generally, we want to show every good on any screen. On the trade
+  screen you have to flip tabs between buy/sell which I find cumbersome. Come up with your best
+  layouts. This will be harder on the phone, so a tab might make sense there, but there's no excuse
+  for it on a desktop display." Done:
+  - the HUD's profile card lists every good aboard (and the colonists), two by two, and grows a row
+    at a time; on a portrait phone it keeps to three rows (the sixth slot reads "+N more") so it
+    stays above the card;
+  - the ship's card lists every good (nine rows at most, closer past six);
+  - the trade menu on a wide screen shows Buy and Sell side by side, every dial at once, with no
+    tabs; the Port of Trade panel lists every good the port trades (one line each past four, with
+    the card's arrows: ↓ sells, ↑ buys); the cargo tabs show every good traded here or aboard, in
+    two columns past five. On a phone the Buy and Sell pages stay, with the page's goods.
+- **F17, the galaxy map:** "Bring it in line now." Its buttons are the card's pill (the dialog's,
+  shared from `App.vue`), its title the menus' dim 1.5em; the hex view, lines and stars are as they were.
+- **F21 / L9, the jump tips:** "We may want one way jumps later, but for now we don't, so remove
+  those tips. Feel free to add 3–6 new tips, and to use cheeky language like the one that says brb."
+  The two went; six new ones: Minerva's books, black holes in pairs ("Probably. It has always been
+  fine so far."), the thirty-second scan, nobody has lost an Orbiter 8, colonists a hundred to a hold
+  ("They say it is cosy"), the weapon counters, and Sol's planets.
+- **T7, pinch-zoom on the galaxy map:** "Yes." Two fingers zoom about the point between them, as
+  on the system view; the wheel zooms about the cursor now too. The pointer is captured only once
+  a drag or pinch is under way, so a tap still picks a star.
+- **R9, the event reads:** "This seems like a bug and we should fix it. Chunk the reads." Done:
+  `sdk/event-log.js` reads every event range in 2,000-block chunks (under every provider cap seen),
+  and keeps a rolling window per feed (trades, broadcasts, registrations, the siege feed) so each
+  reload reads only the blocks since the last. Networks can carry a `startBlock` (the deployment's)
+  so the first read never walks the chain from genesis; set it for every public network with
+  milestone 6. For the record: the contracts' view calls (regions, systems, ports) have no range
+  limit; only event reads go through `eth_getLogs`.
+- **T1, the trade slider's pointer events:** "Fine, keep it."
+
 ## For Koda to decide
 
-- F13: the opening screen for a brand-new pilot (first steps hidden behind the ship's card).
-- F14: the settings menu's to-do sentence.
-- F15: thousands separators in the HUD.
-- F16 / L10: the HUD and card show two goods and "+N more" with eight goods in the game.
-- F17: the galaxy map itself (the hex view, its lines and tooltip) is still plain; only its card
-  took the card frame.
-- F21 / L9: the "can't jump back the same way" and "rename stars you visit first" tips.
-- T7: pinch-zoom on the galaxy map; a real phone's keyboard over the dialogs.
-- R9: log ranges on public RPCs, with the first testnet.
-- The trade slider now listens to pointer events (T1): same look, but it's your menu.
+Answered above, bar these:
+- R10: an index by star in the contracts (or an indexer) once pilots number in the hundreds.
+- T7's other half: a real phone's keyboard over the dialogs wasn't checked.
+- The HUD profile card on a portrait phone keeps to three rows of goods ("+N more" past five);
+  everything else shows every good.

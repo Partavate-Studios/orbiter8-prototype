@@ -11,6 +11,8 @@
  * @property {string[]} rpc
  * @property {string[]} explorer   Block explorer base URLs, without a trailing slash.
  * @property {Record<string, string>} contracts  addresses by module: galaxy, pilots, market, credits, ships, planets, deeds, factory, battle, armory
+ * @property {number} [startBlock]  the block the contracts were deployed at: no game events before it, so
+ *   event reads start there (0 when not given; set it for every public network, or the first read walks the chain)
  * @property {string} [sessionFunds]  native currency (decimal string) sent with a session key for gas
  * @property {{ text: string, url?: string }[]} [funding]  How to get gas money: shown on the funds step and the Network panel.
  * @property {{ name: string, tokenUrl: string }} [nftMarket]  Where the game's NFTs can be viewed and traded;

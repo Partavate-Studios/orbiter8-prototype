@@ -150,8 +150,13 @@ export default {
         'Orbiter 8 is being lovingingly designed and developed by Partavate Studios.',
         'Every Orbiter 8 is created the same, but you will be able to invest in and upgrade your ship.',
         'When you claim a planet you also claim any orbiting moons. In addition to moons, you will be able to build a space port to orbit your planets.',
-        'Not all stars offer the same gravity assist. Just because you can jump from one star to another does not mean you will be able to jump back the same way.',
-        'Once claimed, you can rename a planet. Likewise, you can rename new stars you visit first.'
+        'Minerva keeps the books. Every claim, every name, every siege: filed, stamped, and on the record forever.',
+        'Black holes come in pairs. Fly into one and you come out of its partner, somewhere in the dark between the arms. Probably. It has always been fine so far.',
+        'A long-range scan takes about thirty seconds. Space is big. The sensors are doing their best.',
+        'Nobody has ever lost an Orbiter 8. Beaten up, out of range, limping back to a shipyard, sure. Lost, never.',
+        'Colonists travel a hundred to a hold. They say it is cosy.',
+        'Railguns punch through armor, missiles through shields, and drones chew up point defense. Bring the right tool. Bring all three if you can afford it.',
+        'Sol belongs to the Federation. Its planets are not for sale and not for siege, and the Federation would rather you did not ask.'
       ]
       return tips[parseInt(Math.random() * tips.length)]
     }

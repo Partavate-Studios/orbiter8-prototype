@@ -24,11 +24,10 @@
               />
             </g>
             <g dominant-baseline="middle" font-size="0.7em">
-              <template v-for="(good, index) in pageGoods" :key="'transfer' + good.id">
-                <g v-if="amountOf(good) != 0" :transform="'translate(-45 ' + (30 + index * rowGap) + ')'">
-                  <transfer-tab :quantity="amountOf(good)" :price="good.price" :total="lineTotal(good)" />
-                </g>
-              </template>
+              <!-- what's changing hands: one tab per line of the trade, stacked -->
+              <g v-for="(good, index) in tradedLines" :key="'transfer' + good.id" :transform="'translate(-45 ' + (30 + index * 32) + ')'">
+                <transfer-tab :quantity="amountOf(good)" :price="good.price" :total="lineTotal(good)" />
+              </g>
 
               <rect
                 x="-175"
@@ -42,28 +41,28 @@
                 stroke-width="1.5"
               />
 
-              <text x="-110" y="15" text-anchor="middle" fill="#ffffff88" font-size="1em">Port of Trade</text>
+              <text x="-110" y="15" text-anchor="middle" fill="#ffffff88" font-size="1em">
+                Port of Trade<tspan v-if="compactRows" fill="#ffffff66" font-size="0.75em"> · &#8595; sells &#8593; buys</tspan>
+              </text>
 
               <line x1="-170" x2="-50" y1="23" y2="23" stroke="#ffffff88" stroke-width="0.5" />
 
               <inventory-item
-                v-for="(good, index) in pageGoods"
+                v-for="(good, index) in listed"
                 :key="'port' + good.id"
                 :transform="'translate(-110 ' + (35 + index * rowGap) + ')'"
-                :goodstype="shortGoodName(good.name, true)"
+                :goodstype="shortGoodName(good.name, !compactRows)"
                 :inventory="signedStock(good)"
                 :price="good.price"
+                :compact="compactRows"
               />
             </g>
 
-            <g
-              v-for="(good, index) in pageGoods"
-              :key="'cargo' + good.id"
-              :transform="'translate(135 ' + (30 + index * tabGap) + ')'"
-            >
+            <!-- the ship's holds: every good traded here or aboard, then the empty holds; two columns past five -->
+            <g v-for="(good, index) in cargoTabGoods" :key="'cargo' + good.id" :transform="cargoTabAt(index)">
               <cargo-tab :before="carried(good)" :after="carried(good) + amountOf(good)" :label="shortGoodName(good.name)" />
             </g>
-            <g :transform="'translate(135 ' + (30 + pageGoods.length * tabGap) + ')'">
+            <g :transform="cargoTabAt(cargoTabGoods.length)">
               <cargo-tab :before="avatar.ship.holds - avatar.ship.usedHolds" :after="predictedEmptyHolds" label="Empty" />
             </g>
 
@@ -97,7 +96,7 @@
                 stroke-width="1.5"
               />
               <text x="0" y="0" text-anchor="middle" fill="#ffffff" font-size="0.7em"
-                >Bal: {{ avatar.credits }}&cent;</text
+                >Bal: {{ avatar.credits.toLocaleString('en-US') }}&cent;</text
               >
             </g>
 
@@ -114,10 +113,10 @@
                 stroke-width="1.5"
               />
               <text v-if="currentBalance < 0" x="0" y="0" text-anchor="middle" fill="#ffffff" font-size="0.7em"
-                >Pay: &#8595; {{ Math.abs(currentBalance) }}&cent;</text
+                >Pay: &#8595; {{ Math.abs(currentBalance).toLocaleString('en-US') }}&cent;</text
               >
               <text v-else-if="currentBalance > 0" x="0" y="0" text-anchor="middle" fill="#ffffff" font-size="0.7em"
-                >Gain: &#8593; {{ currentBalance }}&cent;</text
+                >Gain: &#8593; {{ currentBalance.toLocaleString('en-US') }}&cent;</text
               >
             </g>
 
@@ -151,7 +150,7 @@
                 stroke-width="1.5"
               />
               <text x="2" y="0" text-anchor="middle" fill="#ffffff" font-size="0.7em"
-                >Fin: {{ avatar.credits + currentBalance }}&cent;</text
+                >Fin: {{ (avatar.credits + currentBalance).toLocaleString('en-US') }}&cent;</text
               >
             </g>
             <g v-if="avatar.credits + currentBalance < 0" transform="translate(120 180)" dominant-baseline="middle">
@@ -185,9 +184,26 @@
           </g>
         </g>
 
+        <!-- Wide screens: what the port sells (Buy) and what it buys (Sell) side by side, every dial at once -->
+        <g v-if="wide" fill="#ffffff" :transform="'translate(0 ' + (250 - 400 / slotScale) + ') scale(' + dialScale + ')'">
+          <g v-for="column in dialColumns" :key="column.key" :transform="'translate(' + column.x + ' 0)'">
+            <text x="0" y="-14" text-anchor="middle" fill="#ffffff88" font-size="0.9em">{{ column.label }}</text>
+            <g v-for="(good, index) in column.goods" :key="'dial' + good.id" :transform="'translate(0 ' + (14 + index * 60) + ')'">
+              <inventory-dial
+                :label="good.name"
+                :port-inventory="signedStock(good)"
+                :inventory-to-trade="Math.abs(amountOf(good))"
+                :max-allowed="allowed(good)"
+                :max-holds="avatar.ship.holds"
+                @update:inventory-to-trade="updateAmount(good, $event)"
+              />
+            </g>
+          </g>
+        </g>
+        <!-- Narrow screens: a page each -->
         <g
+          v-else
           fill="#ffffff"
-          font-size=""
           :transform="'translate(0 ' + (250 - 400 / slotScale) + ') scale(' + (1 + slotScale / 4) + ')'"
         >
           <g
@@ -206,8 +222,8 @@
           </g>
         </g>
 
-        <!-- What the port sells (Buy) and what it buys (Sell), a page each -->
-        <g :transform="'translate(0 ' + tabsY + ')'" font-size="0.8em">
+        <!-- Narrow screens: the Buy and Sell pages' tabs -->
+        <g v-if="!wide" :transform="'translate(0 ' + tabsY + ')'" font-size="0.8em">
           <g
             v-for="(tab, index) in pages"
             :key="tab.key"
@@ -290,7 +306,7 @@ export default {
   },
   computed: {
     ...mapState(useStarMapStore, ['systemObjects']),
-    ...mapState(useGameStateStore, ['avatar']),
+    ...mapState(useGameStateStore, ['avatar', 'goods']),
     ...mapState(useUIStore, ['viewport']),
     /** The station's goods (sdk/game/trade.js StationGood). */
     stationGoods() {
@@ -307,6 +323,47 @@ export default {
     pageGoods() {
       return (this.pages.find((tab) => tab.key === this.page) ?? this.pages[0]).goods
     },
+    /** Every good the port trades: what it sells, then what it buys. */
+    traded() {
+      return [...this.pages[0].goods, ...this.pages[1].goods]
+    },
+    /** A wide screen shows every good at once; a narrow one, a page at a time (Koda, 2026-11-07). */
+    wide() {
+      return this.slotScale > 1
+    },
+    /** The goods the port panel lists. */
+    listed() {
+      return this.wide ? this.traded : this.pageGoods
+    },
+    /** The two columns of dials on a wide screen. */
+    dialColumns() {
+      return [
+        { key: 'buy', label: 'Buy', x: -185, goods: this.pages[0].goods },
+        { key: 'sell', label: 'Sell', x: 185, goods: this.pages[1].goods }
+      ]
+    },
+    /** Two columns of dials fit the menu's width at this scale. */
+    dialScale() {
+      return 1.05
+    },
+    /** The lines of the trade so far, in the port panel's order. */
+    tradedLines() {
+      return this.traded.filter((good) => this.amountOf(good) !== 0)
+    },
+    /** The cargo tabs: every good traded here or aboard on a wide screen; the page's goods on a narrow one. */
+    cargoTabGoods() {
+      if (!this.wide) return this.pageGoods
+      const cargo = this.avatar.ship.cargo ?? []
+      const tradedIds = new Set(this.traded.map((good) => good.id))
+      const aboard = this.goods
+        .map((name, id) => ({ id, name, mode: 'none' }))
+        .filter((good) => !tradedIds.has(good.id) && cargo[good.id] > 0)
+      return [...this.traded, ...aboard]
+    },
+    /** Past four port lines, each takes one line. */
+    compactRows() {
+      return this.listed.length > 4
+    },
     /** The page tabs sit halfway between the balance row and the first dial, at any scale. */
     tabsY() {
       const s = this.slotScale
@@ -315,16 +372,18 @@ export default {
       const labelTop = 250 - 400 / s + 10 * (1 + s / 4) - 12 * (1 + s / 4)
       return (balanceBottom + labelTop) / 2
     },
-    /** Rows a little closer when a page has four goods. */
+    /** Rows a little closer with four goods, and one line each past that. */
     rowGap() {
-      return this.pageGoods.length > 3 ? 27 : 30
+      if (this.compactRows) return 18
+      return this.listed.length > 3 ? 27 : 30
     },
     tabGap() {
       return 25
     },
-    /** The Port of Trade panel grows to fit a fourth row. */
+    /** The Port of Trade panel grows to fit its rows. */
     portPanelHeight() {
-      return 120 + Math.max(0, this.pageGoods.length - 3) * 18
+      if (this.compactRows) return 44 + this.listed.length * 18
+      return 120 + Math.max(0, this.listed.length - 3) * 18
     },
     dialGap() {
       return this.pageGoods.length > 3 ? 55 : 70
@@ -381,6 +440,10 @@ export default {
     },
     carried(good) {
       return this.avatar.ship.cargo?.[good.id] ?? 0
+    },
+    /** Where cargo tab `index` sits: a column of five, then a second column to the right. */
+    cargoTabAt(index) {
+      return `translate(${index < 5 ? 135 : 187} ${30 + (index % 5) * this.tabGap})`
     },
     /** The widgets' sign convention: positive the port sells, negative it buys. */
     signedStock(good) {

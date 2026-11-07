@@ -235,42 +235,6 @@ input[aria-invalid='true'] {
   gap: 0.7em;
   margin-top: 0.4em;
 }
-/* card-button.svg.vue's pill; hovered, only its outline stays, as in the cards. */
-.card-pill {
-  font: inherit;
-  font-weight: bold;
-  min-width: 7.5em;
-  padding: 0.45em 1.2em;
-  border: 1px solid #5b1aaa88;
-  border-radius: 40px / 12px;
-  background: linear-gradient(135deg, #5c1aae 0%, #280b4b 10%, #5c1aae 50%, #280b4b 90%, #5c1aae 100%);
-  color: #ffffff;
-  text-shadow: 0 1px 2px #0008;
-  cursor: pointer;
-}
-.card-pill:hover:not(:disabled) {
-  background: transparent;
-  border-color: #5b1aaa;
-}
-.card-pill:focus-visible {
-  outline: 2px solid #c3b3da;
-  outline-offset: 2px;
-}
-.card-pill:disabled {
-  color: #ffffff66;
-  cursor: default;
-}
-/* The dialog's action, lavender like the title's primary buttons (.o8-button.primary). */
-.card-pill.accent:not(:disabled) {
-  background: #c3b3da;
-  border-color: #c3b3da;
-  color: #1c0838;
-  text-shadow: none;
-}
-.card-pill.accent:hover:not(:disabled) {
-  background: #e6dcf5;
-  border-color: #e6dcf5;
-}
 .dialog-enter-active,
 .dialog-leave-active {
   transition: opacity 0.15s;

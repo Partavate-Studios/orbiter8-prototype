@@ -4,6 +4,7 @@
 import { Contract, JsonRpcProvider } from 'ethers'
 import PilotsAbi from '@/sdk/abi/Pilots.json'
 import GalaxyAbi from '@/sdk/abi/Galaxy.json'
+import { queryChunked } from '@/sdk/event-log'
 
 const MAX_AGE_MS = 5 * 60 * 1000
 // A public RPC that hasn't answered by then is treated as unreachable (the next one is tried).
@@ -40,8 +41,9 @@ async function readStats(url, network) {
     // Pilots registered, and stars discovered (each discovery's event) plus Sol.
     const pilots = new Contract(network.contracts.pilots, PilotsAbi, provider)
     const galaxy = new Contract(network.contracts.galaxy, GalaxyAbi, provider)
+    const latest = await withTimeout(provider.getBlockNumber())
     const [count, discovered] = await withTimeout(
-      Promise.all([pilots.pilotCount(), galaxy.queryFilter(galaxy.filters.Discovered(), 0)])
+      Promise.all([pilots.pilotCount(), queryChunked(galaxy, galaxy.filters.Discovered(), network.startBlock ?? 0, latest)])
     )
     return { pilots: Number(count), starSystems: discovered.length + 1 }
   } finally {

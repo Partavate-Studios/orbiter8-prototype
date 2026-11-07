@@ -5,7 +5,8 @@
     <transaction-tray />
     <galaxy-map v-if="neighborView && !jumpAnimationState" />
     <black-hole-entry />
-    <first-steps v-if="!neighborView && selected == null && !isMenuOn" />
+    <!-- Landscape: beside the open card, bottom right (Koda, 2026-11-07). Portrait: only with nothing selected, where the card would be. -->
+    <first-steps v-if="!neighborView && !isMenuOn && (selected == null || viewRatio > 1)" />
     <tech-tree v-if="techTreeOpen" class="tech-tree-over" @close="techTreeOpen = false" />
     <game-dialog />
   </div>
@@ -54,7 +55,7 @@ export default {
   },
   computed: {
     ...mapState(useGameStateStore, ['haveAvatar', 'haveShip']),
-    ...mapState(useUIStore, ['selected', 'jumpAnimationState', 'viewport', 'neighborView', 'isMenuOn']),
+    ...mapState(useUIStore, ['selected', 'jumpAnimationState', 'viewport', 'neighborView', 'isMenuOn', 'viewRatio']),
     techTreeOpen: {
       get() {
         return useUIStore().techTreeOpen
