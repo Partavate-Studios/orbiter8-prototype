@@ -59,6 +59,9 @@ design doc), [`design-ideas.md`](design-ideas.md) (Koda's working doc), [`cost-e
 | D38 | **Koda leans toward Polkadot Hub** ("I think we will"). Contracts stay EVM-portable; the decision is made at the end. | 2026-11-06 |
 | D39 | **Black holes: no risk of damage.** Going through is clean. | 2026-11-06 |
 | D40 | **The discoverer's first claim: a 10-minute window,** ending early if the discoverer flies on, so others get a shot. | 2026-11-06 |
+| D41 | **Session keys:** one approval per play session creates a browser key that can make game moves only, for a few hours, funded with a little gas money in the same approval; whatever is left can be sent back. Built into the game contracts (Polkadot has nothing built in that's safe for this), so it works on any network. | 2026-11-06 |
+| D42 | **The local Polkadot Hub node is the main integration target:** each milestone's play-bot run and gas and deposit measurements happen there. Foundry's chain stays for fast unit tests, so the contracts are checked on both and stay portable. | 2026-11-06 |
+| D43 | **Avoid RPC nodes where possible.** On Polkadot: reads through the smoldot light client and PAPI (data from the network's own nodes, peer to peer, with proofs); moves signed by the session key and sent through smoldot too. Only the session-starting approval goes through MetaMask's RPC. The client's chain access is one swappable layer: plain RPC for local development and other EVM chains, smoldot for Polkadot, proven on Polkadot's testnet in the final milestone (the light-client path is young). **Keep calls to a minimum:** whole regions and systems per view call; cache what never changes once loaded (decided cells, derived planets), refresh the rest from events; keep the cache's memory bounded. | 2026-11-06 |
 
 ## Features: this run and consider next (proposed, for Koda to choose)
 
@@ -99,7 +102,7 @@ hard to add later because it shapes the data, low-hanging, or the battle minimum
 
 Rounds 1–5 answered, except Q25 (contract tooling), which waits for the research. Next: the research's findings (the engine question is settled by D33).
 
-**Research done (D34).** Round 6 answered (D35–D40). Round 7 (asked 2026-11-06): session keys, explained; Polkadot as the main development target; the read path.
+**Research done (D34).** Rounds 6–7 answered (D35–D43). Round 8 (asked 2026-11-06): battle details.
 
 ## Plan (draft, 2026-11-06; for Koda's review)
 
@@ -178,7 +181,7 @@ discoverer, the math), against 2.5 million today. Measured in milestone 1.
 - **Call signs:** unique (case-insensitive), with on-chain rules (length, characters), and a fee to change. A name → pilot lookup replaces reading every callsign.
 - **One ship per pilot** (D26), an ERC-721. The pilot record holds its active ship, so fleets can come later.
 - **The ship:** location (star and orbit), holds, range level (1 to 4), fitted parts (weapons, armor, cargo pods), system damage.
-- **Session keys (proposed):** server-free and network-neutral. One transaction authorizes a key the browser generates, with an expiry, and sends it a little gas money; then that key can act for the pilot without wallet popups. The contracts check "the pilot, or the pilot's current session key".
+- **Session keys (D41):** one approval authorizes a key the browser generates, game moves only, for a few hours, and sends it a little gas money; then that key acts for the pilot without wallet popups. The contracts check "the pilot, or the pilot's current session key".
 
 ### 4. Market and trade
 
