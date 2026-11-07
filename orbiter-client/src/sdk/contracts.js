@@ -10,7 +10,7 @@ import FactoryAbi from './abi/Factory.json'
 import BattleAbi from './abi/Battle.json'
 import ArmoryAbi from './abi/Armory.json'
 import { fetchRound } from './drand'
-import { describeRevert } from './reverts'
+import { parseRevert } from './reverts'
 
 export const STATE = { UNDECIDED: 0, EMPTY: 1, STAR: 2, BLACK_HOLE: 3 }
 /** Cells per region read; the contracts cap it at 10. */
@@ -106,11 +106,12 @@ async function sent(transaction, options) {
   try {
     tx = await transaction
   } catch (error) {
-    const words = describeRevert(error, INTERFACES)
-    if (!words) throw error
-    const refused = new Error(words, { cause: error })
-    refused.shortMessage = words
-    refused.reason = words
+    const revert = parseRevert(error, INTERFACES)
+    if (!revert) throw error
+    const refused = new Error(revert.words, { cause: error })
+    refused.shortMessage = revert.words
+    refused.reason = revert.words
+    refused.revertName = revert.name
     refused.code = error.code
     throw refused
   }
@@ -146,6 +147,12 @@ export function createGame(runner, addresses) {
   const recent = async (contract, filter, blocks) => {
     const latest = await provider.getBlockNumber()
     return contract.queryFilter(filter, Math.max(0, latest - blocks), latest)
+  }
+  /** Events after `fromBlock` (exclusive) up to the latest block, and that block: for reading only what's new. */
+  const since = async (contract, filter, fromBlock) => {
+    const latest = await provider.getBlockNumber()
+    if (latest <= fromBlock) return { logs: [], toBlock: fromBlock }
+    return { logs: await contract.queryFilter(filter, fromBlock + 1, latest), toBlock: latest }
   }
 
   const game = {
@@ -318,15 +325,16 @@ export function createGame(runner, addresses) {
         .reverse()
     },
 
-    /** How many stars pilots have discovered so far (Galaxy's Discovered events), not counting Sol. */
-    async discoveries() {
-      return (await galaxy.queryFilter(galaxy.filters.Discovered(), 0)).length
+    /** Stars discovered after `fromBlock` (Galaxy's Discovered events): how many, and the block read up to. */
+    async discoveriesSince(fromBlock = -1) {
+      const { logs, toBlock } = await since(galaxy, galaxy.filters.Discovered(), fromBlock)
+      return { count: logs.length, toBlock }
     },
 
-    /** Every registered pilot's address (lowercase), oldest first, from the registrations. */
-    async pilotList() {
-      const logs = await pilots.queryFilter(pilots.filters.Registered(), 0)
-      return logs.map((l) => l.args[0].toLowerCase())
+    /** Pilots registered after `fromBlock`: their addresses (lowercase), oldest first, and the block read up to. */
+    async pilotsSince(fromBlock = -1) {
+      const { logs, toBlock } = await since(pilots, pilots.filters.Registered(), fromBlock)
+      return { pilots: logs.map((l) => l.args[0].toLowerCase()), toBlock }
     },
 
     /** The pilots whose ships are at `cell`, among `addresses`: [{ address, shipId, name, callsign }]. */

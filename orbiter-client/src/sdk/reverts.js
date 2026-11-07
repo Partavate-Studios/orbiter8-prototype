@@ -81,11 +81,13 @@ export function revertData(error) {
 }
 
 /**
- * Plain words for a refused move, or null if the error isn't a decodable revert.
+ * The contract error behind a refused move: its name and plain words, or null if the error isn't a
+ * decodable revert.
  * @param {unknown} error  what ethers threw
  * @param {import('ethers').Interface[]} interfaces  the game's contracts' ABIs
+ * @returns {{ name: string, words: string } | null}
  */
-export function describeRevert(error, interfaces) {
+export function parseRevert(error, interfaces) {
   const data = revertData(error)
   if (!data) return null
   for (const abi of interfaces) {
@@ -97,9 +99,14 @@ export function describeRevert(error, interfaces) {
     }
     if (!parsed) continue
     const words = WORDS[parsed.name]
-    if (words) return words(parsed.args)
+    if (words) return { name: parsed.name, words: words(parsed.args) }
     const args = parsed.args.map((a) => (typeof a === 'bigint' ? a.toString() : String(a))).join(', ')
-    return args ? `${parsed.name} (${args})` : parsed.name
+    return { name: parsed.name, words: args ? `${parsed.name} (${args})` : parsed.name }
   }
   return null
+}
+
+/** Plain words for a refused move, or null if the error isn't a decodable revert. */
+export function describeRevert(error, interfaces) {
+  return parseRevert(error, interfaces)?.words ?? null
 }

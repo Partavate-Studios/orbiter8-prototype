@@ -97,8 +97,10 @@
       <p v-if="scanningNow" class="scanning-now">{{ scanningNow }}</p>
     </header>
 
+    <!-- The chosen star's card, in the frame the in-game dialog and the tech tree use (game-dialog.vue) -->
     <aside v-if="chosen !== null" class="card">
-      <h3>{{ chosenName }}</h3>
+      <div class="inside">
+      <h3 class="pill">{{ chosenName }}</h3>
       <p class="sub">{{ chosenKind }} · {{ distanceAway }} {{ distanceAway === 1 ? 'step' : 'steps' }} away</p>
       <p v-if="chosenCell?.discoverer" class="sub">Discovered by {{ discovererName }}</p>
       <p v-if="isPartnerHere && chosen !== shipCell" class="sub">The far side of the black hole you're at.</p>
@@ -115,6 +117,7 @@
         </button>
         <p v-else-if="distanceAway > range" class="sub">Out of range: upgrade the engines at a shipyard.</p>
         <button class="o8-button small" :disabled="waiting" @click="choose(null)">Cancel</button>
+      </div>
       </div>
     </aside>
 
@@ -561,15 +564,29 @@ export default {
   transform: translateX(-50%);
   width: min(92vw, 24em);
   box-sizing: border-box;
-  background: #12052af0;
-  border: 1px solid #c3b3da44;
-  border-radius: 12px;
-  padding: 0.8em 1em;
+  padding: 3px;
+  border-radius: 40px / 9px;
+  background: linear-gradient(135deg, #5c1aae 0%, #280b4b 10%, #5c1aae 50%, #280b4b 90%, #5c1aae 100%);
+  box-shadow: 0 1.2em 3em #0009;
   text-align: left;
 }
-.card h3 {
-  margin: 0;
-  font-weight: 500;
+.card .inside {
+  padding: 0.5em 1.2em 1em;
+  border: 1px solid #5b1aaa;
+  border-radius: 38px / 8px;
+  background: #12052ae6;
+}
+.card .pill {
+  margin: 0 -0.6em 0.3em;
+  padding: 0.25em 1em;
+  border: 1px solid #5b1aaa88;
+  border-radius: 40px / 12px;
+  background: linear-gradient(135deg, #5c1aae 0%, #280b4b 10%, #5c1aae 50%, #280b4b 90%, #5c1aae 100%);
+  color: #ffffff;
+  font-size: 1.05em;
+  font-weight: normal;
+  text-align: center;
+  text-shadow: 0 1px 3px #000a;
 }
 .card p {
   margin: 0.3em 0;

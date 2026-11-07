@@ -129,11 +129,25 @@ export function createGameClient() {
   let keyGame = null // the session key's
   let keyWallet = null
   let pilots = [] // every registered pilot's address
+  let pilotsBlock = -1 // the block the registrations were read up to
   let discovered = 0 // stars discovered so far, galaxy-wide (plus Sol: the count the title shows)
+  let discoveredBlock = -1
   let leaderboard = null
+
+  /** Reads the registrations and discoveries since the last read, so each refresh reads only what's new. */
+  async function countPilotsAndStars() {
+    const [fresh, found] = await Promise.all([game.pilotsSince(pilotsBlock), game.discoveriesSince(discoveredBlock)])
+    if (fresh.pilots.length) pilots = [...new Set([...pilots, ...fresh.pilots])]
+    pilotsBlock = fresh.toBlock
+    discovered += found.count
+    discoveredBlock = found.toBlock
+  }
 
   const MAX_TIME_BETWEEN_RELOADS_MS = 2 * 60 * 1000
   let lastReload = 0
+  /** The reload under way, and the one to run after it (client.refresh). */
+  let refreshing = null
+  let queuedRefresh = null
   const watcher = createBlockWatcher({
     watchedAddresses: () => (network ? Object.values(network.contracts) : []),
     onBlock: (blockNumber, gameChanged) => {
@@ -286,7 +300,8 @@ export function createGameClient() {
   async function loadPilot() {
     state.pilot = (await game.pilot(state.account)) ?? false
     if (!state.pilot) {
-      Object.assign(state, { credits: 0, cargo: [], condition: null })
+      Object.assign(state, { credits: 0, cargo: [], condition: null, deeds: 0, session: null })
+      keyGame = keyWallet = null
       return
     }
     releaseCallsign()
@@ -301,13 +316,28 @@ export function createGameClient() {
     resumeSession()
   }
 
-  /** Picks up a session key this browser started earlier, if it's still the pilot's live one. */
+  /** A key saved before its session's transaction landed waits this long to be honoured on chain. */
+  const PENDING_KEY_MS = 10 * 60 * 1000
+
+  /**
+   * Picks up a session key this browser started earlier, if it's still the pilot's live one. A key
+   * whose session is over (expired, ended or replaced) is forgotten and its gas money swept back; one
+   * saved moments ago, whose transaction may still be on its way, is left to land.
+   */
   function resumeSession() {
     keyGame = keyWallet = null
     state.session = null
     const stored = state.pilot && loadKey(state.chainId, state.account)
-    const onChain = state.pilot?.session
-    if (!stored || !onChain || stored.address !== onChain.key || onChain.expiry * 1000 <= Date.now()) return
+    if (!stored) return
+    const onChain = state.pilot.session
+    const live = onChain && stored.address === onChain.key && onChain.expiry * 1000 > Date.now()
+    if (!live) {
+      if (stored.pending && Date.now() - stored.pending < PENDING_KEY_MS) return
+      forgetKey(state.chainId, state.account)
+      reclaim(stored)
+      return
+    }
+    if (stored.pending) saveKey(state.chainId, state.account, { ...stored, pending: undefined })
     keyWallet = keySigner(stored.privateKey, network.rpc[0])
     keyGame = createGame(keyWallet, network.contracts)
     state.session = { key: stored.address, expiry: onChain.expiry }
@@ -521,9 +551,38 @@ export function createGameClient() {
 
   /** Sends a move (with proofs for published scans) from the session key or the wallet, then reloads. */
   async function move(send, options) {
-    const receipt = await send(await proofs(), mover(), options)
+    const published = await proofs()
+    let receipt
+    try {
+      receipt = await send(published, mover(), options)
+    } catch (error) {
+      // The session ended on chain (another browser ended or replaced it, or it ran out): the wallet
+      // sends the move instead, and the key's gas money comes home.
+      if (error.revertName !== 'BadSession' || mover() === game) throw error
+      dropSession()
+      receipt = await send(published, game, options)
+    }
     await client.refresh()
     return receipt
+  }
+
+  /** Forgets the session key in use: the chain no longer honours it. Its gas money is swept back. */
+  function dropSession() {
+    const stored = loadKey(state.chainId, state.account)
+    keyGame = keyWallet = null
+    state.session = null
+    forgetKey(state.chainId, state.account)
+    if (stored) reclaim(stored)
+    notify('pilot')
+  }
+
+  /** Sends a key's leftover gas money back to the wallet, in the background. */
+  async function reclaim(stored) {
+    try {
+      await sweep(keySigner(stored.privateKey, network.rpc[0]), state.account)
+    } catch (error) {
+      console.warn('Returning gas money failed:', error)
+    }
   }
 
   /** Credits for a trade line now: cost with fee for a purchase, proceeds after fee for a sale. */
@@ -572,7 +631,11 @@ export function createGameClient() {
     /** Claims a planet, then names it (with a session key, neither asks the wallet). */
     async claimPlanet(planetId, name, options) {
       const receipt = await move((p, by, o) => by.claim(Number(planetId), o), options)
-      if (name) await move((p, by) => by.renamePlanet(Number(planetId), NAME.PLANET, name))
+      // The planet is the pilot's either way: a name that doesn't take can be given from its card.
+      if (name)
+        await move((p, by) => by.renamePlanet(Number(planetId), NAME.PLANET, name)).catch((error) =>
+          console.warn('Naming the planet failed:', error.shortMessage ?? error.message)
+        )
       return receipt
     },
     /** Starts a building on the planet (the building line, D57). */
@@ -678,21 +741,43 @@ export function createGameClient() {
     async startSession(options) {
       const key = newKey()
       const expiry = Math.floor(Date.now() / 1000) + SESSION_HOURS * 3600
-      const receipt = await game.startSession(key.address, expiry, parseEther(network.sessionFunds ?? '0.2'), options)
+      // Saved before it's sent: a reload while the wallet or the chain still has it would otherwise
+      // lose the key, and the gas money sent to it. resumeSession picks it up once it lands.
+      const previous = loadKey(state.chainId, state.account)
+      saveKey(state.chainId, state.account, { ...key, expiry, pending: Date.now() })
+      let receipt
+      try {
+        receipt = await game.startSession(key.address, expiry, parseEther(network.sessionFunds ?? '0.2'), options)
+      } catch (error) {
+        // Declined or refused: nothing on chain knows this key.
+        if (previous) saveKey(state.chainId, state.account, previous)
+        else forgetKey(state.chainId, state.account)
+        throw error
+      }
       saveKey(state.chainId, state.account, { ...key, expiry })
+      // The contract ended the previous session: its key's gas money comes home.
+      if (previous && previous.address !== key.address) reclaim(previous)
       await client.refresh()
       return receipt
     },
     /** Ends the session from the key itself (no wallet popup) and sends its leftover gas money home. */
     async endSession(options) {
       let receipt
+      const stored = loadKey(state.chainId, state.account)
       if (keyGame) {
-        receipt = await keyGame.endSession(options)
-        await sweep(keyWallet, state.account).catch((error) => console.warn('Returning gas money failed:', error))
+        try {
+          receipt = await keyGame.endSession(options)
+        } catch (error) {
+          // The key can't end it (its session is already over on chain, or it has no gas): the wallet can.
+          console.warn('Ending the session from its key failed:', error.shortMessage ?? error.message)
+          receipt = await game.endSession(options)
+        }
       } else {
         receipt = await game.endSession(options)
       }
       forgetKey(state.chainId, state.account)
+      keyGame = keyWallet = null
+      if (stored) await reclaim(stored)
       await client.refresh()
       return receipt
     }
@@ -752,12 +837,11 @@ export function createGameClient() {
       if ((await provider.getCode(network.contracts.pilots)) === '0x') return false
       game = createGame(signer, network.contracts)
       state.contracts = { ...network.contracts }
-      ;[state.universe, state.economy, state.rules, pilots, discovered] = await Promise.all([
+      ;[state.universe, state.economy, state.rules] = await Promise.all([
         game.universe(),
         game.economy(),
         game.planetRules(),
-        game.pilotList(),
-        game.discoveries()
+        countPilotsAndStars()
       ])
       notify('contracts')
       return true
@@ -770,7 +854,7 @@ export function createGameClient() {
     async getLeaderboard({ refresh = false } = {}) {
       const fresh = leaderboard && Date.now() - leaderboard.loadedAt < 60_000
       if (!fresh || refresh) {
-        pilots = await game.pilotList()
+        await countPilotsAndStars()
         const [names, claimed] = await Promise.all([game.callsigns(pilots), game.claimedPlanets()])
         const views = await Promise.all(claimed.map((c) => game.planetView(c.id)))
         const players = await Promise.all(
@@ -805,7 +889,7 @@ export function createGameClient() {
     /** Every call sign in use, lowercased. */
     async listCallsigns() {
       if (!game) return null
-      pilots = await game.pilotList()
+      await countPilotsAndStars()
       return new Set(Object.values(await game.callsigns(pilots)).map((c) => c.toLowerCase()))
     },
 
@@ -814,15 +898,33 @@ export function createGameClient() {
       notify('balance')
     },
 
+    /**
+     * Reloads everything: one reload at a time. A request made during one runs once more after it,
+     * so a move that lands mid-reload is read, and the caller gets the reload that includes it.
+     */
     refresh() {
+      if (refreshing) {
+        if (!queuedRefresh) {
+          queuedRefresh = refreshing.then(() => {
+            queuedRefresh = null
+            return client.refresh()
+          })
+        }
+        return queuedRefresh
+      }
       lastReload = Date.now()
-      return Promise.all([client.refreshPlayer(), client.refreshEvents()]).then(() => client.refreshSystem())
+      refreshing = Promise.all([client.refreshPlayer(), client.refreshEvents()])
+        .then(() => client.refreshSystem())
+        .finally(() => {
+          refreshing = null
+        })
+      return refreshing
     },
 
     refreshPlayer() {
       setLoading('player', true)
       return attempt('player', async () => {
-        ;[pilots, discovered] = await Promise.all([game.pilotList(), game.discoveries()])
+        await countPilotsAndStars()
         await loadPilot()
         state.player = playerShape()
         notify('player')

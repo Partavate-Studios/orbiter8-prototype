@@ -111,6 +111,7 @@ for (const step of steps) {
     await page.click(sel, { clickCount: 3 })
     await page.type(sel, val)
   } else if (kind === 'wait') await new Promise((r) => setTimeout(r, Number(arg)))
+  else if (kind === 'reload') await page.reload({ waitUntil: 'networkidle2' }) // the same browser: storage survives
   else if (kind === 'key') await page.keyboard.press(arg)
   else if (kind === 'offline') await page.setOfflineMode(arg === 'on')
   else if (kind === 'eval') logs.push('[eval] ' + JSON.stringify(await page.evaluate(arg)))
