@@ -4,7 +4,12 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 
 const OUT = new URL('../../contracts-v4/out/', import.meta.url)
 const DEST = new URL('../src/sdk/v4/abi/', import.meta.url)
-const CONTRACTS = { Galaxy: 'Galaxy.sol/Galaxy.json', Pilots: 'Pilots.sol/Pilots.json' }
+const CONTRACTS = {
+  Galaxy: 'Galaxy.sol/Galaxy.json',
+  Pilots: 'Pilots.sol/Pilots.json',
+  Market: 'Market.sol/Market.json',
+  Credits: 'Credits.sol/Credits.json'
+}
 
 mkdirSync(DEST, { recursive: true })
 for (const [name, path] of Object.entries(CONTRACTS)) {

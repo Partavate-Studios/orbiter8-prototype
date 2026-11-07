@@ -1,7 +1,7 @@
 <template>
   <!-- Demo 4's galaxy (docs/demo4-plan.md, milestone 1): the hex grid's charted stars, drawn slightly
        off the grid so it reads as a star field; your ship; what's in range. Regions load as you pan. -->
-  <div class="galaxy-view" @pointerdown="onDown" @pointermove="onMove" @pointerup="onUp" @wheel.prevent="onWheel">
+  <div class="galaxy-view" @pointerdown="onDown" @pointermove="onMove" @pointerup="onUp" @wheel="onWheel">
     <svg ref="svg" class="map" :viewBox="`0 0 ${width} ${height}`">
       <g
         v-for="star in drawn"
@@ -30,7 +30,23 @@
       <span class="title">Orbiter 8 · Demo 4</span>
       <span v-if="galaxy.pilot">
         <b>{{ galaxy.pilot.callsign }}</b> aboard <b>{{ galaxy.pilot.ship.name }}</b> · range
-        {{ galaxy.pilot.ship.range }}
+        {{ galaxy.pilot.ship.range }} · bays {{ galaxy.pilot.ship.cargo }}/{{ galaxy.pilot.ship.bays }} ·
+        <b class="credits">{{ galaxy.credits.toLocaleString() }} cr</b>
+      </span>
+      <span v-if="galaxy.pilot" class="session">
+        <template v-if="galaxy.sessionLive">
+          Session · {{ sessionLeft }}
+          <button class="o8-button small" :disabled="Boolean(galaxy.busy)" @click="galaxy.endSession()">End</button>
+        </template>
+        <button
+          v-else
+          class="o8-button small"
+          :disabled="Boolean(galaxy.busy)"
+          title="One wallet approval lets this browser make your moves for the next few hours"
+          @click="galaxy.startSession()"
+        >
+          Start session
+        </button>
       </span>
       <span v-if="galaxy.busy" class="busy">{{ busyWords }}</span>
       <span v-if="galaxy.error" class="problem">{{ galaxy.error }}</span>
@@ -52,9 +68,13 @@
     </form>
 
     <star-card v-if="galaxy.selected !== null && galaxy.status === 'ready'" :cell="galaxy.selected" />
+    <docks-panel v-if="docksOpen && galaxy.ports.length && galaxy.pilot" @close="docksOpen = false" />
 
     <footer class="controls">
       <button class="o8-button small" @click="centerOnShip">My ship</button>
+      <button v-if="galaxy.pilot && galaxy.ports.length" class="o8-button small" @click="toggleDocks">
+        Docks ({{ galaxy.ports.length }})
+      </button>
       <button class="o8-button small" @click="showNames = !showNames">{{ showNames ? 'Hide' : 'Show' }} names</button>
     </footer>
   </div>
@@ -66,6 +86,7 @@ import { position, cellAt, distance } from '@/sdk/v4/hex'
 import { starTraits, anomalyName } from '@/sdk/v4/traits'
 import FleetShip from '@/components/assets/fleet-ship.svg'
 import StarCard from './star-card.vue'
+import DocksPanel from './docks-panel.vue'
 
 // Pixels between neighboring stars at zoom 1, and the isometric squash (the prototype's look).
 const SPACING = 64
@@ -73,7 +94,7 @@ const FLAT = 0.7
 
 export default {
   name: 'GalaxyView',
-  components: { FleetShip, StarCard },
+  components: { FleetShip, StarCard, DocksPanel },
   data() {
     return {
       galaxy: useGalaxyStore(),
@@ -83,7 +104,9 @@ export default {
       drag: null,
       showNames: true,
       callsign: '',
-      shipName: ''
+      shipName: '',
+      docksOpen: false,
+      now: Date.now()
     }
   },
   computed: {
@@ -129,8 +152,17 @@ export default {
         jump: 'Jumping…',
         traverse: 'Going through…',
         rename: 'Renaming…',
-        resolve: 'Recording scans…'
+        resolve: 'Recording scans…',
+        trade: 'Trading…',
+        yard: 'At the yard…',
+        session: 'Waiting for the wallet…'
       }[this.galaxy.busy]
+    },
+    sessionLeft() {
+      const seconds = Math.max(0, this.galaxy.session.expiry - this.now / 1000)
+      const h = Math.floor(seconds / 3600)
+      const m = Math.floor((seconds % 3600) / 60)
+      return h ? `${h}h ${m}m` : `${m}m`
     }
   },
   watch: {
@@ -144,11 +176,13 @@ export default {
       this.height = window.innerHeight
     }
     window.addEventListener('resize', this.onResize)
+    this.clock = setInterval(() => (this.now = Date.now()), 30_000)
     if (this.galaxy.status === 'idle') this.galaxy.connect()
     else if (this.galaxy.status === 'ready') this.centerOnShip()
   },
   unmounted() {
     window.removeEventListener('resize', this.onResize)
+    clearInterval(this.clock)
   },
   methods: {
     project(cell, jitter = [0, 0]) {
@@ -164,11 +198,16 @@ export default {
       this.camera.x = x
       this.camera.y = y
     },
+    toggleDocks() {
+      this.docksOpen = !this.docksOpen
+      // On a phone held upright the docks take the bottom of the screen, where the star card sits.
+      if (this.docksOpen && this.width <= 600) this.galaxy.select(null)
+    },
     async register() {
       await this.galaxy.register(this.callsign.trim(), this.shipName.trim())
     },
     onDown(event) {
-      if (event.target.closest('.panel, .controls, .star-card')) return
+      if (event.target.closest('.panel, .controls, .star-card, .docks, .hud')) return
       this.drag = { x: event.clientX, y: event.clientY, cx: this.camera.x, cy: this.camera.y, moved: false }
     },
     onMove(event) {
@@ -187,6 +226,8 @@ export default {
       else this.galaxy.select(null)
     },
     onWheel(event) {
+      if (event.target.closest('.docks, .star-card')) return // let panels scroll
+      event.preventDefault()
       const factor = event.deltaY > 0 ? 1 / 1.15 : 1.15
       this.camera.zoom = Math.min(3, Math.max(0.15, this.camera.zoom * factor))
       this.loadHere()
@@ -272,6 +313,15 @@ export default {
 }
 .busy {
   color: var(--o8-yellow-light);
+}
+.credits {
+  color: var(--o8-yellow-light);
+}
+.session {
+  display: flex;
+  gap: 0.4em;
+  align-items: center;
+  color: #c3b3da;
 }
 .problem {
   color: var(--o8-pink-light);

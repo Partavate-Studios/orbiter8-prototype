@@ -3,6 +3,8 @@
 import { Contract } from 'ethers'
 import GalaxyAbi from './abi/Galaxy.json'
 import PilotsAbi from './abi/Pilots.json'
+import MarketAbi from './abi/Market.json'
+import CreditsAbi from './abi/Credits.json'
 import { fetchRound } from './drand'
 
 export const STATE = { UNDECIDED: 0, EMPTY: 1, STAR: 2, BLACK_HOLE: 3 }
@@ -28,17 +30,31 @@ function toCell(c) {
   }
 }
 
+/** A port from `Market.portsAt`, as plain data. */
+function toPort(p) {
+  return {
+    port: Number(p.port),
+    class: Number(p.class),
+    yard: p.yard,
+    owner: p.owner === ZERO ? null : p.owner.toLowerCase(),
+    quotes: p.quotes.map((q) => ({ mode: Number(q.mode), shortfall: Number(q.shortfall), price: Number(q.price) }))
+  }
+}
+
 /**
  * @param {import('ethers').ContractRunner} runner
- * @param {{ galaxy: string, pilots: string }} addresses
+ * @param {{ galaxy: string, pilots: string, market: string, credits: string }} addresses
  */
 export function createGame(runner, addresses) {
   const galaxy = new Contract(addresses.galaxy, GalaxyAbi, runner)
   const pilots = new Contract(addresses.pilots, PilotsAbi, runner)
+  const market = new Contract(addresses.market, MarketAbi, runner)
+  const credits = new Contract(addresses.credits, CreditsAbi, runner)
 
   const game = {
     galaxy,
     pilots,
+    market,
 
     async universe() {
       const [seed, , scanDelay] = await galaxy.universe()
@@ -51,8 +67,49 @@ export function createGame(runner, addresses) {
       if (!p.registered) return null
       return {
         callsign: p.callsign,
-        ship: { name: p.ship.name, cell: Number(p.ship.cell), range: Number(p.ship.range) }
+        shipId: Number(p.shipId),
+        ship: {
+          name: p.ship.name,
+          cell: Number(p.ship.cell),
+          range: Number(p.ship.range),
+          bays: Number(p.ship.bays),
+          cargo: Number(p.ship.cargo)
+        },
+        session: p.sessionKey === ZERO ? null : { key: p.sessionKey.toLowerCase(), expiry: Number(p.sessionExpiry) }
       }
+    },
+
+    /** Credits in a wallet. */
+    async balance(address) {
+      return Number(await credits.balanceOf(address))
+    },
+
+    /** Units of each good aboard the pilot's ship. */
+    async cargo(address, goods) {
+      return (await pilots.cargoOf(address, goods)).map(Number)
+    },
+
+    /** The goods registry, the tuning and the ports' current capacity: what prices are computed from. */
+    async economy() {
+      const [goods, tuning, capacity] = await Promise.all([market.goods(), market.tuning(), market.capacity()])
+      return {
+        goods: goods.map((g) => ({ name: g.name, base: Number(g.base), spread: Number(g.spread) })),
+        tuning: {
+          capacity: Number(tuning.capacity),
+          capacityPerPilot: Number(tuning.capacityPerPilot),
+          refill: Number(tuning.refill),
+          feeBps: Number(tuning.feeBps),
+          bayBase: Number(tuning.bayBase),
+          bayStep: Number(tuning.bayStep),
+          rangePrices: tuning.rangePrices.map(Number)
+        },
+        capacity: Number(capacity)
+      }
+    },
+
+    /** Every port at a star, with stock and next-unit prices. */
+    async portsAt(cell) {
+      return (await market.portsAt(cell)).map(toPort)
     },
 
     /** Every decided cell within REGION_RADIUS of `center`, in one call. */
@@ -102,6 +159,23 @@ export function createGame(runner, addresses) {
     },
     async resolveScans(proofs) {
       return (await pilots.resolveScans(proofs)).wait()
+    },
+    /** lines: [{ good, units (+ buy, - sell), limit }], sales first. */
+    async trade(port, lines) {
+      return (await market.trade(port, lines)).wait()
+    },
+    async buyBays(port, count, maxCost) {
+      return (await market.buyBays(port, count, maxCost)).wait()
+    },
+    async buyRange(port, maxCost) {
+      return (await market.buyRange(port, maxCost)).wait()
+    },
+    /** From the wallet: lets `key` move for the pilot until `expiry`, sending it `value` (wei) for gas. */
+    async startSession(key, expiry, value) {
+      return (await pilots.startSession(key, expiry, { value })).wait()
+    },
+    async endSession() {
+      return (await pilots.endSession()).wait()
     }
   }
   return game

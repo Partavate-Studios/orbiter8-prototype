@@ -1,15 +1,26 @@
-// The Demo 4 galaxy as the player sees it (docs/demo4-plan.md, milestone 1): the wallet, the
-// universe, the player's pilot and ship, and the cells loaded so far, region by region as the player
-// looks around (D18). Moves send any published pending scans along, so scans never need their own
-// approval (D21).
+// The Demo 4 galaxy as the player sees it (docs/demo4-plan.md, milestones 1 and 2): the wallet, the
+// universe, the player's pilot, ship, credits and cargo, the ports where the ship is, and the cells
+// loaded so far, region by region as the player looks around (D18). Moves send any published pending
+// scans along, so scans never need their own approval (D21), and go through the session key when one
+// is live, so they need no wallet approval either (D41).
 import { defineStore } from 'pinia'
 import { markRaw } from 'vue'
-import { discoverWallets, preferredWallet, connectWallet, getSession } from '@/sdk/chain/wallet'
+import { parseEther } from 'ethers'
+import { discoverWallets, preferredWallet, connectWallet } from '@/sdk/chain/wallet'
 import { createGame, STATE, REGION_RADIUS } from '@/sdk/v4/game'
 import { deployment } from '@/sdk/v4/config'
 import { distance } from '@/sdk/v4/hex'
+import { buyCost, sellProceeds, fee, baysCost, MODE } from '@/sdk/v4/market'
+import { SESSION_HOURS, loadKey, saveKey, forgetKey, newKey, keySigner, sweep } from '@/sdk/v4/session-key'
 
+/** The wallet's game (registering, sessions) and the session key's (moves), outside the reactive state. */
 let game = null
+let keyGame = null
+let keyWallet = null
+let where = null
+
+/** A trade line's price limit allows this much movement since the prices were read (B23). */
+const SLIPPAGE = 0.02
 
 export const useGalaxyStore = defineStore('Galaxy', {
   state: () => ({
@@ -28,11 +39,22 @@ export const useGalaxyStore = defineStore('Galaxy', {
     loadedCenters: [],
     names: {},
     selected: null,
-    /** a move in progress: 'register' | 'jump' | 'traverse' | 'rename' */
-    busy: null
+    /** a move in progress: 'register' | 'jump' | 'traverse' | 'rename' | 'trade' | 'yard' | 'session' */
+    busy: null,
+    credits: 0,
+    /** units aboard, by good id */
+    cargo: [],
+    /** the goods registry, tuning and port capacity (see sdk/v4/game.js economy()) */
+    economy: null,
+    /** the ports at the ship's star */
+    ports: [],
+    /** the live session key, or null: { key, expiry } */
+    session: null
   }),
   getters: {
     shipCell: (state) => (state.pilot ? state.pilot.ship.cell : null),
+    freeBays: (state) => (state.pilot ? state.pilot.ship.bays - state.pilot.ship.cargo : 0),
+    sessionLive: (state) => Boolean(state.session && state.session.expiry * 1000 > Date.now() + 60_000),
     cellAt: (state) => (n) => state.cells.get(n) ?? null,
     /** Can the ship jump to `n` now? */
     canJumpTo: (state) => (n) => {
@@ -47,7 +69,7 @@ export const useGalaxyStore = defineStore('Galaxy', {
     async connect() {
       this.status = 'connecting'
       try {
-        const where = await deployment()
+        where = await deployment()
         if (!where) {
           this.status = 'no-deployment'
           return
@@ -59,7 +81,9 @@ export const useGalaxyStore = defineStore('Galaxy', {
         game = markRaw(createGame(session.signer, where.contracts))
         this.account = session.account.toLowerCase()
         this.universe = await game.universe()
+        this.economy = await game.economy()
         await this.refreshPilot()
+        this.resumeSession()
         await this.loadAround(this.pilot ? this.pilot.ship.cell : 0, true)
         this.status = 'ready'
       } catch (error) {
@@ -68,8 +92,32 @@ export const useGalaxyStore = defineStore('Galaxy', {
         this.status = 'error'
       }
     },
+    /** The pilot, their credits and cargo, and the ports where their ship is. */
     async refreshPilot() {
-      this.pilot = (await game.pilot(getSession().account)) ?? false
+      this.pilot = (await game.pilot(this.account)) ?? false
+      if (!this.pilot) return
+      const [credits, cargo, ports, economy] = await Promise.all([
+        game.balance(this.account),
+        game.cargo(this.account, this.economy.goods.length),
+        game.portsAt(this.pilot.ship.cell),
+        game.economy()
+      ])
+      Object.assign(this, { credits, cargo, ports, economy })
+    },
+    /** Picks up a session key this browser started earlier, if it's still the pilot's live one. */
+    resumeSession() {
+      keyGame = keyWallet = null
+      this.session = null
+      const stored = this.pilot && loadKey(where.chainId, this.account)
+      const onChain = this.pilot?.session
+      if (!stored || !onChain || stored.address !== onChain.key || onChain.expiry * 1000 <= Date.now()) return
+      keyWallet = markRaw(keySigner(stored.privateKey, where.rpc))
+      keyGame = markRaw(createGame(keyWallet, where.contracts))
+      this.session = { key: stored.address, expiry: onChain.expiry }
+    },
+    /** Who signs moves: the session key while it's live, otherwise the wallet. */
+    mover() {
+      return this.sessionLive && keyGame ? keyGame : game
     },
     /** Reads the region around `center` unless a loaded region already covers it (or `force`). */
     async loadAround(center, force = false) {
@@ -107,7 +155,7 @@ export const useGalaxyStore = defineStore('Galaxy', {
       this.busy = kind
       this.error = null
       try {
-        await send(await this.proofs())
+        await send(await this.proofs(), this.mover())
         await this.refreshPilot()
         await this.loadAround(this.pilot.ship.cell)
         await this.reload()
@@ -124,21 +172,123 @@ export const useGalaxyStore = defineStore('Galaxy', {
       return this.move('register', () => game.register(callsign, shipName))
     },
     jump(to) {
-      return this.move('jump', (proofs) => game.jump(to, proofs))
+      return this.move('jump', (proofs, by) => by.jump(to, proofs))
     },
     traverse() {
-      return this.move('traverse', (proofs) => game.traverse(proofs))
+      return this.move('traverse', (proofs, by) => by.traverse(proofs))
     },
     async renameStar(cell, name) {
-      const ok = await this.move('rename', (proofs) => game.renameStar(cell, name, proofs))
+      const ok = await this.move('rename', (proofs, by) => by.renameStar(cell, name, proofs))
       if (ok) await this.loadName(cell)
       return ok
     },
     /** Writes published scans now, without moving (e.g. the player wants their neighborhood on record). */
     resolveScans() {
-      return this.move('resolve', async (proofs) => {
-        if (proofs.length) await game.resolveScans(proofs)
+      return this.move('resolve', async (proofs, by) => {
+        if (proofs.length) await by.resolveScans(proofs)
       })
+    },
+
+    // ── trade and the yard (milestone 2) ──────────────────────────────────────────────────────
+
+    /** Credits for a trade line now (cost with fee for a purchase, proceeds after fee for a sale). */
+    lineValue(port, good, units) {
+      const quote = port.quotes[good]
+      const g = this.economy.goods[good]
+      const { capacity } = this.economy
+      const { feeBps } = this.economy.tuning
+      if (units > 0) {
+        const cost = buyCost(g.base, g.spread, capacity, quote.shortfall, units)
+        return cost + fee(cost, feeBps)
+      }
+      const proceeds = sellProceeds(g.base, g.spread, capacity, quote.shortfall, -units)
+      return proceeds - fee(proceeds, feeBps)
+    },
+    /** Most units of a good the ship can buy here: bays, credits and the port's stock allowing. */
+    maxBuy(port, good) {
+      const quote = port.quotes[good]
+      if (quote.mode !== MODE.SELLS) return 0
+      let n = Math.min(this.freeBays, this.economy.capacity - quote.shortfall)
+      while (n > 0 && this.lineValue(port, good, n) > this.credits) n--
+      return n
+    },
+    /** Most units of a good the port will take from the ship. */
+    maxSell(port, good) {
+      const quote = port.quotes[good]
+      if (quote.mode !== MODE.BUYS) return 0
+      return Math.min(this.cargo[good] ?? 0, this.economy.capacity - quote.shortfall)
+    },
+    /** Trades at a port: `lines` is [{ good, units }] (+ buy, - sell). Sales go first, to free bays. */
+    trade(port, lines) {
+      const priced = [...lines]
+        .filter((l) => l.units !== 0)
+        .sort((a, b) => a.units - b.units)
+        .map(({ good, units }) => {
+          const value = this.lineValue(port, good, units)
+          const limit = units > 0 ? Math.ceil(value * (1 + SLIPPAGE)) : Math.floor(value * (1 - SLIPPAGE))
+          return { good, units, limit }
+        })
+      return this.move('trade', (proofs, by) => by.trade(port.port, priced))
+    },
+    baysQuote(count) {
+      const t = this.economy.tuning
+      return baysCost(t.bayBase, t.bayStep, this.pilot.ship.bays, count)
+    },
+    rangeQuote() {
+      const range = this.pilot.ship.range
+      return range >= 4 ? null : this.economy.tuning.rangePrices[range - 1]
+    },
+    buyBays(port, count) {
+      return this.move('yard', (proofs, by) => by.buyBays(port.port, count, this.baysQuote(count)))
+    },
+    buyRange(port) {
+      return this.move('yard', (proofs, by) => by.buyRange(port.port, this.rangeQuote()))
+    },
+
+    // ── session keys (D41) ────────────────────────────────────────────────────────────────────
+
+    /** One wallet approval: a new key may make moves for SESSION_HOURS, with gas money sent along. */
+    async startSession() {
+      this.busy = 'session'
+      this.error = null
+      try {
+        const key = newKey()
+        const expiry = Math.floor(Date.now() / 1000) + SESSION_HOURS * 3600
+        await game.startSession(key.address, expiry, parseEther(where.sessionFunds ?? '0.2'))
+        saveKey(where.chainId, this.account, { ...key, expiry })
+        await this.refreshPilot()
+        this.resumeSession()
+        return true
+      } catch (error) {
+        console.error('Starting a session failed:', error)
+        this.error = error.shortMessage ?? error.reason ?? error.message
+        return false
+      } finally {
+        this.busy = null
+      }
+    },
+    /** Ends the session from the key itself (no wallet popup) and sends its leftover gas money home. */
+    async endSession() {
+      this.busy = 'session'
+      this.error = null
+      try {
+        if (keyGame) {
+          await keyGame.endSession()
+          await sweep(keyWallet, this.account).catch((error) => console.warn('Returning gas money failed:', error))
+        } else {
+          await game.endSession()
+        }
+        forgetKey(where.chainId, this.account)
+        await this.refreshPilot()
+        this.resumeSession()
+        return true
+      } catch (error) {
+        console.error('Ending the session failed:', error)
+        this.error = error.shortMessage ?? error.reason ?? error.message
+        return false
+      } finally {
+        this.busy = null
+      }
     }
   }
 })

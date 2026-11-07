@@ -1,6 +1,19 @@
 [
   {
     "type": "function",
+    "name": "CALLSIGN_FEE",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "DEFAULT_ADMIN_ROLE",
     "inputs": [],
     "outputs": [
@@ -21,6 +34,19 @@
         "name": "",
         "type": "bytes32",
         "internalType": "bytes32"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "MAX_BAYS",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint16",
+        "internalType": "uint16"
       }
     ],
     "stateMutability": "view"
@@ -53,7 +79,59 @@
   },
   {
     "type": "function",
+    "name": "MAX_SESSION",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "MIN_NAME",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "SHIP_NAME_FEE",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "START_BAYS",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint16",
+        "internalType": "uint16"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "START_CREDITS",
     "inputs": [],
     "outputs": [
       {
@@ -105,6 +183,66 @@
   },
   {
     "type": "function",
+    "name": "actorOf",
+    "inputs": [
+      {
+        "name": "sender",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "addBays",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "bays",
+        "type": "uint16",
+        "internalType": "uint16"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "addCargo",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "good",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "units",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "byCallsign",
     "inputs": [
       {
@@ -121,6 +259,63 @@
       }
     ],
     "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "cargoOf",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "goods",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "units",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "changeCallsign",
+    "inputs": [
+      {
+        "name": "callsign",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "credits",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "contract Credits"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "endSession",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
   },
   {
     "type": "function",
@@ -206,9 +401,19 @@
         "internalType": "address"
       },
       {
-        "name": "galaxy",
+        "name": "galaxy_",
         "type": "address",
         "internalType": "contract Galaxy"
+      },
+      {
+        "name": "credits_",
+        "type": "address",
+        "internalType": "contract Credits"
+      },
+      {
+        "name": "ships_",
+        "type": "address",
+        "internalType": "contract Ships"
       }
     ],
     "outputs": [],
@@ -269,9 +474,9 @@
     ],
     "outputs": [
       {
-        "name": "",
+        "name": "v",
         "type": "tuple",
-        "internalType": "struct Pilots.Pilot",
+        "internalType": "struct Pilots.PilotView",
         "components": [
           {
             "name": "callsign",
@@ -282,6 +487,11 @@
             "name": "registered",
             "type": "bool",
             "internalType": "bool"
+          },
+          {
+            "name": "shipId",
+            "type": "uint256",
+            "internalType": "uint256"
           },
           {
             "name": "ship",
@@ -302,8 +512,28 @@
                 "name": "range",
                 "type": "uint8",
                 "internalType": "uint8"
+              },
+              {
+                "name": "bays",
+                "type": "uint16",
+                "internalType": "uint16"
+              },
+              {
+                "name": "cargo",
+                "type": "uint16",
+                "internalType": "uint16"
               }
             ]
+          },
+          {
+            "name": "sessionKey",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "sessionExpiry",
+            "type": "uint64",
+            "internalType": "uint64"
           }
         ]
       }
@@ -334,6 +564,42 @@
       },
       {
         "name": "shipName",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "removeCargo",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "good",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "units",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "renameShip",
+    "inputs": [
+      {
+        "name": "name",
         "type": "string",
         "internalType": "string"
       }
@@ -439,6 +705,101 @@
   },
   {
     "type": "function",
+    "name": "setRange",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "range",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "shipOf",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple",
+        "internalType": "struct Pilots.Ship",
+        "components": [
+          {
+            "name": "name",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "cell",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "range",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "bays",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "cargo",
+            "type": "uint16",
+            "internalType": "uint16"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "shipTokens",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "contract Ships"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "startSession",
+    "inputs": [
+      {
+        "name": "key",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "expiry",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
     "name": "supportsInterface",
     "inputs": [
       {
@@ -501,6 +862,69 @@
   },
   {
     "type": "event",
+    "name": "BaysAdded",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "bays",
+        "type": "uint16",
+        "indexed": false,
+        "internalType": "uint16"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "CallsignChanged",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "callsign",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "CargoChanged",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "good",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "units",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
     "name": "Initialized",
     "inputs": [
       {
@@ -545,6 +969,25 @@
   },
   {
     "type": "event",
+    "name": "RangeChanged",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "range",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "uint8"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
     "name": "Registered",
     "inputs": [
       {
@@ -552,6 +995,12 @@
         "type": "address",
         "indexed": true,
         "internalType": "address"
+      },
+      {
+        "name": "shipId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
       },
       {
         "name": "callsign",
@@ -639,6 +1088,75 @@
         "type": "address",
         "indexed": true,
         "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "SessionEnded",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "key",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "SessionStarted",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "key",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "expiry",
+        "type": "uint64",
+        "indexed": false,
+        "internalType": "uint64"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "ShipRenamed",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "shipId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
       }
     ],
     "anonymous": false
@@ -737,6 +1255,22 @@
   },
   {
     "type": "error",
+    "name": "BadRange",
+    "inputs": [
+      {
+        "name": "range",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "BadSession",
+    "inputs": []
+  },
+  {
+    "type": "error",
     "name": "CallsignTaken",
     "inputs": [
       {
@@ -774,6 +1308,33 @@
   },
   {
     "type": "error",
+    "name": "NoRoom",
+    "inputs": [
+      {
+        "name": "free",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "NotEnoughCargo",
+    "inputs": [
+      {
+        "name": "good",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "have",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ]
+  },
+  {
+    "type": "error",
     "name": "NotInitializing",
     "inputs": []
   },
@@ -781,6 +1342,22 @@
     "type": "error",
     "name": "NotRegistered",
     "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "SendFailed",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "TooManyBays",
+    "inputs": [
+      {
+        "name": "max",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ]
   },
   {
     "type": "error",
