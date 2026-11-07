@@ -1,7 +1,8 @@
 # Demo 4 plan
 
-**Status: complete, awaiting Koda's confirmation.** Nothing is built until Koda confirms it. Then it's
-followed to the end, each step ticked off as it lands.
+**Status: confirmed by Koda (2026-11-06); building.** Followed to the end, each step ticked off as it
+lands. Calls made while building, where the plan didn't say, are logged under "Built: calls for Koda to
+review" at the end.
 
 Branch `demo4`, off `modernize` (2026-11-06). Background: [`design.md`](design.md) (post-Demo 3
 design doc), [`design-ideas.md`](design-ideas.md) (Koda's working doc), [`cost-estimates.md`](cost-estimates.md)
@@ -121,7 +122,7 @@ Rounds 1–5 answered, except Q25 (contract tooling), which waits for the resear
 
 **Research done (D34).** All rounds answered (D1–D60). D53's balance table is a proposal to confirm with the finished plan.
 
-## Plan (complete, 2026-11-06; awaiting Koda's confirmation)
+## Plan (confirmed 2026-11-06)
 
 Built from decisions D1–D53. Once Koda confirms it, it's followed to the end without stopping between
 milestones (D31), each step ticked as it lands, with a commit per step. Anything that turns out
@@ -323,4 +324,13 @@ impossible or needs a design call goes back to Koda; everything else is decided 
 ### 12. Confirm with Koda before building
 
 - The plan as a whole.
-- **D53, the weapon balance table.**
+- **D53, the weapon balance table.** Confirmed.
+
+## Built: calls for Koda to review
+
+Educated guesses made while building, where the plan didn't decide (Koda: "take an educated guess and
+when you're done, let me know about any of those decisions I should review").
+
+| # | Where | The call | Why |
+|---|---|---|---|
+
