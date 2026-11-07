@@ -147,7 +147,7 @@ export default {
     typeName() {
       switch (this.systemObjects[this.objectId].type) {
         case 'star':
-          return 'Warpstar'
+          return this.systemObjects[this.objectId].blackHole ? 'Black Hole' : 'Warpstar'
         case 'ship':
           return 'Starship'
         case 'moon':

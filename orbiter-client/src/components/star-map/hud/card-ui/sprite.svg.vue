@@ -1,7 +1,11 @@
 <template>
   <g>
     <planet v-if="systemObjects[objectId].type == 'planet'" transform="scale(2)" :sprite="sprites[objectId]"></planet>
-    <star v-if="systemObjects[objectId].type == 'star'" transform="scale(0.2)"></star>
+    <star
+      v-if="systemObjects[objectId].type == 'star'"
+      transform="scale(0.2)"
+      :black-hole="Boolean(systemObjects[objectId].blackHole)"
+    ></star>
     <ship v-if="systemObjects[objectId].type == 'ship'" transform="rotate(180) scale(4)" :should-show-engines="false" />
     <station v-if="systemObjects[objectId].type == 'station'" transform="scale(0.075)" />
     <moon v-if="systemObjects[objectId].type == 'moon'" transform="scale(4)"></moon>
