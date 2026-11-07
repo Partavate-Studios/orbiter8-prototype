@@ -78,6 +78,8 @@ hard to add later because it shapes the data, low-hanging, or the battle minimum
 
 Round 3 (asked 2026-11-06): exploration in one approval; black hole portals; this run's feature list; the battle minimum.
 
+**Queued topic (Koda, 2026-11-06): the game engine.** After the research and the immediate questions: how the client renders the game. Keep SVG, or go down a new path (canvas, WebGL, a game engine)? Earlier work in the modernize branch is relevant (the canvas layers, the canvas prototype tangent, the frame loop).
+
 **Still open from round 2:** Q15, exploration without two approvals (reworked as round 3's first question); Q13's Polkadot check (research running).
 
 ## Plan
