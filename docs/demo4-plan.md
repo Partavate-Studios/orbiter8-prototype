@@ -47,6 +47,10 @@ design doc), [`design-ideas.md`](design-ideas.md) (Koda's working doc), [`cost-e
 | D26 | **One ship per pilot, for this run.** Fleets move to "consider next": a remote-control model (the working doc's signal lag and relays) is likely, and needs refining first. Keep this run straightforward, but shape the data so fleets can be added (ships are NFTs; a pilot has an active ship). | 2026-11-06 |
 | D27 | **The eight goods:** water ice, metals, rare elements, helium-3, organics, silicon (raw); equipment, electronics (manufactured, by planet type). **Goods are data, not code:** a registry of goods, so crafting's planned expansion can add more without rewriting contracts. | 2026-11-06 |
 | D28 | **Black hole exits:** 8 to 24 cells away, the deepest void in that band with no charted star within 2 cells. **The exit is decided when the black hole is created,** not when someone first goes through: its partner cell is reserved as a black hole right away. If someone reaches that area normally before anyone goes through, their scan reveals the partner black hole. (On chain, the band can't be searched cell by cell; a few candidate cells are sampled from the scan's randomness and the deepest one is chosen.) | 2026-11-06 |
+| D29 | **Numbers are tuned to play-time targets by simulation:** range 2 in about an hour of active play, range 3 in about a day, range 4 in about a week, full holds in a few days, a first station in about a day. A simulator built from the play bot finds the prices, rates and fees; Koda approves them. This is a baseline: **"find the fun"** comes later, with humans playing and tuning for fun. | 2026-11-06 |
+| D30 | **Durations use timestamps, safely.** Siege starting values: an undefended planet worn down in about an hour, a fully built and defended one in about three days, a 24-hour claim waiting period, a few hours' repair before attacking again. Rules, so timestamps can't be exploited: only for durations of minutes or longer; never in randomness; nothing where being a few seconds early or late gains anything. (On Ethereum the timestamp is fixed to the slot; on rollups and Polkadot the block producer can shift it within limits that the research confirms.) | 2026-11-06 |
+| D31 | **Build order is Claude's call,** working through to the end of this run without stopping between milestones (proposed order: hex galaxy and foundations, then pilots and trade, planets, battle, graphics and session keys, then testnets and the network decision). | 2026-11-06 |
+| D32 | **Testing bar:** every contract module ships with unit tests, fuzz tests and a gas report per action; each milestone ends with the play bot playing it on the local chain; costs are compared with `docs/cost-estimates.md`. | 2026-11-06 |
 
 ## Features: this run and consider next (proposed, for Koda to choose)
 
@@ -84,7 +88,7 @@ hard to add later because it shapes the data, low-hanging, or the battle minimum
 
 ## Open questions
 
-Rounds 1–4 answered, except Q25 (contract tooling), which waits for the research. Round 5 (asked 2026-11-06): tuning the economy's numbers; siege timing; build order.
+Rounds 1–5 answered, except Q25 (contract tooling), which waits for the research. Next: the research's findings, then the game engine question.
 
 **Queued topic (Koda, 2026-11-06): the game engine.** After the research and the immediate questions: how the client renders the game. Keep SVG, or go down a new path (canvas, WebGL, a game engine)? Earlier work in the modernize branch is relevant (the canvas layers, the canvas prototype tangent, the frame loop).
 
