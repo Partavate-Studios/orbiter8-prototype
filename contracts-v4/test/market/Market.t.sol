@@ -13,6 +13,7 @@ import {Ships} from "../../src/tokens/Ships.sol";
 import {HexMath} from "../../src/galaxy/HexMath.sol";
 
 contract GameFixture is Test {
+    Deployment.Game game;
     Galaxy galaxy;
     Pilots pilots;
     Market market;
@@ -34,7 +35,7 @@ contract GameFixture is Test {
     function setUp() public virtual {
         vm.warp(1_800_000_000);
         vm.startPrank(admin);
-        Deployment.Game memory game = Deployment.deploy(admin, keccak256("test universe"), 30);
+        game = Deployment.deploy(admin, keccak256("test universe"), 30);
         Deployment.wire(game);
         // The tests pay pilots directly.
         game.credits.grantRole(game.credits.GAME_MODULE(), admin);
@@ -215,7 +216,7 @@ contract MarketTest is GameFixture {
     function test_anOwnedPortPaysItsOwnerTheFee() public {
         uint256 port = 10; // Sol, body 10: not a Federation station, so opened as a player's port
         vm.prank(admin);
-        market.openPort(port, 0, false, bo); // Terrestrial
+        market.openPort(port, 0, bo, uint40(block.timestamp), 0); // Terrestrial
         Market.Good memory g = market.goods()[ORGANICS];
         Market.Tuning memory t = market.tuning();
         uint256 cost = Pricing.buyCost(g.base, g.spread, market.capacity(), 0, 5);

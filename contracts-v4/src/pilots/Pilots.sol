@@ -28,13 +28,15 @@ contract Pilots is ModuleBase {
     uint256 public constant CALLSIGN_FEE = 2_000;
     uint256 public constant SHIP_NAME_FEE = 500;
     uint256 public constant MAX_SESSION = 12 hours;
+    uint256 public constant COLONISTS_PER_BAY = 100;
 
     struct Ship {
         string name;
         uint256 cell; // the star the ship is at
         uint8 range; // jump range, 1–4 (D10, D11)
         uint16 bays; // internal space bought, up to 250 (D59)
-        uint16 cargo; // bays holding cargo, one unit each
+        uint16 cargo; // units of cargo aboard, one bay each
+        uint32 colonists; // people aboard, 100 to a bay (D57, D59)
     }
 
     struct Pilot {
@@ -87,6 +89,7 @@ contract Pilots is ModuleBase {
     event Jumped(address indexed pilot, uint256 from, uint256 to, bool discovered);
     event Traversed(address indexed pilot, uint256 blackHole, uint256 exit, bool discovered);
     event CargoChanged(address indexed pilot, uint256 indexed good, uint256 units);
+    event ColonistsChanged(address indexed pilot, uint256 colonists);
     event BaysAdded(address indexed pilot, uint16 bays);
     event RangeChanged(address indexed pilot, uint8 range);
     event SessionStarted(address indexed pilot, address indexed key, uint64 expiry);
@@ -98,6 +101,7 @@ contract Pilots is ModuleBase {
     error CallsignTaken(string callsign);
     error NoRoom(uint256 free);
     error NotEnoughCargo(uint256 good, uint256 have);
+    error NotEnoughColonists(uint256 have);
     error TooManyBays(uint256 max);
     error BadRange(uint8 range);
     error BadSession();
@@ -155,7 +159,7 @@ contract Pilots is ModuleBase {
         pilot.callsign = callsign;
         pilot.registered = true;
         pilot.shipId = shipId;
-        p.ships[shipId] = Ship(shipName, 0, START_RANGE, START_BAYS, 0);
+        p.ships[shipId] = Ship(shipName, 0, START_RANGE, START_BAYS, 0, 0);
         p.shipTokens.mint(who, shipId);
         p.credits.mint(who, START_CREDITS);
         emit Registered(who, shipId, callsign, shipName);
@@ -276,7 +280,7 @@ contract Pilots is ModuleBase {
     /// Loads `units` of a good into the pilot's bays. Reverts with NoRoom if they don't fit.
     function addCargo(address pilot, uint256 good, uint256 units) external onlyRole(GAME_MODULE) {
         Ship storage ship = _ship(pilot);
-        uint256 free = ship.bays - ship.cargo;
+        uint256 free = _freeBays(ship);
         if (units > free) revert NoRoom(free);
         ship.cargo += uint16(units);
         uint256 shipId = _p().pilots[pilot].shipId;
@@ -293,6 +297,32 @@ contract Pilots is ModuleBase {
         ship.cargo -= uint16(units);
         _p().cargo[shipId][good] = have - units;
         emit CargoChanged(pilot, good, have - units);
+    }
+
+    /// Takes `count` people aboard, 100 to a bay. Reverts with NoRoom if they don't fit.
+    function addColonists(address pilot, uint256 count) external onlyRole(GAME_MODULE) {
+        Ship storage ship = _ship(pilot);
+        uint256 before = _baysForColonists(ship.colonists);
+        uint256 needed = _baysForColonists(ship.colonists + count) - before;
+        uint256 free = _freeBays(ship);
+        if (needed > free) revert NoRoom(free);
+        ship.colonists += uint32(count);
+        emit ColonistsChanged(pilot, ship.colonists);
+    }
+
+    function removeColonists(address pilot, uint256 count) external onlyRole(GAME_MODULE) {
+        Ship storage ship = _ship(pilot);
+        if (count > ship.colonists) revert NotEnoughColonists(ship.colonists);
+        ship.colonists -= uint32(count);
+        emit ColonistsChanged(pilot, ship.colonists);
+    }
+
+    function _baysForColonists(uint256 colonists) internal pure returns (uint256) {
+        return (colonists + COLONISTS_PER_BAY - 1) / COLONISTS_PER_BAY;
+    }
+
+    function _freeBays(Ship storage ship) internal view returns (uint256) {
+        return ship.bays - ship.cargo - _baysForColonists(ship.colonists);
     }
 
     function addBays(address pilot, uint16 bays) external onlyRole(GAME_MODULE) {

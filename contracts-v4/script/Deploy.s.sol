@@ -8,6 +8,9 @@ import {Pilots} from "../src/pilots/Pilots.sol";
 import {Market} from "../src/market/Market.sol";
 import {Credits} from "../src/tokens/Credits.sol";
 import {Ships} from "../src/tokens/Ships.sol";
+import {Deeds} from "../src/tokens/Deeds.sol";
+import {Planets} from "../src/planets/Planets.sol";
+import {Factory} from "../src/planets/Factory.sol";
 
 /// Deploys every game module behind its proxy and wires them together. The deployer is the admin
 /// and upgrader (a multisig takes these over for a public release, D14).
@@ -18,6 +21,9 @@ library Deployment {
         Market market;
         Credits credits;
         Ships ships;
+        Deeds deeds;
+        Planets planets;
+        Factory factory;
     }
 
     function _proxy(address implementation, bytes memory init) private returns (address) {
@@ -38,6 +44,21 @@ library Deployment {
         game.market = Market(
             _proxy(address(new Market()), abi.encodeCall(Market.initialize, (admin, game.pilots, game.credits)))
         );
+        game.deeds = Deeds(_proxy(address(new Deeds()), abi.encodeCall(Deeds.initialize, (admin))));
+        game.planets = Planets(
+            _proxy(
+                address(new Planets()),
+                abi.encodeCall(
+                    Planets.initialize, (admin, game.galaxy, game.pilots, game.market, game.credits, game.deeds)
+                )
+            )
+        );
+        game.factory = Factory(
+            _proxy(
+                address(new Factory()),
+                abi.encodeCall(Factory.initialize, (admin, game.pilots, game.planets, game.credits))
+            )
+        );
     }
 
     /// Grants the modules the roles they need on each other (run by the admin).
@@ -48,6 +69,12 @@ library Deployment {
         game.credits.grantRole(role, address(game.pilots));
         game.credits.grantRole(role, address(game.market));
         game.pilots.grantRole(role, address(game.market));
+        game.credits.grantRole(role, address(game.planets));
+        game.credits.grantRole(role, address(game.factory));
+        game.pilots.grantRole(role, address(game.planets));
+        game.market.grantRole(role, address(game.planets));
+        game.deeds.grantRole(role, address(game.planets));
+        game.planets.grantRole(role, address(game.factory));
     }
 }
 
@@ -69,6 +96,9 @@ contract Deploy is Script {
         vm.serializeAddress(json, "market", address(game.market));
         vm.serializeAddress(json, "credits", address(game.credits));
         vm.serializeAddress(json, "ships", address(game.ships));
+        vm.serializeAddress(json, "deeds", address(game.deeds));
+        vm.serializeAddress(json, "planets", address(game.planets));
+        vm.serializeAddress(json, "factory", address(game.factory));
         string memory out = vm.serializeAddress(json, "pilots", address(game.pilots));
         vm.writeJson(out, string.concat("deployments/", vm.toString(block.chainid), ".json"));
     }

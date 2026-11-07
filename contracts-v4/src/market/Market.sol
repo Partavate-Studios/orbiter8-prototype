@@ -50,12 +50,14 @@ contract Market is ModuleBase {
         uint64[3] rangePrices; // to reach range 2, 3 and 4
     }
 
-    /// A port opened on a claimed planet (milestone 3).
+    /// A port opened on a claimed planet (milestone 3): it trades from `opensAt`, when its building
+    /// is finished, with no further transaction.
     struct Opened {
         bool open;
         uint8 class;
-        bool yard;
         address owner;
+        uint40 opensAt;
+        uint40 yardAt; // 0: no shipyard
     }
 
     /// One line of a trade: units > 0 buys from the port, units < 0 sells to it. `limit` is the
@@ -98,7 +100,7 @@ contract Market is ModuleBase {
     event GoodAdded(uint256 indexed good, string name, uint32 base, uint32 spread);
     event MixSet(uint8 indexed class, uint256 sells, uint256 buys);
     event TuningSet(Tuning tuning);
-    event PortOpened(uint256 indexed port, uint8 class, bool yard, address owner);
+    event PortOpened(uint256 indexed port, uint8 class, address owner, uint40 opensAt, uint40 yardAt);
     event Traded(address indexed pilot, uint256 indexed port, uint256 indexed good, int256 units, uint256 credits);
     event BaysBought(address indexed pilot, uint256 indexed port, uint16 bays, uint256 credits);
     event RangeBought(address indexed pilot, uint256 indexed port, uint8 range, uint256 credits);
@@ -163,10 +165,24 @@ contract Market is ModuleBase {
         _setTuning(tuning_);
     }
 
-    /// Opens a port on a claimed planet (the Planets module, milestone 3).
-    function openPort(uint256 port, uint8 class, bool yard, address owner) external onlyRole(GAME_MODULE) {
-        _m().opened[port] = Opened(true, class, yard, owner);
-        emit PortOpened(port, class, yard, owner);
+    /// Opens (or updates) a port on a claimed planet: the Planets module, when a Port or Yards is
+    /// built or the planet changes hands. It trades from `opensAt` and has a shipyard from `yardAt`
+    /// (0 for none). Zero for either keeps what's there.
+    function openPort(uint256 port, uint8 class, address owner, uint40 opensAt, uint40 yardAt)
+        external
+        onlyRole(GAME_MODULE)
+    {
+        Opened storage o = _m().opened[port];
+        if (o.open && opensAt == 0) opensAt = o.opensAt;
+        if (yardAt == 0) yardAt = o.yardAt;
+        _m().opened[port] = Opened(true, class, owner, opensAt, yardAt);
+        emit PortOpened(port, class, owner, opensAt, yardAt);
+    }
+
+    /// Whether a player's port is trading now.
+    function _isOpen(uint256 port) internal view returns (bool) {
+        Opened storage o = _m().opened[port];
+        return o.open && o.opensAt <= block.timestamp;
     }
 
     function _addGood(string memory name, uint32 base, uint32 spread) internal {
@@ -200,9 +216,9 @@ contract Market is ModuleBase {
         uint256 cell = port >> 8;
         uint256 body = port & 0xff;
         if (cell == 0 && body < SOL_PORTS) return (_solClass(body), body == SOL_YARD, address(0));
+        if (!_isOpen(port)) revert NoSuchPort(port);
         Opened storage o = _m().opened[port];
-        if (!o.open) revert NoSuchPort(port);
-        return (o.class, o.yard, o.owner);
+        return (o.class, o.yardAt != 0 && o.yardAt <= block.timestamp, o.owner);
     }
 
     function _mode(uint8 class, uint256 good) internal view returns (Mode) {
@@ -359,7 +375,7 @@ contract Market is ModuleBase {
         for (uint256 body = 0; body < MAX_BODIES; body++) {
             uint256 port = (cell << 8) | body;
             bool isSol = cell == 0 && body < SOL_PORTS;
-            if (isSol || _m().opened[port].open) found[n++] = portView(port);
+            if (isSol || _isOpen(port)) found[n++] = portView(port);
         }
         list = new PortView[](n);
         for (uint256 i = 0; i < n; i++) {
