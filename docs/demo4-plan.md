@@ -52,6 +52,7 @@ design doc), [`design-ideas.md`](design-ideas.md) (Koda's working doc), [`cost-e
 | D31 | **Build order is Claude's call,** working through to the end of this run without stopping between milestones (proposed order: hex galaxy and foundations, then pilots and trade, planets, battle, graphics and session keys, then testnets and the network decision). | 2026-11-06 |
 | D32 | **Testing bar:** every contract module ships with unit tests, fuzz tests and a gas report per action; each milestone ends with the play bot playing it on the local chain; costs are compared with `docs/cost-estimates.md`. | 2026-11-06 |
 | D33 | **The client stays on the SVG engine for this run.** A change of engine is for later, possibly **3D rendering**: Koda has a 3D model of the ship and a prototype project to reference. Until then, this run's graphics are SVG, built on the modernize client. | 2026-11-06 |
+| D34 | **Polkadot research done** ([`research/polkadot-hub-2026-11.md`](research/polkadot-hub-2026-11.md), Opus, 2026-11-06; spot-checked on the live chain). It changes the plan in five places:<br>• **UUPS works on Polkadot Hub's REVM** (proxies are live on mainnet; a plain OpenZeppelin upgrade gets its own test). D14 stands.<br>• **The block-hash scan (D21) is not safe there.** Polkadot Hub's block hashes are built from public values, `PREVRANDAO` is a constant, and the chain is so quiet that a player could compute the next block's hash before jumping. **The scan needs a different source of randomness** (the next round).<br>• **Timestamps move in 24-second steps there**; fine for D30's minute-and-longer durations.<br>• **No Multicall3 there:** batched reads must be the contracts' own view functions (already planned).<br>• **Storage deposits are several times Base's per slot,** which rewards D9's store-little design. | 2026-11-06 |
 
 ## Features: this run and consider next (proposed, for Koda to choose)
 
@@ -92,7 +93,7 @@ hard to add later because it shapes the data, low-hanging, or the battle minimum
 
 Rounds 1–5 answered, except Q25 (contract tooling), which waits for the research. Next: the research's findings (the engine question is settled by D33).
 
-**Still open:** Q13's Polkadot check (research running).
+**Research done (D34).** Round 6 (asked 2026-11-06): randomness for the scan; contract tooling (Q25); the primary development network; three proposals from the draft.
 
 ## Plan (draft, 2026-11-06; for Koda's review)
 
@@ -134,7 +135,7 @@ The client computes these with the same functions as the contract.
 **Jumps (D10–D12).** A ship may jump to any star that is charted (decided as existing), not a
 black hole's far side, and within its range (hex distance ≤ range level, 1 to 4).
 
-**Arrival and the long-range scan (D21).**
+**Arrival and the long-range scan (D21).** *(The randomness source is being reconsidered after the research, D34; the one-approval flow stays.)*
 1. The jump moves the ship and records the block number for the star if it's a first arrival.
 2. One block later, the scan's outcome is fixed by that next block's hash. A view call shows it at once; nothing is written yet.
 3. The next transaction that touches the area writes the outcome (`resolveScan` runs inside jumps, trades and other moves). Usually that's the explorer's own next move.
