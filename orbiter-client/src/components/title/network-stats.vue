@@ -3,7 +3,7 @@
   <span class="network-stats">
     <template v-if="stats === 'loading' || stats === undefined">checking…</template>
     <template v-else-if="stats">
-      {{ stats.pilots }} {{ stats.pilots === 1 ? 'pilot' : 'pilots' }} · {{ stats.starSystems }} star systems
+      {{ stats.pilots }} {{ stats.pilots === 1 ? 'pilot' : 'pilots' }} · {{ stats.starSystems }} {{ stats.starSystems === 1 ? 'star system' : 'star systems' }}
     </template>
     <template v-else>not answering right now</template>
   </span>

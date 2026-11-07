@@ -33,8 +33,16 @@ export function discoverWallets(waitMs = 300) {
   })
 }
 
-/** The wallet to use without asking: the one picked last time, or the only one installed. */
+/** The dev build's own wallet over the local chain's test accounts (src/dev/dev-wallet.js). */
+export const DEV_WALLET_RDNS = 'com.orbiter8.devwallet'
+
+/**
+ * The wallet to use without asking: under `npm run local`, the dev wallet (whatever else is
+ * installed); otherwise the one picked last time, or the only one installed.
+ */
 export function preferredWallet(wallets) {
+  const dev = wallets.find((wallet) => wallet.info.rdns === DEV_WALLET_RDNS)
+  if (dev) return dev
   let remembered = null
   try {
     remembered = localStorage.getItem(PREFERRED_WALLET_KEY)
