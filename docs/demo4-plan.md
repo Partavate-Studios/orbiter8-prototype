@@ -293,10 +293,10 @@ impossible or needs a design call goes back to Koda; everything else is decided 
 
 **Milestone 2: pilots and trade**
 - [ ] `Pilots`: call signs, the ship NFT, location, the bays and weapon mounts (D59), range, damage fields. *Done except mounts and damage, which come with battle (milestone 4).*
-- [ ] Session keys, and the client's session flow. *Contracts done.*
+- [x] Session keys, and the client's session flow.
 - [x] `Market`: the goods registry, ports, trade with price limits and a location check, sales of holds and range.
 - [x] Credits and fees as sinks.
-- [ ] The client's trading, upgrade and pilot screens, on the new SDK.
+- [x] The client's trading, upgrade and pilot screens, on the new SDK. *The docks panel; `dev/harness/trade-bot4.mjs` plays it (B24).*
 - [x] The simulator's first version, with the economy tuned to D29's targets (for Koda's approval). *[`demo4-tuning.md`](demo4-tuning.md).*
 
 **Milestone 3: planets**
@@ -355,4 +355,7 @@ when you're done, let me know about any of those decisions I should review").
 | B20 | Milestone 2 | **Every unit moves the price** (a trade pays the average over its units), not one price per trade. **Goods have different margins** (1.2 × spread: 36 to 156 credits). | The play session found every good paid the same, and one big trade drained a port at the opening price. |
 | B21 | Milestone 2 | **The economy's numbers, from the simulator,** are in [`demo4-tuning.md`](demo4-tuning.md), for Koda's approval. Among them: **Federation ports grow with the number of registered pilots** (220 units of each good per pilot), and **"a day" of D29 is read as 2 hours of play**. | With fixed stock, one pilot reached range 4 in under an hour and 40 pilots mostly never did. |
 | B22 | Milestone 2 | **Restocking fixed:** the stored clock moves on only by the time the regrown units took. | Found by the simulator: rounding down at each trade meant a busy port never restocked. |
+| B23 | Milestone 2 | **The client sends each trade line with a 2% price limit** around the price it showed. **A session lasts 4 hours** and is sent 0.2 of the network's coin for gas (local chain; real amounts set per network in milestone 6). Its key is kept in the browser's storage. | Room for another pilot's trade landing first, without filling at a surprise price. |
+| B24 | Milestone 2 | **Measured by the trading bot (60 moves through a session key, local chain):** a trade (selling and buying) costs about 180,000 gas, against 118,000 in Demo 3. Bays cost 96,000; registering plus the ship 290,000 (Demo 3: 480,000); starting a session 114,000; ending one 33,000. | Trades cost more for the calls between modules: the session-key lookup, cargo and credits, and the events. A later saving: Market could hold cargo itself. |
+| B25 | Milestone 2 | **The docks panel is new, plain UI** on the galaxy map, not the Demo 3 trade menus. | The old menus are bound to Demo 3's contracts. Milestone 5's graphics and polish pass is the place to bring their look over. |
 
