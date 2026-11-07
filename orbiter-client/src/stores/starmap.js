@@ -10,7 +10,8 @@ let nextWarp = 1
 
 export const useStarMapStore = defineStore('StarMap', {
   state: () => ({
-    starId: 0,
+    /** the star system shown (Sol is 0), or null before one has loaded */
+    starId: null,
     starName: '...',
     neighbors: [],
     // Game objects (sdk/system.js) by stable key, in drawing order.

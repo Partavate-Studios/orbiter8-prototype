@@ -6,7 +6,7 @@
     <div v-if="haveAvatar">Credits {{ avatar.credits }}</div>
     <div v-if="haveAvatar">Cargo {{ (avatar.ship.cargo ?? []).join(' | ') }}</div>
     <div>Eth Address: {{ account }}</div>
-    <div v-if="currentStarSystemId > 0">
+    <div v-if="currentStarSystemId !== null">
       <span
         >Currently in Sector: <b>{{ currentStarSystemId }}</b> {{ currentStarSystemName }}</span
       >

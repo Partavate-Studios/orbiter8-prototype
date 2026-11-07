@@ -3,7 +3,7 @@
        and everything orbiting them are drawn in their own layers (planet-layers.vue), except ships
        flying from one planet to another (Sprite.fly), which are drawn here until they arrive; the orbit
        rings around the star are on the guides canvas, under every body. -->
-  <g v-if="currentStarSystemId > 0">
+  <g v-if="currentStarSystemId !== null">
     <template v-for="(object, key) in systemObjects" :key="'sprite-' + key">
       <sprite-transform
         v-if="object.type !== 'planet' && (!orbitsPlanet(object) || inTransit[key])"
