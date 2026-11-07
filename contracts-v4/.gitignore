@@ -4,3 +4,4 @@ cache/
 broadcast/
 .env
 .polkadot/
+deployments/
