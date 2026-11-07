@@ -348,6 +348,27 @@ Left as is: the returning-player auto-connect (no popup when the wallet already 
 the funds step's six-second balance poll; the one-wallet / remembered-wallet shortcut on Begin.
 Not tried here: a real MetaMask (none in headless Chrome); `?wallet=browser` is for that.
 
+### Checked against a simulated wallet (2026-11-07, after the wallet pass)
+
+The real connect flow was driven through `?wallet=browser` with the harness's injected wallet
+patched to behave as a real one does: a fresh wallet that approves; one that declines (4001); one
+whose popup never answers; one with a request already open (-32002); and one on Ethereum mainnet.
+Each gave the right screen: connected and on to the call sign within a second; "You closed Test
+Wallet's request, so nothing was connected" with Try again; after 15 s "hasn't answered" with
+"Ask again", which connects once the wallet answers; "already has a request open"; and the
+network step with the local chain offered. Two gaps found and fixed:
+
+- **A retry's outcome could be overwritten by the first, hung attempt.** Attempts were told apart
+  by the wallet object, which is the same for a retry; a first popup answered late would have set
+  the error state (or cleared the retry's timer) over the retry. Each attempt has its own token now.
+- **A wallet that switches network without saying so left the player on the network step** with
+  no message, since the page reloads only on the wallet's `chainChanged`. After a switch the wallet
+  agreed to, the chain is read back: if it changed, the page reloads itself; if the wallet stayed
+  put, it says so and asks the player to switch in the wallet. Verified with a wallet that never
+  emits the event.
+
+Not exercised: a real MetaMask (none in headless Chrome). `?wallet=browser` is there for you to try.
+
 ## For Koda to decide
 
 Answered above, bar these:

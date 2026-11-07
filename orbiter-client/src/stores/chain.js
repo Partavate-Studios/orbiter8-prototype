@@ -14,8 +14,9 @@ import { game } from '@/sdk/client'
 import { useConfigStore } from '@/stores/config'
 
 let blockPoller = null
-/** The wallet being connected to (raw: a provider object), for trying again. */
+/** The wallet being connected to (raw: a provider object), for trying again, and the attempt under way. */
 let connectingWallet = null
+let attempt = 0
 let slowTimer = null
 /** After this long waiting for the wallet's popup, the wizard offers a way to try again (ms). */
 const SLOW_CONNECT_MS = 15_000
@@ -115,6 +116,7 @@ export const useChainStore = defineStore('Chain', {
     async chooseWallet(wallet) {
       if (this.walletStatus === 'connected') return
       connectingWallet = wallet
+      const mine = ++attempt
       this.walletError = null
       this.walletName = wallet.info.name
       // The wallet usually shows a popup now; until the player approves it, we wait here.
@@ -124,18 +126,19 @@ export const useChainStore = defineStore('Chain', {
       slowTimer = setTimeout(() => (this.walletSlow = true), SLOW_CONNECT_MS)
       try {
         await game.connect(wallet)
+        // A later attempt took over (the player asked again): its outcome counts, not this one's.
+        if (mine !== attempt) return
         rememberWallet(wallet)
         this.web3Loaded = true
         this.walletStatus = 'connected'
       } catch (error) {
-        // A later attempt took over (the player tried again): its outcome counts, not this one's.
-        if (connectingWallet !== wallet || this.walletStatus === 'connected') return
+        if (mine !== attempt || this.walletStatus === 'connected') return
         console.error('Wallet connection failed:', error)
         this.walletError = error.shortMessage ?? error.message
         this.walletErrorKind = walletErrorKind(error)
         this.walletStatus = 'error'
       } finally {
-        if (connectingWallet === wallet) {
+        if (mine === attempt) {
           clearTimeout(slowTimer)
           this.walletSlow = false
         }
@@ -192,7 +195,7 @@ export const useChainStore = defineStore('Chain', {
       if (!network) return 'Unknown network.'
       try {
         await walletRequest('wallet_switchEthereumChain', [{ chainId: network.hexId }])
-        return null
+        return this.followSwitch(chainId)
       } catch (error) {
         // 4902: the wallet doesn't know this network (some wallets nest the code). Anything else,
         // such as the player declining the switch, isn't a reason to offer adding it.
@@ -215,10 +218,29 @@ export const useChainStore = defineStore('Chain', {
       // Some wallets add a network without switching to it: ask once more, now that it's known.
       try {
         await walletRequest('wallet_switchEthereumChain', [{ chainId: network.hexId }])
-        return null
+        return this.followSwitch(chainId)
       } catch (error) {
         return switchFailure(error, network.name)
       }
+    },
+    /**
+     * The wallet agreed to switch: a wallet that follows the standard then says chainChanged and the
+     * page reloads (sdk/chain/wallet.js). One that doesn't would leave the player on the network step
+     * with no message, so the chain is read back and the page reloaded by hand; a wallet that agreed
+     * but didn't switch gets a message.
+     */
+    async followSwitch(chainId) {
+      let now
+      try {
+        now = Number(await walletRequest('eth_chainId'))
+      } catch {
+        return null // the reload is on its way
+      }
+      if (now === Number(chainId)) {
+        location.reload()
+        return null
+      }
+      return `Your wallet stayed on ${chainName(now) || 'its network'}. Switch to ${this.networkData[chainId].name} in the wallet, then try again.`
     },
     /** Asks the wallet to show the Credits token (wallet_watchAsset). */
     async addCreditsToken() {
