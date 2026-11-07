@@ -357,6 +357,7 @@ The platform is undecided between Ethereum (L2s) and Polkadot. Gas is the Achill
 | Block time | \~12 s mainnet, \~2 s L2s | \~6 s |
 | On-chain randomness | RANDAO (+ commit-reveal) | Built-in randomness |
 | Sponsored gas without servers | Usually needs bundlers | Fee rules can live in the chain |
+| Reading the chain without a provider | Light clients (Helios) verify answers but still fetch data from an RPC provider | **The smoldot light client runs in the browser and talks straight to the network's nodes: no provider.** Officially through Polkadot tooling (PAPI); a community layer (Pine-RPC) offers Ethereum-style RPC on top. Each read asks peers for proofs, so batching reads matters for speed. |
 
 Note: Polkadot has reportedly been shifting toward a central Hub, so the parachain scene may be shrinking. Check the current state before betting on it. One data point: Moonbeam, Moonriver and Moonbase Alpha, where earlier demos ran, shut down on 2026-08-01, and their tokens moved to Base.
 
