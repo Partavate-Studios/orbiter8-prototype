@@ -31,78 +31,54 @@ design doc), [`design-ideas.md`](design-ideas.md) (Koda's working doc), [`cost-e
 | D10 | **Range is a straight-line leap.** A ship can jump to any charted, existing star within range on the hex grid, crossing empty cells; no chain of stars is needed (as the prototype's `recomputeReach` does). | 2026-11-06 |
 | D11 | **Range starts at 1, and each upgrade adds 1, up to 4.** Each level costs progressively more **in time to earn**, not just in credits: getting from 1 to 2 should take far less play than 3 to 4. The prices must account for a pilot's profit rate rising as they add holds (in the play session, profit per trade grew from about 300 credits at 5 holds to about 15,000 at 250). | 2026-11-06 |
 | D12 | **Range never reveals stars.** It only reaches stars already charted. New stars appear only around a star someone arrives at for the first time: its 6 neighbors, never more. | 2026-11-06 |
+| D13 | **Research runs on Opus** (Koda's account has few Fable credits). Fable can check it later. | 2026-11-06 |
+| D14 | **UUPS proxies** (ERC-1967) with namespaced storage (ERC-7201), one per module, upgraded by an admin multisig. **Pending:** confirmation that this works on Polkadot Hub (the research). | 2026-11-06 |
+| D15 | **No wallet-only check.** Since EIP-7702 it can't be enforced, and it would block the smart wallets session keys need. Exploration's own design must prevent re-rolls. | 2026-11-06 |
+| D16 | **The spiral can be revised by an upgrade, for uncharted space only.** Decided stars never change. | 2026-11-06 |
+| D17 | **Black holes are portals** to another part of space where there's another black hole. A ship can travel to a black hole and orbit it, then choose to leave or to go through. (Details in the next round.) | 2026-11-06 |
+| D18 | **Map data loads as the player looks around:** only what's on screen, more as they pan. Whatever is most efficient for reading the map from the chain. | 2026-11-06 |
+| D19 | **Terraforming is an advanced feature, designed together later** (Koda wants help building out the concept). Every planet gets a surface seed from the start so it can be added without changing existing planets. | 2026-11-06 |
+| D20 | **This run is a chosen subset; the rest goes on a "consider next" list,** revisited in a new interview after this run. Pack in as much as reasonable, low-hanging fruit first. **Some form of battle is absolutely required.** | 2026-11-06 |
 
-## Feature inventory (proposed tiers, for Koda to correct)
+## Features: this run and consider next (proposed, for Koda to choose)
 
-Every idea from [`design.md`](design.md) (D), [`design-ideas.md`](design-ideas.md) (I), the contract
-wish list in `UPGRADE_NOTES.md` (W) and the play session in [`cost-estimates.md`](cost-estimates.md)
-(P), sorted by how settled it is and how much it's needed. **Proposed, not decided.**
+Every idea from [`design.md`](design.md), [`design-ideas.md`](design-ideas.md), the contract wish
+list in `UPGRADE_NOTES.md` and the play session in [`cost-estimates.md`](cost-estimates.md).
+**Proposed, not decided.** The test for "this run": decided already, needed by other features,
+hard to add later because it shapes the data, low-hanging, or the battle minimum.
 
-### Tier 1: foundations (needed by everything else)
+### This run (proposed)
 
-| Feature | From | Why it's here |
-|---|---|---|
-| Upgradeable contract architecture, admin roles, access control | D3, I (review) | Every later release depends on it; the review's High finding is unprotected setters |
-| Hex galaxy: two-step exploration, seeded spiral, black holes, region views | decided, I | Decided |
-| Jump range upgrade | D1 | Decided |
-| Pilots: unique call signs with on-chain name rules, name-change fee | D, W | Long wanted; the client can't check uniqueness at scale |
-| **Fleets: several ships per pilot, one active** (switching rules below) | D, I (Leaning) | The NFT-trading problem; Demo 3 has `boardShip` groundwork |
-| Trade fixes: the ship must be at the port, a price limit per trade (the late-transaction problem), restocking and margins retuned | D, W, P | Found broken or weak in play |
-| More goods (5–12; the working doc proposes 8) | D, I | Long wanted; needed by the tech tree and crafting |
-| Events for every action | W, I (siege feed) | Lets the client update without reloading; feeds a public siege feed |
-| Batched reads: a whole system or region in one call | W, P | About 130 reads per reload today |
-| Credit sinks: claim fee, name fees, repairs, buildings; owner cut as a transfer, not new credits | I (Economy) | The economy inflates without them |
-| On-chain SVG ship NFTs, drawn from upgrades | I (Koda: wants soon) | Visible, self-contained, no server |
-| Session keys: sign once per session | I (Platform) | Cost and wallet popups; also unblocks gamepad play |
-
-### Tier 2: the headline, battle (principle 3: "Battle is Demo 4's headline feature")
-
-| Feature | From | Notes |
-|---|---|---|
-| Planet tech tree: Citadel → Colony → Station → Port → Yards → Armory (linear first) | D | Branching after Colony is the stated direction (I) |
-| Colonists and planet production (lazy, by timestamp) | D | Production rate follows population |
-| Planet defenses (weapons on planets and moons) | D | |
-| Ship weapons with counters (railguns, missiles, drones, point defense) and armor | D, I (Leaning) | Bring the right weapons, not more |
-| Slow, public sieges; damage to ship systems instead of a reset; repair at a shipyard before attacking again | D, I (Leaning) | Fixes "the richer player always wins" |
-| Claims through Minerva after a siege, with waiting periods and limits on repeats | D, I | |
-| Overheating (push your luck), radiators as an upgrade | I (Leaning) | Needs fair randomness: the same commit-reveal |
-| Experience from building and battle (not trade) | D | |
-
-### Tier 3: social
-
-| Feature | From | Notes |
-|---|---|---|
-| Corporations: membership, a shared credit account, shared ships and planets | D | |
-| Corporate law: what each corporation allows or punishes | I (Leaning) | Open: whose law applies in a fight |
-| Protected zones and NPC patrols near home systems | I (Exploring) | A safe start for new players |
-| Pirates: bands that mirror corporations, refusing corporate alliance | D, I (Leaning) | |
-| Bounties | I | |
-
-### Tier 4: stretch (substantial, less settled)
-
-| Feature | From |
+| Feature | Why now |
 |---|---|
-| Supply routes: automated recurring shipments, delivered lazily | I (Leaning) |
-| Crafting: raw → primitives → modules at autofactories; items as ERC-1155 | D, I (Exploring) |
-| Planet terraforming: seeded surface maps, structures placed on top | D9 (new) |
-| Digital pilots ("cubes"): signal lag, subspace relays, escape pods, cube hunting | I (Leaning / Exploring) |
-| Ship-to-ship combat | D, I (undefined) |
-| Booby traps, sweeping scanners | I (Exploring) |
-| Tractor beams and ship trains | D |
-| Negotiated prices at ports | D |
-| Builders: AMI probes / roamers, auto factories | D |
-| Asteroid attacks | D |
+| Upgradeable contracts, admin roles, access control | Everything later depends on it |
+| Hex galaxy: exploration, seeded spiral, region views, black hole portals | Decided |
+| Jump range upgrade | Decided |
+| Pilots: unique call signs, on-chain name rules, name-change fee | Long wanted; low-hanging |
+| Fleets: several ships per pilot, one active | Shapes the data; hard to add later; fixes the NFT-trading problem |
+| Trade fixes: ship must be at the port, a price limit per trade, restocking and margins retuned | Found broken in play; low-hanging |
+| More goods (about 8) | Shapes the data; needed by planets and battle supplies |
+| Events for every action | Low-hanging; the client updates without reloading |
+| Batched reads (a system or region per call) | Needed for map loading |
+| Credit sinks: claim fee, name fees, repairs; the port owner's cut as a transfer | Low-hanging; the economy inflates without them |
+| On-chain SVG ship NFTs that show upgrades | Koda wants it soon; self-contained |
+| Session keys (approve once per session) | Needed for one-approval play; fewer wallet popups |
+| Planets, linear tech tree: Citadel, Colony, Station, Port, Yards, Armory; colonists and production | Battle needs planets worth taking and defending |
+| **Battle minimum:** planet defenses; a few ship weapons that counter each other; armor; slow, public sieges; damage to ship systems instead of a reset; repairs before attacking again; claims with a waiting period | Required |
 
-### Parked (not in Demo 4 unless pulled in)
+### Consider next (proposed)
 
-Portals and parallel universes; new ship types and aliens; tokenized goods as ERC-20s; hidden
-information with zero-knowledge proofs; invite-only cubes; star-system weapons; Minerva's hidden
-agenda; planet maintenance; vanity upgrades; alignment; corporate taxes; custom soundtrack folders,
-re-skinning and ENS names (client features, any time).
+- **Battle, more:** overheating, experience, booby traps, ship-to-ship combat, asteroid attacks
+- **Social:** corporations, corporate law, protected zones, pirates and bands, bounties
+- **Economy and building:** supply routes, crafting, builders (probes, autofactories), negotiated prices, branching tech tree
+- **Bigger systems:** terraforming (designed together), digital pilots (cubes, lag, relays, escape pods, cube hunting), tractor beams
+- **Parked:** portals between networks, new ship types and aliens, tokenized goods, hidden information with ZK proofs, invite-only cubes, star-system weapons, Minerva's hidden agenda, planet maintenance, vanity upgrades, alignment, corporate taxes; client extras (soundtrack folders, re-skinning, ENS names)
 
 ## Open questions
 
-Round 2 (asked 2026-11-06): Fable's research; how contracts upgrade; wallet-only play; the exploration commit-reveal; what counts as critical mass; the feature tiers; revising the spiral; region views; terraforming's place.
+Round 3 (asked 2026-11-06): exploration in one approval; black hole portals; this run's feature list; the battle minimum.
+
+**Still open from round 2:** Q15, exploration without two approvals (reworked as round 3's first question); Q13's Polkadot check (research running).
 
 ## Plan
 
