@@ -180,7 +180,7 @@ export default {
       let address = this.systemObjects[this.objectId].owner
 
       if (this.systemObjects[this.objectId]?.federation) return 'The Federation'
-      if (parseInt(address) === 0) return 'unclaimed'
+      if (!address) return 'unclaimed'
 
       let name = '[' + address.replace(address.substring(5, 40), '...') + ']'
 

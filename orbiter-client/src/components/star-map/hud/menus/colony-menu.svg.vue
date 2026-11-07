@@ -26,9 +26,9 @@
           >
             <rect
               x="-34"
-              y="-11"
+              y="-14"
               width="68"
-              height="22"
+              height="28"
               rx="4"
               ry="4"
               :fill="page === tab.key ? '#5D1EB0' : '#2e0d56'"
@@ -73,16 +73,16 @@
           <g
             v-for="(row, index) in storage"
             :key="row.good"
-            :transform="'translate(' + (index % 2 ? 5 : -175) + ' ' + Math.floor(index / 2) * 22 + ')'"
+            :transform="'translate(' + (index % 2 ? 5 : -175) + ' ' + Math.floor(index / 2) * 28 + ')'"
             class="can-click"
             font-size="0.75em"
             @click="chooseGood(row.good)"
           >
             <rect
               x="0"
-              y="-9"
+              y="-12"
               width="170"
-              height="18"
+              height="24"
               rx="3"
               :fill="good === row.good ? '#5D1EB0' : '#2e0d56'"
               stroke="#ffffff44"
@@ -93,10 +93,11 @@
               >{{ row.stored.toLocaleString('en-US') }} · {{ row.aboard }} aboard</text
             >
           </g>
-          <text x="0" y="98" text-anchor="middle" font-size="0.7em" fill="#ffffff88">
-            Holds up to {{ player.rules.storageCap.toLocaleString('en-US') }} of each good
+          <text x="0" y="110" text-anchor="middle" font-size="0.7em" fill="#ffffff88">
+            In storage · aboard your ship. Storage holds up to
+            {{ player.rules.storageCap.toLocaleString('en-US') }} of each good; choose one to move it.
           </text>
-          <g v-if="good != null" transform="translate(0 135)">
+          <g v-if="good != null" transform="translate(0 150)">
             <amount-dial v-model:value="deliver" :label="'Deliver ' + goodName(good)" :max="maxDeliver" />
             <g transform="translate(0 62)">
               <menu-button :enabled="deliver > 0" :text="'Deliver ' + deliver" @buttonclick="doDeliver" />
@@ -162,20 +163,57 @@
           <g :transform="'translate(0 ' + (40 + factory.queue.length * 14) + ')'">
             <text x="0" y="0" text-anchor="middle">Finished parts</text>
             <text v-if="!finished.length" x="0" y="18" text-anchor="middle" fill="#ffffff88" font-size="0.9em">None yet</text>
-            <g v-for="(row, i) in finished" :key="row.part" :transform="'translate(0 ' + (20 + i * 26) + ')'">
+            <g v-for="(row, i) in finished" :key="row.part" :transform="'translate(0 ' + (22 + i * 30) + ')'">
               <text x="-170" y="0" font-size="0.9em">{{ row.count }} × {{ row.name }}</text>
               <g class="can-click" transform="translate(60 0)" @click="doFitPlanet(row)">
-                <rect x="-40" y="-10" width="80" height="20" rx="4" fill="#3d1273" stroke="#ffffff44" />
+                <rect x="-40" y="-13" width="80" height="26" rx="4" fill="#3d1273" stroke="#ffffff44" />
                 <text x="0" y="0" text-anchor="middle" font-size="0.85em">Install</text>
               </g>
               <g v-if="row.part < 7" class="can-click" transform="translate(140 0)" @click="doFitShip(row)">
-                <rect x="-36" y="-10" width="72" height="20" rx="4" fill="#3d1273" stroke="#ffffff44" />
+                <rect x="-36" y="-13" width="72" height="26" rx="4" fill="#3d1273" stroke="#ffffff44" />
                 <text x="0" y="0" text-anchor="middle" font-size="0.85em">To ship</text>
               </g>
             </g>
           </g>
           <g transform="translate(0 330)">
-            <menu-button :enabled="factory.queue.length < 5" text="Order Parts" @buttonclick="doOrder" />
+            <menu-button :enabled="factory.queue.length < 5" text="Order Parts" @buttonclick="openOrders" />
+          </g>
+        </g>
+
+        <!-- Ordering: the Autofactory's parts, what each takes, and how many to queue -->
+        <g v-if="page === 'order'" transform="translate(0 105)" font-size="0.8em">
+          <g
+            v-for="(row, index) in orderable"
+            :key="row.id"
+            :transform="'translate(0 ' + index * 26 + ')'"
+            class="can-click"
+            @click="choosePart(row.id)"
+          >
+            <rect
+              x="-175"
+              y="-12"
+              width="350"
+              height="24"
+              rx="4"
+              :fill="part === row.id ? '#5D1EB0' : '#2e0d56'"
+              stroke="#ffffff44"
+              stroke-width="0.75"
+            />
+            <text x="-165" y="0">{{ row.name }}</text>
+            <text x="165" y="0" text-anchor="end">{{ row.price }}¢ · {{ row.time }}</text>
+          </g>
+          <g v-if="part != null" transform="translate(0 250)">
+            <amount-dial v-model:value="count" :label="'How many ' + partPlural(partName)" :max="20" />
+            <text x="0" y="50" text-anchor="middle" font-size="0.8em" fill="#ffffffaa">{{ orderNeeds }}</text>
+            <text x="0" y="68" text-anchor="middle" font-size="0.85em" :fill="orderProblem ? PINK : '#ffffff'">
+              {{ orderProblem || orderTotal }}
+            </text>
+            <g transform="translate(0 100)">
+              <menu-button :enabled="!orderProblem" :text="'Order ' + count" @buttonclick="placeOrder" />
+            </g>
+          </g>
+          <g transform="translate(0 390)">
+            <menu-button text="Back" @buttonclick="page = 'factory'" />
           </g>
         </g>
 
@@ -200,9 +238,9 @@ import { useStarMapStore } from '@/stores/starmap'
 import { useGameStateStore } from '@/stores/gamestate'
 import { useUIStore } from '@/stores/ui'
 import { usePlayerStore } from '@/stores/player'
-import { useDialogStore } from '@/stores/dialog'
 import { planetTypeName } from '@/sdk/game/planet-types'
 import { BUILDING_NAMES } from '@/sdk/client'
+import { partPlural } from '@/sdk/parts'
 import { YELLOW, PINK } from '@/libs/palette'
 import MenuContainer from './menu-container/_menu-container.svg'
 import MenuButton from './menu-button.svg'
@@ -236,6 +274,9 @@ export default {
       good: null,
       deliver: 0,
       collect: 0,
+      /** the part being ordered, and how many */
+      part: null,
+      count: 1,
       BUILDING_NAMES,
       YELLOW,
       PINK
@@ -319,10 +360,46 @@ export default {
       const d = this.player.defenses[this.planet.id]
       if (!d) return []
       return DEFENSES.filter(([key]) => d[key] > 0).map(([key, name]) => ({ name, count: d[key] }))
+    },
+    /** The Autofactory's parts: what each takes from storage and in credits, and how long it builds. */
+    orderable() {
+      return this.player.rules.parts.map((p, id) => ({
+        id,
+        name: p.name,
+        price: p.credits.toLocaleString('en-US'),
+        time: p.time >= 3600 ? `${+(p.time / 3600).toFixed(1)} h` : `${Math.round(p.time / 60)} min`
+      }))
+    },
+    partName() {
+      return this.part == null ? '' : this.player.rules.parts[this.part].name
+    },
+    /** What each one takes from the planet's storage. */
+    orderNeeds() {
+      const p = this.player.rules.parts[this.part]
+      const goods = p.goods.map(([good, amount]) => `${amount} ${this.goods[good].toLowerCase()}`)
+      return goods.length ? `Each takes ${goods.join(' and ')} from storage` : 'Takes no goods'
+    },
+    orderTotal() {
+      const p = this.player.rules.parts[this.part]
+      const goods = p.goods.map(([good, amount]) => `${amount * this.count} ${this.goods[good].toLowerCase()}`)
+      return [`Total ${(p.credits * this.count).toLocaleString('en-US')}¢`, ...goods].join(' · ')
+    },
+    /** Why the order can't be placed yet, or null. */
+    orderProblem() {
+      if (this.part == null || this.count < 1) return 'Choose how many'
+      if (this.factory.queue.length >= 5) return 'The Autofactory already has five orders'
+      const p = this.player.rules.parts[this.part]
+      if (p.credits * this.count > this.player.credits) return `Not enough credits: ${(p.credits * this.count).toLocaleString('en-US')}¢`
+      for (const [good, amount] of p.goods) {
+        if ((this.planet.stock[good] ?? 0) < amount * this.count)
+          return `Needs ${amount * this.count} ${this.goods[good].toLowerCase()} in storage`
+      }
+      return null
     }
   },
   methods: {
     planetTypeName,
+    partPlural,
     goodName(good) {
       return this.goods[good]
     },
@@ -371,26 +448,22 @@ export default {
       this.o8audio.playEffect('click')
       this.player.fitShip(this.planet.id, row.part, 1)
     },
-    async doOrder() {
+    openOrders() {
       this.o8audio.playEffect('click')
-      const dialog = useDialogStore()
-      const parts = this.player.rules.parts
-      const list = parts.map((p, i) => `${i + 1} ${p.name} (${p.credits.toLocaleString('en-US')}¢)`).join(', ')
-      const which = await dialog.ask({
-        title: 'Order Parts',
-        message: `Which part? ${list}.`,
-        input: { label: 'Part number', kind: 'number', min: 1, max: parts.length },
-        confirm: 'Next'
-      })
-      if (!which) return
-      const part = which - 1
-      const count = await dialog.ask({
-        title: 'Order ' + parts[part].name,
-        message: `${parts[part].credits.toLocaleString('en-US')}¢ each, paid now; the Autofactory builds them in turn.`,
-        input: { label: 'How many', kind: 'number', min: 1, max: 99, value: '1' },
-        confirm: 'Order'
-      })
-      if (count) this.player.order(this.planet.id, part, count)
+      this.page = 'order'
+    },
+    choosePart(part) {
+      this.o8audio.playEffect('click')
+      this.part = part
+      this.count = 1
+    },
+    async placeOrder() {
+      this.o8audio.playEffect('click')
+      if (await this.player.order(this.planet.id, this.part, this.count)) {
+        this.part = null
+        this.count = 1
+        this.page = 'factory'
+      }
     },
     openTechTree() {
       this.o8audio.playEffect('click')

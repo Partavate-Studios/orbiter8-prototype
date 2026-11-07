@@ -61,11 +61,10 @@ export function bindStoresToGame(game) {
         chain.balance = state.balance
         break
       case 'contracts':
-        chain.galaxyAddress = state.contracts.game
-        chain.avatarAddress = state.contracts.avatars
-        chain.planetTokenAddress = state.contracts.planetToken
-        chain.shipTokenAddress = state.contracts.shipToken
-        chain.creditTokenAddress = state.contracts.creditToken
+        chain.contracts = { ...state.contracts }
+        chain.planetTokenAddress = state.contracts.deeds
+        chain.shipTokenAddress = state.contracts.ships
+        chain.creditTokenAddress = state.contracts.credits
         break
       case 'balance':
         chain.balance = state.balance

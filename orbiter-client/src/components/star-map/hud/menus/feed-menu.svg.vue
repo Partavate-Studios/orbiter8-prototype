@@ -8,8 +8,8 @@
         <text v-if="!player.feed.length" x="0" y="50" text-anchor="middle" font-size="0.85em" fill="#ffffff88">
           Quiet across the galaxy. No sieges yet.
         </text>
-        <g v-for="(e, i) in shown" :key="i" :transform="'translate(0 ' + (45 + i * 22) + ')'" font-size="0.8em">
-          <rect x="-175" y="-10" width="350" height="20" rx="4" fill="#2e0d56" stroke="#ffffff22" />
+        <g v-for="(e, i) in shown" :key="i" :transform="'translate(0 ' + (45 + i * 26) + ')'" font-size="0.8em">
+          <rect x="-175" y="-12" width="350" height="24" rx="4" fill="#2e0d56" stroke="#ffffff22" />
           <text x="-165" y="0" :fill="e.event === 'SiegeEnded' ? '#c3b3da' : PINK_LIGHT">{{ words(e) }}</text>
         </g>
       </g>

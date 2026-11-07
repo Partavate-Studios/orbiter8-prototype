@@ -46,6 +46,9 @@
           <g v-for="(action, i) in actions" :key="action.text" :transform="'translate(0 ' + i * 50 + ')'">
             <menu-button :enabled="action.enabled" :text="action.text" @buttonclick="action.run" />
           </g>
+          <text :y="actions.length * 50 + 2" text-anchor="middle" font-size="0.75em" fill="#ffffff88">
+            Rounds count once recorded; any move at this star records them too.
+          </text>
         </g>
       </g>
     </menu-container>

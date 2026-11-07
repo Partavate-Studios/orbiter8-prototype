@@ -33,11 +33,11 @@ export const useChainStore = defineStore('Chain', {
     contractsLoaded: false,
     /** Binding the contracts failed (the network's node didn't answer); the player can retry. */
     contractsFailed: false,
+    /** The game's contracts on this network, by module (sdk/chain/networks.js). */
+    contracts: {},
     creditTokenAddress: null,
     shipTokenAddress: null,
     planetTokenAddress: null,
-    avatarAddress: null,
-    galaxyAddress: null,
     chainId: 0,
     account: null,
     currentBlockId: 0,
@@ -187,7 +187,7 @@ export const useChainStore = defineStore('Chain', {
           type: 'ERC20',
           options: {
             address: this.creditTokenAddress,
-            symbol: 'OBTR8',
+            symbol: 'O8C',
             decimals: 0,
             image: 'https://orbiter8.com/tokens/orbiter-8-credits.png'
           }

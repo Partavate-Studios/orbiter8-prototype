@@ -70,7 +70,7 @@
           <circle :r="star.r" :fill="MAP.hole" />
         </template>
         <circle v-else :r="star.r" :fill="star.color" :opacity="star.visited ? 1 : 0.65" />
-        <circle :r="Math.max(star.r + 6, 12)" fill="transparent" />
+        <circle :r="Math.max(star.r + 6, touch ? 18 : 12)" fill="transparent" />
         <text :y="star.r + 13" class="name">{{ star.name }}</text>
       </g>
       <g v-if="shipPoint" :transform="`translate(${shipPoint.x} ${shipPoint.y - 16}) scale(2.2)`" class="ship">

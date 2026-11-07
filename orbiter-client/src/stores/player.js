@@ -105,7 +105,7 @@ export const usePlayerStore = defineStore('Player', {
     // ── moves, each shown in the transaction tray ───────────────────────────────────────────────
     startSession() {
       return track(
-        { doing: 'Starting a session', done: 'Session started: no wallet popups for a while', failed: "Couldn't start a session" },
+        { doing: 'Starting a session', done: 'Session started: no wallet popups for 4 hours', failed: "Couldn't start a session" },
         (o) => game.actions.startSession(o)
       )
     },

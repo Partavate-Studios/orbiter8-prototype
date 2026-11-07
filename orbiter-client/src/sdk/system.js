@@ -55,7 +55,7 @@ export function objectKey(type, { id, planet }) {
  * - star: size, birth
  * - planet: size, class, rings, orbitalPosition, hasStation, stationKey, stationName,
  *   moons ([{ moonId: key, moonName }])
- * - station: size, inventory, prices (see sdk/chain/decode decodeStation)
+ * - station: size, goods (what the port sells and buys, sdk/game/trade.js), yard, armory
  * - moon: size, class, orbitalPosition, planet (the planet's id)
  * - ship: location (system id)
  */
@@ -69,7 +69,7 @@ export function objectKey(type, { id, planet }) {
 export function buildSystem(system, playerAccount) {
   const objects = {}
   const keys = { planets: [], moons: [], stations: [], ships: [] }
-  const ownerName = (owner, fallback) => (owner > 0 ? system.avatarNames[owner] : fallback)
+  const ownerName = (owner, fallback) => (owner ? system.avatarNames[owner] : fallback)
   const add = (type, fields) => {
     const object = {
       type,

@@ -101,7 +101,7 @@ export default {
     },
     ownerName() {
       let address = this.ship.owner
-      if (parseInt(address) === 0) return 'unclaimed'
+      if (!address) return 'Unknown'
       let name = '[' + address.replace(address.substring(5, 40), '...') + ']'
       if (typeof this.players[address] !== 'undefined') {
         name = this.players[address] + ' ' + name

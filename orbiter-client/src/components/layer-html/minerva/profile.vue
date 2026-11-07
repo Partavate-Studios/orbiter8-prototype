@@ -30,7 +30,7 @@
       ><br />
     </div>
     <br />
-    There are <b>{{ gameState.avatarCount }}</b> total avatars and <b>{{ gameState.systemCount }}</b> known star
+    There are <b>{{ gameState.avatarCount }}</b> pilots and <b>{{ gameState.starSystemCount }}</b> known star
     systems.
   </div>
 </template>

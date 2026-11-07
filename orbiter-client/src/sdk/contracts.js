@@ -318,6 +318,11 @@ export function createGame(runner, addresses) {
         .reverse()
     },
 
+    /** How many stars pilots have discovered so far (Galaxy's Discovered events), not counting Sol. */
+    async discoveries() {
+      return (await galaxy.queryFilter(galaxy.filters.Discovered(), 0)).length
+    },
+
     /** Every registered pilot's address (lowercase), oldest first, from the registrations. */
     async pilotList() {
       const logs = await pilots.queryFilter(pilots.filters.Registered(), 0)

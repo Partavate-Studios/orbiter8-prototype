@@ -52,4 +52,3 @@ export async function getNativeBalance() {
   return formatEther(await provider.getBalance(account))
 }
 
-/** The AvatarControls contract: player names. Method names match the ABI. */

@@ -47,7 +47,7 @@
         <dt>Galaxy</dt>
         <dd v-if="gameDataLoaded">{{ gameState.avatarCount }} pilots, {{ gameState.starSystemCount }} star systems</dd>
         <dd v-else>Loading…</dd>
-        <template v-for="contract in contracts" :key="contract.label">
+        <template v-for="contract in contractList" :key="contract.label">
           <dt>{{ contract.label }}</dt>
           <dd>
             <a
@@ -115,11 +115,7 @@ export default {
       'account',
       'balance',
       'contractsLoaded',
-      'galaxyAddress',
-      'avatarAddress',
-      'creditTokenAddress',
-      'planetTokenAddress',
-      'shipTokenAddress'
+      'contracts'
     ]),
     ...mapState(useGameStateStore, ['gameDataLoaded', 'gameState']),
     currentNetwork() {
@@ -137,14 +133,21 @@ export default {
     balanceText() {
       return `${Number(this.balance).toFixed(4)} ${this.currency}`
     },
-    contracts() {
-      return [
-        { label: 'Game', address: this.galaxyAddress },
-        { label: 'Avatars', address: this.avatarAddress },
-        { label: 'Credits', address: this.creditTokenAddress },
-        { label: 'Planet NFTs', address: this.planetTokenAddress },
-        { label: 'Ship NFTs', address: this.shipTokenAddress }
-      ].filter((contract) => contract.address)
+    /** The game's modules on this network, in the order a player would look for them. */
+    contractList() {
+      const labels = [
+        ['galaxy', 'Galaxy'],
+        ['pilots', 'Pilots'],
+        ['market', 'Market'],
+        ['planets', 'Planets'],
+        ['factory', 'Autofactory'],
+        ['battle', 'Battle'],
+        ['armory', 'Armory'],
+        ['credits', 'Credits'],
+        ['ships', 'Ship NFTs'],
+        ['deeds', 'Planet NFTs']
+      ]
+      return labels.map(([key, label]) => ({ label, address: this.contracts[key] })).filter((c) => c.address)
     },
     allNetworks() {
       return networks

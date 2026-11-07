@@ -8,15 +8,6 @@ import { BLACK_HOLE_ENTRY_MS } from '@/constants'
 /** Shows a transaction's progress in the tray (stores/transactions.js). */
 const track = (words, send) => useTransactionsStore().track(words, send)
 
-/** Waits for a player action; if it fails, logs why (the revert reason when there is one). */
-async function logFailure(what, action) {
-  try {
-    await action
-  } catch (error) {
-    console.error(what + ' failed:', error.shortMessage ?? error.message)
-  }
-}
-
 export const useGameStateStore = defineStore('GameState', {
   state: () => ({
     gameDataLoading: false,
@@ -70,13 +61,7 @@ export const useGameStateStore = defineStore('GameState', {
     loadEvents() {
       return game.refreshEvents()
     },
-    /** player actions */
-    async createAvatar(name) {
-      await logFailure('Avatar creation', game.actions.createAvatar(name))
-    },
-    async launchShip(name) {
-      await logFailure('Ship launch', game.actions.launchShip(name))
-    },
+    /** player actions (registering is stores/onboarding.js; the pilot's own moves are stores/player.js) */
     /**
      * Jumps the player's ship to a neighboring system. The jump animation starts as soon as the wallet
      * has sent the move (committed, not yet mined) and plays until the new system loads (StarMap
@@ -141,12 +126,6 @@ export const useGameStateStore = defineStore('GameState', {
       return track(
         { doing: 'Claiming ' + name, done: name + ' is yours', failed: "Couldn't claim " + name },
         (options) => game.actions.claimPlanet(planetId, name, options)
-      )
-    },
-    buildStation({ planetId, name }) {
-      return track(
-        { doing: 'Building ' + name, done: name + ' is open for trade', failed: "Couldn't build " + name },
-        (options) => game.actions.buildStation(planetId, name, options)
       )
     },
     /** `amounts`: units by good id (+ buy, - sell). */

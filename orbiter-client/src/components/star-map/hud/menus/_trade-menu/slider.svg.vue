@@ -69,6 +69,7 @@
       <g :transform="'translate(' + (sliderLeft + placement) + ' 0) scale(1.5)'"><slider-arrow /></g>
     </g>
 
+    <!-- The arrow buttons: drawn 16 wide, but a thumb-sized area round each takes the tap. -->
     <g :opacity="opacityLeft">
       <g :transform="'translate(' + (sliderWidth / -2 - 16) + ' 0) rotate(180)'" opacity="0.5"><slider-arrow /></g>
       <rect
@@ -82,6 +83,14 @@
         stroke="#ffffff44"
         stroke-width="0.5"
         fill="#ffffff22"
+        class="can-click"
+      />
+      <rect
+        :x="sliderWidth / -2 - 30"
+        y="-15"
+        width="30"
+        height="30"
+        fill="transparent"
         class="can-click"
         @click="decrementSlider"
       />
@@ -101,10 +110,12 @@
         stroke-width="0.5"
         fill="#ffffff22"
         class="can-click"
-        @click="incrementSlider"
       />
+      <rect :x="sliderWidth / 2" y="-15" width="30" height="30" fill="transparent" class="can-click" @click="incrementSlider" />
     </g>
 
+    <!-- Dragging: pointer events, so a finger works as well as a mouse; the pointer is captured, so a
+         drag that leaves the bar keeps going. -->
     <g>
       <rect
         ref="touchArea"
@@ -117,10 +128,10 @@
         fill="#00000000"
         class="can-drag"
         :class="{ 'is-dragging': mouseHold }"
-        @mousedown.stop="handleMouseDown"
-        @mouseup.stop="handleMouseUp"
-        @mousemove.stop="handleMouseMove"
-        @mouseleave="handleMouseLeave"
+        @pointerdown.stop="handlePointerDown"
+        @pointerup.stop="handlePointerUp"
+        @pointercancel.stop="handlePointerUp"
+        @pointermove.stop="handlePointerMove"
       />
     </g>
   </g>
@@ -207,29 +218,26 @@ export default {
     }
   },
   methods: {
-    handleMouseDown(event) {
+    handlePointerDown(event) {
       this.mouseHold = true
+      event.currentTarget.setPointerCapture?.(event.pointerId)
       this.updateSlider(event)
     },
-    handleMouseUp() {
+    handlePointerUp(event) {
+      if (!this.mouseHold) return
       this.mouseHold = false
+      event.currentTarget.releasePointerCapture?.(event.pointerId)
     },
-    handleMouseMove: _.throttle(function (event) {
+    handlePointerMove: _.throttle(function (event) {
       if (this.mouseHold) {
         this.updateSlider(event)
       }
     }, 2),
-    handleMouseLeave(event) {
-      if (this.mouseHold) {
-        this.updateSlider(event)
-        this.mouseHold = false
-      }
-    },
     updateSlider(event) {
       let boxLeft = parseInt(this.$refs.sliderLine.getBoundingClientRect().left)
       let boxRight = parseInt(this.$refs.sliderLine.getBoundingClientRect().right)
       let width = boxRight - boxLeft
-      let percentage = Math.max(0, Math.min(1, (event.pageX - boxLeft) / width))
+      let percentage = Math.max(0, Math.min(1, (event.clientX - boxLeft) / width))
       if (this.reverse) {
         percentage = 1 - percentage
       }

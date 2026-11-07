@@ -14,15 +14,15 @@
           <g
             v-for="(row, index) in parts"
             :key="row.id"
-            :transform="'translate(0 ' + index * 26 + ')'"
+            :transform="'translate(0 ' + index * 30 + ')'"
             class="can-click"
             @click="choose(row.id)"
           >
             <rect
               x="-175"
-              y="-11"
+              y="-13"
               width="350"
-              height="22"
+              height="26"
               rx="4"
               :fill="part === row.id ? '#5D1EB0' : '#2e0d56'"
               stroke="#ffffff44"
@@ -34,8 +34,8 @@
           </g>
         </g>
 
-        <g v-if="part != null" transform="translate(0 270)">
-          <amount-dial v-model:value="count" :label="'How many ' + partName" :max="20" />
+        <g v-if="part != null" transform="translate(0 300)">
+          <amount-dial v-model:value="count" :label="'How many ' + partPlural(partName)" :max="20" />
           <text x="0" y="62" text-anchor="middle" font-size="0.85em" :fill="affordable ? '#ffffff' : '#ffffff88'">
             {{ affordable ? 'Total' : 'Insufficient funds' }}: {{ total.toLocaleString('en-US') }}&cent;
           </text>
@@ -57,7 +57,7 @@ import { usePlayerStore } from '@/stores/player'
 import MenuContainer from './menu-container/_menu-container.svg'
 import MenuButton from './menu-button.svg'
 import AmountDial from './widgets/amount-dial.svg'
-import { SHIP_PARTS, mountsUsed } from '@/sdk/parts'
+import { SHIP_PARTS, mountsUsed, partPlural } from '@/sdk/parts'
 
 export default {
   name: 'ArmoryMenu',
@@ -117,6 +117,7 @@ export default {
   },
   methods: {
     ...mapActions(useUIStore, ['closeMenu']),
+    partPlural,
     choose(part) {
       this.o8audio.playEffect('click')
       this.part = part

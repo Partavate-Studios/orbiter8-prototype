@@ -3,16 +3,15 @@
        it unlocks, read from the contracts, so nobody has to find out by trial and error. -->
   <div class="backdrop" @click.self="$emit('close')">
     <article class="tree" role="dialog" aria-label="Tech tree">
+      <div class="inside">
       <header>
-        <h3>Tech tree</h3>
+        <h3 class="title">Tech Tree</h3>
         <button class="close" aria-label="Close" @click="$emit('close')">×</button>
       </header>
       <p class="sub">
-        Claim a planet ({{ rules.claimFee.toLocaleString() }}¢, your ship at its star), bring people from Earth ({{
-          rules.colonistPrice
-        }}
-        ¢ each, 100 to a hold) and goods, then build up the line. Credits are spent when a building starts; goods come
-        from the planet's storage.
+        Claim a planet ({{ rules.claimFee.toLocaleString() }}¢, with your ship at its star). Bring people from Earth
+        ({{ rules.colonistPrice }}¢ each, 100 to a hold) and goods, then build up the line. Credits are spent when a
+        building starts; goods come from the planet's storage.
       </p>
 
       <ol class="line">
@@ -40,7 +39,8 @@
           </tr>
         </tbody>
       </table>
-      <p class="sub">Parts are fitted to planets and ships with battle, in the next milestone.</p>
+      <p class="sub">Finished parts wait in the Factory page: install them on the planet, or fit them to your ship.</p>
+      </div>
     </article>
   </div>
 </template>
@@ -102,24 +102,49 @@ export default {
   place-items: center;
   z-index: 5;
 }
+/* The card's frame, as the in-game dialog draws it (game-dialog.vue): the striped purple edge, the
+   wide rounded corners and the title pill. */
 .tree {
   width: min(94vw, 40em);
   max-height: 88vh;
-  overflow-y: auto;
-  background: #12052af5;
-  border: 1px solid #c3b3da55;
-  border-radius: 12px;
-  padding: 1em 1.3em;
+  padding: 3px;
+  border-radius: 40px / 9px;
+  background: linear-gradient(135deg, #5c1aae 0%, #280b4b 10%, #5c1aae 50%, #280b4b 90%, #5c1aae 100%);
+  box-shadow: 0 1.2em 3em #0009;
   font-size: 14px;
   box-sizing: border-box;
   text-align: left;
+  display: flex;
+}
+.inside {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0.6em 1.3em 1.2em;
+  border: 1px solid #5b1aaa;
+  border-radius: 38px / 8px;
+  background: #12052ae6;
+  color: #e6dcf5;
 }
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.6em;
 }
-h3,
+.title {
+  flex: 1;
+  margin: 0;
+  padding: 0.3em 1em;
+  border: 1px solid #5b1aaa88;
+  border-radius: 40px / 12px;
+  background: linear-gradient(135deg, #5c1aae 0%, #280b4b 10%, #5c1aae 50%, #280b4b 90%, #5c1aae 100%);
+  color: #ffffff;
+  font-size: 1.1em;
+  font-weight: normal;
+  text-align: center;
+  text-shadow: 0 1px 3px #000a;
+}
 h4 {
   margin: 0;
   font-weight: 500;

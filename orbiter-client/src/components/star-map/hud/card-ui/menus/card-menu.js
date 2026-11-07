@@ -57,7 +57,7 @@ function pilotMenu(object, d, marketName) {
       const sol = Math.floor(object.objectId / 256) === 0
       const siege = d.siegeAt(object.objectId)
       if (sol && object.objectId === SOL_EARTH) add('Recruit Colonists', 'recruit')
-      if (!sol && parseInt(object.owner) === 0) {
+      if (!sol && !object.owner) {
         add(`Claim Planet (${d.claimFee.toLocaleString('en-US')}¢)`, 'claim', d.credits >= d.claimFee, object.objectId)
       } else if (object.isMine) {
         add('Colony', 'colony', true, object.objectId)

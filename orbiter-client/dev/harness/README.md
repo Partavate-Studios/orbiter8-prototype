@@ -35,7 +35,7 @@ the address in `ACCOUNT`. `npm run build:local` builds a production bundle that 
 | `explore-bot.mjs [moves] [account] [out.json]` | (`npm run local` running) a pilot that explores outward from Sol in Node, carrying scan proofs along with its moves, and logs each move's gas. |
 | `trade-bot.mjs [moves] [account] [out.json]` | A pilot that starts a session key, then trades at Sol and fits bays with it, logging each action's gas. |
 | `fake-gamepad.js` | Load with `PRELOAD=dev/harness/fake-gamepad.js`: replaces the browser's gamepads with one the steps can press (`eval:__pad.press(0)`, `__pad.hold(7, 1)`, `__pad.stick(0, 1)`, `__pad.release()`). |
-| `explore.mjs <url> <outdir> [steps…]` | The driver the others use. Steps: `wait:ms`, `click:text`, `clickxy:x,y`, `move:x,y` (hover), `type:selector=value`, `key:k`, `wheel:deltaY:times` (over the center), `wheelat:x,y:deltaY:times`, `drag:x1,y1,x2,y2`, `pinch:x,y,fromDistance,toDistance` (two touches), `shot:name`, `offline:on` / `offline:off` (cuts the page's network), `eval:js`, `commit:Store/action=json`, `trace:name`, `idletrace:name`. |
+| `explore.mjs <url> <outdir> [steps…]` | The driver the others use. Steps: `wait:ms`, `click:text`, `clickxy:x,y`, `move:x,y` (hover), `type:selector=value`, `key:k`, `wheel:deltaY:times` (over the center), `wheelat:x,y:deltaY:times`, `drag:x1,y1,x2,y2`, `pinch:x,y,fromDistance,toDistance` (two touches), `tdrag:x1,y1,x2,y2` (one finger), `shot:name`, `offline:on` / `offline:off` (cuts the page's network), `eval:js`, `commit:Store/action=json`, `trace:name`, `idletrace:name`. |
 
 Example, from `orbiter-client/`:
 

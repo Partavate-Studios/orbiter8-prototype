@@ -25,19 +25,19 @@
             <tspan x="0" y="0">Nothing fitted: no weapons, armor or shields.</tspan>
             <tspan x="0" y="22">The I.S.S. armory sells them.</tspan>
           </text>
-          <g v-for="(row, i) in fitted" :key="row.part" :transform="'translate(0 ' + i * 24 + ')'">
+          <g v-for="(row, i) in fitted" :key="row.part" :transform="'translate(0 ' + i * 30 + ')'">
             <text x="-170" y="0">{{ row.count }} × {{ row.name }}</text>
             <text v-if="row.off" x="-20" y="0" :fill="PINK" font-size="0.85em">{{ row.off }} out of action</text>
             <text x="60" y="0" fill="#ffffff88" font-size="0.8em">{{ row.space }}</text>
             <g v-if="myPlanetHere" class="can-click" transform="translate(150 0)" @click="unload(row)">
-              <rect x="-26" y="-10" width="52" height="20" rx="4" fill="#3d1273" stroke="#ffffff44" />
+              <rect x="-30" y="-13" width="60" height="26" rx="4" fill="#3d1273" stroke="#ffffff44" />
               <text x="0" y="0" text-anchor="middle" font-size="0.8em">Unload</text>
             </g>
           </g>
           <text
             v-if="ship.rangeLost || ship.baysLost"
             x="0"
-            :y="fitted.length * 24 + 10"
+            :y="fitted.length * 30 + 10"
             text-anchor="middle"
             font-size="0.85em"
             :fill="PINK"

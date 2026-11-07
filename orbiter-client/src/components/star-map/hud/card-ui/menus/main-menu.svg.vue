@@ -125,7 +125,7 @@ export default {
             const go = await this.ask({
               title: 'Start a Session',
               message:
-                'One approval in your wallet, and your moves for the next few hours go through a key kept in this browser: no more popups. Some gas money travels with it, and comes back when you end the session.',
+                'Approve once. For the next 4 hours your moves go through a key kept in this browser, with no popups. It carries a little gas money; what is left comes back when you end the session.',
               confirm: 'Start Session'
             })
             if (go) this.player.startSession()
@@ -145,7 +145,7 @@ export default {
             await this.ask({
               title: 'Lay Siege to ' + object.name,
               message:
-                'A siege is public: everyone sees it in the feed. Rounds are fought every 30 minutes while your ship stays here. Wear the planet down, then file a claim; it completes a day later unless the defenses come back.',
+                'A siege is public, fought in rounds every 30 minutes while your ship stays here. Wear the planet down, then file a claim: it completes a day later unless the defenses come back.',
               confirm: 'Attack'
             })
           )

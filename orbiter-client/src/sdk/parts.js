@@ -10,5 +10,19 @@ export const SHIP_PARTS = [
   { id: 6, field: 'shields', space: '20 holds a level, up to 3' }
 ]
 
+/** A part's name in the plural, for counts ("How many railguns"). */
+const PLURALS = {
+  Railgun: 'railguns',
+  'Missile rack': 'missile racks',
+  'Point defense': 'point-defense turrets',
+  Drone: 'drones',
+  'Repair bot': 'repair bots',
+  'Armor plating': 'armor plates',
+  'Shield generator': 'shield levels',
+  'Orbital platform': 'orbital platforms',
+  BFG: 'BFGs'
+}
+export const partPlural = (name) => PLURALS[name] ?? name.toLowerCase() + 's'
+
 /** Weapon mounts in use (of 6): point defense 1, railguns and missile racks 2 each. */
 export const mountsUsed = (l) => l.pointDefense + 2 * l.railguns + 2 * l.missiles

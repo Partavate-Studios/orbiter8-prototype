@@ -166,6 +166,20 @@ for (const step of steps) {
     await page.mouse.down()
     await page.mouse.move(x2, y2, { steps: 20 })
     await page.mouse.up()
+  } else if (kind === 'tdrag') {
+    // tdrag:<x1>,<y1>,<x2>,<y2> drags one finger between two screen points (needs TOUCH=1).
+    const [x1, y1, x2, y2] = arg.split(',').map(Number)
+    const cdp = await page.createCDPSession()
+    await cdp.send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 2 })
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: x1, y: y1, id: 1 }] })
+    for (let i = 1; i <= 20; i++) {
+      await cdp.send('Input.dispatchTouchEvent', {
+        type: 'touchMove',
+        touchPoints: [{ x: x1 + ((x2 - x1) * i) / 20, y: y1 + ((y2 - y1) * i) / 20, id: 1 }]
+      })
+      await new Promise((r) => setTimeout(r, 16))
+    }
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
   } else if (kind === 'pinch') {
     // pinch:<x>,<y>,<from>,<to> two fingers around a screen point, spreading (or closing) from one
     // distance apart to another, in pixels.

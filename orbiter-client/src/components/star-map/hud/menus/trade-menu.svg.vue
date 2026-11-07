@@ -217,9 +217,9 @@
           >
             <rect
               x="-40"
-              y="-11"
+              y="-14"
               width="80"
-              height="22"
+              height="28"
               rx="4"
               ry="4"
               :fill="page === tab.key ? '#5D1EB0' : '#2e0d56'"

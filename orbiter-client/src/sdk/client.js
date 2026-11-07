@@ -129,6 +129,7 @@ export function createGameClient() {
   let keyGame = null // the session key's
   let keyWallet = null
   let pilots = [] // every registered pilot's address
+  let discovered = 0 // stars discovered so far, galaxy-wide (plus Sol: the count the title shows)
   let leaderboard = null
 
   const MAX_TIME_BETWEEN_RELOADS_MS = 2 * 60 * 1000
@@ -266,7 +267,7 @@ export function createGameClient() {
     }
     return { goods: state.economy.goods.map((g) => g.name), avatarCount: pilots.length, starSystemCount: starCount(), avatar }
   }
-  const starCount = () => [...state.cells.values()].filter((c) => c.state === STATE.STAR).length
+  const starCount = () => discovered + 1
 
   /**
    * The planet a pilot last traded at, if their ship is still at that star (`cell`), else null: where
@@ -750,20 +751,13 @@ export function createGameClient() {
       const { signer, provider } = getSession()
       if ((await provider.getCode(network.contracts.pilots)) === '0x') return false
       game = createGame(signer, network.contracts)
-      const c = network.contracts
-      state.contracts = {
-        game: c.pilots,
-        avatars: c.pilots,
-        planetToken: c.deeds,
-        shipToken: c.ships,
-        creditToken: c.credits,
-        ...c
-      }
-      ;[state.universe, state.economy, state.rules, pilots] = await Promise.all([
+      state.contracts = { ...network.contracts }
+      ;[state.universe, state.economy, state.rules, pilots, discovered] = await Promise.all([
         game.universe(),
         game.economy(),
         game.planetRules(),
-        game.pilotList()
+        game.pilotList(),
+        game.discoveries()
       ])
       notify('contracts')
       return true
@@ -828,7 +822,7 @@ export function createGameClient() {
     refreshPlayer() {
       setLoading('player', true)
       return attempt('player', async () => {
-        pilots = await game.pilotList()
+        ;[pilots, discovered] = await Promise.all([game.pilotList(), game.discoveries()])
         await loadPilot()
         state.player = playerShape()
         notify('player')
