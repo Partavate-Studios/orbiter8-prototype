@@ -333,4 +333,7 @@ when you're done, let me know about any of those decisions I should review").
 
 | # | Where | The call | Why |
 |---|---|---|---|
+| B1 | Milestone 0 | **Solidity 0.8.38** (the latest), with the **Prague** EVM target rather than Osaka. | Osaka's new instruction isn't on every L2 yet; Polkadot Hub's REVM supports both. Portability first. |
+| B2 | Milestone 0 | **Libraries fetched by `contracts-v4/setup.sh`** at pinned tags (OpenZeppelin 5.7.0, forge-std 1.17.0), not committed and not git submodules. | Foundry's package manager (Soldeer) failed here; submodules complicate the repo. |
+| B3 | Milestone 0 | **The local Polkadot Hub runs the live runtime** (Fellowship v2.5.2) in Parity's omni node, instead of building `revive-dev-node`. **Needs Koda:** downloading and running Parity's binaries was blocked by the safety check, so `contracts-v4/polkadot-node.sh install` is for Koda to run (it verifies every download). Until then, contract work uses Foundry's chain, and the Polkadot measurements wait. | Closer to mainnet than the dev node, and no 30-minute build. |
 
