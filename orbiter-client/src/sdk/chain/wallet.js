@@ -105,16 +105,34 @@ export function getSession() {
   return session
 }
 
-/** Requests account access and opens a session. Reloads the page if the wallet switches account or network. */
+/** Providers whose account and network changes are already watched (one set of listeners each). */
+const watched = new WeakSet()
+
+/**
+ * Requests account access and opens a session. Reloads the page if the wallet switches account or
+ * network, so every store starts over on the new one. A wallet's 'disconnect' (it lost its own
+ * connection to the chain) is not a reason to reload: the block watcher reports lost contact and
+ * recovers by itself.
+ */
 export async function connectWallet(wallet) {
   const eip1193 = wallet.provider
   const accounts = await eip1193.request({ method: 'eth_requestAccounts' })
+  // Some wallets answer a declined request with an empty list instead of an error.
+  if (!Array.isArray(accounts) || !accounts.length) {
+    const declined = new Error('No account was shared.')
+    declined.code = 4001
+    throw declined
+  }
   const provider = new BrowserProvider(eip1193)
   const signer = await provider.getSigner(accounts[0])
   const { chainId } = await provider.getNetwork()
 
-  for (const event of ['accountsChanged', 'chainChanged', 'disconnect']) {
-    eip1193.on?.(event, () => location.reload())
+  if (!watched.has(eip1193)) {
+    watched.add(eip1193)
+    for (const event of ['accountsChanged', 'chainChanged']) {
+      eip1193.on?.(event, () => location.reload())
+    }
+    eip1193.on?.('disconnect', (error) => console.warn('The wallet lost its connection to the chain:', error?.message ?? error))
   }
 
   session = { wallet, provider, signer, account: signer.address, chainId: Number(chainId) }

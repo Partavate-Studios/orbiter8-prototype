@@ -13,7 +13,8 @@ asking him); and it gives where things stand, how to run and see the game, and w
 - Node 24: `source ~/.nvm/nvm.sh && nvm use 24`. Foundry is in `~/.foundry/bin`.
 - Play locally, from `orbiter-client/`: `npm run local`. It starts a fresh chain, deploys, and serves
   the game at http://localhost:8080 with a built-in dev wallet (no MetaMask). Add `?account=2`,
-  `?account=3`… for other pilots. Every start is a full reset.
+  `?account=3`… for other pilots. Every start is a full reset. `?wallet=browser` uses a real wallet
+  extension instead of the dev wallet, to try the connect flow.
 - **If Koda or another session may already be running it, use other ports:**
   `CHAIN_PORT=8546 UI_PORT=8092 npm run local`. Stop only your own processes, by PID: a broad
   `pkill -f "dev/local.js"` stops theirs too.

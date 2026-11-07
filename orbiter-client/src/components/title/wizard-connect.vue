@@ -26,6 +26,12 @@
           >. Approve the connection in its window.
         </p>
         <p class="hint">Don't see it? Click {{ walletName }}'s icon in your browser's toolbar.</p>
+        <template v-if="walletSlow">
+          <p class="problem" role="status">
+            {{ walletName }} hasn't answered. Its window may be hidden, or it may be waiting to be unlocked.
+          </p>
+          <p><button type="button" class="o8-button" @click="retry">Ask {{ walletName }} again</button></p>
+        </template>
       </template>
 
       <template v-else>
@@ -116,6 +122,7 @@ export default {
       'walletName',
       'walletError',
       'walletErrorKind',
+      'walletSlow',
       'networkName',
       'networkData',
       'chainId',
@@ -157,11 +164,15 @@ export default {
     clearInterval(this.balanceTimer)
   },
   methods: {
-    ...mapActions(useChainStore, ['chooseWallet', 'switchNetwork', 'initContracts']),
+    ...mapActions(useChainStore, ['chooseWallet', 'retryConnect', 'switchNetwork', 'initContracts']),
     ...mapActions(useOnboardingStore, ['loadNetworkStats']),
     connect(wallet) {
       this.o8audio.playEffect('click')
       this.chooseWallet(wallet)
+    },
+    retry() {
+      this.o8audio.playEffect('click')
+      this.retryConnect()
     },
     async switchTo(chainId) {
       this.o8audio.playEffect('click')

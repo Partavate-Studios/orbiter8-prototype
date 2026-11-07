@@ -7,8 +7,11 @@
       <pilot-card v-else :pilot-name="registration.name" />
 
       <template v-if="registration.status === 'confirm'">
-        <p>Confirm the registration in your wallet.</p>
-        <p class="hint">Don't see it? Click your wallet's icon in your browser's toolbar.</p>
+        <p v-if="kind === 'callsign'">Checking with Minerva that the call sign is free…</p>
+        <template v-else>
+          <p>Confirm the registration in your wallet.</p>
+          <p class="hint">Don't see it? Click your wallet's icon in your browser's toolbar.</p>
+        </template>
       </template>
 
       <template v-else-if="registration.status === 'sent'">

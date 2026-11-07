@@ -75,7 +75,7 @@ From `orbiter-client/`:
 npm run local
 ```
 
-This starts a fresh local chain, deploys the contracts to it, and opens the dev server at http://localhost:8080 with a built-in dev wallet. Add `?account=2`, `?account=3` … to the URL to play as other pilots (account 0 deployed the contracts). Stopping it resets the chain.
+This starts a fresh local chain, deploys the contracts to it, and opens the dev server at http://localhost:8080 with a built-in dev wallet. Add `?account=2`, `?account=3` … to the URL to play as other pilots (account 0 deployed the contracts). Stopping it resets the chain. Add `?wallet=browser` to use your own wallet extension instead of the dev wallet (point it at the local chain, chain id 31337), to try the real connect flow.
 
 Other client scripts: `npm run dev` (dev server, uses your browser wallet), `npm run build`, `npm run preview`, `npm run lint`, `npm test`, and `npm run abi` (copies the contracts' ABIs into the client after an interface change).
 

@@ -14,6 +14,13 @@ import { game } from '@/sdk/client'
 import { useConfigStore } from '@/stores/config'
 
 let blockPoller = null
+/** The wallet being connected to (raw: a provider object), for trying again. */
+let connectingWallet = null
+let slowTimer = null
+/** After this long waiting for the wallet's popup, the wizard offers a way to try again (ms). */
+const SLOW_CONNECT_MS = 15_000
+/** Wallets that announce late (an extension still loading) get this long, in all, before "none found" (ms). */
+const DISCOVERY_WAITS_MS = [300, 700, 2000]
 
 function switchFailure(error, networkName) {
   console.error('Switching networks failed:', error.shortMessage ?? error.message)
@@ -54,6 +61,8 @@ export const useChainStore = defineStore('Chain', {
     walletError: null,
     /** 'rejected' | 'pending' | 'other' (sdk/chain/wallet.js walletErrorKind) */
     walletErrorKind: null,
+    /** The wallet has had the connect request a while without answering (its popup may be hidden). */
+    walletSlow: false,
     /** The network has stopped answering (several block checks in a row failed); see checkForNewBlock. */
     connectionLost: false,
     /** When contact came back (Date.now()), for the tray's brief "back in contact". */
@@ -79,7 +88,12 @@ export const useChainStore = defineStore('Chain', {
      */
     async initWeb3() {
       this.walletStatus = 'searching'
-      const wallets = await discoverWallets()
+      // An extension that's still loading announces late: ask a few times before giving up.
+      let wallets = []
+      for (const waitMs of DISCOVERY_WAITS_MS) {
+        wallets = await discoverWallets(waitMs)
+        if (wallets.length) break
+      }
       if (wallets.length === 0) {
         this.walletStatus = 'none'
         return
@@ -93,23 +107,43 @@ export const useChainStore = defineStore('Chain', {
     defaultWallet() {
       return preferredWallet(this.wallets)
     },
-    /** Connects to the given EIP-6963 wallet; walletStatus tracks how it goes. */
+    /**
+     * Connects to the given EIP-6963 wallet; walletStatus tracks how it goes. The wallet's popup can
+     * sit unanswered (closed by accident, or behind another window) with no error ever coming back:
+     * after a while walletSlow turns on and the wizard offers to ask again.
+     */
     async chooseWallet(wallet) {
+      if (this.walletStatus === 'connected') return
+      connectingWallet = wallet
       this.walletError = null
       this.walletName = wallet.info.name
       // The wallet usually shows a popup now; until the player approves it, we wait here.
       this.walletStatus = 'connecting'
+      this.walletSlow = false
+      clearTimeout(slowTimer)
+      slowTimer = setTimeout(() => (this.walletSlow = true), SLOW_CONNECT_MS)
       try {
         await game.connect(wallet)
         rememberWallet(wallet)
         this.web3Loaded = true
         this.walletStatus = 'connected'
       } catch (error) {
+        // A later attempt took over (the player tried again): its outcome counts, not this one's.
+        if (connectingWallet !== wallet || this.walletStatus === 'connected') return
         console.error('Wallet connection failed:', error)
         this.walletError = error.shortMessage ?? error.message
         this.walletErrorKind = walletErrorKind(error)
         this.walletStatus = 'error'
+      } finally {
+        if (connectingWallet === wallet) {
+          clearTimeout(slowTimer)
+          this.walletSlow = false
+        }
       }
+    },
+    /** Asks the wallet again (its popup went unanswered). A request still open comes back as 'pending'. */
+    retryConnect() {
+      if (connectingWallet) return this.chooseWallet(connectingWallet)
     },
     /** Binds the game contracts on the connected network (addresses arrive through stores/game-bindings.js). */
     async initContracts() {
@@ -175,6 +209,12 @@ export const useChainStore = defineStore('Chain', {
             blockExplorerUrls: network.explorer.length ? network.explorer : undefined
           }
         ])
+      } catch (error) {
+        return switchFailure(error, network.name)
+      }
+      // Some wallets add a network without switching to it: ask once more, now that it's known.
+      try {
+        await walletRequest('wallet_switchEthereumChain', [{ chainId: network.hexId }])
         return null
       } catch (error) {
         return switchFailure(error, network.name)

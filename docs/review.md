@@ -313,6 +313,41 @@ Koda answered the list below in one sitting. Each answer, and the change it led 
   limit; only event reads go through `eth_getLogs`.
 - **T1, the trade slider's pointer events:** "Fine, keep it."
 
+## 7. The wallet connect flow (Koda, 2026-11-07: "super awkward")
+
+Read `sdk/chain/wallet.js`, the chain store, the onboarding store and the wizard against the
+intended flow (connect once, register, then one approval for a session key). Tried four paths in
+headless Chrome: the dev wallet; a plain injected wallet (the harness's) with `?wallet=browser`;
+a wallet whose popup is never answered; and no wallet at all. Fixed:
+
+- **W1. Nothing to do when the wallet's popup went unanswered.** A closed or hidden MetaMask
+  popup (or a locked wallet) left "Waiting for MetaMask" on screen for good: the request never
+  errors, and clicking Connect again only reopened the same screen. After 15 seconds the wizard
+  now says the wallet hasn't answered and offers "Ask MetaMask again"; a request still open in the
+  wallet comes back as "already has a request open: click its icon", as before.
+- **W2. The real flow couldn't be tried locally:** under `npm run local` the dev wallet is always
+  preferred, so the connect wizard is bypassed. `?wallet=browser` leaves the dev wallet out, so an
+  extension pointed at the local chain (chain id 31337) goes through the real steps. Documented in
+  `readme.md` and `CLAUDE.md`.
+- **W3. A wallet that announces late** (an extension still loading) was reported as "No wallet was
+  found… reload". Discovery now asks three times over about three seconds before giving up.
+- **W4. The wallet's `disconnect` event reloaded the page.** MetaMask fires it when it loses its own
+  connection to the chain, so a flaky RPC could reload the game in a loop, mid-move. It's logged
+  now; the block watcher already reports lost contact and recovers. Account and network changes
+  still reload (every store starts over on the new one). Listeners are set once per provider, not
+  once per attempt.
+- **W5. Adding a network didn't switch to it** in wallets that add without switching, leaving the
+  player on the network step with no message. After adding, the switch is asked for again.
+- **W6. The call-sign step said "Confirm the registration in your wallet"** for a moment, though
+  that step never touches the wallet (the name is checked free and held until the ship is named).
+  It says "Checking with Minerva that the call sign is free…".
+- **W7. A wallet answering a declined request with an empty account list** (some do, instead of an
+  error) now reads as "declined" rather than failing on an undefined account.
+
+Left as is: the returning-player auto-connect (no popup when the wallet already trusts the site);
+the funds step's six-second balance poll; the one-wallet / remembered-wallet shortcut on Begin.
+Not tried here: a real MetaMask (none in headless Chrome); `?wallet=browser` is for that.
+
 ## For Koda to decide
 
 Answered above, bar these:
