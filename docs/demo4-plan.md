@@ -94,6 +94,170 @@ Rounds 1–5 answered, except Q25 (contract tooling), which waits for the resear
 
 **Still open:** Q13's Polkadot check (research running).
 
-## Plan
+## Plan (draft, 2026-11-06; for Koda's review)
 
-To be written once the questions are settled.
+**Draft.** Written while the Polkadot research runs. Items marked **(proposed)** are Claude's
+proposals awaiting Koda's answer; items marked **(research)** wait on `docs/research/`. Nothing is
+built until Koda confirms the whole plan.
+
+### 1. Contract architecture
+
+- **Modules, each behind its own UUPS proxy** (D14) with ERC-7201 namespaced storage:
+
+  | Module | Owns |
+  |---|---|
+  | `Galaxy` | Cells and their states, the spiral, scans, black hole pairs, discoverers and star names, region views |
+  | `Pilots` | Call signs, the one ship per pilot (D26), ship location, holds, range, fitted parts, session keys |
+  | `Market` | The goods registry (D27), ports' stock and prices, trade, cargo-hold sales |
+  | `Planets` | Claims, the tech tree, colonists, production, planet defenses |
+  | `Battle` | Sieges, damage and repair, claims after a siege |
+  | Tokens | `Credits` (ERC-20), `Ships` and `Planets` (ERC-721, ships with on-chain SVG) |
+
+- **Modules call each other through narrow interfaces**, each guarded by a role (`GAME_MODULE`), so no module writes another's storage.
+- **Roles:** `UPGRADER` and `ADMIN` held by a multisig; no public setters (the review's High finding).
+- **Every state change emits an event** (siege feed, client updates, indexing). The ABI uses named return values.
+- **Tooling:** Foundry (proposed; Q25 waits on the research), Solidity 0.8.x latest, OpenZeppelin's upgradeable contracts.
+
+### 2. The galaxy
+
+**Cells.** Every hex cell has an index, counted outward from Sol (0) ring by ring (the prototype's
+scheme; integer-only math checked over 300,000 cells). A cell's state is 2 bits (undecided, empty,
+star, black hole), packed 128 cells per storage slot.
+
+**Derived, not stored (D8, D9).** From the universe seed and the cell index: a star's name, color,
+size and on-screen jitter; its planets (count, types, sizes, orbits); each planet's surface seed (D19).
+The client computes these with the same functions as the contract.
+
+**Stored per star, only when it happens:** visited, discovered by, renamed to, and a pending scan
+(the block number of the arriving jump).
+
+**Jumps (D10–D12).** A ship may jump to any star that is charted (decided as existing), not a
+black hole's far side, and within its range (hex distance ≤ range level, 1 to 4).
+
+**Arrival and the long-range scan (D21).**
+1. The jump moves the ship and records the block number for the star if it's a first arrival.
+2. One block later, the scan's outcome is fixed by that next block's hash. A view call shows it at once; nothing is written yet.
+3. The next transaction that touches the area writes the outcome (`resolveScan` runs inside jumps, trades and other moves). Usually that's the explorer's own next move.
+4. After the block-hash window (256 blocks, or more where EIP-2935 exists: research), an unwritten scan resolves from a fixed fallback seed.
+
+**What the scan decides (D6).** For each of the 6 neighbors still undecided: star, empty, or
+black hole. The number of new stars follows the prototype: mostly about 4 in total, more on a
+spiral arm, fewer in the void, nudged by how crowded the star you came from is. Inputs: the cell
+index, the universe seed, the spiral density, the origin's neighbor count, the explorer's address,
+and the hidden block hash. Later, ship traits (a scanner upgrade) can join them.
+
+**The spiral (D8, D16).** Two arms, settings fixed by the universe seed, revisable by an upgrade for
+uncharted space only. A cheap closed form replaces the prototype's sampling: the radial gap to
+the arm crossings on the point's own bearing, scaled by the arm's slope. It matches the prototype
+(median error 0.003 on a 0–1 scale) except within about 1.3 cells of Sol, where it measures to
+the arms' starting points instead; Sol's neighborhood is preset anyway.
+
+**Black holes (D17, D22, D28).** About 2% of new stars. When one is created, its partner cell is
+chosen at once and reserved as a black hole: 8 to 24 cells away, sampling a few candidate cells from
+the scan's randomness and taking the one deepest in the void with no charted star within 2 cells.
+Ships can jump to a black hole, orbit it, leave, or go through to its partner (two-way). Going
+through charts around the exit as a first arrival would. (Proposed: each trip risks minor damage to a
+ship system.)
+
+**Sol** is preset at cell 0 with its named planets and ports.
+
+**Region views (D18).** `region(center, radius ≤ 10)` returns every decided cell in the area with
+its state, discoverer, name if renamed, and visited flag. The client loads regions as the player pans.
+
+**Estimated cost:** about 100,000–200,000 gas per first arrival (6 packed cell writes, the
+discoverer, the math), against 2.5 million today. Measured in milestone 1.
+
+### 3. Pilots and the ship
+
+- **Call signs:** unique (case-insensitive), with on-chain rules (length, characters), and a fee to change. A name → pilot lookup replaces reading every callsign.
+- **One ship per pilot** (D26), an ERC-721. The pilot record holds its active ship, so fleets can come later.
+- **The ship:** location (star and orbit), holds, range level (1 to 4), fitted parts (weapons, armor, cargo pods), system damage.
+- **Session keys (proposed):** server-free and network-neutral. One transaction authorizes a key the browser generates, with an expiry, and sends it a little gas money; then that key can act for the pilot without wallet popups. The contracts check "the pilot, or the pilot's current session key".
+
+### 4. Market and trade
+
+- **The goods registry (D27):** eight goods to start, each with a base price and spread; ports and planet types refer to goods by id.
+- **Ports:** stock regrows lazily by timestamp, as now. Each planet type has its own mix of goods it sells and buys.
+- **Trade:** the ship must be at the port. Each trade carries a price limit per good, so a late transaction fails instead of trading at a surprise price. A purchase may spend the exact balance (`<=`).
+- **The port owner's cut** is taken from the trade, not newly minted.
+- **Holds** are bought at Yards, priced to the play-time targets (D29).
+
+### 5. Planets
+
+- **Derived planets** (D9); only ownership and what's built are stored.
+- **Claims:** the ship must be in the system; a fee (a credit sink). (Proposed: the discoverer gets a first-claim window, to keep the explorer's reward.)
+- **The linear tech tree:** Citadel, Colony, Station, Port, Yards, Armory. Each level costs goods, credits and build time.
+- **Colonists:** grow lazily toward a cap. Production follows population, lazily by timestamp.
+
+### 6. Battle (the minimum, D24)
+
+- **Ship weapons:** railguns, missiles and point defense, which counter one another; plus armor.
+- **Planet defenses:** bought at an Armory, installed on the planet and its moons.
+- **Sieges:** slow and public. The siege's progress is computed lazily from its start time, the attackers' loadout against the defenses, and the counters. Attacking ships take damage to specific systems.
+- **After a siege:** ships need a shipyard repair before attacking again. A worn-down planet can be claimed through Minerva after a 24-hour waiting period (D30), in which the owner can rally help.
+- **Timings (D30):** about an hour for an undefended planet, three days for a fully built one.
+- **(Open: details for the next round:** how defenders break a siege, what damage does to each system, how claims resolve if the owner fights back.)
+
+### 7. Graphics (D25, D33)
+
+- SVG, building on the modernize client.
+- The ship's look comes from parts: a railgun barrel, missile racks, point-defense turrets, armor plating, cargo pods, damage marks.
+- The same pieces assemble the on-chain SVG `tokenURI`, so the NFT matches the game.
+- **New views:** the hex galaxy map (zoomable, loading regions as you pan, stars jittered off the grid), black holes, the scan resolving, upgrades, planets' tech levels, and sieges.
+
+### 8. The client
+
+- A new SDK layer for the new contracts, behind the same `sdk/` shape as today.
+- The galaxy map replaces the neighbor view.
+- The system view uses derived planets.
+- The menus gain upgrades, building, defenses and sieges.
+- The client resolves scans for display with view calls.
+- The session-key flow.
+
+### 9. Economy and tuning (D29)
+
+- A simulator built on the play bot plays thousands of pilots against the real contracts, to set prices, rates and fees for the play-time targets. Koda approves the numbers.
+- Credit sinks: claim and name fees, repairs, buildings, holds, range upgrades.
+
+### 10. Milestones (D31; each ends with the play bot playing it, D32)
+
+1. [ ] **Foundation and galaxy:**
+   - [ ] modules and roles;
+   - [ ] the galaxy module: cells, scans, spiral, black holes, region views;
+   - [ ] events;
+   - [ ] the client's galaxy map.
+2. [ ] **Pilots and trade:**
+   - [ ] call signs and the ship;
+   - [ ] the goods registry, ports and trade, holds;
+   - [ ] range upgrades;
+   - [ ] credit sinks;
+   - [ ] the client's trading.
+3. [ ] **Planets:**
+   - [ ] claims;
+   - [ ] the tech tree;
+   - [ ] colonists and production;
+   - [ ] the client's planet menus.
+4. [ ] **Battle:**
+   - [ ] weapons and armor, defenses;
+   - [ ] sieges, damage and repair, claims;
+   - [ ] the siege feed;
+   - [ ] the client's battle views.
+5. [ ] **Graphics, NFTs and session keys:**
+   - [ ] ship parts;
+   - [ ] on-chain SVG;
+   - [ ] session keys;
+   - [ ] polish.
+6. [ ] **Testnets and the decision:**
+   - [ ] deploy to an L2 testnet and Polkadot Hub's testnet;
+   - [ ] run the play bot and simulator on both;
+   - [ ] update `cost-estimates.md`;
+   - [ ] decide the network with Koda.
+
+### 11. Still to settle before building
+
+- **Research:** UUPS on Polkadot Hub, tooling (Q25), the block-hash window, and timestamp rules there.
+- **Battle details** (section 6).
+- **Proposals awaiting Koda:**
+  - minor damage on black hole trips;
+  - session keys funded from the wallet;
+  - the discoverer's first-claim window.
