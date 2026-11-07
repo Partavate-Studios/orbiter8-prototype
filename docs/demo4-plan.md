@@ -305,10 +305,10 @@ impossible or needs a design call goes back to Koda; everything else is decided 
 - [ ] Tuning of building costs and times. *Starting values in place (B29); simulated with battle.*
 
 **Milestone 4: battle**
-- [ ] Weapons, armor, shields, repair bots and platforms as parts and buildings.
-- [ ] `Battle`: sieges, lazy resolution, counters, the BFG, damage and retreat, repairs, claims, and the siege feed.
+- [x] Weapons, armor, shields, repair bots and platforms as parts and buildings.
+- [x] `Battle`: sieges, lazy resolution, counters, the BFG, damage and retreat, repairs, claims, and the siege feed.
 - [ ] The client's battle views, loadouts and the siege feed.
-- [ ] The simulator plays sieges; battle numbers tuned to D30's timings (for Koda's approval).
+- [x] The simulator plays sieges; battle numbers tuned to D30's timings (for Koda's approval). *One target needs several attackers (B32).*
 
 **Milestone 5: graphics, NFTs and polish**
 - [ ] Ship part art and damage marks in the client.
@@ -364,4 +364,10 @@ when you're done, let me know about any of those decisions I should review").
 | B29 | Milestone 3 | **Building costs and part costs are starting values,** not yet simulated (in the tech tree, `docs/demo4-plan.md` section 5's line). Buildings can be ordered from anywhere; their goods must already be in the planet's storage. One building at a time per planet. | The simulator covers trade; extending it to planets fits best after battle, when parts have a use. |
 | B30 | Milestone 3 | **Planet NFTs (`Deeds`) can't be traded by players;** the game moves them when a siege's claim succeeds. A seized planet's port and yard follow the level it keeps. | As with ships (B15): one owner path while sieges are new. |
 | B31 | Milestone 3 | **The planets panel and tech tree are plain UI** on the galaxy map, like the docks (B25). | Milestone 5 brings over the old look. |
+| B32 | Milestone 4 | **One attacker per siege.** Up to four armed ships can join the defense; the owner's ship joins automatically at the star. Attackers fire at the planet, not at the ships defending it. **So a fully defended planet holds against any single ship,** and D30's three days needs several attackers ([`demo4-tuning.md`](demo4-tuning.md), Battle). | D44 says "attackers"; pooling several attackers' damage and sharing their losses is the next step if wanted. |
+| B33 | Milestone 4 | **Rounds of 30 minutes**, played lazily: any move at the star, change to the defenses, or call to `advance` plays the rounds due first, so each stretch counts who was really there. Up to 64 rounds per call. | Durations of an hour to days (D30) in a few transactions. |
+| B34 | Milestone 4 | **Battle numbers are constants in `Combat`** (changed by an upgrade, not a setter), and are in [`demo4-tuning.md`](demo4-tuning.md) for approval. | They're read every round; constants keep each round cheap. |
+| B35 | Milestone 4 | **Repair bots restore armor only.** A ship's shields are full again after each battle. Destroyed weapons stay out of action until a shipyard repair (3,000 credits, then 3 hours in the yard). A planet's losses carry over: destroyed parts are gone. | D45 and D46 without a parts-repair system. |
+| B36 | Milestone 4 | **Sol's I.S.S. sells ship parts at twice their cost,** so pilots can arm before anyone has an Autofactory. A player's Armory sells from its store at 1.5 times, to its owner. | D58 named the Armory as the shop; Sol needed one to start battle at all. |
+| B37 | Milestone 4 | **Ships can't change their loadout while attacking,** and planets can't take parts off during a siege; planets can add defenses mid-siege (D45). | Keeps a siege's sides from shifting except in the ways D45 allows. |
 

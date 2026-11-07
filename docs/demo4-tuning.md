@@ -58,3 +58,42 @@ A unit's margin, from a full selling port to a needy buying port, is 1.2 × its 
 
 - Approve these numbers, or name the targets to change.
 - Is "2 hours of play a day" the right reading of D29's "a day" and "a week"?
+
+# Battle (milestone 4)
+
+**For Koda's approval** (D30, D53). Played with the contracts' own rounds:
+`forge test --match-contract Scenarios -vv` in `contracts-v4/`
+([`test/battle/Scenarios.t.sol`](../contracts-v4/test/battle/Scenarios.t.sol)).
+
+## The numbers
+
+| Setting | Value |
+|---|---|
+| A round | 30 minutes; both sides fire with what they have at its start |
+| Damage per round | railgun 12, missile rack 12, drone 2, BFG 300 (once every 6 hours) |
+| Point defense | stops 15 missile damage a round each; drones aren't stopped and destroy it first |
+| Counters (D53) | railguns ×2 against armor, ×¼ against shields; missiles ×2 against shields and platforms; drones ×2 against weapon systems, ×½ against armor, ×¼ against platforms |
+| Hit points | platform 150, shield level 60 (regains 10% of its full strength a round), armor plate or level 50, weapon 30, drone 10, repair bot 20, BFG 200; a planet's hull is 60 per tech level |
+| Repair bots | 5 armor a round each on a planet, 2 on a ship |
+| A ship | 6 mounts (point defense 1, railgun 2, missile rack 2); up to 5 armor levels and 3 shield levels |
+| A planet | 12 mounts plus 4 per orbital platform (up to 3); up to 60 drones, 20 repair bots, 20 armor plates, 5 shield levels, 1 BFG |
+| Parts at Sol's I.S.S. | twice their Autofactory cost; a player's Armory sells at 1.5 times, to its owner |
+| Repairs | 3,000 credits at any shipyard, then 3 hours in the yard |
+| A claim | filed once the planet is worn down; completes 24 hours later unless its defenses are back or the attacker is gone |
+
+## What the scenarios show
+
+| Siege | Result |
+|---|---|
+| Starter (2 railguns, a missile rack) vs an undefended Citadel | worn down in **1 hour** (target: about an hour) |
+| Starter vs a Station with a few defenses | the starter is driven off in 30 minutes |
+| Raider (3 railguns, 5 armor, 3 shields, 60 drones) vs that Station | worn down in **5 hours** |
+| Raider, or a missile brawler, vs a fully built and defended Armory | **the planet holds**; the attacker is driven off within 1.5 hours |
+
+## To decide
+
+- **D30's "about three days" against a fully built and defended planet needs several attackers.** This run's siege has
+  one attacker (with up to four ships joining the defense). Against the caps above, no single Orbiter 8 can win.
+  Options: let ships join the attack (their fire and hit points pooled, losses shared at the end), or keep one attacker
+  and treat a fully defended planet as a fortress until fleets come (D26). Built as a fortress for now.
+- Approve the numbers, or name what should change.
