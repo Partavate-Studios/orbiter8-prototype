@@ -46,7 +46,7 @@ describe('star traits', () => {
   it('are the same every time for a cell, and differ between cells', () => {
     const seed = '0x' + '11'.repeat(32)
     expect(starTraits(seed, 42)).toEqual(starTraits(seed, 42))
-    expect(starTraits(seed, 42).name).not.toBe(starTraits(seed, 43).name)
+    expect(starTraits(seed, 42).color).not.toBe(starTraits(seed, 43).color)
     const { size, jitter } = starTraits(seed, 42)
     expect(size).toBeGreaterThanOrEqual(0.25)
     expect(Math.hypot(...jitter)).toBeLessThanOrEqual(0.2)

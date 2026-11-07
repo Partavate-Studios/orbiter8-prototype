@@ -45,6 +45,8 @@ function pilotMenu(object, d, marketName) {
     case 'star':
       add('Jump To Neighbor Star', 'jump')
       if (object.blackHole) add('Go Through the Black Hole', 'traverse')
+      // Naming has its own rules (Planets.mayNameStar) and a fee: the name dialog says what it costs.
+      if (object.mayName) add(object.named ? 'Rename Star' : 'Name Star', 'nameStar')
       break
 
     case 'moon':
@@ -85,7 +87,8 @@ function pilotMenu(object, d, marketName) {
       add('Visit Planet', 'visitPlanet', true, object.objectId)
       break
   }
-  // Sol's are the Federation's; anything else the player owns, they can name.
-  if (object.isMine) add('Rename ' + object.type.charAt(0).toUpperCase() + object.type.slice(1), 'rename')
+  // Planets, stations, moons and the ship: the owner names them (stars above).
+  if (object.isMine && object.type !== 'star')
+    add('Rename ' + object.type.charAt(0).toUpperCase() + object.type.slice(1), 'rename')
   return menu
 }

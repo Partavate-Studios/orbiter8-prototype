@@ -62,7 +62,7 @@ import { mapActions } from 'pinia'
 import { game } from '@/sdk/client'
 import { STATE } from '@/sdk/client'
 import { position, cellAt, distance, neighbors } from '@/sdk/hex'
-import { starTraits, anomalyName } from '@/sdk/traits'
+import { starTraits } from '@/sdk/traits'
 import { timeOf } from '@/sdk/drand'
 import { usePlayerStore } from '@/stores/player'
 import { useGameStateStore } from '@/stores/gamestate'
@@ -202,9 +202,8 @@ export default {
     ...mapActions(useGameStateStore, ['moveToSystem']),
     nameOf(cell) {
       if (cell === null) return ''
-      if (this.client.names[cell]) return this.client.names[cell]
-      if (this.client.cells.get(cell)?.state === STATE.BLACK_HOLE) return anomalyName(cell)
-      return this.client.universe ? starTraits(this.client.universe.seed, cell).name : ''
+      void this.player.cellsVersion
+      return game.starName(cell)
     },
     project(cell, jitter = [0, 0]) {
       const [x, y] = position(cell)

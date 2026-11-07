@@ -14,7 +14,7 @@ import { pendingRegistration, rememberPending, forgetPending } from '@/sdk/pendi
 import { createGame, STATE, REGION_RADIUS } from './contracts'
 import { timeOf } from './drand'
 import { distance } from './hex'
-import { starTraits, anomalyName } from './traits'
+import { starTraits } from './traits'
 import { planet as derivePlanet, planetCount, looks, moonName, planetName } from './system-gen'
 import { portNames, buyCost, sellProceeds, fee, baysCost, MODE } from './market'
 import { SESSION_HOURS, loadKey, saveKey, forgetKey, newKey, keySigner, sweep } from './session-key'
@@ -28,6 +28,9 @@ const SOL = 0
 /** Planets.sol's name parts. */
 const NAME = { PLANET: 0, STATION: 1, MOON: 2 }
 const BUILDING_NAMES = ['', 'Citadel', 'Colony', 'Station', 'Port', 'Yards', 'Armory', 'Autofactory']
+
+/** What an unnamed star is called: "Star 1234", by its cell (a black hole: "Black Hole 1234"). */
+export const unnamed = (cell, blackHole = false) => `${blackHole ? 'Black Hole' : 'Star'} ${cell}`
 
 /** The system view draws stars 1–6 in size (Sol 4); star traits run 0.25–1. */
 const starSize = (cell, size) => (cell === SOL ? 4 : Math.max(1, Math.min(6, Math.round(1 + ((size - 0.25) / 0.75) * 5))))
@@ -308,17 +311,18 @@ export function createGameClient() {
     for (const c of cells) next.set(c.cell, c)
     state.cells = next
     if (!covered) state.loadedCenters.push(center)
+    // Names change (Planets.nameStar), so a forced read fetches the named stars' names again.
     await Promise.all(
-      cells.filter((c) => c.named && !(c.cell in state.names)).map(async (c) => (state.names[c.cell] = await game.nameOf(c.cell)))
+      cells
+        .filter((c) => c.named && (force || !(c.cell in state.names)))
+        .map(async (c) => (state.names[c.cell] = await game.nameOf(c.cell)))
     )
     notify('cells')
   }
 
-  /** A star's name: the discoverer's, else derived. */
+  /** A star's name as given (genesis or a player, Planets.nameStar), else "Star 1234" by its cell. */
   function starName(cell) {
-    const c = state.cells.get(cell)
-    if (c?.state === STATE.BLACK_HOLE) return anomalyName(cell)
-    return state.names[cell] || starTraits(state.universe.seed, cell).name
+    return state.names[cell] || unnamed(cell, state.cells.get(cell)?.state === STATE.BLACK_HOLE)
   }
 
   /** The star the view shows: the ship's, or Sol before there is one. */
@@ -333,12 +337,14 @@ export function createGameClient() {
     await loadAround(cell, true)
     onProgress(10)
     const star = state.cells.get(cell)
-    const [planets, ports, sieges, here, recentTrades] = await Promise.all([
+    const [planets, ports, sieges, here, recentTrades, keeper, naming] = await Promise.all([
       star?.state === STATE.STAR ? game.system(cell, goods) : [],
       game.portsAt(cell),
       game.siegesAt(cell),
       game.shipsAt(cell, pilots),
-      game.recentTrades(LOOKBACK_BLOCKS)
+      game.recentTrades(LOOKBACK_BLOCKS),
+      game.keeperOf(cell),
+      state.pilot ? game.mayNameStar(cell, state.account) : { may: false, becomesOwner: false }
     ])
     trades = recentTrades
     onProgress(50)
@@ -356,6 +362,7 @@ export function createGameClient() {
     const avatarNames = Object.fromEntries(here.map((s) => [s.address, s.callsign]))
     const owners = [...new Set(planets.map((p) => p.owner).filter(Boolean))].filter((a) => !(a in avatarNames))
     if (star?.discoverer && !(star.discoverer in avatarNames)) owners.push(star.discoverer)
+    if (keeper && keeper !== network.contracts.galaxy.toLowerCase() && !(keeper in avatarNames)) owners.push(keeper)
     Object.assign(avatarNames, await game.callsigns(owners))
 
     const name = starName(cell)
@@ -376,7 +383,12 @@ export function createGameClient() {
       // for the screens that show them
       cell: star ?? null,
       blackHole: star?.state === STATE.BLACK_HOLE,
-      sieges
+      sieges,
+      // its owner (null for none; "federation" for the Federation's) and whether the pilot may name it
+      keeper: keeper === network.contracts.galaxy.toLowerCase() ? 'federation' : keeper,
+      mayName: naming.may,
+      namingOwns: naming.becomesOwner,
+      named: Boolean(state.names[cell])
     }
 
     // Neighbors: every star and black hole the ship can reach from here (the galaxy map shows the rest).
@@ -572,7 +584,7 @@ export function createGameClient() {
     rename({ type, objectId, parentId, name }, options) {
       switch (type) {
         case 'star':
-          return move((p, by, o) => by.renameStar(viewCell(), name, p, o), options)
+          return move((p, by, o) => by.nameStar(viewCell(), name, o), options)
         case 'planet':
           return move((p, by, o) => by.renamePlanet(Number(objectId), NAME.PLANET, name, o), options)
         case 'station':

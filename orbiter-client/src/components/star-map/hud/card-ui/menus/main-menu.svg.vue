@@ -150,6 +150,20 @@ export default {
           )
             this.player.attack(option.value, object.name)
           break
+        case 'nameStar': {
+          const fee = this.player.rules.buildings[3].credits // a Station's cost (Planets.nameStar)
+          const owns = object.namingOwns && object.keeper !== this.player.account
+          const name = await this.ask({
+            title: (object.named ? 'Rename ' : 'Name ') + object.name,
+            message:
+              `Filing a star's name with Minerva costs ${fee.toLocaleString('en-US')} credits.` +
+              (owns ? ' Holding its planets, you become the star’s owner.' : ''),
+            input: { label: 'Star name', value: object.named ? object.name : '', kind: 'name' },
+            confirm: object.named ? 'Rename' : 'Name Star'
+          })
+          if (name && name !== object.name) this.renameAsset({ objectId: object.objectId, name, type: 'star' })
+          break
+        }
         case 'rename': {
           const { type, objectId } = object
           // A ship's new name costs (B16).

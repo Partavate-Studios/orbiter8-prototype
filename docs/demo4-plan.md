@@ -363,9 +363,9 @@ Milestones 1–5 built the new rules on a separate `/galaxy` screen with plain p
 - [x] A scan is recorded as soon as its drand round is out (about 30 s after arriving): silently with a session key, with one wallet approval without. Until then the system view and the map show "Scanning…" with a countdown.
 
 *Star names.*
-- [ ] New stars are unnamed and show as "Star 1234" (the cell). Genesis stars (Sol's ring) get real nearby-star names.
-- [ ] Who may name a star: the discoverer, until the star has an owner. A pilot holding all its planets, which makes them the owner. The owner, any time. Once owned, a pilot holding a majority of its planets, which makes them the owner (the old owner keeps it until then). And while unnamed, the pilot with the most planets there (not on a tie), without becoming the owner.
-- [ ] Naming costs about a Station (50,000 credits), filed with Minerva and burned.
+- [x] New stars are unnamed and show as "Star 1234" (the cell). Genesis stars (Sol's ring) get real nearby-star names.
+- [x] Who may name a star: the discoverer, until the star has an owner. A pilot holding all its planets, which makes them the owner. The owner, any time. Once owned, a pilot holding a majority of its planets, which makes them the owner (the old owner keeps it until then). And while unnamed, the pilot with the most planets there (not on a tie), without becoming the owner.
+- [x] Naming costs about a Station (50,000 credits), filed with Minerva and burned.
 
 *The map, in Orbiter 8's colors* (purple, with the red and yellow highlights; a small palette for it)
 - [ ] The hex prototype's hover: hovering your star draws dashed lines to every star you can jump to; hovering a star in range draws its line; a tooltip names the star and says where it stands ("you are here", "visited · in range"…); the jump-range outline.

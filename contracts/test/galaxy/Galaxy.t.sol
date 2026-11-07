@@ -123,16 +123,23 @@ contract GalaxyTest is Test {
         galaxy.region(0, 11);
     }
 
-    function test_onlyTheDiscovererRenames() public {
+    function test_genesisNamesSolAndItsRingForTheFederation() public view {
+        assertEq(galaxy.nameOf(0), "Sol");
+        assertEq(galaxy.keeperOf(0), address(galaxy));
         uint256 target = _firstStarAroundSol();
+        assertEq(galaxy.nameOf(target), "Alpha Centauri");
+        assertEq(galaxy.keeperOf(target), address(galaxy));
+    }
+
+    function test_onlyTheGameSetsNames() public {
+        uint256 target = _firstStarAroundSol();
+        vm.prank(explorer);
+        vm.expectRevert();
+        galaxy.setName(target, "Mine", explorer);
         vm.prank(pilots);
-        galaxy.arrive(explorer, 0, target, 1);
-        vm.prank(pilots);
-        vm.expectRevert(abi.encodeWithSelector(Galaxy.NotTheDiscoverer.selector, target));
-        galaxy.rename(makeAddr("someone else"), target, "Mine");
-        vm.prank(pilots);
-        galaxy.rename(explorer, target, "Prospect");
+        galaxy.setName(target, "Prospect", explorer);
         assertEq(galaxy.nameOf(target), "Prospect");
+        assertEq(galaxy.keeperOf(target), explorer);
     }
 
     /// Thousands of scans with made-up randomness: black holes always come in symmetric pairs 8–24

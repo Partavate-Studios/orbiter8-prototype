@@ -95,7 +95,14 @@ export function buildSystem(system, playerAccount) {
     ownerName: system.avatarNames[system.discoveredBy],
     isMine: String(playerAccount) == String(system.discoveredBy),
     // a black hole, with a partner to go through to
-    blackHole: system.blackHole ?? false
+    blackHole: system.blackHole ?? false,
+    // its owner ('federation', an address or null), and whether the player may name it (Planets.mayNameStar)
+    keeper: system.keeper ?? null,
+    keeperName:
+      system.keeper === 'federation' ? FEDERATION : system.keeper ? (system.avatarNames[system.keeper] ?? '') : '',
+    mayName: system.mayName ?? false,
+    namingOwns: system.namingOwns ?? false,
+    named: system.named ?? true
   })
 
   for (const orbitalPosition in system.planets) {

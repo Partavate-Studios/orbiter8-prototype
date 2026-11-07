@@ -255,6 +255,25 @@
   },
   {
     "type": "function",
+    "name": "keeperOf",
+    "inputs": [
+      {
+        "name": "cell",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "nameOf",
     "inputs": [
       {
@@ -406,29 +425,6 @@
   },
   {
     "type": "function",
-    "name": "rename",
-    "inputs": [
-      {
-        "name": "pilot",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "cell",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "name",
-        "type": "string",
-        "internalType": "string"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
     "name": "renounceRole",
     "inputs": [
       {
@@ -492,6 +488,29 @@
       },
       {
         "name": "account",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setName",
+    "inputs": [
+      {
+        "name": "cell",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "keeper",
         "type": "address",
         "internalType": "address"
       }
@@ -1001,17 +1020,6 @@
   {
     "type": "error",
     "name": "NotScannable",
-    "inputs": [
-      {
-        "name": "cell",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "NotTheDiscoverer",
     "inputs": [
       {
         "name": "cell",

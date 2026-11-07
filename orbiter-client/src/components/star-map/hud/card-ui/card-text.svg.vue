@@ -91,10 +91,14 @@
       <g v-else-if="systemObjects[objectId].type == 'star'">
         <text x="55" y="15" text-anchor="end" font-size="0.9em"> Discovered by: </text>
         <text x="10" y="25" text-anchor="start" font-size="0.9em">
-          {{ ownerName }}
+          {{ systemObjects[objectId].keeper === 'federation' && objectId === 'star' && !systemObjects[objectId].owner ? 'The Federation' : ownerName }}
         </text>
-        <text x="55" y="45" text-anchor="end" font-size="0.9em"> Size:</text>
-        <text x="58" y="45" text-anchor="start" font-weight="bold">
+        <text x="55" y="38" text-anchor="end" font-size="0.9em"> Owner:</text>
+        <text x="58" y="38" text-anchor="start" font-weight="bold">
+          {{ systemObjects[objectId].keeperName || 'none yet' }}
+        </text>
+        <text x="55" y="50" text-anchor="end" font-size="0.9em"> Size:</text>
+        <text x="58" y="50" text-anchor="start" font-weight="bold">
           {{ systemObjects[objectId].size }}
         </text>
       </g>

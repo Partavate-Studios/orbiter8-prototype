@@ -66,6 +66,7 @@ contract Galaxy is ModuleBase {
         mapping(uint256 => Star) stars;
         mapping(uint256 => uint256) partnerPlusOne;
         mapping(uint256 => string) names;
+        mapping(uint256 => address) keepers; // a star's owner (Planets.nameStar), once it has one
     }
 
     // keccak256(abi.encode(uint256(keccak256("orbiter8.galaxy")) - 1)) & ~bytes32(uint256(0xff))
@@ -81,7 +82,6 @@ contract Galaxy is ModuleBase {
     error OutOfRange(uint256 from, uint256 to, uint256 range);
     error NotScannable(uint256 cell);
     error NotABlackHole(uint256 cell);
-    error NotTheDiscoverer(uint256 cell);
     error RegionTooLarge(uint256 radius);
     error BadName();
 
@@ -102,6 +102,22 @@ contract Galaxy is ModuleBase {
         _setState(0, STAR);
         g.stars[0] = Star(address(0), uint40(block.timestamp), 0, NO_ORIGIN, true, true);
         _applyScan(0, keccak256(abi.encode(seed, "sol")), NO_ORIGIN);
+        // Genesis: Sol and the stars it charts get real names; later stars are named by players.
+        g.names[0] = "Sol";
+        uint256[6] memory around = HexMath.neighbors(0);
+        uint256 given;
+        g.keepers[0] = address(this);
+        for (uint256 i = 0; i < 6; i++) {
+            if (stateOf(around[i]) != STAR) continue;
+            g.names[around[i]] = _genesisName(given++);
+            // Owned by the Federation (this contract): renamed only by a pilot holding most of its planets.
+            g.keepers[around[i]] = address(this);
+        }
+    }
+
+    /// The stars nearest Sol, for the genesis ring.
+    function _genesisName(uint256 i) internal pure returns (string memory) {
+        return ["Alpha Centauri", "Barnard's Star", "Wolf 359", "Lalande 21185", "Sirius", "Ross 154"][i];
     }
 
     // ── moves (called by the Pilots module, which checks who's acting) ──────────────────────────
@@ -134,12 +150,13 @@ contract Galaxy is ModuleBase {
         emit Arrived(exit, pilot, blackHole);
     }
 
-    /// The discoverer names their star (D-numbers: the explorer's reward).
-    function rename(address pilot, uint256 cell, string calldata name) external onlyRole(GAME_MODULE) {
-        if (_g().stars[cell].discoverer != pilot || pilot == address(0)) revert NotTheDiscoverer(cell);
+    /// Names a star and records its owner (`keeper`, or address(0) for none). Who may is decided by
+    /// Planets.nameStar, which knows the star's planets and charges the fee.
+    function setName(uint256 cell, string calldata name, address keeper) external onlyRole(GAME_MODULE) {
         bytes memory b = bytes(name);
         if (b.length == 0 || b.length > 24) revert BadName();
         _g().names[cell] = name;
+        _g().keepers[cell] = keeper;
         emit Renamed(cell, name);
     }
 
@@ -193,6 +210,11 @@ contract Galaxy is ModuleBase {
 
     function nameOf(uint256 cell) external view returns (string memory) {
         return _g().names[cell];
+    }
+
+    /// A star's owner (who last named it holding its planets), or address(0).
+    function keeperOf(uint256 cell) external view returns (address) {
+        return _g().keepers[cell];
     }
 
     function universe()

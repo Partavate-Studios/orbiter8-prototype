@@ -81,6 +81,7 @@ library Deployment {
     function wire(Game memory game) internal {
         bytes32 role = game.galaxy.GAME_MODULE();
         game.galaxy.grantRole(role, address(game.pilots));
+        game.galaxy.grantRole(role, address(game.planets)); // star names (Planets.nameStar)
         game.ships.grantRole(role, address(game.pilots));
         game.credits.grantRole(role, address(game.pilots));
         game.credits.grantRole(role, address(game.market));

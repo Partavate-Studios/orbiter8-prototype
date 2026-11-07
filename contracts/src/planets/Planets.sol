@@ -120,6 +120,7 @@ contract Planets is ModuleBase {
     error StorageFull(uint256 good, uint256 room);
     error BadName();
     error NoSuchMoon(uint256 planet, uint8 orbit);
+    error CannotNameStar(uint256 cell);
 
     function _s() internal pure returns (PlanetsStorage storage s) {
         assembly {
@@ -221,7 +222,59 @@ contract Planets is ModuleBase {
         emit Claimed(id, pilot);
     }
 
-    // ── names (Demo 3's renames) ────────────────────────────────────────────────────────────────
+    // ── star names ──────────────────────────────────────────────────────────────────────────────
+
+    /// Names a star, for a fee filed with Minerva and burned (a Station's cost). Who may, and whether
+    /// naming makes them the star's owner: see mayNameStar.
+    function nameStar(uint256 cell, string calldata name) external {
+        PlanetsStorage storage s = _s();
+        address pilot = s.pilots.actorOf(msg.sender);
+        (bool may, bool owns) = mayNameStar(cell, pilot);
+        if (!may) revert CannotNameStar(cell);
+        s.credits.burn(pilot, s.costs[STATION].credits);
+        s.galaxy.setName(cell, name, owns ? pilot : s.galaxy.keeperOf(cell));
+    }
+
+    /// Who may name a star:
+    /// - its owner, any time;
+    /// - once it has an owner, a pilot holding a majority of its planets, who becomes the owner;
+    /// - while it has none, a pilot holding all its planets, who becomes the owner;
+    /// - while it has none, its discoverer;
+    /// - while it's unnamed, the pilot holding the most of its planets (not on a tie).
+    /// Genesis stars and Sol belong to the Federation (Galaxy itself) from the start.
+    function mayNameStar(uint256 cell, address pilot) public view returns (bool may, bool becomesOwner) {
+        Galaxy galaxy = _s().galaxy;
+        uint8 state = galaxy.stateOf(cell);
+        if (state != 2 && state != 3) return (false, false); // stars and black holes only
+        uint256 n = state == 2 ? SystemGen.planetCount(_seed(), cell) : 0;
+        address[8] memory others;
+        uint256[8] memory counts;
+        uint256 mine;
+        uint256 best;
+        for (uint256 body = 0; body < n; body++) {
+            address o = _s().planets[(cell << 8) | body].owner;
+            if (o == address(0)) continue;
+            if (o == pilot) {
+                mine++;
+                continue;
+            }
+            for (uint256 k = 0; k < 8; k++) {
+                if (others[k] == o || others[k] == address(0)) {
+                    others[k] = o;
+                    if (++counts[k] > best) best = counts[k];
+                    break;
+                }
+            }
+        }
+        address keeper = galaxy.keeperOf(cell);
+        if (keeper == pilot) return (true, false);
+        if (keeper != address(0)) return (n > 0 && mine * 2 > n, true);
+        if (n > 0 && mine == n) return (true, true);
+        if (galaxy.star(cell).discoverer == pilot && pilot != address(0)) return (true, false);
+        return (bytes(galaxy.nameOf(cell)).length == 0 && mine > 0 && mine > best, false);
+    }
+
+    // ── planet names ────────────────────────────────────────────────────────────────────────────
 
     /// The parts of a planet that carry a name: the planet, its station, and moons by orbit.
     uint8 public constant NAME_PLANET = 0;

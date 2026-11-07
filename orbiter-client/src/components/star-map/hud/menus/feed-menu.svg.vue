@@ -23,7 +23,6 @@ import { game } from '@/sdk/client'
 import { useUIStore } from '@/stores/ui'
 import { useStarMapStore } from '@/stores/starmap'
 import { usePlayerStore } from '@/stores/player'
-import { starTraits } from '@/sdk/traits'
 import { planetName } from '@/sdk/system-gen'
 import { PINK_LIGHT } from '@/libs/palette'
 import MenuContainer from './menu-container/_menu-container.svg'
@@ -51,8 +50,7 @@ export default {
       const here = useStarMapStore().systemObjects['planet:' + planet]
       if (here) return here.name
       const cell = Math.floor(planet / 256)
-      const state = game.state
-      const star = state.names[cell] || starTraits(state.universe.seed, cell).name
+      const star = game.starName(cell)
       return planetName(star, cell, planet % 256)
     },
     who(address) {

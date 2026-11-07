@@ -393,6 +393,18 @@ export function createGame(runner, addresses) {
       return galaxy.nameOf(cell)
     },
 
+    /** A star's owner (lowercase), or null; the Galaxy contract itself for the Federation's. */
+    async keeperOf(cell) {
+      const keeper = await galaxy.keeperOf(cell)
+      return keeper === ZERO ? null : keeper.toLowerCase()
+    },
+
+    /** Whether `address` may name the star at `cell`, and whether doing so makes them its owner. */
+    async mayNameStar(cell, address) {
+      const [may, becomesOwner] = await planets.mayNameStar(cell, address)
+      return { may, becomesOwner }
+    },
+
     /** What a pending scan will decide, once its round is published (null before). */
     async previewScan(cell, scanRound) {
       const signature = await fetchRound(scanRound)
@@ -440,8 +452,9 @@ export function createGame(runner, addresses) {
     async broadcast(message, options) {
       return sent(pilots.broadcast(message), options)
     },
-    async renameStar(cell, name, proofs = [], options) {
-      return sent(pilots.renameStar(cell, name, proofs), options)
+    /** Names a star, for the Station's cost, if the pilot may (Planets.mayNameStar). */
+    async nameStar(cell, name, options) {
+      return sent(planets.nameStar(cell, name), options)
     },
     async resolveScans(proofs, options) {
       return sent(pilots.resolveScans(proofs), options)

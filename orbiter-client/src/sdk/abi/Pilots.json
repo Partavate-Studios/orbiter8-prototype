@@ -767,41 +767,6 @@
   },
   {
     "type": "function",
-    "name": "renameStar",
-    "inputs": [
-      {
-        "name": "cell",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "name",
-        "type": "string",
-        "internalType": "string"
-      },
-      {
-        "name": "proofs",
-        "type": "tuple[]",
-        "internalType": "struct Pilots.ScanProof[]",
-        "components": [
-          {
-            "name": "cell",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "signature",
-            "type": "bytes",
-            "internalType": "bytes"
-          }
-        ]
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
     "name": "renounceRole",
     "inputs": [
       {

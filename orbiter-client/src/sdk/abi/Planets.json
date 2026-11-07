@@ -486,6 +486,53 @@
   },
   {
     "type": "function",
+    "name": "mayNameStar",
+    "inputs": [
+      {
+        "name": "cell",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "pilot",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "may",
+        "type": "bool",
+        "internalType": "bool"
+      },
+      {
+        "name": "becomesOwner",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "nameStar",
+    "inputs": [
+      {
+        "name": "cell",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "namesOf",
     "inputs": [
       {
@@ -1469,6 +1516,17 @@
         "name": "building",
         "type": "uint8",
         "internalType": "uint8"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "CannotNameStar",
+    "inputs": [
+      {
+        "name": "cell",
+        "type": "uint256",
+        "internalType": "uint256"
       }
     ]
   },

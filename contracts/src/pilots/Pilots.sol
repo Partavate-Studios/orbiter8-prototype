@@ -300,12 +300,6 @@ contract Pilots is ModuleBase {
         emit Traversed(who, hole, exit, discovered);
     }
 
-    /// Names a star the pilot discovered.
-    function renameStar(uint256 cell, string calldata name, ScanProof[] calldata proofs) external {
-        _resolve(proofs);
-        _p().galaxy.rename(actorOf(msg.sender), cell, name);
-    }
-
     /// Sends a message to the whole galaxy (Demo 3's chat). Only an event: nothing is stored.
     function broadcast(string calldata message) external {
         address pilot = actorOf(msg.sender);

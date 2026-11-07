@@ -294,6 +294,68 @@ contract PlanetsTest is PlanetsFixture {
         planets.rename(EARTH, 0, "Ada's Earth");
     }
 
+    /// The naming rules (Planets.mayNameStar), on the star next to Sol: a genesis star, so the
+    /// Federation owns it until the test clears that.
+    function test_whoNamesAStar() public {
+        uint256 fee = planets.costOf(planets.STATION()).credits;
+        uint256 n = SystemGen.planetCount(keccak256("test universe"), star);
+        vm.prank(bo);
+        pilots.register("Bodo", "Raider");
+        _go(ada, star); // Ada arrives first: the discoverer
+        _go(bo, star);
+        assertEq(galaxy.star(star).discoverer, ada);
+
+        // The Federation owns the genesis star: the discoverer can't rename it.
+        (bool may,) = planets.mayNameStar(star, ada);
+        assertFalse(may, "the Federation's");
+
+        // A star nobody owns yet: its discoverer may name it, without owning it.
+        vm.startPrank(admin);
+        galaxy.grantRole(galaxy.GAME_MODULE(), admin);
+        galaxy.setName(star, "Nameless", address(0));
+        vm.stopPrank();
+        _pay(ada, fee);
+        uint256 supply = credits.totalSupply();
+        vm.prank(ada);
+        planets.nameStar(star, "Adaheim");
+        assertEq(galaxy.nameOf(star), "Adaheim");
+        assertEq(galaxy.keeperOf(star), address(0));
+        assertEq(credits.totalSupply(), supply - fee, "the fee is burned");
+
+        // Bo holds every planet (after the discoverer's first-claim window): naming makes Bo the owner,
+        // and Ada loses the right.
+        skip(10 minutes);
+        for (uint256 body = 0; body < n; body++) _claim(bo, (star << 8) | body);
+        _pay(bo, fee);
+        vm.prank(bo);
+        planets.nameStar(star, "Bodo's Reach");
+        assertEq(galaxy.keeperOf(star), bo);
+        (may,) = planets.mayNameStar(star, ada);
+        assertFalse(may, "the discoverer, once there's an owner");
+
+        // Bo loses all but one planet to Ada: still the owner, until Ada holds a majority and names it.
+        vm.startPrank(admin);
+        planets.grantRole(planets.GAME_MODULE(), admin);
+        for (uint256 body = 1; body < n; body++) planets.seize((star << 8) | body, ada);
+        vm.stopPrank();
+        assertEq(galaxy.keeperOf(star), bo);
+        bool owns;
+        (may, owns) = planets.mayNameStar(star, ada);
+        assertEq(may, (n - 1) * 2 > n);
+        if (may) {
+            assertTrue(owns);
+            _pay(ada, fee);
+            vm.prank(ada);
+            planets.nameStar(star, "Adaheim Again");
+            assertEq(galaxy.keeperOf(star), ada);
+        }
+
+        // Someone with nothing there can't.
+        vm.prank(makeAddr("nobody"));
+        vm.expectRevert();
+        planets.nameStar(star, "Nope");
+    }
+
     function test_solHasItsMoons() public pure {
         bytes32 seed = keccak256("orbiter8 demo 4");
         assertEq(SystemGen.moonSlots(seed, 0, 2), 0x02, "Luna");
