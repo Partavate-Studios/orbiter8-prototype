@@ -311,8 +311,8 @@ impossible or needs a design call goes back to Koda; everything else is decided 
 - [x] The simulator plays sieges; battle numbers tuned to D30's timings (for Koda's approval). *One target needs several attackers (B32).*
 
 **Milestone 5: graphics, NFTs and polish**
-- [ ] Ship part art and damage marks in the client.
-- [ ] The on-chain SVG `tokenURI` from the same pieces.
+- [x] Ship part art and damage marks in the client.
+- [x] The on-chain SVG `tokenURI` from the same pieces.
 - [ ] Sol's preset content, onboarding on the new contracts, and polish.
 
 **Milestone 6: testnets and the decision**
@@ -372,4 +372,5 @@ when you're done, let me know about any of those decisions I should review").
 | B37 | Milestone 4 | **Ships can't change their loadout while attacking,** and planets can't take parts off during a siege; planets can add defenses mid-siege (D45). | Keeps a siege's sides from shifting except in the ways D45 allows. |
 | B38 | Milestone 4 | **Measured (Foundry gas report):** laying siege about 280,000 gas; recording rounds 180,000–575,000 (up to 64 rounds); completing a claim 380,000–550,000; buying and fitting parts about 220,000; a repair 175,000. Every jump pays about 10,000 for the move hook, more when a siege at the star needs its rounds recorded. | For the record; deposits on Polkadot still wait on B3. |
 | B39 | Milestone 4 | **The ship panel, siege box and siege feed are plain UI** like the docks (B25). Besieged stars get a pink ring on the map, and the Sieges button turns pink while any siege runs. The feed reads the Battle contract's events from the last 50,000 blocks. | Milestone 5 brings over the old look; a long-lived feed may want an indexer later. |
+| B40 | Milestone 5 | **The ship's picture is Koda's Orbiter 8 hull with its parts drawn over it**, in the hull's own coordinates: railgun barrels, missile racks, point-defense turrets, drone chevrons, repair-bot pods, cargo pods (one per 50 bays), armor as a heavier outline, a shield shimmer, and scorch marks after damage. `ShipArt.sol` draws it for the NFT's `tokenURI`; `sdk/v4/ship-art.js` draws the identical string for the client (pinned by hashes). The map keeps the plain ship icon. | D25's "simpler than before, fancier later". |
 

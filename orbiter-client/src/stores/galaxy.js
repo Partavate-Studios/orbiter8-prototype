@@ -69,8 +69,10 @@ export const useGalaxyStore = defineStore('Galaxy', {
     shipCell: (state) => (state.pilot ? state.pilot.ship.cell : null),
     freeBays: (state) => {
       if (!state.pilot) return 0
-      const { bays, cargo, colonists } = state.pilot.ship
-      return bays - cargo - Math.ceil(colonists / 100)
+      // As Pilots.sol counts them: cargo, people (100 a bay), fitted parts (D59) and damaged bays.
+      const { bays, cargo, colonists, loadout: l, baysLost } = state.pilot.ship
+      const parts = l.drones * 2 + l.repairBots * 5 + l.armor * 10 + l.shields * 20
+      return Math.max(0, bays - cargo - Math.ceil(colonists / 100) - parts - baysLost)
     },
     /** Stars with a siege running, from the feed: for the map. */
     besiegedCells: (state) => {

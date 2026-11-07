@@ -7,6 +7,10 @@
       <button class="close" aria-label="Close" @click="$emit('close')">×</button>
     </header>
 
+    <!-- The same drawing as the ship's NFT (ShipArt.sol); only numbers and fixed strings go in. -->
+    <!-- eslint-disable-next-line vue/no-v-html -->
+    <div class="art" v-html="art" />
+
     <p v-if="condition?.retreated" class="alert">Retreated: repair at a shipyard before attacking again.</p>
     <p v-else-if="docked" class="sub">In the yard after repairs: ready {{ docked }}.</p>
     <p class="sub">
@@ -68,6 +72,7 @@
 <script>
 import { useGalaxyStore } from '@/stores/galaxy'
 import { portNames } from '@/sdk/v4/market'
+import { shipSvg } from '@/sdk/v4/ship-art'
 
 // Parts that go aboard (Factory ids 0–6), their loadout field and the room each takes (D59).
 const SHIP_PARTS = [
@@ -92,6 +97,10 @@ export default {
     },
     condition() {
       return this.galaxy.condition
+    },
+    art() {
+      const off = this.condition?.off ?? []
+      return shipSvg(this.ship, Boolean(this.condition?.armorLost || off.some((n) => n > 0)))
     },
     docked() {
       const left = (this.condition?.dockedUntil ?? 0) - this.now / 1000
@@ -187,6 +196,16 @@ p {
 }
 .alert {
   color: var(--o8-pink-light);
+}
+.art {
+  width: 9em;
+  margin: 0.3em auto;
+}
+.art :deep(svg) {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
 }
 table {
   width: 100%;

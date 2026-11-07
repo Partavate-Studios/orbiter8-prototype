@@ -99,6 +99,7 @@ library Deployment {
         game.factory.grantRole(role, address(game.armory));
         game.credits.grantRole(role, address(game.armory));
         game.pilots.setBattle(game.battle);
+        game.ships.setPilots(game.pilots);
     }
 }
 
