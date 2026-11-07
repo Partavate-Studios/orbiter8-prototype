@@ -41,9 +41,12 @@ design doc), [`design-ideas.md`](design-ideas.md) (Koda's working doc), [`cost-e
 | D20 | **This run is a chosen subset; the rest goes on a "consider next" list,** revisited in a new interview after this run. Pack in as much as reasonable, low-hanging fruit first. **Some form of battle is absolutely required.** | 2026-11-06 |
 | D21 | **Exploring takes one approval.** The jump arrives at once; the ship's **long-range scan** resolves one block later, from that block's hash (unknowable when the jump was sent, so no prediction and no re-rolls). Reading the result is a free view call. It's written to storage by the next move that touches that area, usually the explorer's own next jump or trade, with no separate approval. A scan left untouched past the block-hash window (about 8.5 minutes on 2-second blocks) resolves from a fixed fallback. | 2026-11-06 |
 | D22 | **Black holes are permanently paired.** Each one's exit is decided the first time anyone goes through, then fixed for everyone, both ways. The exit is **neither too far nor too close** (a distance band), and **in dead space**: the void between spiral arms, away from charted stars. The traveler's scan charts what's around the exit, so it's the one way to leap into the dark. | 2026-11-06 |
-| D23 | **This run's feature list is accepted as proposed** (the 14 items under "This run"). | 2026-11-06 |
+| D23 | **This run's feature list is accepted as proposed** (the items under "This run"; fleets moved out by D26). | 2026-11-06 |
 | D24 | **The battle minimum is accepted as a start:** planet defenses; three countering ship weapons (railguns, missiles, point defense) and armor; slow, public sieges; damage that disables systems until repaired; a shipyard repair before attacking again; a Minerva claim with a waiting period. | 2026-11-06 |
 | D25 | **Basic graphics are part of this run.** Simpler than before, to be made fancier later, but **an Orbiter 8's look must show what it carries**: a railgun, missile racks, point-defense turrets, armor plating, cargo pods, damage. The same pieces make up the on-chain SVG NFT. | 2026-11-06 |
+| D26 | **One ship per pilot, for this run.** Fleets move to "consider next": a remote-control model (the working doc's signal lag and relays) is likely, and needs refining first. Keep this run straightforward, but shape the data so fleets can be added (ships are NFTs; a pilot has an active ship). | 2026-11-06 |
+| D27 | **The eight goods:** water ice, metals, rare elements, helium-3, organics, silicon (raw); equipment, electronics (manufactured, by planet type). **Goods are data, not code:** a registry of goods, so crafting's planned expansion can add more without rewriting contracts. | 2026-11-06 |
+| D28 | **Black hole exits:** 8 to 24 cells away, the deepest void in that band with no charted star within 2 cells. **The exit is decided when the black hole is created,** not when someone first goes through: its partner cell is reserved as a black hole right away. If someone reaches that area normally before anyone goes through, their scan reveals the partner black hole. (On chain, the band can't be searched cell by cell; a few candidate cells are sampled from the scan's randomness and the deepest one is chosen.) | 2026-11-06 |
 
 ## Features: this run and consider next (proposed, for Koda to choose)
 
@@ -60,7 +63,6 @@ hard to add later because it shapes the data, low-hanging, or the battle minimum
 | Hex galaxy: exploration, seeded spiral, region views, black hole portals | Decided |
 | Jump range upgrade | Decided |
 | Pilots: unique call signs, on-chain name rules, name-change fee | Long wanted; low-hanging |
-| Fleets: several ships per pilot, one active | Shapes the data; hard to add later; fixes the NFT-trading problem |
 | Trade fixes: ship must be at the port, a price limit per trade, restocking and margins retuned | Found broken in play; low-hanging |
 | More goods (about 8) | Shapes the data; needed by planets and battle supplies |
 | Events for every action | Low-hanging; the client updates without reloading |
@@ -76,12 +78,13 @@ hard to add later because it shapes the data, low-hanging, or the battle minimum
 - **Battle, more:** overheating, experience, booby traps, ship-to-ship combat, asteroid attacks
 - **Social:** corporations, corporate law, protected zones, pirates and bands, bounties
 - **Economy and building:** supply routes, crafting, builders (probes, autofactories), negotiated prices, branching tech tree
+- **Fleets:** several ships per pilot, with remote control (signal lag, relays); refine first (D26)
 - **Bigger systems:** terraforming (designed together), digital pilots (cubes, lag, relays, escape pods, cube hunting), tractor beams
 - **Parked:** portals between networks, new ship types and aliens, tokenized goods, hidden information with ZK proofs, invite-only cubes, star-system weapons, Minerva's hidden agenda, planet maintenance, vanity upgrades, alignment, corporate taxes; client extras (soundtrack folders, re-skinning, ENS names)
 
 ## Open questions
 
-Rounds 1–3 answered. Round 4 (asked 2026-11-06): contract tooling; switching ships; the goods list; a minimum and maximum for black-hole exits.
+Rounds 1–4 answered, except Q25 (contract tooling), which waits for the research. Round 5 (asked 2026-11-06): tuning the economy's numbers; siege timing; build order.
 
 **Queued topic (Koda, 2026-11-06): the game engine.** After the research and the immediate questions: how the client renders the game. Keep SVG, or go down a new path (canvas, WebGL, a game engine)? Earlier work in the modernize branch is relevant (the canvas layers, the canvas prototype tangent, the frame loop).
 
