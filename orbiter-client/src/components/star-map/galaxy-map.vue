@@ -1,9 +1,56 @@
 <template>
-  <!-- Demo 4's galaxy map, in the neighbor view's place (docs/demo4-plan.md section 8: "the galaxy map
-       replaces the neighbor view"): the hex grid's charted stars, your ship, what's in range, scans and
-       sieges. Choose a star in range to jump; the jump plays the jump animation. Regions load as you pan. -->
-  <div class="galaxy-map" @pointerdown="onDown" @pointermove="onMove" @pointerup="onUp" @wheel="onWheel">
+  <!-- The galaxy map, in the neighbor view's place (docs/demo4-plan.md section 8: "the galaxy map
+       replaces the neighbor view"), drawn in Orbiter 8's colors (libs/palette.js MAP): the hex grid's
+       charted stars, your ship, what's in range, scans, sieges and black-hole partners. As in the hex
+       prototype, hovering your star fans out every jump you can make, and hovering a star in range
+       draws its line. Regions load as you pan. -->
+  <div
+    class="galaxy-map"
+    :style="{ '--space-center': MAP.spaceCenter, '--space-edge': MAP.spaceEdge }"
+    @pointerdown="onDown"
+    @pointermove="onMove"
+    @pointerup="onUp"
+    @wheel="onWheel"
+  >
     <svg class="map" :viewBox="`0 0 ${width} ${height}`">
+      <!-- your jump range: the hex outline of the ring `range` steps out -->
+      <polygon
+        v-if="rangeHull"
+        :points="rangeHull"
+        fill="none"
+        :stroke="MAP.route"
+        stroke-opacity="0.22"
+        stroke-width="1"
+        stroke-dasharray="3 6"
+      />
+      <!-- black holes and their partners -->
+      <g v-for="link in partnerLinks" :key="'link' + link.key" class="link" @click.stop="followLink(link)">
+        <line
+          :x1="link.x1"
+          :y1="link.y1"
+          :x2="link.x2"
+          :y2="link.y2"
+          :stroke="MAP.partnerLink"
+          :stroke-opacity="link.mine ? 0.8 : 0.45"
+          :stroke-width="link.mine ? 1.8 : 1.2"
+          stroke-dasharray="2 5"
+        />
+        <!-- a wider, invisible line to click -->
+        <line :x1="link.x1" :y1="link.y1" :x2="link.x2" :y2="link.y2" stroke="transparent" stroke-width="14" />
+      </g>
+      <!-- jump lines: from your star to every star in range (hovering your star), or to one -->
+      <line
+        v-for="line in routeLines"
+        :key="'route' + line.cell"
+        :x1="line.x1"
+        :y1="line.y1"
+        :x2="line.x2"
+        :y2="line.y2"
+        :stroke="MAP.route"
+        stroke-opacity="0.6"
+        stroke-width="1.3"
+        stroke-dasharray="5 5"
+      />
       <g
         v-for="star in drawn"
         :key="star.cell"
@@ -11,15 +58,18 @@
         class="star"
         :class="{ selected: star.cell === chosen }"
         @click.stop="choose(star.cell)"
+        @pointerenter="hover = star.cell"
+        @pointerleave="hover = hover === star.cell ? null : hover"
       >
-        <circle v-if="star.reachable" :r="star.r + 7" class="reach" />
+        <circle v-if="star.here" :r="star.r + 8" fill="none" stroke="#ffffff" stroke-width="1.6" />
+        <circle v-else-if="star.reachable" :r="star.r + 7" class="reach" />
         <circle v-if="star.pending" :r="star.r + 4" class="scanning" />
-        <circle v-if="star.besieged" :r="star.r + 10" class="besieged" />
+        <circle v-if="star.besieged" :r="star.r + 11" class="besieged" />
         <template v-if="star.blackHole">
           <circle :r="star.r + 2" class="hole-ring" />
-          <circle :r="star.r" fill="#05010d" />
+          <circle :r="star.r" :fill="MAP.hole" />
         </template>
-        <circle v-else :r="star.r" :fill="star.color" :opacity="star.visited ? 1 : 0.6" />
+        <circle v-else :r="star.r" :fill="star.color" :opacity="star.visited ? 1 : 0.65" />
         <circle :r="Math.max(star.r + 6, 12)" fill="transparent" />
         <text :y="star.r + 13" class="name">{{ star.name }}</text>
       </g>
@@ -28,9 +78,18 @@
       </g>
     </svg>
 
+    <!-- the hovered star: its name and where it stands, beside the pointer -->
+    <div v-if="tip" class="tip" :style="{ left: tip.x + 'px', top: tip.y + 'px' }">
+      <b>{{ tip.name }}</b>
+      <i>{{ tip.note }}</i>
+    </div>
+
     <header class="title">
       <h2>Galaxy Map</h2>
-      <p>Stars within {{ range }} {{ range === 1 ? 'jump' : 'jumps' }} are ringed. Drag to look around.</p>
+      <p>
+        Hover your star to see every jump you can make ({{ range }} {{ range === 1 ? 'step' : 'steps' }}). Drag to look
+        around.
+      </p>
       <p v-if="scanningNow" class="scanning-now">{{ scanningNow }}</p>
     </header>
 
@@ -38,11 +97,16 @@
       <h3>{{ chosenName }}</h3>
       <p class="sub">{{ chosenKind }} · {{ distanceAway }} {{ distanceAway === 1 ? 'step' : 'steps' }} away</p>
       <p v-if="chosenCell?.discoverer" class="sub">Discovered by {{ discovererName }}</p>
+      <p v-if="isPartnerHere && chosen !== shipCell" class="sub">The far side of the black hole you're at.</p>
+      <p v-else-if="isPartnerHere" class="sub">You're at this black hole. Its far side: {{ nameOf(partnerHere) }}.</p>
       <p v-if="scanWords" class="scan">{{ scanWords }}</p>
       <p v-if="besieged" class="alert">A siege is under way here.</p>
-      <p v-if="failed" class="alert">The jump didn't go through: the transaction tray says why.</p>
+      <p v-if="failed" class="alert">That didn't go through: the transaction tray says why.</p>
       <div class="actions">
-        <button v-if="canJump" class="o8-button primary" :disabled="waiting" @click="jump">
+        <button v-if="isPartnerHere" class="o8-button primary" :disabled="waiting" @click="enterBlackHole">
+          {{ waiting ? 'Entering…' : 'Enter the black hole' }}
+        </button>
+        <button v-else-if="canJump" class="o8-button primary" :disabled="waiting" @click="jump">
           {{ waiting ? 'Waiting for the jump…' : 'Jump to ' + chosenName }}
         </button>
         <p v-else-if="distanceAway > range" class="sub">Out of range: upgrade the engines at a shipyard.</p>
@@ -61,6 +125,7 @@
 import { mapActions } from 'pinia'
 import { game } from '@/sdk/client'
 import { STATE } from '@/sdk/client'
+import { MAP } from '@/libs/palette'
 import { position, cellAt, distance, neighbors } from '@/sdk/hex'
 import { starTraits } from '@/sdk/traits'
 import { timeOf } from '@/sdk/drand'
@@ -87,7 +152,11 @@ export default {
       preview: null,
       waiting: false,
       failed: false,
-      now: Date.now()
+      now: Date.now(),
+      /** the star under the pointer, and where the pointer is (for the tooltip) */
+      hover: null,
+      pointer: { x: 0, y: 0 },
+      MAP
     }
   },
   computed: {
@@ -124,12 +193,89 @@ export default {
           blackHole: c.state === STATE.BLACK_HOLE,
           visited: c.visited,
           pending: c.visited && !c.scanned,
+          here: c.cell === this.shipCell,
           reachable: steps > 0 && steps <= this.range,
           besieged: this.player.besiegedCells.has(c.cell),
           name: this.nameOf(c.cell)
         })
       }
       return out
+    },
+    /** Screen points of the drawn stars, by cell. */
+    points() {
+      return new Map(this.drawn.map((star) => [star.cell, star]))
+    },
+    /** The ship's star on screen (drawn or not), from its cell and jitter. */
+    herePoint() {
+      if (!this.client.universe) return null
+      const [x, y] = this.project(this.shipCell, starTraits(this.client.universe.seed, this.shipCell).jitter)
+      return { x, y }
+    },
+    /** As in the prototype: hovering your star fans out to every star in range; hovering (or choosing) one in range draws its line. */
+    routeLines() {
+      const from = this.herePoint
+      if (!from) return []
+      const reachable = this.drawn.filter((star) => star.reachable)
+      let targets = []
+      if (this.hover === this.shipCell) targets = reachable
+      else {
+        const one = reachable.find((star) => star.cell === this.hover) ?? reachable.find((star) => star.cell === this.chosen)
+        if (one) targets = [one]
+      }
+      return targets.map((star) => ({ cell: star.cell, x1: from.x, y1: from.y, x2: star.x, y2: star.y }))
+    },
+    /** Black holes on screen joined to their partners (the partner may be off screen: the line runs off the edge). */
+    partnerLinks() {
+      const seed = this.client.universe?.seed
+      if (!seed) return []
+      const links = []
+      for (const star of this.drawn) {
+        if (!star.blackHole) continue
+        const partner = this.client.cells.get(star.cell)?.partner
+        if (!partner || (this.points.has(partner) && partner < star.cell)) continue // each pair once
+        const [x2, y2] = this.project(partner, starTraits(seed, partner).jitter)
+        links.push({ key: star.cell, a: star.cell, b: partner, mine: star.cell === this.shipCell || partner === this.shipCell, x1: star.x, y1: star.y, x2, y2 })
+      }
+      return links
+    },
+    /** The hex outline `range` steps out from your star (the prototype's jump-range boundary). */
+    rangeHull() {
+      const from = this.herePoint
+      if (!from || this.range < 2) return null
+      // The six axial directions, as the galaxy's plane measures them (x = q + r/2, y = r·√3/2).
+      const DIRS = [[1, 0], [1, -1], [0, -1], [-1, 0], [-1, 1], [0, 1]]
+      return DIRS.map(([q, r]) => {
+        const x = (q + r / 2) * this.range * 1.14
+        const y = ((r * Math.sqrt(3)) / 2) * this.range * 1.14
+        return `${(from.x + x * this.scale).toFixed(1)},${(from.y + y * this.scale * FLAT).toFixed(1)}`
+      }).join(' ')
+    },
+    partnerHere() {
+      return this.client.cells.get(this.shipCell)?.partner ?? null
+    },
+    /** The hovered star's name and where it stands. */
+    tip() {
+      if (this.hover === null || this.drag?.moved) return null
+      const c = this.client.cells.get(this.hover)
+      if (!c) return null
+      const steps = distance(this.shipCell, this.hover)
+      const inRange = steps > 0 && steps <= this.range
+      let note
+      if (this.hover === this.shipCell) note = 'you are here'
+      else if (c.state === STATE.BLACK_HOLE)
+        note = this.isPartnerOf(this.hover) ? 'the far side of this black hole' : inRange ? 'black hole · in range' : 'black hole'
+      else if (c.visited) note = inRange ? 'visited · in range' : 'visited'
+      else note = inRange ? 'unsurveyed · in range' : 'unsurveyed'
+      // Beside the pointer, flipped near the edges.
+      const x = this.pointer.x + 16 + 200 > this.width ? this.pointer.x - 216 : this.pointer.x + 16
+      const y = this.pointer.y + 16 + 60 > this.height ? this.pointer.y - 76 : this.pointer.y + 16
+      return { name: this.nameOf(this.hover), note, x, y }
+    },
+    /** The chosen star is the black hole the ship is at, or its partner: offer to go through. */
+    isPartnerHere() {
+      if (this.chosen === null) return false
+      const here = this.client.cells.get(this.shipCell)
+      return here?.state === STATE.BLACK_HOLE && (this.chosen === here.partner || this.chosen === this.shipCell)
     },
     shipPoint() {
       if (!this.client.universe) return null
@@ -199,7 +345,7 @@ export default {
   },
   methods: {
     ...mapActions(useUIStore, ['exitNeighborView', 'zoomInToStar']),
-    ...mapActions(useGameStateStore, ['moveToSystem']),
+    ...mapActions(useGameStateStore, ['moveToSystem', 'traverseBlackHole']),
     nameOf(cell) {
       if (cell === null) return ''
       void this.player.cellsVersion
@@ -250,6 +396,28 @@ export default {
         holes: fresh.filter((s) => s === STATE.BLACK_HOLE).length
       }
     },
+    /** Clicking a black hole's link: choose its far end (from here, the far side) and fly the view there. */
+    followLink(link) {
+      const target = link.a === this.shipCell ? link.b : link.b === this.shipCell ? link.a : link.b
+      const [x, y] = position(target)
+      this.camera.x = x
+      this.camera.y = y
+      game.loadAround(target)
+      this.choose(target)
+    },
+    isPartnerOf(cell) {
+      const here = this.client.cells.get(this.shipCell)
+      return here?.state === STATE.BLACK_HOLE && here.partner === cell
+    },
+    /** Through the black hole to its partner, with the ship stretching into it (black-hole-entry.vue). */
+    async enterBlackHole() {
+      this.o8audio.playEffect('click')
+      this.waiting = true
+      const through = await this.traverseBlackHole()
+      this.waiting = false
+      if (through) this.exitNeighborView()
+      else this.failed = true
+    },
     /** Waits for the wallet (or the session key); the jump animation starts once the move is sent. */
     async jump() {
       this.o8audio.playEffect('click')
@@ -268,6 +436,7 @@ export default {
       this.drag = { x: event.clientX, y: event.clientY, cx: this.camera.x, cy: this.camera.y, moved: false }
     },
     onMove(event) {
+      this.pointer = { x: event.clientX, y: event.clientY }
       if (!this.drag) return
       const dx = event.clientX - this.drag.x
       const dy = event.clientY - this.drag.y
@@ -299,7 +468,7 @@ export default {
   inset: 0;
   z-index: 50;
   overflow: hidden;
-  background: radial-gradient(ellipse at center, #2b0c50 0%, #160631 75%);
+  background: radial-gradient(ellipse at center, var(--space-center) 0%, var(--space-edge) 75%);
   color: #e6dcf5;
   font-family: Ubuntu, sans-serif;
   touch-action: none;
@@ -344,6 +513,9 @@ export default {
   stroke: var(--o8-pink-light);
   stroke-width: 2;
   stroke-dasharray: 3 3;
+}
+.link {
+  cursor: pointer;
 }
 .hole-ring {
   fill: none;
@@ -421,5 +593,26 @@ export default {
   display: flex;
   justify-content: center;
   gap: 0.6em;
+}
+.tip {
+  position: absolute;
+  pointer-events: none;
+  display: grid;
+  gap: 0.15em;
+  padding: 0.45em 0.7em;
+  min-width: 9em;
+  background: #12052af0;
+  border: 1px solid #c3b3da44;
+  border-radius: 8px;
+  font-size: 13px;
+}
+.tip b {
+  font-weight: 500;
+  color: #ffffff;
+}
+.tip i {
+  font-style: normal;
+  color: #c3b3daaa;
+  font-size: 0.9em;
 }
 </style>

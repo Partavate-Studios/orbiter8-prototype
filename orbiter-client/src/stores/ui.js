@@ -65,6 +65,8 @@ export const useUIStore = defineStore('UI', {
     selectedSprite: null,
     /** The tech tree reference screen (D60), over the game. */
     techTreeOpen: false,
+    /** When the ship began stretching into a black hole (Date.now()), or null (black-hole-entry.vue). */
+    blackHoleEntry: null,
     minerva: {
       terminal: {
         history: []

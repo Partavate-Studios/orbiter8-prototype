@@ -60,3 +60,6 @@ export const TIMING = {
   /** Chat history: blocks to look back. */
   CHAT_LOOKBACK_BLOCKS: 950
 }
+
+/** How long the ship takes to stretch into a black hole (black-hole-entry.vue) before the jump animation. */
+export const BLACK_HOLE_ENTRY_MS = 2200

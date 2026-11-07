@@ -368,8 +368,8 @@ Milestones 1–5 built the new rules on a separate `/galaxy` screen with plain p
 - [x] Naming costs about a Station (50,000 credits), filed with Minerva and burned.
 
 *The map, in Orbiter 8's colors* (purple, with the red and yellow highlights; a small palette for it)
-- [ ] The hex prototype's hover: hovering your star draws dashed lines to every star you can jump to; hovering a star in range draws its line; a tooltip names the star and says where it stands ("you are here", "visited · in range"…); the jump-range outline.
-- [ ] Black hole partners are joined by a line. At a black hole, choosing its partner offers "Enter the black hole", with an animation: the ship's nose stretches into the hole ahead of its tail, then the tail catches up.
+- [x] The hex prototype's hover: hovering your star draws dashed lines to every star you can jump to; hovering a star in range draws its line; a tooltip names the star and says where it stands ("you are here", "visited · in range"…); the jump-range outline.
+- [x] Black hole partners are joined by a line. At a black hole, choosing its partner offers "Enter the black hole", with an animation: the ship's nose stretches into the hole ahead of its tail, then the tail catches up.
 
 *Jumps*
 - [x] A jump takes at least as long as its sounds, so Minerva's lines finish. *4.5 s; "jump complete" is said when the animation ends.*

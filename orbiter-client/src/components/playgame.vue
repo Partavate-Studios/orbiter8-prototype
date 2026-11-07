@@ -4,6 +4,7 @@
     <layer-html />
     <transaction-tray />
     <galaxy-map v-if="neighborView && !jumpAnimationState" />
+    <black-hole-entry />
     <first-steps v-if="!neighborView && selected == null" />
     <tech-tree v-if="techTreeOpen" class="tech-tree-over" @close="techTreeOpen = false" />
     <game-dialog />
@@ -24,6 +25,7 @@ import TransactionTray from '@/components/transaction-tray.vue'
 import GameDialog from '@/components/game-dialog.vue'
 import TechTree from '@/components/star-map/tech-tree.vue'
 import GalaxyMap from '@/components/star-map/galaxy-map.vue'
+import BlackHoleEntry from '@/components/star-map/black-hole-entry.vue'
 import FirstSteps from '@/components/star-map/first-steps.vue'
 import { usePlayerStore } from '@/stores/player'
 import router from '@/router/router'
@@ -44,6 +46,7 @@ export default {
     GameDialog,
     TechTree,
     GalaxyMap,
+    BlackHoleEntry,
     FirstSteps
   },
   data() {

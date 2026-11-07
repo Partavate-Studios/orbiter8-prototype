@@ -3,6 +3,7 @@ import { game } from '@/sdk/client'
 import { useUIStore } from '@/stores/ui'
 import { useTransactionsStore } from '@/stores/transactions'
 import { gameAudio } from '@/libs/08audio'
+import { BLACK_HOLE_ENTRY_MS } from '@/constants'
 
 /** Shows a transaction's progress in the tray (stores/transactions.js). */
 const track = (words, send) => useTransactionsStore().track(words, send)
@@ -98,6 +99,33 @@ export const useGameStateStore = defineStore('GameState', {
         // Sent, then failed (reverted, dropped or replaced): the jump animation stalls and explains.
         // Rejected in the wallet: nothing was sent, and the neighbor view says so itself.
         if (ui.jumpAnimationState) ui.jumpStalled(reason)
+        return false
+      }
+      return true
+    },
+    /**
+     * Through the black hole the ship is at, to its partner: once the move is sent, the ship stretches
+     * into the hole (black-hole-entry.vue), then the jump animation plays until the far side loads.
+     * Resolves true if it went through.
+     */
+    async traverseBlackHole() {
+      const ui = useUIStore()
+      ui.jumpPending = true
+      try {
+        await game.actions.traverse({
+          onSent: () => {
+            gameAudio().speak('jumpStarting')
+            ui.blackHoleEntry = Date.now()
+            setTimeout(() => {
+              if (!ui.hud.jumpAnimationState) ui.jumpAnimationOn()
+            }, BLACK_HOLE_ENTRY_MS)
+          }
+        })
+      } catch (error) {
+        ui.jumpPending = false
+        ui.blackHoleEntry = null
+        console.error('Going through failed:', error.shortMessage ?? error.message)
+        if (ui.jumpAnimationState) ui.jumpStalled(error.shortMessage ?? error.message)
         return false
       }
       return true

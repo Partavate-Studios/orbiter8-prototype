@@ -116,7 +116,7 @@ export default {
           this.openMenu('siege')
           break
         case 'traverse':
-          this.player.traverse()
+          this.traverseBlackHole()
           break
         case 'session':
           if (this.player.sessionLive) this.player.endSession()
@@ -182,7 +182,7 @@ export default {
       }
     },
     ...mapActions(useDialogStore, ['ask', 'tell']),
-    ...mapActions(useGameStateStore, ['claimPlanet', 'renameAsset']),
+    ...mapActions(useGameStateStore, ['claimPlanet', 'renameAsset', 'traverseBlackHole']),
     ...mapActions(useUIStore, ['zoomOutToNeighbors', 'openMenu', 'selectSprite'])
   }
 }
