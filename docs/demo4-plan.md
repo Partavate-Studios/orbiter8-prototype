@@ -39,6 +39,11 @@ design doc), [`design-ideas.md`](design-ideas.md) (Koda's working doc), [`cost-e
 | D18 | **Map data loads as the player looks around:** only what's on screen, more as they pan. Whatever is most efficient for reading the map from the chain. | 2026-11-06 |
 | D19 | **Terraforming is an advanced feature, designed together later** (Koda wants help building out the concept). Every planet gets a surface seed from the start so it can be added without changing existing planets. | 2026-11-06 |
 | D20 | **This run is a chosen subset; the rest goes on a "consider next" list,** revisited in a new interview after this run. Pack in as much as reasonable, low-hanging fruit first. **Some form of battle is absolutely required.** | 2026-11-06 |
+| D21 | **Exploring takes one approval.** The jump arrives at once; the ship's **long-range scan** resolves one block later, from that block's hash (unknowable when the jump was sent, so no prediction and no re-rolls). Reading the result is a free view call. It's written to storage by the next move that touches that area, usually the explorer's own next jump or trade, with no separate approval. A scan left untouched past the block-hash window (about 8.5 minutes on 2-second blocks) resolves from a fixed fallback. | 2026-11-06 |
+| D22 | **Black holes are permanently paired.** Each one's exit is decided the first time anyone goes through, then fixed for everyone, both ways. The exit is **neither too far nor too close** (a distance band), and **in dead space**: the void between spiral arms, away from charted stars. The traveler's scan charts what's around the exit, so it's the one way to leap into the dark. | 2026-11-06 |
+| D23 | **This run's feature list is accepted as proposed** (the 14 items under "This run"). | 2026-11-06 |
+| D24 | **The battle minimum is accepted as a start:** planet defenses; three countering ship weapons (railguns, missiles, point defense) and armor; slow, public sieges; damage that disables systems until repaired; a shipyard repair before attacking again; a Minerva claim with a waiting period. | 2026-11-06 |
+| D25 | **Basic graphics are part of this run.** Simpler than before, to be made fancier later, but **an Orbiter 8's look must show what it carries**: a railgun, missile racks, point-defense turrets, armor plating, cargo pods, damage. The same pieces make up the on-chain SVG NFT. | 2026-11-06 |
 
 ## Features: this run and consider next (proposed, for Koda to choose)
 
@@ -76,11 +81,11 @@ hard to add later because it shapes the data, low-hanging, or the battle minimum
 
 ## Open questions
 
-Round 3 (asked 2026-11-06): exploration in one approval; black hole portals; this run's feature list; the battle minimum.
+Rounds 1–3 answered. Round 4 (asked 2026-11-06): contract tooling; switching ships; the goods list; a minimum and maximum for black-hole exits.
 
 **Queued topic (Koda, 2026-11-06): the game engine.** After the research and the immediate questions: how the client renders the game. Keep SVG, or go down a new path (canvas, WebGL, a game engine)? Earlier work in the modernize branch is relevant (the canvas layers, the canvas prototype tangent, the frame loop).
 
-**Still open from round 2:** Q15, exploration without two approvals (reworked as round 3's first question); Q13's Polkadot check (research running).
+**Still open:** Q13's Polkadot check (research running).
 
 ## Plan
 
