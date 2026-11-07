@@ -73,6 +73,7 @@ design doc), [`design-ideas.md`](design-ideas.md) (Koda's working doc), [`cost-e
 | D52 | **The ship retreats automatically** to orbit its system's star when its armor and shields are both gone, even with weapons left, or when all its weapons are disabled. It can't attack again until repaired. | 2026-11-06 |
 | D53 | **Proposed balance** (for Koda's confirmation with the plan): three attack types, each beaten by one defense: railguns beat armor and are stopped by shields; missiles beat shields and orbital platforms and are stopped by point defense; drones beat point defense and are stopped by armor and orbital platforms. The BFG beats anything but recharges slowly and hits one target per shot. Exact numbers by simulation. | 2026-11-06 |
 | D54 | **Ships carry drones too, but fewer than a planet can field** (planets have drones as well). **Shields regenerate** (confirmed). | 2026-11-06 |
+| D55 | **Drones can be moved between your ship and your planet** (e.g. dropping drones off to defend it), within each one's capacity. **Drones are bought, or produced by an autofactory on your planet.** (Where the autofactory sits in the tech tree, and what it consumes: the next question.) | 2026-11-06 |
 
 ## Features: this run and consider next (proposed, for Koda to choose)
 
@@ -113,7 +114,7 @@ hard to add later because it shapes the data, low-hanging, or the battle minimum
 
 Rounds 1–5 answered, except Q25 (contract tooling), which waits for the research. Next: the research's findings (the engine question is settled by D33).
 
-**Research done (D34).** All rounds answered (D1–D54). D53's balance table is a proposal to confirm with the finished plan.
+**Research done (D34).** All rounds answered (D1–D55); two follow-ups on the autofactory are open. D53's balance table is a proposal to confirm with the finished plan.
 
 ## Plan (complete, 2026-11-06; awaiting Koda's confirmation)
 
@@ -203,7 +204,7 @@ impossible or needs a design call goes back to Koda; everything else is decided 
 - **Claims:** the ship must be in the system, and there's a claim fee. The discoverer has a 10-minute first-claim window, ending early if they fly on.
 - **The linear tech tree:** Citadel, Colony, Station, Port, Yards, Armory. Each level costs goods, credits and build time.
 - **Colonists** grow lazily toward a cap. **Production** follows population.
-- **Defenses:** the same weapon types as ships, drones included (a planet fields more drones than a ship carries, D54), plus the BFG, orbital platforms, armor plating, a regenerating planet shield and repair bots. They can be built in advance.
+- **Defenses:** the same weapon types as ships, drones included (a planet fields more drones than a ship carries, D54; drones move between your ship and your planet, and are bought or made by an autofactory, D55), plus the BFG, orbital platforms, armor plating, a regenerating planet shield and repair bots. They can be built in advance.
 - **Every planet's surface seed** is reserved for terraforming later.
 
 ### 6. Battle (D24, D44–D53)
