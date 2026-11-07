@@ -46,6 +46,14 @@ export function bindStoresToGame(game) {
     const player = usePlayerStore()
     player.sync()
     if (change === 'cells') player.cellsVersion++
+    // A scan's round is out: record it (through the session key when there is one, so no popup).
+    if (change === 'scanDue') {
+      const cell = state.scan?.cell
+      player.resolveScans().then((recorded) => {
+        if (!recorded && cell != null) game.scanDeclined(cell)
+        else if (recorded) gameAudio().speak('neighborsScanned')
+      })
+    }
     switch (change) {
       case 'connected':
         chain.chainId = state.chainId

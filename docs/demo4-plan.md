@@ -359,8 +359,8 @@ Milestones 1–5 built the new rules on a separate `/galaxy` screen with plain p
 - [x] Remove the old contracts (`contracts/`, `migrations/`, `test/`, Truffle), the old client path and the old networks; `npm run local` starts the local chain; the `v4` and `demo4` names go. *The new contracts now live in `contracts/`.*
 
 *New stars appear.*
-- [ ] Bug: the client never re-read the map after a move, so it never sent pending scans and nothing was charted. It re-reads after every move.
-- [ ] A scan is recorded as soon as its drand round is out (about 30 s after arriving): silently with a session key, with one wallet approval without. Until then the system view and the map show "Scanning…" with a countdown.
+- [x] Bug: the client never re-read the map after a move, so it never sent pending scans and nothing was charted. It re-reads after every move.
+- [x] A scan is recorded as soon as its drand round is out (about 30 s after arriving): silently with a session key, with one wallet approval without. Until then the system view and the map show "Scanning…" with a countdown.
 
 *Star names.*
 - [ ] New stars are unnamed and show as "Star 1234" (the cell). Genesis stars (Sol's ring) get real nearby-star names.

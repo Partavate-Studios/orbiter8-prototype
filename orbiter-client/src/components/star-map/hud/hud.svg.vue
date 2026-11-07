@@ -63,6 +63,16 @@
 
       <minimap v-if="mapDataLoaded && !neighborView" :transform="corner(rightMostX, -70, topMostY, 160)" />
 
+      <!-- The long-range scan of a star you discovered, until it's recorded (yellow: yours) -->
+      <text
+        v-if="scanWords"
+        :transform="corner(rightMostX, -20, topMostY, 232)"
+        text-anchor="end"
+        font-size="0.8em"
+        :fill="YELLOW_LIGHT"
+        >{{ scanWords }}</text
+      >
+
       <g :transform="corner(rightMostX, -50, topMostY, 50)">
         <!-- A star until the star is selected; then the star-nav icon, which zooms out to its neighbors. -->
         <a cursor="pointer" @click.prevent="selectStar()">
@@ -218,6 +228,7 @@
 <script>
 import { cargoLines, emptyHolds, shortGoodName } from '@/sdk/game/trade'
 import { STAR_KEY } from '@/sdk/system'
+import { game } from '@/sdk/client'
 
 import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
@@ -290,6 +301,9 @@ export default {
     FeedMenu,
     SiegesIcon
   },
+  data() {
+    return { now: Date.now() }
+  },
   computed: {
     starSelected() {
       return this.selected === STAR_KEY
@@ -320,6 +334,16 @@ export default {
       const h = Math.floor(seconds / 3600)
       const m = Math.floor((seconds % 3600) / 60)
       return h ? `${h}h ${m}m` : `${m}m`
+    },
+    /** "Scanning Lulin-851… 23 s", then "Recording the scan…", or null. */
+    scanWords() {
+      const scan = this.player.scan
+      if (!scan) return null
+      const here = scan.cell === this.player.ship?.cell
+      const where = here ? 'this star' : game.starName(scan.cell)
+      if (scan.status === 'due') return `Recording the scan of ${where}…`
+      const seconds = Math.max(0, Math.ceil((scan.readyAt - this.now) / 1000))
+      return seconds > 0 ? `Scanning ${where}… ${seconds} s` : `Scanning ${where}…`
     },
     PINK_LIGHT: () => PINK_LIGHT,
     YELLOW_LIGHT: () => YELLOW_LIGHT,
@@ -360,11 +384,15 @@ export default {
     }
   },
   mounted() {
-    // Timers (sessions, buildings, sieges) count down by this clock.
+    // Timers (sessions, buildings, sieges) count down by this clock; the scan's by the second.
     this.clock = setInterval(() => usePlayerStore().tick(), 15_000)
+    this.seconds = setInterval(() => {
+      if (usePlayerStore().scan) this.now = Date.now()
+    }, 1000)
   },
   unmounted() {
     clearInterval(this.clock)
+    clearInterval(this.seconds)
   },
   methods: {
     /** Where cargo slot `index` sits: two columns, the empty holds always last on the right. */

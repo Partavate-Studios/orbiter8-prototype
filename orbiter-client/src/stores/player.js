@@ -29,6 +29,8 @@ export const usePlayerStore = defineStore('Player', {
     factories: {},
     feed: [],
     session: null,
+    /** the pilot's next scan: { cell, readyAt, status: 'waiting' | 'due' }, or null */
+    scan: null,
     /** bumped when the galaxy map's cells change */
     cellsVersion: 0,
     /** Pilots.sol SHIP_NAME_FEE (B16) */
@@ -78,7 +80,8 @@ export const usePlayerStore = defineStore('Player', {
         defenses: { ...s.defenses },
         factories: { ...s.factories },
         feed: markRaw(s.feed),
-        session: s.session
+        session: s.session,
+        scan: s.scan
       })
     },
     tick() {
@@ -128,7 +131,7 @@ export const usePlayerStore = defineStore('Player', {
       )
     },
     resolveScans() {
-      return track({ doing: 'Recording the scans', done: 'Scans recorded', failed: "Couldn't record the scans" }, (o) =>
+      return track({ doing: 'Recording the long-range scan', done: 'Scan recorded: new stars charted', failed: "Couldn't record the scan" }, (o) =>
         game.actions.resolveScans(o)
       )
     },

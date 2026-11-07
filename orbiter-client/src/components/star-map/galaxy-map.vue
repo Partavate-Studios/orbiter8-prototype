@@ -31,6 +31,7 @@
     <header class="title">
       <h2>Galaxy Map</h2>
       <p>Stars within {{ range }} {{ range === 1 ? 'jump' : 'jumps' }} are ringed. Drag to look around.</p>
+      <p v-if="scanWords" class="scanning-now">{{ scanWords }}</p>
     </header>
 
     <aside v-if="chosen !== null" class="card">
@@ -85,7 +86,8 @@ export default {
       chosen: null,
       preview: null,
       waiting: false,
-      failed: false
+      failed: false,
+      now: Date.now()
     }
   },
   computed: {
@@ -154,6 +156,15 @@ export default {
     canJump() {
       return this.distanceAway > 0 && this.distanceAway <= this.range
     },
+    /** The pilot's scan in progress: "Scanning Lulin-851… 23 s", or null. */
+    scanWords() {
+      const scan = this.player.scan
+      if (!scan) return null
+      const where = this.nameOf(scan.cell)
+      if (scan.status === 'due') return `Recording the scan of ${where}…`
+      const seconds = Math.max(0, Math.ceil((scan.readyAt - this.now) / 1000))
+      return seconds > 0 ? `Scanning ${where}… ${seconds} s` : `Scanning ${where}…`
+    },
     besieged() {
       return this.player.besiegedCells.has(this.chosen)
     },
@@ -177,12 +188,14 @@ export default {
       this.height = window.innerHeight
     }
     window.addEventListener('resize', this.onResize)
+    this.seconds = setInterval(() => (this.now = Date.now()), 1000)
     this.centerOnShip()
     game.loadAround(this.shipCell)
   },
   unmounted() {
     window.removeEventListener('resize', this.onResize)
     clearTimeout(this.timer)
+    clearInterval(this.seconds)
   },
   methods: {
     ...mapActions(useUIStore, ['exitNeighborView', 'zoomInToStar']),
@@ -358,6 +371,9 @@ export default {
   margin: 0.3em 0 0;
   font-size: 0.85em;
   color: #c3b3da;
+}
+.title .scanning-now {
+  color: var(--o8-yellow-light);
 }
 .card {
   position: absolute;

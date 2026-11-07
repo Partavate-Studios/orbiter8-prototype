@@ -12,6 +12,7 @@ import { networkFor } from '@/sdk/chain/networks'
 import { createBlockWatcher } from '@/sdk/sync'
 import { pendingRegistration, rememberPending, forgetPending } from '@/sdk/pending'
 import { createGame, STATE, REGION_RADIUS } from './contracts'
+import { timeOf } from './drand'
 import { distance } from './hex'
 import { starTraits, anomalyName } from './traits'
 import { planet as derivePlanet, planetCount, looks, moonName, planetName } from './system-gen'
@@ -104,6 +105,8 @@ export function createGameClient() {
     feed: [],
     /** the live session key: { key, expiry }, or null */
     session: null,
+    /** the pilot's next scan: { cell, readyAt, status }, or null (scheduleScan) */
+    scan: null,
     /** the galaxy map: cell number → cell, and star names by cell */
     cells: new Map(),
     names: {},
@@ -146,6 +149,48 @@ export function createGameClient() {
   /** Who signs moves: the session key while it's live, otherwise the wallet. */
   const mover = () => (sessionLive() && keyGame ? keyGame : game)
   const proofs = () => game.proofsFor([...state.cells.values()])
+
+  // ── scans: recorded as soon as drand publishes their round (D21) ─────────────────────────────
+
+  /** The pilot's own discoveries still waiting for their scan. */
+  const ownPending = () =>
+    [...state.cells.values()].filter((c) => c.visited && !c.scanned && c.discoverer === state.account)
+  let scanTimer = null
+  /** Scans the pilot declined in the wallet: not asked again until something changes. */
+  const declinedScans = new Set()
+  /**
+   * Plans the next scan: `state.scan` is { cell, readyAt (ms), status: 'waiting' | 'due' } for the one
+   * at the ship's star (or the soonest), or null; when its round is out, subscribers hear 'scanDue'
+   * and record it (stores/game-bindings.js), silently through a session key, else with one approval.
+   */
+  function scheduleScan() {
+    clearTimeout(scanTimer)
+    const pending = ownPending().filter((c) => !declinedScans.has(c.cell))
+    if (!pending.length || !state.pilot) {
+      if (state.scan) {
+        state.scan = null
+        notify('scan')
+      }
+      return
+    }
+    const here = pending.find((c) => c.cell === state.pilot.ship.cell)
+    const next = here ?? pending.sort((a, b) => a.scanRound - b.scanRound)[0]
+    const readyAt = timeOf(next.scanRound) * 1000
+    state.scan = { cell: next.cell, readyAt, status: 'waiting' }
+    notify('scan')
+    // A moment after the round is due, so the relays have it.
+    scanTimer = setTimeout(scanDue, Math.max(0, readyAt - Date.now()) + 1500)
+  }
+  async function scanDue() {
+    if (!state.scan) return
+    const ready = await game.proofsFor(ownPending())
+    if (!ready.length) {
+      scanTimer = setTimeout(scanDue, 3000) // not on the relays yet
+      return
+    }
+    state.scan = { ...state.scan, status: 'due' }
+    notify('scanDue')
+  }
   const ship = () => state.pilot?.ship
 
   // ── the call sign, held until the ship is named (the wizard asks for them one at a time; they register in one move)
@@ -284,7 +329,8 @@ export function createGameClient() {
     const cell = viewCell()
     const seed = state.universe.seed
     const goods = state.economy.goods.length
-    await loadAround(cell)
+    // Re-read every time: visits and scans change the cells (a stale map never sends its scans).
+    await loadAround(cell, true)
     onProgress(10)
     const star = state.cells.get(cell)
     const [planets, ports, sieges, here, recentTrades] = await Promise.all([
@@ -788,7 +834,14 @@ export function createGameClient() {
         if (state.player) state.player = playerShape()
         notify('player')
         notify('system')
+        scheduleScan()
       }).finally(() => setLoading('system', false))
+    },
+
+    /** The pilot declined recording a scan: don't ask again for it until the next change. */
+    scanDeclined(cell) {
+      declinedScans.add(cell)
+      scheduleScan()
     },
 
     // ── reads for the pilot's screens ─────────────────────────────────────────────────────────
