@@ -30,8 +30,16 @@
           <text x="0" :y="30 + shipBars.length * 18" fill="#ffffff88" font-size="0.85em">{{ weapons(siege.ship) }}</text>
         </g>
 
-        <text x="0" y="200" text-anchor="middle" font-size="0.85em" :fill="siege.wornAt ? PINK_LIGHT : '#ffffffaa'">
-          {{ status }}
+        <text
+          v-for="(line, i) in status"
+          :key="i"
+          x="0"
+          :y="192 + i * 18"
+          text-anchor="middle"
+          font-size="0.85em"
+          :fill="siege.wornAt ? PINK_LIGHT : '#ffffffaa'"
+        >
+          {{ line }}
         </text>
 
         <g transform="translate(0 250)">
@@ -103,10 +111,12 @@ export default {
         .filter((b) => b.max > 0)
         .map((b) => ({ ...b, part: b.value / b.max }))
     },
+    /** In short lines, to fit a phone. */
     status() {
-      if (this.siege.claimAt) return `Claim filed with Minerva: completes ${this.when(this.siege.claimAt)} unless the defenses come back.`
-      if (this.siege.wornAt) return `Worn down ${this.ago(this.siege.wornAt)}: production has stopped.`
-      return 'The planet is holding.'
+      if (this.siege.claimAt)
+        return [`Claim filed with Minerva: completes ${this.when(this.siege.claimAt)},`, 'unless the defenses come back.']
+      if (this.siege.wornAt) return [`Worn down ${this.ago(this.siege.wornAt)}:`, 'production has stopped.']
+      return ['The planet is holding.']
     },
     actions() {
       const d = this.demo4

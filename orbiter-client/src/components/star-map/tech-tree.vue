@@ -8,10 +8,10 @@
         <button class="close" aria-label="Close" @click="$emit('close')">×</button>
       </header>
       <p class="sub">
-        Claim a planet ({{ rules.claimFee.toLocaleString() }} cr, your ship at its star), bring people from Earth ({{
+        Claim a planet ({{ rules.claimFee.toLocaleString() }}¢, your ship at its star), bring people from Earth ({{
           rules.colonistPrice
         }}
-        cr each, 100 to a bay) and goods, then build up the line. Credits are spent when a building starts; goods come
+        ¢ each, 100 to a hold) and goods, then build up the line. Credits are spent when a building starts; goods come
         from the planet's storage.
       </p>
 
@@ -19,7 +19,7 @@
         <li v-for="b in buildings" :key="b.building">
           <h4>{{ b.name }}</h4>
           <p class="cost">
-            {{ b.cost.credits.toLocaleString() }} cr<template v-for="[good, amount] in b.cost.goods" :key="good">
+            {{ b.cost.credits.toLocaleString() }}¢<template v-for="[good, amount] in b.cost.goods" :key="good">
               · {{ amount }} {{ goodName(good) }}</template
             >
             · {{ duration(b.cost.time) }}
@@ -34,7 +34,7 @@
         <tbody>
           <tr v-for="(p, i) in rules.parts" :key="i">
             <td>{{ p.name }}<span v-if="p.planetOnly" class="sub"> · planets only</span></td>
-            <td class="num">{{ p.credits.toLocaleString() }} cr</td>
+            <td class="num">{{ p.credits.toLocaleString() }}¢</td>
             <td class="sub">{{ p.goods.map(([g, a]) => `${a} ${goodName(g)}`).join(', ') }}</td>
             <td class="num sub">{{ duration(p.time) }}</td>
           </tr>
@@ -54,7 +54,7 @@ const UNLOCKS = {
   2: 'Opens the Station and the Autofactory.',
   3: 'Opens the Port.',
   4: 'A market port at the planet, trading by its class. You take the fee on every trade.',
-  5: 'A shipyard at your port: pilots buy bays and range there.',
+  5: 'A shipyard at your port: pilots buy cargo holds and engine range there.',
   6: 'The Armory: weapons for sale to visiting pilots (with battle).',
   7: 'Builds drones, weapons, defenses, platforms and repair bots from goods in storage, five orders at a time.'
 }

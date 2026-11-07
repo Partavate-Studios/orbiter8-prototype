@@ -313,9 +313,10 @@ export default {
     /** The page tabs sit halfway between the balance row and the first dial, at any scale. */
     tabsY() {
       const s = this.slotScale
-      const balanceRow = -400 + 215 * s
-      const firstDial = 250 - 400 / s + 10 * (1 + s / 4)
-      return (balanceRow + firstDial) / 2 + 4
+      // The balance boxes' bottom edge, and the top of the first dial's label.
+      const balanceBottom = -400 + 215 * s + 10 * s
+      const labelTop = 250 - 400 / s + 10 * (1 + s / 4) - 12 * (1 + s / 4)
+      return (balanceBottom + labelTop) / 2
     },
     /** Rows a little closer when a page has four goods. */
     rowGap() {
