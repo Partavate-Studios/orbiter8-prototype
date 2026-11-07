@@ -4,6 +4,8 @@
 import { Contract, JsonRpcProvider } from 'ethers'
 import Orbiter8Abi from '@/sdk/chain/abi/Orbiter8.json'
 import AvatarControlsAbi from '@/sdk/chain/abi/AvatarControls.json'
+import PilotsAbi from '@/sdk/v4/abi/Pilots.json'
+import GalaxyAbi from '@/sdk/v4/abi/Galaxy.json'
 
 const MAX_AGE_MS = 5 * 60 * 1000
 // A public RPC that hasn't answered by then is treated as unreachable (the next one is tried).
@@ -37,6 +39,15 @@ async function readStats(url, network) {
   // some free RPCs (dRPC) refuse JSON-RPC batches.
   const provider = new JsonRpcProvider(url, network.chainId, { staticNetwork: true, batchMaxCount: 1 })
   try {
+    if (network.version === 4) {
+      // Demo 4: pilots registered, and stars discovered (each discovery's event) plus Sol.
+      const pilots = new Contract(network.contracts.pilots, PilotsAbi, provider)
+      const galaxy = new Contract(network.contracts.galaxy, GalaxyAbi, provider)
+      const [count, discovered] = await withTimeout(
+        Promise.all([pilots.pilotCount(), galaxy.queryFilter(galaxy.filters.Discovered(), 0)])
+      )
+      return { pilots: Number(count), starSystems: discovered.length + 1 }
+    }
     const game = new Contract(network.contracts.Orbiter8, Orbiter8Abi, provider)
     const avatars = new Contract(network.contracts.AvatarControls, AvatarControlsAbi, provider)
     const [pilots, starSystems] = await withTimeout(Promise.all([avatars.getAvatarCount(), game.getSystemCount()]))

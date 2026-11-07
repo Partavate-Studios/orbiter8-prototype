@@ -5,6 +5,9 @@ import { galaxy, avatars } from '@/sdk/chain/contracts'
 import { getSession } from '@/sdk/chain/wallet'
 import { decodeSystem, decodePlanet, decodeStation, decodeMoon, decodeShip, decodeMyShip } from '@/sdk/chain/decode'
 
+/** Demo 3's goods, by id (Demo 4 has eight, from its Market contract). */
+export const DEMO3_GOODS = ['Equipment', 'Fuel Ore', 'Organics']
+
 /**
  * The game as a whole and the player's avatar, ship and credits.
  * `avatar.registered` is false until the player has made an avatar; `avatar.shipId` is 0 until they
@@ -12,6 +15,7 @@ import { decodeSystem, decodePlanet, decodeStation, decodeMoon, decodeShip, deco
  */
 export async function loadPlayer() {
   const player = {
+    goods: DEMO3_GOODS,
     avatarCount: null,
     starSystemCount: null,
     avatar: {
@@ -42,7 +46,15 @@ export async function loadPlayer() {
   }
 
   if (player.avatar.shipId > 0) {
-    player.avatar.ship = { ...decodeMyShip(await galaxy.getMyShip()), owner: getSession().account }
+    const ship = decodeMyShip(await galaxy.getMyShip())
+    // The same cargo shape as Demo 4's (sdk/v4/client.js): units by good id, and holds in use.
+    const cargo = [ship.equipment, ship.fuel, ship.organics]
+    player.avatar.ship = {
+      ...ship,
+      cargo,
+      usedHolds: cargo.reduce((a, b) => a + b, 0),
+      owner: getSession().account
+    }
   }
   return player
 }
@@ -123,7 +135,11 @@ export async function loadSystem(onProgress = () => {}) {
   onProgress(5)
 
   for (const [key, neighborId] of Object.entries(data.neighborIds)) {
-    data.neighbors[key] = { id: neighborId, name: await galaxy.getSystemName(String(neighborId)) }
+    data.neighbors[key] = {
+      id: neighborId,
+      exists: neighborId > 0, // 0: an empty slot
+      name: await galaxy.getSystemName(String(neighborId))
+    }
     onProgress(Math.min(24, 6 + Number(key)))
   }
   onProgress(25)

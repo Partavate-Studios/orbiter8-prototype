@@ -1,6 +1,6 @@
 // The game client: connects to a wallet, keeps a plain copy of the game state up to date as blocks
 // arrive, and offers every player action. Framework-free; a UI subscribes and draws from the state.
-import { connectWallet } from '@/sdk/chain/wallet'
+import { connectWallet, getSession } from '@/sdk/chain/wallet'
 import { initContracts, contractAddresses, galaxy, getNativeBalance, waitForTransaction } from '@/sdk/chain/contracts'
 import { loadPlayer, loadRecentEvents, loadSystem } from '@/sdk/load'
 import { createBlockWatcher } from '@/sdk/sync'
@@ -9,6 +9,8 @@ import { loadLeaderboard } from '@/sdk/leaderboard'
 import { createExploredMap } from '@/sdk/explored'
 import { loadCallsigns } from '@/sdk/callsigns'
 import { pendingRegistration, rememberPending, forgetPending } from '@/sdk/pending'
+import { networkFor } from '@/sdk/chain/networks'
+import { createGameClientV4 } from '@/sdk/v4/client'
 
 // Registrations are remembered while in flight (sdk/pending.js), so a reload can pick up the wait.
 const REGISTRATIONS = { createAvatar: 'callsign', launchShip: 'ship' }
@@ -131,7 +133,13 @@ export function createGameClient() {
 
     /** Connects to an EIP-6963 wallet (sdk/chain/wallet.js discoverWallets). Rejects if the player declines. */
     async connect(wallet) {
-      const session = await connectWallet(wallet)
+      await connectWallet(wallet)
+      await client.useSession()
+    },
+
+    /** Takes up the wallet session already open (sdk/chain/wallet.js). */
+    async useSession() {
+      const session = getSession()
       state.chainId = session.chainId
       state.account = session.account
       notify('connected')
@@ -261,5 +269,61 @@ export function createGameClient() {
   return client
 }
 
+/**
+ * The app's one game client: Demo 3's, or Demo 4's (sdk/v4/client.js, the same interface) once the
+ * wallet is on a network where Demo 4 is deployed. Subscribers hear only the one in use.
+ */
+function createGameClientFor() {
+  const demo3 = createGameClient()
+  const demo4 = createGameClientV4()
+  let active = demo3
+  const listeners = new Set()
+  for (const client of [demo3, demo4]) {
+    client.subscribe((change, state) => {
+      if (client === active) listeners.forEach((listener) => listener(change, state))
+    })
+  }
+  const facade = {
+    get state() {
+      return active.state
+    },
+    get actions() {
+      return active.actions
+    },
+    /** 3 or 4: which demo's contracts the player is on. */
+    get version() {
+      return active === demo4 ? 4 : 3
+    },
+    /** Demo 4's client, for its own screens (sessions, planets, battle, the galaxy map). */
+    demo4,
+    subscribe(listener) {
+      listeners.add(listener)
+      return () => listeners.delete(listener)
+    },
+    /** Connects the wallet, then hands the session to the client for that network's demo. */
+    async connect(wallet) {
+      const session = await connectWallet(wallet)
+      active = networkFor(session.chainId)?.version === 4 ? demo4 : demo3
+      await active.useSession()
+    }
+  }
+  const delegated = [
+    'bindContracts',
+    'checkForNewBlock',
+    'explored',
+    'getLeaderboard',
+    'pendingRegistration',
+    'resumeRegistration',
+    'listCallsigns',
+    'refreshBalance',
+    'refresh',
+    'refreshPlayer',
+    'refreshEvents',
+    'refreshSystem'
+  ]
+  for (const name of delegated) facade[name] = (...args) => active[name](...args)
+  return facade
+}
+
 /** The app's one game client. */
-export const game = createGameClient()
+export const game = createGameClientFor()

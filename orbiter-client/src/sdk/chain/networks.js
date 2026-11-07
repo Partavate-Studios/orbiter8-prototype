@@ -5,6 +5,7 @@
 /**
  * @typedef {object} Network
  * @property {number} chainId
+ * @property {number} [version]  4 for Demo 4's contracts (sdk/v4); Demo 3's otherwise
  * @property {string} name
  * @property {string} shortName
  * @property {{ name: string, symbol: string, decimals: number }} currency
@@ -104,13 +105,42 @@ const includeLocal = import.meta.env.DEV || import.meta.env.VITE_LOCAL_NETWORK =
 const localLoaders = includeLocal ? import.meta.glob('/dev/local-deployment.json', { import: 'default' }) : {}
 const localDeployment = await Object.values(localLoaders)[0]?.()
 
+// Demo 4's local chain (`npm run local4`, dev/local-deployment-v4.json). Its contracts are Demo 4's,
+// by name (sdk/v4/game.js), and `version: 4` picks Demo 4's game client (sdk/client.js). Under
+// `npm run local4` it replaces Demo 3's local entry, whose chain isn't running then.
+const local4Loaders = includeLocal ? import.meta.glob('/dev/local-deployment-v4*.json', { import: 'default' }) : {}
+// The copy of `npm run local4` this server belongs to (dev/local4.js CHAIN_PORT).
+const local4Load = local4Loaders[`/dev/local-deployment-v4${import.meta.env.VITE_LOCAL4_FILE ?? ''}.json`]
+const local4Deployment = await local4Load?.()
+const onlyDemo4 = Boolean(import.meta.env.VITE_DEMO4)
+
 /** @type {Network[]} */
-export const networks = localDeployment
+const local4 = local4Deployment
+  ? [
+      {
+        chainId: local4Deployment.chainId,
+        version: 4,
+        name: 'Local Dev Chain (Demo 4)',
+        shortName: 'Local',
+        currency: { name: 'Dev Ether', symbol: 'ETH', decimals: 18 },
+        rpc: [local4Deployment.rpc],
+        explorer: [],
+        contracts: local4Deployment.contracts,
+        funding: [{ text: 'Test accounts on the local chain start with 10,000 ETH.' }]
+      }
+    ]
+  : []
+
+/** @type {Network[]} */
+export const networks = onlyDemo4
+  ? local4
+  : localDeployment
   ? [
       ...deployed,
+      ...local4,
       {
         chainId: localDeployment.chainId,
-        name: 'Local Dev Chain',
+        name: 'Local Dev Chain (Demo 3)',
         shortName: 'Local',
         currency: { name: 'Dev Ether', symbol: 'ETH', decimals: 18 },
         rpc: ['http://127.0.0.1:8545'],
@@ -122,7 +152,7 @@ export const networks = localDeployment
         funding: [{ text: 'Test accounts on the local chain start with 10,000 ETH.' }]
       }
     ]
-  : deployed
+  : [...deployed, ...local4]
 
 /** @returns {Network | undefined} */
 export function networkFor(chainId) {

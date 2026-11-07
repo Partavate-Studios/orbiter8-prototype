@@ -91,6 +91,15 @@ const toSiege = (planet, s) => ({
   side: toSide(s.planet)
 })
 
+/** Sends a move, tells `options.onSent` its hash, and resolves with the receipt once mined. */
+async function sent(transaction, options) {
+  const tx = await transaction
+  options?.onSent?.(tx.hash)
+  return tx.wait()
+}
+
+const DEEDS_ABI = ['function balanceOf(address owner) view returns (uint256)']
+
 const toCost = (c) => ({
   credits: Number(c.credits),
   time: Number(c.time),
@@ -111,6 +120,13 @@ export function createGame(runner, addresses) {
   const factory = new Contract(addresses.factory, FactoryAbi, runner)
   const battle = new Contract(addresses.battle, BattleAbi, runner)
   const armory = new Contract(addresses.armory, ArmoryAbi, runner)
+  const deeds = addresses.deeds ? new Contract(addresses.deeds, DEEDS_ABI, runner) : null
+  const provider = runner.provider ?? runner
+  /** Events from the last `blocks` blocks (all of them on a young chain). */
+  const recent = async (contract, filter, blocks) => {
+    const latest = await provider.getBlockNumber()
+    return contract.queryFilter(filter, Math.max(0, latest - blocks), latest)
+  }
 
   const game = {
     galaxy,
@@ -179,6 +195,11 @@ export function createGame(runner, addresses) {
         },
         capacity: Number(capacity)
       }
+    },
+
+    /** One planet as it stands now, with `goods` stock entries. */
+    async planetView(id, goods = 0) {
+      return toPlanet(await planets.planetView(id, goods))
     },
 
     /** Every planet at a star, as it stands now, with `goods` stock entries. */
@@ -277,6 +298,87 @@ export function createGame(runner, addresses) {
         .reverse()
     },
 
+    /** Every registered pilot's address (lowercase), oldest first, from the registrations. */
+    async pilotList() {
+      const logs = await pilots.queryFilter(pilots.filters.Registered(), 0)
+      return logs.map((l) => l.args[0].toLowerCase())
+    },
+
+    /** The pilots whose ships are at `cell`, among `addresses`: [{ address, shipId, name, callsign }]. */
+    async shipsAt(cell, addresses) {
+      const all = await Promise.all(addresses.map((a) => pilots.pilotOf(a).then((p) => [a, p])))
+      return all
+        .filter(([, p]) => p.registered && Number(p.ship.cell) === cell)
+        .map(([address, p]) => ({ address, shipId: Number(p.shipId), name: p.ship.name, callsign: p.callsign }))
+    },
+
+    /** Call signs by address (lowercase), for `addresses`. */
+    async callsigns(addresses) {
+      const all = await Promise.all(addresses.map((a) => pilots.pilotOf(a)))
+      return Object.fromEntries(addresses.map((a, i) => [a, all[i].callsign]))
+    },
+
+    /** Who has the call sign (any case), or null. */
+    async callsignOwner(callsign) {
+      const owner = await pilots.byCallsign(callsign)
+      return owner === ZERO ? null : owner.toLowerCase()
+    },
+
+    /** Trades in the last `blocks` blocks, oldest first: [{ sender, port, good, units, hash }]. */
+    async recentTrades(blocks) {
+      const logs = await recent(market, market.filters.Traded(), blocks)
+      return logs.map((l) => ({
+        sender: l.args[0].toLowerCase(),
+        port: Number(l.args[1]),
+        good: Number(l.args[2]),
+        units: Number(l.args[3]),
+        hash: l.transactionHash
+      }))
+    },
+
+    /** Galaxy chat in the last `blocks` blocks, oldest first: [{ sender, message, hash, block }]. */
+    async broadcasts(blocks) {
+      const logs = await recent(pilots, pilots.filters.Broadcast(), blocks)
+      return logs.map((l) => ({
+        sender: l.args[0].toLowerCase(),
+        message: l.args[1],
+        hash: l.transactionHash,
+        block: l.blockNumber
+      }))
+    },
+
+    /** Registrations in the last `blocks` blocks: [{ pilot, shipId, callsign, shipName, hash, block }]. */
+    async registrations(blocks) {
+      const logs = await recent(pilots, pilots.filters.Registered(), blocks)
+      return logs.map((l) => ({
+        pilot: l.args[0].toLowerCase(),
+        shipId: Number(l.args[1]),
+        callsign: l.args[2],
+        shipName: l.args[3],
+        hash: l.transactionHash,
+        block: l.blockNumber
+      }))
+    },
+
+    /** Names an owner gave a planet: { planet, station, moons: [8] } ("" where unnamed). */
+    async namesOf(planet) {
+      const names = await planets.namesOf(planet)
+      return { planet: names[0], station: names[1], moons: names.slice(2) }
+    },
+
+    /** Planet deeds a pilot holds. */
+    async deedCount(address) {
+      return deeds ? Number(await deeds.balanceOf(address)) : 0
+    },
+
+    /** Every claimed planet's id and owner now, from the claims and seizures. */
+    async claimedPlanets() {
+      const claims = await planets.queryFilter(planets.filters.Claimed(), 0)
+      const ids = [...new Set(claims.map((l) => Number(l.args[0])))]
+      const owners = await Promise.all(ids.map((id) => planets.ownerOf(id)))
+      return ids.map((id, i) => ({ id, owner: owners[i].toLowerCase() }))
+    },
+
     /** Every port at a star, with stock and next-unit prices. */
     async portsAt(cell) {
       return (await market.portsAt(cell)).map(toPort)
@@ -314,95 +416,109 @@ export function createGame(runner, addresses) {
       return proofs
     },
 
-    // Moves resolve after they're mined, with the receipt.
-    async register(callsign, shipName) {
-      return (await pilots.register(callsign, shipName)).wait()
+    // Moves resolve after they're mined, with the receipt. Each takes `options` last: `{ onSent(hash) }`
+    // hears the moment the wallet has sent it, before it's mined (Demo 3's actions, sdk/actions.js).
+    async register(callsign, shipName, options) {
+      return sent(pilots.register(callsign, shipName), options)
     },
-    async jump(to, proofs = []) {
-      return (await pilots.jump(to, proofs)).wait()
+    async jump(to, proofs = [], options) {
+      return sent(pilots.jump(to, proofs), options)
     },
-    async traverse(proofs = []) {
-      return (await pilots.traverse(proofs)).wait()
+    async traverse(proofs = [], options) {
+      return sent(pilots.traverse(proofs), options)
     },
-    async renameStar(cell, name, proofs = []) {
-      return (await pilots.renameStar(cell, name, proofs)).wait()
+    /** Names part of the player's planet: Planets.NAME_PLANET (0), NAME_STATION (1), NAME_MOON (2) + orbit. */
+    async renamePlanet(planet, part, name, options) {
+      return sent(planets.rename(planet, part, name), options)
     },
-    async resolveScans(proofs) {
-      return (await pilots.resolveScans(proofs)).wait()
+    async renameShip(name, options) {
+      return sent(pilots.renameShip(name), options)
+    },
+    async changeCallsign(callsign, options) {
+      return sent(pilots.changeCallsign(callsign), options)
+    },
+    async broadcast(message, options) {
+      return sent(pilots.broadcast(message), options)
+    },
+    async renameStar(cell, name, proofs = [], options) {
+      return sent(pilots.renameStar(cell, name, proofs), options)
+    },
+    async resolveScans(proofs, options) {
+      return sent(pilots.resolveScans(proofs), options)
     },
     /** lines: [{ good, units (+ buy, - sell), limit }], sales first. */
-    async trade(port, lines) {
-      return (await market.trade(port, lines)).wait()
+    async trade(port, lines, options) {
+      return sent(market.trade(port, lines), options)
     },
-    async buyBays(port, count, maxCost) {
-      return (await market.buyBays(port, count, maxCost)).wait()
+    async buyBays(port, count, maxCost, options) {
+      return sent(market.buyBays(port, count, maxCost), options)
     },
-    async buyRange(port, maxCost) {
-      return (await market.buyRange(port, maxCost)).wait()
+    async buyRange(port, maxCost, options) {
+      return sent(market.buyRange(port, maxCost), options)
     },
     /** From the wallet: lets `key` move for the pilot until `expiry`, sending it `value` (wei) for gas. */
-    async startSession(key, expiry, value) {
-      return (await pilots.startSession(key, expiry, { value })).wait()
+    async startSession(key, expiry, value, options) {
+      return sent(pilots.startSession(key, expiry, { value }), options)
     },
-    async endSession() {
-      return (await pilots.endSession()).wait()
+    async endSession(options) {
+      return sent(pilots.endSession(), options)
     },
-    async claim(planet) {
-      return (await planets.claim(planet)).wait()
+    async claim(planet, options) {
+      return sent(planets.claim(planet), options)
     },
-    async recruit(count) {
-      return (await planets.recruit(count)).wait()
+    async recruit(count, options) {
+      return sent(planets.recruit(count), options)
     },
-    async land(planet, count) {
-      return (await planets.land(planet, count)).wait()
+    async land(planet, count, options) {
+      return sent(planets.land(planet, count), options)
     },
-    async board(planet, count) {
-      return (await planets.board(planet, count)).wait()
+    async board(planet, count, options) {
+      return sent(planets.board(planet, count), options)
     },
-    async deliver(planet, good, units) {
-      return (await planets.deliver(planet, good, units)).wait()
+    async deliver(planet, good, units, options) {
+      return sent(planets.deliver(planet, good, units), options)
     },
-    async collect(planet, good, units) {
-      return (await planets.collect(planet, good, units)).wait()
+    async collect(planet, good, units, options) {
+      return sent(planets.collect(planet, good, units), options)
     },
-    async build(planet, building) {
-      return (await planets.build(planet, building)).wait()
+    async build(planet, building, options) {
+      return sent(planets.build(planet, building), options)
     },
-    async order(planet, part, count) {
-      return (await factory.order(planet, part, count)).wait()
+    async order(planet, part, count, options) {
+      return sent(factory.order(planet, part, count), options)
     },
-    async attack(planet) {
-      return (await battle.attack(planet)).wait()
+    async attack(planet, options) {
+      return sent(battle.attack(planet), options)
     },
-    async joinDefense(planet) {
-      return (await battle.joinDefense(planet)).wait()
+    async joinDefense(planet, options) {
+      return sent(battle.joinDefense(planet), options)
     },
-    async advance(planet) {
-      return (await battle.advance(planet)).wait()
+    async advance(planet, options) {
+      return sent(battle.advance(planet), options)
     },
-    async fileClaim(planet) {
-      return (await battle.fileClaim(planet)).wait()
+    async fileClaim(planet, options) {
+      return sent(battle.fileClaim(planet), options)
     },
-    async completeClaim(planet) {
-      return (await battle.completeClaim(planet)).wait()
+    async completeClaim(planet, options) {
+      return sent(battle.completeClaim(planet), options)
     },
-    async withdraw(planet) {
-      return (await battle.withdraw(planet)).wait()
+    async withdraw(planet, options) {
+      return sent(battle.withdraw(planet), options)
     },
-    async fitShip(planet, part, count) {
-      return (await armory.fitShip(planet, part, count)).wait()
+    async fitShip(planet, part, count, options) {
+      return sent(armory.fitShip(planet, part, count), options)
     },
-    async unloadShip(planet, part, count) {
-      return (await armory.unloadShip(planet, part, count)).wait()
+    async unloadShip(planet, part, count, options) {
+      return sent(armory.unloadShip(planet, part, count), options)
     },
-    async fitPlanet(planet, part, count) {
-      return (await armory.fitPlanet(planet, part, count)).wait()
+    async fitPlanet(planet, part, count, options) {
+      return sent(armory.fitPlanet(planet, part, count), options)
     },
-    async buyParts(port, part, count, maxCost) {
-      return (await armory.buy(port, part, count, maxCost)).wait()
+    async buyParts(port, part, count, maxCost, options) {
+      return sent(armory.buy(port, part, count, maxCost), options)
     },
-    async repair(port) {
-      return (await armory.repair(port)).wait()
+    async repair(port, options) {
+      return sent(armory.repair(port), options)
     }
   }
   return game

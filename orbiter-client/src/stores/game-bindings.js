@@ -4,6 +4,7 @@
 import { useChainStore } from '@/stores/chain'
 import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
+import { useDemo4Store } from '@/stores/demo4'
 import { gameAudio } from '@/libs/08audio'
 
 const FAILURE_MESSAGES = {
@@ -41,6 +42,8 @@ export function bindStoresToGame(game) {
       console.error(FAILURE_MESSAGES[change.what], change.error)
       return
     }
+    // Demo 4's own state (sessions, planets, battle) follows every change.
+    if (game.version === 4) useDemo4Store().sync()
     switch (change) {
       case 'connected':
         chain.chainId = state.chainId

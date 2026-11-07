@@ -44,11 +44,12 @@ export function buildStation(planetId, name, options) {
 }
 
 /**
- * Trades at the station orbiting `planetId`: positive amounts buy from the port, negative sell to it.
- * @param {{ equipment: number, fuel: number, organics: number }} amounts
+ * Trades at the station orbiting `planetId`: `lines` is [{ good, units }], good 0 equipment, 1 fuel,
+ * 2 organics (sdk/load.js DEMO3_GOODS); positive units buy from the port, negative sell to it.
  */
-export function trade(planetId, { equipment, fuel, organics }, options) {
-  return galaxy.tradeAtPort(String(planetId), equipment, fuel, organics, options)
+export function trade(planetId, lines, options) {
+  const units = (good) => lines.filter((line) => line.good === good).reduce((sum, line) => sum + line.units, 0)
+  return galaxy.tradeAtPort(String(planetId), units(0), units(1), units(2), options)
 }
 
 /** Buys cargo holds at the shipyard of the station orbiting `planetId`. */

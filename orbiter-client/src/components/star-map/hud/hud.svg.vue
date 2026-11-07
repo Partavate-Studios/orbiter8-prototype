@@ -44,17 +44,12 @@
           <text text-anchor="end" transform="translate(70 11)">Credits:</text>
           <text text-anchor="start" transform="translate(75 11)" fill="#ffffff">{{ avatar.credits }}&cent;</text>
 
+          <!-- Three goods and the empty holds, two by two (Demo 3's three always; Demo 4's aboard) -->
           <g font-size="0.9em">
-            <text text-anchor="end" transform="translate(40 30)" fill="#ffffff">{{ avatar.ship.equipment }}</text>
-            <text text-anchor="end" transform="translate(140 30)" fill="#ffffff">{{ avatar.ship.fuel }}</text>
-            <text text-anchor="end" transform="translate(40 45)" fill="#ffffff">{{ avatar.ship.organics }}</text>
-            <text text-anchor="end" transform="translate(140 45)" fill="#ffffff">{{
-              avatar.ship.holds - (avatar.ship.equipment + avatar.ship.fuel + avatar.ship.organics)
-            }}</text>
-            <text text-anchor="start" transform="translate(45 30)">Equipment</text>
-            <text text-anchor="start" transform="translate(145 30)">Fuel</text>
-            <text text-anchor="start" transform="translate(45 45)">Organics</text>
-            <text text-anchor="start" transform="translate(145 45)">Empty</text>
+            <g v-for="(slot, index) in cargoSlots" :key="index" :transform="cargoSlotAt(index)">
+              <text text-anchor="end" fill="#ffffff">{{ slot.units }}</text>
+              <text text-anchor="start" x="5">{{ slot.name }}</text>
+            </g>
           </g>
         </g>
       </g>
@@ -189,6 +184,7 @@
 </template>
 
 <script>
+import { cargoLines, emptyHolds, shortGoodName } from '@/sdk/game/trade'
 import { STAR_KEY } from '@/sdk/system'
 
 import { useGameStateStore } from '@/stores/gamestate'
@@ -266,7 +262,20 @@ export default {
       'hudScale'
     ]),
     ...mapState(useStarMapStore, ['myShipId', 'spriteIds', 'mapDataLoaded']),
-    ...mapState(useGameStateStore, ['avatar', 'events']),
+    ...mapState(useGameStateStore, ['avatar', 'events', 'goods']),
+    /** Up to three goods aboard, then the empty holds; more than three goods aboard share the third slot. */
+    cargoSlots() {
+      // The left column is wide, the right narrow (Demo 3: Equipment | Fuel, Organics | Empty).
+      const lines = cargoLines(this.avatar.ship, this.goods).map((line, index) => ({
+        ...line,
+        name: shortGoodName(line.name, index % 2 === 0)
+      }))
+      const shown =
+        lines.length > 3
+          ? [...lines.slice(0, 2), { name: `+${lines.length - 2} more`, units: lines.slice(2).reduce((a, l) => a + l.units, 0) }]
+          : lines
+      return [...shown, { name: 'Empty', units: emptyHolds(this.avatar.ship) }]
+    },
     /** Where the profile card sits from the top left corner: under the avatar button on portrait screens. */
     profileOffset() {
       return this.viewRatio <= 1 ? { x: 20, y: 90 } : { x: 100, y: 15 }
@@ -291,6 +300,12 @@ export default {
     }
   },
   methods: {
+    /** Where cargo slot `index` sits: two columns, the empty holds always last on the right. */
+    cargoSlotAt(index) {
+      const last = index === this.cargoSlots.length - 1
+      const at = last ? 3 : index
+      return `translate(${at % 2 ? 140 : 40} ${at < 2 ? 30 : 45})`
+    },
     /**
      * Places a corner control (offset from a screen edge) at the player's interface size: the
      * offset and the control grow together, so it stays the same distance inside the screen's edge.

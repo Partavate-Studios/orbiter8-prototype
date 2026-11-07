@@ -14,6 +14,26 @@ import {
   SHIP_ORBIT_RADIUS_AROUND_STAR
 } from '@/sdk/game/orbits'
 import { dockedShips } from '@/sdk/game/docking'
+import { DEMO3_GOODS } from '@/sdk/load'
+
+/**
+ * A Demo 3 station's goods as a list, the shape Demo 4's are in (sdk/v4/client.js): a positive
+ * inventory is for sale, a negative one is what the port buys; Demo 3's prices are flat.
+ */
+function demo3Goods(station) {
+  return DEMO3_GOODS.map((name, id) => {
+    const key = ['equipment', 'fuel', 'organics'][id]
+    const inventory = station.inventory?.[key] ?? 0
+    return {
+      id,
+      name,
+      mode: inventory > 0 ? 'sells' : inventory < 0 ? 'buys' : 'none',
+      stock: Math.abs(inventory),
+      price: station.prices?.[key] ?? 0,
+      curve: null
+    }
+  })
+}
 
 /** The star at the center of every system has a fixed key. */
 export const STAR_KEY = 'star'
@@ -113,7 +133,9 @@ export function buildSystem(system, playerAccount) {
         speed: planetOrbitSpeed(planet.orbitSpeed, orbitalPosition)
       },
       hasStation: planet.hasStation,
-      moons: []
+      moons: [],
+      // Demo 4's own: level, buildings, people, storage, siege, defenses (sdk/v4/client.js)
+      v4: planet.v4 ?? null
     })
     keys.planets.push(planetObject.key)
 
@@ -128,8 +150,10 @@ export function buildSystem(system, playerAccount) {
         orbiting: planetObject.key,
         orbit: { radius: stationOrbitRadius(planet.size), speed: stationOrbitSpeed(planet.size) },
         orbitalPosition: 0,
-        inventory: planet.station.inventory,
-        prices: planet.station.prices
+        goods: planet.station.goods ?? demo3Goods(planet.station),
+        yard: planet.station.yard ?? true,
+        armory: planet.station.armory ?? false,
+        holdPrice: planet.station.prices?.holds ?? null
       })
       keys.stations.push(station.key)
       planetObject.stationKey = station.key

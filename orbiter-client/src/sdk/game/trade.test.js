@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
-  usedHolds,
   emptyHolds,
+  lineValue,
   tradeBalance,
   emptyHoldsAfterTrade,
   isValidTrade,
@@ -9,44 +9,70 @@ import {
   clampTradeAmount,
   maxHoldsToBuy,
   canAfford,
+  cargoLines,
   MAX_CARGO_HOLDS
 } from './trade'
+import { buyCost, sellProceeds, fee } from '@/sdk/v4/market'
 
-const ship = { holds: 10, equipment: 2, fuel: 1, organics: 3 }
-const prices = { equipment: 50, fuel: 20, organics: 10 }
-const none = { equipment: 0, fuel: 0, organics: 0 }
+const ship = { holds: 10, usedHolds: 6, cargo: [2, 1, 3] }
+// Demo 3's flat prices
+const goods = [
+  { id: 0, name: 'Equipment', mode: 'sells', stock: 10, price: 50, curve: null },
+  { id: 1, name: 'Fuel Ore', mode: 'sells', stock: 1, price: 20, curve: null },
+  { id: 2, name: 'Organics', mode: 'buys', stock: 2, price: 10, curve: null }
+]
 
 describe('cargo', () => {
-  it('counts used and free holds', () => {
-    expect(usedHolds(ship)).toBe(6)
+  it('counts free holds', () => {
     expect(emptyHolds(ship)).toBe(4)
+  })
+
+  it("lists Demo 3's three goods always, and Demo 4's only when aboard", () => {
+    expect(cargoLines(ship, ['Equipment', 'Fuel Ore', 'Organics'])).toEqual([
+      { name: 'Equipment', units: 2 },
+      { name: 'Fuel Ore', units: 1 },
+      { name: 'Organics', units: 3 }
+    ])
+    const names = ['Water ice', 'Metals', 'Rare elements', 'Helium-3', 'Organics', 'Silicon', 'Equipment', 'Electronics']
+    expect(cargoLines({ holds: 5, usedHolds: 4, cargo: [0, 0, 0, 0, 4, 0, 0, 0] }, names)).toEqual([
+      { name: 'Organics', units: 4 }
+    ])
   })
 })
 
 describe('trading', () => {
   it('buying costs credits and fills holds; selling earns and frees them', () => {
-    const buy = { equipment: 2, fuel: 0, organics: 0 }
-    expect(tradeBalance(buy, prices)).toBe(-100)
+    const buy = { 0: 2 }
+    expect(tradeBalance(buy, goods)).toBe(-100)
     expect(emptyHoldsAfterTrade(ship, buy)).toBe(2)
-    const sell = { equipment: 0, fuel: 0, organics: -3 }
-    expect(tradeBalance(sell, prices)).toBe(30)
+    const sell = { 2: -3 }
+    expect(tradeBalance(sell, goods)).toBe(30)
     expect(emptyHoldsAfterTrade(ship, sell)).toBe(7)
   })
 
+  it("prices Demo 4's goods by the unit, fee included", () => {
+    const curve = { base: 100, spread: 30, capacity: 300, shortfall: 40, feeBps: 200 }
+    const good = { id: 4, mode: 'sells', stock: 260, price: 0, curve }
+    const cost = buyCost(100, 30, 300, 40, 5)
+    expect(lineValue(good, 5)).toBe(cost + fee(cost, 200))
+    const proceeds = sellProceeds(100, 30, 300, 40, 5)
+    expect(lineValue(good, -5)).toBe(proceeds - fee(proceeds, 200))
+  })
+
   it('a trade must be non-empty, affordable and fit', () => {
-    expect(isValidTrade({ credits: 100, ship, amounts: none, prices })).toBe(false)
-    expect(isValidTrade({ credits: 100, ship, amounts: { equipment: 2, fuel: 0, organics: 0 }, prices })).toBe(true)
-    expect(isValidTrade({ credits: 99, ship, amounts: { equipment: 2, fuel: 0, organics: 0 }, prices })).toBe(false)
-    expect(isValidTrade({ credits: 9999, ship, amounts: { equipment: 5, fuel: 0, organics: 0 }, prices })).toBe(false)
+    expect(isValidTrade({ credits: 100, ship, amounts: {}, goods })).toBe(false)
+    expect(isValidTrade({ credits: 100, ship, amounts: { 0: 2 }, goods })).toBe(true)
+    expect(isValidTrade({ credits: 99, ship, amounts: { 0: 2 }, goods })).toBe(false)
+    expect(isValidTrade({ credits: 9999, ship, amounts: { 0: 5 }, goods })).toBe(false)
   })
 
   it('limits each good by what the port buys or sells', () => {
-    // port buying (negative inventory): sell what you carry, up to what it wants
-    expect(maxTradable(-10, 3, 4)).toBe(3)
-    expect(maxTradable(-2, 3, 4)).toBe(2)
+    // port buying: sell what you carry, up to what it wants
+    expect(maxTradable({ mode: 'buys', stock: 10 }, 3, 4)).toBe(3)
+    expect(maxTradable({ mode: 'buys', stock: 2 }, 3, 4)).toBe(2)
     // port selling: buy what fits, up to what it has
-    expect(maxTradable(10, 3, 4)).toBe(4)
-    expect(maxTradable(1, 3, 4)).toBe(1)
+    expect(maxTradable({ mode: 'sells', stock: 10 }, 3, 4)).toBe(4)
+    expect(maxTradable({ mode: 'sells', stock: 1 }, 3, 4)).toBe(1)
   })
 
   it('clamps slider moves to the free holds', () => {

@@ -4,7 +4,7 @@
 
     <div v-if="haveAvatar" class="title">Commander {{ avatar.name }}</div>
     <div v-if="haveAvatar">Credits {{ avatar.credits }}</div>
-    <div v-if="haveAvatar">Cargo {{ avatar.ship.equipment }} | {{ avatar.ship.fuel }} | {{ avatar.ship.organics }}</div>
+    <div v-if="haveAvatar">Cargo {{ (avatar.ship.cargo ?? []).join(' | ') }}</div>
     <div>Eth Address: {{ account }}</div>
     <div v-if="currentStarSystemId > 0">
       <span
@@ -26,7 +26,7 @@
     <hr />
     Neighbors:
     <div v-for="(neighbor, index) in neighbors" :key="index" class="jump">
-      <a v-if="neighbor.id > 0" href="" @click.prevent="move(neighbor.id)">{{ neighbor.name }} ({{ neighbor.id }})</a
+      <a v-if="neighbor.exists" href="" @click.prevent="move(neighbor.id)">{{ neighbor.name }} ({{ neighbor.id }})</a
       ><br />
     </div>
     <br />

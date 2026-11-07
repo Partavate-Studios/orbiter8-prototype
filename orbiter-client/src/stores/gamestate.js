@@ -32,9 +32,8 @@ export const useGameStateStore = defineStore('GameState', {
           location: null,
           orbit: null,
           holds: null,
-          equipment: null,
-          fuel: null,
-          organics: null,
+          cargo: [],
+          usedHolds: 0,
           owner: null
         },
         credits: 0
@@ -49,7 +48,9 @@ export const useGameStateStore = defineStore('GameState', {
     }
   }),
   getters: {
-    avatar: (state) => state.gameState.avatar
+    avatar: (state) => state.gameState.avatar,
+    /** The goods' names, by id: Demo 3's three or Demo 4's eight. */
+    goods: (state) => state.gameState.goods ?? ['Equipment', 'Fuel Ore', 'Organics']
   },
   actions: {
     /** Reloads the player's avatar, ship and credits; the result arrives through importPlayer. */
@@ -120,9 +121,13 @@ export const useGameStateStore = defineStore('GameState', {
         (options) => game.actions.buildStation(planetId, name, options)
       )
     },
-    tradeAtPort({ planetId, equipment, fuel, organics }) {
+    /** `amounts`: units by good id (+ buy, - sell). */
+    tradeAtPort({ planetId, amounts }) {
+      const lines = Object.entries(amounts)
+        .map(([good, units]) => ({ good: Number(good), units }))
+        .filter((line) => line.units !== 0)
       return track({ doing: 'Trading', done: 'Trade done', failed: "The trade didn't go through" }, (options) =>
-        game.actions.trade(planetId, { equipment, fuel, organics }, options)
+        game.actions.trade(planetId, lines, options)
       )
     },
     async addHoldsToShip({ planetId, amount }) {

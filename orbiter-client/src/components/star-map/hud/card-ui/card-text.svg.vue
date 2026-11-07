@@ -50,14 +50,10 @@
 
             <text x="16" y="18" text-anchor="middle"> {{ emptyHolds }} Empty</text>
 
-            <text x="52" y="2" text-anchor="start"> Equipment</text>
-            <text x="50" y="2" text-anchor="end"> {{ avatar.ship.equipment }}</text>
-
-            <text x="52" y="10" text-anchor="start"> Fuel Ore</text>
-            <text x="50" y="10" text-anchor="end"> {{ avatar.ship.fuel }}</text>
-
-            <text x="52" y="18" text-anchor="start"> Organics</text>
-            <text x="50" y="18" text-anchor="end"> {{ avatar.ship.organics }}</text>
+            <g v-for="(line, index) in cargoRows" :key="line.name" :transform="'translate(0 ' + (2 + index * 8) + ')'">
+              <text x="52" y="0" text-anchor="start"> {{ line.name }}</text>
+              <text x="50" y="0" text-anchor="end"> {{ line.units }}</text>
+            </g>
           </g>
         </g>
         <g v-else>
@@ -104,48 +100,23 @@
       </g>
 
       <g v-else-if="systemObjects[objectId].type == 'station'">
-        <g v-if="systemObjects[objectId].inventory.equipment != 0" font-size="0.9em">
-          <text x="40" y="25" text-anchor="end">Equipment:</text>
-
-          <g v-if="systemObjects[objectId].inventory.equipment < 0">
-            <text x="90" y="25" text-anchor="end">Buying</text>
-            <text x="64" y="25" text-anchor="start">&#8593;</text>
+        <!-- What the port sells and buys: Demo 3's three goods, or Demo 4's mix (tighter when there are more) -->
+        <g
+          v-for="(good, index) in stationGoods"
+          :key="good.id"
+          :font-size="stationGoods.length > 3 ? '0.75em' : '0.9em'"
+          :transform="'translate(0 ' + stationRowY(index) + ')'"
+        >
+          <text x="40" y="0" text-anchor="end">{{ shortGoodName(good.name, true) }}:</text>
+          <g v-if="good.mode === 'buys'">
+            <text x="90" y="0" text-anchor="end">Buying</text>
+            <text x="64" y="0" text-anchor="start">&#8593;</text>
           </g>
           <g v-else>
-            <text x="90" y="25" text-anchor="end"> Selling</text>
-            <text x="64" y="25" text-anchor="start"> &#8595;</text>
+            <text x="90" y="0" text-anchor="end"> Selling</text>
+            <text x="64" y="0" text-anchor="start"> &#8595;</text>
           </g>
-          <text x="62" y="25" text-anchor="end" font-weight="bold">
-            {{ Math.abs(systemObjects[objectId].inventory.equipment) }}
-          </text>
-        </g>
-        <g v-if="systemObjects[objectId].inventory.fuel != 0" font-size="0.9em">
-          <text x="40" y="35" text-anchor="end">Fuel:</text>
-          <g v-if="systemObjects[objectId].inventory.fuel < 0">
-            <text x="90" y="35" text-anchor="end">Buying</text>
-            <text x="64" y="35" text-anchor="start">&#8593;</text>
-          </g>
-          <g v-else>
-            <text x="90" y="35" text-anchor="end"> Selling</text>
-            <text x="64" y="35" text-anchor="start"> &#8595;</text>
-          </g>
-          <text x="62" y="35" text-anchor="end" font-weight="bold">
-            {{ Math.abs(systemObjects[objectId].inventory.fuel) }}
-          </text>
-        </g>
-        <g v-if="systemObjects[objectId].inventory.organics != 0" font-size="0.9em">
-          <text x="40" y="45" text-anchor="end">Organics:</text>
-          <g v-if="systemObjects[objectId].inventory.organics < 0">
-            <text x="90" y="45" text-anchor="end">Buying</text>
-            <text x="64" y="45" text-anchor="start">&#8593;</text>
-          </g>
-          <g v-else>
-            <text x="90" y="45" text-anchor="end"> Selling</text>
-            <text x="64" y="45" text-anchor="start"> &#8595;</text>
-          </g>
-          <text x="62" y="45" text-anchor="end" font-weight="bold">
-            {{ Math.abs(systemObjects[objectId].inventory.organics) }}
-          </text>
+          <text x="62" y="0" text-anchor="end" font-weight="bold">{{ good.stock }}</text>
         </g>
       </g>
     </g>
@@ -158,6 +129,7 @@ import { mapState } from 'pinia'
 import { useStarMapStore } from '@/stores/starmap'
 
 import { planetTypeName } from '@/sdk/game/planet-types'
+import { cargoLines, emptyHolds, shortGoodName } from '@/sdk/game/trade'
 import { YELLOW } from '@/libs/palette'
 
 export default {
@@ -171,7 +143,7 @@ export default {
   },
   computed: {
     ...mapState(useStarMapStore, ['systemObjects', 'players']),
-    ...mapState(useGameStateStore, ['avatar']),
+    ...mapState(useGameStateStore, ['avatar', 'goods']),
     typeName() {
       switch (this.systemObjects[this.objectId].type) {
         case 'star':
@@ -188,8 +160,17 @@ export default {
       return null
     },
     emptyHolds() {
-      let load = this.avatar.ship.equipment + this.avatar.ship.fuel + this.avatar.ship.organics
-      return this.avatar.ship.holds - load
+      return emptyHolds(this.avatar.ship)
+    },
+    /** The cargo rows: Demo 3's three goods, or Demo 4's aboard (three at most, the rest summed). */
+    cargoRows() {
+      const lines = cargoLines(this.avatar.ship, this.goods)
+      if (lines.length <= 3) return lines
+      const rest = lines.slice(2)
+      return [...lines.slice(0, 2), { name: `+${rest.length} more`, units: rest.reduce((a, l) => a + l.units, 0) }]
+    },
+    stationGoods() {
+      return (this.systemObjects[this.objectId].goods ?? []).filter((good) => good.mode !== 'none')
     },
     ownerName() {
       let address = this.systemObjects[this.objectId].owner
@@ -205,7 +186,12 @@ export default {
     }
   },
   methods: {
-    planetTypeName
+    planetTypeName,
+    shortGoodName,
+    /** Rows from y 25, 10 apart (Demo 3's three); more goods start higher and sit closer. */
+    stationRowY(index) {
+      return this.stationGoods.length > 3 ? 13 + index * 8 : 25 + index * 10
+    }
   }
 }
 </script>

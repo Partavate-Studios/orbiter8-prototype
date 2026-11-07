@@ -24,21 +24,17 @@
               />
             </g>
             <g dominant-baseline="middle" font-size="0.7em">
-              <g v-if="equipmentToTrade != 0" transform="translate(-45 30)">
-                <transfer-tab :quantity="equipmentToTrade" :price="portPrices.equipment" />
-              </g>
-              <g v-if="fuelToTrade != 0" transform="translate(-45 60)">
-                <transfer-tab :quantity="fuelToTrade" :price="portPrices.fuel" />
-              </g>
-              <g v-if="organicsToTrade != 0" transform="translate(-45 90)">
-                <transfer-tab :quantity="organicsToTrade" :price="portPrices.organics" />
-              </g>
+              <template v-for="(good, index) in pageGoods" :key="'transfer' + good.id">
+                <g v-if="amountOf(good) != 0" :transform="'translate(-45 ' + (30 + index * rowGap) + ')'">
+                  <transfer-tab :quantity="amountOf(good)" :price="good.price" :total="lineTotal(good)" />
+                </g>
+              </template>
 
               <rect
                 x="-175"
                 y="0"
                 width="130"
-                height="120"
+                :height="portPanelHeight"
                 rx="3"
                 ry="3"
                 fill="#2e0d56"
@@ -51,46 +47,24 @@
               <line x1="-170" x2="-50" y1="23" y2="23" stroke="#ffffff88" stroke-width="0.5" />
 
               <inventory-item
-                transform="translate(-110 35)"
-                goodstype="Equipment"
-                :inventory="portInventory.equipment"
-                :price="portPrices.equipment"
-              />
-
-              <inventory-item
-                transform="translate(-110 65)"
-                goodstype="Fuel"
-                :inventory="portInventory.fuel"
-                :price="portPrices.fuel"
-              />
-
-              <inventory-item
-                transform="translate(-110 95)"
-                goodstype="Organics"
-                :inventory="portInventory.organics"
-                :price="portPrices.organics"
+                v-for="(good, index) in pageGoods"
+                :key="'port' + good.id"
+                :transform="'translate(-110 ' + (35 + index * rowGap) + ')'"
+                :goodstype="shortGoodName(good.name, true)"
+                :inventory="signedStock(good)"
+                :price="good.price"
               />
             </g>
 
-            <g transform="translate(135 30)">
-              <cargo-tab
-                :before="avatar.ship.equipment"
-                :after="avatar.ship.equipment + equipmentToTrade"
-                label="Equipment"
-              />
+            <g
+              v-for="(good, index) in pageGoods"
+              :key="'cargo' + good.id"
+              :transform="'translate(135 ' + (30 + index * tabGap) + ')'"
+            >
+              <cargo-tab :before="carried(good)" :after="carried(good) + amountOf(good)" :label="shortGoodName(good.name)" />
             </g>
-            <g transform="translate(135 55)">
-              <cargo-tab :before="avatar.ship.fuel" :after="avatar.ship.fuel + fuelToTrade" label="Fuel" />
-            </g>
-            <g transform="translate(135 80)">
-              <cargo-tab
-                :before="avatar.ship.organics"
-                :after="avatar.ship.organics + organicsToTrade"
-                label="Organics"
-              />
-            </g>
-            <g transform="translate(135 105)">
-              <cargo-tab :quantity="predictedEmptyHolds" label="Empty" />
+            <g :transform="'translate(135 ' + (30 + pageGoods.length * tabGap) + ')'">
+              <cargo-tab :before="avatar.ship.holds - avatar.ship.usedHolds" :after="predictedEmptyHolds" label="Empty" />
             </g>
 
             <g transform="translate(105 10)" dominant-baseline="middle">
@@ -216,37 +190,45 @@
           font-size=""
           :transform="'translate(0 ' + (250 - 400 / slotScale) + ') scale(' + (1 + slotScale / 4) + ')'"
         >
-          <g transform="translate(0 10)">
+          <g
+            v-for="(good, index) in pageGoods"
+            :key="'dial' + good.id"
+            :transform="'translate(0 ' + (10 + index * dialGap) + ')'"
+          >
             <inventory-dial
-              label="Equipment"
-              :port-inventory="parseInt(portInventory.equipment)"
-              :inventory-to-trade="Math.abs(equipmentToTrade)"
-              :max-allowed="equipmentAllowed"
+              :label="good.name"
+              :port-inventory="signedStock(good)"
+              :inventory-to-trade="Math.abs(amountOf(good))"
+              :max-allowed="allowed(good)"
               :max-holds="avatar.ship.holds"
-              @update:inventory-to-trade="updateEquipmentToTrade($event)"
+              @update:inventory-to-trade="updateAmount(good, $event)"
             />
           </g>
+        </g>
 
-          <g transform="translate(0 80)">
-            <inventory-dial
-              label="Fuel Ore"
-              :port-inventory="parseInt(portInventory.fuel)"
-              :inventory-to-trade="Math.abs(fuelToTrade)"
-              :max-allowed="fuelAllowed"
-              :max-holds="avatar.ship.holds"
-              @update:inventory-to-trade="updateFuelToTrade($event)"
+        <!-- Demo 4's ports trade more goods: what they sell (Buy) and what they buy (Sell), a page each -->
+        <g v-if="pages.length > 1" :transform="'translate(0 ' + tabsY + ')'" font-size="0.8em">
+          <g
+            v-for="(tab, index) in pages"
+            :key="tab.key"
+            :transform="'translate(' + (index ? 45 : -45) + ' 0)'"
+            class="can-click"
+            @click="page = tab.key"
+          >
+            <rect
+              x="-40"
+              y="-11"
+              width="80"
+              height="22"
+              rx="4"
+              ry="4"
+              :fill="page === tab.key ? '#5D1EB0' : '#2e0d56'"
+              stroke="#ffffff44"
+              stroke-width="1.5"
             />
-          </g>
-
-          <g transform="translate(0 150)">
-            <inventory-dial
-              label="Organics"
-              :port-inventory="parseInt(portInventory.organics)"
-              :inventory-to-trade="Math.abs(organicsToTrade)"
-              :max-allowed="organicsAllowed"
-              :max-holds="avatar.ship.holds"
-              @update:inventory-to-trade="updateOrganicsToTrade($event)"
-            />
+            <text x="0" y="0" dominant-baseline="middle" text-anchor="middle" fill="#ffffff"
+              >{{ tab.label }} ({{ tab.goods.length }})</text
+            >
           </g>
         </g>
 
@@ -264,9 +246,10 @@ import {
   emptyHoldsAfterTrade,
   isEmptyTrade,
   isValidTrade,
+  lineValue,
   maxTradable,
-  tradeBalance,
-  usedHolds
+  shortGoodName,
+  tradeBalance
 } from '@/sdk/game/trade'
 
 import { useGameStateStore } from '@/stores/gamestate'
@@ -298,9 +281,10 @@ export default {
   },
   data() {
     return {
-      equipmentToTrade: 0,
-      fuelToTrade: 0,
-      organicsToTrade: 0,
+      /** What the player is trading: units by good id (negative sells). */
+      amounts: {},
+      /** Demo 4's page: 'buy' (what the port sells) or 'sell' (what it buys). */
+      page: 'buy',
       pending: false
     }
   },
@@ -308,22 +292,51 @@ export default {
     ...mapState(useStarMapStore, ['systemObjects']),
     ...mapState(useGameStateStore, ['avatar']),
     ...mapState(useUIStore, ['viewport']),
-    portInventory() {
-      return this.systemObjects[this.objectId].inventory
+    /** The station's goods (sdk/game/trade.js StationGood): Demo 3's three, or Demo 4's mix. */
+    stationGoods() {
+      return this.systemObjects[this.objectId].goods
     },
-    portPrices() {
-      return this.systemObjects[this.objectId].prices
+    /** Demo 3: one page of its three goods. Demo 4: what the port sells, and what it buys. */
+    pages() {
+      const traded = this.stationGoods.filter((good) => good.mode !== 'none')
+      if (this.stationGoods.length <= 3 && !traded.some((good) => good.curve)) {
+        return [{ key: 'all', label: 'Trade', goods: this.stationGoods }]
+      }
+      return [
+        { key: 'buy', label: 'Buy', goods: traded.filter((good) => good.mode === 'sells') },
+        { key: 'sell', label: 'Sell', goods: traded.filter((good) => good.mode === 'buys') }
+      ]
     },
-    /** What the player is trading, per good (negative sells). */
-    amounts() {
-      return { equipment: this.equipmentToTrade, fuel: this.fuelToTrade, organics: this.organicsToTrade }
+    pageGoods() {
+      return (this.pages.find((tab) => tab.key === this.page) ?? this.pages[0]).goods
+    },
+    /** The page tabs sit halfway between the balance row and the first dial, at any scale. */
+    tabsY() {
+      const s = this.slotScale
+      const balanceRow = -400 + 215 * s
+      const firstDial = 250 - 400 / s + 10 * (1 + s / 4)
+      return (balanceRow + firstDial) / 2 + 4
+    },
+    /** Rows a little closer when a page has four goods. */
+    rowGap() {
+      return this.pageGoods.length > 3 ? 27 : 30
+    },
+    tabGap() {
+      return 25
+    },
+    /** The Port of Trade panel grows to fit a fourth row. */
+    portPanelHeight() {
+      return 120 + Math.max(0, this.pageGoods.length - 3) * 18
+    },
+    dialGap() {
+      return this.pageGoods.length > 3 ? 55 : 70
     },
     /** Credits gained by the trade (negative = paid). */
     currentBalance() {
-      return tradeBalance(this.amounts, this.portPrices)
+      return tradeBalance(this.amounts, this.stationGoods)
     },
     fullHolds() {
-      return usedHolds(this.avatar.ship)
+      return this.avatar.ship.usedHolds
     },
     predictedEmptyHolds() {
       return emptyHoldsAfterTrade(this.avatar.ship, this.amounts)
@@ -336,25 +349,8 @@ export default {
         credits: this.avatar.credits,
         ship: this.avatar.ship,
         amounts: this.amounts,
-        prices: this.portPrices
+        goods: this.stationGoods
       })
-    },
-    equipmentAllowed() {
-      return maxTradable(
-        this.portInventory.equipment,
-        this.avatar.ship.equipment,
-        this.predictedEmptyHolds + this.equipmentToTrade
-      )
-    },
-    fuelAllowed() {
-      return maxTradable(this.portInventory.fuel, this.avatar.ship.fuel, this.predictedEmptyHolds + this.fuelToTrade)
-    },
-    organicsAllowed() {
-      return maxTradable(
-        this.portInventory.organics,
-        this.avatar.ship.organics,
-        this.predictedEmptyHolds + this.organicsToTrade
-      )
     },
     slotScale() {
       if (this.slotWidth > 450) {
@@ -367,54 +363,56 @@ export default {
     },
     nothingToTrade() {
       return isEmptyTrade(this.amounts)
+    },
+    /** The cargo aboard, for noticing a trade went through. */
+    cargoNow() {
+      return (this.avatar.ship.cargo ?? []).join(',')
     }
   },
   watch: {
-    avatar: {
-      handler: function (val, oldVal) {
-        if (
-          val.ship.equipment != oldVal.ship.equipment ||
-          val.ship.fuel != oldVal.ship.fuel ||
-          val.ship.organics != oldVal.ship.organics
-        ) {
-          this.closeMenu()
-        }
-      },
-      deep: true
+    cargoNow(now, before) {
+      if (now !== before) this.closeMenu()
     }
   },
   methods: {
     ...mapActions(useGameStateStore, ['tradeAtPort']),
     ...mapActions(useUIStore, ['closeMenu']),
+    shortGoodName,
+    amountOf(good) {
+      return this.amounts[good.id] ?? 0
+    },
+    carried(good) {
+      return this.avatar.ship.cargo?.[good.id] ?? 0
+    },
+    /** The widgets' sign convention (Demo 3's inventory): positive the port sells, negative it buys. */
+    signedStock(good) {
+      return good.mode === 'buys' ? -good.stock : good.mode === 'sells' ? good.stock : 0
+    },
+    /** Credits this good's line moves, signed as the tab shows them (negative paid). */
+    lineTotal(good) {
+      const units = this.amountOf(good)
+      return units > 0 ? -lineValue(good, units) : lineValue(good, units)
+    },
+    allowed(good) {
+      if (good.mode === 'none') return 0
+      return maxTradable(good, this.carried(good), this.predictedEmptyHolds + this.amountOf(good))
+    },
+    updateAmount(good, value) {
+      const next = clampTradeAmount(value, this.amountOf(good), this.predictedEmptyHolds)
+      this.amounts = { ...this.amounts, [good.id]: next }
+    },
     async doTrade() {
       this.o8audio.playEffect('click')
       this.pending = true
       let planet = this.systemObjects[this.objectId].orbiting
       let planetId = this.systemObjects[planet].id
-      const traded = await this.tradeAtPort({
-        planetId: planetId,
-        equipment: this.equipmentToTrade,
-        fuel: this.fuelToTrade,
-        organics: this.organicsToTrade
-      })
+      const traded = await this.tradeAtPort({ planetId, amounts: this.amounts })
       // Done: start the next trade from the new cargo. Failed or declined: the same amounts, to try again
       // (the transaction tray says why).
-      if (traded) {
-        this.equipmentToTrade = 0
-        this.fuelToTrade = 0
-        this.organicsToTrade = 0
-      }
+      if (traded) this.amounts = {}
       this.pending = false
-    },
-    updateEquipmentToTrade(value) {
-      this.equipmentToTrade = clampTradeAmount(value, this.equipmentToTrade, this.predictedEmptyHolds)
-    },
-    updateFuelToTrade(value) {
-      this.fuelToTrade = clampTradeAmount(value, this.fuelToTrade, this.predictedEmptyHolds)
-    },
-    updateOrganicsToTrade(value) {
-      this.organicsToTrade = clampTradeAmount(value, this.organicsToTrade, this.predictedEmptyHolds)
     }
   }
 }
 </script>
+

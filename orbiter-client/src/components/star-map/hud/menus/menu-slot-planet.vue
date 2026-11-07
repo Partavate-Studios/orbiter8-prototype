@@ -140,8 +140,6 @@ import Moon from '@/components/star-map/sprites/moon.svg'
 import { planetTypeName } from '@/sdk/game/planet-types'
 import { YELLOW } from '@/libs/palette'
 
-const GOODS = ['equipment', 'fuel', 'organics']
-
 export default {
   name: 'PlanetsMenu',
   components: {
@@ -170,19 +168,20 @@ export default {
       'moonsForPlanet',
       'players'
     ]),
-    ...mapState(useGameStateStore, ['avatar']),
+    ...mapState(useGameStateStore, ['avatar', 'goods']),
     slotWidth() {
       return Math.min(this.viewport.width - 100, 700)
     },
     /**
-     * The port's trade code, one letter per good (equipment, fuel, organics): S selling, B buying,
+     * The port's trade code, one letter per good (Demo 3's three, Demo 4's eight): S selling, B buying,
      * - neither. A B is wanted when the port buys something my ship carries (yellow, libs/palette.js).
      */
     portCode() {
-      const inventory = this.systemObjects[this.portForPlanet(this.planetId)].inventory
-      return GOODS.map((good) => {
-        const letter = inventory[good] > 0 ? 'S' : inventory[good] < 0 ? 'B' : '-'
-        return { good, letter, wanted: letter === 'B' && this.avatar.ship[good] > 0 }
+      const station = this.systemObjects[this.portForPlanet(this.planetId)]
+      return this.goods.map((name, id) => {
+        const good = station.goods.find((g) => g.id === id)
+        const letter = good?.mode === 'sells' ? 'S' : good?.mode === 'buys' ? 'B' : '-'
+        return { good: name, letter, wanted: letter === 'B' && (this.avatar.ship.cargo?.[id] ?? 0) > 0 }
       })
     },
     planet() {

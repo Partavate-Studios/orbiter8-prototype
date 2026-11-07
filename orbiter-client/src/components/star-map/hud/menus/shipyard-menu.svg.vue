@@ -31,18 +31,21 @@
           >
 
           <g transform="translate(0 400)" fill="#ffffff">
-            <text v-if="shipMax > 0" font-size="0.9em">Install cargo holds for {{ holdPrice }}&cent; each.</text>
+            <text v-if="shipMax > 0 && risingPrices" font-size="0.9em"
+              >Install cargo holds from {{ costOf(1) }}&cent; each (each one dearer).</text
+            >
+            <text v-else-if="shipMax > 0" font-size="0.9em">Install cargo holds for {{ holdPrice }}&cent; each.</text>
             <text v-else font-size="0.9em">You are at max capcity.</text>
 
             <g transform="translate(0 20)">
               <text transform="translate(0 30)" font-size="1.5em">{{ holdsToBuy }}</text>
 
-              <g v-if="holdsToBuy * holdPrice > 0" transform="translate(0 120)" font-size="1em" fill="#ffffff88">
+              <g v-if="totalCost > 0" transform="translate(0 120)" font-size="1em" fill="#ffffff88">
                 <g v-if="canAfford" fill="#ffffff">
-                  <text>Total Cost: {{ holdsToBuy * holdPrice }}&cent;</text>
+                  <text>Total Cost: {{ totalCost.toLocaleString('en-US') }}&cent;</text>
                 </g>
                 <g v-else fill="#ffffff88">
-                  <text>Insufficient Funds: {{ holdsToBuy * holdPrice }}&cent;</text>
+                  <text>Insufficient Funds: {{ totalCost.toLocaleString('en-US') }}&cent;</text>
                 </g>
               </g>
 
@@ -88,6 +91,22 @@
           <g :transform="'translate(0 620)'">
             <menu-button :enabled="canUpgrade" text="Upgrade" @buttonclick="applyUpgrades" />
           </g>
+
+          <!-- Demo 4: engines, for the range of a jump -->
+          <g v-if="demo4.active" transform="translate(0 700)" fill="#ffffff">
+            <text v-if="rangePrice != null" font-size="0.9em"
+              >Engines: jump range {{ demo4.ship.range }} → {{ demo4.ship.range + 1 }} for
+              {{ rangePrice.toLocaleString('en-US') }}&cent;</text
+            >
+            <text v-else font-size="0.9em" fill="#ffffff88">Engines at full range ({{ demo4.ship.range }}).</text>
+            <g v-if="rangePrice != null" transform="translate(0 50)">
+              <menu-button
+                :enabled="avatar.credits >= rangePrice"
+                text="Upgrade Engines"
+                @buttonclick="upgradeRange"
+              />
+            </g>
+          </g>
         </g>
       </g>
     </menu-container>
@@ -101,13 +120,14 @@ import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
 import { mapActions, mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
+import { useDemo4Store } from '@/stores/demo4'
 import MenuContainer from './menu-container/_menu-container.svg'
 import MenuButton from './menu-button.svg'
 import Arrow from './widgets/arrow.svg'
 import ShipUpgrade from './_trade-menu/ship-upgrade.svg'
 
 export default {
-  name: 'TradeMenu',
+  name: 'ShipyardMenu',
   components: {
     MenuContainer,
     MenuButton,
@@ -121,24 +141,38 @@ export default {
   data() {
     return {
       holdsToBuy: 0,
-      pending: false
+      pending: false,
+      demo4: useDemo4Store()
     }
   },
   computed: {
     ...mapState(useStarMapStore, ['systemObjects']),
     ...mapState(useGameStateStore, ['avatar']),
+    /** Demo 4's holds cost more the more a ship has (Market.sol baysCost); Demo 3's are flat. */
+    risingPrices() {
+      return this.demo4.active
+    },
+    totalCost() {
+      return this.costOf(this.holdsToBuy)
+    },
     maxHoldsAvailable() {
-      return maxHoldsToBuy(this.avatar.credits, this.avatar.ship.holds, this.holdPrice)
+      if (!this.risingPrices) return maxHoldsToBuy(this.avatar.credits, this.avatar.ship.holds, this.holdPrice)
+      let n = this.shipMax
+      while (n > 0 && this.costOf(n) > this.avatar.credits) n--
+      return n
+    },
+    rangePrice() {
+      return this.demo4.active ? this.demo4.rangeQuote() : null
     },
     /** Holds this ship can still add before reaching the contract's maximum. */
     shipMax() {
       return MAX_CARGO_HOLDS - this.avatar.ship.holds
     },
     holdPrice() {
-      return this.systemObjects[this.objectId].prices.holds
+      return this.systemObjects[this.objectId].holdPrice
     },
     canAfford() {
-      return canAfford(this.avatar.credits, this.holdPrice * this.holdsToBuy)
+      return canAfford(this.avatar.credits, this.totalCost)
     },
     canUpgrade() {
       if (this.canAfford && this.holdsToBuy > 0) {
@@ -171,6 +205,17 @@ export default {
         if (bought) this.holdsToBuy = 0
         this.pending = false
       }
+    },
+    costOf(count) {
+      if (count <= 0) return 0
+      return this.risingPrices ? this.demo4.baysQuote(count) : count * this.holdPrice
+    },
+    async upgradeRange() {
+      this.o8audio.playEffect('click')
+      this.pending = true
+      const upgraded = await this.demo4.buyRange(this.systemObjects[this.objectId].id)
+      if (upgraded) this.o8audio.speak('upgraded')
+      this.pending = false
     },
     decrementHolds() {
       this.holdsToBuy = Math.max(0, this.holdsToBuy - 1)
