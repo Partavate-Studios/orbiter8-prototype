@@ -136,6 +136,12 @@ Known gaps:
 
 ## Focus areas, in this order
 
+Throughout, bring what you know about good game UI and UX: the established body of work on game
+interfaces, from heuristics for playability to how strategy and trading games handle dense information,
+onboarding, feedback and readability. Name the principle behind a finding in the log, so Koda can
+weigh it. Weigh it against Orbiter 8's own identity: a menu-driven game ("the buttons are the game"),
+with NFT playing cards, big menus, Koda's art, and phones. Don't trade any of that for convention.
+
 1. **A first-time player's eyes.** Play from the title screen as someone who knows nothing about the
    game. Do it in one long session, at desktop size, then again at phone size (`VW=390 VH=844`). Note
    every moment of "what do I do now?" or "what does this mean?", with a screenshot. The builder knew
