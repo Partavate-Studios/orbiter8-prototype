@@ -79,6 +79,7 @@
     <ship-panel v-if="open === 'ship' && galaxy.pilot" @close="open = null" />
     <siege-feed v-if="open === 'feed'" @close="open = null" />
     <tech-tree v-if="techTree" @close="techTree = false" />
+    <first-steps v-if="galaxy.status === 'ready' && galaxy.pilot && !open && galaxy.selected === null" />
 
     <footer class="controls">
       <button class="o8-button small" @click="centerOnShip">My ship</button>
@@ -115,6 +116,7 @@ import PlanetsPanel from './planets-panel.vue'
 import TechTree from './tech-tree.vue'
 import ShipPanel from './ship-panel.vue'
 import SiegeFeed from './siege-feed.vue'
+import FirstSteps from './first-steps.vue'
 
 // Pixels between neighboring stars at zoom 1, and the isometric squash (the prototype's look).
 const SPACING = 64
@@ -122,7 +124,7 @@ const FLAT = 0.7
 
 export default {
   name: 'GalaxyView',
-  components: { FleetShip, StarCard, DocksPanel, PlanetsPanel, TechTree, ShipPanel, SiegeFeed },
+  components: { FleetShip, StarCard, DocksPanel, PlanetsPanel, TechTree, ShipPanel, SiegeFeed, FirstSteps },
   data() {
     return {
       galaxy: useGalaxyStore(),

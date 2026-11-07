@@ -313,7 +313,7 @@ impossible or needs a design call goes back to Koda; everything else is decided 
 **Milestone 5: graphics, NFTs and polish**
 - [x] Ship part art and damage marks in the client.
 - [x] The on-chain SVG `tokenURI` from the same pieces.
-- [ ] Sol's preset content, onboarding on the new contracts, and polish.
+- [x] Sol's preset content, onboarding on the new contracts, and polish. *Sol's nine planets and stations (unclaimable, D49), the I.S.S.'s yard and armory, a self-ticking first-steps card. Bringing the Demo 3 menus' look to the new panels is open (B25).*
 
 **Milestone 6: testnets and the decision**
 - [ ] Deploy to Polkadot Hub's testnet and an L2 testnet.
