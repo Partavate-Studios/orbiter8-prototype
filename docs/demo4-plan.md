@@ -75,6 +75,10 @@ design doc), [`design-ideas.md`](design-ideas.md) (Koda's working doc), [`cost-e
 | D54 | **Ships carry drones too, but fewer than a planet can field** (planets have drones as well). **Shields regenerate** (confirmed). | 2026-11-06 |
 | D55 | **Drones can be moved between your ship and your planet** (e.g. dropping drones off to defend it), within each one's capacity. **Drones are bought, or produced by an autofactory on your planet.** (Where the autofactory sits in the tech tree, and what it consumes: the next question.) | 2026-11-06 |
 | D56 | **Any ship weapon can be moved between your ship and your planet** (the BFG and orbital platforms stay planet-only). **The Orbiter 8 has limits with real trade-offs:** slots that hold either cargo or other things (such as drones), and a set number of weapon mounts where bigger weapons take more of them. Numbers should seem balanced and fit the lore now, and get cleaned up in "find the fun". (The proposed slot model: the next questions.) | 2026-11-06 |
+| D57 | **Populations:** colonists are recruited at Sol (Earth's port) and carried 100 to a hold; founding a Citadel takes a delivery of colonists and goods; the population then grows by itself toward a cap set by the planet's type and size, and can be shipped in or out; production follows population (half the cap, half the output); a planet becomes a Colony once it has held its cap for a while. | 2026-11-06 |
+| D58 | **The Autofactory** is a planet building after Colony: a Bobiverse-style build queue of up to 5 orders. Each order's goods are paid when queued; orders are built one after another, lazily by timestamp; finished items go to the planet's storage, to fit to the planet or load onto the ship. In this run it builds drones, weapons, defenses, platforms and repair bots; crafting adds recipes later. **The Armory** stays a shop at the station, selling finished weapons to any visiting pilot, with the owner's cut. | 2026-11-06 |
+| D59 | **The Orbiter 8's slots:** 6 weapon mounts (point defense 1, railgun 2, missile rack 2); and up to 250 bays of internal space, bought as holds are today, each given to one thing: cargo (1 unit, or 100 colonists) 1 bay, a drone 2, a repair bot 5, a shield level (up to 3) 20, an armor level (up to 5) 10. Range upgrades are engines and take no space. Planets' capacities are much larger. Numbers tuned by simulation, then "find the fun". | 2026-11-06 |
+| D60 | **A tech tree reference screen:** pithy and straightforward, showing what each building, part and upgrade takes and what it unlocks, so players aren't left to trial and error. | 2026-11-06 |
 
 ## Features: this run and consider next (proposed, for Koda to choose)
 
@@ -115,7 +119,7 @@ hard to add later because it shapes the data, low-hanging, or the battle minimum
 
 Rounds 1–5 answered, except Q25 (contract tooling), which waits for the research. Next: the research's findings (the engine question is settled by D33).
 
-**Research done (D34).** All rounds answered (D1–D56). Round 10 (asked 2026-11-06): populations, the autofactory and the Armory, the ship's slots. D53's balance table is a proposal to confirm with the finished plan.
+**Research done (D34).** All rounds answered (D1–D60). D53's balance table is a proposal to confirm with the finished plan.
 
 ## Plan (complete, 2026-11-06; awaiting Koda's confirmation)
 
@@ -180,7 +184,7 @@ impossible or needs a design call goes back to Koda; everything else is decided 
   - its location (star and orbit);
   - holds;
   - range (1 to 4);
-  - fitted parts: weapons, armor, shields, repair bots, cargo pods;
+  - **6 weapon mounts** (point defense 1, railgun 2, missile rack 2) and **up to 250 bays**, each given to cargo, colonists, drones, repair bots, shield levels or armor levels (D59);
   - system damage;
   - whether it has retreated.
 - **Session keys:**
@@ -203,8 +207,9 @@ impossible or needs a design call goes back to Koda; everything else is decided 
 ### 5. Planets (D9, D19, D40, D47)
 
 - **Claims:** the ship must be in the system, and there's a claim fee. The discoverer has a 10-minute first-claim window, ending early if they fly on.
-- **The linear tech tree:** Citadel, Colony, Station, Port, Yards, Armory. Each level costs goods, credits and build time.
-- **Colonists** grow lazily toward a cap. **Production** follows population.
+- **The tech tree:** Citadel, then Colony, then Station, Port, Yards and Armory in a line, with the **Autofactory** after Colony (D58). Each costs goods, credits and build time.
+- **Populations (D57):** colonists recruited at Sol, carried 100 to a hold; a Citadel founded with colonists and goods; growth toward a cap by type and size, lazily by timestamp; shipping colonists in and out; output follows population; Colony once the cap has held a while.
+- **The Autofactory (D58):** a queue of up to 5 orders, goods paid up front, built in sequence by timestamp, into the planet's storage. **The Armory:** a shop selling finished weapons to visitors.
 - **Defenses:** the same weapon types as ships, drones included (a planet fields more drones than a ship carries, D54; drones move between your ship and your planet, and are bought or made by an autofactory, D55), plus the BFG, orbital platforms, armor plating, a regenerating planet shield and repair bots. They can be built in advance.
 - **Every planet's surface seed** is reserved for terraforming later.
 
@@ -255,6 +260,8 @@ impossible or needs a design call goes back to Koda; everything else is decided 
   - the galaxy map replaces the neighbor view;
   - the system view uses derived planets;
   - menus for upgrades, building, defenses and sieges;
+  - the ship's loadout (mounts and bays) and moving drones and weapons to and from your planet;
+  - **a tech tree reference screen** (D60): what each building, part and upgrade takes and unlocks;
   - the session-key flow.
 
 ### 9. Tuning (D29)
@@ -284,7 +291,7 @@ impossible or needs a design call goes back to Koda; everything else is decided 
 - [ ] The play bot explores; gas and deposits per arrival measured.
 
 **Milestone 2: pilots and trade**
-- [ ] `Pilots`: call signs, the ship NFT, location, holds, range, parts and damage fields.
+- [ ] `Pilots`: call signs, the ship NFT, location, the bays and weapon mounts (D59), range, damage fields.
 - [ ] Session keys, and the client's session flow.
 - [ ] `Market`: the goods registry, ports, trade with price limits and a location check, sales of holds and range.
 - [ ] Credits and fees as sinks.
@@ -292,8 +299,8 @@ impossible or needs a design call goes back to Koda; everything else is decided 
 - [ ] The simulator's first version, with the economy tuned to D29's targets (for Koda's approval).
 
 **Milestone 3: planets**
-- [ ] `Planets`: claims with the discoverer's window, the tech tree, colonists and production.
-- [ ] The client's planet screens and building.
+- [ ] `Planets`: claims with the discoverer's window, the tech tree, populations (D57), production, the Autofactory queue and planet storage (D58), moving drones and weapons between ship and planet (D55, D56).
+- [ ] The client's planet screens, building, the Autofactory queue, and the **tech tree reference screen** (D60).
 - [ ] Tuning of building costs and times.
 
 **Milestone 4: battle**
