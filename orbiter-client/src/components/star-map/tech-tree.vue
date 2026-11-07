@@ -55,7 +55,7 @@ const UNLOCKS = {
   3: 'Opens the Port.',
   4: 'A market port at the planet, trading by its class. You take the fee on every trade.',
   5: 'A shipyard at your port: pilots buy cargo holds and engine range there.',
-  6: 'The Armory: weapons for sale to visiting pilots (with battle).',
+  6: 'Weapons and armor for sale to visiting pilots.',
   7: 'Builds drones, weapons, defenses, platforms and repair bots from goods in storage, five orders at a time.'
 }
 

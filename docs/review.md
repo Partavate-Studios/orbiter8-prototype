@@ -279,6 +279,12 @@ Koda answered the list below in one sitting. Each answer, and the change it led 
   first-steps card sits at the bottom right, clear of the open card and the HUD's buttons, whether
   or not something is selected; on a portrait phone it still shows only with nothing selected,
   where the card would cover it.
+  - *Later the same day, Koda:* "I don't like this popup in the corner… bury it under an icon with a
+    question mark and have it pop up in the middle of the screen… slide up like all of the other
+    menus do." The corner card is gone. A "?" button in the HUD's left column, above the siege
+    feed, opens a First Steps menu in the usual menu container: five steps ticked off in yellow as
+    they're done, how many are left, and "How Planets Grow" (the tech tree). The button carries a
+    badge with the steps left, like chat's count, until all five are done.
 - **F14, the settings footer:** "Replace it with a Back to Title button." Done, a menu button.
 - **F15, thousands separators:** "Yes, separators everywhere." The HUD, the trade menu's balance
   boxes and tabs, the port's prices and the shipyard's first-hold price.

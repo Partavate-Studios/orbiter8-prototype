@@ -108,7 +108,7 @@ INJECT=0 node dev/harness/explore.mjs "http://localhost:8092/?account=1" /tmp/sh
 - `src/components/star-map/`:
   - `map.vue`: the system view's layers.
   - `galaxy-map.vue`: the hex map.
-  - `black-hole-entry.vue`, `first-steps.vue`, `tech-tree.vue`.
+  - `black-hole-entry.vue`, `tech-tree.vue`. First steps: `hud/menus/help-menu.svg.vue` (the HUD's "?" button), steps in `libs/first-steps.js`.
   - `hud/`: the HUD, the card UI, and every menu in `hud/menus/` (trade, shipyard, colony, armory,
     loadout, siege, feed, chat, leaderboard, planets, ships, settings).
 - `src/libs/palette.js`: the accent colors and the map's palette.
@@ -125,7 +125,6 @@ Built quickly and only partly reviewed by Koda:
 - **The scan countdown** is small yellow text under the minimap.
 - **The crossed-blades siege icon** is new and not Koda's art.
 - **Black hole entry:** the part of the ship already inside the hole shows grey before it disappears.
-- **The first-steps card** sits over the right side of the system view for new pilots; whether it's in the way hasn't been judged.
 - **Wording:** player-facing text should be plain and short. Several new dialogs are long (session,
   attack, naming).
 

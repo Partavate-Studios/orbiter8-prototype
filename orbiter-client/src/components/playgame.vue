@@ -5,8 +5,6 @@
     <transaction-tray />
     <galaxy-map v-if="neighborView && !jumpAnimationState" />
     <black-hole-entry />
-    <!-- Landscape: beside the open card, bottom right (Koda, 2026-11-07). Portrait: only with nothing selected, where the card would be. -->
-    <first-steps v-if="!neighborView && !isMenuOn && (selected == null || viewRatio > 1)" />
     <tech-tree v-if="techTreeOpen" class="tech-tree-over" @close="techTreeOpen = false" />
     <game-dialog />
   </div>
@@ -27,7 +25,6 @@ import GameDialog from '@/components/game-dialog.vue'
 import TechTree from '@/components/star-map/tech-tree.vue'
 import GalaxyMap from '@/components/star-map/galaxy-map.vue'
 import BlackHoleEntry from '@/components/star-map/black-hole-entry.vue'
-import FirstSteps from '@/components/star-map/first-steps.vue'
 import { usePlayerStore } from '@/stores/player'
 import router from '@/router/router'
 import { onFrame } from '@/libs/frame-loop'
@@ -47,15 +44,14 @@ export default {
     GameDialog,
     TechTree,
     GalaxyMap,
-    BlackHoleEntry,
-    FirstSteps
+    BlackHoleEntry
   },
   data() {
     return { player: usePlayerStore() }
   },
   computed: {
     ...mapState(useGameStateStore, ['haveAvatar', 'haveShip']),
-    ...mapState(useUIStore, ['selected', 'jumpAnimationState', 'viewport', 'neighborView', 'isMenuOn', 'viewRatio']),
+    ...mapState(useUIStore, ['selected', 'jumpAnimationState', 'viewport', 'neighborView']),
     techTreeOpen: {
       get() {
         return useUIStore().techTreeOpen

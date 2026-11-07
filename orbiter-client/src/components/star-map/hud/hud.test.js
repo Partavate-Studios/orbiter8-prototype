@@ -162,7 +162,8 @@ describe('HUD: the pilot', () => {
     ['armory', 'station:1'],
     ['loadout', 'ship:5'],
     ['siege', 'planet:1'],
-    ['feed', null]
+    ['feed', null],
+    ['help', null]
   ]) {
     it(`opens the ${menu} menu`, async () => {
       ui.selectSprite(key)

@@ -88,6 +88,25 @@
         </a>
       </g>
 
+      <!-- Help: the first steps, with how many are left until they're done -->
+      <g :transform="corner(leftMostX, 50, bottomMostY, -450)">
+        <a cursor="pointer" @click.prevent="openMenu('help')">
+          <title>First steps</title>
+          <help-icon />
+          <g v-if="stepsLeft">
+            <circle cx="-25" cy="20" fill="#230b41" stroke="#ffffff88" stroke-width="0.5" r="10" />
+            <text
+              text-anchor="middle"
+              dominant-baseline="middle"
+              font-size="0.65em"
+              fill="#ffffffaa"
+              transform="translate(-25 20)"
+              >{{ stepsLeft }}</text
+            >
+          </g>
+        </a>
+      </g>
+
       <!-- The siege feed, ringed in pink while a siege is running -->
       <g :transform="corner(leftMostX, 50, bottomMostY, -350)">
         <a cursor="pointer" @click.prevent="openMenu('feed')">
@@ -221,6 +240,9 @@
       <g v-if="menuState.feedMenu">
         <feed-menu />
       </g>
+      <g v-if="menuState.helpMenu">
+        <help-menu />
+      </g>
     </g>
   </g>
 </template>
@@ -245,6 +267,9 @@ import LoadoutMenu from './menus/loadout-menu.svg'
 import SiegeMenu from './menus/siege-menu.svg'
 import FeedMenu from './menus/feed-menu.svg'
 import SiegesIcon from './icons/sieges-icon.svg'
+import HelpMenu from './menus/help-menu.svg'
+import HelpIcon from './icons/help-icon.svg'
+import { firstSteps } from '@/libs/first-steps'
 import { PINK_LIGHT, YELLOW_LIGHT } from '@/libs/palette'
 import { usePlayerStore } from '@/stores/player'
 // import SpriteInfo from './scope/sprite-info-box.svg'
@@ -299,6 +324,8 @@ export default {
     LoadoutMenu,
     SiegeMenu,
     FeedMenu,
+    HelpMenu,
+    HelpIcon,
     SiegesIcon
   },
   data() {
@@ -371,6 +398,11 @@ export default {
     /** Where the profile card sits from the top left corner: under the avatar button on portrait screens. */
     profileOffset() {
       return this.viewRatio <= 1 ? { x: 20, y: 90 } : { x: 100, y: 15 }
+    },
+    /** First steps not done yet: a badge on the "?" button (none once they're all done). */
+    stepsLeft() {
+      if (!this.player.pilot) return 0
+      return firstSteps(this.player).filter((step) => !step.done).length
     },
     chatEventsCount() {
       if (Array.isArray(this.events.chatEvents)) {

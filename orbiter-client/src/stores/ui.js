@@ -19,7 +19,7 @@ let jumpAnimationTimer = null
  * The HUD's full-screen menus (hud.svg.vue), each shown by `menuState[name + 'Menu']`, including
  * colony (a planet's people, storage, buildings and transfers), armory, loadout, siege and the siege feed.
  */
-const MENUS = ['planets', 'ships', 'settings', 'trade', 'shipyard', 'chat', 'leaderboard', 'colony', 'armory', 'loadout', 'siege', 'feed']
+const MENUS = ['planets', 'ships', 'settings', 'trade', 'shipyard', 'chat', 'leaderboard', 'colony', 'armory', 'loadout', 'siege', 'feed', 'help']
 
 export const useUIStore = defineStore('UI', {
   state: () => ({
