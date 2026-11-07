@@ -18,6 +18,7 @@ import { useStarMapStore } from '@/stores/starmap'
 import { mapActions, mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
 import { useDialogStore } from '@/stores/dialog'
+import { useDemo4Store } from '@/stores/demo4'
 import { cardMenu } from './card-menu'
 import { marketTokenUrl, networkFor } from '@/sdk/chain/networks'
 import CardBackground from '../card-background.svg'
@@ -34,12 +35,26 @@ export default {
     objectId: { type: String, default: null }
   },
   emits: ['moon-menu'],
+  data() {
+    return { demo4: useDemo4Store() }
+  },
   computed: {
     ...mapState(useChainStore, ['chainId', 'planetTokenAddress', 'shipTokenAddress']),
     ...mapState(useStarMapStore, ['systemObjects']),
     ...mapState(useGameStateStore, ['avatar']),
     menuData: function () {
-      return cardMenu(this.systemObjects[this.objectId], { marketName: networkFor(this.chainId)?.nftMarket?.name })
+      const d = this.demo4
+      const demo4 = d.active
+        ? {
+            credits: d.credits,
+            claimFee: d.rules.claimFee,
+            armed: d.armed,
+            retreated: Boolean(d.condition?.retreated),
+            sessionLive: d.sessionLive,
+            siegeAt: (id) => d.siegeAt(id)
+          }
+        : undefined
+      return cardMenu(this.systemObjects[this.objectId], { marketName: networkFor(this.chainId)?.nftMarket?.name, demo4 })
     }
   },
   methods: {
@@ -85,15 +100,63 @@ export default {
           break
         }
         case 'claim': {
+          const fee = this.demo4.active ? this.demo4.rules.claimFee : 0
           const name = await this.ask({
             title: 'Claim ' + object.name,
-            message: 'Make planet #' + option.value + ' your own, and give it a name.',
-            input: { label: "Your planet's name", kind: 'name' },
+            message: fee
+              ? `Make ${object.name} your own for ${fee.toLocaleString('en-US')} credits, and give it a name. Then bring colonists and supplies to found a Citadel.`
+              : 'Make planet #' + option.value + ' your own, and give it a name.',
+            input: { label: "Your planet's name", kind: 'name', value: fee ? object.name : undefined },
             confirm: 'Claim Planet'
           })
-          if (name) this.claimPlanet({ planetId: option.value, name })
+          if (name) this.claimPlanet({ planetId: option.value, name: name === object.name ? '' : name })
           break
         }
+        // Demo 4's
+        case 'recruit': {
+          const d = this.demo4
+          const price = d.rules.colonistPrice
+          const max = Math.min(Math.floor(d.credits / price), d.freeBays * 100)
+          if (max < 1) {
+            this.tell('Recruiting Colonists', `Colonists cost ${price} credits each, 100 to a free hold. You need credits and free holds.`)
+            break
+          }
+          const count = await this.ask({
+            title: "Earth's Hiring Hall",
+            message: `Colonists sign on for ${price} credits each and travel 100 to a hold.`,
+            input: { label: 'How many colonists', kind: 'number', min: 1, max, value: String(Math.min(100, max)) },
+            confirm: 'Recruit'
+          })
+          if (count) d.recruit(count)
+          break
+        }
+        case 'colony':
+          this.openMenu('colony')
+          break
+        case 'armory':
+          this.openMenu('armory')
+          break
+        case 'loadout':
+          this.openMenu('loadout')
+          break
+        case 'siege':
+          this.openMenu('siege')
+          break
+        case 'traverse':
+          this.demo4.traverse()
+          break
+        case 'session':
+          if (this.demo4.sessionLive) this.demo4.endSession()
+          else {
+            const go = await this.ask({
+              title: 'Start a Session',
+              message:
+                'One approval in your wallet, and your moves for the next few hours go through a key kept in this browser: no more popups. Some gas money travels with it, and comes back when you end the session.',
+              confirm: 'Start Session'
+            })
+            if (go) this.demo4.startSession()
+          }
+          break
         case 'buildStation':
           if (this.avatar.credits > 10000) {
             const name = await this.ask({
@@ -125,12 +188,27 @@ export default {
           this.$emit('moon-menu')
           break
         case 'attack':
-          this.tell('Attacking', "You won't be able to attack anything until demo\u00a04.")
+          if (!this.demo4.active) {
+            this.tell('Attacking', "You won't be able to attack anything until demo\u00a04.")
+            break
+          }
+          if (
+            await this.ask({
+              title: 'Lay Siege to ' + object.name,
+              message:
+                'A siege is public: everyone sees it in the feed. Rounds are fought every 30 minutes while your ship stays here. Wear the planet down, then file a claim; it completes a day later unless the defenses come back.',
+              confirm: 'Attack'
+            })
+          )
+            this.demo4.attack(option.value, object.name)
           break
         case 'rename': {
           const { type, objectId } = object
+          // Demo 4 charges for a ship's new name (B16); the rest are free.
+          const fee = this.demo4.active && type === 'ship' ? this.demo4.shipNameFee : 0
           const name = await this.ask({
             title: 'Rename ' + object.name,
+            message: fee ? `A new name for your ship costs ${fee.toLocaleString('en-US')} credits.` : undefined,
             input: { label: 'New ' + type + ' name', value: object.name, kind: 'name' },
             confirm: 'Rename'
           })

@@ -15,6 +15,12 @@ const OFFSCREEN_MARGIN_PX = 100
 let jumpAnimationStartedAt = 0
 let jumpAnimationTimer = null
 
+/**
+ * The HUD's full-screen menus (hud.svg.vue), each shown by `menuState[name + 'Menu']`. Demo 4 adds
+ * colony (a planet's people, storage, buildings and transfers), armory, loadout and siege.
+ */
+const MENUS = ['planets', 'ships', 'settings', 'trade', 'shipyard', 'chat', 'leaderboard', 'colony', 'armory', 'loadout', 'siege']
+
 export const useUIStore = defineStore('UI', {
   state: () => ({
     // The map's HUD and world sit in a group scaled by this much (inside 1200 units per screen height).
@@ -52,17 +58,13 @@ export const useUIStore = defineStore('UI', {
       menuState: {
         menuShowing: false, //should this just be a getter?
 
-        planetsMenu: false,
-        settingsMenu: false,
-        shipsMenu: false,
-        tradeMenu: false,
-        shipyardMenu: false,
-        chatMenu: false,
-        leaderboardMenu: false,
+        ...Object.fromEntries(MENUS.map((menu) => [menu + 'Menu', false])),
         spriteMenus: []
       }
     },
     selectedSprite: null,
+    /** Demo 4's tech tree reference screen (D60), over the game. */
+    techTreeOpen: false,
     minerva: {
       terminal: {
         history: []
@@ -123,27 +125,8 @@ export const useUIStore = defineStore('UI', {
     jumpAnimationState: (state) => state.hud.jumpAnimationState,
     selected: (state) => state.selectedSprite,
     menuState: (state) => state.hud.menuState,
-    isMenuOn: (state) => {
-      if (state.hud.menuState.planetsMenu) {
-        return true
-      }
-      if (state.hud.menuState.settingsMenu) {
-        return true
-      }
-      if (state.hud.menuState.shipsMenu) {
-        return true
-      }
-      if (state.hud.menuState.tradeMenu) {
-        return true
-      }
-      if (state.hud.menuState.shipyardMenu) {
-        return true
-      }
-      if (state.hud.menuState.leaderboardMenu) {
-        return true
-      }
-      return false
-    },
+    /** A full menu is open (chat excepted: it sits beside the map). */
+    isMenuOn: (state) => MENUS.some((menu) => menu !== 'chat' && state.hud.menuState[menu + 'Menu']),
     cameraMotionRemaining: (state) => {
       let x = 0
       let y = 0
@@ -491,49 +474,11 @@ export const useUIStore = defineStore('UI', {
       this.viewport.scaleTween.useGeometric()
     },
     openMenu(menu) {
-      this.hud.menuState.shipsMenu = false
-      this.hud.menuState.planetsMenu = false
-      this.hud.menuState.settingsMenu = false
-      this.hud.menuState.tradeMenu = false
-      this.hud.menuState.shipyardMenu = false
-      this.hud.menuState.chatMenu = false
-      this.hud.menuState.leaderboardMenu = false
-      switch (menu) {
-        case 'planets':
-          this.hud.menuState.planetsMenu = true
-          break
-        case 'ships':
-          this.hud.menuState.shipsMenu = true
-          break
-        case 'settings':
-          this.hud.menuState.settingsMenu = true
-          break
-        case 'trade':
-          this.hud.menuState.tradeMenu = true
-          break
-        case 'shipyard':
-          this.hud.menuState.shipyardMenu = true
-          break
-        case 'chat':
-          this.hud.menuState.chatMenu = true
-          break
-        case 'leaderboard':
-          this.hud.menuState.leaderboardMenu = true
-          break
-        case 'jump':
-          break
-        case 'sprite':
-          break
-      }
+      this.closeMenu()
+      if (MENUS.includes(menu)) this.hud.menuState[menu + 'Menu'] = true
     },
     closeMenu() {
-      this.hud.menuState.shipsMenu = false
-      this.hud.menuState.planetsMenu = false
-      this.hud.menuState.settingsMenu = false
-      this.hud.menuState.tradeMenu = false
-      this.hud.menuState.shipyardMenu = false
-      this.hud.menuState.chatMenu = false
-      this.hud.menuState.leaderboardMenu = false
+      for (const name of MENUS) this.hud.menuState[name + 'Menu'] = false
     },
     // unevaluated
 

@@ -295,6 +295,7 @@ export function createGameClientV4() {
       recentTrades: trades.map((t) => ({ sender: t.sender, planetId: t.port })),
       // Demo 4's own, for the screens that show them
       cell: star ?? null,
+      blackHole: star?.state === STATE.BLACK_HOLE,
       sieges
     }
 
@@ -333,6 +334,8 @@ export function createGameClientV4() {
         owner,
         hasMoons: [0, 1, 2, 3, 4, 5, 6, 7].map((j) => look.moons.some((m) => m.orbit === j)),
         hasStation: Boolean(port),
+        // Sol's nine are the Federation's (D49): nobody claims them
+        federation: cell === SOL,
         moons: {},
         station: {},
         // Demo 4's own

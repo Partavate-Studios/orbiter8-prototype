@@ -27,11 +27,14 @@
               id="dialog-input"
               ref="input"
               v-model="text"
-              type="text"
+              :type="isNumber ? 'number' : 'text'"
+              :min="isNumber ? (open.input.min ?? 1) : undefined"
+              :max="isNumber ? open.input.max : undefined"
+              :inputmode="isNumber ? 'numeric' : undefined"
               autocomplete="off"
               spellcheck="false"
               :maxlength="maxLength"
-              :aria-invalid="problem === 'too long' ? 'true' : 'false'"
+              :aria-invalid="problem === 'too long' || problem === 'out of range' ? 'true' : 'false'"
               aria-describedby="dialog-hint"
             />
             <p id="dialog-hint" class="hint" :class="{ problem: problem === 'too long' }" aria-live="polite">
@@ -66,7 +69,11 @@ export default {
   computed: {
     ...mapState(useDialogStore, ['open']),
     isName() {
-      return this.open?.input?.kind !== 'message'
+      return !['message', 'number'].includes(this.open?.input?.kind)
+    },
+    /** A count (Demo 4: colonists, units, parts): whole numbers from min (1) to max. */
+    isNumber() {
+      return this.open?.input?.kind === 'number'
     },
     maxLength() {
       // Names may be typed long and trimmed; the hint says when one is still too long.
@@ -75,10 +82,19 @@ export default {
     /** Why the text can't be sent yet ('empty' only disables the button), or null. */
     problem() {
       if (!this.open?.input) return null
+      if (this.isNumber) {
+        const n = Number(this.text)
+        const { min = 1, max = Infinity } = this.open.input
+        return Number.isInteger(n) && n >= min && n <= max ? null : 'out of range'
+      }
       if (this.isName) return nameProblem(this.text)
       return this.text.trim() ? null : 'empty'
     },
     hint() {
+      if (this.isNumber) {
+        const { min = 1, max } = this.open.input
+        return this.open.input.hint ?? (max != null ? `From ${min} to ${max.toLocaleString('en-US')}.` : '')
+      }
       if (!this.isName) {
         const left = this.maxLength - this.text.length
         return left <= 20 ? `${left} characters left.` : 'Broadcasts are public, and stay on the chain.'
@@ -108,6 +124,7 @@ export default {
       if (this.problem) return
       this.o8audio.playEffect('click')
       if (!this.open.input) this.close(true)
+      else if (this.isNumber) this.close(Number(this.text))
       else this.close(this.isName ? cleanName(this.text) : this.text.trim())
     },
     cancel() {

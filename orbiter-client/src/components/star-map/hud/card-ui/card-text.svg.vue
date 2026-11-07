@@ -175,6 +175,7 @@ export default {
     ownerName() {
       let address = this.systemObjects[this.objectId].owner
 
+      if (this.systemObjects[this.objectId ?? this.planetId]?.federation) return 'The Federation'
       if (parseInt(address) === 0) return 'unclaimed'
 
       let name = '[' + address.replace(address.substring(5, 40), '...') + ']'

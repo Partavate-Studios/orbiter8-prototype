@@ -7,8 +7,11 @@ import { defineStore } from 'pinia'
  * @typedef {object} DialogInput
  * @property {string} label
  * @property {string} [value]  filled in to start with
- * @property {'name' | 'message'} [kind]  names follow the callsign rules (libs/onboarding.js nameProblem)
+ * @property {'name' | 'message' | 'number'} [kind]  names follow the callsign rules (libs/onboarding.js nameProblem)
  * @property {number} [maxLength]  for messages
+ * @property {number} [min]  for numbers (1 when not given)
+ * @property {number} [max]  for numbers
+ * @property {string} [hint]  for numbers, in place of the range
  */
 
 /**

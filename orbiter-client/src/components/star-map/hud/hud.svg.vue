@@ -179,6 +179,19 @@
       <g v-if="menuState.leaderboardMenu">
         <leaderboard-menu />
       </g>
+      <!-- Demo 4's -->
+      <g v-if="menuState.colonyMenu">
+        <colony-menu :object-id="selected" />
+      </g>
+      <g v-if="menuState.armoryMenu">
+        <armory-menu :object-id="selected" />
+      </g>
+      <g v-if="menuState.loadoutMenu">
+        <loadout-menu />
+      </g>
+      <g v-if="menuState.siegeMenu">
+        <siege-menu :object-id="selected" />
+      </g>
     </g>
   </g>
 </template>
@@ -196,6 +209,11 @@ import CurrentSystem from './current-system/system.svg'
 import ScopeToggle from './toggles/scope-toggle.svg'
 import ZoomSlider from './zoom-slider.svg'
 import CardUi from './card-ui/card-ui.svg'
+import ColonyMenu from './menus/colony-menu.svg'
+import ArmoryMenu from './menus/armory-menu.svg'
+import LoadoutMenu from './menus/loadout-menu.svg'
+import SiegeMenu from './menus/siege-menu.svg'
+import { useDemo4Store } from '@/stores/demo4'
 // import SpriteInfo from './scope/sprite-info-box.svg'
 // import SpriteMenu from './scope/sprite-menu.svg'
 //Icons
@@ -242,7 +260,11 @@ export default {
     ScopeToggle,
     TradeMenu,
     ShipyardMenu,
-    ZoomSlider
+    ZoomSlider,
+    ColonyMenu,
+    ArmoryMenu,
+    LoadoutMenu,
+    SiegeMenu
   },
   computed: {
     starSelected() {
@@ -298,6 +320,13 @@ export default {
       }
       return 0
     }
+  },
+  mounted() {
+    // Demo 4's timers (sessions, buildings, sieges) count down by this clock.
+    this.demo4Clock = setInterval(() => useDemo4Store().tick(), 15_000)
+  },
+  unmounted() {
+    clearInterval(this.demo4Clock)
   },
   methods: {
     /** Where cargo slot `index` sits: two columns, the empty holds always last on the right. */

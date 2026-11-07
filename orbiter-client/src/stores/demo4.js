@@ -15,6 +15,8 @@ export const useDemo4Store = defineStore('Demo4', {
   state: () => ({
     /** Playing Demo 4's contracts (game.version === 4). */
     active: false,
+    /** the player's address, lowercase */
+    account: null,
     economy: null,
     rules: null,
     /** the raw pilot (sdk/v4/game.js pilot()), null before loading, false if unregistered */
@@ -32,6 +34,8 @@ export const useDemo4Store = defineStore('Demo4', {
     session: null,
     /** bumped when the galaxy map's cells change */
     cellsVersion: 0,
+    /** Pilots.sol SHIP_NAME_FEE (B16) */
+    shipNameFee: 500,
     /** clock for timers (session expiry, buildings, sieges), ticked by the screens */
     now: Date.now()
   }),
@@ -65,6 +69,7 @@ export const useDemo4Store = defineStore('Demo4', {
       this.active = game.version === 4
       if (!this.active) return
       Object.assign(this, {
+        account: s.account,
         economy: s.economy,
         rules: s.rules,
         pilot: s.pilot,

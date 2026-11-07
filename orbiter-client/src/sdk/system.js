@@ -35,6 +35,9 @@ function demo3Goods(station) {
   })
 }
 
+/** Who owns Sol's planets in Demo 4 (Demo 3 gave them to a house account of this name). */
+const FEDERATION = 'The Federation'
+
 /** The star at the center of every system has a fixed key. */
 export const STAR_KEY = 'star'
 
@@ -110,12 +113,14 @@ export function buildSystem(system, playerAccount) {
     birth: system.birthTime,
     owner: system.discoveredBy,
     ownerName: system.avatarNames[system.discoveredBy],
-    isMine: String(playerAccount) == String(system.discoveredBy)
+    isMine: String(playerAccount) == String(system.discoveredBy),
+    // Demo 4: a black hole, with a partner to go through to
+    blackHole: system.blackHole ?? false
   })
 
   for (const orbitalPosition in system.planets) {
     const planet = system.planets[orbitalPosition]
-    const planetOwnerName = ownerName(planet.owner, 'unclaimed')
+    const planetOwnerName = planet.federation ? FEDERATION : ownerName(planet.owner, 'unclaimed')
     const isMine = String(playerAccount) == String(planet.owner)
     const planetObject = add('planet', {
       id: planet.id,
@@ -133,6 +138,7 @@ export function buildSystem(system, playerAccount) {
         speed: planetOrbitSpeed(planet.orbitSpeed, orbitalPosition)
       },
       hasStation: planet.hasStation,
+      federation: planet.federation ?? false,
       moons: [],
       // Demo 4's own: level, buildings, people, storage, siege, defenses (sdk/v4/client.js)
       v4: planet.v4 ?? null

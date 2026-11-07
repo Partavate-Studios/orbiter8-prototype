@@ -3,6 +3,7 @@
     <star-map />
     <layer-html />
     <transaction-tray />
+    <tech-tree v-if="techTreeOpen" class="tech-tree-over" @close="techTreeOpen = false" />
     <game-dialog />
   </div>
 </template>
@@ -19,6 +20,7 @@ import starMap from '@/components/star-map/map'
 import layerHtml from '@/components/layer-html/container-html'
 import TransactionTray from '@/components/transaction-tray.vue'
 import GameDialog from '@/components/game-dialog.vue'
+import TechTree from '@/components/galaxy/tech-tree.vue'
 import router from '@/router/router'
 import { onFrame } from '@/libs/frame-loop'
 
@@ -34,11 +36,20 @@ export default {
     starMap,
     layerHtml,
     TransactionTray,
-    GameDialog
+    GameDialog,
+    TechTree
   },
   computed: {
     ...mapState(useGameStateStore, ['haveAvatar', 'haveShip']),
     ...mapState(useUIStore, ['selected', 'jumpAnimationState', 'viewport', 'neighborView']),
+    techTreeOpen: {
+      get() {
+        return useUIStore().techTreeOpen
+      },
+      set(open) {
+        useUIStore().techTreeOpen = open
+      }
+    },
     ...mapState(useStarMapStore, ['gameTime', 'systemObjects', 'sprites', 'spriteIds', 'myShipId']),
     ...mapState(useConfigStore, ['tickDelay'])
   },

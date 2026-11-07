@@ -47,6 +47,7 @@
 
 <script>
 import { useGalaxyStore } from '@/stores/galaxy'
+import { useDemo4Store } from '@/stores/demo4'
 import { BUILDINGS } from '@/sdk/v4/system'
 
 const UNLOCKS = {
@@ -63,7 +64,9 @@ export default {
   name: 'TechTree',
   emits: ['close'],
   data() {
-    return { galaxy: useGalaxyStore() }
+    // The game screen's Demo 4 store when playing there; the galaxy screen's otherwise.
+    const demo4 = useDemo4Store()
+    return { galaxy: demo4.active ? demo4 : useGalaxyStore() }
   },
   computed: {
     rules() {
