@@ -129,3 +129,27 @@ endpoint), and with MetaMask they go through the wallet's provider.
 - **The contracts don't check that the ship is at the port** for `tradeAtPort` or `addHoldsToShip`. A player could trade at any port in the galaxy without going there; only the client stops it. That's for the contract wish list.
 - **Holds are capped at 250** (`maxHolds`), stored as a uint8.
 - **A purchase must leave a balance:** it's refused unless its cost is strictly less than the balance.
+
+## Releasing the contracts on Polkadot Hub (added 2026-11-07)
+
+Measured by deploying `contracts/script/Deploy.s.sol` to a local chain: **45 transactions, 45.9M gas,
+24 contracts (10 modules behind proxies, their implementations and 4 linked libraries) holding 175 KB
+of code, and 218 new storage slots.**
+
+Polkadot Hub charges two things:
+- **Fees,** scaled from gas as above (DOT $0.955; a plain transfer at 0.00147 DOT for 21,000 gas): **about 3.2 DOT**, 1.6 to 16 DOT from quiet to busy. Rough: Polkadot Hub prices by weight and length, and uploading code may not follow gas.
+- **Storage deposits,** held (not spent) while the data exists, from Asset Hub's runtime (`pallet_revive`'s settings; system chains charge 1/100 of the relay chain's rate): 0.2 DOT per item, 0.00001 DOT per byte, and 0.002 DOT per contract storage slot.
+  - code: 175 KB and 24 code items, about 6.5 DOT
+  - the 24 contracts' records, about 4.8 DOT
+  - each contract also locks 30% of its code's deposit, about 2 DOT
+  - the 218 slots, about 0.6 DOT
+  - **about 14 DOT** in all
+
+**So a release costs about 17 DOT, about $16: 3 DOT spent and 14 held.** The deposits come back only
+if the contracts' code and storage are removed, which upgradeable contracts never do, so treat them as
+spent. An upgrade uploads one module's new code: a fraction of this.
+
+Player moves pay deposits too, at 0.002 DOT a storage slot: a first arrival at a new star writes a
+handful of slots, so about 0.01 to 0.02 DOT more. That's far less than feared above.
+
+Testnet first: Polkadot Hub's testnet would give the real numbers for both (milestone 6).
