@@ -53,6 +53,12 @@ design doc), [`design-ideas.md`](design-ideas.md) (Koda's working doc), [`cost-e
 | D32 | **Testing bar:** every contract module ships with unit tests, fuzz tests and a gas report per action; each milestone ends with the play bot playing it on the local chain; costs are compared with `docs/cost-estimates.md`. | 2026-11-06 |
 | D33 | **The client stays on the SVG engine for this run.** A change of engine is for later, possibly **3D rendering**: Koda has a 3D model of the ship and a prototype project to reference. Until then, this run's graphics are SVG, built on the modernize client. | 2026-11-06 |
 | D34 | **Polkadot research done** ([`research/polkadot-hub-2026-11.md`](research/polkadot-hub-2026-11.md), Opus, 2026-11-06; spot-checked on the live chain). It changes the plan in five places:<br>• **UUPS works on Polkadot Hub's REVM** (proxies are live on mainnet; a plain OpenZeppelin upgrade gets its own test). D14 stands.<br>• **The block-hash scan (D21) is not safe there.** Polkadot Hub's block hashes are built from public values, `PREVRANDAO` is a constant, and the chain is so quiet that a player could compute the next block's hash before jumping. **The scan needs a different source of randomness** (the next round).<br>• **Timestamps move in 24-second steps there**; fine for D30's minute-and-longer durations.<br>• **No Multicall3 there:** batched reads must be the contracts' own view functions (already planned).<br>• **Storage deposits are several times Base's per slot,** which rewards D9's store-little design. | 2026-11-06 |
+| D35 | **Randomness comes from drand** (Koda, 2026-11-06): the League of Entropy's public beacon, a new signed random value every 3 seconds, verified by the contracts themselves. The jump names a future drand round; the client fetches it from drand's public relays; the contract checks its signature. The scan still resolves after the jump and is written by the next transaction that touches the area: **one wallet approval for the player.** (The jump can't use an already-published round: the player could look at it first and only jump when it's good.) The signature check needs code without an audited Solidity implementation yet, so it's tested thoroughly. | 2026-11-06 |
+| D36 | **Foundry** for writing and testing the contracts. It keeps them plain EVM code (Polkadot Hub's REVM), so they also run on other EVM chains. | 2026-11-06 |
+| D37 | **Develop locally; no testnets** until the final work is tested, or when Koda chooses to try one. Two local chains: Foundry's (fast tests, Ethereum rules) and Parity's **local Polkadot Hub node** (`revive-dev-node` with `eth-rpc`: Polkadot's real contract engine, for deposits, gas and block data). | 2026-11-06 |
+| D38 | **Koda leans toward Polkadot Hub** ("I think we will"). Contracts stay EVM-portable; the decision is made at the end. | 2026-11-06 |
+| D39 | **Black holes: no risk of damage.** Going through is clean. | 2026-11-06 |
+| D40 | **The discoverer's first claim: a 10-minute window,** ending early if the discoverer flies on, so others get a shot. | 2026-11-06 |
 
 ## Features: this run and consider next (proposed, for Koda to choose)
 
@@ -93,7 +99,7 @@ hard to add later because it shapes the data, low-hanging, or the battle minimum
 
 Rounds 1–5 answered, except Q25 (contract tooling), which waits for the research. Next: the research's findings (the engine question is settled by D33).
 
-**Research done (D34).** Round 6 (asked 2026-11-06): randomness for the scan; contract tooling (Q25); the primary development network; three proposals from the draft.
+**Research done (D34).** Round 6 answered (D35–D40). Round 7 (asked 2026-11-06): session keys, explained; Polkadot as the main development target; the read path.
 
 ## Plan (draft, 2026-11-06; for Koda's review)
 
@@ -156,9 +162,8 @@ the arms' starting points instead; Sol's neighborhood is preset anyway.
 **Black holes (D17, D22, D28).** About 2% of new stars. When one is created, its partner cell is
 chosen at once and reserved as a black hole: 8 to 24 cells away, sampling a few candidate cells from
 the scan's randomness and taking the one deepest in the void with no charted star within 2 cells.
-Ships can jump to a black hole, orbit it, leave, or go through to its partner (two-way). Going
-through charts around the exit as a first arrival would. (Proposed: each trip risks minor damage to a
-ship system.)
+Ships can jump to a black hole, orbit it, leave, or go through to its partner (two-way), with no
+risk of damage (D39). Going through charts around the exit as a first arrival would.
 
 **Sol** is preset at cell 0 with its named planets and ports.
 
@@ -186,7 +191,7 @@ discoverer, the math), against 2.5 million today. Measured in milestone 1.
 ### 5. Planets
 
 - **Derived planets** (D9); only ownership and what's built are stored.
-- **Claims:** the ship must be in the system; a fee (a credit sink). (Proposed: the discoverer gets a first-claim window, to keep the explorer's reward.)
+- **Claims:** the ship must be in the system; a fee (a credit sink). The discoverer gets a 10-minute first-claim window, ending early if they fly on (D40).
 - **The linear tech tree:** Citadel, Colony, Station, Port, Yards, Armory. Each level costs goods, credits and build time.
 - **Colonists:** grow lazily toward a cap. Production follows population, lazily by timestamp.
 
