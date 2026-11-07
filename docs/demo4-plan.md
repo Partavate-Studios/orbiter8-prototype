@@ -318,7 +318,7 @@ impossible or needs a design call goes back to Koda; everything else is decided 
 **Milestone 6: testnets and the decision**
 - [ ] Deploy to Polkadot Hub's testnet and an L2 testnet.
 - [ ] The research's test list on Polkadot (UUPS, drand cost, the read path through smoldot and through RPC, wallets).
-- [ ] The play bot and simulator on both testnets; `cost-estimates.md` updated.
+- [ ] The play bot and simulator on both testnets; `cost-estimates.md` updated. *Local gas and money added to `cost-estimates.md` (2026-11-07); testnets wait for Koda (D37).*
 - [ ] The network decision with Koda.
 
 ### 12. Confirm with Koda before building

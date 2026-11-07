@@ -85,6 +85,30 @@ Assumptions: ETH $2,300 and DOT $0.955.
 
 **Moonbeam, Moonriver and Moonbase Alpha have shut down** (maintenance mode from 2026-08-01; transactions are rejected). The client still lists Moonriver and Moonbase Alpha.
 
+## Demo 4, measured locally (added 2026-11-07)
+
+Gas from Demo 4's contracts on Foundry's local chain: the exploring and trading bots
+(`orbiter-client/dev/harness/explore-bot4.mjs`, `trade-bot4.mjs`) and Foundry's gas reports. Polkadot
+Hub's storage deposits aren't in these: they wait for the local Polkadot node (`docs/demo4-plan.md`, B3).
+Typical prices, as above (Base 0.008 gwei, Arbitrum One 0.02 gwei, Polkadot Hub scaled from a transfer).
+
+| Move | Demo 4 gas | Demo 3 gas | Base | Arbitrum One | Polkadot Hub |
+|---|---:|---:|---|---|---|
+| Sign-up (call sign and ship) | 290,000 | 480,000 | $0.005 | $0.013 | $0.019 |
+| Start a session (once per 4 hours) | 114,000 | none | $0.002 | $0.005 | $0.008 |
+| One trade (sell and buy) | 180,000 | 118,000 | $0.003 | $0.008 | $0.012 |
+| Buy bays | 96,000 | 83,000 | $0.002 | $0.004 | $0.006 |
+| Jump, charted | 96,000 | 81,000 | $0.002 | $0.004 | $0.006 |
+| **Jump to a new star, with its scan** | **508,000** | **2,494,000** | $0.009 | $0.023 | $0.034 |
+| Claim a planet | 202,000 | 177,000 | $0.004 | $0.009 | $0.014 |
+| Start a building | 108,000 | 172,000 | $0.002 | $0.005 | $0.007 |
+| Lay siege | 280,000 | none | $0.005 | $0.013 | $0.019 |
+
+**An hour of play costs about $0.80 on Base, $2 on Arbitrum One and $3 on Polkadot Hub,** at the tuning's pace of a
+trade every 15 seconds (`docs/demo4-tuning.md`), about 240 moves. With a session key, the key pays these from the gas
+money the wallet sent it. Two ways to bring it down, if wanted: fewer, bigger moves (the tuning could assume a slower
+pace), or cheaper trades (Market holding cargo itself would save the calls between modules, `docs/demo4-plan.md` B24).
+
 ## Load on the network's nodes (RPC)
 
 Reads are free in gas, but they count against the node provider's limits (Infura, Alchemy, a public
