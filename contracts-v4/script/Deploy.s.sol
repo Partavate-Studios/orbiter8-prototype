@@ -5,6 +5,9 @@ import {Script, console} from "forge-std/Script.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import {Galaxy} from "../src/galaxy/Galaxy.sol";
 import {Pilots} from "../src/pilots/Pilots.sol";
+import {Market} from "../src/market/Market.sol";
+import {Credits} from "../src/tokens/Credits.sol";
+import {Ships} from "../src/tokens/Ships.sol";
 
 /// Deploys every game module behind its proxy and wires them together. The deployer is the admin
 /// and upgrader (a multisig takes these over for a public release, D14).
@@ -12,24 +15,39 @@ library Deployment {
     struct Game {
         Galaxy galaxy;
         Pilots pilots;
+        Market market;
+        Credits credits;
+        Ships ships;
+    }
+
+    function _proxy(address implementation, bytes memory init) private returns (address) {
+        return address(new ERC1967Proxy(implementation, init));
     }
 
     function deploy(address admin, bytes32 seed, uint64 scanDelay) internal returns (Game memory game) {
-        game.galaxy = Galaxy(
-            address(
-                new ERC1967Proxy(
-                    address(new Galaxy()), abi.encodeCall(Galaxy.initialize, (admin, seed, scanDelay))
-                )
+        game.credits = Credits(_proxy(address(new Credits()), abi.encodeCall(Credits.initialize, (admin))));
+        game.ships = Ships(_proxy(address(new Ships()), abi.encodeCall(Ships.initialize, (admin))));
+        game.galaxy =
+            Galaxy(_proxy(address(new Galaxy()), abi.encodeCall(Galaxy.initialize, (admin, seed, scanDelay))));
+        game.pilots = Pilots(
+            _proxy(
+                address(new Pilots()),
+                abi.encodeCall(Pilots.initialize, (admin, game.galaxy, game.credits, game.ships))
             )
         );
-        game.pilots = Pilots(
-            address(new ERC1967Proxy(address(new Pilots()), abi.encodeCall(Pilots.initialize, (admin, game.galaxy))))
+        game.market = Market(
+            _proxy(address(new Market()), abi.encodeCall(Market.initialize, (admin, game.pilots, game.credits)))
         );
     }
 
     /// Grants the modules the roles they need on each other (run by the admin).
     function wire(Game memory game) internal {
-        game.galaxy.grantRole(game.galaxy.GAME_MODULE(), address(game.pilots));
+        bytes32 role = game.galaxy.GAME_MODULE();
+        game.galaxy.grantRole(role, address(game.pilots));
+        game.ships.grantRole(role, address(game.pilots));
+        game.credits.grantRole(role, address(game.pilots));
+        game.credits.grantRole(role, address(game.market));
+        game.pilots.grantRole(role, address(game.market));
     }
 }
 
@@ -45,8 +63,12 @@ contract Deploy is Script {
         vm.stopBroadcast();
         console.log("Galaxy", address(game.galaxy));
         console.log("Pilots", address(game.pilots));
+        console.log("Market", address(game.market));
         string memory json = "deployment";
         vm.serializeAddress(json, "galaxy", address(game.galaxy));
+        vm.serializeAddress(json, "market", address(game.market));
+        vm.serializeAddress(json, "credits", address(game.credits));
+        vm.serializeAddress(json, "ships", address(game.ships));
         string memory out = vm.serializeAddress(json, "pilots", address(game.pilots));
         vm.writeJson(out, string.concat("deployments/", vm.toString(block.chainid), ".json"));
     }

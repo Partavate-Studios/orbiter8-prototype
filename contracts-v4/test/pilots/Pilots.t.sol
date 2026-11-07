@@ -43,7 +43,7 @@ contract PilotsTest is Test {
     function test_registerStartsAtSol() public {
         vm.prank(ada);
         pilots.register("Ada", "Ledger");
-        Pilots.Pilot memory p = pilots.pilotOf(ada);
+        Pilots.PilotView memory p = pilots.pilotOf(ada);
         assertEq(p.callsign, "Ada");
         assertEq(p.ship.cell, 0);
         assertEq(p.ship.range, 1);
