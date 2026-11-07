@@ -74,6 +74,7 @@ design doc), [`design-ideas.md`](design-ideas.md) (Koda's working doc), [`cost-e
 | D53 | **Proposed balance** (for Koda's confirmation with the plan): three attack types, each beaten by one defense: railguns beat armor and are stopped by shields; missiles beat shields and orbital platforms and are stopped by point defense; drones beat point defense and are stopped by armor and orbital platforms. The BFG beats anything but recharges slowly and hits one target per shot. Exact numbers by simulation. | 2026-11-06 |
 | D54 | **Ships carry drones too, but fewer than a planet can field** (planets have drones as well). **Shields regenerate** (confirmed). | 2026-11-06 |
 | D55 | **Drones can be moved between your ship and your planet** (e.g. dropping drones off to defend it), within each one's capacity. **Drones are bought, or produced by an autofactory on your planet.** (Where the autofactory sits in the tech tree, and what it consumes: the next question.) | 2026-11-06 |
+| D56 | **Any ship weapon can be moved between your ship and your planet** (the BFG and orbital platforms stay planet-only). **The Orbiter 8 has limits with real trade-offs:** slots that hold either cargo or other things (such as drones), and a set number of weapon mounts where bigger weapons take more of them. Numbers should seem balanced and fit the lore now, and get cleaned up in "find the fun". (The proposed slot model: the next questions.) | 2026-11-06 |
 
 ## Features: this run and consider next (proposed, for Koda to choose)
 
@@ -114,7 +115,7 @@ hard to add later because it shapes the data, low-hanging, or the battle minimum
 
 Rounds 1–5 answered, except Q25 (contract tooling), which waits for the research. Next: the research's findings (the engine question is settled by D33).
 
-**Research done (D34).** All rounds answered (D1–D55); two follow-ups on the autofactory are open. D53's balance table is a proposal to confirm with the finished plan.
+**Research done (D34).** All rounds answered (D1–D56). Round 10 (asked 2026-11-06): populations, the autofactory and the Armory, the ship's slots. D53's balance table is a proposal to confirm with the finished plan.
 
 ## Plan (complete, 2026-11-06; awaiting Koda's confirmation)
 
