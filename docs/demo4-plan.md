@@ -51,6 +51,7 @@ design doc), [`design-ideas.md`](design-ideas.md) (Koda's working doc), [`cost-e
 | D30 | **Durations use timestamps, safely.** Siege starting values: an undefended planet worn down in about an hour, a fully built and defended one in about three days, a 24-hour claim waiting period, a few hours' repair before attacking again. Rules, so timestamps can't be exploited: only for durations of minutes or longer; never in randomness; nothing where being a few seconds early or late gains anything. (On Ethereum the timestamp is fixed to the slot; on rollups and Polkadot the block producer can shift it within limits that the research confirms.) | 2026-11-06 |
 | D31 | **Build order is Claude's call,** working through to the end of this run without stopping between milestones (proposed order: hex galaxy and foundations, then pilots and trade, planets, battle, graphics and session keys, then testnets and the network decision). | 2026-11-06 |
 | D32 | **Testing bar:** every contract module ships with unit tests, fuzz tests and a gas report per action; each milestone ends with the play bot playing it on the local chain; costs are compared with `docs/cost-estimates.md`. | 2026-11-06 |
+| D33 | **The client stays on the SVG engine for this run.** A change of engine is for later, possibly **3D rendering**: Koda has a 3D model of the ship and a prototype project to reference. Until then, this run's graphics are SVG, built on the modernize client. | 2026-11-06 |
 
 ## Features: this run and consider next (proposed, for Koda to choose)
 
@@ -84,13 +85,12 @@ hard to add later because it shapes the data, low-hanging, or the battle minimum
 - **Economy and building:** supply routes, crafting, builders (probes, autofactories), negotiated prices, branching tech tree
 - **Fleets:** several ships per pilot, with remote control (signal lag, relays); refine first (D26)
 - **Bigger systems:** terraforming (designed together), digital pilots (cubes, lag, relays, escape pods, cube hunting), tractor beams
+- **3D rendering** (Koda has a ship model and a prototype project to reference) (D33)
 - **Parked:** portals between networks, new ship types and aliens, tokenized goods, hidden information with ZK proofs, invite-only cubes, star-system weapons, Minerva's hidden agenda, planet maintenance, vanity upgrades, alignment, corporate taxes; client extras (soundtrack folders, re-skinning, ENS names)
 
 ## Open questions
 
-Rounds 1–5 answered, except Q25 (contract tooling), which waits for the research. Next: the research's findings, then the game engine question.
-
-**Queued topic (Koda, 2026-11-06): the game engine.** After the research and the immediate questions: how the client renders the game. Keep SVG, or go down a new path (canvas, WebGL, a game engine)? Earlier work in the modernize branch is relevant (the canvas layers, the canvas prototype tangent, the frame loop).
+Rounds 1–5 answered, except Q25 (contract tooling), which waits for the research. Next: the research's findings (the engine question is settled by D33).
 
 **Still open:** Q13's Polkadot check (research running).
 
