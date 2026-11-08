@@ -101,6 +101,8 @@ export function createGameClient() {
     cargo: [],
     /** planets the pilot owns, anywhere (their deeds) */
     deeds: 0,
+    /** the stars where the pilot owns planets, and how many: cell → count (read when the deed count changes) */
+    ownedAt: new Map(),
     ports: [],
     planets: [],
     sieges: [],
@@ -188,6 +190,8 @@ export function createGameClient() {
   const ownPending = () =>
     [...state.cells.values()].filter((c) => c.visited && !c.scanned && c.discoverer === state.account)
   let scanTimer = null
+  /** The deed count ownedAt was read for. */
+  let ownedFor = null
   /** Scans the pilot declined in the wallet: not asked again until something changes. */
   const declinedScans = new Set()
   /**
@@ -305,7 +309,8 @@ export function createGameClient() {
   async function loadPilot() {
     state.pilot = (await game.pilot(state.account)) ?? false
     if (!state.pilot) {
-      Object.assign(state, { credits: 0, cargo: [], condition: null, deeds: 0, session: null })
+      Object.assign(state, { credits: 0, cargo: [], condition: null, deeds: 0, session: null, ownedAt: new Map() })
+      ownedFor = null
       keyGame = keyWallet = null
       return
     }
@@ -318,6 +323,15 @@ export function createGameClient() {
       game.deedCount(state.account)
     ])
     Object.assign(state, { credits, cargo, condition, deeds })
+    // Where they are: read again only when the count changes (a claim, a loss), not every refresh.
+    if (deeds !== ownedFor) {
+      ownedFor = deeds
+      const ids = deeds ? await game.ownedPlanets(state.account).catch(() => []) : []
+      const at = new Map()
+      for (const id of ids) at.set(Math.floor(id / 256), (at.get(Math.floor(id / 256)) ?? 0) + 1)
+      state.ownedAt = at
+      notify('cells')
+    }
     resumeSession()
   }
 

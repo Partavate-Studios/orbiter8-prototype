@@ -71,6 +71,16 @@
       >
         <circle v-if="star.here" :r="star.r + 7" fill="none" stroke="#ffffff" stroke-width="1.6" />
         <circle v-if="star.pending" :r="star.r + 4" class="scanning" />
+        <!-- your planets here: a small yellow dot for each (up to four), arched over the star -->
+        <circle
+          v-for="(dot, i) in star.owned"
+          :key="'own' + i"
+          :cx="dot.x"
+          :cy="dot.y"
+          r="1.7"
+          :fill="YELLOW_LIGHT"
+          opacity="0.9"
+        />
         <circle v-if="star.besieged" :r="star.r + 11" class="besieged" />
         <template v-if="star.blackHole">
           <circle :r="star.r + 1.5" class="hole-ring" />
@@ -145,7 +155,7 @@
 import { mapActions } from 'pinia'
 import { game } from '@/sdk/client'
 import { STATE } from '@/sdk/client'
-import { MAP } from '@/libs/palette'
+import { MAP, YELLOW_LIGHT } from '@/libs/palette'
 import { position, cellAt, distance, neighbors } from '@/sdk/hex'
 import { CARD_THEMES } from '@/libs/card-theme'
 import { fitText } from '@/libs/fit-text'
@@ -186,6 +196,14 @@ const BACKGROUND_PARALLAX = 20 // background-canvas.vue PARALLAX
 const MAX_ZOOM = 3
 const MIN_ZOOM = 0.15
 const easeOut = (t) => 1 - Math.pow(1 - t, 3)
+/** Up to four dots in an arc over a star of radius r: one for each of your planets there. */
+const ownedDots = (count, r) => {
+  const n = Math.min(4, count)
+  return Array.from({ length: n }, (_, i) => {
+    const a = -Math.PI / 2 + (i - (n - 1) / 2) * 0.42
+    return { x: Math.cos(a) * (r + 11.5), y: Math.sin(a) * (r + 11.5) }
+  })
+}
 
 export default {
   name: 'GalaxyMap',
@@ -209,6 +227,7 @@ export default {
       /** no hover: a touch screen (the hint says to tap) */
       touch: window.matchMedia?.('(hover: none)').matches ?? false,
       pointer: { x: 0, y: 0 },
+      YELLOW_LIGHT,
       /** the opening, 0 to 1: the heliopause shrinking, the neighbors flying in */
       opening: 0,
       MAP
@@ -299,6 +318,7 @@ export default {
           here: c.cell === this.shipCell,
           reachable: steps > 0 && steps <= this.range,
           besieged: this.player.besiegedCells.has(c.cell),
+          owned: ownedDots(this.client.ownedAt?.get(c.cell) ?? 0, (2.5 + traits.size * 5) * Math.min(1.6, Math.max(0.6, this.camera.zoom))),
           name: this.nameOf(c.cell),
           // a long name shrunk or cut, so it doesn't run into its neighbors' (libs/fit-text.js)
           label: fitText(this.nameOf(c.cell), 11, Math.min(96, this.scale * 0.95))
@@ -361,6 +381,8 @@ export default {
         note = this.isPartnerOf(this.hover) ? 'the far side of this black hole' : inRange ? 'black hole · in range' : 'black hole'
       else if (c.visited) note = inRange ? 'visited · in range' : 'visited'
       else note = inRange ? 'unsurveyed · in range' : 'unsurveyed'
+      const mine = this.client.ownedAt?.get(this.hover) ?? 0
+      if (mine) note += ` · ${mine} of your planets`.replace('1 of your planets', 'your planet')
       // Beside the pointer, flipped near the edges.
       const x = this.pointer.x + 16 + 200 > this.width ? this.pointer.x - 216 : this.pointer.x + 16
       const y = this.pointer.y + 16 + 60 > this.height ? this.pointer.y - 76 : this.pointer.y + 16

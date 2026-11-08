@@ -123,7 +123,11 @@ async function sent(transaction, options) {
   return tx.wait()
 }
 
-const DEEDS_ABI = ['function balanceOf(address owner) view returns (uint256)']
+const DEEDS_ABI = [
+  'function balanceOf(address owner) view returns (uint256)',
+  'function ownerOf(uint256 id) view returns (address)',
+  'event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)'
+]
 
 const toCost = (c) => ({
   credits: Number(c.credits),
@@ -407,6 +411,15 @@ export function createGame(runner, addresses) {
     /** Planet deeds a pilot holds. */
     async deedCount(address) {
       return deeds ? Number(await deeds.balanceOf(address)) : 0
+    },
+
+    /** The planets `address` owns now: every deed ever sent to it (in chunks), still its own. */
+    async ownedPlanets(address) {
+      if (!deeds) return []
+      const { logs } = await since(deeds, deeds.filters.Transfer(null, address), -1)
+      const ids = [...new Set(logs.map((l) => Number(l.args[2])))]
+      const owners = await Promise.all(ids.map((id) => deeds.ownerOf(id).catch(() => null)))
+      return ids.filter((_, i) => owners[i]?.toLowerCase() === address.toLowerCase())
     },
 
     /** Every claimed planet's id and owner now, from the claims and seizures. */
