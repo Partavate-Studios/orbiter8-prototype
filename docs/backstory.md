@@ -160,18 +160,20 @@ In just the last few decades, we’ve seen rapid improvements in Orbiter technol
 
 ## How it lines up with the title's Story scene
 
-The title's Story scene was built from the Multiverse Portals demo's storyboard (see
-`UPGRADE_NOTES.md`, "Up next"); the scene doesn't need to tell all of the story. The storyboard's
-first three panels follow this arc. Panels 4–6 are the hackathon pitch ("portals", "an MMO for the
-EVM") and don't belong to this story.
+The title's Story button (2026-11-07) tells this story in eight comic panels, drawn with the game's
+art; the words are this file's, shortened to captions. The panels and the text they're from:
 
-| Panel | Says | In the story |
+| Panel | Scene | In the story |
 |---|---|---|
-| 1 | "By the year 2140…" | civilization spans the solar system |
-| 2 | "Still bound to our sun…" | the second plateau: the sun as the barrier |
-| 3 | "That was until today! The first starships have arrived." | the Orbiter 8's first jump and return |
+| 1 | Sol, its nine planets on their rings | "It is the year 2140 … the whole of the solar system" |
+| 2 | Mars, a colony pod landing, domes lighting | the first colony on Mars; the second and third generations |
+| 3 | Jupiter, its moons, freighters, the asteroids' ice | the moons of Jupiter, Venus, the asteroids; bodies made for space; water |
+| 4 | A crowded port, every trade code falling | the trade wars, the Great Regrettion, the corporations |
+| 5 | Minerva's owl, the ledger's stamps | the Minerva Galactic Network |
+| 6 | An Orbiter slinging planet to planet to the edge | the Orbiters of the 2090s; "that was as far as we could go" |
+| 7 | A charging orbit around the sun, the flash, the streak to a star | the jump; the Orbiter 6 and the Orbiter 8's return |
+| 8 | The galaxy map, routes, claim flags, a pirate band | the new land rush; the pirates; "Liberta Galactica!" |
 
-Beats a short scene could use: Mars's hard first colony, the Great Regrettion and the corporations,
-the Orbiters opening the outer worlds in the 2090s, the sun as both the barrier and the way out (the
-charging orbit), and the closing "Liberta Galactica!", which the game already uses when a new ship
-launches.
+The captions are in `orbiter-client/src/components/title/story-scene.vue` (`PANELS`); the scenes are
+the components under `orbiter-client/src/components/title/story/`. The Federation isn't in the
+panels; nothing else of the story's arc is left out.

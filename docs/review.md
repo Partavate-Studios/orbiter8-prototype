@@ -375,6 +375,50 @@ network step with the local chain offered. Two gaps found and fixed:
 
 Not exercised: a real MetaMask (none in headless Chrome). `?wallet=browser` is there for you to try.
 
+## 8. The story page (Koda, 2026-11-07: "it kind of sucks")
+
+Koda's brief: the Story page was too thin, its opening orbiting planets looked terrible (one gradient
+for every planet), its Back button was confusing and the close "×" easy to miss. Tell the story in
+summary, as before, with the game's own assets, inspired by how comics and graphic novels tell a
+story; eight panels or so (four to twelve). Done, and seen at 1440 × 900 and 390 × 844
+(`docs/review/story-*.png`):
+
+- **Eight panels, one per page, each framed like a comic panel** with the narration in caption
+  boxes on the frame's corners (lead on the top left, close on the bottom right, sentences arriving
+  one at a time): Sol in 2140; the first colony on Mars; thriving across the system (Jupiter's
+  moons, the ice of the asteroids); the Great Regrettion and the corporations (a crowded port, every
+  trade code falling); Minerva (her owl, the ledger's entries stamped one after another); the
+  Orbiters of the 2090s slinging planet to planet to the dashed edge of the system; the jump (a
+  charging orbit around the sun, then the flash and the streak to a neighboring star); and the land
+  rush (the galaxy map, routes in your yellow, claim flags going up, a pirate band in the dark),
+  closing on "Liberta Galactica!". The words are `docs/backstory.md` shortened to captions; the
+  story text itself didn't change.
+- **The game's art throughout:** the sun is the star sprite; the planets are drawn by a new
+  `story-planet` component with the planet sprite's disc, lighting and per-class surfaces (the
+  surfaces now live in `components/assets/planet-surfaces.js`, shared with the tech tree's pictures,
+  which had already invented Oceanic, Desert and Swamp surfaces in the sprite's style); Sol's nine
+  planets use the classes, sizes and rings SystemGen gives them; the station, the moons, the ships
+  (with engine trails) and Minerva's owl are the sprites' art. Invented, small and on-brand: the
+  colony domes and the descending pod on Mars, the ledger stamps, the trade ticker, the claim flag
+  (from the tech-tree art), the heliopause flare.
+- **Navigation:** "◀ Title" top left goes back to the title; "◀ Back" and "Next ▶" turn the pages
+  (the last says "Done ▶" and returns to the title); page dots jump to a panel; "3 / 8" top right;
+  a tap on the panel reads on; a sideways swipe turns the page on touch; ← → Space and Escape work.
+  The "×" is gone, replaced by the Title button.
+- **Phones:** the frame turns tall (9:16), the captions span its width, and the four wide
+  compositions (Minerva, the Orbiters, the jump, the land rush) are shown whole as a square in the
+  middle instead of cropped to a column. The other scenes are cropped to their middle, where the
+  subject is.
+
+Calls made in your place:
+- **Nine panels would have given the pirates their own page**; eight keeps your target, so they
+  share the last panel's closing caption and the dark corner of its map. Easy to split if you'd
+  rather.
+- **The story doesn't mention the Federation** (the trust holding Sol's worlds): it's a game rule
+  more than a story beat, and the caption was already long.
+- **The ticker's codes fall (▼) in lavender, not pink:** pink is reserved for what needs you.
+- **Routes on the last panel are your yellow** (yellow is "where you can go" on the galaxy map).
+
 ## For Koda to decide
 
 Answered above, bar these:
