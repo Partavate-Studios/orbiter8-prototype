@@ -52,6 +52,6 @@ asking him); and it gives where things stand, how to run and see the game, and w
 - `docs/demo4-plan.md`: decisions D1–D60, milestones with checkboxes, and calls B1–B54 (guesses made
   while building, for Koda's review).
 - `docs/demo4-tuning.md` (economy and battle numbers), `docs/cost-estimates.md` (gas and money per
-  move, and per release), `docs/design.md`, `docs/backstory.md` (the lore; don't change its text).
+  move, and per release), `docs/design.md`, `docs/backstory.md` (the story; Koda's: change it only when he asks).
 - `UPGRADE_NOTES.md`: the client's modernization history (older; some of it describes the old contracts).
 - `orbiter-client/dev/harness/README.md`: the screenshot and play harness.

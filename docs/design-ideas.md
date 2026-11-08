@@ -28,7 +28,9 @@ A related constraint: playing shouldn't feel more expensive than a regular MMO (
 
 ## Setting and lore additions
 
-The published backstory (2140, Mars colonies, the Great Regrettion, Orbiters in the 2090s, the Orbiter 8 interstellar test, "Liberta Galactica!") stands. These are the unwritten pieces Koda filled in.
+The published backstory (2140, Mars colonies, the Great Regrettion, Orbiters in the 2090s, the Orbiter 8 interstellar test, "Liberta Galactica!") stands, with one change (below). These are the unwritten pieces Koda filled in. [`backstory.md`](backstory.md) now tells them all as one story (2026-11-07).
+
+**Stars charge the jump drive (Koda, 2026-11-07, Leaning).** The Orbiter 8 doesn't slingshot from star to star; that doesn't fit real physics. Like Stargate Universe's ship, it charges from a star: a capacitor bank fills in a close orbit and is spent in one faster-than-light jump to a neighboring star, where it has to recharge. That's why travel goes star to star. The 2090s Orbiters stay gravity-assist ships, but only between planets. The game's UI needn't tell this. Suggestions in `backstory.md`: the long-range scan runs while the banks charge, engine range is the size of the bank, and black holes need no charge.
 
 **Corporatocracy (Koda).** All governments failed, but nothing collapsed, because corporations had long since privatized every service. People felt uneasy without government, so corporations built government-like systems: people are *citizens of a corporation*, get a vote, and receive services and protections. This expands the doc's "Idea: No Governments" note.
 

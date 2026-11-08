@@ -9,7 +9,7 @@ For a Claude Code session picking up from the one that built the current release
 3. `docs/demo4-plan.md`: the goals, decisions D1–D60 (Koda's), the plan, the milestones and what's
    ticked, and calls B1–B54 (guesses made while building; struck-through ones were overruled).
 4. `docs/design.md` and `docs/design-ideas.md`: Koda's design intent, and ideas for later.
-5. `docs/backstory.md`: the lore and Minerva's world. Its text is Koda's: don't change it.
+5. `docs/backstory.md`: the story, Minerva, the corporations and the pirates. It's Koda's: change it only when he asks.
 6. `docs/demo4-tuning.md`: the economy and battle numbers.
 7. `docs/cost-estimates.md`, the sections from "Demo 4, measured locally" on: gas and money per move.
 8. `readme.md`, `contracts/README.md` and `orbiter-client/dev/harness/README.md`: setup and tools.
@@ -132,6 +132,20 @@ Known gaps:
 - Gamepad and audio weren't tried in the last pass.
 - `docs/baseline/` screenshots predate these screens.
 - Testnets wait on Koda (milestone 6).
+
+## Since the first review (2026-11-07)
+
+Changed after `docs/review.md` was written, by the session that built the release:
+- **First steps** are a menu now: the HUD's "?" button (with a badge of steps left) opens it, sliding
+  up like every menu (Koda: no floating cards in a corner). `hud/menus/help-menu.svg.vue`.
+- **The loadout's ship** is drawn inline (sharp, no background box): `shipArtParts` in `sdk/ship-art.js`.
+- **Moons are free weapons platforms** (D61, B55): six mounts a moon, weapons only, outside the
+  planet's shield in a siege. "To moons" on the Colony menu's Factory page; a "Moon guns" bar in the
+  Siege menu. Battle is 654 bytes under the size limit.
+- **Tech trees** for reference: `docs/tech-trees/` (upgrades, crafting, planet classes), redrawn by
+  `orbiter-client/dev/tech-trees/build.mjs`.
+- **The story** was updated (`docs/backstory.md`): stars charge the jump drive; corporate governance,
+  Minerva and the pirates are in it. The UI's text didn't change.
 
 ## Focus areas, in this order
 
