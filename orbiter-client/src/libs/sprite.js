@@ -24,6 +24,18 @@ const rad = (degrees) => (degrees * Math.PI) / 180
 const turn = (from, to) => ((((to - from) % 360) + 540) % 360) - 180
 const smoothstep = (x) => x * x * (3 - 2 * x)
 
+/** Where a ship sits at a pad (dockGeometry's shape), relative to the station's planet. */
+function padPoseFor(dock, gameTime) {
+  const station = orbitAt(dock.orbit.radius, dock.orbit.speed, gameTime)
+  const direction = -station.angle * 4 + dock.pad
+  return {
+    x: station.x + Math.cos(rad(direction)) * dock.distance,
+    y: station.y + Math.sin(rad(direction)) * dock.distance,
+    // The ship art is drawn turned 180° (sprite-transform), so this points its nose anticlockwise.
+    rotation: direction + 180
+  }
+}
+
 /**
  * How one game object (sdk/system.js) is drawn: its click target, the zoom the camera moves to when
  * it's selected, and where it is this frame. The game data itself stays on `object`.
@@ -60,8 +72,11 @@ export default class Sprite {
     this.docking = this.dock ? 1 : 0
     // Flying from the planet it was at to a new one (ships; see carryOver and fly).
     this.transit = null
-    // My ship, in my own view only: the planet it has flown to because I selected it (see visitPlanet).
+    // My ship, in my own view only: the planet it has flown to because I selected it (see visitPlanet),
+    // and the pad it sits at when I selected that planet's station (dockGeometry's shape), or null.
     this.visit = null
+    this.visitDock = null
+    this.visitStation = null
     // When it warped into this system from another (Date.now()), if it just did.
     this.warpIn = null
     // Telemetry changes every frame; the frame loop updates it and components read it per frame.
@@ -120,15 +135,7 @@ export default class Sprite {
    * turns with the station as if attached. Matches the station's own rotation in updateTelemetry.
    */
   padPose(gameTime) {
-    const dock = this.dock ?? this.lastDock
-    const station = orbitAt(dock.orbit.radius, dock.orbit.speed, gameTime)
-    const direction = -station.angle * 4 + dock.pad
-    return {
-      x: station.x + Math.cos(rad(direction)) * dock.distance,
-      y: station.y + Math.sin(rad(direction)) * dock.distance,
-      // The ship art is drawn turned 180° (sprite-transform), so this points its nose anticlockwise.
-      rotation: direction + 180
-    }
+    return padPoseFor(this.dock ?? this.lastDock, gameTime)
   }
 
   /** Moves the phase toward the orbit's, by the shorter way round, at PHASE_GLIDE_DEG_PER_S. */
@@ -145,6 +152,8 @@ export default class Sprite {
   carryOver(previous) {
     if (previous.key !== this.key) return
     this.telemetry = previous.telemetry
+    // Where it was drawn: a flight that starts this frame starts from there, not from the origin.
+    this.position = { ...previous.position }
     this.phase = previous.phase
     this.phaseTime = previous.phaseTime
     // Undocking flies back from the pad it was at; docking flies in from where it was.
@@ -164,6 +173,8 @@ export default class Sprite {
       this.transit = previous.transit
     }
     this.visit = previous.visit
+    this.visitDock = previous.visitDock
+    this.visitStation = previous.visitStation
     // Still fading in after warping into the system (warp-effects.svg.vue).
     this.warpIn = previous.warpIn
   }
@@ -174,8 +185,9 @@ export default class Sprite {
    * @param {string | null} planetKey
    * @param {{ x: number, y: number, rotation: number }} shown  where it was drawn last frame
    */
-  visitPlanet(planetKey, shown) {
+  visitPlanet(planetKey, shown, dock = null) {
     this.visit = planetKey
+    this.visitDock = dock
     this.transit = { from: { x: shown.x, y: shown.y }, facing: shown.rotation, start: null }
   }
 
@@ -184,12 +196,15 @@ export default class Sprite {
    * really there (fly then eases it there). Its telemetry stays relative to the planet it's really at.
    */
   placeAtVisit(planet, home, gameTime) {
-    const orbit = orbitAt(shipOrbitRadius(planet.object.size), SHIP_ORBIT_SPEED, gameTime, this.phase)
-    this.position.x = planet.position.x + orbit.x
-    this.position.y = planet.position.y + orbit.y
+    // At the selected station's pad, turning with it, or in orbit round the planet.
+    const pose = this.visitDock
+      ? padPoseFor(this.visitDock, gameTime)
+      : (({ x, y, angle }) => ({ x, y, rotation: angle }))(orbitAt(shipOrbitRadius(planet.object.size), SHIP_ORBIT_SPEED, gameTime, this.phase))
+    this.position.x = planet.position.x + pose.x
+    this.position.y = planet.position.y + pose.y
     this.telemetry.translatex = this.position.x - home.position.x
     this.telemetry.translatey = this.position.y - home.position.y
-    this.telemetry.rotation = orbit.angle
+    this.telemetry.rotation = pose.rotation
   }
 
   /**

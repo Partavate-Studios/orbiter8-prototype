@@ -5,6 +5,7 @@ import { markRaw } from 'vue'
 import Sprite from '@/libs/sprite.js'
 import { spriteScaleOf } from '@/libs/sprite-types'
 import { buildSystem, STAR_KEY } from '@/sdk/system'
+import { PADS } from '@/sdk/game/docking'
 
 let nextWarp = 1
 
@@ -192,19 +193,43 @@ export const useStarMapStore = defineStore('StarMap', {
     followSelection(mine, shown) {
       const selected = useUIStore().selectedSprite
       let planet = null
-      if (selected === mine.key) planet = mine.visit
+      let station = null
+      if (selected === mine.key) [planet, station] = [mine.visit, mine.visitStation ?? null]
       else {
         const object = this.systemObjects[selected]
         if (object?.type === 'planet') planet = selected
-        else if (object?.type === 'moon' || object?.type === 'station') planet = object.orbiting
+        else if (object?.type === 'moon') planet = object.orbiting
+        else if (object?.type === 'station') [planet, station] = [object.orbiting, selected]
       }
-      // Its own planet: it's already there.
-      if (planet === mine.orbiting) planet = null
-      if (planet !== mine.visit) {
-        mine.visitPlanet(planet, shown)
-        this.inTransit[mine.key] = true
+      // Already there: in orbit round its own planet, or docked at the station selected.
+      const dockedAt = mine.object.dock?.station ?? null
+      if (planet === mine.orbiting && (station === null ? !dockedAt : station === dockedAt)) planet = station = null
+      if (planet !== mine.visit || station !== (mine.visitStation ?? null)) {
+        // Arrived for real at the station it was visiting (a trade there): it stays at the pad.
+        if (planet === null && mine.visitStation && mine.visitStation === dockedAt) {
+          mine.visit = mine.visitDock = mine.visitStation = null
+          mine.docking = 1
+        } else {
+          mine.visitPlanet(planet, shown, station ? this.visitPad(mine, station) : null)
+          mine.visitStation = station
+          this.inTransit[mine.key] = true
+        }
       }
       if (mine.visit) mine.placeAtVisit(this.sprites[mine.visit], this.sprites[mine.orbiting], this.gameTime)
+    },
+    /**
+     * The pad my ship docks at when I select a station (only in my view): the pad it would be given
+     * after a trade there (sdk/game/docking.js: its own preferred pad, or the next free one round).
+     */
+    visitPad(mine, stationKey) {
+      const taken = new Set(
+        Object.values(this.systemObjects)
+          .filter((o) => o.type === 'ship' && o.dock?.station === stationKey && o.key !== mine.key)
+          .map((o) => o.dock.pad)
+      )
+      let index = Number(mine.object.id) % PADS.length
+      for (let i = 0; i < PADS.length && taken.has(PADS[index]); i++) index = (index + 1) % PADS.length
+      return mine.dockGeometry({ ...mine.object, dock: { station: stationKey, pad: PADS[index] } }, this.systemObjects)
     }
   }
 })

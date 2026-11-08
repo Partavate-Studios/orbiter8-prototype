@@ -78,6 +78,7 @@ import { useUIStore } from '@/stores/ui'
 import { mapActions, mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 import { ART, spriteScaleOf } from '@/libs/sprite-types'
+import { shipOrbitRadius } from '@/sdk/game/orbits'
 import { offerLabel, withdrawLabel } from '@/libs/label-layout'
 import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
 import { writeAttribute } from '@/libs/dom-writes'
@@ -324,9 +325,21 @@ export default {
         writeAttribute(placed, 'opacity', Math.min(1, Math.max(0, (sinceWarp / WARP_IN_MS - 0.4) / 0.3)))
       }
       const rotation = Math.round(this.sprite.telemetry.rotation / ROTATION_STEP) * ROTATION_STEP
-      writeAttribute(this.$refs.turned, 'transform', 'scale(' + this.spriteScale + ') rotate(' + rotation + ')')
+      // My ship visiting another planet (or docked at its station in my view) is drawn at the size it
+      // has there, so it doesn't change size when it really arrives.
+      const scale = this.sprite.visit ? this.visitScale(this.sprite.visit) : this.spriteScale
+      writeAttribute(this.$refs.turned, 'transform', 'scale(' + scale + ') rotate(' + rotation + ')')
       const atPad = this.sprite.docking === 1 && !this.sprite.transit && !this.sprite.visit
       if (this.$refs.tube) writeAttribute(this.$refs.tube, 'opacity', atPad ? 1 : 0)
+    },
+    /** A ship's scale as if it orbited `planetKey` (spriteScaleOf), remembered per planet. */
+    visitScale(planetKey) {
+      if (this.visitScaleFor?.key !== planetKey || this.visitScaleFor.boost !== this.zoomedOutBoost) {
+        const planet = this.systemObjects[planetKey]
+        const there = { ...this.sprite.object, orbiting: planetKey, orbit: { radius: shipOrbitRadius(Number(planet?.size ?? 0)) } }
+        this.visitScaleFor = { key: planetKey, boost: this.zoomedOutBoost, scale: spriteScaleOf(there, this.systemObjects) * this.zoomedOutBoost }
+      }
+      return this.visitScaleFor.scale
     },
     /** The translate that puts the sprite at (x, y), snapped to the device-pixel grid of the drawn world. */
     placement(x, y) {
