@@ -71,14 +71,14 @@ const SCARS =
   '<g fill="#1c0838" fill-opacity="0.7"><circle cx="-900" cy="900" r="160"/><circle cx="300" cy="-600" r="120"/><circle cx="1500" cy="1400" r="140"/></g>'
 
 /**
+ * The ship's parts, without the NFT's frame (its <svg> and background): for drawing inline in the
+ * game, in a viewBox of SHIP_ART_VIEWBOX.
  * @param {{ bays: number, rangeLost: number, baysLost: number, loadout: object }} ship  (game.js pilot().ship)
  * @param {boolean} scarred  damaged in battle, beyond engines and bays
  */
-export function shipSvg(ship, scarred = false) {
+export function shipArtParts(ship, scarred = false) {
   const l = ship.loadout
   return (
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2800 -2800 5600 5600">' +
-    '<rect x="-2800" y="-2800" width="5600" height="5600" fill="#160631"/>' +
     shield(l.shields) +
     cargo(ship.bays) +
     `<path transform="translate(-2300,-2300)" d="${HULL}" fill="#e6dcf5" stroke="#8f7fb0" stroke-width="${40 + l.armor * 50}"/>` +
@@ -87,7 +87,18 @@ export function shipSvg(ship, scarred = false) {
     turrets(l.pointDefense) +
     drones(l.drones) +
     bots(l.repairBots) +
-    (scarred || ship.rangeLost > 0 || ship.baysLost > 0 ? SCARS : '') +
+    (scarred || ship.rangeLost > 0 || ship.baysLost > 0 ? SCARS : '')
+  )
+}
+
+export const SHIP_ART_VIEWBOX = '-2800 -2800 5600 5600'
+
+/** The NFT's picture, identical to ShipArt.sol's tokenURI image (pinned by hashes in the tests). */
+export function shipSvg(ship, scarred = false) {
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${SHIP_ART_VIEWBOX}">` +
+    '<rect x="-2800" y="-2800" width="5600" height="5600" fill="#160631"/>' +
+    shipArtParts(ship, scarred) +
     '</svg>'
   )
 }

@@ -6,8 +6,8 @@
       <g :transform="'translate(0 -400) scale(' + scale + ')'" fill="#ffffff" dominant-baseline="middle">
         <text x="0" y="5" text-anchor="middle" fill="#ffffff88" font-size="1.5em">{{ ship.name }}</text>
 
-        <!-- The NFT's own picture (sdk/ship-art.js), as an image -->
-        <image x="-75" y="25" width="150" height="150" :href="art" />
+        <!-- The NFT's own drawing (sdk/ship-art.js), inline so it stays sharp, without the NFT's background -->
+        <svg ref="art" x="-75" y="25" width="150" height="150" :viewBox="SHIP_ART_VIEWBOX" />
 
         <text x="0" y="185" text-anchor="middle" font-size="0.8em" fill="#ffffffaa">
           Mounts {{ mounts }} of 6 · holds {{ ship.bays - player.freeBays }} of {{ ship.bays }} used · range
@@ -54,7 +54,7 @@
 import { mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
 import { usePlayerStore } from '@/stores/player'
-import { shipSvg } from '@/sdk/ship-art'
+import { shipArtParts, SHIP_ART_VIEWBOX } from '@/sdk/ship-art'
 import { PINK } from '@/libs/palette'
 import MenuContainer from './menu-container/_menu-container.svg'
 import { SHIP_PARTS, mountsUsed } from '@/sdk/parts'
@@ -63,7 +63,7 @@ export default {
   name: 'LoadoutMenu',
   components: { MenuContainer },
   data() {
-    return { player: usePlayerStore(), PINK }
+    return { player: usePlayerStore(), PINK, SHIP_ART_VIEWBOX }
   },
   computed: {
     ...mapState(useUIStore, ['viewport']),
@@ -80,7 +80,7 @@ export default {
     art() {
       const off = this.condition?.off ?? []
       const scarred = Boolean(this.condition?.armorLost || off.some((n) => n > 0))
-      return 'data:image/svg+xml;utf8,' + encodeURIComponent(shipSvg(this.ship, scarred))
+      return shipArtParts(this.ship, scarred)
     },
     mounts() {
       return mountsUsed(this.ship.loadout)
@@ -105,7 +105,19 @@ export default {
       return this.player.planets.find((p) => p.owner === this.player.account) ?? null
     }
   },
+  watch: {
+    // The drawing is our own string (sdk/ship-art.js), set as the inline <svg>'s content.
+    art() {
+      this.drawArt()
+    }
+  },
+  mounted() {
+    this.drawArt()
+  },
   methods: {
+    drawArt() {
+      if (this.$refs.art) this.$refs.art.innerHTML = this.art
+    },
     unload(row) {
       this.o8audio.playEffect('click')
       this.player.unloadShip(this.myPlanetHere.id, row.part, row.count)
