@@ -144,6 +144,10 @@ Changed after `docs/review.md` was written, by the session that built the releas
   Siege menu. Battle is 654 bytes under the size limit.
 - **Tech trees** for reference: `docs/tech-trees/` (upgrades, crafting, planet classes), redrawn by
   `orbiter-client/dev/tech-trees/build.mjs`.
+- **Color** (`docs/mockups/color-direction.md`, B56): stars by spectral class, planets by class,
+  tinted orbits and HUD buttons, purple-gray card insides, a pink frame on a besieged planet's card.
+  Purple stays deep space's color. Costly detail is on high graphics only; measured, no cost on low
+  and normal.
 - **The story** was updated (`docs/backstory.md`): stars charge the jump drive; corporate governance,
   Minerva and the pirates are in it. The UI's text didn't change.
 
