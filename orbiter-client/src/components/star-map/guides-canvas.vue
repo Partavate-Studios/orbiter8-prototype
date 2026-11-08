@@ -13,7 +13,7 @@ import { useUIStore } from '@/stores/ui'
 import { useStarMapStore } from '@/stores/starmap'
 import { useConfigStore } from '@/stores/config'
 import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
-import { WORLD_OFFSET_Y } from '@/constants'
+import { WORLD_OFFSET_Y, HELIOPAUSE_RADIUS } from '@/constants'
 import { writeStyle } from '@/libs/dom-writes'
 import { RING_COLOR, RING_FAINT, ringOpacity, ringWidth } from '@/libs/sprite-types'
 import { STAR_CLASSES, PLANET_COLORS } from '@/libs/palette'
@@ -29,7 +29,6 @@ const rgb = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16))
 const rgba = ([r, g, b], a) => `rgba(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)}, ${a})`
 const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t)
 // The heliopause: the system's outer edge.
-const HELIOPAUSE_RADIUS = 5000
 const HELIOPAUSE_WIDTH = 10
 // Orbit rings are dotted: 0.5 on, 1 off (world units). Below this many pixels per dot period the
 // dots blur together anyway, so the ring is drawn solid at the same average brightness.

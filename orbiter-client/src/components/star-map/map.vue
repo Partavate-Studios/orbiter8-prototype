@@ -3,11 +3,12 @@
        so changes in one layer never make the browser repaint the others. -->
   <div ref="gamelayerContainer" class="layer star-map">
     <background-canvas />
-    <guides-canvas />
+    <!-- The system fades out under the galaxy map; the background stays (it's the map's too). -->
+    <guides-canvas class="system-part" :class="{ away: neighborView }" />
 
     <!-- The world is drawn for the camera in drawnView and slightly larger than the screen;
          between redraws a CSS transform (composited, no repaint) follows the live camera. -->
-    <div ref="world" class="world-layer" :style="worldBox">
+    <div ref="world" class="world-layer system-part" :class="{ away: neighborView }" :style="worldBox">
       <svg
         id="gamelayer"
         ref="gamelayer"
@@ -341,6 +342,13 @@ export default {
 }
 .world-layer {
   position: absolute;
+}
+.system-part {
+  transition: opacity 0.45s ease;
+}
+.system-part.away {
+  opacity: 0;
+  pointer-events: none;
 }
 .is-dragging {
   cursor: grabbing;

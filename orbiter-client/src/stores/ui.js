@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { gameAudio } from '@/libs/08audio'
 import Tween from '@/libs/tween'
 import { STAR_KEY } from '@/sdk/system'
-import { CAMERA, MAP_GROUP_SCALE, MAP_RESOLUTION, WORLD_OFFSET_Y } from '@/constants'
+import { CAMERA, MAP_GROUP_SCALE, MAP_RESOLUTION, WORLD_OFFSET_Y, HELIOPAUSE_RADIUS } from '@/constants'
 import { useConfigStore } from '@/stores/config'
 
 // Camera zooms this long or longer are flights (arrivals, selections), not wheel steps (ms).
@@ -81,6 +81,8 @@ export const useUIStore = defineStore('UI', {
     neighborView: false,
     // Zooming out toward the neighbor view (zoomOutToNeighbors); it opens when the zoom arrives.
     neighborViewPending: false,
+    /** The galaxy map's pan, in world units: the background's parallax follows it as it does the system camera. */
+    galaxyPan: { x: 0, y: 0 },
     // A jump's transaction has been sent and the new system hasn't loaded yet (GameState moveToSystem).
     jumpPending: false,
     // A sent jump that failed: { at: ms timestamp, reason }. The jump animation stalls (jump-animation.svg.vue).
@@ -97,6 +99,11 @@ export const useUIStore = defineStore('UI', {
   getters: {
     /** Screen pixels per map-group unit, before the camera's zoom. */
     groupPixels: (state) => (state.baseScale * state.screenSize.height) / state.viewport.resolution,
+    /** The zoom at which the heliopause spans CAMERA.NEIGHBOR_SWITCH_SHARE of the screen: where the system hands over to the galaxy map. */
+    neighborSwitchScale() {
+      const short = Math.min(this.screenSize.width, this.screenSize.height) || 1
+      return Math.min(CAMERA.MAX_SCALE, (HELIOPAUSE_RADIUS * this.groupPixels) / (CAMERA.NEIGHBOR_SWITCH_SHARE * short))
+    },
     /** Screen pixels per world unit as the world layer is drawn (changes only on a redraw). */
     drawnPixelsPerUnit() {
       return this.groupPixels / this.drawnView.scale
@@ -449,7 +456,8 @@ export const useUIStore = defineStore('UI', {
     zoomOutToNeighbors() {
       if (this.neighborView) return
       this.selectSprite(STAR_KEY)
-      this.viewport.scaleTween = new Tween(this.viewport.scale, CAMERA.MAX_SCALE, CAMERA.NEIGHBOR_ZOOM_MS)
+      // Out to where the heliopause nearly fills the screen; the galaxy map takes the zoom on from there.
+      this.viewport.scaleTween = new Tween(this.viewport.scale, this.neighborSwitchScale, CAMERA.NEIGHBOR_ZOOM_MS)
       this.viewport.scaleTween.useGeometric()
       this.neighborViewPending = true
     },

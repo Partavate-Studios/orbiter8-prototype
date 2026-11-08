@@ -9,7 +9,6 @@
 
 <script>
 import { mapActions, mapState } from 'pinia'
-import { CAMERA } from '@/constants'
 import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
 import { createGamepadController } from '@/libs/gamepad/controller'
 import { useUIStore } from '@/stores/ui'
@@ -123,10 +122,10 @@ export default {
           return this.toggleScope()
         case 'zoomOutPressed':
           // Already as far out as the camera goes: leave the system for its neighbors.
-          if (!this.neighborView && this.viewport.scale >= CAMERA.NEIGHBOR_VIEW_FROM_SCALE) this.enterNeighborView()
+          if (!this.neighborView && this.viewport.scale >= useUIStore().neighborSwitchScale * 0.97) this.enterNeighborView()
           return
         case 'zoomInPressed':
-          if (this.neighborView) this.exitNeighborView()
+          if (this.neighborView) useUIStore().zoomInToStar()
           return
         case 'pan':
           return this.pan(detail)

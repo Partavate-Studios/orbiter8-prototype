@@ -51,7 +51,7 @@ export default {
   },
   computed: {
     ...mapState(useGameStateStore, ['haveAvatar', 'haveShip']),
-    ...mapState(useUIStore, ['selected', 'jumpAnimationState', 'viewport', 'neighborView']),
+    ...mapState(useUIStore, ['selected', 'jumpAnimationState', 'viewport', 'neighborView', 'neighborSwitchScale']),
     techTreeOpen: {
       get() {
         return useUIStore().techTreeOpen
@@ -138,13 +138,11 @@ export default {
       // Over the dialog, the wheel isn't the map's.
       if (event.target instanceof Element && event.target.closest('[data-own-scroll]')) return
       const zoomingOut = event.deltaY > 0
-      // In the neighbor-star view, wheeling in returns to the system; wheeling out does nothing more.
-      if (this.neighborView) {
-        if (!zoomingOut) this.exitNeighborView()
-        return
-      }
-      // Already as far out as the camera goes: the next step out leaves the system for its neighbors.
-      if (zoomingOut && this.viewport.scale >= CAMERA.NEIGHBOR_VIEW_FROM_SCALE) {
+      // The galaxy map handles its own wheel (zooming in past your star brings you back here).
+      if (this.neighborView) return
+      // Zoomed out until the heliopause nearly fills the screen: the next step out hands over to the
+      // galaxy map, which carries the zoom on (the heliopause shrinks into the star).
+      if (zoomingOut && this.viewport.scale >= this.neighborSwitchScale * 0.97) {
         this.enterNeighborView()
         return
       }

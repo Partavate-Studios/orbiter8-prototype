@@ -1,9 +1,10 @@
 <template>
-  <!-- The galaxy map, in the neighbor view's place (docs/demo4-plan.md section 8: "the galaxy map
-       replaces the neighbor view"), drawn in Orbiter 8's colors (libs/palette.js MAP): the hex grid's
-       charted stars, your ship, what's in range, scans, sieges and black-hole partners. As in the hex
-       prototype, hovering your star fans out every jump you can make, and hovering a star in range
-       draws its line. Regions load as you pan. -->
+  <!-- The galaxy map, the system view zoomed out (docs/demo4-plan.md section 8): the system's
+       heliopause shrinks into its star while the neighbors fly in from the edges, over the same
+       starfield, which pans with the map. The hex grid (the color study's look, Koda 2026-11-07), each
+       charted star at its cell's center in its spectral class's color, your ship circling your star,
+       your jump range, scans, sieges and black-hole partners. Hovering your star fans out every jump
+       you can make; hovering a star in range draws its line. Regions load as you pan. -->
   <div
     class="galaxy-map"
     :style="{ '--space-center': MAP.spaceCenter, '--space-edge': MAP.spaceEdge }"
@@ -14,15 +15,21 @@
     @wheel="onWheel"
   >
     <svg class="map" :viewBox="`0 0 ${width} ${height}`">
-      <!-- your jump range: the hex outline of the ring `range` steps out -->
-      <polygon
-        v-if="rangeHull"
-        :points="rangeHull"
+      <!-- Charted space (Koda, 2026-11-07): a hex around every cell a scan has decided, star or empty;
+           space nobody has scanned stays open, so the frontier shows. -->
+      <path v-if="gridPath" :d="gridPath" fill="#2b0c50" fill-opacity="0.35" stroke="#4a2d7a" stroke-width="1" :opacity="gridOpacity" />
+      <!-- your jump range: its cells, outlined in your yellow -->
+      <path v-if="rangePath" :d="rangePath" :fill="MAP.route" fill-opacity="0.04" :stroke="MAP.route" stroke-opacity="0.3" stroke-width="1" />
+      <!-- the system's heliopause, shrinking into its star as the map opens -->
+      <circle
+        v-if="opening < 1 && herePoint"
+        :cx="herePoint.x"
+        :cy="herePoint.y"
+        :r="heliopauseRadius"
         fill="none"
-        :stroke="MAP.route"
-        stroke-opacity="0.22"
-        stroke-width="1"
-        stroke-dasharray="3 6"
+        stroke="#ffffff"
+        :stroke-opacity="0.85 * (1 - opening)"
+        :stroke-width="10 * (1 - opening) + 1.5"
       />
       <!-- black holes and their partners -->
       <g v-for="link in partnerLinks" :key="'link' + link.key" class="link" @click.stop="followLink(link)">
@@ -62,20 +69,25 @@
         @pointerenter="hover = star.cell"
         @pointerleave="hover = hover === star.cell ? null : hover"
       >
-        <circle v-if="star.here" :r="star.r + 8" fill="none" stroke="#ffffff" stroke-width="1.6" />
-        <circle v-else-if="star.reachable" :r="star.r + 7" class="reach" />
+        <circle v-if="star.here" :r="star.r + 7" fill="none" stroke="#ffffff" stroke-width="1.6" />
         <circle v-if="star.pending" :r="star.r + 4" class="scanning" />
         <circle v-if="star.besieged" :r="star.r + 11" class="besieged" />
         <template v-if="star.blackHole">
-          <circle :r="star.r + 2" class="hole-ring" />
+          <circle :r="star.r + 1.5" class="hole-ring" />
           <circle :r="star.r" :fill="MAP.hole" />
         </template>
-        <circle v-else :r="star.r" :fill="star.color" :opacity="star.visited ? 1 : 0.65" />
-        <circle :r="Math.max(star.r + 6, touch ? 18 : 12)" fill="transparent" />
+        <template v-else>
+          <circle :r="star.r * 2.4" :fill="star.color" opacity="0.14" />
+          <circle :r="star.r" :fill="star.color" :opacity="star.visited ? 1 : 0.7" />
+        </template>
+        <!-- the whole hex takes the pointer (a circle when the hexes are too small to aim at) -->
+        <path v-if="scale > 30" :d="hexShape" fill="transparent" />
+        <circle v-else :r="Math.max(star.r + 6, touch ? 18 : 12)" fill="transparent" />
         <text :y="star.r + 13" class="name" :style="{ fontSize: star.label.size + 'px' }">{{ star.label.text }}</text>
       </g>
-      <g v-if="shipPoint" :transform="`translate(${shipPoint.x} ${shipPoint.y - 16}) scale(2.2)`" class="ship">
-        <fleet-ship type="orbiter8" />
+      <!-- your ship, circling your star (racing round while a jump waits for the wallet); placed every frame -->
+      <g ref="ship" class="ship" display="none">
+        <g transform="scale(2.1)"><fleet-ship type="orbiter8" :engines="true" /></g>
       </g>
     </svg>
 
@@ -135,18 +147,45 @@ import { game } from '@/sdk/client'
 import { STATE } from '@/sdk/client'
 import { MAP } from '@/libs/palette'
 import { position, cellAt, distance, neighbors } from '@/sdk/hex'
-import { starTraits } from '@/sdk/traits'
 import { CARD_THEMES } from '@/libs/card-theme'
 import { fitText } from '@/libs/fit-text'
 import { timeOf } from '@/sdk/drand'
 import { usePlayerStore } from '@/stores/player'
 import { useGameStateStore } from '@/stores/gamestate'
 import { useUIStore } from '@/stores/ui'
+import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
+import { writeAttribute } from '@/libs/dom-writes'
+import { HELIOPAUSE_RADIUS, WORLD_OFFSET_Y } from '@/constants'
 import FleetShip from '@/components/assets/fleet-ship.svg'
 
-// Pixels between neighboring stars at zoom 1, and the isometric squash (the prototype's look).
+// Pixels between neighboring stars at zoom 1. The grid is regular, as in the color study (no squash).
 const SPACING = 64
-const FLAT = 0.7
+const FLAT = 1
+const ROOT3 = Math.sqrt(3)
+// A cell's hex: pointy-topped, its corners 1/√3 of a cell from its center, so neighbors share edges.
+const HEX_R = 1 / ROOT3
+/** A pointy-topped hex of radius r centered on (cx, cy), in screen pixels. */
+const hexPath = (cx, cy, r) =>
+  [0, 1, 2, 3, 4, 5]
+    .map((i) => {
+      const a = (Math.PI / 3) * i + Math.PI / 6
+      return `${i ? 'L' : 'M'}${(cx + r * Math.cos(a)).toFixed(1)} ${(cy + r * Math.sin(a)).toFixed(1)}`
+    })
+    .join('') + 'Z'
+// The opening: the heliopause shrinks into the star and the neighbors fly in, over ENTER_MS, from
+// FLY_IN times farther out (the old neighbor view's entrance).
+const ENTER_MS = 1300
+const FLY_IN = 3.5
+// The ship's orbit around your star: a lap every ORBIT_SECONDS, RACING_SECONDS while a jump waits.
+const ORBIT_SECONDS = 7
+const RACING_SECONDS = 0.9
+const ORBIT_GAP = 16
+// The background's stars shift this share of the map's own movement (its parallax, as in the system).
+const BACKGROUND_SHARE = 0.22
+const BACKGROUND_PARALLAX = 20 // background-canvas.vue PARALLAX
+const MAX_ZOOM = 3
+const MIN_ZOOM = 0.15
+const easeOut = (t) => 1 - Math.pow(1 - t, 3)
 
 export default {
   name: 'GalaxyMap',
@@ -170,6 +209,8 @@ export default {
       /** no hover: a touch screen (the hint says to tap) */
       touch: window.matchMedia?.('(hover: none)').matches ?? false,
       pointer: { x: 0, y: 0 },
+      /** the opening, 0 to 1: the heliopause shrinking, the neighbors flying in */
+      opening: 0,
       MAP
     }
   },
@@ -187,6 +228,54 @@ export default {
       const ship = this.player.ship
       return ship ? Math.max(1, ship.range - ship.rangeLost) : 1
     },
+    /** A hex the size of one cell, around (0, 0): a star's pointer area. */
+    hexShape() {
+      return hexPath(0, 0, HEX_R * this.scale)
+    },
+    /** Every decided cell on screen (star, black hole or empty) as one path of hexes. */
+    gridPath() {
+      void this.player.cellsVersion
+      if (this.scale < 12) return null
+      const r = HEX_R * this.scale
+      let d = ''
+      for (const c of this.client.cells.values()) {
+        if (c.state === STATE.UNDECIDED || c.state === undefined) continue
+        const [x, y] = this.project(c.cell)
+        if (x < -r || y < -r || x > this.width + r || y > this.height + r) continue
+        d += hexPath(x, y, r)
+      }
+      return d || null
+    },
+    /** The grid fades in as the cells grow big enough to read, and with the opening. */
+    gridOpacity() {
+      return Math.min(1, (this.scale - 12) / 24) * (0.35 + 0.65 * this.opening)
+    },
+    /** Your jump range's cells as one path (at most a few dozen). */
+    rangePath() {
+      if (this.opening < 1) return null
+      const cells = []
+      const here = this.shipCell
+      const near = new Set([here])
+      let frontier = [here]
+      for (let step = 0; step < this.range; step++) {
+        const next = []
+        for (const cell of frontier) for (const n of neighbors(cell)) if (!near.has(n)) (near.add(n), next.push(n))
+        frontier = next
+      }
+      for (const cell of near) if (cell !== here) cells.push(cell)
+      return cells
+        .map((cell) => {
+          const [x, y] = this.project(cell)
+          return hexPath(x, y, HEX_R * this.scale)
+        })
+        .join('')
+    },
+    /** The heliopause's radius on screen: as big as the system showed it, shrinking to the star. */
+    heliopauseRadius() {
+      const star = this.points.get(this.shipCell)
+      const end = star ? star.r + 7 : 10
+      return end + (this.heliopauseStart - end) * (1 - easeOut(this.opening))
+    },
     drawn() {
       void this.player.cellsVersion
       const seed = this.client.universe?.seed
@@ -195,7 +284,7 @@ export default {
       for (const c of this.client.cells.values()) {
         if (c.state !== STATE.STAR && c.state !== STATE.BLACK_HOLE) continue
         const traits = game.traitsOf(c.cell)
-        const [x, y] = this.project(c.cell, traits.jitter)
+        const [x, y] = this.project(c.cell)
         if (x < -40 || y < -40 || x > this.width + 40 || y > this.height + 40) continue
         const steps = distance(this.shipCell, c.cell)
         out.push({
@@ -212,7 +301,7 @@ export default {
           besieged: this.player.besiegedCells.has(c.cell),
           name: this.nameOf(c.cell),
           // a long name shrunk or cut, so it doesn't run into its neighbors' (libs/fit-text.js)
-          label: fitText(this.nameOf(c.cell), 11, 96)
+          label: fitText(this.nameOf(c.cell), 11, Math.min(96, this.scale * 0.95))
         })
       }
       return out
@@ -221,10 +310,10 @@ export default {
     points() {
       return new Map(this.drawn.map((star) => [star.cell, star]))
     },
-    /** The ship's star on screen (drawn or not), from its cell and jitter. */
+    /** The ship's star on screen (drawn or not), at its cell's center. */
     herePoint() {
       if (!this.client.universe) return null
-      const [x, y] = this.project(this.shipCell, starTraits(this.client.universe.seed, this.shipCell).jitter)
+      const [x, y] = this.project(this.shipCell)
       return { x, y }
     },
     /** As in the prototype: hovering your star fans out to every star in range; hovering (or choosing) one in range draws its line. */
@@ -249,23 +338,12 @@ export default {
         if (!star.blackHole) continue
         const partner = this.client.cells.get(star.cell)?.partner
         if (!partner || (this.points.has(partner) && partner < star.cell)) continue // each pair once
-        const [x2, y2] = this.project(partner, starTraits(seed, partner).jitter)
+        const [x2, y2] = this.project(partner)
         links.push({ key: star.cell, a: star.cell, b: partner, mine: star.cell === this.shipCell || partner === this.shipCell, x1: star.x, y1: star.y, x2, y2 })
       }
       return links
     },
-    /** The hex outline `range` steps out from your star (the prototype's jump-range boundary). */
-    rangeHull() {
-      const from = this.herePoint
-      if (!from || this.range < 2) return null
-      // The six axial directions, as the galaxy's plane measures them (x = q + r/2, y = r·√3/2).
-      const DIRS = [[1, 0], [1, -1], [0, -1], [-1, 0], [-1, 1], [0, 1]]
-      return DIRS.map(([q, r]) => {
-        const x = (q + r / 2) * this.range * 1.14
-        const y = ((r * Math.sqrt(3)) / 2) * this.range * 1.14
-        return `${(from.x + x * this.scale).toFixed(1)},${(from.y + y * this.scale * FLAT).toFixed(1)}`
-      }).join(' ')
-    },
+
     partnerHere() {
       return this.client.cells.get(this.shipCell)?.partner ?? null
     },
@@ -294,11 +372,7 @@ export default {
       const here = this.client.cells.get(this.shipCell)
       return here?.state === STATE.BLACK_HOLE && (this.chosen === here.partner || this.chosen === this.shipCell)
     },
-    shipPoint() {
-      if (!this.client.universe) return null
-      const [x, y] = this.project(this.shipCell, starTraits(this.client.universe.seed, this.shipCell).jitter)
-      return { x, y }
-    },
+
     hereName() {
       return this.nameOf(this.shipCell)
     },
@@ -366,11 +440,25 @@ export default {
     this.seconds = setInterval(() => (this.now = Date.now()), 1000)
     this.centerOnShip()
     game.loadAround(this.shipCell)
+    // The opening carries on the system view's zoom: the heliopause starts as big as the system drew
+    // it, where it drew it (the world sits a little above the screen's center), and shrinks into the
+    // star while the camera pulls out from FLY_IN times closer to the zoom that frames your range.
+    const ui = useUIStore()
+    this.heliopauseStart = (HELIOPAUSE_RADIUS * ui.groupPixels) / ui.viewport.scale
+    this.startShift = WORLD_OFFSET_Y * ui.groupPixels
+    this.zoomEnd = this.framingZoom()
+    this.camera.zoom = Math.min(MAX_ZOOM * 2, this.zoomEnd * FLY_IN)
+    this.zoomStart = this.camera.zoom
+    this.openedAt = performance.now()
+    this.orbit = { angle: -Math.PI / 2 - 0.3, speed: (2 * Math.PI) / ORBIT_SECONDS }
+    this.stopFrames = onFrame(this.onFrame, FRAME_ORDER.render)
   },
   unmounted() {
     window.removeEventListener('resize', this.onResize)
     clearTimeout(this.timer)
     clearInterval(this.seconds)
+    this.stopFrames?.()
+    useUIStore().galaxyPan = { x: 0, y: 0 }
   },
   methods: {
     ...mapActions(useUIStore, ['exitNeighborView', 'zoomInToStar']),
@@ -380,12 +468,55 @@ export default {
       void this.player.cellsVersion
       return game.starName(cell)
     },
-    project(cell, jitter = [0, 0]) {
+    project(cell) {
       const [x, y] = position(cell)
-      return [
-        this.width / 2 + (x + jitter[0] - this.camera.x) * this.scale,
-        this.height / 2 + (y + jitter[1] - this.camera.y) * this.scale * FLAT
-      ]
+      // (During the opening, the view drifts from where the system showed its star to the center.)
+      const shift = (this.startShift ?? 0) * (1 - easeOut(this.opening))
+      return [this.width / 2 + (x - this.camera.x) * this.scale, this.height / 2 + shift + (y - this.camera.y) * this.scale * FLAT]
+    },
+    /** The zoom at which your jump range, and a ring beyond it, fills a good part of the screen. */
+    framingZoom() {
+      const rings = this.range + 1.5
+      // (a phone's narrow screen gets more of its width)
+      const across = this.width < 600 ? 0.47 : 0.36
+      const fit = Math.min((0.36 * this.height) / (rings * SPACING * (ROOT3 / 2)), (across * this.width) / (rings * SPACING))
+      return Math.min(MAX_ZOOM, Math.max(0.6, fit))
+    },
+    /**
+     * Each frame: the opening's progress and zoom, the ship's place on its orbit, and the background's
+     * parallax. The ship is placed by writing its transform, so Vue doesn't re-render for it.
+     */
+    onFrame(now) {
+      if (this.opening < 1) {
+        this.opening = Math.min(1, (now - this.openedAt) / ENTER_MS)
+        const t = easeOut(this.opening)
+        this.camera.zoom = this.zoomStart * Math.pow(this.zoomEnd / this.zoomStart, t)
+      }
+      const seconds = this.lastFrame ? Math.min(0.1, (now - this.lastFrame) / 1000) : 0
+      this.lastFrame = now
+      const target = (2 * Math.PI) / (this.waiting ? RACING_SECONDS : ORBIT_SECONDS)
+      this.orbit.speed += (target - this.orbit.speed) * Math.min(1, seconds * 2.5)
+      this.orbit.angle += this.orbit.speed * seconds
+      const center = this.herePoint
+      const star = this.points.get(this.shipCell)
+      if (center && star) {
+        const reveal = easeOut(this.opening)
+        const radius = (star.r + ORBIT_GAP) * reveal
+        const x = center.x + radius * Math.cos(this.orbit.angle)
+        const y = center.y + radius * Math.sin(this.orbit.angle)
+        // Nose along the orbit (the art points up; angles grow clockwise on screen).
+        const heading = (this.orbit.angle * 180) / Math.PI + 180
+        writeAttribute(this.$refs.ship, 'display', reveal > 0.05 ? 'inline' : 'none')
+        writeAttribute(this.$refs.ship, 'transform', `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${heading.toFixed(1)}) scale(${reveal.toFixed(3)})`)
+      }
+      // The starfield pans with the map, a share of its movement, as it does under the system.
+      const [hx, hy] = position(this.shipCell)
+      const unit = useUIStore().screenSize.height / useUIStore().viewport.resolution || 1
+      const k = (BACKGROUND_SHARE * BACKGROUND_PARALLAX * this.scale) / unit
+      const pan = useUIStore().galaxyPan
+      const px = Math.round((this.camera.x - hx) * k)
+      const py = Math.round((this.camera.y - hy) * k)
+      if (pan.x !== px || pan.y !== py) useUIStore().galaxyPan = { x: px, y: py }
     },
     centerOnShip() {
       const [x, y] = position(this.shipCell)
@@ -466,12 +597,14 @@ export default {
     },
     /** Zooms to `zoom` keeping the galaxy point `world` under the screen point (sx, sy). */
     zoomTo(zoom, world, sx, sy) {
-      this.camera.zoom = Math.min(3, Math.max(0.15, zoom))
+      this.opening = 1
+      this.camera.zoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom))
       this.camera.x = world.x - (sx - this.width / 2) / this.scale
       this.camera.y = world.y - (sy - this.height / 2) / (this.scale * FLAT)
     },
     onDown(event) {
       if (event.target.closest('.card, .controls, .title')) return
+      this.opening = 1
       this.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY })
       this.startGesture()
       // Two fingers are never a tap: hold both pointers, so the pinch carries on past the stars.
@@ -530,6 +663,11 @@ export default {
       event.preventDefault()
       event.stopPropagation()
       const factor = event.deltaY > 0 ? 1 / 1.15 : 1.15
+      // Zooming in past the closest view, at your star: back into the system (the way you came out).
+      if (factor > 1 && this.camera.zoom >= MAX_ZOOM * 0.999 && distance(cellAt(this.camera.x, this.camera.y), this.shipCell) <= 1) {
+        this.back()
+        return
+      }
       // Like a map: the spot under the cursor stays put.
       this.zoomTo(this.camera.zoom * factor, this.worldAt(event.clientX, event.clientY), event.clientX, event.clientY)
       game.loadAround(cellAt(this.camera.x, this.camera.y))
@@ -544,7 +682,7 @@ export default {
   inset: 0;
   z-index: 50;
   overflow: hidden;
-  background: radial-gradient(ellipse at center, var(--space-center) 0%, var(--space-edge) 75%);
+  /* no background of its own: the system view's starfield (background-canvas.vue) is the map's too */
   color: #e6dcf5;
   font-family: Ubuntu, sans-serif;
   touch-action: none;
@@ -575,12 +713,6 @@ export default {
 .selected .name {
   fill: #ffffff;
 }
-.reach {
-  fill: none;
-  stroke: #c3b3da88;
-  stroke-width: 1;
-  stroke-dasharray: 2 3;
-}
 .selected .reach,
 .selected .scanning {
   stroke: #ffffff;
@@ -602,7 +734,7 @@ export default {
 }
 .hole-ring {
   fill: none;
-  stroke: #c3b3da;
+  stroke: #ffe28a; /* a black hole's accretion glow (libs/palette.js STAR_CLASSES.G.mid) */
   stroke-width: 1.5;
 }
 .ship {

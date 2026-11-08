@@ -9,6 +9,8 @@ export const MAP_GROUP_SCALE = 1.25
 
 /** The world sits this many group units above the screen center. */
 export const WORLD_OFFSET_Y = -100
+/** The system's outer edge, in world units (drawn by the guides canvas; the galaxy map shrinks it into the star). */
+export const HELIOPAUSE_RADIUS = 5000
 
 export const CAMERA = {
   /** Zoom on first load (far out). */
@@ -20,8 +22,12 @@ export const CAMERA = {
   MIN_JUMP_ANIMATION_MS: 4500,
   /** The star button's zoom from the system out to the neighbor view. */
   NEIGHBOR_ZOOM_MS: 1800,
-  /** Wheeling out at or beyond this zoom (near MAX_SCALE) leaves the system for the neighbor-star view. */
-  NEIGHBOR_VIEW_FROM_SCALE: 400,
+  /**
+   * Zoomed out until the heliopause spans this share of the screen's shorter side, the system hands
+   * over to the galaxy map, which goes on shrinking the heliopause into the star's dot (ui store
+   * neighborSwitchScale; components/star-map/galaxy-map.vue).
+   */
+  NEIGHBOR_SWITCH_SHARE: 0.42,
   /** Most zoomed in the camera goes. */
   MIN_SCALE: 0.001,
   /** Below this the camera snaps to MIN_SCALE. */

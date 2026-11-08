@@ -80,7 +80,7 @@ export default {
     screenDimensions() {
       return this.screenSize.width + 'x' + this.screenSize.height
     },
-    ...mapState(useUIStore, ['viewport', 'screenSize', 'jumpAnimationState', 'jumpStall']),
+    ...mapState(useUIStore, ['viewport', 'screenSize', 'jumpAnimationState', 'jumpStall', 'galaxyPan']),
     ...mapState(useConfigStore, ['graphicsQuality']),
     showStars() {
       return this.graphicsQuality > 1
@@ -141,6 +141,13 @@ export default {
       // Near stars pan at 1/7 of the camera, so they spread wide enough to cover its whole range.
       this.nearStars = Object.freeze(randomStars(this.graphicsQuality > 2 ? 1000 : 0, { spread: 2000, sizeScale: 1.7 }))
     },
+    /** Where the stars' parallax looks from: the system camera, plus the galaxy map's pan while it's open. */
+    camX() {
+      return this.viewport.x + this.galaxyPan.x
+    },
+    camY() {
+      return this.viewport.y + this.galaxyPan.y
+    },
     /** Pixels per map unit: the map fits 1200 units (viewport.resolution) into the screenSize height. */
     unit() {
       return this.screenSize.height / this.viewport.resolution
@@ -187,8 +194,8 @@ export default {
     drawStars() {
       if (!this.showStars) return
       const scale = starfieldScaleFor(this.viewport.scale)
-      const x = this.viewport.x / PARALLAX
-      const y = this.viewport.y / PARALLAX
+      const x = this.camX() / PARALLAX
+      const y = this.camY() / PARALLAX
       this.drawnStars = { scale, x, y }
       const ctx = this.centeredContext(this.$refs.stars, MARGIN)
       const unit = this.unit()
@@ -203,8 +210,8 @@ export default {
     drawNearStars() {
       if (!this.showNearStars) return
       const scale = nearScaleFor(this.viewport.scale)
-      const x = this.viewport.x / NEAR_PARALLAX
-      const y = this.viewport.y / NEAR_PARALLAX
+      const x = this.camX() / NEAR_PARALLAX
+      const y = this.camY() / NEAR_PARALLAX
       this.drawnNear = { scale, x, y }
       const ctx = this.centeredContext(this.$refs.near, MARGIN)
       const unit = this.unit()
@@ -244,8 +251,8 @@ export default {
       const drawn = this.drawnStars
       const starsDelta = {
         scale: starfieldScaleFor(this.viewport.scale) / drawn.scale,
-        x: unit * (this.viewport.x / PARALLAX - drawn.x),
-        y: unit * (this.viewport.y / PARALLAX - drawn.y),
+        x: unit * (this.camX() / PARALLAX - drawn.x),
+        y: unit * (this.camY() / PARALLAX - drawn.y),
         originX: centerX + unit * drawn.x,
         originY: centerY + unit * drawn.y
       }
@@ -255,8 +262,8 @@ export default {
       const near = this.drawnNear
       const nearDelta = {
         scale: nearScaleFor(this.viewport.scale) / near.scale,
-        x: unit * (this.viewport.x / NEAR_PARALLAX - near.x),
-        y: unit * (this.viewport.y / NEAR_PARALLAX - near.y),
+        x: unit * (this.camX() / NEAR_PARALLAX - near.x),
+        y: unit * (this.camY() / NEAR_PARALLAX - near.y),
         originX: centerX + unit * near.x,
         originY: centerY + unit * near.y
       }
