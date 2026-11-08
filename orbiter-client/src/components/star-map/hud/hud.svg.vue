@@ -57,7 +57,7 @@
       <g :transform="corner(leftMostX, 50, topMostY, 50)">
         <a cursor="pointer" @click.prevent="selectMyShip()">
           <title>My ship (Space)</title>
-          <avatar-icon />
+          <tinted :tint="HUD_TINT.you"><avatar-icon /></tinted>
         </a>
       </g>
 
@@ -77,8 +77,7 @@
         <!-- A star until the star is selected; then the star-nav icon, which zooms out to its neighbors. -->
         <a cursor="pointer" @click.prevent="selectStar()">
           <title>{{ starSelected ? 'Neighboring stars' : 'The star' }}</title>
-          <jump-icon v-if="starSelected" />
-          <star-icon v-else />
+          <tinted :tint="starTint"><jump-icon v-if="starSelected" /><star-icon v-else /></tinted>
         </a>
       </g>
 
@@ -92,7 +91,7 @@
       <g :transform="corner(leftMostX, 50, bottomMostY, -450)">
         <a cursor="pointer" @click.prevent="openMenu('help')">
           <title>First steps</title>
-          <help-icon />
+          <tinted :tint="HUD_TINT.help"><help-icon /></tinted>
           <g v-if="stepsLeft">
             <circle cx="-25" cy="20" fill="#230b41" stroke="#ffffff88" stroke-width="0.5" r="10" />
             <text
@@ -112,7 +111,7 @@
         <a cursor="pointer" @click.prevent="openMenu('feed')">
           <title>Siege feed</title>
           <circle v-if="player.besiegedCells.size" r="27" fill="none" :stroke="PINK_LIGHT" stroke-width="2" />
-          <sieges-icon />
+          <tinted :tint="HUD_TINT.sieges"><sieges-icon /></tinted>
         </a>
       </g>
       <!-- The session key's time left (yellow: yours) -->
@@ -127,14 +126,14 @@
       <g :transform="corner(leftMostX, 50, bottomMostY, -250)">
         <a cursor="pointer" @click.prevent="showLeaderboard()">
           <title>Leaderboard</title>
-          <trophy-icon />
+          <tinted :tint="HUD_TINT.leaderboard"><trophy-icon /></tinted>
         </a>
       </g>
 
       <g :transform="corner(leftMostX, 50, bottomMostY, -150)">
         <a cursor="pointer" @click.prevent="showChat()">
           <title>Chat</title>
-          <broadcast-icon />
+          <tinted :tint="HUD_TINT.chat"><broadcast-icon /></tinted>
           <g v-if="chatEventsCount">
             <circle cx="-25" cy="20" fill="#230b41" stroke="#ffffff88" stroke-width="0.5" r="10" />
             <text
@@ -157,14 +156,14 @@
       <g :transform="corner(leftMostX, 50, bottomMostY, -50)">
         <a cursor="pointer" @click.prevent="showSettings()">
           <title>Settings</title>
-          <gear-icon />
+          <tinted :tint="HUD_TINT.settings"><gear-icon /></tinted>
         </a>
       </g>
 
       <g :transform="corner(rightMostX, -50, bottomMostY, -50)">
         <a cursor="pointer" @click.prevent="showShips()">
           <title>Ships in this system</title>
-          <ships-icon />
+          <tinted :tint="HUD_TINT.ships"><ships-icon /></tinted>
           <g v-if="shipCount">
             <circle cx="25" cy="20" fill="#230b41" stroke="#ffffff88" stroke-width="0.5" r="10" />
             <text
@@ -181,7 +180,7 @@
       <g :transform="corner(rightMostX, -50, bottomMostY, -150)">
         <a cursor="pointer" @click.prevent="showPlanets()">
           <title>Planets (Tab and Shift+Tab step through them)</title>
-          <planets-icon />
+          <tinted :tint="HUD_TINT.planets"><planets-icon /></tinted>
           <g>
             <circle cx="25" cy="20" fill="#230b41" stroke="#ffffff88" stroke-width="0.5" r="10" />
             <text
@@ -278,6 +277,8 @@ import { usePlayerStore } from '@/stores/player'
 // import MyShipIcon from './icons/my-ship-icon.svg'
 import AvatarIcon from './icons/avatar-icon.svg'
 import GearIcon from './icons/gear-icon.svg'
+import Tinted from './icons/tinted.svg.vue'
+import { HUD_TINT, STAR_CLASSES } from '@/libs/palette'
 import JumpIcon from './icons/jump-icon.svg'
 import StarIcon from './icons/star-icon.svg'
 import Minimap from './minimap.svg'
@@ -298,6 +299,7 @@ import SettingsMenu from './menus/settings-menu.svg'
 export default {
   name: 'Hud',
   components: {
+    Tinted,
     AvatarIcon,
     CardUi,
     CurrentSystem,
@@ -329,11 +331,17 @@ export default {
     SiegesIcon
   },
   data() {
-    return { now: Date.now() }
+    return { now: Date.now(), HUD_TINT }
   },
   computed: {
     starSelected() {
       return this.selected === STAR_KEY
+    },
+    /** The star button takes the star's light (sdk/traits.js); a black hole its partner link's violet. */
+    starTint() {
+      const star = useStarMapStore().systemObjects[STAR_KEY]
+      if (star?.blackHole) return '#af6fff'
+      return star?.spectral ? STAR_CLASSES[star.spectral].glow : '#e6dcf5'
     },
     ...mapState(useUIStore, [
       'showScope',

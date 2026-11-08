@@ -83,6 +83,46 @@
         <stop offset="90%" stop-color="#230b41" stop-opacity="1" />
       </linearGradient>
 
+      <!-- Stars by spectral class (libs/palette.js STAR_CLASSES): the body, and its glow (normal and high
+           graphics; the glow is a gradient, never a filter, so it costs what the old white glow did). -->
+      <radialGradient v-for="(c, k) in STAR_CLASSES" :id="'star-' + k" :key="'star-' + k">
+        <stop offset="0%" :stop-color="c.core" />
+        <stop offset="55%" :stop-color="c.core" />
+        <stop offset="85%" :stop-color="c.mid" />
+        <stop offset="100%" :stop-color="c.glow" />
+      </radialGradient>
+      <radialGradient v-for="(c, k) in STAR_CLASSES" :id="'starGlow-' + k" :key="'starGlow-' + k">
+        <stop offset="0%" :stop-color="c.glow" :stop-opacity="graphicsQuality > 2 ? 0.55 : 0.45" />
+        <stop offset="45%" :stop-color="c.glow" stop-opacity="0.16" />
+        <stop offset="100%" :stop-color="c.glow" stop-opacity="0" />
+      </radialGradient>
+
+      <!-- Planets by class (libs/palette.js PLANET_COLORS): a lit sphere on normal and high graphics,
+           a plain two-color fill on low. Rings in the class's colors. -->
+      <template v-for="(c, i) in PLANET_COLORS" :key="'planet-' + i">
+        <radialGradient v-if="graphicsQuality > 1" :id="'planet-' + i" cx="30%" cy="50%" r="80%" fx="15%" fy="50%">
+          <stop offset="0%" :stop-color="c.light" />
+          <stop offset="55%" :stop-color="c.mid" />
+          <stop offset="100%" :stop-color="c.dark" />
+        </radialGradient>
+        <linearGradient v-else :id="'planet-' + i" x1="0%" y1="50%" x2="100%" y2="50%">
+          <stop offset="0%" :stop-color="c.light" />
+          <stop offset="100%" :stop-color="c.dark" />
+        </linearGradient>
+        <linearGradient :id="'ring-' + i" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" :stop-color="c.light" stop-opacity="0.1" />
+          <stop offset="50%" :stop-color="c.light" stop-opacity="0.95" />
+          <stop offset="100%" :stop-color="c.mid" stop-opacity="0.1" />
+        </linearGradient>
+      </template>
+      <!-- High graphics: light and shadow over a planet's surface marks -->
+      <radialGradient id="planetShade" cx="25%" cy="50%" r="85%">
+        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.35" />
+        <stop offset="35%" stop-color="#ffffff" stop-opacity="0" />
+        <stop offset="80%" stop-color="#160631" stop-opacity="0.35" />
+        <stop offset="100%" stop-color="#160631" stop-opacity="0.7" />
+      </radialGradient>
+
       <!-- Planet surface details rotate under this clip -->
       <clipPath id="just-the-planet">
         <circle cx="0" cy="0" r="10" />
@@ -153,9 +193,13 @@
 <script>
 import { mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
+import { STAR_CLASSES, PLANET_COLORS } from '@/libs/palette'
 
 export default {
   name: 'SvgDefs',
+  data() {
+    return { STAR_CLASSES, PLANET_COLORS }
+  },
   computed: {
     ...mapState(useConfigStore, ['graphicsQuality'])
   }

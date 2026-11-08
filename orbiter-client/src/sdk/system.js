@@ -52,7 +52,7 @@ export function objectKey(type, { id, planet }) {
  * @property {{ station: string, pad: number } | null} [dock]  ships: the station it's docked at, and which pad (degrees)
  *
  * Plus, by type:
- * - star: size, birth
+ * - star: size, birth, spectral
  * - planet: size, class, rings, orbitalPosition, hasStation, stationKey, stationName,
  *   moons ([{ moonId: key, moonName }])
  * - station: size, goods (what the port sells and buys, sdk/game/trade.js), yard, armory
@@ -90,6 +90,8 @@ export function buildSystem(system, playerAccount) {
     id: system.id,
     name: system.starName,
     size: system.starSize,
+    // its spectral class (sdk/traits.js): its color, and the light it casts on the system (null: a black hole)
+    spectral: system.spectral ?? null,
     birth: system.birthTime,
     owner: system.discoveredBy,
     ownerName: system.avatarNames[system.discoveredBy],

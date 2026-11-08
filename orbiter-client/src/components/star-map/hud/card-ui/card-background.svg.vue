@@ -14,6 +14,8 @@
             opacity="1"
             stroke-width="0"
           />
+          <!-- The inside: a quiet purple-gray (libs/palette.js CARD_GRAY), so the purple edge, the title
+               and the buttons stand out against it -->
           <rect
             x="0"
             y="0"
@@ -21,8 +23,8 @@
             rx="25"
             width="140"
             height="210"
-            fill="#000000"
-            opacity="0.5"
+            :fill="CARD_GRAY"
+            opacity="0.72"
             stroke="#5b1aaa"
             stroke-width="0.25"
           />
@@ -33,8 +35,13 @@
 </template>
 
 <script>
+import { CARD_GRAY } from '@/libs/palette'
+
 export default {
   name: 'CardBackground',
+  data() {
+    return { CARD_GRAY }
+  },
   methods: {
     handleMouseDown() {}
   }

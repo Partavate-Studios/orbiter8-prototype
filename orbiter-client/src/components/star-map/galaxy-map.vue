@@ -192,7 +192,7 @@ export default {
       const out = []
       for (const c of this.client.cells.values()) {
         if (c.state !== STATE.STAR && c.state !== STATE.BLACK_HOLE) continue
-        const traits = starTraits(seed, c.cell)
+        const traits = game.traitsOf(c.cell)
         const [x, y] = this.project(c.cell, traits.jitter)
         if (x < -40 || y < -40 || x > this.width + 40 || y > this.height + 40) continue
         const steps = distance(this.shipCell, c.cell)

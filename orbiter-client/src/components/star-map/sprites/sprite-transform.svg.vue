@@ -8,7 +8,7 @@
       </g>
       <g ref="turned">
         <!-- Only a few pixels across: a plain dot looks the same and costs far less to draw. -->
-        <circle v-if="isTiny" cx="0" cy="0" :r="dotRadius" fill="#e5cfff" />
+        <circle v-if="isTiny" cx="0" cy="0" :r="dotRadius" :fill="dotColor" />
         <template v-else>
           <planet v-if="type === 'planet'" :sprite="sprite" />
           <moon v-if="type === 'moon'" />
@@ -26,7 +26,7 @@
             <line :x1="sprite.dock.tube.from" y1="1.6" :x2="sprite.dock.tube.to" y2="1.6" />
           </g>
           <g transform="rotate(180)"><ship v-if="type === 'ship'" :should-show-engines="!sprite.object.dock" /></g>
-          <star v-if="type === 'star'" :black-hole="Boolean(sprite.object.blackHole)" />
+          <star v-if="type === 'star'" :black-hole="Boolean(sprite.object.blackHole)" :spectral="sprite.object.spectral" />
         </template>
         <a cursor="pointer" @mouseover="pointerOn(true)" @mouseleave="pointerOn(false)" @click.prevent="spriteAction()">
           <circle v-if="hitRadius > sprite.selectorSize" cx="0" cy="0" :r="hitRadius" fill="#ffffff00" />
@@ -82,7 +82,7 @@ import { offerLabel, withdrawLabel } from '@/libs/label-layout'
 import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
 import { writeAttribute } from '@/libs/dom-writes'
 import { WARP_IN_MS } from '../warp-effects.svg.vue'
-import { YELLOW, YELLOW_LIGHT } from '@/libs/palette'
+import { YELLOW, YELLOW_LIGHT, PLANET_COLORS, STAR_CLASSES } from '@/libs/palette'
 import Star from './star.svg'
 import Ship from './ship.svg'
 import Station from './station.svg'
@@ -241,6 +241,13 @@ export default {
     hitRadius() {
       if (!DETAILED_WHEN_TINY.includes(this.type)) return this.sprite.selectorSize
       return Math.max(this.sprite.selectorSize, MIN_HIT_RADIUS_PX / (this.drawnPixelsPerUnit * this.spriteScale))
+    },
+    /** A tiny sprite's dot: a planet in its class's color, a star in its own; others lavender. */
+    dotColor() {
+      const object = this.sprite.object
+      if (this.type === 'planet') return PLANET_COLORS[object.class]?.light ?? '#e5cfff'
+      if (this.type === 'star' && object.spectral) return STAR_CLASSES[object.spectral].mid
+      return '#e5cfff'
     },
     /** Half the sprite's size, but never under one pixel (in sprite units). */
     dotRadius() {

@@ -16,11 +16,18 @@ import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
 import { WORLD_OFFSET_Y } from '@/constants'
 import { writeStyle } from '@/libs/dom-writes'
 import { RING_COLOR, RING_FAINT, ringOpacity, ringWidth } from '@/libs/sprite-types'
+import { STAR_CLASSES, PLANET_COLORS } from '@/libs/palette'
 
-// A dim glow around the star (normal and high graphics).
+// A dim glow around the star (normal and high graphics): deep space's purple, warmed or cooled toward
+// the star's own color so its light reaches the whole system a little.
 const GLOW_RADIUS = 2500
-const GLOW_INNER = 'rgba(49, 14, 92, 0.25)' // #310e5c
-const GLOW_OUTER = 'rgba(76, 39, 119, 0)' // #4c2777
+const GLOW_PURPLE = [49, 14, 92] // #310e5c
+// On high graphics, the star's own light close in.
+const LIGHT_RADIUS = 700
+
+const rgb = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16))
+const rgba = ([r, g, b], a) => `rgba(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)}, ${a})`
+const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t)
 // The heliopause: the system's outer edge.
 const HELIOPAUSE_RADIUS = 5000
 const HELIOPAUSE_WIDTH = 10
@@ -138,17 +145,37 @@ export default {
       const originY = MARGIN + this.screenSize.height / 2 + WORLD_OFFSET_Y * this.groupPixels + y * pixels
       ctx.setTransform(dpr * pixels, 0, 0, dpr * pixels, dpr * originX, dpr * originY)
       if (this.graphicsQuality > 1) this.drawGlow(ctx)
+      if (this.graphicsQuality > 2) this.drawStarLight(ctx)
       // In the neighbor view, the heliopause becomes that view's star (neighbor-view.svg.vue).
       if (!this.neighborView) this.drawHeliopause(ctx)
       this.drawStarOrbits(ctx, pixels)
     },
+    /** The star's class colors (libs/palette.js), or none for a black hole. */
+    starColors() {
+      const spectral = this.systemObjects.star?.spectral
+      return spectral ? STAR_CLASSES[spectral] : null
+    },
     drawGlow(ctx) {
+      const star = this.starColors()
+      const inner = star ? mix(GLOW_PURPLE, rgb(star.glow), 0.22) : GLOW_PURPLE
       const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, GLOW_RADIUS)
-      glow.addColorStop(0, GLOW_INNER)
-      glow.addColorStop(1, GLOW_OUTER)
+      glow.addColorStop(0, rgba(inner, 0.25))
+      glow.addColorStop(0.3, rgba(GLOW_PURPLE, 0.12))
+      glow.addColorStop(1, rgba(GLOW_PURPLE, 0))
       ctx.fillStyle = glow
       ctx.beginPath()
       ctx.arc(0, 0, GLOW_RADIUS, 0, Math.PI * 2)
+      ctx.fill()
+    },
+    drawStarLight(ctx) {
+      const star = this.starColors()
+      if (!star) return
+      const light = ctx.createRadialGradient(0, 0, 0, 0, 0, LIGHT_RADIUS)
+      light.addColorStop(0, rgba(rgb(star.glow), 0.07))
+      light.addColorStop(1, rgba(rgb(star.glow), 0))
+      ctx.fillStyle = light
+      ctx.beginPath()
+      ctx.arc(0, 0, LIGHT_RADIUS, 0, Math.PI * 2)
       ctx.fill()
     },
     drawHeliopause(ctx) {
@@ -158,7 +185,10 @@ export default {
       ctx.arc(0, 0, HELIOPAUSE_RADIUS, 0, Math.PI * 2)
       ctx.stroke()
     },
-    /** Orbit rings centered on the star: the planets', and those of ships orbiting the star itself. */
+    /**
+     * Orbit rings centered on the star: the planets' (solid, in the planet's class color, libs/palette.js),
+     * and those of ships orbiting the star itself.
+     */
     drawStarOrbits(ctx, pixels) {
       for (const [key, object] of Object.entries(this.systemObjects)) {
         if (object.orbiting !== 'star') continue
@@ -166,14 +196,21 @@ export default {
         const emphasized = key === this.selected || key === this.hovered
         const opacity = ringOpacity(radius * pixels) * (emphasized ? 1 : RING_FAINT)
         if (opacity === 0) continue
-        ctx.strokeStyle = emphasized ? RING_COLOR.bright : RING_COLOR.faint
         ctx.lineWidth = ringWidth(emphasized, pixels)
-        if ((DOT_ON + DOT_OFF) * pixels >= MIN_DOT_PERIOD_PX) {
-          ctx.globalAlpha = opacity
-          ctx.setLineDash([DOT_ON, DOT_OFF])
-        } else {
-          ctx.globalAlpha = (opacity * DOT_ON) / (DOT_ON + DOT_OFF)
+        if (object.type === 'planet') {
+          const colors = PLANET_COLORS[object.class] ?? PLANET_COLORS[1]
+          ctx.strokeStyle = colors.light
+          ctx.globalAlpha = emphasized ? 0.6 : opacity * 0.55
           ctx.setLineDash([])
+        } else {
+          ctx.strokeStyle = emphasized ? RING_COLOR.bright : RING_COLOR.faint
+          if ((DOT_ON + DOT_OFF) * pixels >= MIN_DOT_PERIOD_PX) {
+            ctx.globalAlpha = opacity
+            ctx.setLineDash([DOT_ON, DOT_OFF])
+          } else {
+            ctx.globalAlpha = (opacity * DOT_ON) / (DOT_ON + DOT_OFF)
+            ctx.setLineDash([])
+          }
         }
         ctx.beginPath()
         ctx.arc(0, 0, radius, 0, Math.PI * 2)

@@ -14,7 +14,7 @@ import { pendingRegistration, rememberPending, forgetPending } from '@/sdk/pendi
 import { createGame, STATE, REGION_RADIUS } from './contracts'
 import { timeOf } from './drand'
 import { distance } from './hex'
-import { starTraits } from './traits'
+import { starTraits, genesisName } from './traits'
 import { planet as derivePlanet, planetCount, looks, moonName, planetName } from './system-gen'
 import { portNames, buyCost, sellProceeds, fee, baysCost, MODE } from './market'
 import { SESSION_HOURS, loadKey, saveKey, forgetKey, newKey, keySigner, sweep } from './session-key'
@@ -367,6 +367,12 @@ export function createGameClient() {
     notify('cells')
   }
 
+  /** How a star looks (sdk/traits.js): its spectral class, color, size and place off the grid. */
+  function traitsOf(cell) {
+    const isStar = (c) => state.cells.get(c)?.state === STATE.STAR
+    return starTraits(state.universe?.seed, cell, genesisName(cell, isStar))
+  }
+
   /** A star's name as given (genesis or a player, Planets.nameStar), else "Star 1234" by its cell. */
   function starName(cell) {
     return state.names[cell] || unnamed(cell, state.cells.get(cell)?.state === STATE.BLACK_HOLE)
@@ -417,7 +423,8 @@ export function createGameClient() {
     const data = {
       id: cell,
       starName: name,
-      starSize: starSize(cell, starTraits(seed, cell).size),
+      starSize: starSize(cell, traitsOf(cell).size),
+      spectral: star?.state === STATE.BLACK_HOLE ? null : traitsOf(cell).spectral,
       birthTime: star?.discoveredAt ?? 0,
       discoveredBy: star?.discoverer ?? 0,
       neighborIds: [],
@@ -991,6 +998,7 @@ export function createGameClient() {
     /** Reads the galaxy map's region around `center` (the map view calls this as the player pans). */
     loadAround,
     starName,
+    traitsOf,
     /** A pilot's call sign, if the client has met them, else null. */
     callsignOf(address) {
       return state.callsigns[address] || null

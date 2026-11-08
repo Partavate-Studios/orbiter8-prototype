@@ -38,7 +38,7 @@
         stroke-opacity="0.18"
         stroke-width="0.5"
       />
-      <circle r="2.6" fill="#fff4d8" />
+      <circle r="2.6" :fill="starDot" />
       <circle v-for="dot in dots" :key="dot.key" :ref="'dot-' + dot.key" :r="dot.r" :fill="dot.fill" cx="0" cy="0" />
       <rect
         ref="view"
@@ -74,7 +74,8 @@ import { useUIStore } from '@/stores/ui'
 import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
 import { writeAttribute } from '@/libs/dom-writes'
 import { WORLD_OFFSET_Y } from '@/constants'
-import { YELLOW } from '@/libs/palette'
+import { YELLOW, PLANET_COLORS, STAR_CLASSES } from '@/libs/palette'
+import { STAR_KEY } from '@/sdk/system'
 
 // The box is 2 * HALF HUD units across. The outermost orbit, plus a margin, fills a radius of FIT.
 const HALF = 55
@@ -118,6 +119,11 @@ export default {
     heliopauseR() {
       return HELIOPAUSE * this.scale
     },
+    /** The star, in its spectral class's color (sdk/traits.js). */
+    starDot() {
+      const spectral = this.systemObjects?.[STAR_KEY]?.spectral
+      return spectral ? STAR_CLASSES[spectral].mid : '#fff4d8'
+    },
     /** What gets a dot: planets, stations and ships (moons are too close to their planets to show). */
     dots() {
       return Object.values(this.sprites ?? {})
@@ -125,7 +131,9 @@ export default {
         .map((sprite) => {
           const mine = sprite.type === 'ship' && sprite.object.isMine
           const style = DOT_STYLE[sprite.type]
-          return { key: sprite.key, r: mine ? 2.4 : style.r, fill: mine ? YELLOW : style.fill }
+          // planets in their class's color (libs/palette.js)
+          const fill = sprite.type === 'planet' ? (PLANET_COLORS[sprite.object.class]?.light ?? style.fill) : style.fill
+          return { key: sprite.key, r: mine ? 2.4 : style.r, fill: mine ? YELLOW : fill }
         })
     }
   },

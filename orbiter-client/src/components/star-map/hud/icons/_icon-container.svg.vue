@@ -1,7 +1,7 @@
 <template>
   <g @mouseover="hover = true" @mouseleave="hover = false">
     <g clip-path="url(#icon-clip)">
-      <circle cx="0" cy="0" r="30" stroke="#ffffff22" stroke-width="1" :fill="fillColor" />
+      <circle cx="0" cy="0" r="30" :stroke="strokeColor" :stroke-width="tint ? 1.5 : 1" :fill="fillColor" />
       <g :transform="'scale(' + scaleSize + ')'">
         <slot />
       </g>
@@ -13,8 +13,17 @@
 import { mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 
+/** `a` blended toward `b` by `t`, as #rrggbb. */
+function mixHex(a, b, t) {
+  const c = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16))
+  const [x, y] = [c(a), c(b)]
+  return '#' + x.map((v, i) => Math.round(v + (y[i] - v) * t).toString(16).padStart(2, '0')).join('')
+}
+
 export default {
   name: 'IconContainer',
+  // A tint from an enclosing <tinted> (the HUD's buttons), or none.
+  inject: { iconTint: { default: null } },
   props: {
     selected: {
       type: Boolean,
@@ -28,7 +37,17 @@ export default {
   },
   computed: {
     ...mapState(useConfigStore, ['graphicsQuality']),
+    tint() {
+      // (Vue unwraps an injected computed; older versions hand over the ref itself.)
+      const tint = this.iconTint
+      return typeof tint === 'string' ? tint : (tint?.value ?? null)
+    },
+    strokeColor() {
+      return this.tint ? this.tint + (this.hover || this.selected ? 'ff' : 'aa') : '#ffffff22'
+    },
     fillColor: function () {
+      // Tinted: the tint over the button's purple, solid (no blending on low graphics).
+      if (this.tint) return mixHex('#230b41', this.tint, this.hover || this.selected ? 0.32 : 0.18)
       if (this.hover || this.selected) {
         return '#140828'
       } else {
