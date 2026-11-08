@@ -99,7 +99,7 @@
     </header>
 
     <!-- The chosen star's card, in the frame the in-game dialog and the tech tree use (game-dialog.vue) -->
-    <aside v-if="chosen !== null" class="card">
+    <aside v-if="chosen !== null" class="card" :style="chosenTheme">
       <div class="inside">
       <h3 class="pill">{{ chosenName }}</h3>
       <p class="sub">{{ chosenKind }} · {{ distanceAway }} {{ distanceAway === 1 ? 'step' : 'steps' }} away</p>
@@ -136,6 +136,7 @@ import { STATE } from '@/sdk/client'
 import { MAP } from '@/libs/palette'
 import { position, cellAt, distance, neighbors } from '@/sdk/hex'
 import { starTraits } from '@/sdk/traits'
+import { CARD_THEMES } from '@/libs/card-theme'
 import { timeOf } from '@/sdk/drand'
 import { usePlayerStore } from '@/stores/player'
 import { useGameStateStore } from '@/stores/gamestate'
@@ -308,6 +309,13 @@ export default {
     chosenKind() {
       if (this.chosenCell?.state === STATE.BLACK_HOLE) return 'Black hole'
       return this.chosen === 0 ? 'Home star' : 'Star'
+    },
+    /** The chosen star's card colors, as CSS variables (see .card). */
+    chosenTheme() {
+      if (this.chosen === null) return null
+      const theme = this.chosenCell?.state === STATE.BLACK_HOLE ? CARD_THEMES.blackHole : CARD_THEMES['star-' + game.traitsOf(this.chosen).spectral]
+      if (!theme) return null
+      return { '--card-mid': theme.mid, '--card-deep': theme.deep, '--card-stroke': theme.stroke }
     },
     distanceAway() {
       return distance(this.shipCell, this.chosen)
@@ -612,6 +620,8 @@ export default {
 .title .scanning-now {
   color: var(--o8-yellow-light);
 }
+/* In the chosen star's card colors (libs/card-theme.js), as the game's cards: its spectral class,
+   or a black hole's amber; purple until set. */
 .card {
   position: absolute;
   left: 50%;
@@ -621,22 +631,40 @@ export default {
   box-sizing: border-box;
   padding: 3px;
   border-radius: 40px / 9px;
-  background: linear-gradient(135deg, #5c1aae 0%, #280b4b 10%, #5c1aae 50%, #280b4b 90%, #5c1aae 100%);
+  background: linear-gradient(
+    135deg,
+    var(--card-mid, #5c1aae) 0%,
+    var(--card-deep, #280b4b) 10%,
+    var(--card-mid, #5c1aae) 50%,
+    var(--card-deep, #280b4b) 90%,
+    var(--card-mid, #5c1aae) 100%
+  );
   box-shadow: 0 1.2em 3em #0009;
   text-align: left;
 }
+.card .card-pill:not(.accent) {
+  border-color: var(--card-stroke, #5b1aaa);
+  background: linear-gradient(135deg, var(--card-mid, #5c1aae) 0%, var(--card-deep, #280b4b) 50%, var(--card-mid, #5c1aae) 100%);
+}
 .card .inside {
   padding: 0.5em 1.2em 1em;
-  border: 1px solid #5b1aaa;
+  border: 1px solid var(--card-stroke, #5b1aaa);
   border-radius: 38px / 8px;
-  background: #12052ae6;
+  background: #1d1926e6;
 }
 .card .pill {
   margin: 0 -0.6em 0.3em;
   padding: 0.25em 1em;
-  border: 1px solid #5b1aaa88;
+  border: 1px solid var(--card-stroke, #5b1aaa);
   border-radius: 40px / 12px;
-  background: linear-gradient(135deg, #5c1aae 0%, #280b4b 10%, #5c1aae 50%, #280b4b 90%, #5c1aae 100%);
+  background: linear-gradient(
+    135deg,
+    var(--card-mid, #5c1aae) 0%,
+    var(--card-deep, #280b4b) 10%,
+    var(--card-mid, #5c1aae) 50%,
+    var(--card-deep, #280b4b) 90%,
+    var(--card-mid, #5c1aae) 100%
+  );
   color: #ffffff;
   font-size: 1.05em;
   font-weight: normal;
