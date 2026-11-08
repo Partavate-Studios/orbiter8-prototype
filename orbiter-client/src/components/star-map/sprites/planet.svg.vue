@@ -8,7 +8,7 @@
       <g transform="rotate(-18)" fill="none" :stroke="'url(#ring-' + planet.class + ')'">
         <path :d="ringArc(ringRx, ringRy, true)" :stroke-width="ringWidth" opacity="0.75" />
         <template v-if="graphicsQuality > 2">
-          <path v-for="n in ringLines" :key="n" :d="ringArc(ringRx + n.offset, ringRy + n.offset * 0.3, true)" stroke-width="0.12" opacity="0.5" />
+          <path v-for="n in ringLines" :key="n.offset" :d="ringArc(ringRx + n.offset, ringRy + n.offset * 0.3, true)" :stroke="colors.light" stroke-width="0.12" opacity="0.45" />
         </template>
       </g>
     </g>
@@ -25,8 +25,7 @@
       :fill="colors.mark"
       :fill-opacity="colors.markOpacity"
       :stroke="colors.mark"
-      :stroke-opacity="colors.markOpacity * 0.5"
-      stroke-width="0.4"
+      stroke-width="0"
     >
       <g v-if="planet.class == 0">
         <!-- Earth Like -->
@@ -153,7 +152,7 @@
       <g transform="rotate(-18)" fill="none" :stroke="'url(#ring-' + planet.class + ')'">
         <path :d="ringArc(ringRx, ringRy, false)" :stroke-width="ringWidth" opacity="0.75" />
         <template v-if="graphicsQuality > 2">
-          <path v-for="n in ringLines" :key="n" :d="ringArc(ringRx + n.offset, ringRy + n.offset * 0.3, false)" stroke-width="0.12" opacity="0.5" />
+          <path v-for="n in ringLines" :key="n.offset" :d="ringArc(ringRx + n.offset, ringRy + n.offset * 0.3, false)" :stroke="colors.light" stroke-width="0.12" opacity="0.45" />
         </template>
       </g>
     </g>
@@ -190,9 +189,11 @@ export default {
     ringWidth() {
       return Math.max(0.6, this.planet.rings * 0.55)
     },
+    // At most three fine lines, in a plain color: a gradient stroke per line cost too much.
     ringLines() {
-      const n = Number(this.planet.rings)
-      return Array.from({ length: n }, (_, i) => ({ offset: (i - (n - 1) / 2) * 0.55 }))
+      const n = Math.min(3, Number(this.planet.rings))
+      const spread = this.ringWidth / 2
+      return Array.from({ length: n }, (_, i) => ({ offset: n === 1 ? 0 : -spread + (2 * spread * i) / (n - 1) }))
     },
     ...mapState(useConfigStore, ['graphicsQuality'])
   },

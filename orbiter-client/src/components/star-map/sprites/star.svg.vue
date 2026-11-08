@@ -13,7 +13,7 @@
       v-if="graphicsQuality > 1"
       cx="0"
       cy="0"
-      :r="spectral && graphicsQuality > 2 ? 320 : 240"
+      :r="spectral && graphicsQuality > 2 ? 270 : 240"
       stroke-width="0"
       :fill="spectral ? 'url(#starGlow-' + spectral + ')' : 'url(#glowingGradient)'"
       pointer-events="none"
