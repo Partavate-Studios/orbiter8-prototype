@@ -43,11 +43,8 @@
 
 <script>
 import { fitSize } from '@/libs/fit-text'
-import { CARD_THEMES } from '@/libs/card-theme'
-
 export default {
   name: 'CardButton',
-  inject: { cardTheme: { default: null } },
   props: {
     text: {
       type: String,
@@ -63,20 +60,13 @@ export default {
     }
   },
   computed: {
-    /** The card's colors (libs/card-theme.js, from card-ui), purple outside a card. */
-    theme() {
-      const t = this.cardTheme
-      return (typeof t === 'string' || !t ? null : (t.base ? t : t.value)) ?? CARD_THEMES.ship
-    },
-    themeKey() {
-      return Object.keys(CARD_THEMES).find((key) => CARD_THEMES[key] === this.theme)
-    },
+    // The menu's buttons are the same purple on every card (Koda: consistent buttons); only the
+    // card's border and title take the selection's color.
     getButtonFill() {
-      if (this.themeKey === 'ship') return this.hover ? 'url(#cardGradient45)' : 'url(#cardGradient)'
-      return this.hover ? `url(#cardHover-${this.themeKey})` : `url(#card-${this.themeKey})`
+      return this.hover ? 'url(#cardGradient45)' : 'url(#cardGradient)'
     },
     getButtonStroke() {
-      return this.theme.stroke + (this.hover ? 'ff' : '88')
+      return this.hover ? '#5b1aaaff' : '#5b1aaa88'
     },
     getTextColor() {
       if (this.enabled) {

@@ -14,8 +14,8 @@
             opacity="1"
             stroke-width="0"
           />
-          <!-- The inside: a quiet purple-gray (libs/palette.js CARD_GRAY), so the purple edge, the title
-               and the buttons stand out against it -->
+          <!-- The inside: the same quiet purple-gray on every card (libs/palette.js CARD_GRAY), nearly
+               opaque so the frame's color stays on the border (Koda: consistent backgrounds) -->
           <rect
             x="0"
             y="0"
@@ -24,7 +24,7 @@
             width="140"
             height="210"
             :fill="CARD_GRAY"
-            opacity="0.72"
+            opacity="0.96"
             :stroke="theme.stroke"
             stroke-width="0.25"
           />

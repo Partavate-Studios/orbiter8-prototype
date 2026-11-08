@@ -514,8 +514,9 @@ export default {
       const unit = useUIStore().screenSize.height / useUIStore().viewport.resolution || 1
       const k = (BACKGROUND_SHARE * BACKGROUND_PARALLAX * this.scale) / unit
       const pan = useUIStore().galaxyPan
-      const px = Math.round((this.camera.x - hx) * k)
-      const py = Math.round((this.camera.y - hy) * k)
+      // (The system's camera is the world's offset; this camera is a position: hence the sign.)
+      const px = Math.round((hx - this.camera.x) * k)
+      const py = Math.round((hy - this.camera.y) * k)
       if (pan.x !== px || pan.y !== py) useUIStore().galaxyPan = { x: px, y: py }
     },
     centerOnShip() {
