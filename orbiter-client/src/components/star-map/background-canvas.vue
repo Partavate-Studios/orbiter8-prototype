@@ -77,8 +77,9 @@ function paintStars(ctx, stars, layers) {
 export default {
   name: 'BackgroundCanvas',
   computed: {
+    // The window's size and pixel ratio: either one means resizing the canvas.
     screenDimensions() {
-      return this.screenSize.width + 'x' + this.screenSize.height
+      return this.screenSize.width + 'x' + this.screenSize.height + '@' + this.screenSize.dpr
     },
     ...mapState(useUIStore, ['viewport', 'screenSize', 'jumpAnimationState', 'jumpStall', 'galaxyPan']),
     ...mapState(useConfigStore, ['graphicsQuality']),
@@ -223,6 +224,10 @@ export default {
       ])
     },
     onFrame(now) {
+      // A new pixel ratio (another screen): every canvas resizes (screenDimensions). Checked here each
+      // frame as well as by the ui store's media query, which some browsers report late.
+      const dpr = window.devicePixelRatio || 1
+      if (dpr !== this.screenSize.dpr) useUIStore().screenSize.dpr = dpr
       if (this.jumpAnimationState) {
         // The streaks travel at jump speed, or coast to a stop if the jump stalled (eased: slowing fast, then coasting).
         const seconds = this.lastJumpFrame ? Math.min(0.1, (now - this.lastJumpFrame) / 1000) : 0

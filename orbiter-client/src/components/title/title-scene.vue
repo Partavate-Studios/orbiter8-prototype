@@ -124,6 +124,7 @@
 import FleetShip from '@/components/assets/fleet-ship.svg'
 import { paintBackdrop, BACKDROP_SIZE } from '@/components/star-map/assets/backdrop-art'
 import { onFrame } from '@/libs/frame-loop'
+import { useUIStore } from '@/stores/ui'
 import { flightPose, planFlight, SLOTS } from '@/libs/title-flight'
 import { DOCKED, TUBE, dockRadius, dockTransform, visitorPose, VISITOR_SCALE } from '@/libs/title-visitor'
 
@@ -194,8 +195,12 @@ export default {
       })
     }
     window.addEventListener('resize', this.onResize)
+    // A new pixel ratio (the window moved to a screen with other scaling) repaints too.
+    useUIStore().watchPixelRatio()
+    this.stopRatioWatch = this.$watch(() => useUIStore().screenSize.dpr, this.onResize)
   },
   unmounted() {
+    this.stopRatioWatch?.()
     window.removeEventListener('resize', this.onResize)
     cancelAnimationFrame(this.resizeFrame)
     this.stopFrames()

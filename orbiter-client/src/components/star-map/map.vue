@@ -182,6 +182,7 @@ export default {
     this.$nextTick(function () {
       this.resizeHandler() //set initial ratio
       window.addEventListener('resize', this.resizeHandler)
+      useUIStore().watchPixelRatio()
     })
   },
   beforeUnmount() {

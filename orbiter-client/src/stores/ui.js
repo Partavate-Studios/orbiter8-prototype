@@ -41,10 +41,13 @@ export const useUIStore = defineStore('UI', {
       width: MAP_RESOLUTION,
       height: MAP_RESOLUTION
     },
-    // The browser window's size in pixels, and where the mouse is in it.
+    // The browser window's size in pixels, its pixel ratio, and where the mouse is in it.
     screenSize: {
       width: MAP_RESOLUTION,
       height: MAP_RESOLUTION,
+      // The device pixel ratio: it changes without a resize when the window moves to a screen with
+      // other scaling, and every canvas has to be resized for it (watchPixelRatio).
+      dpr: typeof window === 'undefined' ? 1 : window.devicePixelRatio || 1,
       mouse: {
         x: 0,
         y: 0,
@@ -170,6 +173,23 @@ export const useUIStore = defineStore('UI', {
     }
   },
   actions: {
+    /**
+     * Keeps screenSize.dpr up to date: a media query matching the current ratio fires when it stops
+     * matching (another screen, browser zoom), then is set up again for the new ratio.
+     */
+    watchPixelRatio() {
+      if (typeof window === 'undefined' || !window.matchMedia || this.pixelRatioWatched) return
+      this.pixelRatioWatched = true
+      const arm = () => {
+        const query = window.matchMedia(`(resolution: ${window.devicePixelRatio || 1}dppx)`)
+        query.addEventListener('change', () => {
+          this.screenSize.dpr = window.devicePixelRatio || 1
+          arm()
+        }, { once: true })
+      }
+      this.screenSize.dpr = window.devicePixelRatio || 1
+      arm()
+    },
     calculateViewableArea({ x, y }) {
       let ratio = this.viewport.resolution / y
       this.viewport.width = parseInt(x * ratio * 0.8)

@@ -41,8 +41,9 @@ const MARGIN = 128
 export default {
   name: 'GuidesCanvas',
   computed: {
+    // The window's size and pixel ratio: either one means resizing the canvas.
     screenDimensions() {
-      return this.screenSize.width + 'x' + this.screenSize.height
+      return this.screenSize.width + 'x' + this.screenSize.height + '@' + this.screenSize.dpr
     },
     ...mapState(useUIStore, [
       'viewport',

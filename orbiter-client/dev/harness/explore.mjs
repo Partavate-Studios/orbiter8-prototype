@@ -1,5 +1,5 @@
 // Step through the app interactively: node explore.mjs <url> <outdir> [step...]
-// Each step: "shot:name", "click:text", "clickxy:x,y", "move:x,y", "type:selector=value", "wait:ms", "key:k", "eval:js"
+// Each step: "dpr:2" (pixel ratio), "shot:name", "click:text", "clickxy:x,y", "move:x,y", "type:selector=value", "wait:ms", "key:k", "eval:js"
 import puppeteer from 'puppeteer-core'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -210,6 +210,10 @@ for (const step of steps) {
     // move:<x>,<y> moves the mouse to a screen point (hover effects, tooltips).
     const [x, y] = arg.split(',').map(Number)
     await page.mouse.move(x, y, { steps: 5 })
+  } else if (kind === 'dpr') {
+    // dpr:<ratio> changes the device pixel ratio mid-session, keeping the size (a window dragged to
+    // a screen with other scaling).
+    await page.setViewport({ ...page.viewport(), deviceScaleFactor: Number(arg) })
   } else if (kind === 'clickxy') {
     const [x, y] = arg.split(',').map(Number)
     await page.mouse.click(x, y)
