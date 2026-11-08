@@ -3,7 +3,7 @@
        out from the sun on the left to the dashed edge of the solar system on the right, where it stops:
        the edge flares as the ship reaches it. -->
   <svg class="art wide" viewBox="-500 -500 1000 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-    <g transform="translate(-520 0) scale(0.45)"><star /></g>
+    <g transform="translate(-520 0) scale(0.45)"><star spectral="G" /></g>
     <g v-for="planet in planets" :key="planet.name" :transform="'translate(' + planet.x + ' ' + planet.y + ')'">
       <story-planet :planet-class="planet.cls" :radius="planet.r" :rings="planet.rings" />
     </g>

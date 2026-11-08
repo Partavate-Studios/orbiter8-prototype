@@ -15,7 +15,7 @@
           :transform="'rotate(' + n * 40 + ')'"
           rx="150"
           ry="5"
-          fill="url(#glowingGradient)"
+          fill="url(#starGlow-G)"
           opacity="0.3"
         />
       </svg>
@@ -26,13 +26,14 @@
           :transform="'rotate(' + (n * 40 + 20) + ')'"
           :rx="90 + (n % 4) * 18"
           ry="4"
-          fill="url(#glowingGradient)"
+          fill="url(#starGlow-G)"
           opacity="0.3"
         />
       </svg>
       <svg class="part" viewBox="-160 -160 320 320">
-        <circle r="70" fill="url(#glowingGradient)" />
-        <circle r="28" fill="url(#starGradient)" stroke="#ffffff" stroke-width="0.4" />
+        <!-- Sol, in the star map's yellow (libs/palette.js STAR_CLASSES.G) -->
+        <circle r="70" fill="url(#starGlow-G)" />
+        <circle r="28" fill="url(#star-G)" stroke="#fffbe6" stroke-width="0.4" />
       </svg>
       <!-- ships circling the sun, noses along their orbit; the third, the one that leaves, is the runner -->
       <svg ref="orbit" class="part orbit" viewBox="-160 -160 320 320">
@@ -45,15 +46,26 @@
     <div class="anchor planet">
       <svg viewBox="-260 -260 520 520">
         <defs>
+          <!-- Earth, by the I.S.S.: the star map's Terrestrial colors (libs/palette.js PLANET_COLORS[0]) -->
           <radialGradient id="title-planet-light" cx="35%" cy="30%" r="75%">
-            <stop offset="0%" stop-color="#eadcff" />
-            <stop offset="45%" stop-color="#a48bd0" />
-            <stop offset="100%" stop-color="#34245a" />
+            <stop offset="0%" stop-color="#a8e6ff" />
+            <stop offset="50%" stop-color="#2f7fd9" />
+            <stop offset="100%" stop-color="#1a2a6e" />
           </radialGradient>
+          <clipPath id="title-planet-disc"><circle r="180" /></clipPath>
         </defs>
-        <circle r="236" fill="none" stroke="#c3b3da" stroke-width="44" opacity="0.07" />
-        <circle r="206" fill="none" stroke="#c3b3da" stroke-width="6" opacity="0.08" />
-        <circle r="180" fill="url(#title-planet-light)" stroke="#e6dcf5" stroke-width="2" stroke-opacity="0.7" />
+        <circle r="236" fill="none" stroke="#7fd4ff" stroke-width="44" opacity="0.06" />
+        <circle r="206" fill="none" stroke="#7fd4ff" stroke-width="6" opacity="0.08" />
+        <circle r="180" fill="url(#title-planet-light)" stroke="#a8e6ff" stroke-width="2" stroke-opacity="0.7" />
+        <!-- its land, as the map's Earth-like surface marks -->
+        <g clip-path="url(#title-planet-disc)" fill="#5fd27e" fill-opacity="0.42" transform="scale(18)">
+          <rect x="-2" y="-8" width="12" height="2" rx="1" /><rect x="0" y="-6" width="14" height="2" rx="1" />
+          <rect x="-9" y="-7" width="6" height="2" rx="1" /><rect x="-10" y="-4" width="10" height="2" rx="1" />
+          <rect x="-1" y="-2" width="12" height="2" rx="1" /><rect x="-12" y="1" width="12" height="2" rx="1" />
+          <rect x="-10" y="3" width="14" height="2" rx="1" /><rect x="-4" y="4" width="14" height="2" rx="1" />
+          <rect x="0" y="6" width="6" height="2" rx="1" /><rect x="-10" y="9" width="12" height="2" rx="1" />
+        </g>
+        <circle r="180" fill="url(#planetShade)" />
       </svg>
     </div>
 

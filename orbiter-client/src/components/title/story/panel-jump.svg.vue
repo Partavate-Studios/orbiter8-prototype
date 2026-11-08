@@ -3,13 +3,13 @@
        glowing brighter with every lap, then spends it all in one flash: a streak to the far star on
        the right, which lights up as the ship arrives. Then it plays again. -->
   <svg class="art wide" viewBox="-500 -500 1000 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-    <g transform="translate(-230 0) scale(0.9)"><star /></g>
+    <g transform="translate(-230 0) scale(0.9)"><star spectral="G" /></g>
     <circle cx="-230" cy="0" r="150" class="charging-orbit" />
 
     <!-- the far star -->
     <g transform="translate(390 -150)">
-      <circle r="90" fill="url(#glowingGradient)" class="arrival" />
-      <g transform="scale(0.12)"><star /></g>
+      <circle r="90" fill="url(#starGlow-K)" class="arrival" />
+      <g transform="scale(0.12)"><star spectral="K" /></g>
     </g>
 
     <!-- the ship, its charge, and its jump -->

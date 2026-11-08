@@ -12,8 +12,8 @@
 
     <!-- Sol and the charted stars -->
     <g v-for="(point, name) in stars" :key="name" :transform="'translate(' + point.x + ' ' + point.y + ')'">
-      <circle :r="point.r * 2.2" fill="url(#glowingGradient)" />
-      <circle :r="point.r" fill="url(#starGradient)" stroke="#ffffff" stroke-width="0.3" />
+      <circle :r="point.r * 2.2" :fill="'url(#starGlow-' + point.spectral + ')'" />
+      <circle :r="point.r" :fill="'url(#star-' + point.spectral + ')'" stroke="#ffffff" stroke-width="0.3" />
       <text :y="point.r + 20" class="label">{{ name }}</text>
       <g v-if="point.claimed" class="flag" :style="{ animationDelay: point.claimed + 's' }">
         <g :transform="'translate(' + (point.r + 4) + ' ' + -(point.r + 2) + ')'">
@@ -43,14 +43,15 @@ import FleetShip from '@/components/assets/fleet-ship.svg'
 
 // Sol, the genesis ring with its old Earth names, and numbered stars past them, as the map places them.
 const STARS = {
-  Sol: { x: -240, y: 70, r: 20 },
-  'Alpha Centauri': { x: -70, y: -50, r: 10, claimed: 3.2 },
-  "Barnard's Star": { x: -380, y: -150, r: 8 },
-  'Wolf 359': { x: -40, y: 210, r: 7 },
-  Sirius: { x: 130, y: 100, r: 12, claimed: 5.6 },
-  'Star 1234': { x: 270, y: -160, r: 7 },
-  'Star 2051': { x: 350, y: 180, r: 6 },
-  'Star 877': { x: 40, y: -250, r: 5 }
+  // (spectral: their classes as the game draws them, sdk/traits.js; the genesis stars' are real)
+  Sol: { x: -240, y: 70, r: 20, spectral: 'G' },
+  'Alpha Centauri': { x: -70, y: -50, r: 10, claimed: 3.2, spectral: 'G' },
+  "Barnard's Star": { x: -380, y: -150, r: 8, spectral: 'M' },
+  'Wolf 359': { x: -40, y: 210, r: 7, spectral: 'M' },
+  Sirius: { x: 130, y: 100, r: 12, claimed: 5.6, spectral: 'A' },
+  'Star 1234': { x: 270, y: -160, r: 7, spectral: 'K' },
+  'Star 2051': { x: 350, y: 180, r: 6, spectral: 'B' },
+  'Star 877': { x: 40, y: -250, r: 5, spectral: 'F' }
 }
 const ROUTES = [
   ['Sol', 'Alpha Centauri'],

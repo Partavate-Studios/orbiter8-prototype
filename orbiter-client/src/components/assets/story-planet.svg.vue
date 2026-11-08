@@ -4,21 +4,23 @@
        when `spin` is set. Rings are seen edge-on, like the tech tree's pictures. -->
   <g :transform="'scale(' + radius / 10 + ')'">
     <g v-if="rings" :transform="'rotate(' + ringTilt + ')'">
-      <ellipse rx="19" ry="5" fill="none" stroke="url(#ringGradient)" :stroke-width="ringWidth" opacity="0.7" />
+      <ellipse rx="19" ry="5" fill="none" :stroke="'url(#ring-' + planetClass + ')'" :stroke-width="ringWidth" opacity="0.7" />
     </g>
-    <circle r="10" stroke="#c3b3da" stroke-width="0.25" fill="url(#planetGradient)" />
-    <g clip-path="url(#just-the-planet)">
+    <circle r="10" :stroke="colors.light" stroke-width="0.25" :fill="'url(#planet-' + planetClass + ')'" />
+    <g clip-path="url(#just-the-planet)" class="story-surface" :style="{ '--mark': colors.mark, '--mark-opacity': colors.markOpacity }">
       <!-- eslint-disable-next-line vue/no-v-html, vue/no-v-text-v-html-on-component -- the surfaces are the game's own SVG, not user content -->
       <g class="surface" :style="spin ? { animation: 'story-planet-turn ' + spin + 's linear infinite' } : null" v-html="surface" />
     </g>
+    <circle r="10" fill="url(#planetShade)" />
     <g v-if="rings" :transform="'rotate(' + ringTilt + ')'">
-      <path d="M-18 5.9A19 5 0 0 0 18 -5.9" fill="none" stroke="url(#ringGradient)" :stroke-width="ringWidth" opacity="0.7" />
+      <path d="M-18 5.9A19 5 0 0 0 18 -5.9" fill="none" :stroke="'url(#ring-' + planetClass + ')'" :stroke-width="ringWidth" opacity="0.7" />
     </g>
   </g>
 </template>
 
 <script>
 import { PLANET_SURFACES } from './planet-surfaces'
+import { PLANET_COLORS } from '@/libs/palette'
 
 export default {
   name: 'StoryPlanet',
@@ -34,6 +36,10 @@ export default {
     ringTilt: { type: Number, default: -18 }
   },
   computed: {
+    /** The class's colors, as the star map draws it (libs/palette.js). */
+    colors() {
+      return PLANET_COLORS[this.planetClass] ?? PLANET_COLORS[1]
+    },
     surface() {
       return PLANET_SURFACES[this.planetClass] ?? ''
     },
@@ -45,6 +51,16 @@ export default {
 </script>
 
 <style>
+/* The surface marks in the class's color, as on the star map (marks drawn as lines keep no fill). */
+.story-surface g:not([fill='none']) {
+  fill: var(--mark);
+  fill-opacity: var(--mark-opacity);
+  stroke: none;
+}
+.story-surface g[fill='none'] {
+  stroke: var(--mark);
+  stroke-opacity: var(--mark-opacity);
+}
 /* Global, so the surface keeps turning inside v-html markup (scoped attributes don't reach it). */
 @keyframes story-planet-turn {
   to {

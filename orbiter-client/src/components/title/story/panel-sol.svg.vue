@@ -5,7 +5,7 @@
   <svg class="art" viewBox="-500 -500 1000 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
     <g class="system">
       <circle v-for="planet in planets" :key="'ring' + planet.name" :r="planet.orbit" class="ring" />
-      <g transform="scale(0.32)"><star /></g>
+      <g transform="scale(0.32)"><star spectral="G" /></g>
       <g
         v-for="planet in planets"
         :key="planet.name"
