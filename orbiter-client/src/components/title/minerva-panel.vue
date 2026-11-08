@@ -56,9 +56,13 @@ export default {
     }
   },
   watch: {
-    // A new step: move keyboard and screen-reader focus to its heading.
+    // A new step: move keyboard and screen-reader focus to its text field if it has one (the call
+    // sign, the ship's name: ready to type, its label read out), else to its heading.
     title() {
-      this.$nextTick(() => this.$refs.heading?.focus())
+      this.$nextTick(() => {
+        const field = this.$el.querySelector('input:not([type="hidden"]):not([disabled]), textarea')
+        ;(field ?? this.$refs.heading)?.focus()
+      })
     }
   }
 }
