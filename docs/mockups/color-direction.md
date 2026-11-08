@@ -50,6 +50,28 @@ detail on high graphics only. Built:
 No cost on low and normal; on high about 60 ms more paint and raster per 5 s, with the same frame
 rate. (Script time varies by a second between runs from block reloads, so it isn't comparable.)
 
+## Second pass (2026-11-07, Koda: "visit all screens and consider colors")
+
+Koda: the colors "look very good"; high graphics felt slower; the title and story were still purple;
+"for the cards, change the purple UI colors to a color that best represents the thing selected... for
+the Orbiter 8 ship, we can stick with the purple." Done:
+
+- **High graphics trimmed** (42944f7): at most three ring lines in a plain color, no outlines on
+  surface marks, a smaller star glow. Measured close up against the version before the colors (served
+  from a worktree on the same chain): the same cost, within noise. High graphics' remaining cost over
+  normal was there before the colors (its extra background star layers).
+- **Cards in the selected thing's color** (fc0b46b, `libs/card-theme.js`): shades of one color on the
+  frame, title, menu buttons, selection ring and lines; planets by class, stars by spectral class,
+  moons gray, stations steel blue, black holes amber; ships keep the purple. No gradient into purple.
+- **Menus** (e4cb8b8): a menu about the selection takes its card's color; a HUD button's menu takes the
+  button's tint; the loadout keeps the purple. Color on the frame and buttons, a quiet gray inside.
+- **Title and story** (4e38a01): a yellow Sol, Earth by the port, and the story's planets and stars in
+  the game's class colors. **Galaxy map:** the chosen star's card in its colors.
+- Left purple: Minerva's wizard panel, the jump animation and the black hole entry (deep space).
+
+**For Koda:** Sol's Mars is a Rocky world in the contracts, so it's gray in the game and the story. A
+Ferrous Mars would be red, as people know it, but it would change what Mars's port trades.
+
 ## To do, later
 
 - **Star colors by class:** done (above). Still open: tie a star's class to play. Real stars run from blue (hottest, heaviest) through white, yellow and orange to red (coolest, lightest).
