@@ -32,7 +32,9 @@ function toCell(c) {
     discoverer: c.discoverer === ZERO ? null : c.discoverer.toLowerCase(),
     discoveredAt: Number(c.discoveredAt),
     partner: Number(c.partner),
-    named: c.named
+    named: c.named,
+    // its owner (lowercase; the Galaxy contract itself for the Federation's), or null
+    keeper: !c.keeper || c.keeper === ZERO ? null : c.keeper.toLowerCase()
   }
 }
 

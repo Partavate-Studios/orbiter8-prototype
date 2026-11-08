@@ -18,8 +18,11 @@
       <!-- Charted space (Koda, 2026-11-07): a hex around every cell a scan has decided, star or empty;
            space nobody has scanned stays open, so the frontier shows. -->
       <path v-if="gridPath" :d="gridPath" fill="#2b0c50" fill-opacity="0.35" stroke="#4a2d7a" stroke-width="1" :opacity="gridOpacity" />
-      <!-- your jump range: its cells, outlined in your yellow -->
-      <path v-if="rangePath" :d="rangePath" :fill="MAP.route" fill-opacity="0.04" :stroke="MAP.route" stroke-opacity="0.3" stroke-width="1" />
+      <!-- your jump range: its cells, dashed in your yellow -->
+      <path v-if="rangePath" :d="rangePath" fill="none" :stroke="MAP.route" stroke-opacity="0.35" stroke-width="1" stroke-dasharray="4 4" />
+      <!-- stars that are yours to name (you discovered them and nobody owns them) or that you own:
+           their hexes tinted and outlined in your yellow -->
+      <path v-if="yoursPath" :d="yoursPath" :fill="MAP.route" fill-opacity="0.07" :stroke="MAP.route" stroke-opacity="0.55" stroke-width="1.3" :opacity="gridOpacity" />
       <!-- the system's heliopause, shrinking into its star as the map opens -->
       <circle
         v-if="opening < 1 && herePoint"
@@ -265,6 +268,22 @@ export default {
       }
       return d || null
     },
+    /** Your stars' hexes: the ones you own, or discovered while nobody owns them. */
+    yoursPath() {
+      void this.player.cellsVersion
+      if (this.scale < 12) return null
+      const me = this.player.account
+      const r = HEX_R * this.scale
+      let d = ''
+      for (const c of this.client.cells.values()) {
+        if (c.state !== STATE.STAR) continue
+        if (!(c.keeper === me || (!c.keeper && c.discoverer === me))) continue
+        const [x, y] = this.project(c.cell)
+        if (x < -r || y < -r || x > this.width + r || y > this.height + r) continue
+        d += hexPath(x, y, r)
+      }
+      return d || null
+    },
     /** The grid fades in as the cells grow big enough to read, and with the opening. */
     gridOpacity() {
       return Math.min(1, (this.scale - 12) / 24) * (0.35 + 0.65 * this.opening)
@@ -381,6 +400,8 @@ export default {
         note = this.isPartnerOf(this.hover) ? 'the far side of this black hole' : inRange ? 'black hole · in range' : 'black hole'
       else if (c.visited) note = inRange ? 'visited · in range' : 'visited'
       else note = inRange ? 'unsurveyed · in range' : 'unsurveyed'
+      const me = this.player.account
+      if (c.state === STATE.STAR && (c.keeper === me || (!c.keeper && c.discoverer === me))) note += c.keeper === me ? ' · your star' : ' · yours to name'
       const mine = this.client.ownedAt?.get(this.hover) ?? 0
       if (mine) note += ` · ${mine} of your planets`.replace('1 of your planets', 'your planet')
       // Beside the pointer, flipped near the edges.

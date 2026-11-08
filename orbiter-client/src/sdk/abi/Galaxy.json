@@ -417,6 +417,11 @@
             "name": "named",
             "type": "bool",
             "internalType": "bool"
+          },
+          {
+            "name": "keeper",
+            "type": "address",
+            "internalType": "address"
           }
         ]
       }

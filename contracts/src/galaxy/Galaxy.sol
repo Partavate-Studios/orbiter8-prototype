@@ -55,6 +55,7 @@ contract Galaxy is ModuleBase {
         uint40 discoveredAt;
         uint256 partner; // a black hole's partner cell, or 0
         bool named;
+        address keeper; // its owner (Planets.nameStar; this contract for the Federation's), or none
     }
 
     /// @custom:storage-location erc7201:orbiter8.galaxy
@@ -264,7 +265,8 @@ contract Galaxy is ModuleBase {
             s.discoverer,
             s.discoveredAt,
             partnerOf(cell),
-            bytes(_g().names[cell]).length > 0
+            bytes(_g().names[cell]).length > 0,
+            _g().keepers[cell]
         );
     }
 
