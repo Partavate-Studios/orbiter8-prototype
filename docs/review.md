@@ -410,6 +410,11 @@ story; eight panels or so (four to twelve). Done, and seen at 1440 × 900 and 39
   middle instead of cropped to a column. The other scenes are cropped to their middle, where the
   subject is.
 
+Koda's second pass (same day): the frame's white border was too intense and its square corners off
+style; the captions covered the art; the type was small. Now: a thin lavender border, rounded
+corners (as the panels and cards have), captions that hang over the frame's top-left and bottom-right
+edges so they cover little of the scene, and larger type.
+
 Calls made in your place:
 - **Nine panels would have given the pirates their own page**; eight keeps your target, so they
   share the last panel's closing caption and the dark corner of its map. Easy to split if you'd

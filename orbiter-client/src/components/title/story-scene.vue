@@ -27,14 +27,14 @@
       <transition :name="direction < 0 ? 'turn-back' : 'turn-next'" mode="out-in">
         <section
           :key="page"
-          class="frame"
+          class="panel"
           :aria-label="'Panel ' + (page + 1)"
           @click="next"
           @pointerdown="swipeStart"
           @pointerup="swipeEnd"
           @pointercancel="swipeCancel"
         >
-          <component :is="panel.scene" />
+          <div class="frame"><component :is="panel.scene" /></div>
           <p class="caption lead">
             <template v-for="(line, index) in panel.lead" :key="index">
               <span :style="{ animationDelay: 0.4 + index * 0.7 + 's' }">{{ line }}</span>{{ ' ' }}
@@ -248,31 +248,36 @@ export default {
   color: #c3b3da;
 }
 
-/* The page: one panel, framed like a comic's, as large as the screen allows at a landscape shape. */
+/* The page: one panel, framed like a comic's, as large as the screen allows at a landscape shape.
+   The page's padding leaves room for the captions, which hang over the frame's top and bottom edges. */
 .page {
   position: relative;
   display: grid;
   place-items: center;
-  padding: 0 1rem;
+  padding: 5rem 1rem;
   min-height: 0;
 }
-.frame {
+.panel {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   height: min(100%, (100vw - 2rem) * 9 / 16);
   aspect-ratio: 16 / 9;
-  background: #0b0218;
-  border: 3px solid #e6dcf5;
-  box-shadow:
-    0 0 0 1px #12052a,
-    0 1.2rem 3rem #000a;
-  overflow: hidden;
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
   touch-action: pan-y;
+}
+.frame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  background: #0b0218;
+  border: 2px solid #c3b3da88;
+  border-radius: 1rem;
+  box-shadow: 0 1.2rem 3rem #000a;
+  overflow: hidden;
 }
 .frame :deep(.art) {
   display: block;
@@ -280,31 +285,31 @@ export default {
   height: 100%;
 }
 
-/* Captions: the narrator's boxes, on the frame's top-left and bottom-right corners. */
+/* Captions: the narrator's boxes, hanging over the frame's top-left and bottom-right edges so
+   they cover little of the scene. */
 .caption {
   position: absolute;
   margin: 0;
-  max-width: 46%;
-  padding: 0.55em 0.8em;
+  max-width: 50%;
+  padding: 0.6em 0.9em;
   background: #e6dcf5;
   color: #1c0838;
   border: 2px solid #1c0838;
-  box-shadow: 0 0 0 2px #e6dcf5;
-  font-size: clamp(0.9rem, 1.6vw, 1.15rem);
+  border-radius: 0.6rem;
+  box-shadow: 0 0.5rem 1.5rem #0008;
+  font-size: clamp(1rem, 1.8vw, 1.3rem);
   line-height: 1.35;
   pointer-events: none;
 }
 .caption.lead {
   top: 0;
-  left: 0;
-  border-top: 0;
-  border-left: 0;
+  left: 1.2rem;
+  transform: translateY(-62%);
 }
 .caption.close {
-  right: 0;
+  right: 1.2rem;
   bottom: 0;
-  border-right: 0;
-  border-bottom: 0;
+  transform: translateY(62%);
   text-align: right;
 }
 .caption span,
@@ -380,16 +385,29 @@ export default {
   .heading {
     display: none;
   }
-  .frame {
+  .page {
+    padding: 4.5rem 1rem 5.5rem;
+  }
+  .panel {
     height: min(100%, (100vw - 2rem) * 16 / 9);
     aspect-ratio: 9 / 16;
+  }
+  .frame {
+    border-radius: 0.8rem;
   }
   .frame :deep(.art.wide) {
     height: auto;
     aspect-ratio: 1 / 1;
   }
   .caption {
-    max-width: 88%;
+    max-width: calc(100% - 1.2rem);
+    font-size: 1rem;
+  }
+  .caption.lead {
+    left: 0.6rem;
+  }
+  .caption.close {
+    right: 0.6rem;
   }
   .controls .o8-button {
     min-width: 5.5em;
