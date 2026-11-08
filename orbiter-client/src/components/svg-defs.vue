@@ -155,6 +155,29 @@
         <stop offset="100%" stop-color="#5c1aae" stop-opacity="1" />
       </linearGradient>
 
+      <!-- A hovered card button (this one was referenced but missing, so hovering emptied the button) -->
+      <linearGradient id="cardGradient45" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#7c39cd" />
+        <stop offset="50%" stop-color="#9a5ae6" />
+        <stop offset="100%" stop-color="#7c39cd" />
+      </linearGradient>
+      <!-- Selection cards in the selected thing's colors (libs/card-theme.js): the frame and buttons,
+           and hovered buttons -->
+      <template v-for="(t, key) in CARD_THEMES" :key="'card-' + key">
+        <linearGradient :id="'card-' + key" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" :stop-color="t.mid" />
+          <stop offset="10%" :stop-color="t.deep" />
+          <stop offset="50%" :stop-color="t.mid" />
+          <stop offset="90%" :stop-color="t.deep" />
+          <stop offset="100%" :stop-color="t.mid" />
+        </linearGradient>
+        <linearGradient :id="'cardHover-' + key" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" :stop-color="t.hoverMid" />
+          <stop offset="50%" :stop-color="t.hoverDeep" />
+          <stop offset="100%" :stop-color="t.hoverMid" />
+        </linearGradient>
+      </template>
+
       <!-- Cargo hold blocks -->
       <linearGradient id="emptyBlockGradient" x1="0%" y1="0%" x2="0%" y2="100%">
         <stop offset="0%" stop-color="#c3b3da00" stop-opacity="1" />
@@ -194,11 +217,12 @@
 import { mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 import { STAR_CLASSES, PLANET_COLORS } from '@/libs/palette'
+import { CARD_THEMES } from '@/libs/card-theme'
 
 export default {
   name: 'SvgDefs',
   data() {
-    return { STAR_CLASSES, PLANET_COLORS }
+    return { STAR_CLASSES, PLANET_COLORS, CARD_THEMES }
   },
   computed: {
     ...mapState(useConfigStore, ['graphicsQuality'])

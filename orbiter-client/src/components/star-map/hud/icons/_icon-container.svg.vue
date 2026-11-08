@@ -12,13 +12,8 @@
 <script>
 import { mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
+import { mixHex } from '@/libs/card-theme'
 
-/** `a` blended toward `b` by `t`, as #rrggbb. */
-function mixHex(a, b, t) {
-  const c = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16))
-  const [x, y] = [c(a), c(b)]
-  return '#' + x.map((v, i) => Math.round(v + (y[i] - v) * t).toString(16).padStart(2, '0')).join('')
-}
 
 export default {
   name: 'IconContainer',

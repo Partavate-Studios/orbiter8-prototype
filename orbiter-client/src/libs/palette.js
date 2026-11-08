@@ -49,20 +49,21 @@ export const STAR_CLASSES = {
 }
 
 /**
- * Planets by class (sdk/game/planet-types.js order): light, mid and dark for the sphere, and the
- * color of its surface marks. Purple stays in the shadows, so a system still reads as Orbiter 8's.
+ * Planets by class (sdk/game/planet-types.js order): light, mid and dark for the sphere, the color of
+ * its surface marks, and its card's color (libs/card-theme.js). Purple stays in the shadows, so a
+ * system still reads as Orbiter 8's.
  */
 export const PLANET_COLORS = [
-  { light: '#a8e6ff', mid: '#2f7fd9', dark: '#1a2a6e', mark: '#5fd27e', markOpacity: 0.75 }, // Terrestrial
-  { light: '#efe8f7', mid: '#9a8fb2', dark: '#352d4f', mark: '#4a3f63', markOpacity: 0.45 }, // Rocky
-  { light: '#9ff0ff', mid: '#1e8fd8', dark: '#122a6e', mark: '#e9fbff', markOpacity: 0.5 }, // Oceanic
-  { light: '#ffe0b0', mid: '#e5823e', dark: '#5e2440', mark: '#ffcf8a', markOpacity: 0.45 }, // Desert
-  { light: '#f2fdff', mid: '#9adfff', dark: '#33569e', mark: '#ffffff', markOpacity: 0.55 }, // Ice
-  { light: '#b0566a', mid: '#5a1424', dark: '#1c0618', mark: '#ff7a2f', markOpacity: 0.5 }, // Volcanic
-  { light: '#ffe4c4', mid: '#e58fb5', dark: '#5e2a78', mark: '#fff0e0', markOpacity: 0.3 }, // Gaseous
-  { light: '#f0c2ac', mid: '#a5583c', dark: '#3e1a32', mark: '#5a2418', markOpacity: 0.45 }, // Ferrous
-  { light: '#fff0a0', mid: '#ff6a1f', dark: '#7a1230', mark: '#ffe08a', markOpacity: 0.6 }, // Lava
-  { light: '#d6f7a6', mid: '#3fae6a', dark: '#163f4a', mark: '#1f6b4a', markOpacity: 0.55 } // Swamp
+  { light: '#a8e6ff', mid: '#2f7fd9', dark: '#1a2a6e', mark: '#5fd27e', markOpacity: 0.75, card: '#2f7fd9' }, // Terrestrial
+  { light: '#efe8f7', mid: '#9a8fb2', dark: '#352d4f', mark: '#4a3f63', markOpacity: 0.45, card: '#8a80a3' }, // Rocky
+  { light: '#9ff0ff', mid: '#1e8fd8', dark: '#122a6e', mark: '#e9fbff', markOpacity: 0.5, card: '#1e8fd8' }, // Oceanic
+  { light: '#ffe0b0', mid: '#e5823e', dark: '#5e2440', mark: '#ffcf8a', markOpacity: 0.45, card: '#e5823e' }, // Desert
+  { light: '#f2fdff', mid: '#9adfff', dark: '#33569e', mark: '#ffffff', markOpacity: 0.55, card: '#5fb8e8' }, // Ice
+  { light: '#b0566a', mid: '#5a1424', dark: '#1c0618', mark: '#ff7a2f', markOpacity: 0.5, card: '#c2413a' }, // Volcanic
+  { light: '#ffe4c4', mid: '#e58fb5', dark: '#5e2a78', mark: '#fff0e0', markOpacity: 0.3, card: '#d97aa8' }, // Gaseous
+  { light: '#f0c2ac', mid: '#a5583c', dark: '#3e1a32', mark: '#5a2418', markOpacity: 0.45, card: '#b0623f' }, // Ferrous
+  { light: '#fff0a0', mid: '#ff6a1f', dark: '#7a1230', mark: '#ffe08a', markOpacity: 0.6, card: '#ff6a1f' }, // Lava
+  { light: '#d6f7a6', mid: '#3fae6a', dark: '#163f4a', mark: '#1f6b4a', markOpacity: 0.55, card: '#3fae6a' } // Swamp
 ]
 
 /**

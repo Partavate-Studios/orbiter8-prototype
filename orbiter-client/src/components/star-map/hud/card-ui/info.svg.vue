@@ -23,8 +23,8 @@
       rx="25"
       width="130"
       height="15"
-      stroke="#5b1aaa"
-      fill="url(#cardGradient)"
+      :stroke="theme.stroke"
+      :fill="titleFill"
       stroke-width="0.5"
     />
 
@@ -58,6 +58,7 @@ import Sprite from './sprite.svg'
 import { useStarMapStore } from '@/stores/starmap'
 import { usePlayerStore } from '@/stores/player'
 import { CARD_GRAY, PINK_LIGHT } from '@/libs/palette'
+import { CARD_THEMES } from '@/libs/card-theme'
 
 export default {
   name: 'CardInfo',
@@ -66,6 +67,7 @@ export default {
     CardBackground,
     CardText
   },
+  inject: { cardTheme: { default: null } },
   props: {
     /** The selected object's key (see sdk/system.js objectKey). */
     objectId: { type: String, default: null }
@@ -74,6 +76,15 @@ export default {
     return { CARD_GRAY, PINK_LIGHT }
   },
   computed: {
+    /** The card's colors (libs/card-theme.js, from card-ui), purple outside a card. */
+    theme() {
+      const t = this.cardTheme
+      return (typeof t === 'string' || !t ? null : (t.base ? t : t.value)) ?? CARD_THEMES.ship
+    },
+    titleFill() {
+      const key = Object.keys(CARD_THEMES).find((k) => CARD_THEMES[k] === this.theme)
+      return key === 'ship' ? 'url(#cardGradient)' : `url(#card-${key})`
+    },
     /** A planet with a siege running against it. */
     besieged() {
       const object = this.systemObjects[this.objectId]

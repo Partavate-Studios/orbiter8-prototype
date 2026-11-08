@@ -42,33 +42,40 @@
 </template>
 
 <script>
+import { CARD_THEMES } from '@/libs/card-theme'
+
 export default {
   name: 'CardButton',
+  inject: { cardTheme: { default: null } },
   props: {
     text: {
       type: String,
       default: 'default'
-    }
+    },
+    /** A move that can't be made now: dimmed text (the menu still explains why when chosen). */
+    enabled: { type: Boolean, default: true }
   },
   emits: ['buttonclick'],
   data() {
     return {
-      hover: false,
-      enabled: true
+      hover: false
     }
   },
   computed: {
+    /** The card's colors (libs/card-theme.js, from card-ui), purple outside a card. */
+    theme() {
+      const t = this.cardTheme
+      return (typeof t === 'string' || !t ? null : (t.base ? t : t.value)) ?? CARD_THEMES.ship
+    },
+    themeKey() {
+      return Object.keys(CARD_THEMES).find((key) => CARD_THEMES[key] === this.theme)
+    },
     getButtonFill() {
-      if (this.hover) {
-        return 'url(#cardGradient45)'
-      }
-      return 'url(#cardGradient)'
+      if (this.themeKey === 'ship') return this.hover ? 'url(#cardGradient45)' : 'url(#cardGradient)'
+      return this.hover ? `url(#cardHover-${this.themeKey})` : `url(#card-${this.themeKey})`
     },
     getButtonStroke() {
-      if (this.hover) {
-        return '#5b1aaaff'
-      }
-      return '#5b1aaa88'
+      return this.theme.stroke + (this.hover ? 'ff' : '88')
     },
     getTextColor() {
       if (this.enabled) {

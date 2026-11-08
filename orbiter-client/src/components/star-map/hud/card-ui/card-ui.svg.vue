@@ -1,7 +1,7 @@
 <template>
   <g>
     <card-scaling :sprite="sprites[objectId]">
-      <g v-if="viewRatio > 1" stroke="#c3b3da88" stroke-width="2" stroke-dasharray="3 3">
+      <g v-if="viewRatio > 1" :stroke="theme.accent + '88'" stroke-width="2" stroke-dasharray="3 3">
         <line x1="-70" y1="70" x2="-120" y2="120" />
         <line x1="-150" y1="120" x2="-120" y2="120" />
         <g v-if="menuShouldDisplay">
@@ -97,6 +97,8 @@
 import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
 import { mapActions, mapState } from 'pinia'
+import { computed } from 'vue'
+import { CARD_THEMES, cardThemeKey } from '@/libs/card-theme'
 
 import IconContainer from '../icons/_icon-container.svg'
 import Info from './info.svg'
@@ -123,6 +125,13 @@ export default {
     Sprite,
     XIcon
   },
+  // The card's colors (libs/card-theme.js) for everything inside it, and a tint for its round buttons.
+  provide() {
+    return {
+      cardTheme: computed(() => this.theme),
+      iconTint: computed(() => this.theme.accent)
+    }
+  },
   props: {
     /** The selected object's key (see sdk/system.js objectKey). */
     objectId: { type: String, default: null }
@@ -134,6 +143,13 @@ export default {
     }
   },
   computed: {
+    /** The selected thing's card colors: a planet's class, a star's spectral class; ships purple. */
+    theme() {
+      return CARD_THEMES[this.themeKey]
+    },
+    themeKey() {
+      return cardThemeKey(useStarMapStore().systemObjects[this.objectId])
+    },
     ...mapState(useStarMapStore, ['systemObjects', 'sprites']),
     ...mapState(useUIStore, ['viewRatio']),
     menuShouldDisplay() {
