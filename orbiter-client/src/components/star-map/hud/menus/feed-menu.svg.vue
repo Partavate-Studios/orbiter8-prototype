@@ -23,7 +23,6 @@ import { game } from '@/sdk/client'
 import { useUIStore } from '@/stores/ui'
 import { useStarMapStore } from '@/stores/starmap'
 import { usePlayerStore } from '@/stores/player'
-import { planetName } from '@/sdk/system-gen'
 import { PINK_LIGHT } from '@/libs/palette'
 import MenuContainer from './menu-container/_menu-container.svg'
 
@@ -46,12 +45,10 @@ export default {
   },
   methods: {
     place(planet) {
-      // The owner's name when the planet is at this star; its derived name otherwise.
+      // The planet's name when it's at this star; elsewhere its stand-in name and its star's.
       const here = useStarMapStore().systemObjects['planet:' + planet]
       if (here) return here.name
-      const cell = Math.floor(planet / 256)
-      const star = game.starName(cell)
-      return planetName(star, cell, planet % 256)
+      return `${game.derivedPlanetName(planet)} at ${game.starName(Math.floor(planet / 256))}`
     },
     who(address) {
       if (!address) return 'someone'

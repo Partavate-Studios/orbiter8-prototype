@@ -12,6 +12,7 @@
 </template>
 
 <script>
+import { isUnnamed } from '@/sdk/system-gen'
 import { useChainStore } from '@/stores/chain'
 import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
@@ -81,7 +82,8 @@ export default {
           const name = await this.ask({
             title: 'Claim ' + object.name,
             message: `Make ${object.name} your own for ${fee.toLocaleString('en-US')} credits, and give it a name. Then bring colonists and supplies to found a Citadel.`,
-            input: { label: "Your planet's name", kind: 'name', value: object.name },
+            // An unnamed planet's stand-in name isn't offered as its name: the owner gives the first one.
+            input: { label: "Your planet's name", kind: 'name', value: isUnnamed(object.name) ? '' : object.name },
             confirm: 'Claim Planet'
           })
           if (name) this.claimPlanet({ planetId: option.value, name: name === object.name ? '' : name })
@@ -174,7 +176,7 @@ export default {
             message: fee ? `A new name for your ship costs ${fee.toLocaleString('en-US')} credits.` : undefined,
             input: {
               label: 'New ' + type + ' name',
-              value: object.name,
+              value: isUnnamed(object.name) ? '' : object.name,
               kind: 'name',
               minLength: type === 'ship' ? PILOT_NAME_MIN_LENGTH : 1
             },

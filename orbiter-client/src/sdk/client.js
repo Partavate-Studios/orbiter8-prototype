@@ -374,6 +374,15 @@ export function createGameClient() {
     return starTraits(state.universe?.seed, cell, genesisName(cell, isStar))
   }
 
+  /** A planet anywhere by its id, unnamed (sdk/system-gen.js planetName): for screens about other stars. */
+  function derivedPlanetName(id) {
+    const cell = Math.floor(Number(id) / 256)
+    const seed = state.universe?.seed
+    if (!seed) return 'a planet'
+    const classes = Array.from({ length: planetCount(seed, cell) }, (_, body) => derivePlanet(seed, cell, body).class)
+    return planetName(cell, Number(id) % 256, classes)
+  }
+
   /** A star's name as given (genesis or a player, Planets.nameStar), else "Star 1234" by its cell. */
   function starName(cell) {
     return state.names[cell] || unnamed(cell, state.cells.get(cell)?.state === STATE.BLACK_HOLE)
@@ -465,10 +474,11 @@ export function createGameClient() {
     })
 
     const portAt = new Map(ports.map((p) => [p.port, p]))
+    const classes = planets.map((p) => p.class)
     planets.forEach((p, index) => {
       const look = looks(seed, cell, p.body)
       const given = names[index]
-      const pname = given?.planet || planetName(name, cell, p.body)
+      const pname = given?.planet || planetName(cell, p.body, classes)
       const owner = p.owner ?? 0
       const port = portAt.get(p.id)
       const planet = {
@@ -1000,6 +1010,7 @@ export function createGameClient() {
     loadAround,
     starName,
     traitsOf,
+    derivedPlanetName,
     /** A pilot's call sign, if the client has met them, else null. */
     callsignOf(address) {
       return state.callsigns[address] || null

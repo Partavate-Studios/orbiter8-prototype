@@ -2,6 +2,7 @@
 // contracts/src/planets/SystemGen.sol: how many planets, and each one's class, size and surface
 // seed. Owners, buildings, people and storage come from the Planets contract.
 import { keccak256, AbiCoder, id as hashText } from 'ethers'
+import { PLANET_TYPE_NAMES } from './game/planet-types'
 
 const coder = AbiCoder.defaultAbiCoder()
 const hash = (types, values) => BigInt(keccak256(coder.encode(types, values)))
@@ -35,10 +36,21 @@ export const populationCap = (cls, size) => size * HABITABILITY[cls]
 /** The seed the local deployment uses (contracts/script/Deploy.s.sol's default). */
 export const DEMO_SEED = hashText('orbiter8 demo 4')
 
-/** A planet's display name: Sol's by name, others by star and place (e.g. "Kara-412 b"). */
-export function planetName(starName, cell, body) {
-  return cell === 0 ? SOL_PLANETS[body] : `${starName} ${String.fromCharCode(98 + body)}`
+/**
+ * An unnamed planet's display name (Koda, 2026-11-07: not named after its star, but by its type):
+ * Sol's by name; others "Unnamed Rocky Planet", with the orbit number when another planet of the same
+ * class circles the same star ("Unnamed Rocky Planet 3"). The owner can give it a real name.
+ * @param {number[]} classes  every planet's class at this star, by orbit (to tell same-class ones apart)
+ */
+export function planetName(cell, body, classes) {
+  if (cell === 0) return SOL_PLANETS[body]
+  const cls = classes[body]
+  const name = `Unnamed ${PLANET_TYPE_NAMES[cls] ?? 'Rocky'} Planet`
+  return classes.filter((c) => c === cls).length > 1 ? `${name} ${body + 1}` : name
 }
+
+/** Whether a planet's name is the stand-in one (planetName), not one it was given. */
+export const isUnnamed = (name) => /^Unnamed /.test(name)
 
 /** The building line (Planets.sol), by number. */
 export const BUILDINGS = ['', 'Citadel', 'Colony', 'Station', 'Port', 'Yards', 'Armory', 'Autofactory']
@@ -144,5 +156,7 @@ export function looks(seed, cell, body) {
 
 /** A moon's display name when its owner hasn't named it: the planet's name and the orbit, e.g. "Kara-412 b II". */
 export function moonName(planetName, orbit) {
-  return `${planetName} ${['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'][orbit]}`
+  const numeral = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'][orbit]
+  // A named planet's moons carry its name ("Haven II"); an unnamed planet's are unnamed too.
+  return isUnnamed(planetName) ? `Unnamed Moon ${numeral}` : `${planetName} ${numeral}`
 }

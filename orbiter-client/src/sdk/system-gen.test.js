@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { planetCount, planet, moonSlots, looks, DEMO_SEED } from './system-gen'
+import { planetCount, planet, moonSlots, looks, planetName, moonName, DEMO_SEED } from './system-gen'
 
 describe('derived planets match the contracts', () => {
   it('reproduces the Solidity values (contracts/test/vectors/SystemVectors.t.sol)', () => {
@@ -40,5 +40,19 @@ describe('derived planets match the contracts', () => {
   it('keeps Sol as it was', () => {
     expect(planetCount(DEMO_SEED, 0)).toBe(9)
     expect(planet(DEMO_SEED, 0, 2)).toMatchObject({ class: 0, size: 12 })
+  })
+})
+
+describe('names of unnamed planets and moons', () => {
+  it('names a planet by its class, with its orbit when the class repeats at its star', () => {
+    expect(planetName(0, 2, [1, 5, 0])).toBe('Earth')
+    expect(planetName(7, 1, [1, 6, 4])).toBe('Unnamed Gaseous Planet')
+    expect(planetName(7, 2, [1, 4, 1])).toBe('Unnamed Rocky Planet 3')
+    expect(planetName(7, 0, [1, 4, 1])).toBe('Unnamed Rocky Planet 1')
+  })
+
+  it("names a moon after a named planet, and an unnamed planet's moons as unnamed", () => {
+    expect(moonName('Haven', 1)).toBe('Haven II')
+    expect(moonName('Unnamed Ice Planet', 0)).toBe('Unnamed Moon I')
   })
 })
