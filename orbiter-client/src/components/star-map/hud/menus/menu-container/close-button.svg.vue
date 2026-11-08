@@ -9,7 +9,7 @@
         rx="4"
         ry="4"
         stroke-width="4"
-        stroke="#5c1aae"
+        :stroke="theme.mid"
         :fill="fillColor"
       />
       <rect x="-30" y="-4" width="32" height="6" rx="3" ry="3" fill="#ffffff" transform=" translate(0 10) rotate(45)" />
@@ -19,19 +19,22 @@
 </template>
 
 <script>
+import { unwrapTheme } from '@/libs/card-theme'
+
 export default {
   name: 'MenuCloseButton',
+  inject: { menuTheme: { default: null } },
   data() {
     return {
       hover: false
     }
   },
   computed: {
+    theme() {
+      return unwrapTheme(this.menuTheme)
+    },
     fillColor() {
-      if (this.hover) {
-        return '#5c1aae'
-      }
-      return '#280b4b'
+      return this.hover ? this.theme.mid : this.theme.deep
     }
   }
 }

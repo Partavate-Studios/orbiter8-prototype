@@ -30,12 +30,19 @@ import { useUIStore } from '@/stores/ui'
 import CloseButton from './close-button.svg'
 import MenuBackground from './menu-background.svg'
 import Tween from '@/libs/tween'
+import { computed } from 'vue'
+import { menuTheme } from '@/libs/card-theme'
 
 export default {
   name: 'MenuContainer',
   components: {
     CloseButton,
     MenuBackground
+  },
+  // The menu's colors for everything inside it (libs/card-theme.js menuTheme): its frame, close
+  // button and buttons.
+  provide() {
+    return { menuTheme: computed(() => this.theme) }
   },
   data() {
     return {
@@ -47,7 +54,12 @@ export default {
   },
   computed: {
     ...mapState(useUIStore, ['leftMostX', 'topMostY', 'bottomMostY', 'viewport']),
-    ...mapState(useStarMapStore, ['gameTime'])
+    ...mapState(useStarMapStore, ['gameTime']),
+    theme() {
+      const ui = useUIStore()
+      const open = Object.entries(ui.hud.menuState).find(([, on]) => on)?.[0]?.replace(/Menu$/, '')
+      return menuTheme(open, useStarMapStore().systemObjects[ui.selected])
+    }
   },
   watch: {
     gameTime: function (newTime) {

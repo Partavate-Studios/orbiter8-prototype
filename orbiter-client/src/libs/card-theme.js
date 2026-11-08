@@ -2,7 +2,7 @@
 // represents the thing selected... for the Orbiter 8 ship, we can stick with the purple." The card's
 // frame, title, menu buttons and selection lines take one color in a few shades; ships keep Koda's
 // purple. A planet under siege adds a pink frame (pink needs you); the inside stays purple-gray.
-import { PLANET_COLORS, STAR_CLASSES } from './palette'
+import { PLANET_COLORS, STAR_CLASSES, HUD_TINT } from './palette'
 
 const DARK = '#0b0218'
 
@@ -14,7 +14,7 @@ export function mixHex(a, b, t) {
 }
 
 /** A theme in shades of one color: the frame's two tones, the hovered button's, the stroke and the accent. */
-function shades(base) {
+export function shades(base) {
   return {
     base,
     mid: mixHex(base, DARK, 0.35),
@@ -54,4 +54,31 @@ export function cardThemeKey(object) {
     default:
       return 'ship'
   }
+}
+
+/** An injected theme, whether Vue handed over the value or its ref; purple when there's none. */
+export function unwrapTheme(theme) {
+  if (!theme) return SHIP
+  return theme.base ? theme : (theme.value ?? SHIP)
+}
+
+/** Menus opened from the HUD's buttons take the button's tint (libs/palette.js HUD_TINT). */
+const MENU_TINTS = {
+  help: HUD_TINT.help,
+  leaderboard: HUD_TINT.leaderboard,
+  chat: HUD_TINT.chat,
+  settings: HUD_TINT.settings,
+  feed: HUD_TINT.sieges,
+  planets: HUD_TINT.planets
+}
+
+/**
+ * A menu's colors: a menu about the selected thing (trade, shipyard, armory at a station; colony and
+ * siege on a planet) takes its card's; the ship's loadout and ships list keep the purple; a HUD
+ * button's menu takes the button's tint.
+ */
+export function menuTheme(menu, selectedObject) {
+  if (MENU_TINTS[menu]) return shades(MENU_TINTS[menu])
+  if (['trade', 'shipyard', 'armory', 'colony', 'siege'].includes(menu)) return CARD_THEMES[cardThemeKey(selectedObject)]
+  return SHIP
 }

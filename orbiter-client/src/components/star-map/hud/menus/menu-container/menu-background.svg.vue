@@ -1,11 +1,11 @@
 <template>
   <g>
     <linearGradient id="menuGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#5c1aae" stop-opacity="0.9" />
-      <stop offset="10%" stop-color="#280b4b" stop-opacity="1" />
-      <stop offset="50%" stop-color="#5c1aae" stop-opacity="1" />
-      <stop offset="90%" stop-color="#280b4b" stop-opacity="1" />
-      <stop offset="100%" stop-color="#5c1aae" stop-opacity="0.9" />
+      <stop offset="0%" :stop-color="theme.mid" stop-opacity="0.9" />
+      <stop offset="10%" :stop-color="theme.deep" stop-opacity="1" />
+      <stop offset="50%" :stop-color="theme.mid" stop-opacity="1" />
+      <stop offset="90%" :stop-color="theme.deep" stop-opacity="1" />
+      <stop offset="100%" :stop-color="theme.mid" stop-opacity="0.9" />
     </linearGradient>
 
     <rect
@@ -25,7 +25,7 @@
       :y="menuTop + padding / 2"
       :width="menuWidth - padding"
       :height="menuHeight - padding"
-      fill="#280b4baa"
+      :fill="inside"
       stroke="#ffffff22"
       stroke-width="4"
       rx="5"
@@ -37,9 +37,12 @@
 <script>
 import { mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
+import { CARD_GRAY } from '@/libs/palette'
+import { mixHex, unwrapTheme } from '@/libs/card-theme'
 
 export default {
   name: 'MenuBackground',
+  inject: { menuTheme: { default: null } },
   data() {
     return {
       padding: 25,
@@ -48,6 +51,13 @@ export default {
   },
   computed: {
     ...mapState(useUIStore, ['leftMostX', 'topMostY', 'viewport']),
+    /** The menu's colors (menu-container); the inside a dark, quiet blend of them. */
+    theme() {
+      return unwrapTheme(this.menuTheme)
+    },
+    inside() {
+      return mixHex(this.theme.deep, CARD_GRAY, 0.6) + 'd9'
+    },
     menuLeft() {
       let shift = 0
       if (this.viewport.width > this.maxWidth) {

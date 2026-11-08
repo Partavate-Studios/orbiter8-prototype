@@ -42,8 +42,11 @@
 </template>
 
 <script>
+import { unwrapTheme } from '@/libs/card-theme'
+
 export default {
   name: 'MenuButton',
+  inject: { menuTheme: { default: null } },
   props: {
     text: {
       type: String,
@@ -61,17 +64,15 @@ export default {
     }
   },
   computed: {
+    /** The menu's colors (menu-container); Koda's purple outside one. */
+    theme() {
+      return unwrapTheme(this.menuTheme)
+    },
     getButtonFill() {
-      if (this.hover) {
-        return '#310e5b'
-      }
-      return '#5D1EB044'
+      return this.hover ? this.theme.deep : this.theme.mid + '44'
     },
     getButtonStroke() {
-      if (this.hover) {
-        return '#5b1aaaff'
-      }
-      return '#5D1EB0'
+      return this.hover ? this.theme.stroke : this.theme.mid
     },
     getTextColor() {
       if (this.enabled) {
