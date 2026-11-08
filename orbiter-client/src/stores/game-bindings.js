@@ -51,7 +51,7 @@ export function bindStoresToGame(game) {
       const cell = state.scan?.cell
       player.resolveScans().then((recorded) => {
         if (!recorded && cell != null) game.scanDeclined(cell)
-        else if (recorded) gameAudio().speak('neighborsScanned')
+        else if (recorded) gameAudio().playChime()
       })
     }
     switch (change) {

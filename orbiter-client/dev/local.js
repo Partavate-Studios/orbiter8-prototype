@@ -14,7 +14,9 @@ const RPC = `http://127.0.0.1:${CHAIN_PORT}`
 const SUFFIX = CHAIN_PORT === '8545' ? '' : `-${CHAIN_PORT}`
 const CONTRACTS = new URL('../../contracts/', import.meta.url).pathname
 const FOUNDRY = join(homedir(), '.foundry', 'bin')
-const env = { ...process.env, PATH: `${FOUNDRY}:${process.env.PATH}` }
+// Scans wait 4 s for their drand round here (blocks every second keep it safely in the future); a
+// deployed network sets its own (Deploy.s.sol, 30 s for Polkadot Hub's 24 s timestamp steps, B5).
+const env = { SCAN_DELAY: '4', ...process.env, PATH: `${FOUNDRY}:${process.env.PATH}` }
 const children = []
 
 async function rpc(method, params = []) {

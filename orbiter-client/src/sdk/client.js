@@ -205,13 +205,14 @@ export function createGameClient() {
       }
       return
     }
-    const here = pending.find((c) => c.cell === state.pilot.ship.cell)
-    const next = here ?? pending.sort((a, b) => a.scanRound - b.scanRound)[0]
-    const readyAt = timeOf(next.scanRound) * 1000
-    state.scan = { cell: next.cell, readyAt, status: 'waiting' }
+    // Shown: the scan at the ship's star, else the soonest. Timed: the soonest of all, so a scan left
+    // behind at another star is recorded when its round is out, not when the next one's is.
+    const soonest = pending.sort((a, b) => a.scanRound - b.scanRound)[0]
+    const shown = pending.find((c) => c.cell === state.pilot.ship.cell) ?? soonest
+    state.scan = { cell: shown.cell, readyAt: timeOf(shown.scanRound) * 1000, status: 'waiting' }
     notify('scan')
     // A moment after the round is due, so the relays have it.
-    scanTimer = setTimeout(scanDue, Math.max(0, readyAt - Date.now()) + 1500)
+    scanTimer = setTimeout(scanDue, Math.max(0, timeOf(soonest.scanRound) * 1000 - Date.now()) + 1200)
   }
   async function scanDue() {
     if (!state.scan) return

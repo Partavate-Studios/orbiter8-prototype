@@ -16,7 +16,6 @@ export const VOICE_LINES = {
   welcomeBack: 'welcome-back',
   jumpStarting: 'fusion-engines-primed-initiating-interstellar-jump',
   jumpComplete: 'interstellar-jump-complete',
-  neighborsScanned: 'lidar-scan-complete',
   transmission: 'incoming-transmission',
   upgraded: 'upgrade-complete',
   failed: 'priority-alert',
@@ -170,6 +169,42 @@ export default class Sound {
     if (this.effectsVolume > 0) {
       this.effects[effect].volume = this.effectsVolume
       this.effects[effect].play()
+    }
+  }
+
+  /**
+   * A long-range scan charted new stars: a soft rising chime, made on the spot (Web Audio), like a
+   * radio telescope's tone settling. (Minerva's "LIDAR scan complete" didn't fit: nobody finds
+   * stars with lidar.)
+   */
+  playChime() {
+    if (this.effectsVolume === 0 || typeof AudioContext === 'undefined') return
+    try {
+      this.chimeContext ??= new AudioContext()
+      const ctx = this.chimeContext
+      const now = ctx.currentTime
+      const out = ctx.createGain()
+      out.gain.value = 0.18 * this.effectsVolume
+      out.connect(ctx.destination)
+      // two notes a fifth apart, each gliding up a little and fading
+      for (const [start, from, to] of [
+        [0, 523.25, 587.33],
+        [0.18, 783.99, 880]
+      ]) {
+        const tone = ctx.createOscillator()
+        const level = ctx.createGain()
+        tone.type = 'sine'
+        tone.frequency.setValueAtTime(from, now + start)
+        tone.frequency.exponentialRampToValueAtTime(to, now + start + 0.5)
+        level.gain.setValueAtTime(0.0001, now + start)
+        level.gain.exponentialRampToValueAtTime(1, now + start + 0.04)
+        level.gain.exponentialRampToValueAtTime(0.0001, now + start + 0.9)
+        tone.connect(level).connect(out)
+        tone.start(now + start)
+        tone.stop(now + start + 1)
+      }
+    } catch {
+      // no audio here: fine
     }
   }
 }
