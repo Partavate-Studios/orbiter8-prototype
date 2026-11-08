@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -60 120 120">
+<!-- Drones in battle: small triangles and dots swarming in loose groups, as simple as the shuttles
+     between ships and ports, so hundreds can be drawn cheaply (Orbiter 8 art, 120 units square,
+     centered; drawn for docs/tech-trees and free to use in the game). -->
+<g fill="#c38bff">
+  <!-- a lead group of triangles, heading up and right -->
+  <g transform="translate(14 -18) rotate(35)">
+    <path d="M0 -5L3.5 3.5H-3.5Z"/>
+    <path d="M-9 4L-5.5 12.5H-12.5Z"/>
+    <path d="M9 4L12.5 12.5H5.5Z"/>
+    <path d="M0 13L3.5 21.5H-3.5Z"/>
+    <path d="M-17 13L-13.5 21.5H-20.5Z" opacity="0.8"/>
+  </g>
+  <!-- a second group, looser -->
+  <g transform="translate(-26 14) rotate(20)">
+    <path d="M0 -5L3.5 3.5H-3.5Z"/>
+    <path d="M10 2L13.5 10.5H6.5Z"/>
+    <path d="M-8 8L-4.5 16.5H-11.5Z" opacity="0.8"/>
+    <path d="M4 16L7.5 24.5H0.5Z" opacity="0.7"/>
+  </g>
+  <!-- stragglers as dots: the far ones, or the ones too small to draw -->
+  <circle cx="-4" cy="-34" r="2"/>
+  <circle cx="34" cy="8" r="2" opacity="0.8"/>
+  <circle cx="-40" cy="-8" r="1.8" opacity="0.7"/>
+  <circle cx="-10" cy="36" r="1.8" opacity="0.7"/>
+  <circle cx="22" cy="30" r="1.5" opacity="0.6"/>
+  <circle cx="40" cy="-30" r="1.5" opacity="0.6"/>
+</g>
+<!-- their trails, faint -->
+<g stroke="#c38bff" stroke-width="1" opacity="0.25" fill="none">
+  <path d="M-30 40Q-20 20 6 -6"/>
+  <path d="M-50 30Q-40 22 -28 18"/>
+</g>
+</svg>

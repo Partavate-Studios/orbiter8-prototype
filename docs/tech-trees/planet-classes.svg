@@ -46,14 +46,54 @@
     </g>
   </g>
 </g></g><text x="16" font-size="12.5" fill="#c3b3da" text-anchor="start" font-weight="400" font-style="italic" y="220">The most livable: the industry worlds</text><text x="16" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" y="240">1,000 people per unit of size</text><text x="16" font-size="12.5" fill="#ebff99" text-anchor="start" font-weight="400" y="270">Mines and makes · its ports sell</text><g transform="translate(16 278)"><rect width="82.8" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><path d="M-9 9C-11 -3 -2 -10 10 -10C10 2 3 10 -9 9Z" fill="#9effa0" stroke="#e5ffe6" stroke-width="1"/><path d="M-9 9L5 -5" stroke="#2b5c2c" stroke-width="1.3"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Organics</text></g><g transform="translate(104.8 278)"><rect width="69.6" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g fill="#ffd65c" stroke="#fff3c2" stroke-width="0.8"><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(0)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(45)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(90)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(135)"/><circle r="7.5"/><circle r="3" fill="#2b0c50"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Equip.</text></g><g transform="translate(180.39999999999998 278)"><rect width="76.19999999999999" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><rect x="-8" y="-8" width="16" height="16" rx="2" fill="#5cffc8" stroke="#d6fff1" stroke-width="1"/><rect x="-4" y="-4" width="8" height="8" fill="#1c0838"/><path d="M-5 -8V-11M0 -8V-11M5 -8V-11M-5 8V11M0 8V11M5 8V11M-8 -5H-11M-8 0H-11M-8 5H-11M8 -5H11M8 0H11M8 5H11" stroke="#5cffc8" stroke-width="1.4"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Electr.</text></g><text x="16" font-size="12.5" fill="#d9cdee" text-anchor="start" font-weight="400" y="336">Its ports buy</text><g transform="translate(16 344)"><rect width="69.6" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><path d="M-11 6L-7 -4H7L11 6Z" fill="#b9a6d6" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -4L-5 -8H5L7 -4Z" fill="#e5cfff"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Metals</text></g><g transform="translate(91.6 344)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><path d="M0 -11L9 -3L0 11L-9 -3Z" fill="#c38bff" stroke="#e5cfff" stroke-width="1"/><path d="M-9 -3H9M0 -11L-3 -3L0 11L3 -3Z" fill="none" stroke="#e5cfff" stroke-width="0.8"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Rares</text></g><g transform="translate(160.6 344)"><rect width="56.4" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g fill="none" stroke="#7fd4ff" stroke-width="1.4"><ellipse rx="11" ry="4.5"/><ellipse rx="11" ry="4.5" transform="rotate(60)"/><ellipse rx="11" ry="4.5" transform="rotate(-60)"/><circle r="2.6" fill="#ffd65c" stroke="none"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">He-3</text></g><g transform="translate(16 371)"><rect width="76.19999999999999" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><circle r="10.5" fill="#8f7fb0" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -3.5H7M-7 0H7M-7 3.5H7M-3.5 -7V7M0 -7V7M3.5 -7V7" stroke="#2b0c50" stroke-width="0.8"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Silicon</text></g><rect x="12" y="404" width="266" height="54" rx="8" fill="none" stroke="#ffffff77" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/><text x="22" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" font-style="italic" y="424">Idea: could also yield</text><g transform="translate(22 432)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g fill="none" stroke="#bfe6ff" stroke-width="2" stroke-linecap="round"><path d="M0 -11V11M-9.5 -5.5L9.5 5.5M-9.5 5.5L9.5 -5.5"/><path d="M-3 -9L0 -6L3 -9M-3 9L0 6L3 9" stroke-width="1.5"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Water</text></g></g><g transform="translate(352 150)"><rect width="290" height="470" rx="14" fill="url(#cardEdge)"/><rect x="5" y="5" width="280" height="460" rx="11" fill="#12052a"/><rect x="12" y="11" width="266" height="28" rx="14" fill="url(#pill)" stroke="#ffffff22"/><text x="145" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="500" y="30">Rocky</text><rect x="12" y="46" width="266" height="150" rx="8" fill="url(#artBox)"/><g transform="translate(145 121)"><g transform="scale(5.2)"><circle r="10" stroke="#c3b3da" stroke-width="0.25" fill="url(#planetGradient)"/><g clip-path="url(#just-the-planet)"><g stroke-width="0.5" stroke="#00000011" fill="#340f6122">
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><path d="M-9 9C-11 -3 -2 -10 10 -10C10 2 3 10 -9 9Z" fill="#9effa0" stroke="#e5ffe6" stroke-width="1"/><path d="M-9 9L5 -5" stroke="#2b5c2c" stroke-width="1.3"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Organics</text></g><g transform="translate(104.8 278)"><rect width="69.6" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g fill="#ffd65c" stroke="#fff3c2" stroke-width="0.8"><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(0)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(45)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(90)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(135)"/><circle r="7.5"/><circle r="3" fill="#2b0c50"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Equip.</text></g><g transform="translate(180.39999999999998 278)"><rect width="76.19999999999999" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><rect x="-8" y="-8" width="16" height="16" rx="2" fill="#5cffc8" stroke="#d6fff1" stroke-width="1"/><rect x="-4" y="-4" width="8" height="8" fill="#1c0838"/><path d="M-5 -8V-11M0 -8V-11M5 -8V-11M-5 8V11M0 8V11M5 8V11M-8 -5H-11M-8 0H-11M-8 5H-11M8 -5H11M8 0H11M8 5H11" stroke="#5cffc8" stroke-width="1.4"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Electr.</text></g><text x="16" font-size="12.5" fill="#d9cdee" text-anchor="start" font-weight="400" y="336">Its ports buy</text><g transform="translate(16 344)"><rect width="69.6" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><path d="M-11 6L-7 -4H7L11 6Z" fill="#b9a6d6" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -4L-5 -8H5L7 -4Z" fill="#e5cfff"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Metals</text></g><g transform="translate(91.6 344)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><path d="M0 -11L9 -3L0 11L-9 -3Z" fill="#c38bff" stroke="#e5cfff" stroke-width="1"/><path d="M-9 -3H9M0 -11L-3 -3L0 11L3 -3Z" fill="none" stroke="#e5cfff" stroke-width="0.8"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Rares</text></g><g transform="translate(160.6 344)"><rect width="56.4" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g fill="none" stroke="#7fd4ff" stroke-width="1.4"><ellipse rx="11" ry="4.5"/><ellipse rx="11" ry="4.5" transform="rotate(60)"/><ellipse rx="11" ry="4.5" transform="rotate(-60)"/><circle r="2.6" fill="#ffd65c" stroke="none"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">He-3</text></g><g transform="translate(16 371)"><rect width="76.19999999999999" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><circle r="10.5" fill="#8f7fb0" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -3.5H7M-7 0H7M-7 3.5H7M-3.5 -7V7M0 -7V7M3.5 -7V7" stroke="#2b0c50" stroke-width="0.8"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Silicon</text></g><rect x="12" y="404" width="266" height="54" rx="8" fill="none" stroke="#ffffff77" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/><text x="22" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" font-style="italic" y="424">Idea: could also yield</text><g transform="translate(22 432)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g fill="none" stroke="#bfe6ff" stroke-width="2" stroke-linecap="round"><path d="M0 -11V11M-9.5 -5.5L9.5 5.5M-9.5 5.5L9.5 -5.5"/><path d="M-3 -9L0 -6L3 -9M-3 9L0 6L3 9" stroke-width="1.5"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Water</text></g></g><g transform="translate(352 150)"><rect width="290" height="470" rx="14" fill="url(#cardEdge)"/><rect x="5" y="5" width="280" height="460" rx="11" fill="#12052a"/><rect x="12" y="11" width="266" height="28" rx="14" fill="url(#pill)" stroke="#ffffff22"/><text x="145" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="500" y="30">Rocky</text><rect x="12" y="46" width="266" height="150" rx="8" fill="url(#artBox)"/><g transform="translate(145 121)"><g transform="scale(5.2)"><circle r="10" stroke="#c3b3da" stroke-width="0.25" fill="url(#planetGradient)"/><g clip-path="url(#just-the-planet)"><g stroke-width="0.5" stroke="#00000011" fill="#340f6122">
         <circle cx="-5" cy="-5" r="1" />
         <circle cx="-4" cy="8" r="0.75" />
         <circle cx="-8" cy="-5" r="1.5" />
@@ -72,18 +112,78 @@
         <circle cx="5" cy="-5" r="0.75" />
         <circle cx="-2" cy="-1" r="0.5" />
       </g></g></g></g><text x="16" font-size="12.5" fill="#c3b3da" text-anchor="start" font-weight="400" font-style="italic" y="220">Thin crust, rich veins</text><text x="16" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" y="240">300 people per unit of size</text><text x="16" font-size="12.5" fill="#ebff99" text-anchor="start" font-weight="400" y="270">Mines and makes · its ports sell</text><g transform="translate(16 278)"><rect width="69.6" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><path d="M-11 6L-7 -4H7L11 6Z" fill="#b9a6d6" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -4L-5 -8H5L7 -4Z" fill="#e5cfff"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Metals</text></g><g transform="translate(91.6 278)"><rect width="76.19999999999999" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><circle r="10.5" fill="#8f7fb0" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -3.5H7M-7 0H7M-7 3.5H7M-3.5 -7V7M0 -7V7M3.5 -7V7" stroke="#2b0c50" stroke-width="0.8"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Silicon</text></g><text x="16" font-size="12.5" fill="#d9cdee" text-anchor="start" font-weight="400" y="336">Its ports buy</text><g transform="translate(16 344)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g fill="none" stroke="#bfe6ff" stroke-width="2" stroke-linecap="round"><path d="M0 -11V11M-9.5 -5.5L9.5 5.5M-9.5 5.5L9.5 -5.5"/><path d="M-3 -9L0 -6L3 -9M-3 9L0 6L3 9" stroke-width="1.5"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Water</text></g><g transform="translate(85 344)"><rect width="56.4" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g fill="none" stroke="#7fd4ff" stroke-width="1.4"><ellipse rx="11" ry="4.5"/><ellipse rx="11" ry="4.5" transform="rotate(60)"/><ellipse rx="11" ry="4.5" transform="rotate(-60)"/><circle r="2.6" fill="#ffd65c" stroke="none"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">He-3</text></g><g transform="translate(147.4 344)"><rect width="82.8" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><path d="M-9 9C-11 -3 -2 -10 10 -10C10 2 3 10 -9 9Z" fill="#9effa0" stroke="#e5ffe6" stroke-width="1"/><path d="M-9 9L5 -5" stroke="#2b5c2c" stroke-width="1.3"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Organics</text></g><rect x="12" y="404" width="266" height="54" rx="8" fill="none" stroke="#ffffff77" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/><text x="22" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" font-style="italic" y="424">Idea: could also yield</text><g transform="translate(22 432)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><path d="M0 -11L9 -3L0 11L-9 -3Z" fill="#c38bff" stroke="#e5cfff" stroke-width="1"/><path d="M-9 -3H9M0 -11L-3 -3L0 11L3 -3Z" fill="none" stroke="#e5cfff" stroke-width="0.8"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Rares</text></g></g><g transform="translate(659 150)"><rect width="290" height="470" rx="14" fill="url(#cardEdge)"/><rect x="5" y="5" width="280" height="460" rx="11" fill="#12052a"/><rect x="12" y="11" width="266" height="28" rx="14" fill="url(#pill)" stroke="#ffffff22"/><text x="145" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="500" y="30">Oceanic</text><rect x="12" y="46" width="266" height="150" rx="8" fill="url(#artBox)"/><g transform="translate(145 121)"><g transform="scale(5.2)"><circle r="10" stroke="#c3b3da" stroke-width="0.25" fill="url(#planetGradient)"/><g clip-path="url(#just-the-planet)"><g stroke="#ffffff22" stroke-width="0.6" fill="none"><path d="M-10 -4q2.5 -2 5 0t5 0t5 0t5 0"/><path d="M-11 1q2.5 -2 5 0t5 0t5 0t5 0"/><path d="M-10 6q2.5 -2 5 0t5 0t5 0t5 0"/></g></g></g></g><text x="16" font-size="12.5" fill="#c3b3da" text-anchor="start" font-weight="400" font-style="italic" y="220">Sea farms; sand on the sea floor</text><text x="16" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" y="240">800 people per unit of size</text><text x="16" font-size="12.5" fill="#ebff99" text-anchor="start" font-weight="400" y="270">Mines and makes · its ports sell</text><g transform="translate(16 278)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g fill="none" stroke="#bfe6ff" stroke-width="2" stroke-linecap="round"><path d="M0 -11V11M-9.5 -5.5L9.5 5.5M-9.5 5.5L9.5 -5.5"/><path d="M-3 -9L0 -6L3 -9M-3 9L0 6L3 9" stroke-width="1.5"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Water</text></g><g transform="translate(85 278)"><rect width="82.8" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><path d="M-9 9C-11 -3 -2 -10 10 -10C10 2 3 10 -9 9Z" fill="#9effa0" stroke="#e5ffe6" stroke-width="1"/><path d="M-9 9L5 -5" stroke="#2b5c2c" stroke-width="1.3"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Organics</text></g><text x="16" font-size="12.5" fill="#d9cdee" text-anchor="start" font-weight="400" y="336">Its ports buy</text><g transform="translate(16 344)"><rect width="69.6" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><path d="M-11 6L-7 -4H7L11 6Z" fill="#b9a6d6" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -4L-5 -8H5L7 -4Z" fill="#e5cfff"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Metals</text></g><g transform="translate(91.6 344)"><rect width="69.6" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g fill="#ffd65c" stroke="#fff3c2" stroke-width="0.8"><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(0)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(45)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(90)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(135)"/><circle r="7.5"/><circle r="3" fill="#2b0c50"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Equip.</text></g><g transform="translate(167.2 344)"><rect width="76.19999999999999" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><rect x="-8" y="-8" width="16" height="16" rx="2" fill="#5cffc8" stroke="#d6fff1" stroke-width="1"/><rect x="-4" y="-4" width="8" height="8" fill="#1c0838"/><path d="M-5 -8V-11M0 -8V-11M5 -8V-11M-5 8V11M0 8V11M5 8V11M-8 -5H-11M-8 0H-11M-8 5H-11M8 -5H11M8 0H11M8 5H11" stroke="#5cffc8" stroke-width="1.4"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Electr.</text></g><rect x="12" y="404" width="266" height="54" rx="8" fill="none" stroke="#ffffff77" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/><text x="22" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" font-style="italic" y="424">Idea: could also yield</text><g transform="translate(22 432)"><rect width="76.19999999999999" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><circle r="10.5" fill="#8f7fb0" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -3.5H7M-7 0H7M-7 3.5H7M-3.5 -7V7M0 -7V7M3.5 -7V7" stroke="#2b0c50" stroke-width="0.8"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Silicon</text></g></g><g transform="translate(966 150)"><rect width="290" height="470" rx="14" fill="url(#cardEdge)"/><rect x="5" y="5" width="280" height="460" rx="11" fill="#12052a"/><rect x="12" y="11" width="266" height="28" rx="14" fill="url(#pill)" stroke="#ffffff22"/><text x="145" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="500" y="30">Desert</text><rect x="12" y="46" width="266" height="150" rx="8" fill="url(#artBox)"/><g transform="translate(145 121)"><g transform="scale(5.2)"><circle r="10" stroke="#c3b3da" stroke-width="0.25" fill="url(#planetGradient)"/><g clip-path="url(#just-the-planet)"><g stroke="#ffffff1a" stroke-width="0.5" fill="#ffffff14"><path d="M-11 -2q6 -5 12 0t12 0v3q-6 -4 -12 0t-12 0z"/><path d="M-9 4q5 -4 10 0t10 0v2.5q-5 -3.5 -10 0t-10 0z"/><path d="M-6 -7q4 -3 8 0t8 0v2q-4 -3 -8 0t-8 0z"/></g></g></g><g transform="translate(56.122821813858124 -38.39568819086241) scale(1.6)">
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><path d="M-11 6L-7 -4H7L11 6Z" fill="#b9a6d6" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -4L-5 -8H5L7 -4Z" fill="#e5cfff"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Metals</text></g><g transform="translate(91.6 278)"><rect width="76.19999999999999" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><circle r="10.5" fill="#8f7fb0" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -3.5H7M-7 0H7M-7 3.5H7M-3.5 -7V7M0 -7V7M3.5 -7V7" stroke="#2b0c50" stroke-width="0.8"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Silicon</text></g><text x="16" font-size="12.5" fill="#d9cdee" text-anchor="start" font-weight="400" y="336">Its ports buy</text><g transform="translate(16 344)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g fill="none" stroke="#bfe6ff" stroke-width="2" stroke-linecap="round"><path d="M0 -11V11M-9.5 -5.5L9.5 5.5M-9.5 5.5L9.5 -5.5"/><path d="M-3 -9L0 -6L3 -9M-3 9L0 6L3 9" stroke-width="1.5"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Water</text></g><g transform="translate(85 344)"><rect width="56.4" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g fill="none" stroke="#7fd4ff" stroke-width="1.4"><ellipse rx="11" ry="4.5"/><ellipse rx="11" ry="4.5" transform="rotate(60)"/><ellipse rx="11" ry="4.5" transform="rotate(-60)"/><circle r="2.6" fill="#ffd65c" stroke="none"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">He-3</text></g><g transform="translate(147.4 344)"><rect width="82.8" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><path d="M-9 9C-11 -3 -2 -10 10 -10C10 2 3 10 -9 9Z" fill="#9effa0" stroke="#e5ffe6" stroke-width="1"/><path d="M-9 9L5 -5" stroke="#2b5c2c" stroke-width="1.3"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Organics</text></g><rect x="12" y="404" width="266" height="54" rx="8" fill="none" stroke="#ffffff77" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/><text x="22" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" font-style="italic" y="424">Idea: could also yield</text><g transform="translate(22 432)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><path d="M0 -11L9 -3L0 11L-9 -3Z" fill="#c38bff" stroke="#e5cfff" stroke-width="1"/><path d="M-9 -3H9M0 -11L-3 -3L0 11L3 -3Z" fill="none" stroke="#e5cfff" stroke-width="0.8"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Rares</text></g></g><g transform="translate(659 150)"><rect width="290" height="470" rx="14" fill="url(#cardEdge)"/><rect x="5" y="5" width="280" height="460" rx="11" fill="#12052a"/><rect x="12" y="11" width="266" height="28" rx="14" fill="url(#pill)" stroke="#ffffff22"/><text x="145" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="500" y="30">Oceanic</text><rect x="12" y="46" width="266" height="150" rx="8" fill="url(#artBox)"/><g transform="translate(145 121)"><g transform="scale(5.2)"><circle r="10" stroke="#c3b3da" stroke-width="0.25" fill="url(#planetGradient)"/><g clip-path="url(#just-the-planet)"><g stroke="#ffffff22" stroke-width="0.6" fill="none"><path d="M-10 -4q2.5 -2 5 0t5 0t5 0t5 0"/><path d="M-11 1q2.5 -2 5 0t5 0t5 0t5 0"/><path d="M-10 6q2.5 -2 5 0t5 0t5 0t5 0"/></g></g></g></g><text x="16" font-size="12.5" fill="#c3b3da" text-anchor="start" font-weight="400" font-style="italic" y="220">Sea farms; sand on the sea floor</text><text x="16" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" y="240">800 people per unit of size</text><text x="16" font-size="12.5" fill="#ebff99" text-anchor="start" font-weight="400" y="270">Mines and makes · its ports sell</text><g transform="translate(16 278)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g fill="none" stroke="#bfe6ff" stroke-width="2" stroke-linecap="round"><path d="M0 -11V11M-9.5 -5.5L9.5 5.5M-9.5 5.5L9.5 -5.5"/><path d="M-3 -9L0 -6L3 -9M-3 9L0 6L3 9" stroke-width="1.5"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Water</text></g><g transform="translate(85 278)"><rect width="82.8" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><path d="M-9 9C-11 -3 -2 -10 10 -10C10 2 3 10 -9 9Z" fill="#9effa0" stroke="#e5ffe6" stroke-width="1"/><path d="M-9 9L5 -5" stroke="#2b5c2c" stroke-width="1.3"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Organics</text></g><text x="16" font-size="12.5" fill="#d9cdee" text-anchor="start" font-weight="400" y="336">Its ports buy</text><g transform="translate(16 344)"><rect width="69.6" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><path d="M-11 6L-7 -4H7L11 6Z" fill="#b9a6d6" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -4L-5 -8H5L7 -4Z" fill="#e5cfff"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Metals</text></g><g transform="translate(91.6 344)"><rect width="69.6" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g fill="#ffd65c" stroke="#fff3c2" stroke-width="0.8"><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(0)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(45)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(90)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(135)"/><circle r="7.5"/><circle r="3" fill="#2b0c50"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Equip.</text></g><g transform="translate(167.2 344)"><rect width="76.19999999999999" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><rect x="-8" y="-8" width="16" height="16" rx="2" fill="#5cffc8" stroke="#d6fff1" stroke-width="1"/><rect x="-4" y="-4" width="8" height="8" fill="#1c0838"/><path d="M-5 -8V-11M0 -8V-11M5 -8V-11M-5 8V11M0 8V11M5 8V11M-8 -5H-11M-8 0H-11M-8 5H-11M8 -5H11M8 0H11M8 5H11" stroke="#5cffc8" stroke-width="1.4"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Electr.</text></g><rect x="12" y="404" width="266" height="54" rx="8" fill="none" stroke="#ffffff77" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/><text x="22" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" font-style="italic" y="424">Idea: could also yield</text><g transform="translate(22 432)"><rect width="76.19999999999999" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><circle r="10.5" fill="#8f7fb0" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -3.5H7M-7 0H7M-7 3.5H7M-3.5 -7V7M0 -7V7M3.5 -7V7" stroke="#2b0c50" stroke-width="0.8"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Silicon</text></g></g><g transform="translate(966 150)"><rect width="290" height="470" rx="14" fill="url(#cardEdge)"/><rect x="5" y="5" width="280" height="460" rx="11" fill="#12052a"/><rect x="12" y="11" width="266" height="28" rx="14" fill="url(#pill)" stroke="#ffffff22"/><text x="145" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="500" y="30">Desert</text><rect x="12" y="46" width="266" height="150" rx="8" fill="url(#artBox)"/><g transform="translate(145 121)"><g transform="scale(5.2)"><circle r="10" stroke="#c3b3da" stroke-width="0.25" fill="url(#planetGradient)"/><g clip-path="url(#just-the-planet)"><g stroke="#ffffff1a" stroke-width="0.5" fill="#ffffff14"><path d="M-11 -2q6 -5 12 0t12 0v3q-6 -4 -12 0t-12 0z"/><path d="M-9 4q5 -4 10 0t10 0v2.5q-5 -3.5 -10 0t-10 0z"/><path d="M-6 -7q4 -3 8 0t8 0v2q-4 -3 -8 0t-8 0z"/></g></g></g><g transform="translate(56.122821813858124 -38.39568819086241) scale(1.6)">
   <g transform="scale(0.5)">
     <circle cx="0" cy="0" r="10" stroke-width="0" fill="#e5cfff00" />
     <circle cx="0" cy="0" r="4" stroke="#c3b3da" stroke-width="0.5" fill="#e5cfff" />
@@ -99,12 +199,42 @@
     </g>
   </g>
 </g></g><text x="16" font-size="12.5" fill="#c3b3da" text-anchor="start" font-weight="400" font-style="italic" y="220">Dune fields over old ore beds</text><text x="16" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" y="240">300 people per unit of size</text><text x="16" font-size="12.5" fill="#ebff99" text-anchor="start" font-weight="400" y="270">Mines and makes · its ports sell</text><g transform="translate(16 278)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><path d="M0 -11L9 -3L0 11L-9 -3Z" fill="#c38bff" stroke="#e5cfff" stroke-width="1"/><path d="M-9 -3H9M0 -11L-3 -3L0 11L3 -3Z" fill="none" stroke="#e5cfff" stroke-width="0.8"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Rares</text></g><g transform="translate(85 278)"><rect width="76.19999999999999" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><circle r="10.5" fill="#8f7fb0" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -3.5H7M-7 0H7M-7 3.5H7M-3.5 -7V7M0 -7V7M3.5 -7V7" stroke="#2b0c50" stroke-width="0.8"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Silicon</text></g><text x="16" font-size="12.5" fill="#d9cdee" text-anchor="start" font-weight="400" y="336">Its ports buy</text><g transform="translate(16 344)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g fill="none" stroke="#bfe6ff" stroke-width="2" stroke-linecap="round"><path d="M0 -11V11M-9.5 -5.5L9.5 5.5M-9.5 5.5L9.5 -5.5"/><path d="M-3 -9L0 -6L3 -9M-3 9L0 6L3 9" stroke-width="1.5"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Water</text></g><g transform="translate(85 344)"><rect width="82.8" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><path d="M-9 9C-11 -3 -2 -10 10 -10C10 2 3 10 -9 9Z" fill="#9effa0" stroke="#e5ffe6" stroke-width="1"/><path d="M-9 9L5 -5" stroke="#2b5c2c" stroke-width="1.3"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Organics</text></g><g transform="translate(173.8 344)"><rect width="69.6" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g fill="#ffd65c" stroke="#fff3c2" stroke-width="0.8"><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(0)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(45)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(90)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(135)"/><circle r="7.5"/><circle r="3" fill="#2b0c50"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Equip.</text></g><rect x="12" y="404" width="266" height="54" rx="8" fill="none" stroke="#ffffff77" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/><text x="22" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" font-style="italic" y="424">Idea: could also yield</text><g transform="translate(22 432)"><rect width="69.6" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><path d="M-11 6L-7 -4H7L11 6Z" fill="#b9a6d6" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -4L-5 -8H5L7 -4Z" fill="#e5cfff"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Metals</text></g></g><g transform="translate(1273 150)"><rect width="290" height="470" rx="14" fill="url(#cardEdge)"/><rect x="5" y="5" width="280" height="460" rx="11" fill="#12052a"/><rect x="12" y="11" width="266" height="28" rx="14" fill="url(#pill)" stroke="#ffffff22"/><text x="145" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="500" y="30">Ice</text><rect x="12" y="46" width="266" height="150" rx="8" fill="url(#artBox)"/><g transform="translate(145 121)"><g transform="scale(5.2)"><circle r="10" stroke="#c3b3da" stroke-width="0.25" fill="url(#planetGradient)"/><g clip-path="url(#just-the-planet)"><g stroke-width="0" stroke="#ffffff11" fill="#ffffff22">
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><path d="M0 -11L9 -3L0 11L-9 -3Z" fill="#c38bff" stroke="#e5cfff" stroke-width="1"/><path d="M-9 -3H9M0 -11L-3 -3L0 11L3 -3Z" fill="none" stroke="#e5cfff" stroke-width="0.8"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Rares</text></g><g transform="translate(85 278)"><rect width="76.19999999999999" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><circle r="10.5" fill="#8f7fb0" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -3.5H7M-7 0H7M-7 3.5H7M-3.5 -7V7M0 -7V7M3.5 -7V7" stroke="#2b0c50" stroke-width="0.8"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Silicon</text></g><text x="16" font-size="12.5" fill="#d9cdee" text-anchor="start" font-weight="400" y="336">Its ports buy</text><g transform="translate(16 344)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g fill="none" stroke="#bfe6ff" stroke-width="2" stroke-linecap="round"><path d="M0 -11V11M-9.5 -5.5L9.5 5.5M-9.5 5.5L9.5 -5.5"/><path d="M-3 -9L0 -6L3 -9M-3 9L0 6L3 9" stroke-width="1.5"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Water</text></g><g transform="translate(85 344)"><rect width="82.8" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><path d="M-9 9C-11 -3 -2 -10 10 -10C10 2 3 10 -9 9Z" fill="#9effa0" stroke="#e5ffe6" stroke-width="1"/><path d="M-9 9L5 -5" stroke="#2b5c2c" stroke-width="1.3"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Organics</text></g><g transform="translate(173.8 344)"><rect width="69.6" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g fill="#ffd65c" stroke="#fff3c2" stroke-width="0.8"><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(0)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(45)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(90)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(135)"/><circle r="7.5"/><circle r="3" fill="#2b0c50"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Equip.</text></g><rect x="12" y="404" width="266" height="54" rx="8" fill="none" stroke="#ffffff77" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/><text x="22" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" font-style="italic" y="424">Idea: could also yield</text><g transform="translate(22 432)"><rect width="69.6" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><path d="M-11 6L-7 -4H7L11 6Z" fill="#b9a6d6" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -4L-5 -8H5L7 -4Z" fill="#e5cfff"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Metals</text></g></g><g transform="translate(1273 150)"><rect width="290" height="470" rx="14" fill="url(#cardEdge)"/><rect x="5" y="5" width="280" height="460" rx="11" fill="#12052a"/><rect x="12" y="11" width="266" height="28" rx="14" fill="url(#pill)" stroke="#ffffff22"/><text x="145" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="500" y="30">Ice</text><rect x="12" y="46" width="266" height="150" rx="8" fill="url(#artBox)"/><g transform="translate(145 121)"><g transform="scale(5.2)"><circle r="10" stroke="#c3b3da" stroke-width="0.25" fill="url(#planetGradient)"/><g clip-path="url(#just-the-planet)"><g stroke-width="0" stroke="#ffffff11" fill="#ffffff22">
         
         <rect x="-2" y="-8" width="12" height="1" rx="1" ry="1" />
         <rect x="-9" y="-7" width="6" height="1" rx="1" ry="1" />
@@ -113,11 +243,36 @@
         <rect x="0" y="6" width="6" height="1" rx="1" ry="1" />
         <rect x="-6" y="8" width="4" height="1" rx="1" ry="1" />
       </g></g></g></g><text x="16" font-size="12.5" fill="#c3b3da" text-anchor="start" font-weight="400" font-style="italic" y="220">Helium-3 trapped in the ice</text><text x="16" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" y="240">200 people per unit of size</text><text x="16" font-size="12.5" fill="#ebff99" text-anchor="start" font-weight="400" y="270">Mines and makes · its ports sell</text><g transform="translate(16 278)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g fill="none" stroke="#bfe6ff" stroke-width="2" stroke-linecap="round"><path d="M0 -11V11M-9.5 -5.5L9.5 5.5M-9.5 5.5L9.5 -5.5"/><path d="M-3 -9L0 -6L3 -9M-3 9L0 6L3 9" stroke-width="1.5"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Water</text></g><text x="16" font-size="12.5" fill="#d9cdee" text-anchor="start" font-weight="400" y="336">Its ports buy</text><g transform="translate(16 344)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><path d="M0 -11L9 -3L0 11L-9 -3Z" fill="#c38bff" stroke="#e5cfff" stroke-width="1"/><path d="M-9 -3H9M0 -11L-3 -3L0 11L3 -3Z" fill="none" stroke="#e5cfff" stroke-width="0.8"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Rares</text></g><g transform="translate(85 344)"><rect width="82.8" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><path d="M-9 9C-11 -3 -2 -10 10 -10C10 2 3 10 -9 9Z" fill="#9effa0" stroke="#e5ffe6" stroke-width="1"/><path d="M-9 9L5 -5" stroke="#2b5c2c" stroke-width="1.3"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Organics</text></g><g transform="translate(173.8 344)"><rect width="76.19999999999999" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><rect x="-8" y="-8" width="16" height="16" rx="2" fill="#5cffc8" stroke="#d6fff1" stroke-width="1"/><rect x="-4" y="-4" width="8" height="8" fill="#1c0838"/><path d="M-5 -8V-11M0 -8V-11M5 -8V-11M-5 8V11M0 8V11M5 8V11M-8 -5H-11M-8 0H-11M-8 5H-11M8 -5H11M8 0H11M8 5H11" stroke="#5cffc8" stroke-width="1.4"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Electr.</text></g><rect x="12" y="404" width="266" height="54" rx="8" fill="none" stroke="#ffffff77" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/><text x="22" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" font-style="italic" y="424">Idea: could also yield</text><g transform="translate(22 432)"><rect width="56.4" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g fill="none" stroke="#7fd4ff" stroke-width="1.4"><ellipse rx="11" ry="4.5"/><ellipse rx="11" ry="4.5" transform="rotate(60)"/><ellipse rx="11" ry="4.5" transform="rotate(-60)"/><circle r="2.6" fill="#ffd65c" stroke="none"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">He-3</text></g></g><g transform="translate(45 644)"><rect width="290" height="470" rx="14" fill="url(#cardEdge)"/><rect x="5" y="5" width="280" height="460" rx="11" fill="#12052a"/><rect x="12" y="11" width="266" height="28" rx="14" fill="url(#pill)" stroke="#ffffff22"/><text x="145" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="500" y="30">Volcanic</text><rect x="12" y="46" width="266" height="150" rx="8" fill="url(#artBox)"/><g transform="translate(145 121)"><g transform="scale(5.2)"><circle r="10" stroke="#c3b3da" stroke-width="0.25" fill="url(#planetGradient)"/><g clip-path="url(#just-the-planet)"><g stroke-width="0.5" stroke="#ffffff11" fill="#00000022">
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g fill="none" stroke="#bfe6ff" stroke-width="2" stroke-linecap="round"><path d="M0 -11V11M-9.5 -5.5L9.5 5.5M-9.5 5.5L9.5 -5.5"/><path d="M-3 -9L0 -6L3 -9M-3 9L0 6L3 9" stroke-width="1.5"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Water</text></g><text x="16" font-size="12.5" fill="#d9cdee" text-anchor="start" font-weight="400" y="336">Its ports buy</text><g transform="translate(16 344)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><path d="M0 -11L9 -3L0 11L-9 -3Z" fill="#c38bff" stroke="#e5cfff" stroke-width="1"/><path d="M-9 -3H9M0 -11L-3 -3L0 11L3 -3Z" fill="none" stroke="#e5cfff" stroke-width="0.8"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Rares</text></g><g transform="translate(85 344)"><rect width="82.8" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><path d="M-9 9C-11 -3 -2 -10 10 -10C10 2 3 10 -9 9Z" fill="#9effa0" stroke="#e5ffe6" stroke-width="1"/><path d="M-9 9L5 -5" stroke="#2b5c2c" stroke-width="1.3"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Organics</text></g><g transform="translate(173.8 344)"><rect width="76.19999999999999" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><rect x="-8" y="-8" width="16" height="16" rx="2" fill="#5cffc8" stroke="#d6fff1" stroke-width="1"/><rect x="-4" y="-4" width="8" height="8" fill="#1c0838"/><path d="M-5 -8V-11M0 -8V-11M5 -8V-11M-5 8V11M0 8V11M5 8V11M-8 -5H-11M-8 0H-11M-8 5H-11M8 -5H11M8 0H11M8 5H11" stroke="#5cffc8" stroke-width="1.4"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Electr.</text></g><rect x="12" y="404" width="266" height="54" rx="8" fill="none" stroke="#ffffff77" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/><text x="22" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" font-style="italic" y="424">Idea: could also yield</text><g transform="translate(22 432)"><rect width="56.4" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g fill="none" stroke="#7fd4ff" stroke-width="1.4"><ellipse rx="11" ry="4.5"/><ellipse rx="11" ry="4.5" transform="rotate(60)"/><ellipse rx="11" ry="4.5" transform="rotate(-60)"/><circle r="2.6" fill="#ffd65c" stroke="none"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">He-3</text></g></g><g transform="translate(45 644)"><rect width="290" height="470" rx="14" fill="url(#cardEdge)"/><rect x="5" y="5" width="280" height="460" rx="11" fill="#12052a"/><rect x="12" y="11" width="266" height="28" rx="14" fill="url(#pill)" stroke="#ffffff22"/><text x="145" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="500" y="30">Volcanic</text><rect x="12" y="46" width="266" height="150" rx="8" fill="url(#artBox)"/><g transform="translate(145 121)"><g transform="scale(5.2)"><circle r="10" stroke="#c3b3da" stroke-width="0.25" fill="url(#planetGradient)"/><g clip-path="url(#just-the-planet)"><g stroke-width="0.5" stroke="#ffffff11" fill="#00000022">
         <rect x="-10" y="-9" width="17" height="4" rx="2" ry="2" />
         <rect x="4" y="-7" width="10" height="4" rx="2" ry="2" />
         <rect x="-9" y="-6" width="12" height="4" rx="2" ry="2" />
@@ -131,12 +286,42 @@
         <rect x="-6" y="6" width="10" height="4" rx="2" ry="2" />
         <rect x="-10" y="8" width="12" height="4" rx="2" ry="2" />
       </g></g></g></g><text x="16" font-size="12.5" fill="#c3b3da" text-anchor="start" font-weight="400" font-style="italic" y="220">Glass fields around the vents</text><text x="16" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" y="240">100 people per unit of size</text><text x="16" font-size="12.5" fill="#ebff99" text-anchor="start" font-weight="400" y="270">Mines and makes · its ports sell</text><g transform="translate(16 278)"><rect width="69.6" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><path d="M-11 6L-7 -4H7L11 6Z" fill="#b9a6d6" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -4L-5 -8H5L7 -4Z" fill="#e5cfff"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Metals</text></g><g transform="translate(91.6 278)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><path d="M0 -11L9 -3L0 11L-9 -3Z" fill="#c38bff" stroke="#e5cfff" stroke-width="1"/><path d="M-9 -3H9M0 -11L-3 -3L0 11L3 -3Z" fill="none" stroke="#e5cfff" stroke-width="0.8"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Rares</text></g><text x="16" font-size="12.5" fill="#d9cdee" text-anchor="start" font-weight="400" y="336">Its ports buy</text><g transform="translate(16 344)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g fill="none" stroke="#bfe6ff" stroke-width="2" stroke-linecap="round"><path d="M0 -11V11M-9.5 -5.5L9.5 5.5M-9.5 5.5L9.5 -5.5"/><path d="M-3 -9L0 -6L3 -9M-3 9L0 6L3 9" stroke-width="1.5"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Water</text></g><g transform="translate(85 344)"><rect width="76.19999999999999" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><circle r="10.5" fill="#8f7fb0" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -3.5H7M-7 0H7M-7 3.5H7M-3.5 -7V7M0 -7V7M3.5 -7V7" stroke="#2b0c50" stroke-width="0.8"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Silicon</text></g><g transform="translate(167.2 344)"><rect width="76.19999999999999" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><rect x="-8" y="-8" width="16" height="16" rx="2" fill="#5cffc8" stroke="#d6fff1" stroke-width="1"/><rect x="-4" y="-4" width="8" height="8" fill="#1c0838"/><path d="M-5 -8V-11M0 -8V-11M5 -8V-11M-5 8V11M0 8V11M5 8V11M-8 -5H-11M-8 0H-11M-8 5H-11M8 -5H11M8 0H11M8 5H11" stroke="#5cffc8" stroke-width="1.4"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Electr.</text></g><rect x="12" y="404" width="266" height="54" rx="8" fill="none" stroke="#ffffff77" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/><text x="22" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" font-style="italic" y="424">Idea: could also yield</text><g transform="translate(22 432)"><rect width="76.19999999999999" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><circle r="10.5" fill="#8f7fb0" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -3.5H7M-7 0H7M-7 3.5H7M-3.5 -7V7M0 -7V7M3.5 -7V7" stroke="#2b0c50" stroke-width="0.8"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Silicon</text></g></g><g transform="translate(352 644)"><rect width="290" height="470" rx="14" fill="url(#cardEdge)"/><rect x="5" y="5" width="280" height="460" rx="11" fill="#12052a"/><rect x="12" y="11" width="266" height="28" rx="14" fill="url(#pill)" stroke="#ffffff22"/><text x="145" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="500" y="30">Gaseous</text><rect x="12" y="46" width="266" height="150" rx="8" fill="url(#artBox)"/><g transform="translate(145 121)"><g transform="scale(5.2)"><ellipse rx="19" ry="5" fill="none" stroke="url(#ringGradient)" stroke-width="1.6" opacity="0.7" transform="rotate(-18)"/><circle r="10" stroke="#c3b3da" stroke-width="0.25" fill="url(#planetGradient)"/><g clip-path="url(#just-the-planet)"><g stroke-width="0.5" stroke="#5c1aae22" fill="#ffffff22">
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><path d="M-11 6L-7 -4H7L11 6Z" fill="#b9a6d6" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -4L-5 -8H5L7 -4Z" fill="#e5cfff"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Metals</text></g><g transform="translate(91.6 278)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><path d="M0 -11L9 -3L0 11L-9 -3Z" fill="#c38bff" stroke="#e5cfff" stroke-width="1"/><path d="M-9 -3H9M0 -11L-3 -3L0 11L3 -3Z" fill="none" stroke="#e5cfff" stroke-width="0.8"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Rares</text></g><text x="16" font-size="12.5" fill="#d9cdee" text-anchor="start" font-weight="400" y="336">Its ports buy</text><g transform="translate(16 344)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g fill="none" stroke="#bfe6ff" stroke-width="2" stroke-linecap="round"><path d="M0 -11V11M-9.5 -5.5L9.5 5.5M-9.5 5.5L9.5 -5.5"/><path d="M-3 -9L0 -6L3 -9M-3 9L0 6L3 9" stroke-width="1.5"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Water</text></g><g transform="translate(85 344)"><rect width="76.19999999999999" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><circle r="10.5" fill="#8f7fb0" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -3.5H7M-7 0H7M-7 3.5H7M-3.5 -7V7M0 -7V7M3.5 -7V7" stroke="#2b0c50" stroke-width="0.8"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Silicon</text></g><g transform="translate(167.2 344)"><rect width="76.19999999999999" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><rect x="-8" y="-8" width="16" height="16" rx="2" fill="#5cffc8" stroke="#d6fff1" stroke-width="1"/><rect x="-4" y="-4" width="8" height="8" fill="#1c0838"/><path d="M-5 -8V-11M0 -8V-11M5 -8V-11M-5 8V11M0 8V11M5 8V11M-8 -5H-11M-8 0H-11M-8 5H-11M8 -5H11M8 0H11M8 5H11" stroke="#5cffc8" stroke-width="1.4"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Electr.</text></g><rect x="12" y="404" width="266" height="54" rx="8" fill="none" stroke="#ffffff77" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/><text x="22" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" font-style="italic" y="424">Idea: could also yield</text><g transform="translate(22 432)"><rect width="76.19999999999999" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><circle r="10.5" fill="#8f7fb0" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -3.5H7M-7 0H7M-7 3.5H7M-3.5 -7V7M0 -7V7M3.5 -7V7" stroke="#2b0c50" stroke-width="0.8"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Silicon</text></g></g><g transform="translate(352 644)"><rect width="290" height="470" rx="14" fill="url(#cardEdge)"/><rect x="5" y="5" width="280" height="460" rx="11" fill="#12052a"/><rect x="12" y="11" width="266" height="28" rx="14" fill="url(#pill)" stroke="#ffffff22"/><text x="145" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="500" y="30">Gaseous</text><rect x="12" y="46" width="266" height="150" rx="8" fill="url(#artBox)"/><g transform="translate(145 121)"><g transform="scale(5.2)"><ellipse rx="19" ry="5" fill="none" stroke="url(#ringGradient)" stroke-width="1.6" opacity="0.7" transform="rotate(-18)"/><circle r="10" stroke="#c3b3da" stroke-width="0.25" fill="url(#planetGradient)"/><g clip-path="url(#just-the-planet)"><g stroke-width="0.5" stroke="#5c1aae22" fill="#ffffff22">
         <rect x="-10" y="-9" width="17" height="4" rx="2" ry="2" />
         <rect x="4" y="-7" width="10" height="4" rx="2" ry="2" />
         <rect x="-9" y="-6" width="12" height="4" rx="2" ry="2" />
@@ -195,11 +380,36 @@
     </g>
   </g>
 </g></g><text x="16" font-size="12.5" fill="#c3b3da" text-anchor="start" font-weight="400" font-style="italic" y="220">Floating cities; ice in the rings. Sizes</text><text x="16" font-size="12.5" fill="#c3b3da" text-anchor="start" font-weight="400" font-style="italic" y="236.25">16–63</text><text x="16" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" y="240">100 people per unit of size</text><text x="16" font-size="12.5" fill="#ebff99" text-anchor="start" font-weight="400" y="270">Mines and makes · its ports sell</text><g transform="translate(16 278)"><rect width="56.4" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g fill="none" stroke="#7fd4ff" stroke-width="1.4"><ellipse rx="11" ry="4.5"/><ellipse rx="11" ry="4.5" transform="rotate(60)"/><ellipse rx="11" ry="4.5" transform="rotate(-60)"/><circle r="2.6" fill="#ffd65c" stroke="none"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">He-3</text></g><text x="16" font-size="12.5" fill="#d9cdee" text-anchor="start" font-weight="400" y="336">Its ports buy</text><g transform="translate(16 344)"><rect width="69.6" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><path d="M-11 6L-7 -4H7L11 6Z" fill="#b9a6d6" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -4L-5 -8H5L7 -4Z" fill="#e5cfff"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Metals</text></g><g transform="translate(91.6 344)"><rect width="82.8" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><path d="M-9 9C-11 -3 -2 -10 10 -10C10 2 3 10 -9 9Z" fill="#9effa0" stroke="#e5ffe6" stroke-width="1"/><path d="M-9 9L5 -5" stroke="#2b5c2c" stroke-width="1.3"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Organics</text></g><g transform="translate(180.39999999999998 344)"><rect width="69.6" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g fill="#ffd65c" stroke="#fff3c2" stroke-width="0.8"><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(0)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(45)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(90)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(135)"/><circle r="7.5"/><circle r="3" fill="#2b0c50"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Equip.</text></g><rect x="12" y="404" width="266" height="54" rx="8" fill="none" stroke="#ffffff77" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/><text x="22" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" font-style="italic" y="424">Idea: could also yield</text><g transform="translate(22 432)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g fill="none" stroke="#bfe6ff" stroke-width="2" stroke-linecap="round"><path d="M0 -11V11M-9.5 -5.5L9.5 5.5M-9.5 5.5L9.5 -5.5"/><path d="M-3 -9L0 -6L3 -9M-3 9L0 6L3 9" stroke-width="1.5"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Water</text></g></g><g transform="translate(659 644)"><rect width="290" height="470" rx="14" fill="url(#cardEdge)"/><rect x="5" y="5" width="280" height="460" rx="11" fill="#12052a"/><rect x="12" y="11" width="266" height="28" rx="14" fill="url(#pill)" stroke="#ffffff22"/><text x="145" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="500" y="30">Ferrous</text><rect x="12" y="46" width="266" height="150" rx="8" fill="url(#artBox)"/><g transform="translate(145 121)"><g transform="scale(5.2)"><circle r="10" stroke="#c3b3da" stroke-width="0.25" fill="url(#planetGradient)"/><g clip-path="url(#just-the-planet)"><g stroke="#c3b3da44" stroke-width="0.15" fill="#340f6122">
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g fill="none" stroke="#7fd4ff" stroke-width="1.4"><ellipse rx="11" ry="4.5"/><ellipse rx="11" ry="4.5" transform="rotate(60)"/><ellipse rx="11" ry="4.5" transform="rotate(-60)"/><circle r="2.6" fill="#ffd65c" stroke="none"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">He-3</text></g><text x="16" font-size="12.5" fill="#d9cdee" text-anchor="start" font-weight="400" y="336">Its ports buy</text><g transform="translate(16 344)"><rect width="69.6" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><path d="M-11 6L-7 -4H7L11 6Z" fill="#b9a6d6" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -4L-5 -8H5L7 -4Z" fill="#e5cfff"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Metals</text></g><g transform="translate(91.6 344)"><rect width="82.8" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><path d="M-9 9C-11 -3 -2 -10 10 -10C10 2 3 10 -9 9Z" fill="#9effa0" stroke="#e5ffe6" stroke-width="1"/><path d="M-9 9L5 -5" stroke="#2b5c2c" stroke-width="1.3"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Organics</text></g><g transform="translate(180.39999999999998 344)"><rect width="69.6" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g fill="#ffd65c" stroke="#fff3c2" stroke-width="0.8"><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(0)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(45)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(90)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(135)"/><circle r="7.5"/><circle r="3" fill="#2b0c50"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Equip.</text></g><rect x="12" y="404" width="266" height="54" rx="8" fill="none" stroke="#ffffff77" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/><text x="22" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" font-style="italic" y="424">Idea: could also yield</text><g transform="translate(22 432)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g fill="none" stroke="#bfe6ff" stroke-width="2" stroke-linecap="round"><path d="M0 -11V11M-9.5 -5.5L9.5 5.5M-9.5 5.5L9.5 -5.5"/><path d="M-3 -9L0 -6L3 -9M-3 9L0 6L3 9" stroke-width="1.5"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Water</text></g></g><g transform="translate(659 644)"><rect width="290" height="470" rx="14" fill="url(#cardEdge)"/><rect x="5" y="5" width="280" height="460" rx="11" fill="#12052a"/><rect x="12" y="11" width="266" height="28" rx="14" fill="url(#pill)" stroke="#ffffff22"/><text x="145" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="500" y="30">Ferrous</text><rect x="12" y="46" width="266" height="150" rx="8" fill="url(#artBox)"/><g transform="translate(145 121)"><g transform="scale(5.2)"><circle r="10" stroke="#c3b3da" stroke-width="0.25" fill="url(#planetGradient)"/><g clip-path="url(#just-the-planet)"><g stroke="#c3b3da44" stroke-width="0.15" fill="#340f6122">
         <circle cx="-2.5" cy="2" r="1.5" />
         <circle cx="2" cy="-2.5" r="0.75" />
         <circle cx="3" cy="2" r="1" />
@@ -213,20 +423,80 @@
         <circle cx="-5" cy="-6" r="2" />
         <circle cx="-5" cy="6" r="1" />
       </g></g></g></g><text x="16" font-size="12.5" fill="#c3b3da" text-anchor="start" font-weight="400" font-style="italic" y="220">Iron worlds with foundries</text><text x="16" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" y="240">200 people per unit of size</text><text x="16" font-size="12.5" fill="#ebff99" text-anchor="start" font-weight="400" y="270">Mines and makes · its ports sell</text><g transform="translate(16 278)"><rect width="69.6" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><path d="M-11 6L-7 -4H7L11 6Z" fill="#b9a6d6" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -4L-5 -8H5L7 -4Z" fill="#e5cfff"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Metals</text></g><g transform="translate(91.6 278)"><rect width="69.6" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g fill="#ffd65c" stroke="#fff3c2" stroke-width="0.8"><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(0)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(45)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(90)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(135)"/><circle r="7.5"/><circle r="3" fill="#2b0c50"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Equip.</text></g><text x="16" font-size="12.5" fill="#d9cdee" text-anchor="start" font-weight="400" y="336">Its ports buy</text><g transform="translate(16 344)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g fill="none" stroke="#bfe6ff" stroke-width="2" stroke-linecap="round"><path d="M0 -11V11M-9.5 -5.5L9.5 5.5M-9.5 5.5L9.5 -5.5"/><path d="M-3 -9L0 -6L3 -9M-3 9L0 6L3 9" stroke-width="1.5"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Water</text></g><g transform="translate(85 344)"><rect width="56.4" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g fill="none" stroke="#7fd4ff" stroke-width="1.4"><ellipse rx="11" ry="4.5"/><ellipse rx="11" ry="4.5" transform="rotate(60)"/><ellipse rx="11" ry="4.5" transform="rotate(-60)"/><circle r="2.6" fill="#ffd65c" stroke="none"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">He-3</text></g><g transform="translate(147.4 344)"><rect width="82.8" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><path d="M-9 9C-11 -3 -2 -10 10 -10C10 2 3 10 -9 9Z" fill="#9effa0" stroke="#e5ffe6" stroke-width="1"/><path d="M-9 9L5 -5" stroke="#2b5c2c" stroke-width="1.3"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Organics</text></g><rect x="12" y="404" width="266" height="54" rx="8" fill="none" stroke="#ffffff77" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/><text x="22" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" font-style="italic" y="424">Idea: could also yield</text><g transform="translate(22 432)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><path d="M0 -11L9 -3L0 11L-9 -3Z" fill="#c38bff" stroke="#e5cfff" stroke-width="1"/><path d="M-9 -3H9M0 -11L-3 -3L0 11L3 -3Z" fill="none" stroke="#e5cfff" stroke-width="0.8"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Rares</text></g></g><g transform="translate(966 644)"><rect width="290" height="470" rx="14" fill="url(#cardEdge)"/><rect x="5" y="5" width="280" height="460" rx="11" fill="#12052a"/><rect x="12" y="11" width="266" height="28" rx="14" fill="url(#pill)" stroke="#ffffff22"/><text x="145" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="500" y="30">Lava</text><rect x="12" y="46" width="266" height="150" rx="8" fill="url(#artBox)"/><g transform="translate(145 121)"><g transform="scale(5.2)"><circle r="10" stroke="#c3b3da" stroke-width="0.25" fill="url(#planetGradient)"/><g clip-path="url(#just-the-planet)"><g stroke-width="0" stroke="none" fill="#ffffff44">
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><path d="M-11 6L-7 -4H7L11 6Z" fill="#b9a6d6" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -4L-5 -8H5L7 -4Z" fill="#e5cfff"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Metals</text></g><g transform="translate(91.6 278)"><rect width="69.6" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g fill="#ffd65c" stroke="#fff3c2" stroke-width="0.8"><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(0)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(45)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(90)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(135)"/><circle r="7.5"/><circle r="3" fill="#2b0c50"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Equip.</text></g><text x="16" font-size="12.5" fill="#d9cdee" text-anchor="start" font-weight="400" y="336">Its ports buy</text><g transform="translate(16 344)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g fill="none" stroke="#bfe6ff" stroke-width="2" stroke-linecap="round"><path d="M0 -11V11M-9.5 -5.5L9.5 5.5M-9.5 5.5L9.5 -5.5"/><path d="M-3 -9L0 -6L3 -9M-3 9L0 6L3 9" stroke-width="1.5"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Water</text></g><g transform="translate(85 344)"><rect width="56.4" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g fill="none" stroke="#7fd4ff" stroke-width="1.4"><ellipse rx="11" ry="4.5"/><ellipse rx="11" ry="4.5" transform="rotate(60)"/><ellipse rx="11" ry="4.5" transform="rotate(-60)"/><circle r="2.6" fill="#ffd65c" stroke="none"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">He-3</text></g><g transform="translate(147.4 344)"><rect width="82.8" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><path d="M-9 9C-11 -3 -2 -10 10 -10C10 2 3 10 -9 9Z" fill="#9effa0" stroke="#e5ffe6" stroke-width="1"/><path d="M-9 9L5 -5" stroke="#2b5c2c" stroke-width="1.3"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Organics</text></g><rect x="12" y="404" width="266" height="54" rx="8" fill="none" stroke="#ffffff77" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/><text x="22" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" font-style="italic" y="424">Idea: could also yield</text><g transform="translate(22 432)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><path d="M0 -11L9 -3L0 11L-9 -3Z" fill="#c38bff" stroke="#e5cfff" stroke-width="1"/><path d="M-9 -3H9M0 -11L-3 -3L0 11L3 -3Z" fill="none" stroke="#e5cfff" stroke-width="0.8"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Rares</text></g></g><g transform="translate(966 644)"><rect width="290" height="470" rx="14" fill="url(#cardEdge)"/><rect x="5" y="5" width="280" height="460" rx="11" fill="#12052a"/><rect x="12" y="11" width="266" height="28" rx="14" fill="url(#pill)" stroke="#ffffff22"/><text x="145" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="500" y="30">Lava</text><rect x="12" y="46" width="266" height="150" rx="8" fill="url(#artBox)"/><g transform="translate(145 121)"><g transform="scale(5.2)"><circle r="10" stroke="#c3b3da" stroke-width="0.25" fill="url(#planetGradient)"/><g clip-path="url(#just-the-planet)"><g stroke-width="0" stroke="none" fill="#ffffff44">
         <circle cx="0" cy="0" r="9" />
       </g></g></g></g><text x="16" font-size="12.5" fill="#c3b3da" text-anchor="start" font-weight="400" font-style="italic" y="220">Molten metal near the surface</text><text x="16" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" y="240">100 people per unit of size</text><text x="16" font-size="12.5" fill="#ebff99" text-anchor="start" font-weight="400" y="270">Mines and makes · its ports sell</text><g transform="translate(16 278)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><path d="M0 -11L9 -3L0 11L-9 -3Z" fill="#c38bff" stroke="#e5cfff" stroke-width="1"/><path d="M-9 -3H9M0 -11L-3 -3L0 11L3 -3Z" fill="none" stroke="#e5cfff" stroke-width="0.8"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Rares</text></g><g transform="translate(85 278)"><rect width="76.19999999999999" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><circle r="10.5" fill="#8f7fb0" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -3.5H7M-7 0H7M-7 3.5H7M-3.5 -7V7M0 -7V7M3.5 -7V7" stroke="#2b0c50" stroke-width="0.8"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Silicon</text></g><text x="16" font-size="12.5" fill="#d9cdee" text-anchor="start" font-weight="400" y="336">Its ports buy</text><g transform="translate(16 344)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g fill="none" stroke="#bfe6ff" stroke-width="2" stroke-linecap="round"><path d="M0 -11V11M-9.5 -5.5L9.5 5.5M-9.5 5.5L9.5 -5.5"/><path d="M-3 -9L0 -6L3 -9M-3 9L0 6L3 9" stroke-width="1.5"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Water</text></g><g transform="translate(85 344)"><rect width="69.6" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g fill="#ffd65c" stroke="#fff3c2" stroke-width="0.8"><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(0)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(45)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(90)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(135)"/><circle r="7.5"/><circle r="3" fill="#2b0c50"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Equip.</text></g><g transform="translate(160.6 344)"><rect width="76.19999999999999" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><rect x="-8" y="-8" width="16" height="16" rx="2" fill="#5cffc8" stroke="#d6fff1" stroke-width="1"/><rect x="-4" y="-4" width="8" height="8" fill="#1c0838"/><path d="M-5 -8V-11M0 -8V-11M5 -8V-11M-5 8V11M0 8V11M5 8V11M-8 -5H-11M-8 0H-11M-8 5H-11M8 -5H11M8 0H11M8 5H11" stroke="#5cffc8" stroke-width="1.4"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Electr.</text></g><rect x="12" y="404" width="266" height="54" rx="8" fill="none" stroke="#ffffff77" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/><text x="22" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" font-style="italic" y="424">Idea: could also yield</text><g transform="translate(22 432)"><rect width="69.6" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><path d="M-11 6L-7 -4H7L11 6Z" fill="#b9a6d6" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -4L-5 -8H5L7 -4Z" fill="#e5cfff"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Metals</text></g></g><g transform="translate(1273 644)"><rect width="290" height="470" rx="14" fill="url(#cardEdge)"/><rect x="5" y="5" width="280" height="460" rx="11" fill="#12052a"/><rect x="12" y="11" width="266" height="28" rx="14" fill="url(#pill)" stroke="#ffffff22"/><text x="145" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="500" y="30">Swamp</text><rect x="12" y="46" width="266" height="150" rx="8" fill="url(#artBox)"/><g transform="translate(145 121)"><g transform="scale(5.2)"><circle r="10" stroke="#c3b3da" stroke-width="0.25" fill="url(#planetGradient)"/><g clip-path="url(#just-the-planet)"><g stroke="none" fill="#2b0c5033"><ellipse cx="-4" cy="-3" rx="4" ry="2.5"/><ellipse cx="4" cy="2" rx="5" ry="2"/><ellipse cx="-3" cy="6" rx="3" ry="1.6"/><ellipse cx="5" cy="-6" rx="2.5" ry="1.4"/></g></g></g><g transform="translate(56.122821813858124 -38.39568819086241) scale(1.6)">
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><path d="M0 -11L9 -3L0 11L-9 -3Z" fill="#c38bff" stroke="#e5cfff" stroke-width="1"/><path d="M-9 -3H9M0 -11L-3 -3L0 11L3 -3Z" fill="none" stroke="#e5cfff" stroke-width="0.8"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Rares</text></g><g transform="translate(85 278)"><rect width="76.19999999999999" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><circle r="10.5" fill="#8f7fb0" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -3.5H7M-7 0H7M-7 3.5H7M-3.5 -7V7M0 -7V7M3.5 -7V7" stroke="#2b0c50" stroke-width="0.8"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Silicon</text></g><text x="16" font-size="12.5" fill="#d9cdee" text-anchor="start" font-weight="400" y="336">Its ports buy</text><g transform="translate(16 344)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g fill="none" stroke="#bfe6ff" stroke-width="2" stroke-linecap="round"><path d="M0 -11V11M-9.5 -5.5L9.5 5.5M-9.5 5.5L9.5 -5.5"/><path d="M-3 -9L0 -6L3 -9M-3 9L0 6L3 9" stroke-width="1.5"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Water</text></g><g transform="translate(85 344)"><rect width="69.6" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g fill="#ffd65c" stroke="#fff3c2" stroke-width="0.8"><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(0)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(45)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(90)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(135)"/><circle r="7.5"/><circle r="3" fill="#2b0c50"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Equip.</text></g><g transform="translate(160.6 344)"><rect width="76.19999999999999" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><rect x="-8" y="-8" width="16" height="16" rx="2" fill="#5cffc8" stroke="#d6fff1" stroke-width="1"/><rect x="-4" y="-4" width="8" height="8" fill="#1c0838"/><path d="M-5 -8V-11M0 -8V-11M5 -8V-11M-5 8V11M0 8V11M5 8V11M-8 -5H-11M-8 0H-11M-8 5H-11M8 -5H11M8 0H11M8 5H11" stroke="#5cffc8" stroke-width="1.4"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Electr.</text></g><rect x="12" y="404" width="266" height="54" rx="8" fill="none" stroke="#ffffff77" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/><text x="22" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" font-style="italic" y="424">Idea: could also yield</text><g transform="translate(22 432)"><rect width="69.6" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><path d="M-11 6L-7 -4H7L11 6Z" fill="#b9a6d6" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -4L-5 -8H5L7 -4Z" fill="#e5cfff"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Metals</text></g></g><g transform="translate(1273 644)"><rect width="290" height="470" rx="14" fill="url(#cardEdge)"/><rect x="5" y="5" width="280" height="460" rx="11" fill="#12052a"/><rect x="12" y="11" width="266" height="28" rx="14" fill="url(#pill)" stroke="#ffffff22"/><text x="145" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="500" y="30">Swamp</text><rect x="12" y="46" width="266" height="150" rx="8" fill="url(#artBox)"/><g transform="translate(145 121)"><g transform="scale(5.2)"><circle r="10" stroke="#c3b3da" stroke-width="0.25" fill="url(#planetGradient)"/><g clip-path="url(#just-the-planet)"><g stroke="none" fill="#2b0c5033"><ellipse cx="-4" cy="-3" rx="4" ry="2.5"/><ellipse cx="4" cy="2" rx="5" ry="2"/><ellipse cx="-3" cy="6" rx="3" ry="1.6"/><ellipse cx="5" cy="-6" rx="2.5" ry="1.4"/></g></g></g><g transform="translate(56.122821813858124 -38.39568819086241) scale(1.6)">
   <g transform="scale(0.5)">
     <circle cx="0" cy="0" r="10" stroke-width="0" fill="#e5cfff00" />
     <circle cx="0" cy="0" r="4" stroke="#c3b3da" stroke-width="0.5" fill="#e5cfff" />
@@ -242,12 +512,76 @@
     </g>
   </g>
 </g></g><text x="16" font-size="12.5" fill="#c3b3da" text-anchor="start" font-weight="400" font-style="italic" y="220">Thick air, thicker water</text><text x="16" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" y="240">600 people per unit of size</text><text x="16" font-size="12.5" fill="#ebff99" text-anchor="start" font-weight="400" y="270">Mines and makes · its ports sell</text><g transform="translate(16 278)"><rect width="82.8" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><path d="M-9 9C-11 -3 -2 -10 10 -10C10 2 3 10 -9 9Z" fill="#9effa0" stroke="#e5ffe6" stroke-width="1"/><path d="M-9 9L5 -5" stroke="#2b5c2c" stroke-width="1.3"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Organics</text></g><text x="16" font-size="12.5" fill="#d9cdee" text-anchor="start" font-weight="400" y="336">Its ports buy</text><g transform="translate(16 344)"><rect width="69.6" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><path d="M-11 6L-7 -4H7L11 6Z" fill="#b9a6d6" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -4L-5 -8H5L7 -4Z" fill="#e5cfff"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Metals</text></g><g transform="translate(91.6 344)"><rect width="69.6" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g fill="#ffd65c" stroke="#fff3c2" stroke-width="0.8"><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(0)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(45)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(90)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(135)"/><circle r="7.5"/><circle r="3" fill="#2b0c50"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Equip.</text></g><g transform="translate(167.2 344)"><rect width="76.19999999999999" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g><rect x="-8" y="-8" width="16" height="16" rx="2" fill="#5cffc8" stroke="#d6fff1" stroke-width="1"/><rect x="-4" y="-4" width="8" height="8" fill="#1c0838"/><path d="M-5 -8V-11M0 -8V-11M5 -8V-11M-5 8V11M0 8V11M5 8V11M-8 -5H-11M-8 0H-11M-8 5H-11M8 -5H11M8 0H11M8 5H11" stroke="#5cffc8" stroke-width="1.4"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Electr.</text></g><rect x="12" y="404" width="266" height="54" rx="8" fill="none" stroke="#ffffff77" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/><text x="22" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" font-style="italic" y="424">Idea: could also yield</text><g transform="translate(22 432)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)"><g fill="none" stroke="#bfe6ff" stroke-width="2" stroke-linecap="round"><path d="M0 -11V11M-9.5 -5.5L9.5 5.5M-9.5 5.5L9.5 -5.5"/><path d="M-3 -9L0 -6L3 -9M-3 9L0 6L3 9" stroke-width="1.5"/></g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Water</text></g></g><g transform="translate(45 1148)"><rect width="1510" height="200" rx="12" fill="#0b0218cc" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><path d="M-9 9C-11 -3 -2 -10 10 -10C10 2 3 10 -9 9Z" fill="#9effa0" stroke="#e5ffe6" stroke-width="1"/><path d="M-9 9L5 -5" stroke="#2b5c2c" stroke-width="1.3"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Organics</text></g><text x="16" font-size="12.5" fill="#d9cdee" text-anchor="start" font-weight="400" y="336">Its ports buy</text><g transform="translate(16 344)"><rect width="69.6" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><path d="M-11 6L-7 -4H7L11 6Z" fill="#b9a6d6" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -4L-5 -8H5L7 -4Z" fill="#e5cfff"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Metals</text></g><g transform="translate(91.6 344)"><rect width="69.6" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g fill="#ffd65c" stroke="#fff3c2" stroke-width="0.8"><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(0)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(45)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(90)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(135)"/><circle r="7.5"/><circle r="3" fill="#2b0c50"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Equip.</text></g><g transform="translate(167.2 344)"><rect width="76.19999999999999" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g><rect x="-8" y="-8" width="16" height="16" rx="2" fill="#5cffc8" stroke="#d6fff1" stroke-width="1"/><rect x="-4" y="-4" width="8" height="8" fill="#1c0838"/><path d="M-5 -8V-11M0 -8V-11M5 -8V-11M-5 8V11M0 8V11M5 8V11M-8 -5H-11M-8 0H-11M-8 5H-11M8 -5H11M8 0H11M8 5H11" stroke="#5cffc8" stroke-width="1.4"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Electr.</text></g><rect x="12" y="404" width="266" height="54" rx="8" fill="none" stroke="#ffffff77" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/><text x="22" font-size="12" fill="#ffffffaa" text-anchor="start" font-weight="400" font-style="italic" y="424">Idea: could also yield</text><g transform="translate(22 432)"><rect width="63" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
+    <g transform="translate(12 11)"><g transform="scale(0.20666666666666667)">
+
+
+<g transform="scale(3)"><g fill="none" stroke="#bfe6ff" stroke-width="2" stroke-linecap="round"><path d="M0 -11V11M-9.5 -5.5L9.5 5.5M-9.5 5.5L9.5 -5.5"/><path d="M-3 -9L0 -6L3 -9M-3 9L0 6L3 9" stroke-width="1.5"/></g></g>
+
+</g></g><text x="24" font-size="11.5" fill="#ffffff" text-anchor="start" font-weight="400" y="15.5">Water</text></g></g><g transform="translate(45 1148)"><rect width="1510" height="200" rx="12" fill="#0b0218cc" stroke="#ffffff33"/>
     <text x="20" font-size="16" fill="#ffffff" text-anchor="start" font-weight="500" y="32">The eight goods</text>
-    <g transform="translate(30 82)"><g transform="scale(1.6)"><g fill="none" stroke="#bfe6ff" stroke-width="2" stroke-linecap="round"><path d="M0 -11V11M-9.5 -5.5L9.5 5.5M-9.5 5.5L9.5 -5.5"/><path d="M-3 -9L0 -6L3 -9M-3 9L0 6L3 9" stroke-width="1.5"/></g></g><text x="30" font-size="13" fill="#e6dcf5" text-anchor="start" font-weight="400" y="6">Water ice</text><text x="30" font-size="11.5" fill="#c3b3da" text-anchor="start" font-weight="400" y="24">raw</text></g><g transform="translate(170 82)"><g transform="scale(1.6)"><g><path d="M-11 6L-7 -4H7L11 6Z" fill="#b9a6d6" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -4L-5 -8H5L7 -4Z" fill="#e5cfff"/></g></g><text x="30" font-size="13" fill="#e6dcf5" text-anchor="start" font-weight="400" y="6">Metals</text><text x="30" font-size="11.5" fill="#c3b3da" text-anchor="start" font-weight="400" y="24">raw</text></g><g transform="translate(310 82)"><g transform="scale(1.6)"><g><path d="M0 -11L9 -3L0 11L-9 -3Z" fill="#c38bff" stroke="#e5cfff" stroke-width="1"/><path d="M-9 -3H9M0 -11L-3 -3L0 11L3 -3Z" fill="none" stroke="#e5cfff" stroke-width="0.8"/></g></g><text x="30" font-size="13" fill="#e6dcf5" text-anchor="start" font-weight="400" y="6">Rare elements</text><text x="30" font-size="11.5" fill="#c3b3da" text-anchor="start" font-weight="400" y="24">raw</text></g><g transform="translate(450 82)"><g transform="scale(1.6)"><g fill="none" stroke="#7fd4ff" stroke-width="1.4"><ellipse rx="11" ry="4.5"/><ellipse rx="11" ry="4.5" transform="rotate(60)"/><ellipse rx="11" ry="4.5" transform="rotate(-60)"/><circle r="2.6" fill="#ffd65c" stroke="none"/></g></g><text x="30" font-size="13" fill="#e6dcf5" text-anchor="start" font-weight="400" y="6">Helium-3</text><text x="30" font-size="11.5" fill="#c3b3da" text-anchor="start" font-weight="400" y="24">raw</text></g><g transform="translate(590 82)"><g transform="scale(1.6)"><g><path d="M-9 9C-11 -3 -2 -10 10 -10C10 2 3 10 -9 9Z" fill="#9effa0" stroke="#e5ffe6" stroke-width="1"/><path d="M-9 9L5 -5" stroke="#2b5c2c" stroke-width="1.3"/></g></g><text x="30" font-size="13" fill="#e6dcf5" text-anchor="start" font-weight="400" y="6">Organics</text><text x="30" font-size="11.5" fill="#c3b3da" text-anchor="start" font-weight="400" y="24">raw</text></g><g transform="translate(730 82)"><g transform="scale(1.6)"><g><circle r="10.5" fill="#8f7fb0" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -3.5H7M-7 0H7M-7 3.5H7M-3.5 -7V7M0 -7V7M3.5 -7V7" stroke="#2b0c50" stroke-width="0.8"/></g></g><text x="30" font-size="13" fill="#e6dcf5" text-anchor="start" font-weight="400" y="6">Silicon</text><text x="30" font-size="11.5" fill="#c3b3da" text-anchor="start" font-weight="400" y="24">raw</text></g><g transform="translate(870 82)"><g transform="scale(1.6)"><g fill="#ffd65c" stroke="#fff3c2" stroke-width="0.8"><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(0)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(45)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(90)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(135)"/><circle r="7.5"/><circle r="3" fill="#2b0c50"/></g></g><text x="30" font-size="13" fill="#e6dcf5" text-anchor="start" font-weight="400" y="6">Equipment</text><text x="30" font-size="11.5" fill="#ebff99" text-anchor="start" font-weight="400" y="24">manufactured</text></g><g transform="translate(1010 82)"><g transform="scale(1.6)"><g><rect x="-8" y="-8" width="16" height="16" rx="2" fill="#5cffc8" stroke="#d6fff1" stroke-width="1"/><rect x="-4" y="-4" width="8" height="8" fill="#1c0838"/><path d="M-5 -8V-11M0 -8V-11M5 -8V-11M-5 8V11M0 8V11M5 8V11M-8 -5H-11M-8 0H-11M-8 5H-11M8 -5H11M8 0H11M8 5H11" stroke="#5cffc8" stroke-width="1.4"/></g></g><text x="30" font-size="13" fill="#e6dcf5" text-anchor="start" font-weight="400" y="6">Electronics</text><text x="30" font-size="11.5" fill="#ebff99" text-anchor="start" font-weight="400" y="24">manufactured</text></g>
-    <text x="20" font-size="13" fill="#d9cdee" text-anchor="start" font-weight="400" y="140">A settled planet makes the goods its class sells, faster with more people, into its storage (none while besieged). Ports trade by the planet's class: every good is sold and bought somewhere at Sol.</text>
-    <text x="20" font-size="13" fill="#d9cdee" text-anchor="start" font-weight="400" y="176">People per unit of size, times the planet's size (1–16; gas giants 16–63), is its population cap. Moons give 6 weapon mounts each. Idea: moons mined for water ice and metals once a planet has a</text><text x="20" font-size="13" fill="#d9cdee" text-anchor="start" font-weight="400" y="192.9">Station.</text></g></svg>
+    <g transform="translate(30 82)"><g transform="scale(0.53)">
+
+
+<g transform="scale(3)"><g fill="none" stroke="#bfe6ff" stroke-width="2" stroke-linecap="round"><path d="M0 -11V11M-9.5 -5.5L9.5 5.5M-9.5 5.5L9.5 -5.5"/><path d="M-3 -9L0 -6L3 -9M-3 9L0 6L3 9" stroke-width="1.5"/></g></g>
+
+</g><text x="30" font-size="13" fill="#e6dcf5" text-anchor="start" font-weight="400" y="6">Water ice</text><text x="30" font-size="11.5" fill="#c3b3da" text-anchor="start" font-weight="400" y="24">raw</text></g><g transform="translate(170 82)"><g transform="scale(0.53)">
+
+
+<g transform="scale(3)"><g><path d="M-11 6L-7 -4H7L11 6Z" fill="#b9a6d6" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -4L-5 -8H5L7 -4Z" fill="#e5cfff"/></g></g>
+
+</g><text x="30" font-size="13" fill="#e6dcf5" text-anchor="start" font-weight="400" y="6">Metals</text><text x="30" font-size="11.5" fill="#c3b3da" text-anchor="start" font-weight="400" y="24">raw</text></g><g transform="translate(310 82)"><g transform="scale(0.53)">
+
+
+<g transform="scale(3)"><g><path d="M0 -11L9 -3L0 11L-9 -3Z" fill="#c38bff" stroke="#e5cfff" stroke-width="1"/><path d="M-9 -3H9M0 -11L-3 -3L0 11L3 -3Z" fill="none" stroke="#e5cfff" stroke-width="0.8"/></g></g>
+
+</g><text x="30" font-size="13" fill="#e6dcf5" text-anchor="start" font-weight="400" y="6">Rare elements</text><text x="30" font-size="11.5" fill="#c3b3da" text-anchor="start" font-weight="400" y="24">raw</text></g><g transform="translate(450 82)"><g transform="scale(0.53)">
+
+
+<g transform="scale(3)"><g fill="none" stroke="#7fd4ff" stroke-width="1.4"><ellipse rx="11" ry="4.5"/><ellipse rx="11" ry="4.5" transform="rotate(60)"/><ellipse rx="11" ry="4.5" transform="rotate(-60)"/><circle r="2.6" fill="#ffd65c" stroke="none"/></g></g>
+
+</g><text x="30" font-size="13" fill="#e6dcf5" text-anchor="start" font-weight="400" y="6">Helium-3</text><text x="30" font-size="11.5" fill="#c3b3da" text-anchor="start" font-weight="400" y="24">raw</text></g><g transform="translate(590 82)"><g transform="scale(0.53)">
+
+
+<g transform="scale(3)"><g><path d="M-9 9C-11 -3 -2 -10 10 -10C10 2 3 10 -9 9Z" fill="#9effa0" stroke="#e5ffe6" stroke-width="1"/><path d="M-9 9L5 -5" stroke="#2b5c2c" stroke-width="1.3"/></g></g>
+
+</g><text x="30" font-size="13" fill="#e6dcf5" text-anchor="start" font-weight="400" y="6">Organics</text><text x="30" font-size="11.5" fill="#c3b3da" text-anchor="start" font-weight="400" y="24">raw</text></g><g transform="translate(730 82)"><g transform="scale(0.53)">
+
+
+<g transform="scale(3)"><g><circle r="10.5" fill="#8f7fb0" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -3.5H7M-7 0H7M-7 3.5H7M-3.5 -7V7M0 -7V7M3.5 -7V7" stroke="#2b0c50" stroke-width="0.8"/></g></g>
+
+</g><text x="30" font-size="13" fill="#e6dcf5" text-anchor="start" font-weight="400" y="6">Silicon</text><text x="30" font-size="11.5" fill="#c3b3da" text-anchor="start" font-weight="400" y="24">raw</text></g><g transform="translate(870 82)"><g transform="scale(0.53)">
+
+
+<g transform="scale(3)"><g fill="#ffd65c" stroke="#fff3c2" stroke-width="0.8"><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(0)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(45)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(90)"/><rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(135)"/><circle r="7.5"/><circle r="3" fill="#2b0c50"/></g></g>
+
+</g><text x="30" font-size="13" fill="#e6dcf5" text-anchor="start" font-weight="400" y="6">Equipment</text><text x="30" font-size="11.5" fill="#ebff99" text-anchor="start" font-weight="400" y="24">manufactured</text></g><g transform="translate(1010 82)"><g transform="scale(0.53)">
+
+
+<g transform="scale(3)"><g><rect x="-8" y="-8" width="16" height="16" rx="2" fill="#5cffc8" stroke="#d6fff1" stroke-width="1"/><rect x="-4" y="-4" width="8" height="8" fill="#1c0838"/><path d="M-5 -8V-11M0 -8V-11M5 -8V-11M-5 8V11M0 8V11M5 8V11M-8 -5H-11M-8 0H-11M-8 5H-11M8 -5H11M8 0H11M8 5H11" stroke="#5cffc8" stroke-width="1.4"/></g></g>
+
+</g><text x="30" font-size="13" fill="#e6dcf5" text-anchor="start" font-weight="400" y="6">Electronics</text><text x="30" font-size="11.5" fill="#ebff99" text-anchor="start" font-weight="400" y="24">manufactured</text></g>
+    <text x="20" font-size="13" fill="#d9cdee" text-anchor="start" font-weight="400" y="140">A settled planet makes the goods its class sells, faster with more people, into its storage (none while besieged). Ports trade by the planet's class: every good is sold and bought somewhere at Sol.</text><text x="20" font-size="13" fill="#d9cdee" text-anchor="start" font-weight="400" y="176">People per unit of size, times the planet's size (1–16; gas giants 16–63), is its population cap. Moons give 6 weapon mounts each. Idea: moons mined for water ice and metals once a planet has a</text><text x="20" font-size="13" fill="#d9cdee" text-anchor="start" font-weight="400" y="192.9">Station.</text></g></svg>

@@ -55,3 +55,6 @@ asking him); and it gives where things stand, how to run and see the game, and w
   move, and per release), `docs/design.md`, `docs/backstory.md` (the story; Koda's: change it only when he asks).
 - `UPGRADE_NOTES.md`: the client's modernization history (older; some of it describes the old contracts).
 - `orbiter-client/dev/harness/README.md`: the screenshot and play harness.
+- `docs/tech-trees/`: the tech trees. The Markdown files are the source of truth; the pictures are
+  redrawn from them. Invented art is saved as SVG in `orbiter-client/src/assets/art/`, for the
+  pictures and the game.

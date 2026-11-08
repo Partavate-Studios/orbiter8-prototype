@@ -1,7 +1,9 @@
 // Draws the reference tech trees in docs/tech-trees/ (upgrades, crafting, planet classes) as SVG and
-// PNG, from the game's own art where it has some (the planet surfaces by class, Koda's station, ship
-// and moon, the ship NFT's drawn parts) and invented art where it doesn't (goods, platforms, the BFG).
-// Numbers are the contracts' starting values (Planets, Factory, Market, Pilots, Armory, Combat).
+// PNG. The Markdown files beside them are the source of truth: every name, number and line comes from
+// their tables, and only the layout lives here. The art is the game's own where it has some (the
+// planet surfaces by class, Koda's station, ship and moon, the ship NFT's drawn parts), read live from
+// the components, and drawings in orbiter-client/src/assets/art/ where it doesn't (goods, buildings,
+// platforms, the BFG). New drawings go in that folder, so the game can use them too.
 //
 //   node dev/tech-trees/build.mjs        (from orbiter-client/; Chrome renders the PNGs)
 import fs from 'node:fs'
@@ -86,46 +88,123 @@ function shipArt(loadout = {}, bays = 5, scale = 1) {
 
 const stationArt = (scale = 1) => `<g transform="scale(${4.8 * scale})">${STATION}</g>`
 
-// ── invented art ───────────────────────────────────────────────────────────────────────────────
 
-/** Glyphs for the eight goods, about 24 across, centered. */
-const GLYPH = {
-  water: `<g fill="none" stroke="#bfe6ff" stroke-width="2" stroke-linecap="round"><path d="M0 -11V11M-9.5 -5.5L9.5 5.5M-9.5 5.5L9.5 -5.5"/><path d="M-3 -9L0 -6L3 -9M-3 9L0 6L3 9" stroke-width="1.5"/></g>`,
-  metals: `<g><path d="M-11 6L-7 -4H7L11 6Z" fill="#b9a6d6" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -4L-5 -8H5L7 -4Z" fill="#e5cfff"/></g>`,
-  rare: `<g><path d="M0 -11L9 -3L0 11L-9 -3Z" fill="#c38bff" stroke="#e5cfff" stroke-width="1"/><path d="M-9 -3H9M0 -11L-3 -3L0 11L3 -3Z" fill="none" stroke="#e5cfff" stroke-width="0.8"/></g>`,
-  he3: `<g fill="none" stroke="#7fd4ff" stroke-width="1.4"><ellipse rx="11" ry="4.5"/><ellipse rx="11" ry="4.5" transform="rotate(60)"/><ellipse rx="11" ry="4.5" transform="rotate(-60)"/><circle r="2.6" fill="#ffd65c" stroke="none"/></g>`,
-  organics: `<g><path d="M-9 9C-11 -3 -2 -10 10 -10C10 2 3 10 -9 9Z" fill="#9effa0" stroke="#e5ffe6" stroke-width="1"/><path d="M-9 9L5 -5" stroke="#2b5c2c" stroke-width="1.3"/></g>`,
-  silicon: `<g><circle r="10.5" fill="#8f7fb0" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -3.5H7M-7 0H7M-7 3.5H7M-3.5 -7V7M0 -7V7M3.5 -7V7" stroke="#2b0c50" stroke-width="0.8"/></g>`,
-  equipment: `<g fill="#ffd65c" stroke="#fff3c2" stroke-width="0.8">${[0, 45, 90, 135].map((a) => `<rect x="-2.5" y="-11.5" width="5" height="23" rx="1" transform="rotate(${a})"/>`).join('')}<circle r="7.5"/><circle r="3" fill="#2b0c50"/></g>`,
-  electronics: `<g><rect x="-8" y="-8" width="16" height="16" rx="2" fill="#5cffc8" stroke="#d6fff1" stroke-width="1"/><rect x="-4" y="-4" width="8" height="8" fill="#1c0838"/><path d="M-5 -8V-11M0 -8V-11M5 -8V-11M-5 8V11M0 8V11M5 8V11M-8 -5H-11M-8 0H-11M-8 5H-11M8 -5H11M8 0H11M8 5H11" stroke="#5cffc8" stroke-width="1.4"/></g>`,
-  alloy: `<g><rect x="-11" y="-6" width="22" height="12" rx="2" fill="#b9a6d6" stroke="#c38bff" stroke-width="1.6"/><path d="M-11 0H11" stroke="#c38bff" stroke-width="1"/></g>`,
-  fuel: `<g><rect x="-6" y="-10" width="12" height="20" rx="3" fill="#7fd4ff" stroke="#d6f2ff" stroke-width="1"/><rect x="-3" y="-13" width="6" height="3" fill="#d6f2ff"/><path d="M-2 -4L2 0H-2L2 5" fill="none" stroke="#1c0838" stroke-width="1.4"/></g>`
+// ── the art files and the Markdown sources ─────────────────────────────────────────────────────
+
+const ART = path.join(src, 'assets/art')
+const docs = path.join(here, '../../../docs/tech-trees')
+
+/** A drawing from assets/art (120 units square, centered), without its <svg>, <defs> and comments. */
+function artFile(name) {
+  const file = path.join(ART, name + '.svg')
+  if (!fs.existsSync(file)) throw new Error(`No drawing ${name}.svg in ${ART}`)
+  return fs
+    .readFileSync(file, 'utf8')
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/<defs>[\s\S]*?<\/defs>/g, '')
+    .replace(/<\/?svg[^>]*>/g, '')
 }
-const GOODS = [
-  { key: 'water', name: 'Water ice', short: 'Water', raw: true },
-  { key: 'metals', name: 'Metals', short: 'Metals', raw: true },
-  { key: 'rare', name: 'Rare elements', short: 'Rares', raw: true },
-  { key: 'he3', name: 'Helium-3', short: 'He-3', raw: true },
-  { key: 'organics', name: 'Organics', short: 'Organics', raw: true },
-  { key: 'silicon', name: 'Silicon', short: 'Silicon', raw: true },
-  { key: 'equipment', name: 'Equipment', short: 'Equip.', raw: false },
-  { key: 'electronics', name: 'Electronics', short: 'Electr.', raw: false }
-]
-const G = Object.fromEntries(GOODS.map((g, i) => [g.key, { ...g, id: i }]))
 
-// What each class sells (makes) and buys (Market._setMix), and people per unit of size (SystemGen).
-const CLASSES = [
-  { name: 'Terrestrial', sells: ['organics', 'equipment', 'electronics'], buys: ['metals', 'rare', 'he3', 'silicon'], people: 1000, idea: ['water'], note: 'The most livable: the industry worlds' },
-  { name: 'Rocky', sells: ['metals', 'silicon'], buys: ['water', 'he3', 'organics'], people: 300, idea: ['rare'], note: 'Thin crust, rich veins' },
-  { name: 'Oceanic', sells: ['water', 'organics'], buys: ['metals', 'equipment', 'electronics'], people: 800, idea: ['silicon'], note: 'Sea farms; sand on the sea floor' },
-  { name: 'Desert', sells: ['rare', 'silicon'], buys: ['water', 'organics', 'equipment'], people: 300, idea: ['metals'], note: 'Dune fields over old ore beds' },
-  { name: 'Ice', sells: ['water'], buys: ['rare', 'organics', 'electronics'], people: 200, idea: ['he3'], note: 'Helium-3 trapped in the ice' },
-  { name: 'Volcanic', sells: ['metals', 'rare'], buys: ['water', 'silicon', 'electronics'], people: 100, idea: ['silicon'], note: 'Glass fields around the vents' },
-  { name: 'Gaseous', sells: ['he3'], buys: ['metals', 'organics', 'equipment'], people: 100, idea: ['water'], note: 'Floating cities; ice in the rings. Sizes 16–63' },
-  { name: 'Ferrous', sells: ['metals', 'equipment'], buys: ['water', 'he3', 'organics'], people: 200, idea: ['rare'], note: 'Iron worlds with foundries' },
-  { name: 'Lava', sells: ['rare', 'silicon'], buys: ['water', 'equipment', 'electronics'], people: 100, idea: ['metals'], note: 'Molten metal near the surface' },
-  { name: 'Swamp', sells: ['organics'], buys: ['metals', 'equipment', 'electronics'], people: 600, idea: ['water'], note: 'Thick air, thicker water' }
-]
+/**
+ * Art from a Markdown cell: `planet:<class>[,moons=N][,rings]`, `ship:<part>=<n>,…[,bays=N]`,
+ * `station`, `moon`, or a drawing's name in assets/art.
+ */
+function art(spec, { scale = 1, r = 36 } = {}) {
+  spec = (spec ?? '').trim()
+  if (!spec) return ''
+  const opts = (list) => Object.fromEntries(list.filter(Boolean).map((o) => o.split('=')))
+  if (spec.startsWith('planet:')) {
+    const [cls, ...rest] = spec.slice(7).split(',')
+    const o = opts(rest)
+    return planetArt(Number(cls), { r, moons: Number(o.moons ?? 0), rings: 'rings' in o || Number(cls) === 6 })
+  }
+  if (spec.startsWith('ship:')) {
+    const o = opts(spec.slice(5).split(','))
+    const bays = Number(o.bays ?? 5)
+    delete o.bays
+    return shipArt(Object.fromEntries(Object.entries(o).map(([k, v]) => [k, Number(v)])), bays, scale)
+  }
+  if (spec === 'station') return stationArt(scale)
+  if (spec === 'moon') return `<g transform="scale(${4 * scale})">${MOON}</g>`
+  return `<g transform="scale(${scale})">${artFile(spec)}</g>`
+}
+
+/** The tables of a Markdown file, by their section (## heading), as rows keyed by column. */
+function tables(file) {
+  const out = {}
+  let section = ''
+  let header = null
+  for (const line of fs.readFileSync(path.join(docs, file), 'utf8').split('\n')) {
+    const heading = line.match(/^## (.+)/)
+    if (heading) {
+      section = heading[1].trim()
+      header = null
+      continue
+    }
+    if (!line.startsWith('|')) {
+      header = null
+      continue
+    }
+    const cells = line.trim().slice(1, -1).split('|').map((c) => c.trim())
+    if (cells.every((c) => /^:?-+:?$/.test(c))) continue
+    if (!header) {
+      header = cells
+      out[section] = []
+      continue
+    }
+    out[section].push(Object.fromEntries(header.map((h, i) => [h, cells[i] ?? ''])))
+  }
+  return out
+}
+
+/** A Details cell as card lines: `<br>` between lines, `**…**` a requirement, `_…_` a side note. */
+function detailLines(cell) {
+  return (cell ?? '')
+    .split('<br>')
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .map((l) => {
+      const req = l.match(/^\*\*(.+)\*\*$/)
+      if (req) return { t: req[1], fill: YELLOW_LIGHT }
+      const note = l.match(/^_(.+)_$/)
+      if (note) return { t: note[1], fill: '#ffffff99', italic: true }
+      return l
+    })
+}
+
+const UP = tables('upgrades.md')
+const CR = tables('crafting.md')
+const PC = tables('planet-classes.md')
+const notesOf = (t) => Object.fromEntries((t.Notes ?? []).map((n) => [n.Title, n.Text.replace(/<br>/g, ' ')]))
+
+/** The goods, by lowercase name. */
+const GOODS = CR.Goods.map((g) => ({ name: g.Good, short: g.Short, kind: g.Kind, art: g.Art }))
+const goodNamed = (name) => {
+  const g = GOODS.find((x) => x.name.toLowerCase() === name.trim().toLowerCase())
+  if (!g) throw new Error(`Unknown good "${name}" (crafting.md, Goods)`)
+  return g
+}
+/** "40 metals, 20 equipment" (or "metals, silicon") → [[good, amount]]. */
+const goodsList = (cell) =>
+  (cell ?? '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map((s) => {
+      const m = s.match(/^(\d+)\s+(.+)$/)
+      return m ? [goodNamed(m[2]), Number(m[1])] : [goodNamed(s), null]
+    })
+
+const CLASSES = PC[Object.keys(PC).find((k) => PC[k][0]?.Class)] ?? PC['']
+const classes = CLASSES.map((c) => ({
+  name: c.Class,
+  art: c.Art,
+  people: Number(c['People per size']),
+  sells: goodsList(c['Mines and sells']).map(([g]) => g),
+  buys: goodsList(c['Ports buy']).map(([g]) => g),
+  idea: goodsList(c['Could also yield']).map(([g]) => g),
+  note: c.Note
+}))
 
 // ── drawing helpers ────────────────────────────────────────────────────────────────────────────
 
@@ -224,15 +303,15 @@ const arrow = (x1, y1, x2, y2, dim = false) =>
 const elbow = (x1, y1, x2, y2, dim = false) =>
   `<path d="M${x1} ${y1}V${(y1 + y2) / 2}H${x2}V${y2}" stroke="${dim ? '#af6fff' : '#c3b3da'}" stroke-width="2.5" fill="none" ${dim ? 'stroke-dasharray="7 5"' : ''} marker-end="url(#${dim ? 'arrowDim' : 'arrow'})"/>`
 
-/** A good as a chip: glyph, amount and short name. */
+/** A good (from crafting.md) as a chip: its drawing, amount and short name. */
 function chip(x, y, key, amount, { w = 0 } = {}) {
-  const g = G[key] ?? { short: key }
+  const g = key
   const label = (amount != null ? amount + ' ' : '') + g.short
   const width = w || 30 + label.length * 6.6
   return {
     w: width,
     s: `<g transform="translate(${x} ${y})"><rect width="${width}" height="22" rx="11" fill="#2e0d56" stroke="#ffffff33"/>
-    <g transform="translate(12 11) scale(0.62)">${GLYPH[key] ?? ''}</g>${text(24, 15.5, label, { size: 11.5, fill: '#ffffff' })}</g>`
+    <g transform="translate(12 11)">${art(g.art, { scale: 0.62 / 3 })}</g>${text(24, 15.5, label, { size: 11.5, fill: '#ffffff' })}</g>`
   }
 }
 function chips(x, y, list, maxW) {
@@ -256,30 +335,8 @@ function svg(w, h, body) {
 <defs>${DEFS}</defs><rect width="${w}" height="${h}" fill="url(#space)"/>${stars(w, h, 260)}${body}</svg>`
 }
 
-// ── invented building and part art ────────────────────────────────────────────────────────────
 
-const flag = `<g transform="translate(14 -30)"><path d="M0 0V-26" stroke="#ffffff" stroke-width="2"/><path d="M0 -26H16L12 -20L16 -14H0Z" fill="${YELLOW_LIGHT}"/></g>`
-const dome = (x, y, r) => `<path d="M${x - r} ${y}A${r} ${r} 0 0 1 ${x + r} ${y}Z" fill="#e5cfff" stroke="#ffffff" stroke-width="1"/><path d="M${x - r} ${y}H${x + r}" stroke="#ffffff" stroke-width="1.5"/>`
-const citadelArt = `${planetArt(0, { r: 34 })}<g transform="translate(0 -24)">${dome(0, 0, 12)}<rect x="-1" y="-22" width="2" height="10" fill="#ffffff"/></g>`
-const colonyArt = `${planetArt(0, { r: 34 })}<g transform="translate(0 -22)">${dome(-14, 4, 8)}${dome(0, 0, 11)}${dome(14, 4, 8)}</g>`
-const portArt = `${stationArt(0.85)}<g transform="translate(-34 26) rotate(30)">${shipArt({}, 5, 0.32)}</g><g transform="translate(36 -24) rotate(-140)">${shipArt({}, 5, 0.32)}</g>`
-const yardsArt = `<g stroke="#8f7fb0" stroke-width="2" fill="none"><path d="M-44 -40V40M44 -40V40M-44 -24H44M-44 24H44"/><path d="M-44 -40L-30 -24M44 -40L30 -24M-44 40L-30 24M44 40L30 24"/></g>${shipArt({}, 150, 0.7)}`
-const armoryArt = shipArt({ railguns: 3, missiles: 2, pointDefense: 2 }, 5, 0.85)
-const autofactoryArt = `<g><rect x="-40" y="-8" width="80" height="34" rx="3" fill="#3d1273" stroke="#c3b3da" stroke-width="1.5"/><path d="M-40 -8L-26 -24V-8L-12 -24V-8L2 -24V-8" fill="#5c1aae" stroke="#c3b3da" stroke-width="1.5"/><rect x="14" y="-38" width="10" height="30" fill="#5c1aae" stroke="#c3b3da" stroke-width="1.5"/><circle cx="21" cy="-46" r="5" fill="#ffffff22"/><circle cx="26" cy="-54" r="7" fill="#ffffff14"/>
-<g transform="translate(-20 10) scale(0.7)">${GLYPH.equipment}</g><g transform="translate(6 10) scale(0.7)">${GLYPH.electronics}</g><path d="M22 10H34" stroke="${YELLOW_LIGHT}" stroke-width="2" marker-end="url(#arrow)"/></g>`
-const scannerArt = `${planetArt(1, { r: 22 })}<g fill="none" stroke="#7fd4ff"><circle r="32" opacity="0.6"/><circle r="44" opacity="0.35"/><path d="M0 0L38 -24" stroke-width="2"/></g>`
-const relayArt = `<g><path d="M0 -6V30M-12 30H12" stroke="#c3b3da" stroke-width="3"/><path d="M-18 -22A24 24 0 0 0 18 -22" fill="none" stroke="#c3b3da" stroke-width="3"/><circle cy="-8" r="4" fill="${YELLOW_LIGHT}"/>${[14, 24, 34].map((r) => `<path d="M${-r * 0.7} ${-8 - r * 0.7}A${r} ${r} 0 0 1 ${r * 0.7} ${-8 - r * 0.7}" fill="none" stroke="#7fd4ff" stroke-width="1.6" opacity="${1 - r / 50}"/>`).join('')}</g>`
-const shipwrightArt = `<g transform="translate(-22 4)">${shipArt({}, 5, 0.6)}</g><g transform="translate(24 -6)">${shipArt({}, 5, 0.6)}</g><g transform="translate(2 34)" opacity="0.6">${shipArt({}, 5, 0.4)}</g>`
-const exchangeArt = `${stationArt(0.6)}<g transform="translate(-30 30) scale(0.9)">${GLYPH.organics}</g><g transform="translate(30 30) scale(0.9)">${GLYPH.metals}</g><path d="M-14 30H14" stroke="${YELLOW_LIGHT}" stroke-width="2" marker-end="url(#arrow)" marker-start="url(#arrow)"/>`
-const platformArt = (s = 1) => `<g transform="scale(${s})"><rect x="-26" y="-6" width="52" height="12" rx="3" fill="#b9a6d6" stroke="#e5cfff"/><rect x="-6" y="-20" width="12" height="40" rx="3" fill="#8f7fb0" stroke="#e5cfff"/><rect x="-40" y="-3" width="14" height="6" fill="#7fd4ff"/><rect x="26" y="-3" width="14" height="6" fill="#7fd4ff"/><rect x="-2" y="-34" width="4" height="16" fill="#ffd65c"/><rect x="-14" y="-2" width="4" height="-14" fill="#ffd65c"/></g>`
-const bfgArt = `<g><rect x="-34" y="4" width="68" height="22" rx="6" fill="#5c1aae" stroke="#c3b3da" stroke-width="1.5"/><path d="M-14 4L-6 -40H6L14 4Z" fill="#b9a6d6" stroke="#e5cfff"/><rect x="-9" y="-52" width="18" height="14" rx="3" fill="#ffd65c"/><circle cy="-58" r="10" fill="${YELLOW_LIGHT}" opacity="0.35"/><circle cy="-58" r="5" fill="#ffffff"/></g>`
-const rangeArt = `${shipArt({}, 5, 0.45)}<g fill="none" stroke="#7fd4ff" stroke-dasharray="4 4">${[24, 36, 48].map((r) => `<circle r="${r}" opacity="${1.2 - r / 50}"/>`).join('')}</g>`
-const podArt = `${shipArt({}, 250, 0.9)}`
-const beaconArt = `<g><path d="M0 -26L14 0L0 26L-14 0Z" fill="#3d1273" stroke="#c3b3da" stroke-width="2"/><circle r="5" fill="${YELLOW_LIGHT}"/>${[16, 26].map((r) => `<circle r="${r}" fill="none" stroke="#7fd4ff" stroke-width="1.4" opacity="${1 - r / 36}"/>`).join('')}</g>`
-const scanArrayArt = `<g><path d="M-20 20L0 -10L20 20Z" fill="#3d1273" stroke="#c3b3da" stroke-width="2"/><path d="M-24 -18A30 30 0 0 1 24 -18" fill="none" stroke="#7fd4ff" stroke-width="3"/><path d="M0 -10V-30" stroke="#c3b3da" stroke-width="2"/></g>`
-const glyphArt = (key, s = 3) => `<g transform="scale(${s})">${GLYPH[key]}</g>`
-
-// ── 1. Upgrades ─────────────────────────────────────────────────────────────────────────────────
+// ── 1. Upgrades (upgrades.md) ──────────────────────────────────────────────────────────────────
 
 function upgrades() {
   const W = 1600
@@ -290,230 +347,167 @@ function upgrades() {
   const gap = 30
   const x0 = 45
   const y0 = 270
-  const line = [
-    { title: 'Claim', art: `${planetArt(0, { r: 36 })}${flag}`, lines: ['2,000¢, your ship at its star', 'The planet\'s deed is an NFT', { t: 'The discoverer has the first 10 minutes', fill: '#ffffff99' }] },
-    { title: 'Citadel', art: citadelArt, lines: ['5,000¢ · 40 equip · 40 organics · 10 min', { t: 'Needs 100 people landed', fill: YELLOW_LIGHT }, 'People grow; the planet makes its class\'s goods'] },
-    { title: 'Colony', art: colonyArt, lines: ['20,000¢ · 80 equip · 40 electr · 30 min', { t: 'Needs the planet 90% full', fill: YELLOW_LIGHT }, 'Opens the Station and the Autofactory'] },
-    { title: 'Station', art: stationArt(), lines: ['50,000¢ · 150 metals · 80 electr · 1 h', 'Opens the Port'] },
-    { title: 'Port', art: portArt, lines: ['80,000¢ · 100 equip · 100 electr · 2 h', 'A market at your planet, trading by its class. You take the fee'] },
-    { title: 'Yards', art: yardsArt, lines: ['150,000¢ · 200 metals · 100 equip · 4 h', 'Sells holds and engine range to visiting pilots'] },
-    { title: 'Armory', art: armoryArt, lines: ['250,000¢ · 150 rares · 100 electr · 6 h', 'Sells weapons and armor; you take a cut'] }
-  ]
+  const at = (i) => x0 + i * (cw + gap)
+  const line = UP['Planet buildings']
   line.forEach((c, i) => {
-    const x = x0 + i * (cw + gap)
-    b += card({ x, y: y0, w: cw, h: 270, ...c })
-    if (i < line.length - 1) b += arrow(x + cw + 2, y0 + 96, x + cw + gap - 2, y0 + 96)
+    b += card({ x: at(i), y: y0, w: cw, h: 270, title: c.Building, status: c.Status, art: art(c.Art), lines: detailLines(c.Details) })
+    if (i < line.length - 1) b += arrow(at(i) + cw + 2, y0 + 96, at(i) + cw + gap - 2, y0 + 96)
   })
   b += text(x0, y0 - 10, 'Each building needs the one before. Credits are spent when it starts; goods come from the planet\'s storage.', { size: 13, fill: '#c3b3da' })
 
-  // Branches under the line
   const by = 610
-  const at = (i) => x0 + i * (cw + gap)
-  const branches = [
-    { i: 1, status: 'idea', title: 'Deep Scanner', art: scannerArt, lines: ['Charts stars two jumps out, not only neighbors', { t: 'Builds on the drand scans', fill: '#ffffff99' }] },
-    { i: 2, status: 'now', title: 'Autofactory', art: autofactoryArt, lines: ['60,000¢ · 100 equip · 100 electr · 50 silicon · 2 h', 'Builds parts from storage, five orders at a time (see Crafting)'] },
-    { i: 3, status: 'planned', title: 'Relay', art: relayArt, lines: ['Carries orders to ships far away, with signal lag', { t: 'For fleets (D26, "next")', fill: '#ffffff99' }] },
-    { i: 4, status: 'idea', title: 'Exchange', art: exchangeArt, lines: ['Standing buy and sell orders at your port, filled while you\'re away'] },
-    { i: 5, status: 'planned', title: 'Shipwright', art: shipwrightArt, lines: ['A second Orbiter 8: fleets, flown through Relays', { t: 'Ships are NFTs already', fill: '#ffffff99' }] }
-  ]
-  for (const br of branches) {
-    b += elbow(at(br.i) + cw / 2, y0 + 270, at(br.i) + cw / 2, by - 2, br.status !== 'now')
-    b += card({ x: at(br.i), y: by, w: cw, h: 270, ...br })
+  for (const br of UP.Branches) {
+    const i = line.findIndex((c) => c.Building === br.Under)
+    if (i < 0) throw new Error(`Branch ${br.Building}: no building "${br.Under}" (upgrades.md)`)
+    b += elbow(at(i) + cw / 2, y0 + 270, at(i) + cw / 2, by - 2, br.Status !== 'now')
+    b += card({ x: at(i), y: by, w: cw, h: 270, title: br.Building, status: br.Status, art: art(br.Art), lines: detailLines(br.Details) })
   }
 
-  // Planet defenses
+  // Planet defenses: the rings, outermost first, and their rules
   const dy = 930
   b += ribbon(30, dy, 'PLANET DEFENSES · where a siege\'s hits land, in order')
+  const layers = UP['Planet defenses']
   const cx = 330
   const cy = dy + 300
-  const layers = [
-    [250, '#b9a6d6', 'Platforms'],
-    [205, '#ffd65c', 'Moon guns'],
-    [165, '#7fd4ff', 'Shield'],
-    [135, '#c3b3da', 'Armor'],
-    [108, '#5cffc8', 'Weapons'],
-    [80, '#e5cfff', 'Hull']
-  ]
+  const radii = layers.map((_, i) => 250 - i * (170 / Math.max(1, layers.length - 1)))
   b += `<g transform="translate(${cx} ${cy})">`
-  layers.forEach(([r, color], i) => {
-    b += `<circle r="${r}" fill="none" stroke="${color}" stroke-width="${i === 2 ? 4 : 1.6}" stroke-dasharray="${i === 0 || i === 1 ? '6 6' : 'none'}" opacity="0.75"/>`
+  layers.forEach((l, i) => {
+    const dashed = /platform|moon/i.test(l.Layer)
+    b += `<circle r="${radii[i]}" fill="none" stroke="${l.Color}" stroke-width="${/shield/i.test(l.Layer) ? 4 : 1.6}" ${dashed ? 'stroke-dasharray="6 6"' : ''} opacity="0.75"/>`
   })
   b += planetArt(6, { r: 62, rings: false })
-  // platforms on the outer ring, moons with guns on the next
-  for (const a of [-2.2, -0.2, 1.6]) b += `<g transform="translate(${Math.cos(a) * 250} ${Math.sin(a) * 250}) rotate(${(a * 180) / Math.PI + 90})">${platformArt(0.55)}</g>`
-  for (const a of [-1.2, 0.8, 2.6, 3.9]) {
-    b += `<g transform="translate(${Math.cos(a) * 205} ${Math.sin(a) * 205})"><g transform="scale(3)">${MOON}</g><rect x="-2" y="-24" width="4" height="12" fill="#ffd65c"/><circle cx="10" cy="-8" r="3" fill="#5cffc8"/></g>`
+  const ringOf = (re) => radii[layers.findIndex((l) => re.test(l.Layer))]
+  if (ringOf(/platform/i)) for (const a of [-2.2, -0.2, 1.6]) b += `<g transform="translate(${Math.cos(a) * ringOf(/platform/i)} ${Math.sin(a) * ringOf(/platform/i)}) rotate(${(a * 180) / Math.PI + 90})">${art('orbital-platform', { scale: 0.5 })}</g>`
+  if (ringOf(/moon/i)) {
+    for (const a of [-1.2, 0.8, 2.6, 3.9]) b += `<g transform="translate(${Math.cos(a) * ringOf(/moon/i)} ${Math.sin(a) * ringOf(/moon/i)})"><g transform="scale(3)">${MOON}</g><rect x="-2" y="-24" width="4" height="12" fill="#ffd65c"/><circle cx="10" cy="-8" r="3" fill="#5cffc8"/></g>`
   }
-  layers.forEach(([r, color], i) => {
-    b += `<g transform="translate(${-r + 6} ${i % 2 ? 14 : -6})">${text(0, 0, i + 1 + '', { size: 15, fill: color, weight: 700 })}</g>`
+  layers.forEach((l, i) => {
+    b += `<g transform="translate(${-radii[i] + 6} ${i % 2 ? 14 : -6})">${text(0, 0, i + 1 + '', { size: 15, fill: l.Color, weight: 700 })}</g>`
   })
   b += '</g>'
-
-  const rows = [
-    ['Orbital platforms', '#b9a6d6', 'Up to 3, from the Autofactory (40,000¢). 150 hit points each; each adds 4 weapon mounts. Missiles do double against them. Destroyed in battle.', 'now'],
-    ['Weapons on moons', '#ffd65c', 'Each moon gives 6 free mounts for railguns, missile racks and point defense. Moons can\'t be destroyed; the weapons on them can. Outside the shield, so they\'re hit early.', 'now'],
-    ['Shield', '#7fd4ff', 'Up to 5 levels, 60 each. Regains 10% of its strength every round. Railguns do a quarter against it; missiles double.', 'now'],
-    ['Armor', '#c3b3da', 'Up to 20 plates, 50 each. Repair bots mend 5 a round each. Railguns do double.', 'now'],
-    ['The planet\'s weapons', '#5cffc8', '12 mounts plus the platforms\'. Up to 60 drones, 20 repair bots and one BFG (a 300-damage shot every 6 hours). Drones do double here.', 'now'],
-    ['Hull', '#e5cfff', '60 per tech level, the defense grid its buildings support. With all six layers gone the planet is worn down, and the attacker can file a claim (a day).', 'now']
-  ]
-  rows.forEach(([name, color, desc], i) => {
+  layers.forEach((l, i) => {
     const y = dy + 70 + i * 92
     b += `<g transform="translate(660 ${y})"><rect width="900" height="80" rx="10" fill="#12052acc" stroke="#ffffff22"/>
-      <circle cx="34" cy="40" r="20" fill="none" stroke="${color}" stroke-width="3"/>${text(34, 46, i + 1 + '', { size: 18, fill: color, anchor: 'middle', weight: 700 })}
-      ${text(70, 30, name, { size: 17, fill: '#ffffff', weight: 500 })}${text(70, 52, desc, { size: 13, fill: '#d9cdee', max: 128 })}</g>`
+      <circle cx="34" cy="40" r="20" fill="none" stroke="${l.Color}" stroke-width="3"/>${text(34, 46, i + 1 + '', { size: 18, fill: l.Color, anchor: 'middle', weight: 700 })}
+      ${text(70, 30, l.Layer, { size: 17, fill: '#ffffff', weight: 500 })}${text(70, 52, l.Rules, { size: 13, fill: '#d9cdee', max: 128 })}</g>`
   })
-  b += text(660, dy + 640, 'Rounds every 30 minutes; both sides fire with what they have at the start of a round. Allies at the star fire with the planet.', { size: 13, fill: '#c3b3da' })
+  b += text(660, dy + 70 + layers.length * 92 + 8, 'Rounds every 30 minutes; both sides fire with what they have at the start of a round. Allies at the star fire with the planet.', { size: 13, fill: '#c3b3da' })
 
   // The Orbiter 8
   const sy = 1620
   b += ribbon(30, sy, 'YOUR ORBITER 8 · one ship, six mounts')
   const s1 = sy + 70
-  b += card({ x: 45, y: s1, w: 230, h: 270, title: 'Orbiter 8', art: shipArt({}, 5, 1.05), artH: 120, lines: ['5 holds · range 1 · 6 weapon mounts', 'Registered with your call sign; an NFT whose picture shows what it carries'] })
-  const top = [
-    { title: 'Holds', art: podArt, lines: ['At a shipyard (the I.S.S. or a Yards). Each costs more than the last; up to 250', 'Pods show on the ship from 50'] },
-    { title: 'Engine range', art: rangeArt, lines: ['Range 2: 15,000¢', 'Range 3: 150,000¢', 'Range 4: 600,000¢'] },
-    { title: 'Repairs', art: `${shipArt({ armor: 2 }, 5, 0.7)}<g transform="translate(30 -24)" fill="#9effa0"><rect x="-3" y="-10" width="6" height="20"/><rect x="-10" y="-3" width="20" height="6"/></g>`, lines: ['3,000¢ at any shipyard: everything restored', 'Then 3 hours in the yard before attacking again'] },
-    { title: 'Fleet', status: 'planned', art: shipwrightArt, lines: ['More ships, flown remotely through Relays, with signal lag', { t: 'D26: "consider next"', fill: '#ffffff99' }] }
-  ]
-  top.forEach((c, i) => {
+  const [base, ...ups] = UP['Your Orbiter 8']
+  b += card({ x: 45, y: s1, w: 230, h: 270, title: base.Upgrade, status: base.Status, art: art(base.Art, { scale: 1.05 }), artH: 120, lines: detailLines(base.Details) })
+  ups.forEach((c, i) => {
     const x = 330 + i * 250
-    b += card({ x, y: s1, w: 220, h: 270, ...c })
+    b += card({ x, y: s1, w: 220, h: 270, title: c.Upgrade, status: c.Status, art: art(c.Art), lines: detailLines(c.Details) })
+    if (i === 0) b += arrow(277, s1 + 104, x - 4, s1 + 104)
+    else if (c.Status !== 'now') b += `<path d="M${x - 30} ${s1 + 104}H${x - 6}" stroke="#af6fff" stroke-width="2.5" stroke-dasharray="7 5" marker-end="url(#arrowDim)"/>`
   })
-  b += arrow(277, s1 + 104, 326, s1 + 104)
-  b += `<path d="M${330 + 3 * 250 - 30} ${s1 + 104}H${330 + 3 * 250 - 6}" stroke="#af6fff" stroke-width="2.5" stroke-dasharray="7 5" marker-end="url(#arrowDim)"/>`
-  b += `<g transform="translate(1340 ${s1 + 10})"><rect width="220" height="250" rx="12" fill="#0b0218cc" stroke="#ffffff33"/>
-    ${text(16, 30, 'How space is shared', { size: 15, fill: '#ffffff', weight: 500 })}
-    ${text(16, 56, 'Mounts (6): railgun 2, missile rack 2, point defense 1.', { size: 13, max: 30 })}
-    ${text(16, 110, 'Holds: drones 2 each, repair bots 5, armor 10 a level (up to 5), shields 20 a level (up to 3). Cargo uses the rest; colonists go 100 to a hold.', { size: 13, max: 30 })}</g>`
+  const notes = notesOf(UP)
+  const space = notes['How space is shared']
+  if (space) {
+    b += `<g transform="translate(1340 ${s1 + 10})"><rect width="220" height="250" rx="12" fill="#0b0218cc" stroke="#ffffff33"/>
+    ${text(16, 30, 'How space is shared', { size: 15, fill: '#ffffff', weight: 500 })}${text(16, 56, space, { size: 13, max: 30 })}</g>`
+  }
 
   const s2 = s1 + 330
-  b += `<path d="M160 ${s1 + 270}V${s2 - 30}H${45 + 6 * 220 + 95}" stroke="#c3b3da" stroke-width="2.5" fill="none"/>`
+  const parts = UP['Ship parts']
+  b += `<path d="M160 ${s1 + 270}V${s2 - 30}H${45 + (parts.length - 1) * 220 + 95}" stroke="#c3b3da" stroke-width="2.5" fill="none"/>`
   b += text(180, s2 - 40, 'Fitted at an armory (Sol\'s I.S.S. sells ship parts at twice their cost) or from your planet\'s Autofactory', { size: 13, fill: '#c3b3da' })
-  const parts = [
-    ['Railguns', { railguns: 3 }, ['2 mounts · 12 damage', 'Double against armor, a quarter against shields']],
-    ['Missile racks', { missiles: 3 }, ['2 mounts · 12 damage', 'Double against shields and platforms; point defense stops them']],
-    ['Point defense', { pointDefense: 6 }, ['1 mount', 'Stops 15 missile damage a round']],
-    ['Drones', { drones: 60 }, ['2 holds each · 2 damage', 'Double against weapons; not stopped']],
-    ['Armor', { armor: 5 }, ['10 holds a level, up to 5', '50 each; takes hits after the shield']],
-    ['Shield', { shields: 3 }, ['20 holds a level, up to 3', '60 each; regains 10% a round']],
-    ['Repair bots', { repairBots: 6 }, ['5 holds each', 'Mend 2 armor a round each']]
-  ]
-  parts.forEach(([name, l, lines], i) => {
+  parts.forEach((p, i) => {
     const x = 45 + i * 220
     b += `<path d="M${x + 95} ${s2 - 30}V${s2 - 2}" stroke="#c3b3da" stroke-width="2.5" marker-end="url(#arrow)"/>`
-    b += card({ x, y: s2, w: 190, h: 260, title: name, art: shipArt(l, 5, 0.95), lines })
+    b += card({ x, y: s2, w: 190, h: 260, title: p.Part, art: art(p.Art, { scale: 0.95 }), lines: detailLines(p.Details) })
   })
   return svg(W, s2 + 300, b)
 }
 
-// ── 2. Crafting ─────────────────────────────────────────────────────────────────────────────────
+// ── 2. Crafting (crafting.md, with sources from planet-classes.md) ─────────────────────────────
 
 function crafting() {
   const W = 1600
   let b = title(W, 'TECH TREE · CRAFTING', 'From what planets mine, to what the Autofactory builds, to where it\'s fitted') + legend(1270, 140)
 
-  // Raw goods
   b += ribbon(30, 150, 'RAW GOODS · mined by settled planets')
-  const raw = GOODS.filter((g) => g.raw)
+  const raw = GOODS.filter((g) => g.kind === 'raw')
   const rw = 190
   const rx = (i) => 45 + i * (rw + 16)
   const ry = 270
   raw.forEach((g, i) => {
-    const from = CLASSES.filter((c) => c.sells.includes(g.key)).map((c) => c.name)
-    b += card({ x: rx(i), y: ry, w: rw, h: 200, title: g.name, art: glyphArt(g.key, 2.6), artH: 70, lines: [{ t: 'From ' + from.join(', '), size: 12 }] })
+    const from = classes.filter((c) => c.sells.includes(g)).map((c) => c.name)
+    b += card({ x: rx(i), y: ry, w: rw, h: 200, title: g.name, art: art(g.art, { scale: 0.87 }), artH: 70, lines: [{ t: 'From ' + from.join(', '), size: 12 }] })
   })
 
-  // Manufactured
   const my = 560
-  const made = [
-    { key: 'equipment', title: 'Equipment', status: 'now', lines: ['Made by Terrestrial and Ferrous worlds today', { t: 'Idea: refine it at an Autofactory from 2 metals + 1 silicon', fill: '#ffffffaa', italic: true }], from: ['metals', 'silicon'] },
-    { key: 'electronics', title: 'Electronics', status: 'now', lines: ['Made by Terrestrial worlds today', { t: 'Idea: from 2 silicon + 1 rare element', fill: '#ffffffaa', italic: true }], from: ['silicon', 'rare'] },
-    { key: 'alloy', title: 'Alloy', status: 'idea', lines: ['3 metals + 1 rare element', 'Lighter armor and platforms: a better tier of plating'], from: ['metals', 'rare'] },
-    { key: 'fuel', title: 'Fuel cells', status: 'idea', lines: ['2 helium-3 + 1 water ice', 'Charges the BFG faster; a longer jump for one trip'], from: ['he3', 'water'] }
-  ]
+  const made = CR['Manufactured goods']
   const mx = (i) => 120 + i * 300
   made.forEach((m, i) => {
-    for (const f of m.from) {
-      const ri = raw.findIndex((g) => g.key === f)
-      b += `<path d="M${rx(ri) + rw / 2} ${ry + 200}C${rx(ri) + rw / 2} ${ry + 250} ${mx(i) + 110} ${my - 60} ${mx(i) + 110} ${my - 4}" fill="none" stroke="${m.status === 'now' ? '#ffffff55' : '#ffffff55'}" stroke-width="2" stroke-dasharray="2 5" stroke-linecap="round" marker-end="url(#arrowDim)"/>`
+    for (const [g] of goodsList(m.From)) {
+      const ri = raw.indexOf(g)
+      if (ri < 0) continue
+      b += `<path d="M${rx(ri) + rw / 2} ${ry + 200}C${rx(ri) + rw / 2} ${ry + 250} ${mx(i) + 110} ${my - 60} ${mx(i) + 110} ${my - 4}" fill="none" stroke="#ffffff55" stroke-width="2" stroke-dasharray="2 5" stroke-linecap="round" marker-end="url(#arrowDim)"/>`
     }
-    b += card({ x: mx(i), y: my, w: 220, h: 250, title: m.title, art: glyphArt(m.key, 2.6), artH: 74, status: m.status, lines: m.lines })
+    b += card({ x: mx(i), y: my, w: 220, h: 250, title: m.Good, art: art(goodNamed(m.Good).art, { scale: 0.87 }), artH: 74, status: m.Status, lines: detailLines(m.Details) })
   })
   b += ribbon(30, my - 50, 'MANUFACTURED GOODS', 320)
-  b += `<g transform="translate(1340 ${my})"><rect width="220" height="250" rx="12" fill="#0b0218cc" stroke="#ffffff33"/>
-    ${text(16, 30, 'Today', { size: 15, fill: '#ffffff', weight: 500 })}
-    ${text(16, 56, 'Every good is made by planets of some class (see Planet Classes) and traded at ports. Nothing is refined yet: the dotted lines are the crafting milestone\'s recipes (D58: "crafting adds recipes later").', { size: 13, max: 30 })}</g>`
+  const notes = notesOf(CR)
+  const panel = (x, y, w, h, t) =>
+    notes[t] ? `<g transform="translate(${x} ${y})"><rect width="${w}" height="${h}" rx="12" fill="#0b0218cc" stroke="#ffffff33"/>${text(16, 30, t, { size: 15, fill: '#ffffff', weight: 500 })}${text(16, 56, notes[t], { size: 13, max: Math.floor((w - 30) / 6.8) })}</g>` : ''
+  b += panel(1340, my, 220, 250, 'Today')
 
-  // The Autofactory's parts, by tier
+  // The Autofactory, its kinds (planned), and its parts by tier
   const py = 920
   b += ribbon(30, py - 50, 'THE AUTOFACTORY · parts, by tier')
-  b += card({ x: 45, y: py + 150, w: 200, h: 250, title: 'Autofactory', art: autofactoryArt, lines: ['After Colony', 'Five orders at a time; goods paid when queued, built one after another'] })
+  const factory = UP.Branches.find((r) => r.Building === 'Autofactory')
+  b += card({ x: 45, y: py + 10, w: 200, h: 250, title: 'Autofactory', status: factory?.Status ?? 'now', art: art(factory?.Art ?? 'autofactory'), lines: ['After Colony', 'Five orders at a time; goods paid when queued, built one after another'] })
+  ;(CR['Autofactory kinds (planned, to design)'] ?? []).forEach((k, i) => {
+    const y = py + 300 + i * 256
+    if (i === 0) b += `<path d="M145 ${py + 262}V${y - 4}" stroke="#af6fff" stroke-width="2.5" stroke-dasharray="7 5" marker-end="url(#arrowDim)"/>`
+    b += card({ x: 45, y, w: 200, h: 244, title: k.Kind.replace(' Autofactory', ''), status: k.Status, art: art(k.Art, { scale: 0.8 }), artH: 80, lines: detailLines(k.Details), size: 11.5 })
+  })
   const FITS = { ship: 'Ship', planet: 'Planet', moons: 'Moons' }
-  const P = (name, credits, time, recipe, fits, l, art) => ({ name, credits, time, recipe, fits, l, art })
-  const tiers = [
-    ['Tier I · basics', [
-      P('Drone', '500¢', '5 min', [['metals', 5], ['electronics', 3]], ['ship', 'planet'], { drones: 60 }),
-      P('Repair bot', '2,000¢', '15 min', [['equipment', 10], ['electronics', 10]], ['ship', 'planet'], { repairBots: 6 }),
-      P('Armor plating', '2,500¢', '20 min', [['metals', 50]], ['ship', 'planet'], { armor: 5 }),
-      P('Point defense', '3,000¢', '20 min', [['metals', 20], ['electronics', 10]], ['ship', 'planet', 'moons'], { pointDefense: 6 })
-    ]],
-    ['Tier II · weapons', [
-      P('Railgun', '6,000¢', '40 min', [['metals', 40], ['equipment', 20]], ['ship', 'planet', 'moons'], { railguns: 3 }),
-      P('Missile rack', '6,000¢', '40 min', [['he3', 30], ['electronics', 20]], ['ship', 'planet', 'moons'], { missiles: 3 }),
-      P('Shield generator', '8,000¢', '1 h', [['rare', 20], ['electronics', 30]], ['ship', 'planet'], { shields: 3 })
-    ]],
-    ['Tier III · planets', [
-      P('Orbital platform', '40,000¢', '3 h', [['metals', 200], ['equipment', 100]], ['planet'], null, platformArt(1.1)),
-      { ...P('Relay beacon', '?', '?', [['electronics', 40], ['rare', 20]], ['planet'], null, beaconArt), status: 'planned', note: 'For fleets' },
-      { ...P('Scanner array', '?', '?', [['silicon', 60], ['electronics', 30]], ['planet'], null, scanArrayArt), status: 'idea', note: 'For a Deep Scanner' }
-    ]],
-    ['Tier IV · the big one', [
-      P('BFG', '150,000¢', '8 h', [['rare', 150], ['electronics', 150]], ['planet'], null, bfgArt),
-      { ...P('Cargo pod', '?', '?', [['metals', 30], ['alloy', 10]], ['ship'], null, glyphArt('alloy', 2.4)), status: 'idea', note: '+10 holds without a shipyard' },
-      { ...P('Colony pod', '?', '?', [['organics', 60], ['equipment', 40]], ['ship'], null, `${dome(0, 14, 26)}`), status: 'idea', note: 'Claim and land 100 people in one move' }
-    ]]
-  ]
+  const tiers = []
+  for (const p of CR['Autofactory parts']) {
+    let t = tiers.find((x) => x.label === p.Tier)
+    if (!t) tiers.push((t = { label: p.Tier, parts: [] }))
+    t.parts.push(p)
+  }
   const tx = (i) => 300 + i * 320
-  tiers.forEach(([label, list], t) => {
-    b += text(tx(t) + 140, py - 6, label, { size: 15, fill: '#ffffff', anchor: 'middle', weight: 500 })
-    list.forEach((p, i) => {
+  tiers.forEach((tier, t) => {
+    b += text(tx(t) + 140, py - 6, 'Tier ' + tier.label, { size: 15, fill: '#ffffff', anchor: 'middle', weight: 500 })
+    tier.parts.forEach((p, i) => {
       const y = py + 10 + i * 190
       const w = 280
-      const st = STATUS[p.status ?? 'now']
+      const status = p.Status || 'now'
+      const st = STATUS[status]
       let s = `<g transform="translate(${tx(t)} ${y})">`
-      s += p.status ? `<rect x="1" y="1" width="${w - 2}" height="176" rx="12" fill="#12052acc" ${st.stroke}/>` : `<rect width="${w}" height="178" rx="12" fill="url(#cardEdge)"/><rect x="4" y="4" width="${w - 8}" height="170" rx="9" fill="#12052a"/>`
-      s += `<rect x="10" y="10" width="86" height="86" rx="8" fill="url(#artBox)"/><g transform="translate(53 53) scale(0.8)">${p.art ?? shipArt(p.l, 5, 0.9)}</g>`
-      s += text(106, 30, p.name, { size: 15.5, fill: '#ffffff', weight: 500 })
-      s += text(106, 50, p.status ? (p.note ?? '') : `${p.credits} · ${p.time}`, { size: 12.5, fill: p.status ? '#ffffffaa' : '#d9cdee', italic: !!p.status, max: 26 })
-      s += text(106, 88, 'Fits: ' + p.fits.map((f) => FITS[f]).join(' · '), { size: 12, fill: YELLOW_LIGHT })
-      const ch = chips(10, 108, p.recipe, w - 20)
-      s += ch.s
-      if (p.status) s += text(w - 12, 168, st.label, { size: 11, fill: p.status === 'planned' ? '#c9a2ff' : '#ffffffaa', anchor: 'end', italic: true })
+      s += status !== 'now' ? `<rect x="1" y="1" width="${w - 2}" height="176" rx="12" fill="#12052acc" ${st.stroke}/>` : `<rect width="${w}" height="178" rx="12" fill="url(#cardEdge)"/><rect x="4" y="4" width="${w - 8}" height="170" rx="9" fill="#12052a"/>`
+      s += `<rect x="10" y="10" width="86" height="86" rx="8" fill="url(#artBox)"/><g transform="translate(53 53) scale(0.8)">${art(p.Art, { scale: 0.9 })}</g>`
+      s += text(106, 30, p.Part, { size: 15.5, fill: '#ffffff', weight: 500 })
+      const sub = status !== 'now' ? p.Note : [p.Price && p.Time ? `${p.Price} · ${p.Time}` : '', p.Note].filter(Boolean).join(' · ')
+      s += text(106, 50, sub, { size: 12.5, fill: status !== 'now' ? '#ffffffaa' : '#d9cdee', italic: status !== 'now', max: 26 })
+      s += text(106, 88, 'Fits: ' + p.Fits.split(',').map((f) => FITS[f.trim()] ?? f.trim()).join(' · '), { size: 12, fill: YELLOW_LIGHT })
+      s += chips(10, 108, goodsList(p.Recipe), w - 20).s
+      if (status !== 'now') s += text(w - 12, 168, st.label, { size: 11, fill: status === 'planned' ? '#c9a2ff' : '#ffffffaa', anchor: 'end', italic: true })
       b += s + '</g>'
     })
-    if (t === 0) b += arrow(247, py + 275, tx(0) - 6, py + 275)
+    if (t === 0) b += arrow(247, py + 135, tx(0) - 6, py + 135)
     else b += arrow(tx(t) - 38, py + 90, tx(t) - 6, py + 90)
   })
 
-  // Where parts go
-  const gy = py + 10 + 4 * 190 + 20
+  const kinds = CR['Autofactory kinds (planned, to design)']?.length ?? 0
+  const gy = py + Math.max(10 + Math.max(...tiers.map((t) => t.parts.length)) * 190, 300 + kinds * 256) + 20
   b += ribbon(30, gy, 'WHERE PARTS GO')
-  const targets = [
-    ['Your Orbiter 8', shipArt({ railguns: 2, missiles: 1, pointDefense: 2, armor: 2 }, 50, 1), '6 mounts, plus holds for drones, bots, armor and shields. Fitted at your planet, or bought at an armory.'],
-    ['Your planet', planetArt(0, { r: 40 }), '12 mounts plus 4 a platform; up to 60 drones, 20 bots, 20 plates, 5 shield levels, 1 BFG. Fitted from anywhere, even mid-siege.'],
-    ['Its moons', `<g transform="scale(5)">${MOON}</g><rect x="-3" y="-44" width="6" height="22" fill="#ffd65c"/>`, '6 mounts a moon for railguns, missile racks and point defense. Free, can\'t be destroyed; their weapons sit outside the shield.']
-  ]
-  targets.forEach(([name, art, desc], i) => {
-    b += card({ x: 45 + i * 420, y: gy + 60, w: 390, h: 240, title: name, art, artH: 110, lines: [desc] })
+  CR['Where parts go'].forEach((t, i) => {
+    b += card({ x: 45 + i * 420, y: gy + 60, w: 390, h: 240, title: t.Target, art: art(t.Art, { r: 40 }), artH: 110, lines: detailLines(t.Details) })
   })
-  b += `<g transform="translate(1310 ${gy + 60})"><rect width="250" height="240" rx="12" fill="#0b0218cc" stroke="#ffffff33"/>
-    ${text(16, 30, 'Moving parts', { size: 15, fill: '#ffffff', weight: 500 })}
-    ${text(16, 56, 'Ship parts go both ways between your ship and your planet. Platforms and the BFG stay on planets. Weapons come off moons only in peace.', { size: 13, max: 34 })}</g>`
+  b += panel(1310, gy + 60, 250, 240, 'Moving parts')
   return svg(W, gy + 340, b)
 }
 
-// ── 3. Planet classes ───────────────────────────────────────────────────────────────────────────
+// ── 3. Planet classes (planet-classes.md) ──────────────────────────────────────────────────────
 
 function planetClasses() {
   const W = 1600
@@ -521,29 +515,31 @@ function planetClasses() {
   const cw = 290
   const ch = 470
   const gap = 17
-  CLASSES.forEach((c, i) => {
+  classes.forEach((c, i) => {
     const x = 45 + (i % 5) * (cw + gap)
     const y = 150 + Math.floor(i / 5) * (ch + 24)
     let s = `<g transform="translate(${x} ${y})"><rect width="${cw}" height="${ch}" rx="14" fill="url(#cardEdge)"/><rect x="5" y="5" width="${cw - 10}" height="${ch - 10}" rx="11" fill="#12052a"/>`
     s += `<rect x="12" y="11" width="${cw - 24}" height="28" rx="14" fill="url(#pill)" stroke="#ffffff22"/>${text(cw / 2, 30, c.name, { size: 16, fill: '#ffffff', anchor: 'middle', weight: 500 })}`
-    s += `<rect x="12" y="46" width="${cw - 24}" height="150" rx="8" fill="url(#artBox)"/><g transform="translate(${cw / 2} 121)">${planetArt(i, { r: 52, moons: i === 6 ? 3 : i % 3 === 0 ? 1 : 0 })}</g>`
+    s += `<rect x="12" y="46" width="${cw - 24}" height="150" rx="8" fill="url(#artBox)"/><g transform="translate(${cw / 2} 121)">${art(c.art, { r: 52 })}</g>`
     s += text(16, 220, c.note, { size: 12.5, fill: '#c3b3da', italic: true, max: 42 })
     s += text(16, 240, `${c.people.toLocaleString('en-US')} people per unit of size`, { size: 12, fill: '#ffffffaa' })
     s += text(16, 270, 'Mines and makes · its ports sell', { size: 12.5, fill: YELLOW_LIGHT })
-    s += chips(16, 278, c.sells.map((k) => [k]), cw - 32).s
+    s += chips(16, 278, c.sells.map((g) => [g]), cw - 32).s
     s += text(16, 336, 'Its ports buy', { size: 12.5, fill: '#d9cdee' })
-    s += chips(16, 344, c.buys.map((k) => [k]), cw - 32).s
+    s += chips(16, 344, c.buys.map((g) => [g]), cw - 32).s
     s += `<rect x="12" y="${ch - 66}" width="${cw - 24}" height="54" rx="8" fill="none" stroke="#ffffff77" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/>`
     s += text(22, ch - 46, 'Idea: could also yield', { size: 12, fill: '#ffffffaa', italic: true })
-    s += chips(22, ch - 38, c.idea.map((k) => [k]), cw - 44).s
+    s += chips(22, ch - 38, c.idea.map((g) => [g]), cw - 44).s
     b += s + '</g>'
   })
-  const fy = 150 + 2 * (ch + 24) + 10
+  const rows = Math.ceil(classes.length / 5)
+  const fy = 150 + rows * (ch + 24) + 10
+  const eight = GOODS.filter((g) => g.kind !== 'intermediate')
+  const notes = notesOf(PC)
   b += `<g transform="translate(45 ${fy})"><rect width="1510" height="200" rx="12" fill="#0b0218cc" stroke="#ffffff33"/>
     ${text(20, 32, 'The eight goods', { size: 16, fill: '#ffffff', weight: 500 })}
-    ${GOODS.map((g, i) => `<g transform="translate(${30 + i * 140} 82)"><g transform="scale(1.6)">${GLYPH[g.key]}</g>${text(30, 6, g.name, { size: 13 })}${text(30, 24, g.raw ? 'raw' : 'manufactured', { size: 11.5, fill: g.raw ? '#c3b3da' : YELLOW_LIGHT })}</g>`).join('')}
-    ${text(20, 140, 'A settled planet makes the goods its class sells, faster with more people, into its storage (none while besieged). Ports trade by the planet\'s class: every good is sold and bought somewhere at Sol.', { size: 13, fill: '#d9cdee', max: 200 })}
-    ${text(20, 176, 'People per unit of size, times the planet\'s size (1–16; gas giants 16–63), is its population cap. Moons give 6 weapon mounts each. Idea: moons mined for water ice and metals once a planet has a Station.', { size: 13, fill: '#d9cdee', max: 200 })}</g>`
+    ${eight.map((g, i) => `<g transform="translate(${30 + i * 140} 82)">${art(g.art, { scale: 0.53 })}${text(30, 6, g.name, { size: 13 })}${text(30, 24, g.kind, { size: 11.5, fill: g.kind === 'raw' ? '#c3b3da' : YELLOW_LIGHT })}</g>`).join('')}
+    ${Object.values(notes).map((t, i) => text(20, 140 + i * 36, t, { size: 13, fill: '#d9cdee', max: 200 })).join('')}</g>`
   return svg(W, fy + 240, b)
 }
 

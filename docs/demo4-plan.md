@@ -110,8 +110,10 @@ hard to add later because it shapes the data, low-hanging, or the battle minimum
 ### Consider next (proposed)
 
 - **Battle, more:** the Federation punishing attacks on its planets (D49), overheating, experience, booby traps, ship-to-ship combat, asteroid attacks
+- **Battle you can watch (to do, Koda 2026-11-07):** drones fight as swarms of small triangles or dots moving in groups: very simple SVG, so many draw fast, like the shuttles going back and forth between the big ships and the ports. A first drawing is `orbiter-client/src/assets/art/drone-swarm.svg`.
 - **Social:** corporations, corporate law, protected zones, pirates and bands, bounties
 - **Economy and building:** supply routes, crafting, builders (probes, autofactories), negotiated prices, branching tech tree
+- **Two kinds of Autofactory (to do, Koda 2026-11-07):** ground (terrestrial) and orbital autofactories build slightly different things, with a lot of overlap. Details to design later; first guesses in `docs/tech-trees/crafting.md`, "Autofactory kinds".
 - **Fleets:** several ships per pilot, with remote control (signal lag, relays); refine first (D26)
 - **Bigger systems:** terraforming (designed together), digital pilots (cubes, lag, relays, escape pods, cube hunting), tractor beams
 - **3D rendering** (Koda has a ship model and a prototype project to reference) (D33)
