@@ -5,7 +5,8 @@ pragma solidity ^0.8.38;
 /// @notice No dice (D50): each 30-minute round, both sides fire with what they have at its start,
 /// then the hits land. orbiter-client sdk/v4/combat.js mirrors it; the simulator tunes the numbers.
 ///
-/// Hits land in layers, in order. A planet: orbital platforms, its shield, armor, its weapon
+/// Hits land in layers, in order. A planet: orbital platforms, the weapons on its moons (outside the
+/// shield; moons give mounts and can't be destroyed, D61), its shield, armor, its own weapon
 /// systems, then its hull (the defense grid its buildings support). A ship: its shield, then armor;
 /// when both are gone it retreats (D52), and what's left of that round's hits disables weapons, then
 /// costs engine range, then bays (D46).
@@ -14,6 +15,7 @@ pragma solidity ^0.8.38;
 ///
 /// | Attack   | Platforms | Shields | Armor | Systems | Hull |
 /// |----------|-----------|---------|-------|---------|------|
+/// (Weapons on moons are systems.)
 /// | Railgun  | 100       | 25      | 200   | 100     | 100  |
 /// | Missile  | 200       | 200     | 100   | 100     | 100  |
 /// | Drone    | 25        | 100     | 50    | 200     | 100  |
@@ -70,6 +72,11 @@ library Combat {
         uint16 baysLost;
         uint16 maxBaysLoss;
         bool retreated;
+        // planet only: weapons on its moons (D61), hit before its shield
+        uint16 moonPointDefense;
+        uint16 moonRailguns;
+        uint16 moonMissiles;
+        uint32 moonCarry; // damage toward the next weapon on a moon
     }
 
     /// Extra fire on a side's behalf (ships joining the defense).
@@ -109,10 +116,10 @@ library Combat {
         // A ship that has retreated no longer fires.
         uint256[3] memory atPlanet = attacker.retreated
             ? [uint256(0), 0, 0]
-            : _fire(attacker.railguns, attacker.missiles, attacker.drones, planet.pointDefense);
+            : _fire(attacker.railguns, attacker.missiles, attacker.drones, planet.pointDefense + planet.moonPointDefense);
         uint256[3] memory atShip = _fire(
-            planet.railguns + allies.railguns,
-            planet.missiles + allies.missiles,
+            planet.railguns + planet.moonRailguns + allies.railguns,
+            planet.missiles + planet.moonMissiles + allies.missiles,
             planet.drones + allies.drones,
             attacker.pointDefense
         );
@@ -146,6 +153,7 @@ library Combat {
     /// Lands `damage` of one kind on a planet, layer by layer.
     function _hitPlanet(Side memory p, uint256 kind, uint256 damage) private pure {
         damage = _absorb(damage, kind, 0, p, 0);
+        damage = _moons(p, kind, damage);
         damage = _absorb(damage, kind, 1, p, 1);
         damage = _absorb(damage, kind, 2, p, 2);
         damage = _systems(p, kind, damage);
@@ -223,6 +231,27 @@ library Combat {
         return (hits * 100) / mult;
     }
 
+    /// Destroys the weapons on a planet's moons (point defense, railguns, missile racks), at the
+    /// systems' multiplier; returns the damage left over. The moons themselves stay.
+    function _moons(Side memory p, uint256 kind, uint256 damage) private pure returns (uint256) {
+        if (damage == 0 || _moonCount(p) == 0) return damage;
+        uint256 mult = _mult(kind, 3);
+        uint256 hits = (damage * mult) / 100 + p.moonCarry;
+        p.moonCarry = 0;
+        (p.moonPointDefense, hits) = _destroy(p.moonPointDefense, WEAPON_HP, hits);
+        (p.moonRailguns, hits) = _destroy(p.moonRailguns, WEAPON_HP, hits);
+        (p.moonMissiles, hits) = _destroy(p.moonMissiles, WEAPON_HP, hits);
+        if (_moonCount(p) > 0) {
+            p.moonCarry = uint32(hits);
+            return 0;
+        }
+        return (hits * 100) / mult;
+    }
+
+    function _moonCount(Side memory p) private pure returns (uint256) {
+        return uint256(p.moonPointDefense) + p.moonRailguns + p.moonMissiles;
+    }
+
     function _destroy(uint16 count, uint256 hp, uint256 hits) private pure returns (uint16, uint256) {
         uint256 lost = hits / hp;
         if (lost >= count) return (0, hits - uint256(count) * hp);
@@ -242,7 +271,8 @@ library Combat {
 
     /// The planet's defenses are gone (D47): nothing left in any layer.
     function wornDown(Side memory p) internal pure returns (bool) {
-        return p.platforms == 0 && p.shield == 0 && p.armor == 0 && p.hull == 0 && _systemCount(p) == 0;
+        return p.platforms == 0 && p.shield == 0 && p.armor == 0 && p.hull == 0 && _systemCount(p) == 0
+            && _moonCount(p) == 0;
     }
 
     /// The attacker can't go on: retreated, or nothing left to fire.

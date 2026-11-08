@@ -77,6 +77,7 @@ A unit's margin, from a full selling port to a needy buying port, is 1.2 × its 
 | Repair bots | 5 armor a round each on a planet, 2 on a ship |
 | A ship | 6 mounts (point defense 1, railgun 2, missile rack 2); up to 5 armor levels and 3 shield levels |
 | A planet | 12 mounts plus 4 per orbital platform (up to 3); up to 60 drones, 20 repair bots, 20 armor plates, 5 shield levels, 1 BFG |
+| Moons (D61) | 6 mounts each for weapons, can't be destroyed; their weapons are hit after platforms, before the shield |
 | Parts at Sol's I.S.S. | twice their Autofactory cost; a player's Armory sells at 1.5 times, to its owner |
 | Repairs | 3,000 credits at any shipyard, then 3 hours in the yard |
 | A claim | filed once the planet is worn down; completes 24 hours later unless its defenses are back or the attacker is gone |

@@ -301,6 +301,11 @@ contract Planets is ModuleBase {
         emit Named(id, part, name);
     }
 
+    /// How many moons a planet has: each gives six weapon mounts that can't be destroyed (D61).
+    function moonCount(uint256 id) external view returns (uint256 n) {
+        for (uint256 m = SystemGen.moonSlots(_seed(), id >> 8, id & 0xff); m != 0; m >>= 1) n += m & 1;
+    }
+
     /// The names an owner has given: the planet, its station, then moons by orbit ("" where unnamed).
     function namesOf(uint256 id) external view returns (string[10] memory names) {
         for (uint8 part = 0; part < 10; part++) {

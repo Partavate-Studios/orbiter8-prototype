@@ -269,6 +269,21 @@
             "name": "bfg",
             "type": "uint8",
             "internalType": "uint8"
+          },
+          {
+            "name": "moonPointDefense",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "moonRailguns",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "moonMissiles",
+            "type": "uint16",
+            "internalType": "uint16"
           }
         ]
       }
@@ -518,6 +533,26 @@
             "name": "retreated",
             "type": "bool",
             "internalType": "bool"
+          },
+          {
+            "name": "moonPointDefense",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "moonRailguns",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "moonMissiles",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "moonCarry",
+            "type": "uint32",
+            "internalType": "uint32"
           }
         ]
       }
@@ -664,6 +699,26 @@
                 "name": "retreated",
                 "type": "bool",
                 "internalType": "bool"
+              },
+              {
+                "name": "moonPointDefense",
+                "type": "uint16",
+                "internalType": "uint16"
+              },
+              {
+                "name": "moonRailguns",
+                "type": "uint16",
+                "internalType": "uint16"
+              },
+              {
+                "name": "moonMissiles",
+                "type": "uint16",
+                "internalType": "uint16"
+              },
+              {
+                "name": "moonCarry",
+                "type": "uint32",
+                "internalType": "uint32"
               }
             ]
           },
@@ -766,6 +821,26 @@
                 "name": "retreated",
                 "type": "bool",
                 "internalType": "bool"
+              },
+              {
+                "name": "moonPointDefense",
+                "type": "uint16",
+                "internalType": "uint16"
+              },
+              {
+                "name": "moonRailguns",
+                "type": "uint16",
+                "internalType": "uint16"
+              },
+              {
+                "name": "moonMissiles",
+                "type": "uint16",
+                "internalType": "uint16"
+              },
+              {
+                "name": "moonCarry",
+                "type": "uint32",
+                "internalType": "uint32"
               }
             ]
           }
@@ -899,6 +974,21 @@
             "name": "bfg",
             "type": "uint8",
             "internalType": "uint8"
+          },
+          {
+            "name": "moonPointDefense",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "moonRailguns",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "moonMissiles",
+            "type": "uint16",
+            "internalType": "uint16"
           }
         ]
       }
@@ -1016,6 +1106,26 @@
             "name": "retreated",
             "type": "bool",
             "internalType": "bool"
+          },
+          {
+            "name": "moonPointDefense",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "moonRailguns",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "moonMissiles",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "moonCarry",
+            "type": "uint32",
+            "internalType": "uint32"
           }
         ]
       }
@@ -1162,6 +1272,26 @@
                 "name": "retreated",
                 "type": "bool",
                 "internalType": "bool"
+              },
+              {
+                "name": "moonPointDefense",
+                "type": "uint16",
+                "internalType": "uint16"
+              },
+              {
+                "name": "moonRailguns",
+                "type": "uint16",
+                "internalType": "uint16"
+              },
+              {
+                "name": "moonMissiles",
+                "type": "uint16",
+                "internalType": "uint16"
+              },
+              {
+                "name": "moonCarry",
+                "type": "uint32",
+                "internalType": "uint32"
               }
             ]
           },
@@ -1264,6 +1394,26 @@
                 "name": "retreated",
                 "type": "bool",
                 "internalType": "bool"
+              },
+              {
+                "name": "moonPointDefense",
+                "type": "uint16",
+                "internalType": "uint16"
+              },
+              {
+                "name": "moonRailguns",
+                "type": "uint16",
+                "internalType": "uint16"
+              },
+              {
+                "name": "moonMissiles",
+                "type": "uint16",
+                "internalType": "uint16"
+              },
+              {
+                "name": "moonCarry",
+                "type": "uint32",
+                "internalType": "uint32"
               }
             ]
           }
@@ -1530,6 +1680,21 @@
             "name": "bfg",
             "type": "uint8",
             "internalType": "uint8"
+          },
+          {
+            "name": "moonPointDefense",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "moonRailguns",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "moonMissiles",
+            "type": "uint16",
+            "internalType": "uint16"
           }
         ]
       }

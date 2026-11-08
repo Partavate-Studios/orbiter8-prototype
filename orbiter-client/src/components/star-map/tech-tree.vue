@@ -40,6 +40,10 @@
         </tbody>
       </table>
       <p class="sub">Finished parts wait in the Factory page: install them on the planet, or fit them to your ship.</p>
+      <p class="sub">
+        Each moon gives six free mounts for railguns, missile racks and point defense. Moons can't be destroyed, but
+        the weapons on them sit outside the planet's shield and are hit first, after any platforms.
+      </p>
       </div>
     </article>
   </div>

@@ -61,6 +61,7 @@ const WORDS = {
   Behind: () => 'Record the rounds first.',
   PlanetOnly: () => 'That part goes on planets only.',
   TooMany: () => "There's no room for more of those.",
+  WeaponsOnly: () => 'Moons take weapons only: railguns, missile racks and point defense.',
   InBattle: () => "The loadout can't change during a siege.",
   NoArmory: () => "There's no armory there.",
   NotEnough: () => 'Not enough credits.',

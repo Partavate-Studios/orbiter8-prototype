@@ -8,6 +8,7 @@ import {Planets} from "../../src/planets/Planets.sol";
 import {Battle} from "../../src/battle/Battle.sol";
 import {Armory} from "../../src/battle/Armory.sol";
 import {Combat} from "../../src/battle/Combat.sol";
+import {SystemGen} from "../../src/planets/SystemGen.sol";
 
 contract BattleFixture is PlanetsFixture {
     Battle battle;
@@ -92,7 +93,7 @@ contract BattleTest is BattleFixture {
 
     function test_defensesDriveAnAttackerOffAndTheShipNeedsRepair() public {
         _citadel();
-        _defend(Battle.Defenses(0, 6, 0, 0, 0, 4, 0, 0, 0)); // six railguns, four armor plates
+        _defend(Battle.Defenses(0, 6, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0)); // six railguns, four armor plates
         _armBo(2);
         _go(bo, star);
         vm.prank(bo);
@@ -125,7 +126,7 @@ contract BattleTest is BattleFixture {
 
     function test_theOwnersShipDefendsWhenItsThere() public {
         _citadel();
-        _defend(Battle.Defenses(0, 0, 0, 0, 0, 10, 0, 0, 0)); // armor only: the planet can't shoot
+        _defend(Battle.Defenses(0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0)); // armor only: the planet can't shoot
         _pay(ada, 1_000_000);
         _go(ada, 0);
         vm.startPrank(ada);
@@ -145,7 +146,7 @@ contract BattleTest is BattleFixture {
 
     function test_leavingEndsTheSiege() public {
         _citadel();
-        _defend(Battle.Defenses(0, 0, 0, 0, 0, 20, 0, 0, 0));
+        _defend(Battle.Defenses(0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0));
         _armBo(0);
         _go(bo, star);
         vm.prank(bo);
@@ -165,7 +166,7 @@ contract BattleTest is BattleFixture {
         _go(bo, star);
         vm.prank(bo);
         battle.attack(home);
-        _defend(Battle.Defenses(0, 0, 0, 0, 0, 20, 0, 3, 0)); // armor and platforms, right away
+        _defend(Battle.Defenses(0, 0, 0, 0, 0, 20, 0, 3, 0, 0, 0, 0)); // armor and platforms, right away
         skip(1 hours);
         battle.advance(home);
         (Battle.Siege memory s,) = battle.siegeOf(home);
@@ -181,6 +182,40 @@ contract BattleTest is BattleFixture {
         armory.buy(EARTH, POINT_DEFENSE, 1, type(uint256).max);
         vm.stopPrank();
         assertEq(pilots.shipOf(bo).loadout.railguns, 3);
+    }
+
+    /// Moons give six mounts each (D61), for weapons only; they can be cleared mid-peace and refitted.
+    function test_moonsCarrySixMountsEachForWeapons() public {
+        // A planet of the test star with moons
+        bytes32 seed = keccak256("test universe");
+        uint256 body;
+        while (SystemGen.moonSlots(seed, star, body) == 0) body++;
+        uint256 planet = (star << 8) | body;
+        uint256 slots = SystemGen.moonSlots(seed, star, body);
+        uint256 moons;
+        for (; slots != 0; slots >>= 1) moons += slots & 1;
+        assertEq(planets.moonCount(planet), moons, "moonCount counts the moon slots");
+        assertEq(planets.moonCount(2), 1, "Earth has Luna");
+
+        _go(ada, star);
+        _claim(ada, planet);
+        vm.startPrank(admin);
+        factory.grantRole(factory.GAME_MODULE(), admin);
+        factory.addParts(planet, RAILGUN, 3 * moons + 1);
+        factory.addParts(planet, ARMOR, 1);
+        vm.stopPrank();
+
+        vm.startPrank(ada);
+        armory.fitMoons(planet, RAILGUN, 3 * moons); // two mounts each: every mount used
+        vm.expectRevert(abi.encodeWithSelector(Armory.TooMany.selector, RAILGUN));
+        armory.fitMoons(planet, RAILGUN, 1);
+        vm.expectRevert(abi.encodeWithSelector(Armory.WeaponsOnly.selector, ARMOR));
+        armory.fitMoons(planet, ARMOR, 1);
+        armory.unfitMoons(planet, RAILGUN, 1);
+        vm.stopPrank();
+        assertEq(battle.defensesOf(planet).moonRailguns, 3 * moons - 1);
+        assertEq(battle.defensesOf(planet).railguns, 0, "the planet's own mounts are untouched");
+        assertEq(battle.planetSide(planet).moonRailguns, 3 * moons - 1);
     }
 
     function test_armorTakesBays() public {
@@ -230,6 +265,40 @@ contract CombatTest is Test {
             assertLe(ship.armor, ship.armorMax);
             if (wasSpent) assertLe(planetArmor, planet.armor); // no harm once spent
         }
+    }
+
+    /// Weapons on moons sit outside the shield (D61): hit after the platforms, before the shield.
+    function test_moonWeaponsAreHitBeforeTheShield() public pure {
+        Combat.Side memory planet;
+        planet.shieldMax = planet.shield = 600;
+        planet.moonRailguns = 2;
+        Combat.round(_ship(3, 0, 0, 5, 3), planet, Combat.Fire(0, 0, 0));
+        assertEq(planet.moonRailguns, 1, "36 damage: one railgun (30) lost, 6 carried");
+        assertEq(planet.shield, 600, "the shield wasn't touched");
+        assertFalse(Combat.wornDown(planet));
+
+        Combat.Side memory platformed;
+        platformed.platforms = 150;
+        platformed.moonRailguns = 1;
+        Combat.round(_ship(3, 0, 0, 5, 3), platformed, Combat.Fire(0, 0, 0));
+        assertEq(platformed.platforms, 114, "platforms first");
+        assertEq(platformed.moonRailguns, 1);
+    }
+
+    /// Weapons on moons fire, and their point defense stops missiles, with the planet's.
+    function test_moonWeaponsFightWithThePlanet() public pure {
+        Combat.Side memory ship = _ship(0, 0, 0, 20, 0);
+        Combat.Side memory planet;
+        planet.moonRailguns = 2;
+        planet.hull = 60;
+        Combat.round(ship, planet, Combat.Fire(0, 0, 0));
+        assertEq(1_000 - ship.armor, 48, "two railguns on moons: 2 x 12, doubled against armor");
+
+        Combat.Side memory guarded;
+        guarded.platforms = 1_000;
+        guarded.moonPointDefense = 2; // stops 30 of the 36
+        Combat.round(_ship(0, 3, 0, 5, 3), guarded, Combat.Fire(0, 0, 0));
+        assertEq(1_000 - guarded.platforms, 12);
     }
 
     function test_countersHold() public pure {

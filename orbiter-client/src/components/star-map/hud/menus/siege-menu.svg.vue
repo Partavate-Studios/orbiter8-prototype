@@ -102,6 +102,8 @@ export default {
       // isn't a bar.
       return [
         { name: 'Platforms', value: s.platforms, max: 450 },
+        // Weapons on the moons (D61), outside the shield: counted, out of what the planet had fitted
+        { name: 'Moon guns', value: this.moonGuns(s), max: Math.max(this.moonGuns(s), this.moonGuns(this.player.defenses[this.siege.planet] ?? {})) },
         { name: 'Shield', value: s.shield, max: s.shieldMax },
         { name: 'Armor', value: s.armor, max: s.armorMax },
         { name: 'Hull', value: s.hull, max: 360 }
@@ -112,7 +114,7 @@ export default {
     /** Nothing stands between the attacker and the planet. */
     defenceless() {
       const s = this.siege.side
-      return s.platforms === 0 && s.shield === 0 && s.armor === 0 && s.hull === 0
+      return s.platforms === 0 && this.moonGuns(s) === 0 && s.shield === 0 && s.armor === 0 && s.hull === 0
     },
     shipBars() {
       const s = this.siege.ship
@@ -154,6 +156,9 @@ export default {
     }
   },
   methods: {
+    moonGuns(s) {
+      return (s.moonPointDefense ?? 0) + (s.moonRailguns ?? 0) + (s.moonMissiles ?? 0)
+    },
     weapons(s) {
       const parts = [
         [s.railguns, 'railgun'],

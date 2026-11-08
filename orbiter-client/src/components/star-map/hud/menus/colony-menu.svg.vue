@@ -165,12 +165,23 @@
             <text v-if="!finished.length" x="0" y="18" text-anchor="middle" fill="#ffffff88" font-size="0.9em">None yet</text>
             <g v-for="(row, i) in finished" :key="row.part" :transform="'translate(0 ' + (22 + i * 30) + ')'">
               <text x="-170" y="0" font-size="0.9em">{{ row.count }} × {{ row.name }}</text>
-              <g class="can-click" transform="translate(60 0)" @click="doFitPlanet(row)">
-                <rect x="-40" y="-13" width="80" height="26" rx="4" fill="#3d1273" stroke="#ffffff44" />
+              <g class="can-click" transform="translate(20 0)" @click="doFitPlanet(row)">
+                <rect x="-32" y="-13" width="64" height="26" rx="4" fill="#3d1273" stroke="#ffffff44" />
                 <text x="0" y="0" text-anchor="middle" font-size="0.85em">Install</text>
               </g>
-              <g v-if="row.part < 7" class="can-click" transform="translate(140 0)" @click="doFitShip(row)">
-                <rect x="-36" y="-13" width="72" height="26" rx="4" fill="#3d1273" stroke="#ffffff44" />
+              <!-- Weapons can go on the moons instead: free mounts, outside the shield (D61) -->
+              <g
+                v-if="moons && MOON_WEAPONS[row.part]"
+                :class="{ 'can-click': moonFit(row) > 0 }"
+                :opacity="moonFit(row) > 0 ? 1 : 0.4"
+                transform="translate(90 0)"
+                @click="moonFit(row) > 0 && doFitMoons(row)"
+              >
+                <rect x="-32" y="-13" width="64" height="26" rx="4" fill="#3d1273" stroke="#ffffff44" />
+                <text x="0" y="0" text-anchor="middle" font-size="0.85em">To moons</text>
+              </g>
+              <g v-if="row.part < 7" class="can-click" transform="translate(160 0)" @click="doFitShip(row)">
+                <rect x="-32" y="-13" width="64" height="26" rx="4" fill="#3d1273" stroke="#ffffff44" />
                 <text x="0" y="0" text-anchor="middle" font-size="0.85em">To ship</text>
               </g>
             </g>
@@ -226,6 +237,16 @@
             <text x="-10" y="0" text-anchor="end">{{ row.name }}</text>
             <text x="10" y="0">{{ row.count }}</text>
           </g>
+          <text
+            v-if="moons"
+            x="0"
+            :y="defenseRows.length * 20 + 16"
+            text-anchor="middle"
+            font-size="0.85em"
+            fill="#ffffffaa"
+          >
+            {{ moons }} {{ moons === 1 ? 'moon' : 'moons' }}: {{ moonMountsUsed }} of {{ moons * MOON_MOUNTS }} mounts used, outside the shield
+          </text>
         </g>
       </g>
     </menu-container>
@@ -255,8 +276,15 @@ const DEFENSES = [
   ['armor', 'Armor plates'],
   ['shields', 'Shield levels'],
   ['platforms', 'Orbital platforms'],
-  ['bfg', 'BFG']
+  ['bfg', 'BFG'],
+  ['moonPointDefense', 'Point defense on moons'],
+  ['moonRailguns', 'Railguns on moons'],
+  ['moonMissiles', 'Missile racks on moons']
 ]
+
+/** Moons (D61): six mounts each, for weapons only; the parts' ids (Factory) and their mounts. */
+const MOON_MOUNTS = 6
+const MOON_WEAPONS = { 2: 1, 3: 2, 4: 2 }
 
 export default {
   name: 'ColonyMenu',
@@ -278,6 +306,8 @@ export default {
       part: null,
       count: 1,
       BUILDING_NAMES,
+      MOON_MOUNTS,
+      MOON_WEAPONS,
       YELLOW,
       PINK
     }
@@ -361,6 +391,15 @@ export default {
       if (!d) return []
       return DEFENSES.filter(([key]) => d[key] > 0).map(([key, name]) => ({ name, count: d[key] }))
     },
+    /** The planet's moons: each gives six weapon mounts that can't be destroyed. */
+    moons() {
+      return useStarMapStore().moonsForPlanet(this.objectId).length
+    },
+    moonMountsUsed() {
+      const d = this.player.defenses[this.planet.id]
+      if (!d) return 0
+      return (d.moonPointDefense ?? 0) + 2 * (d.moonRailguns ?? 0) + 2 * (d.moonMissiles ?? 0)
+    },
     /** The Autofactory's parts: what each takes from storage and in credits, and how long it builds. */
     orderable() {
       return this.player.rules.parts.map((p, id) => ({
@@ -443,6 +482,16 @@ export default {
     doFitPlanet(row) {
       this.o8audio.playEffect('click')
       this.player.fitPlanet(this.planet.id, row.part, row.count)
+    },
+    /** How many of a finished weapon fit on the moons' free mounts. */
+    moonFit(row) {
+      const each = MOON_WEAPONS[row.part]
+      if (!each) return 0
+      return Math.min(row.count, Math.floor((this.moons * MOON_MOUNTS - this.moonMountsUsed) / each))
+    },
+    doFitMoons(row) {
+      this.o8audio.playEffect('click')
+      this.player.fitMoons(this.planet.id, row.part, this.moonFit(row))
     },
     doFitShip(row) {
       this.o8audio.playEffect('click')

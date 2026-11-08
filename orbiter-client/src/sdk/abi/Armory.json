@@ -27,6 +27,19 @@
   },
   {
     "type": "function",
+    "name": "MOON_MOUNTS",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "PLANET_ARMOR",
     "inputs": [],
     "outputs": [
@@ -202,6 +215,29 @@
       },
       {
         "name": "maxCost",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "fitMoons",
+    "inputs": [
+      {
+        "name": "planet",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "part",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "count",
         "type": "uint256",
         "internalType": "uint256"
       }
@@ -439,6 +475,29 @@
       }
     ],
     "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "unfitMoons",
+    "inputs": [
+      {
+        "name": "planet",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "part",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "count",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
   },
   {
     "type": "function",
@@ -806,6 +865,17 @@
         "name": "slot",
         "type": "bytes32",
         "internalType": "bytes32"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "WeaponsOnly",
+    "inputs": [
+      {
+        "name": "part",
+        "type": "uint256",
+        "internalType": "uint256"
       }
     ]
   }

@@ -736,6 +736,9 @@ export function createGameClient() {
     fitPlanet(planet, part, count, options) {
       return move((p, by, o) => by.fitPlanet(Number(planet), part, count, o), options)
     },
+    fitMoons(planet, part, count, options) {
+      return move((p, by, o) => by.fitMoons(Number(planet), part, count, o), options)
+    },
     buyParts(port, part, count, options) {
       return move((p, by, o) => by.buyParts(Number(port), part, count, partPrice(port, part, count), o), options)
     },

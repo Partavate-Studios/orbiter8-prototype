@@ -35,6 +35,7 @@ contract Armory is ModuleBase {
     uint256 public constant PLANET_ARMOR = 20;
     uint256 public constant PLANET_SHIELDS = 5;
     uint256 public constant PLANET_PLATFORMS = 3;
+    uint256 public constant MOON_MOUNTS = 6; // per moon; moons can't be destroyed (D61)
 
     /// @custom:storage-location erc7201:orbiter8.armory
     struct ArmoryStorage {
@@ -61,6 +62,7 @@ contract Armory is ModuleBase {
     error NoYard();
     error PriceLimit(uint256 credits);
     error NotEnough();
+    error WeaponsOnly(uint256 part);
 
     function _a() internal pure returns (ArmoryStorage storage a) {
         assembly {
@@ -129,6 +131,34 @@ contract Armory is ModuleBase {
         if (s.attacker != address(0)) revert InBattle();
         _changePlanet(planet, part, -int256(count));
         _a().factory.addParts(planet, part, count);
+    }
+
+    /// Fits weapons (point defense, railguns, missile racks) from a planet's store to its moons:
+    /// six mounts a moon, outside the planet's shield in a siege (D61). From anywhere, mid-siege included.
+    function fitMoons(uint256 planet, uint256 part, uint256 count) external {
+        _owner(planet);
+        _a().factory.takeParts(planet, part, count);
+        _changeMoons(planet, part, int256(count));
+    }
+
+    /// Takes weapons off a planet's moons back into its store (not during a siege).
+    function unfitMoons(uint256 planet, uint256 part, uint256 count) external {
+        _owner(planet);
+        (Battle.Siege memory s,) = _a().battle.siegeOf(planet);
+        if (s.attacker != address(0)) revert InBattle();
+        _changeMoons(planet, part, -int256(count));
+        _a().factory.addParts(planet, part, count);
+    }
+
+    function _changeMoons(uint256 planet, uint256 part, int256 delta) internal {
+        Battle.Defenses memory d = _a().battle.defensesOf(planet);
+        if (part == 2) d.moonPointDefense = uint16(_add(d.moonPointDefense, delta));
+        else if (part == 3) d.moonRailguns = uint16(_add(d.moonRailguns, delta));
+        else if (part == 4) d.moonMissiles = uint16(_add(d.moonMissiles, delta));
+        else revert WeaponsOnly(part);
+        uint256 mounts = uint256(d.moonPointDefense) + 2 * uint256(d.moonRailguns) + 2 * uint256(d.moonMissiles);
+        if (mounts > MOON_MOUNTS * _a().planets.moonCount(planet)) revert TooMany(part);
+        _a().battle.setDefenses(planet, d);
     }
 
     function _changePlanet(uint256 planet, uint256 part, int256 delta) internal {

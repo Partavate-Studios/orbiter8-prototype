@@ -227,6 +227,12 @@ export const usePlayerStore = defineStore('Player', {
         game.actions.fitPlanet(planet, part, count, o)
       )
     },
+    fitMoons(planet, part, count) {
+      const name = this.rules.parts[part].name
+      return track({ doing: `Mounting ${count} × ${name} on the moons`, done: `${count} × ${name} on the moons`, failed: "Couldn't mount it" }, (o) =>
+        game.actions.fitMoons(planet, part, count, o)
+      )
+    },
     buyParts(port, part, count) {
       const name = this.rules.parts[part].name
       return track({ doing: `Buying ${count} × ${name}`, done: `${count} × ${name} fitted`, failed: "Couldn't buy it" }, (o) =>

@@ -79,7 +79,10 @@ const toSide = (s) => ({
   drones: Number(s.drones),
   repairBots: Number(s.repairBots),
   bfg: Number(s.bfg),
-  retreated: s.retreated
+  retreated: s.retreated,
+  moonPointDefense: Number(s.moonPointDefense),
+  moonRailguns: Number(s.moonRailguns),
+  moonMissiles: Number(s.moonMissiles)
 })
 
 const toSiege = (planet, s) => ({
@@ -299,7 +302,10 @@ export function createGame(runner, addresses) {
         armor: Number(d.armor),
         shields: Number(d.shields),
         platforms: Number(d.platforms),
-        bfg: Number(d.bfg)
+        bfg: Number(d.bfg),
+        moonPointDefense: Number(d.moonPointDefense),
+        moonRailguns: Number(d.moonRailguns),
+        moonMissiles: Number(d.moonMissiles)
       }
     },
 
@@ -558,6 +564,10 @@ export function createGame(runner, addresses) {
     },
     async fitPlanet(planet, part, count, options) {
       return sent(armory.fitPlanet(planet, part, count), options)
+    },
+    /** Weapons onto the planet's moons: six mounts a moon, outside the shield (D61). */
+    async fitMoons(planet, part, count, options) {
+      return sent(armory.fitMoons(planet, part, count), options)
     },
     async buyParts(port, part, count, maxCost, options) {
       return sent(armory.buy(port, part, count, maxCost), options)

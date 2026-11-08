@@ -35,6 +35,10 @@ contract Battle is ModuleBase, IMoveHook {
         uint8 shields; // levels
         uint8 platforms;
         uint8 bfg;
+        // weapons on the planet's moons (D61): six mounts a moon, hit before the planet's shield
+        uint16 moonPointDefense;
+        uint16 moonRailguns;
+        uint16 moonMissiles;
     }
 
     /// A ship's state between battles: what's out of action until a shipyard repair.
@@ -264,6 +268,7 @@ contract Battle is ModuleBase, IMoveHook {
         d.armor = uint8((side.armor + Combat.ARMOR_HP - 1) / Combat.ARMOR_HP);
         (d.pointDefense, d.railguns, d.missiles, d.drones, d.repairBots, d.bfg) =
             (side.pointDefense, side.railguns, side.missiles, side.drones, side.repairBots, uint8(side.bfg));
+        (d.moonPointDefense, d.moonRailguns, d.moonMissiles) = (side.moonPointDefense, side.moonRailguns, side.moonMissiles);
         emit DefensesChanged(planet, d);
     }
 
@@ -306,6 +311,9 @@ contract Battle is ModuleBase, IMoveHook {
             side.drones += uint16(_more(next.drones, had.drones));
             side.repairBots += uint16(_more(next.repairBots, had.repairBots));
             side.bfg += uint16(_more(next.bfg, had.bfg));
+            side.moonPointDefense += uint16(_more(next.moonPointDefense, had.moonPointDefense));
+            side.moonRailguns += uint16(_more(next.moonRailguns, had.moonRailguns));
+            side.moonMissiles += uint16(_more(next.moonMissiles, had.moonMissiles));
             s.planet = side;
         }
         b.defenses[planet] = next;
@@ -358,6 +366,8 @@ contract Battle is ModuleBase, IMoveHook {
         side.hull = uint32(uint256(level) * Combat.HULL_PER_LEVEL);
         (side.pointDefense, side.railguns, side.missiles, side.drones, side.repairBots, side.bfg) =
             (d.pointDefense, d.railguns, d.missiles, d.drones, d.repairBots, d.bfg);
+        (side.moonPointDefense, side.moonRailguns, side.moonMissiles) =
+            (d.moonPointDefense, d.moonRailguns, d.moonMissiles);
     }
 
     function defensesOf(uint256 planet) external view returns (Defenses memory) {
