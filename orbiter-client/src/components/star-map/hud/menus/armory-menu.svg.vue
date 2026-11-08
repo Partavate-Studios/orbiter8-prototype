@@ -4,7 +4,7 @@
   <g v-if="object">
     <menu-container>
       <g :transform="'translate(0 -400) scale(' + scale + ')'" fill="#ffffff" dominant-baseline="middle">
-        <text x="0" y="5" text-anchor="middle" fill="#ffffff88" font-size="1.5em">{{ object.name }} Armory</text>
+        <text x="0" y="5" text-anchor="middle" fill="#ffffff88" :font-size="fitSize(object.name + ' Armory', 24, 340)">{{ object.name }} Armory</text>
         <text x="0" y="32" text-anchor="middle" font-size="0.8em" fill="#ffffffaa">
           Credits {{ avatar.credits.toLocaleString('en-US') }}&cent; · mounts {{ mounts }} of 6 · free holds
           {{ player.freeBays }}
@@ -49,6 +49,7 @@
 </template>
 
 <script>
+import { fitSize } from '@/libs/fit-text'
 import { mapActions, mapState } from 'pinia'
 import { useStarMapStore } from '@/stores/starmap'
 import { useGameStateStore } from '@/stores/gamestate'
@@ -116,6 +117,7 @@ export default {
     }
   },
   methods: {
+    fitSize,
     ...mapActions(useUIStore, ['closeMenu']),
     partPlural,
     choose(part) {

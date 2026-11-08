@@ -36,11 +36,11 @@
             ry="8"
             stroke-width="1"
           />
-          <text text-anchor="start" transform="translate(35 -20)" fill="#ffffff" font-size="1.2em"
-            >{{ avatar.name }}
+          <text text-anchor="start" transform="translate(35 -20)" fill="#ffffff" :font-size="callsignFit.size / 11.2 + 'em'"
+            >{{ callsignFit.text }}
           </text>
           <text text-anchor="end" transform="translate(70 -04)">Starship:</text>
-          <text text-anchor="start" transform="translate(75 -04)" fill="#ffffff">{{ avatar.ship.name }}</text>
+          <text text-anchor="start" transform="translate(75 -04)" fill="#ffffff" :font-size="shipNameFit.size / 11.2 + 'em'">{{ shipNameFit.text }}</text>
           <text text-anchor="end" transform="translate(70 11)">Credits:</text>
           <text text-anchor="start" transform="translate(75 11)" fill="#ffffff">{{ avatar.credits.toLocaleString('en-US') }}&cent;</text>
 
@@ -247,6 +247,7 @@
 </template>
 
 <script>
+import { fitSize, fitText } from '@/libs/fit-text'
 import { cargoLines, emptyHolds, shortGoodName } from '@/sdk/game/trade'
 import { STAR_KEY } from '@/sdk/system'
 import { game } from '@/sdk/client'
@@ -334,6 +335,13 @@ export default {
     return { now: Date.now(), HUD_TINT }
   },
   computed: {
+    // The pilot panel's call sign and ship name, shrunk or cut to fit (libs/fit-text.js).
+    callsignFit() {
+      return fitText(this.avatar.name, 13.44, 155)
+    },
+    shipNameFit() {
+      return fitText(this.avatar.ship.name, 11.2, 118)
+    },
     starSelected() {
       return this.selected === STAR_KEY
     },
@@ -443,6 +451,7 @@ export default {
     clearInterval(this.seconds)
   },
   methods: {
+    fitSize,
     /** Where cargo slot `index` sits: two columns, rows 15 apart, the empty holds last on the right. */
     cargoSlotAt(index) {
       const last = index === this.cargoSlots.length - 1

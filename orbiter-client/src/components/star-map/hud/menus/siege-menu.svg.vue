@@ -4,7 +4,7 @@
   <g v-if="object && siege">
     <menu-container>
       <g :transform="'translate(0 -400) scale(' + scale + ')'" fill="#ffffff" dominant-baseline="middle">
-        <text x="0" y="5" text-anchor="middle" fill="#ffffff88" font-size="1.5em">Siege of {{ object.name }}</text>
+        <text x="0" y="5" text-anchor="middle" fill="#ffffff88" :font-size="fitSize('Siege of ' + object.name, 24, 340)">Siege of {{ object.name }}</text>
         <text x="0" y="32" text-anchor="middle" font-size="0.8em" :fill="PINK_LIGHT">
           {{ attackerName }} attacking · rounds every 30 minutes since {{ ago(siege.started) }}
         </text>
@@ -56,6 +56,7 @@
 </template>
 
 <script>
+import { fitSize } from '@/libs/fit-text'
 import { mapState } from 'pinia'
 import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
@@ -156,6 +157,7 @@ export default {
     }
   },
   methods: {
+    fitSize,
     moonGuns(s) {
       return (s.moonPointDefense ?? 0) + (s.moonRailguns ?? 0) + (s.moonMissiles ?? 0)
     },

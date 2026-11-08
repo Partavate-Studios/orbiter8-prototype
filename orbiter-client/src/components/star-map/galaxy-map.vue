@@ -72,7 +72,7 @@
         </template>
         <circle v-else :r="star.r" :fill="star.color" :opacity="star.visited ? 1 : 0.65" />
         <circle :r="Math.max(star.r + 6, touch ? 18 : 12)" fill="transparent" />
-        <text :y="star.r + 13" class="name">{{ star.name }}</text>
+        <text :y="star.r + 13" class="name" :style="{ fontSize: star.label.size + 'px' }">{{ star.label.text }}</text>
       </g>
       <g v-if="shipPoint" :transform="`translate(${shipPoint.x} ${shipPoint.y - 16}) scale(2.2)`" class="ship">
         <fleet-ship type="orbiter8" />
@@ -123,7 +123,7 @@
     </aside>
 
     <footer class="controls">
-      <button class="card-pill" :disabled="waiting" @click="back">Back to {{ hereName }}</button>
+      <button class="card-pill back" :disabled="waiting" @click="back">Back to {{ hereName }}</button>
       <button class="card-pill" @click="centerOnShip">My ship</button>
     </footer>
   </div>
@@ -137,6 +137,7 @@ import { MAP } from '@/libs/palette'
 import { position, cellAt, distance, neighbors } from '@/sdk/hex'
 import { starTraits } from '@/sdk/traits'
 import { CARD_THEMES } from '@/libs/card-theme'
+import { fitText } from '@/libs/fit-text'
 import { timeOf } from '@/sdk/drand'
 import { usePlayerStore } from '@/stores/player'
 import { useGameStateStore } from '@/stores/gamestate'
@@ -209,7 +210,9 @@ export default {
           here: c.cell === this.shipCell,
           reachable: steps > 0 && steps <= this.range,
           besieged: this.player.besiegedCells.has(c.cell),
-          name: this.nameOf(c.cell)
+          name: this.nameOf(c.cell),
+          // a long name shrunk or cut, so it doesn't run into its neighbors' (libs/fit-text.js)
+          label: fitText(this.nameOf(c.cell), 11, 96)
         })
       }
       return out
@@ -561,6 +564,13 @@ export default {
   font-size: 11px;
   text-anchor: middle;
   pointer-events: none;
+}
+/* A long star name doesn't stretch the button off a phone */
+.card-pill.back {
+  max-width: 15em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .selected .name {
   fill: #ffffff;

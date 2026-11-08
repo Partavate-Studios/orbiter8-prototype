@@ -12,7 +12,7 @@
       <g v-else>
         <g transform="translate(0 -400)" dominant-baseline="middle" text-anchor="middle">
           <g>
-            <text x="0" y="5" fill="#ffffff88" font-size="1.5em">{{ systemObjects[objectId].name }}</text>
+            <text x="0" y="5" fill="#ffffff88" :font-size="fitSize(systemObjects[objectId].name, 24, 340)">{{ systemObjects[objectId].name }}</text>
           </g>
 
           <g transform="translate(0 200)">
@@ -113,6 +113,7 @@
 </template>
 
 <script>
+import { fitSize } from '@/libs/fit-text'
 import { canAfford, MAX_CARGO_HOLDS } from '@/sdk/game/trade'
 
 import { useGameStateStore } from '@/stores/gamestate'
@@ -183,6 +184,7 @@ export default {
     }
   },
   methods: {
+    fitSize,
     ...mapActions(useGameStateStore, ['addHoldsToShip']),
     ...mapActions(useUIStore, ['closeMenu']),
     async applyUpgrades() {

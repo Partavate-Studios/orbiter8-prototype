@@ -41,7 +41,7 @@
             <menu-slot-container :highlight="row.isMe">
               <g :font-size="rowFontSize" :fill="row.isMe ? '#ffffff' : '#ffffffcc'">
                 <text :x="columns.rank" y="36">{{ row.rank }}</text>
-                <text :x="columns.name" y="36" text-anchor="start">{{ pilotName(row.player) }}</text>
+                <text :x="columns.name" y="36" text-anchor="start" :font-size="nameFit(row.player).size / rowEm + 'em'">{{ nameFit(row.player).text }}</text>
                 <text :x="columns.planets" y="36">{{ row.player.planets }}</text>
                 <text :x="columns.ports" y="36">{{ row.player.ports }}</text>
                 <text :x="columns.credits" y="36" text-anchor="end"
@@ -64,6 +64,7 @@
 </template>
 
 <script>
+import { fitText } from '@/libs/fit-text'
 import { mapState } from 'pinia'
 import { game } from '@/sdk/client'
 import { rankPlayers } from '@/sdk/leaderboard'
@@ -108,7 +109,10 @@ export default {
     },
     /** Rows shrink a little on a phone, so "298,979¢" fits beside the counts. */
     rowFontSize() {
-      return this.slotWidth < 400 ? '0.95em' : '1.1em'
+      return this.rowEm + 'em'
+    },
+    rowEm() {
+      return this.slotWidth < 400 ? 0.95 : 1.1
     },
     ranked() {
       const me = String(this.account).toLowerCase()
@@ -157,6 +161,11 @@ export default {
     rankBy(key) {
       this.o8audio.playEffect('click')
       this.rankedBy = key
+    },
+    /** A pilot's name, shrunk or cut to fit before the Planets column (libs/fit-text.js). */
+    nameFit(player) {
+      const size = this.rowEm * 16
+      return fitText(this.pilotName(player), size, this.columns.planets - this.columns.name - size * 1.5)
     },
     pilotName(player) {
       return player.name || player.address.slice(0, 6) + '…' + player.address.slice(-4)

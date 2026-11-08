@@ -4,7 +4,7 @@
       fill="#000000"
       x="70"
       y="10"
-      font-size="0.5em"
+      :font-size="fitSize(systemObjects[objectId].name, 8, 122, 700)"
       text-anchor="middle"
       transform="translate(0 5)"
       font-style="bold"
@@ -18,7 +18,7 @@
       fill="#ffffff"
       x="70"
       y="10"
-      font-size="0.5em"
+      :font-size="fitSize(systemObjects[objectId].name, 8, 122, 700)"
       text-anchor="middle"
       transform="translate(0 5)"
       font-style="bold"
@@ -36,12 +36,10 @@
       <rect x="5" y="4" width="120" height="2" fill="#ffffff" opacity="0.1" />
 
       <g v-if="systemObjects[objectId].type == 'ship'">
-        <text x="65" y="88" text-anchor="middle" font-size="0.9em">
-          Orbiting: {{ systemObjects[systemObjects[objectId].orbiting].name }}</text
-        >
+        <text x="65" y="88" text-anchor="middle" :font-size="orbitingFit.size">{{ orbitingFit.text }}</text>
 
         <g v-if="Boolean(systemObjects[objectId].isMine)">
-          <text x="65" y="15" text-anchor="middle" font-size="0.9em"> Captain: {{ avatar.name }}</text>
+          <text x="65" y="15" text-anchor="middle" :font-size="captainFit.size"> {{ captainFit.text }}</text>
 
           <g font-size="0.9em" transform="translate(22 25)" dominant-baseline="hanging">
             <text x="16" y="0" text-anchor="middle" font-weight="bold" font-size="1.1em"> Cargo</text>
@@ -64,13 +62,13 @@
         </g>
         <g v-else>
           <text x="25" y="15" text-anchor="end" font-size="0.9em"> Pilot:</text>
-          <text x="28" y="15" text-anchor="start" font-weight="bold"> {{ ownerName }}</text>
+          <text x="28" y="15" text-anchor="start" font-weight="bold" :font-size="fitSize(ownerName, 6.4, 96, 700)"> {{ ownerName }}</text>
         </g>
       </g>
 
       <g v-else-if="systemObjects[objectId].type == 'planet'">
         <text x="25" y="15" text-anchor="end" font-size="0.9em"> Owner:</text>
-        <text x="28" y="15" text-anchor="start" font-weight="bold"> {{ ownerName }}</text>
+        <text x="28" y="15" text-anchor="start" font-weight="bold" :font-size="fitSize(ownerName, 6.4, 96, 700)"> {{ ownerName }}</text>
         <text x="35" y="25" text-anchor="end" font-size="0.9em"> Class:</text>
         <text x="38" y="25" text-anchor="start" font-weight="bold">
           {{ planetTypeName(systemObjects[objectId].class) }}</text
@@ -87,7 +85,7 @@
 
       <g v-else-if="systemObjects[objectId].type == 'moon'">
         <text x="25" y="15" text-anchor="end" font-size="0.9em"> Owner: </text>
-        <text x="28" y="15" text-anchor="start" font-weight="bold"> {{ ownerName }}</text>
+        <text x="28" y="15" text-anchor="start" font-weight="bold" :font-size="fitSize(ownerName, 6.4, 96, 700)"> {{ ownerName }}</text>
         <text x="35" y="25" text-anchor="end" font-size="0.9em"> Class:</text>
         <text x="38" y="25" text-anchor="start" font-weight="bold"> {{ systemObjects[objectId].class }}</text>
         <text x="35" y="35" text-anchor="end" font-size="0.9em"> Size:</text>
@@ -96,11 +94,11 @@
 
       <g v-else-if="systemObjects[objectId].type == 'star'">
         <text x="55" y="15" text-anchor="end" font-size="0.9em"> Discovered by: </text>
-        <text x="10" y="25" text-anchor="start" font-size="0.9em">
-          {{ systemObjects[objectId].keeper === 'federation' && objectId === 'star' && !systemObjects[objectId].owner ? 'The Federation' : ownerName }}
+        <text x="10" y="25" text-anchor="start" :font-size="fitSize(discoveredBy, 5.76, 114)">
+          {{ discoveredBy }}
         </text>
         <text x="55" y="38" text-anchor="end" font-size="0.9em"> Owner:</text>
-        <text x="58" y="38" text-anchor="start" font-weight="bold">
+        <text x="58" y="38" text-anchor="start" font-weight="bold" :font-size="fitSize(systemObjects[objectId].keeperName || 'none yet', 6.4, 66, 700)">
           {{ systemObjects[objectId].keeperName || 'none yet' }}
         </text>
         <text x="55" y="50" text-anchor="end" font-size="0.9em"> Size:</text>
@@ -134,6 +132,7 @@
 </template>
 
 <script>
+import { fitSize, fitText } from '@/libs/fit-text'
 import { useGameStateStore } from '@/stores/gamestate'
 import { mapState } from 'pinia'
 import { useStarMapStore } from '@/stores/starmap'
@@ -183,6 +182,17 @@ export default {
     stationGoods() {
       return (this.systemObjects[this.objectId].goods ?? []).filter((good) => good.mode !== 'none')
     },
+    orbitingFit() {
+      const around = this.systemObjects[this.systemObjects[this.objectId].orbiting]
+      return fitText('Orbiting: ' + (around?.name ?? ''), 5.76, 116)
+    },
+    captainFit() {
+      return fitText('Captain: ' + this.avatar.name, 5.76, 116)
+    },
+    discoveredBy() {
+      const o = this.systemObjects[this.objectId]
+      return o.keeper === 'federation' && this.objectId === 'star' && !o.owner ? 'The Federation' : this.ownerName
+    },
     ownerName() {
       let address = this.systemObjects[this.objectId].owner
 
@@ -191,13 +201,17 @@ export default {
 
       let name = '[' + address.replace(address.substring(5, 40), '...') + ']'
 
-      if (typeof this.players[address] !== 'undefined') {
-        name = this.players[address] + ' ' + name
+      // A pilot's call sign, with the short address after it while there's room (a long call sign
+      // stands alone rather than shrinking the line).
+      const callsign = this.players[address]
+      if (typeof callsign !== 'undefined') {
+        name = callsign.length > 12 ? callsign : callsign + ' ' + name
       }
       return name
     }
   },
   methods: {
+    fitSize,
     planetTypeName,
     shortGoodName,
     /** Rows from y 25, 10 apart for three; more goods start higher and sit closer. */

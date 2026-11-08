@@ -4,7 +4,7 @@
   <g v-if="object && planet">
     <menu-container>
       <g :transform="'translate(0 -400) scale(' + scale + ')'" fill="#ffffff" dominant-baseline="middle">
-        <text x="0" y="5" text-anchor="middle" fill="#ffffff88" font-size="1.5em">{{ object.name }}</text>
+        <text x="0" y="5" text-anchor="middle" fill="#ffffff88" :font-size="fitSize(object.name, 24, 340)">{{ object.name }}</text>
         <text x="0" y="32" text-anchor="middle" font-size="0.8em" fill="#ffffffaa">
           {{ planetTypeName(planet.class) }} · size {{ planet.size }} · {{ levelName }}
         </text>
@@ -254,6 +254,7 @@
 </template>
 
 <script>
+import { fitSize } from '@/libs/fit-text'
 import { mapState } from 'pinia'
 import { useStarMapStore } from '@/stores/starmap'
 import { useGameStateStore } from '@/stores/gamestate'
@@ -437,6 +438,7 @@ export default {
     }
   },
   methods: {
+    fitSize,
     planetTypeName,
     partPlural,
     goodName(good) {

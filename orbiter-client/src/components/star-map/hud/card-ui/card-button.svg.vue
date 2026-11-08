@@ -17,7 +17,7 @@
       stroke-width="4"
       x="65"
       y="10"
-      font-size="0.5em"
+      :font-size="fitSize(text, 8, 122, 700)"
       font-weight="bold"
       text-anchor="middle"
     >
@@ -29,7 +29,7 @@
       stroke-width="0"
       x="65"
       y="10"
-      font-size="0.5em"
+      :font-size="fitSize(text, 8, 122, 700)"
       font-weight="bold"
       text-anchor="middle"
     >
@@ -42,6 +42,7 @@
 </template>
 
 <script>
+import { fitSize } from '@/libs/fit-text'
 import { CARD_THEMES } from '@/libs/card-theme'
 
 export default {
@@ -85,6 +86,7 @@ export default {
     }
   },
   methods: {
+    fitSize,
     click() {
       this.o8audio.playEffect('click')
       this.$emit('buttonclick')
