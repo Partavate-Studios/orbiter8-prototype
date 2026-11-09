@@ -123,6 +123,23 @@
         <stop offset="100%" stop-color="#160631" stop-opacity="0.7" />
       </radialGradient>
 
+      <!-- Black holes: Koda's portal art (star-map/sprites/portal.svg.vue) -->
+      <radialGradient id="portalGradient">
+        <stop offset="0%" stop-color="#c3b3da" stop-opacity="1" />
+        <stop offset="40%" stop-color="#280b4b" stop-opacity="0.5" />
+        <stop offset="100%" stop-color="#000000" stop-opacity="1" />
+      </radialGradient>
+      <radialGradient id="portalDarkening">
+        <stop offset="0%" stop-color="#c3b3da" stop-opacity="0" />
+        <stop offset="80%" stop-color="#000000" stop-opacity="0.2" />
+        <stop offset="100%" stop-color="#280b4b" stop-opacity="0" />
+      </radialGradient>
+      <linearGradient id="portalDarkline">
+        <stop offset="0%" stop-color="#000000" stop-opacity="0" />
+        <stop offset="50%" stop-color="#280b4b" stop-opacity="0.4" />
+        <stop offset="100%" stop-color="#000000" stop-opacity="0.2" />
+      </linearGradient>
+
       <!-- Planet surface details rotate under this clip -->
       <clipPath id="just-the-planet">
         <circle cx="0" cy="0" r="10" />

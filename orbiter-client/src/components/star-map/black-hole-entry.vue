@@ -14,13 +14,13 @@
       <circle r="150" fill="url(#entryGlow)" :opacity="0.5 + flash * 0.5" />
       <circle r="62" fill="none" :stroke="MAP.charted" stroke-width="3" :opacity="0.6 + flash * 0.4" />
       <circle :r="62 + flash * 60" fill="none" :stroke="MAP.charted" stroke-width="2" :opacity="flash * 0.7" />
-      <circle r="52" :fill="MAP.hole" />
+      <portal :radius="44" />
       <!-- The ship, nose up (the art's), stretched along its length from the tail -->
       <g v-if="ship.k > 0.01" :transform="`translate(0 ${ship.tail}) scale(1 ${ship.k}) translate(0 ${-LENGTH / 2})`">
         <g :transform="`scale(${ART_SCALE})`"><ship :should-show-engines="true" /></g>
       </g>
       <!-- The hole's dark disk again, over the part of the ship already inside -->
-      <circle r="52" :fill="MAP.hole" :opacity="ship.inside" />
+      <g :opacity="ship.inside"><portal :radius="44" :animate="false" /></g>
     </svg>
   </div>
 </template>
@@ -31,6 +31,7 @@ import { useUIStore } from '@/stores/ui'
 import { MAP } from '@/libs/palette'
 import { BLACK_HOLE_ENTRY_MS } from '@/constants'
 import Ship from '@/components/star-map/sprites/ship.svg'
+import Portal from '@/components/star-map/sprites/portal.svg.vue'
 
 /** The ship's art is 11.5 units long (sprites/ship.svg.vue); drawn this many times larger. */
 const ART_SCALE = 7
@@ -43,7 +44,7 @@ const clamp01 = (t) => Math.max(0, Math.min(1, t))
 
 export default {
   name: 'BlackHoleEntry',
-  components: { Ship },
+  components: { Ship, Portal },
   data() {
     return { MAP, ART_SCALE, LENGTH, t: 0 }
   },

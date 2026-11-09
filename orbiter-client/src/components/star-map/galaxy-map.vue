@@ -85,10 +85,7 @@
           opacity="0.9"
         />
         <circle v-if="star.besieged" :r="star.r + 11" class="besieged" />
-        <template v-if="star.blackHole">
-          <circle :r="star.r + 1.5" class="hole-ring" />
-          <circle :r="star.r" :fill="MAP.hole" />
-        </template>
+        <portal v-if="star.blackHole" :radius="star.r * 1.15" :animate="false" />
         <template v-else>
           <circle :r="star.r * 2.4" :fill="star.color" opacity="0.14" />
           <circle :r="star.r" :fill="star.color" :opacity="star.visited ? 1 : 0.7" />
@@ -170,6 +167,7 @@ import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
 import { writeAttribute } from '@/libs/dom-writes'
 import { HELIOPAUSE_RADIUS, WORLD_OFFSET_Y } from '@/constants'
 import FleetShip from '@/components/assets/fleet-ship.svg'
+import Portal from '@/components/star-map/sprites/portal.svg.vue'
 
 // Pixels between neighboring stars at zoom 1. The grid is regular, as in the color study (no squash).
 const SPACING = 64
@@ -210,7 +208,7 @@ const ownedDots = (count, r) => {
 
 export default {
   name: 'GalaxyMap',
-  components: { FleetShip },
+  components: { FleetShip, Portal },
   data() {
     return {
       player: usePlayerStore(),
@@ -775,11 +773,6 @@ export default {
 }
 .link {
   cursor: pointer;
-}
-.hole-ring {
-  fill: none;
-  stroke: #ffe28a; /* a black hole's accretion glow (libs/palette.js STAR_CLASSES.G.mid) */
-  stroke-width: 1.5;
 }
 .ship {
   pointer-events: none;
