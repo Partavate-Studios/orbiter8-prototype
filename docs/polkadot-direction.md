@@ -89,6 +89,45 @@ Run on the `polkadot` branch. Throwaway test keys only, never committed.
 
 The spike's results go in this file; then the migration is planned with Koda.
 
+## Results
+
+### 1. The contracts compile for PolkaVM (2026-11-08)
+
+Compiled with Parity's `resolc` 1.5.0 (LLVM 23.1.3), size-optimized, from forge's own compiler input
+(55 source files, solc 0.8.38). To rerun: `contracts/polkavm/compile.cjs`.
+
+**All 19 contracts compile, with no errors and no source changes.** Two warnings, both from solc: `at`
+will become a reserved word (an event field and an error argument in Battle). Rename them some time.
+
+| Contract | PolkaVM bytes | EVM bytes (forge, 2026-11-08) |
+|---|---|---|
+| Battle | 514,200 | 23,922 |
+| Galaxy | 379,488 | 15,513 |
+| Planets | 204,126 | 23,233 |
+| Market | 160,337 | |
+| Pilots | 122,252 | |
+| Ships | 113,120 | |
+| Armory | 99,619 | 12,599 |
+| Factory | 83,563 | 10,166 |
+| Drand (library) | 80,855 | |
+| Spiral (library) | 59,695 | |
+| Combat (library) | 54,835 | 5,364 |
+| Deeds | 49,284 | |
+| Credits | 44,146 | |
+| ScanRules (library) | 22,924 | |
+| ShipArt, HexMath, Pricing, Fixed, SystemGen | 872 each (internal libraries, inlined into their callers) | |
+
+What it means:
+- **Everything fits.** PolkaVM code is about 15 to 30 times larger than EVM code, but the limit is
+  1 MiB (1,048,576 bytes): the largest, Battle, is at 49% of it. The 24 KB squeeze is over, and the
+  linked libraries (Drand, Spiral, Combat, ScanRules) could be folded back into their contracts.
+- **Code deposits grow with size.** At the research's 0.00001 DOT per byte, the code alone is about
+  2.0 MB, so roughly 20 DOT locked (refundable) for a full release, up from about 2 DOT for the EVM
+  code (`cost-estimates.md` has the rest of a release's deposits). Worth measuring on Paseo.
+- **Not yet known:** whether it runs as it should. Still to test on Paseo: the upgradeable proxies
+  (UUPS) on PolkaVM, linking the external libraries at deploy time, the drand signature check through
+  the BN254 pairing precompile, and gas.
+
 ## Sources (researched 2026-11-08)
 
 - [Polkadot docs: Apps (Polkadot Products)](https://docs.polkadot.com/apps/)

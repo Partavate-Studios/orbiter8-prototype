@@ -397,7 +397,7 @@ Milestones 1–5 built the new rules on a separate `/galaxy` screen with plain p
 - [x] The network decision with Koda: **Polkadot Hub, launched in the Polkadot App** (2026-11-08).
 
 **Milestone 7: the Polkadot spike** (branch `polkadot`; details in [`polkadot-direction.md`](polkadot-direction.md))
-- [ ] Compile the contracts for PolkaVM with `resolc`: sizes, libraries, what breaks.
+- [x] Compile the contracts for PolkaVM with `resolc`: sizes, libraries, what breaks. *All 19 compile, no errors, no changes; Battle is the largest at 514 KB of the 1 MiB limit (results in `polkadot-direction.md`).*
 - [ ] Deploy to Paseo Asset Hub: proxy upgrades, the drand check, gas and deposits.
 - [ ] Load the client as a Product in Polkadot Desktop and on `dot.li`; measure how it runs.
 - [ ] AutoSigning and sponsored contract calls: play without popups or player fees.

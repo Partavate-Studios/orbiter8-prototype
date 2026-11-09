@@ -1,0 +1,8 @@
+{
+  "name": "orbiter8-polkavm-compile",
+  "private": true,
+  "description": "Compiles the contracts for PolkaVM with resolc (see compile.cjs)",
+  "dependencies": {
+    "@parity/resolc": "1.5.0"
+  }
+}
