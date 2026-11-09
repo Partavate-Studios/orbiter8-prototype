@@ -45,7 +45,14 @@ const provider = {
   removeListener() {}
 }
 
-window.ethereum = provider
+// The old way wallets were found. A wallet extension (MetaMask, Rabby…) may already own it as a
+// read-only property, so setting it can throw: then it stays theirs. The game finds wallets by EIP-6963
+// first (below), and sdk/chain/wallet.js prefers this one whatever else is installed.
+try {
+  window.ethereum = provider
+} catch {
+  console.info('Dev wallet: window.ethereum belongs to an extension; found through EIP-6963 instead')
+}
 
 // EIP-6963 discovery, so wallet pickers list it too.
 const info = {
