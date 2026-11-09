@@ -4,6 +4,10 @@ Koda's on-chain space trading game: explore a hex galaxy, trade, claim and build
 weapons, lay sieges. Solidity contracts in `contracts/` (Foundry), and a Vue 3 client in
 `orbiter-client/` (Pinia, Vite, ethers 6, Vitest, SVG graphics).
 
+**Direction (2026-11-08): Polkadot Hub only, launched as a Polkadot App mini-app** alongside the App's
+own launch. Read [`docs/polkadot-direction.md`](docs/polkadot-direction.md). Work on branch `polkadot`;
+the EVM version is kept on `evm-archive` (don't develop there).
+
 **New to this repo? Read `docs/handoff.md` first, all of it.** It lists the docs to read, in order,
 before touching anything; it says how to work without Koda (log decisions in `docs/review.md` instead of
 asking him); and it gives where things stand, how to run and see the game, and what to focus on.
@@ -44,12 +48,15 @@ asking him); and it gives where things stand, how to run and see the game, and w
 - **Commit, never push.** Koda pushes. Commit messages explain what and why. Never commit keys,
   mnemonics, RPC keys or `.env` files.
 - Don't drop a feature, replace a library, change networks, or make visible changes beyond "faster
-  and sharper" without Koda. No testnet deploys until Koda chooses the network. When working on your
-  own, don't stop to ask: log these in `docs/review.md` for him (see `docs/handoff.md`).
+  and sharper" without Koda. The network is chosen: Polkadot Hub. Test deploys to Paseo and the
+  Products devnet are fine for the spike, with throwaway keys that are never committed; no mainnet
+  deploys. When working on your own, don't stop to ask: log these in `docs/review.md` for him (see
+  `docs/handoff.md`).
 
 ## Where things are documented
 
-- `docs/demo4-plan.md`: decisions D1–D61, milestones with checkboxes, and calls B1–B56 (guesses made
+- `docs/polkadot-direction.md`: the Polkadot direction (D62–D66), branches, unknowns and the spike.
+- `docs/demo4-plan.md`: decisions D1–D66, milestones with checkboxes, and calls B1–B56 (guesses made
   while building, for Koda's review).
 - `docs/demo4-tuning.md` (economy and battle numbers), `docs/cost-estimates.md` (gas and money per
   move, and per release), `docs/design.md`, `docs/backstory.md` (the story; Koda's: change it only when he asks).

@@ -1,10 +1,15 @@
 # Handoff: where Orbiter 8 stands (2026-11-07)
 
+> **2026-11-08: the direction changed.** Orbiter 8 is going Polkadot-only, as a Polkadot App mini-app,
+> launching alongside the App. Read [`polkadot-direction.md`](polkadot-direction.md) first. Work on
+> branch `polkadot`; the EVM version below is kept on `evm-archive`. What follows describes the game
+> as it stood before the switch: still accurate for what's built.
+
 For a Claude Code session picking up from the one that built the current release.
 
 ## Before anything else: read these, in order, in full
 
-1. `CLAUDE.md`: Koda's standing rules and the commands.
+1. `CLAUDE.md`: Koda's standing rules and the commands. Then `docs/polkadot-direction.md`.
 2. This file, to the end: how you'll work, and your focus areas.
 3. `docs/demo4-plan.md`: the goals, decisions D1–D60 (Koda's), the plan, the milestones and what's
    ticked, and calls B1–B54 (guesses made while building; struck-through ones were overruled).

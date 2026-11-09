@@ -1,5 +1,10 @@
 # Demo 4 plan
 
+**Direction changed 2026-11-08 (D62–D66): Polkadot Hub only, launched as a Polkadot App mini-app.**
+See [`polkadot-direction.md`](polkadot-direction.md). The EVM version is kept on branch `evm-archive`;
+work goes on branch `polkadot`. Decisions below that assume other EVM networks, MetaMask or eth-rpc are
+superseded where they conflict (D37's anvil, D41's session keys, D43's RPC path, milestone 6's L2).
+
 **Status: confirmed by Koda (2026-11-06); building.** Followed to the end, each step ticked off as it
 lands. Calls made while building, where the plan didn't say, are logged under "Built: calls for Koda to
 review" at the end.
@@ -80,6 +85,11 @@ design doc), [`design-ideas.md`](design-ideas.md) (Koda's working doc), [`cost-e
 | D58 | **The Autofactory** is a planet building after Colony: a Bobiverse-style build queue of up to 5 orders. Each order's goods are paid when queued; orders are built one after another, lazily by timestamp; finished items go to the planet's storage, to fit to the planet or load onto the ship. In this run it builds drones, weapons, defenses, platforms and repair bots; crafting adds recipes later. **The Armory** stays a shop at the station, selling finished weapons to any visiting pilot, with the owner's cut. | 2026-11-06 |
 | D59 | **The Orbiter 8's slots:** 6 weapon mounts (point defense 1, railgun 2, missile rack 2); and up to 250 bays of internal space, bought as holds are today, each given to one thing: cargo (1 unit, or 100 colonists) 1 bay, a drone 2, a repair bot 5, a shield level (up to 3) 20, an armor level (up to 5) 10. Range upgrades are engines and take no space. Planets' capacities are much larger. Numbers tuned by simulation, then "find the fun". | 2026-11-06 |
 | D60 | **A tech tree reference screen:** pithy and straightforward, showing what each building, part and upgrade takes and what it unlocks, so players aren't left to trial and error. | 2026-11-06 |
+| D62 | **Polkadot only** (Koda, 2026-11-08): give up other EVM networks; explore and use what Polkadot uniquely offers. Focus on **Polkadot Hub**; our own chain only if the game succeeds. ([polkadot-direction.md](polkadot-direction.md)) | 2026-11-08 |
+| D63 | **Launch strictly in the Polkadot App** as a Product, aiming to release alongside the App's launch. Non-App play can be considered later. | 2026-11-08 |
+| D64 | **No clunky wallets:** the App's per-Product account, signer and allowances (AutoSigning, sponsored contract calls) in place of MetaMask, the network step and, if they do the job, session keys. | 2026-11-08 |
+| D65 | **Things become tradable:** ships (pilots will have several, so ships are collectibles), planets, and possibly port goods. B15 and B30 hold only for now. | 2026-11-08 |
+| D66 | **The UI may be rethought for the App,** choosing the best-performing approach; explored after the spike. | 2026-11-08 |
 | D61 | **Moons are free weapons platforms** (Koda, 2026-11-07): **six mounts a moon**, for a planet's owner. Built platforms can be destroyed; moons can't, but every weapon on a moon can be. In a siege the weapons on moons are **exposed, outside the planet's shield**. | 2026-11-07 |
 
 ## Features: this run and consider next (proposed, for Koda to choose)
@@ -380,11 +390,20 @@ Milestones 1–5 built the new rules on a separate `/galaxy` screen with plain p
 *Jumps*
 - [x] A jump takes at least as long as its sounds, so Minerva's lines finish. *4.5 s; "jump complete" is said when the animation ends.*
 
-**Milestone 6: testnets and the decision**
-- [ ] Deploy to Polkadot Hub's testnet and an L2 testnet.
+**Milestone 6: testnets and the decision** *(the decision is made: D62–D66, Polkadot Hub. The L2 is dropped.)*
+- [ ] ~~Deploy to Polkadot Hub's testnet and an L2 testnet.~~ Polkadot Hub's testnet only: milestone 7.
 - [ ] The research's test list on Polkadot (UUPS, drand cost, the read path through smoldot and through RPC, wallets).
 - [ ] The play bot and simulator on both testnets; `cost-estimates.md` updated. *Local gas and money added to `cost-estimates.md` (2026-11-07); testnets wait for Koda (D37).*
-- [ ] The network decision with Koda.
+- [x] The network decision with Koda: **Polkadot Hub, launched in the Polkadot App** (2026-11-08).
+
+**Milestone 7: the Polkadot spike** (branch `polkadot`; details in [`polkadot-direction.md`](polkadot-direction.md))
+- [ ] Compile the contracts for PolkaVM with `resolc`: sizes, libraries, what breaks.
+- [ ] Deploy to Paseo Asset Hub: proxy upgrades, the drand check, gas and deposits.
+- [ ] Load the client as a Product in Polkadot Desktop and on `dot.li`; measure how it runs.
+- [ ] AutoSigning and sponsored contract calls: play without popups or player fees.
+- [ ] The personhood precompile from our contracts.
+- [ ] Mint a ship into Asset Hub's NFT system; see it in the Pocket.
+- [ ] Plan the migration with Koda.
 
 ### 12. Confirm with Koda before building
 
