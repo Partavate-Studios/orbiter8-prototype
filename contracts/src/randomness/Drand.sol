@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.38;
 
-import {BLS} from "bls-solidity/libraries/BLS.sol";
+// BLS with its square root and inverse through the modexp precompile (see BLSPrecompiled.sol).
+import {BLSPrecompiled as BLS} from "./BLSPrecompiled.sol";
 
 /// @title drand's evmnet beacon, verified on chain (docs/demo4-plan.md, D35)
 /// @notice The League of Entropy publishes a new random value every 3 seconds, signed on the BN254

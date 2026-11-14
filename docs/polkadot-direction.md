@@ -142,6 +142,44 @@ TestNet** (Paseo Asset Hub, chain 420420417, `https://eth-rpc-testnet.polkadot.i
 What's left: the same on **PolkaVM** (deploying `resolc`'s bytecode, linking its libraries, proxies
 there), then the App steps (3–6), which need Polkadot Desktop paired with Koda's phone.
 
+### 3. The game runs on PolkaVM too (2026-11-13), after one fix
+
+Deployed the PolkaVM build (`resolc`) to Polkadot Hub TestNet with `contracts/polkavm/deploy-polkavm.mjs`:
+the four external libraries first, then the game compiled again with their addresses (PolkaVM links
+libraries at compile time, not deploy time), then each module and its OpenZeppelin ERC1967 proxy, then
+the same roles as `Deploy.s.sol`. All 46 transactions succeeded.
+
+**The one problem: the drand check ran out of gas on PolkaVM,** even with a billion gas (the whole scan
+costs 6,169 on the EVM build). The cause: randa-mu's BLS library computes the field's square root and
+inverse with hand-written chains of about 300 `mulmod`s each, run several times per check. On the EVM
+`mulmod` is native and cheap; PolkaVM is a 64-bit RISC-V machine, where each 256-bit `mulmod` is a
+software routine. **The fix** (`contracts/src/randomness/BLSPrecompiled.sol`, a copy of the library):
+both are now one call each to the `modexp` precompile, which runs natively. The check then costs
+**4,039 gas** on PolkaVM. On the EVM all 99 contract tests still pass (the drand tests check real
+signatures), and the EVM Drand library shrank from 18.9 KB to 3.5 KB.
+
+With the fix:
+
+| | PolkaVM | EVM (REVM), for comparison |
+|---|---|---|
+| Deploy, all modules | **25.3 PAS** | 17.7 PAS |
+| Register | 0.037 PAS, 4 s | 0.035 PAS |
+| Jump to an unvisited star | 0.014 PAS, 8 s | 0.010 PAS |
+| Record the scan (drand check) | 0.011 PAS, 9 s; 3 cells charted | 0.006 PAS |
+| UUPS upgrade (Credits) | works, state kept | works, state kept |
+
+So **every question the research left open about the contracts is answered:** they compile and run on
+PolkaVM, the proxies upgrade, the drand check works, and moves cost about a hundredth of a PAS. Moves
+cost a little more on PolkaVM than on the EVM engine, and the deploy about half again as much (bigger
+code, bigger deposits, mostly refundable).
+
+Tools in `contracts/polkavm/`: `compile.cjs`, `deploy-polkavm.mjs`, `play-paseo.mjs`, `upgrade-polkavm.mjs`,
+`probe-drand.mjs` and `probe-scan.mjs` (the gas probes that found the problem).
+
+Addresses (testnet, throwaway): armory `0x1522EE84B805000c62F578f6D85802Bdce1d19a1`, battle `0x0b13c0b2583dbc385e476E5adEE65Faad483CeAd`, credits `0xe54c7c9888ECAaFD6cAaBf839d0D8DC851a82949`, deeds `0x935fC5Fd9D675e0Dc8c773390C18b13f66c3ceCF`, factory `0x7aac150Da2c444660F9d3d8dd318F26299fA5077`, galaxy `0xD228187BAC2876B126a7D0292dA54CC2Fd542203`, market `0x5CadfD29700E3DBD36F82859D294c45515C48799`, pilots `0x34041855992c787DF895e82B497B6ACFc6Ee8008`, planets `0x2AD97462E731c1a4a4472250a78781B0E0b67634`, ships `0x80294d1937bD75B32aEb86748111FD12c35dD684`.
+
+**Next:** the Polkadot App steps (3–6), with Polkadot Desktop paired with Koda's phone.
+
 ### 1. The contracts compile for PolkaVM (2026-11-08)
 
 Compiled with Parity's `resolc` 1.5.0 (LLVM 23.1.3), size-optimized, from forge's own compiler input
@@ -160,7 +198,7 @@ will become a reserved word (an event field and an error argument in Battle). Re
 | Ships | 113,120 | |
 | Armory | 99,619 | 12,599 |
 | Factory | 83,563 | 10,166 |
-| Drand (library) | 80,855 | |
+| Drand (library) | 80,855 (49,692 after the precompile fix, section 3) | |
 | Spiral (library) | 59,695 | |
 | Combat (library) | 54,835 | 5,364 |
 | Deeds | 49,284 | |
