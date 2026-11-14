@@ -1,8 +1,10 @@
 {
   "name": "orbiter8-polkavm-compile",
   "private": true,
-  "description": "Compiles the contracts for PolkaVM with resolc (see compile.cjs)",
+  "description": "Milestone 7 spike tools: compile.cjs (resolc, PolkaVM) and play-paseo.mjs (real moves on Polkadot Hub TestNet)",
   "dependencies": {
-    "@parity/resolc": "1.5.0"
-  }
+    "@parity/resolc": "1.5.0",
+    "ethers": "^6.13.0"
+  },
+  "type": "commonjs"
 }

@@ -113,6 +113,35 @@ The spike's results go in this file; then the migration is planned with Koda.
 
 ## Results
 
+### 2. The game runs on Polkadot Hub TestNet (2026-11-13), as EVM bytecode
+
+Deployed the game as it is today (EVM bytecode, run by Polkadot Hub's REVM engine) to **Polkadot Hub
+TestNet** (Paseo Asset Hub, chain 420420417, `https://eth-rpc-testnet.polkadot.io/`) with
+`forge script script/Deploy.s.sol` and a throwaway key kept outside the repo
+(`~/.config/orbiter8/paseo-spike.json`, address `0x66160964b40175D882372c203b51bFD2607EF280`, funded with
+5,000 PAS from the faucet).
+
+- **The deploy:** 45 transactions, all successful, standard Foundry with no Polkadot-specific changes:
+  linked libraries, UUPS proxies, roles and wiring. It cost **17.7 PAS**, gas and storage deposits
+  together (the earlier estimate for mainnet was about 17 DOT).
+- **Real moves** (`contracts/polkavm/play-paseo.mjs`):
+
+  | Move | Result | Cost | Time |
+  |---|---|---|---|
+  | Register a pilot | ok | 0.035 PAS | 3.8 s |
+  | Jump to an unvisited star (Sol to Wolf 359) | ok | 0.010 PAS | 8.4 s |
+  | Record the scan with drand's signature (the BN254 pairing check) | ok; 3 new cells charted | 0.006 PAS | 9.1 s |
+
+  The drand check, the research's biggest worry, works on the live chain. (Polkadot reports gas in its
+  own units, so compare the PAS, not the gas numbers.)
+- **A UUPS upgrade works:** a new Credits implementation deployed, `upgradeToAndCall` through the proxy
+  succeeded, the ERC-1967 slot changed and the state stayed (total supply unchanged). The research had
+  found no plain OpenZeppelin UUPS upgrade on mainnet; now there's one on the testnet.
+- Addresses (testnet, throwaway): armory `0xd199576247ecDc1F0AC23A96fA6e357c94e95c0c`, battle `0xA755158746f968786E8c425BC2DA6F3296b907bF`, credits `0x6C7c8cD5c1cd85052170f0Cd3576E54eEe29971C`, deeds `0x82Fe5957866A76424959DD5402Eaf36E1bF0B6eC`, factory `0x9A50F9610d01b299D30add73278339A0eAFd1fdF`, galaxy `0x3c2041e71235eB455717BDA0CbB39D5Ee8EdA262`, market `0x23D7060da9c017960f57D78BC946374092E5Ae00`, pilots `0xC257BED2601b02cab9864aDEEec867022Cb91b48`, planets `0x81221ABe12217Aa5E0F7c15d55c38E5A943B3b6E`, ships `0x604367E54eD1ffd6fcA0F0D409b44D3CC405aFeE`.
+
+What's left: the same on **PolkaVM** (deploying `resolc`'s bytecode, linking its libraries, proxies
+there), then the App steps (3–6), which need Polkadot Desktop paired with Koda's phone.
+
 ### 1. The contracts compile for PolkaVM (2026-11-08)
 
 Compiled with Parity's `resolc` 1.5.0 (LLVM 23.1.3), size-optimized, from forge's own compiler input
