@@ -40,7 +40,7 @@ asking him); and it gives where things stand, how to run and see the game, and w
   menu-driven ("the buttons are the game"); ports show three-letter trade codes. Change behavior and
   placement, not the art. Before restyling an existing screen, Koda approves a mockup (working on
   your own: save the mockup under `docs/mockups/` and log it).
-- **Accent colors** (`orbiter-client/src/libs/palette.js`): yellow means you and what's good for you;
+- **Accent colors** (`orbiter-client/src/libs/palette.js`, reasoning in `docs/color-guide.md`): yellow means you and what's good for you;
   pink means it needs your attention (waiting on the wallet, failures, sieges). Never pink on a
   profitable or positive button. Buttons stay in the game's purples and lavenders.
 - **Phones matter.** Check every UI change at phone size too (`VW=390 VH=844` in the harness).
@@ -61,6 +61,8 @@ asking him); and it gives where things stand, how to run and see the game, and w
 - `docs/polkadot-direction.md`: the Polkadot direction (D62–D66), branches, unknowns and the spike.
 - `docs/demo4-plan.md`: decisions D1–D66, milestones with checkboxes, and calls B1–B56 (guesses made
   while building, for Koda's review).
+- `docs/ui-guide.md` and `docs/color-guide.md`: how screens are built and colored, and why; read them before
+  building or changing UI. Open design questions are tracked there.
 - `docs/demo4-tuning.md` (economy and battle numbers), `docs/cost-estimates.md` (gas and money per
   move, and per release), `docs/design.md`, `docs/backstory.md` (the story; Koda's: change it only when he asks).
 - `UPGRADE_NOTES.md`: the client's modernization history (older; some of it describes the old contracts).
