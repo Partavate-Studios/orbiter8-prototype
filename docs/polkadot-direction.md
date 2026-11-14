@@ -23,6 +23,28 @@ anything is rebuilt. Decisions D62–D66 in [`demo4-plan.md`](demo4-plan.md) poi
 | D65 | **Things become tradable:** ships (pilots will have several, so a ship is a collectible), planets, and possibly the goods traded at ports. Turns B15 and B30 (bound ships and deeds) into "for now". |
 | D66 | **The UI may be rethought for the App,** choosing the best-performing approach for a good UI there. Explored later, after the spike measures how the current client runs inside the App. |
 
+## Polkadot's own direction (2026-11-11)
+
+Polkadot's governance approved a new strategy (the "DOTDAO mandate", proposed by the Polkadot Community
+Foundation) with 97% of votes on 2026-11-11, as announced by Polkadot (pasted by Koda, 2026-11-13; not
+checked against the referendum itself). What it means for us:
+
+- **The bet lines up.** Polkadot now puts everything behind a **product platform** with the Polkadot
+  App as its flagship (private messaging, digital cash), measured by **how many people use it**, not by
+  developer counts. The PCF commits to marketing the App worldwide. A game that brings players into the
+  App is exactly what they want, which supports D63 (launch inside the App, alongside it).
+- **Players expect free, mobile-first and simple usernames.** Products "should feel as easy as the apps
+  people already use. Free, with simple usernames and built mobile-first." That backs D64 (sponsored
+  fees, no wallets), the phone-first UI rethink (D66), and suggests using the App's usernames in place
+  of, or alongside, our call signs. Privacy is a stated priority: per-game aliases fit.
+- **dotUSD, a stable currency** backed by DOT and watched over by the Technical Fellowship, starting the
+  "dotStables" family. Possible uses, for Koda to weigh: prices for anything sold for real money (ships
+  as collectibles, cosmetics), or a stable anchor for credits. Our in-game credits stay their own token
+  for now.
+- **A funding path.** Shared funds move "away from generic marketing retainers and towards incentive
+  campaigns that tie funding directly to measurable user engagement." A game that brings engaged users
+  could apply for those campaigns once it's live.
+
 ## Why
 
 What the Polkadot App and Polkadot Hub offer that the EVM version can't (researched 2026-11-08; sources below):
