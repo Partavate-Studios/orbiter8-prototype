@@ -34,7 +34,22 @@ export default defineConfig(({ command }) => ({
     extensions: ['.mjs', '.js', '.json', '.vue']
   },
   server: {
-    port: 8080
+    port: 8080,
+    // In development the chain and drand are reached through the game's own origin: a Polkadot Desktop
+    // Product may only talk to its own localhost port ("Direct network access is blocked" otherwise),
+    // so the dev wallet's RPC and drand's relays go through here (dev-wallet.js, sdk/drand.js).
+    proxy: {
+      '/__chain': {
+        target: process.env.VITE_LOCAL_RPC || 'http://127.0.0.1:8545',
+        changeOrigin: true,
+        rewrite: () => '/'
+      },
+      '/__drand': {
+        target: 'https://api.drand.sh',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/__drand/, '')
+      }
+    }
   },
   test: {
     environment: 'happy-dom'

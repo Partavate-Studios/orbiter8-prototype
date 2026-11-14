@@ -7,7 +7,14 @@ export const GENESIS_TIME = 1727521075
 export const PERIOD = 3
 const BEACON = 'evmnet'
 /** Public relays, tried in turn. */
-export const RELAYS = ['https://api.drand.sh', 'https://api2.drand.sh', 'https://api3.drand.sh']
+export const RELAYS = [
+  // In development, first through the dev server's own origin (vite.config.js /__drand), which a Polkadot
+  // Desktop Product is allowed to reach; the public relays after it.
+  ...(import.meta.env?.DEV && typeof location !== 'undefined' && location.origin.startsWith('http') ? [location.origin + '/__drand'] : []),
+  'https://api.drand.sh',
+  'https://api2.drand.sh',
+  'https://api3.drand.sh'
+]
 
 /** The round being published at a Unix time (seconds). */
 export function roundAt(timestamp) {

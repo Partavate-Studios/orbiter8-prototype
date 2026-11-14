@@ -113,6 +113,36 @@ The spike's results go in this file; then the migration is planned with Koda.
 
 ## Results
 
+### Step 3, first look: Polkadot Desktop's sandbox (2026-11-13, in progress)
+
+Koda installed Polkadot Desktop 0.9.3 and the phone App, and opened the local game (`localhost:8092`)
+with Desktop's "Skip (Dev only)" button. The page was **blank**: Desktop's log showed
+`Unexpected token 'D', "Direct net"... is not valid JSON`.
+
+What Desktop's code does (read from its `app.asar`): a Product's page may fetch **only its own
+localhost port**. Any other http, https, ws or wss address answers **403 "Direct network access is
+blocked"**, unless the Product has a product id and the player grants it a *remote permission*. So the
+dev wallet's calls to the local chain (another port) and the drand relays (`api.drand.sh`) both failed.
+
+For development, the Vite dev server now proxies both through the game's own origin: `/__chain` → the
+local chain, `/__drand` → `api.drand.sh` (`orbiter-client/vite.config.js`; the dev wallet, the local
+network's RPC and drand's relay list use them first). Checked in the harness with a preload that blocks
+every other origin the way Desktop does: register, jump to Wolf 359, and its scan all work, with nothing
+blocked.
+
+What it means for the real Product:
+
+- **Chain access goes through the host**, not to an RPC URL of our own: the Product SDK (PAPI) for
+  Substrate calls; how a Product calls an EVM contract (eth-rpc through the host, or `Revive.call`
+  extrinsics built with PAPI) is still to find out. That is the main client change of the migration.
+- **drand needs a remote permission** for `api.drand.sh` (declared by the Product, granted by the
+  player), or the relays move behind something the host already allows.
+- Desktop's own Dashboard widget (`browse.paseo`) showed "Widget is currently unavailable" and its Home
+  button misbehaved for Koda: Desktop's, not the game's; noted in case it matters later.
+
+Still to measure: how smoothly the game runs inside Desktop (frame rate, input), and the same on the
+phone App and `dot.li`.
+
 ### 2. The game runs on Polkadot Hub TestNet (2026-11-13), as EVM bytecode
 
 Deployed the game as it is today (EVM bytecode, run by Polkadot Hub's REVM engine) to **Polkadot Hub

@@ -1,6 +1,8 @@
 // Dev builds only: a minimal EIP-1193 wallet backed by the local chain's unlocked test accounts.
 // Lets you play locally without MetaMask. Pick a player with ?account=N (default 1; account 0 deployed the contracts).
-const RPC = import.meta.env.VITE_LOCAL_RPC || 'http://127.0.0.1:8545'
+// Through the dev server's own origin (vite.config.js proxies /__chain to the local chain), so it also
+// works inside Polkadot Desktop, whose sandbox blocks any other address.
+const RPC = location.origin + '/__chain'
 const accountIndex = Number(new URLSearchParams(location.search).get('account') ?? 1)
 
 let nextId = 0

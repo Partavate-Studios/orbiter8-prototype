@@ -40,7 +40,9 @@ export const networks = [
           name: 'Local Dev Chain',
           shortName: 'Local',
           currency: { name: 'Dev Ether', symbol: 'ETH', decimals: 18 },
-          rpc: [localDeployment.rpc],
+          // On the dev server, through its own origin first (vite.config.js /__chain): a Polkadot Desktop
+          // Product may only reach its own localhost port.
+          rpc: [...(import.meta.env.DEV ? [location.origin + '/__chain'] : []), localDeployment.rpc],
           explorer: [],
           contracts: localDeployment.contracts,
           funding: [{ text: 'Test accounts on the local chain start with 10,000 ETH.' }]
