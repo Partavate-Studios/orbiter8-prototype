@@ -3,6 +3,7 @@ import { execSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import { testnetFaucet } from './dev/testnet-faucet.js'
 
 /**
  * The version shown on the title: 3 (demo 3 contracts) . 2 (this client) . build, from package.json.
@@ -22,7 +23,7 @@ function appVersion(command) {
 export default defineConfig(({ command }) => ({
   // Relative asset paths, so the build can be served from any subdirectory (e.g. /demo3).
   base: './',
-  plugins: [vue()],
+  plugins: [vue(), testnetFaucet()],
   define: {
     __APP_VERSION__: JSON.stringify(appVersion(command))
   },
@@ -37,10 +38,16 @@ export default defineConfig(({ command }) => ({
     port: 8080,
     // In development the chain and drand are reached through the game's own origin: a Polkadot Desktop
     // Product may only talk to its own localhost port ("Direct network access is blocked" otherwise),
-    // so the dev wallet's RPC and drand's relays go through here (dev-wallet.js, sdk/drand.js).
+    // so the dev wallet's RPC and drand's relays go through here (dev-wallet.js, sdk/drand.js). The same
+    // for Polkadot Hub TestNet's RPC, and /__faucet tops up the dev wallet's testnet keys (dev/testnet-faucet.js).
     proxy: {
       '/__chain': {
         target: process.env.VITE_LOCAL_RPC || 'http://127.0.0.1:8545',
+        changeOrigin: true,
+        rewrite: () => '/'
+      },
+      '/__paseo': {
+        target: 'https://eth-rpc-testnet.polkadot.io',
         changeOrigin: true,
         rewrite: () => '/'
       },

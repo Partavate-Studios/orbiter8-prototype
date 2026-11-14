@@ -19,8 +19,40 @@
  *   `tokenUrl` has {contract} and {id} placeholders. Networks without one show no market link.
  */
 
-/** Deployed networks. None yet: testnets come with milestone 6. */
-const deployed = []
+/** On the dev server, an RPC proxied through the game's own origin (vite.config.js): a Polkadot Desktop
+ * Product may only reach its own localhost port. Listed first, before the public address. */
+const devProxy = (route) => (import.meta.env.DEV && typeof location !== 'undefined' ? [location.origin + route] : [])
+
+/** Deployed networks. */
+const deployed = [
+  {
+    // Polkadot Hub's testnet (Paseo Asset Hub): the spike's deployment of 2026-11-13 as EVM bytecode
+    // (contracts/deployments/420420417.json). Not the PolkaVM one: there, reads that return long lists
+    // (Sol's ports and planets, the galaxy map) fail on resolc's default memory (docs/polkadot-direction.md).
+    // Throwaway: redeployed at will.
+    chainId: 420420417,
+    name: 'Polkadot Hub TestNet',
+    shortName: 'Hub TestNet',
+    currency: { name: 'Paseo', symbol: 'PAS', decimals: 18 },
+    rpc: [...devProxy('/__paseo'), 'https://eth-rpc-testnet.polkadot.io/'],
+    explorer: ['https://blockscout-testnet.polkadot.io'],
+    contracts: {
+      credits: '0x6C7c8cD5c1cd85052170f0Cd3576E54eEe29971C',
+      ships: '0x604367E54eD1ffd6fcA0F0D409b44D3CC405aFeE',
+      galaxy: '0x3c2041e71235eB455717BDA0CbB39D5Ee8EdA262',
+      pilots: '0xC257BED2601b02cab9864aDEEec867022Cb91b48',
+      market: '0x23D7060da9c017960f57D78BC946374092E5Ae00',
+      deeds: '0x82Fe5957866A76424959DD5402Eaf36E1bF0B6eC',
+      planets: '0x81221ABe12217Aa5E0F7c15d55c38E5A943B3b6E',
+      factory: '0x9A50F9610d01b299D30add73278339A0eAFd1fdF',
+      battle: '0xA755158746f968786E8c425BC2DA6F3296b907bF',
+      armory: '0xd199576247ecDc1F0AC23A96fA6e357c94e95c0c'
+    },
+    startBlock: 15_722_500, // a little before the deployment (Credits' proxy is at 15,722,601)
+    sessionFunds: '2', // a move costs about 0.01–0.04 PAS
+    funding: [{ text: 'Polkadot faucet (choose Polkadot Hub TestNet)', url: 'https://faucet.polkadot.io/' }]
+  }
+]
 
 // Dev builds (and `npm run build:local`) only: the chain started by `npm run local`, with addresses
 // from dev/local-deployment.json (or -<port>.json for a second copy, dev/local.js CHAIN_PORT). Lazy
@@ -40,9 +72,7 @@ export const networks = [
           name: 'Local Dev Chain',
           shortName: 'Local',
           currency: { name: 'Dev Ether', symbol: 'ETH', decimals: 18 },
-          // On the dev server, through its own origin first (vite.config.js /__chain): a Polkadot Desktop
-          // Product may only reach its own localhost port.
-          rpc: [...(import.meta.env.DEV ? [location.origin + '/__chain'] : []), localDeployment.rpc],
+          rpc: [...devProxy('/__chain'), localDeployment.rpc],
           explorer: [],
           contracts: localDeployment.contracts,
           funding: [{ text: 'Test accounts on the local chain start with 10,000 ETH.' }]

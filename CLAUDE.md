@@ -19,6 +19,9 @@ asking him); and it gives where things stand, how to run and see the game, and w
   the game at http://localhost:8080 with a built-in dev wallet (no MetaMask). Add `?account=2`,
   `?account=3`… for other pilots. Every start is a full reset. `?wallet=browser` uses a real wallet
   extension instead of the dev wallet, to try the connect flow.
+- **Play Polkadot Hub TestNet from the same dev client:** "Switch" in the title's Network panel, or
+  `?network=testnet` (`?network=local` back). The dev wallet makes a key per pilot and the dev server
+  tops it up with PAS from the spike key in `~/.config/orbiter8/` (`docs/polkadot-direction.md`).
 - **If Koda or another session may already be running it, use other ports:**
   `CHAIN_PORT=8546 UI_PORT=8092 npm run local`. Stop only your own processes, by PID: a broad
   `pkill -f "dev/local.js"` stops theirs too.

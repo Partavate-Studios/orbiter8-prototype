@@ -45,7 +45,10 @@
 
       <template v-if="contractsLoaded">
         <dt>Galaxy</dt>
-        <dd v-if="gameDataLoaded">{{ gameState.avatarCount }} pilots, {{ gameState.starSystemCount }} star systems</dd>
+        <dd v-if="gameDataLoaded">
+          {{ gameState.avatarCount }} {{ gameState.avatarCount === 1 ? 'pilot' : 'pilots' }},
+          {{ gameState.starSystemCount }} {{ gameState.starSystemCount === 1 ? 'star system' : 'star systems' }}
+        </dd>
         <dd v-else>Loading…</dd>
         <template v-for="contract in contractList" :key="contract.label">
           <dt>{{ contract.label }}</dt>

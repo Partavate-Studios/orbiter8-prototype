@@ -140,8 +140,39 @@ What it means for the real Product:
 - Desktop's own Dashboard widget (`browse.paseo`) showed "Widget is currently unavailable" and its Home
   button misbehaved for Koda: Desktop's, not the game's; noted in case it matters later.
 
-Still to measure: how smoothly the game runs inside Desktop (frame rate, input), and the same on the
-phone App and `dot.li`.
+**Koda's verdict (2026-11-14): it runs about the same in Desktop as in Chrome.** Still to try: the phone
+App and `dot.li`.
+
+### Playing the testnet from the dev client (2026-11-14)
+
+The local dev client now plays Polkadot Hub TestNet too, and switches between it and the local chain
+from the title's **Network** panel ("Switch"), or with `?network=testnet` / `?network=local`. The page
+reloads itself on a switch, as it does when a real wallet changes network: every store starts clean.
+- The dev wallet makes a throwaway key per `?account=N` on the testnet, kept in the browser, and the dev
+  server tops it up to 25 PAS from the spike's key (`orbiter-client/dev/testnet-faucet.js`; the key stays
+  in `~/.config/orbiter8/`, never in the browser or the repo).
+- The testnet's RPC goes through the dev server (`/__paseo`) like the local chain, so it works inside
+  Desktop's sandbox too.
+- Checked in the harness with the sandbox's blocking: register, jump to Lalande 21185, and its scan
+  (two new stars after the 30-second wait). First load of a new pilot is about 15 s (the top-up waits
+  for its block); returning players skip that.
+
+**It uses the EVM-bytecode deployment, not the PolkaVM one,** because of what follows.
+
+**PolkaVM: reads that return long lists fail.** On the PolkaVM deployment, `Market.portsAt(0)` (Sol's
+nine ports), `Planets.system(0)` (Sol's planets), `Planets.system(17)` (eight planets) and
+`Galaxy.region(center, 10)` revert with no data, at any gas. Short ones work (`portView` of one port,
+three planets, `region` up to radius 9). On the EVM deployment all of them work. The likely cause is
+memory: Solidity never frees memory within a call, and resolc gives each contract a small, fixed heap
+for it (`settings.polkavm.memoryConfig`).
+- Tried (`contracts/polkavm/memprobe.mjs`, `upgrade-module.mjs`): with a 64 KiB heap and 32 KiB stack
+  Market traps on any call; 128 KiB heap and 64 KiB stack runs, but Sol's ports still fail; a 256 KiB
+  heap wouldn't run. So more memory alone isn't the fix (the PolkaVM deployment's Market now runs the
+  128/64 build).
+- **To do before moving the game to PolkaVM:** find resolc's defaults and the chain's limit, measure
+  each big read's memory, and reshape the reads that need it (fewer temporary copies: count, then fill;
+  or smaller reads the client combines). Or stay on EVM bytecode (REVM) for these modules: Polkadot Hub
+  runs both.
 
 ### 2. The game runs on Polkadot Hub TestNet (2026-11-13), as EVM bytecode
 

@@ -130,6 +130,7 @@ hard to add later because it shapes the data, low-hanging, or the battle minimum
 - **Binary stars (to do, Koda 2026-11-07):** some systems have two stars orbiting each other at the center. Selecting either selects the pair as **one object**; a single star can't be selected on its own. Alpha Centauri and Sirius, among Sol's genesis neighbors, are real binaries.
 - **Asteroid fields (to do, Koda 2026-11-07):** fields that can be mined; whether they can be owned is open. Perhaps special **mining drones** that slowly collect resources and bring them to the ship while it's parked there.
 - **Star classes in play (idea):** a star's spectral class (now drawn, B56) could set how fast it charges the jump drive (the story): blue and white stars fast, red dwarfs slow.
+- **Publishing builds quickly (to do, Koda 2026-11-14):** a way to put a build up fast, maybe a page per subdirectory where builds land before they're pushed. Waits for Koda's branch strategy.
 - **3D rendering** (Koda has a ship model and a prototype project to reference) (D33)
 - **Parked:** portals between networks, new ship types and aliens, tokenized goods, hidden information with ZK proofs, invite-only cubes, star-system weapons, Minerva's hidden agenda, planet maintenance, vanity upgrades, alignment, corporate taxes; client extras (soundtrack folders, re-skinning, ENS names)
 
@@ -400,8 +401,9 @@ Milestones 1–5 built the new rules on a separate `/galaxy` screen with plain p
 **Milestone 7: the Polkadot spike** (branch `polkadot`; details in [`polkadot-direction.md`](polkadot-direction.md))
 - [x] Compile the contracts for PolkaVM with `resolc`: sizes, libraries, what breaks. *All 19 compile, no errors, no changes; Battle is the largest at 514 KB of the 1 MiB limit (results in `polkadot-direction.md`).*
 - [x] Deploy to Paseo Asset Hub: proxy upgrades, the drand check, gas and deposits. *Done (2026-11-13), as EVM bytecode and as PolkaVM: everything works; on PolkaVM the drand check needed its square root and inverse moved to the modexp precompile (`BLSPrecompiled.sol`). PolkaVM: deploy 25.3 PAS, moves about 0.01–0.04 PAS.*
-- [ ] Load the client as a Product in Polkadot Desktop and on `dot.li`; measure how it runs.
-- [ ] AutoSigning and sponsored contract calls: play without popups or player fees.
+- [ ] Load the client as a Product in Polkadot Desktop and on `dot.li`; measure how it runs. *Desktop done (2026-11-14): runs about as in Chrome, once the chain and drand go through the game's own port (the sandbox blocks other addresses). Phone App and `dot.li` to try.*
+- [x] Play the testnet from the dev client, switching with the local chain in the Network panel. *(2026-11-14; on the EVM-bytecode deployment: on PolkaVM, reads returning long lists fail, to fix before moving there; `polkadot-direction.md`.)*
+- [ ] AutoSigning and sponsored contract calls: play without popups or player fees. *Koda's question (2026-11-14): how AutoSigning works in the App, and whether our session keys (D41) should stay or give way to it.*
 - [ ] The personhood precompile from our contracts.
 - [ ] Mint a ship into Asset Hub's NFT system; see it in the Pocket.
 - [ ] Plan the migration with Koda.
