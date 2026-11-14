@@ -196,6 +196,10 @@ a component (new colors go in `palette.js`; older ones move there as their scree
 
 ## 8. To do
 
+**Under review:** [`mockups/color-choices.svg`](mockups/color-choices.svg) shows each choice below as the
+game is now and its options, labeled by row (A1…G2) for Koda's answers; redraw it with
+`npx vite-node dev/mockups/color-choices.mjs` from `orbiter-client/`.
+
 In rough order; each visible change goes past Koda first (a mockup in `docs/mockups/` when it restyles
 a screen).
 
