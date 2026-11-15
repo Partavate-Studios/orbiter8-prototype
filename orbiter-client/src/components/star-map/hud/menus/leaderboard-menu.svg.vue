@@ -41,7 +41,7 @@
             <menu-slot-container :highlight="row.isMe">
               <g :font-size="rowFontSize" :fill="row.isMe ? '#ffffff' : '#ffffffcc'">
                 <text :x="columns.rank" y="36">{{ row.rank }}</text>
-                <text :x="columns.name" y="36" text-anchor="start" :font-size="nameFit(row.player).size / rowEm + 'em'">{{ nameFit(row.player).text }}</text>
+                <text :x="columns.name" y="36" text-anchor="start" :font-size="nameFit(row.player).size / (rowEm * 16) + 'em'">{{ nameFit(row.player).text }}</text>
                 <text :x="columns.planets" y="36">{{ row.player.planets }}</text>
                 <text :x="columns.ports" y="36">{{ row.player.ports }}</text>
                 <text :x="columns.credits" y="36" text-anchor="end"
@@ -162,7 +162,8 @@ export default {
       this.o8audio.playEffect('click')
       this.rankedBy = key
     },
-    /** A pilot's name, shrunk or cut to fit before the Planets column (libs/fit-text.js). */
+    /** A pilot's name, shrunk or cut to fit before the Planets column (libs/fit-text.js); its size is in
+     * pixels, and the row's text is rowEm × 16 px, so the template divides by that for an em size. */
     nameFit(player) {
       const size = this.rowEm * 16
       return fitText(this.pilotName(player), size, this.columns.planets - this.columns.name - size * 1.5)
