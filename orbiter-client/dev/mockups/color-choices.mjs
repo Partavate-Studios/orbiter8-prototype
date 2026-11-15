@@ -2,7 +2,7 @@
 // each, with the game as it is now on the left and the proposed options to its right. Cells are labeled
 // (A1 · Now, A1 · 1, A1 · 2…) so Koda can answer row by row. Colors come from libs/palette.js and
 // libs/card-theme.js, so "Now" is the game's own; the options are written here.
-//   npx vite-node dev/mockups/color-choices.mjs [1]    (from orbiter-client/; round 2 unless "1"; vite-node resolves the client's imports)
+//   npx vite-node dev/mockups/color-choices.mjs [round]    (from orbiter-client/; round 1, 2 or 3, default 3; vite-node resolves the client's imports)
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -12,8 +12,8 @@ import { shades, CARD_THEMES } from '../../src/libs/card-theme.js'
 const here = path.dirname(fileURLToPath(import.meta.url))
 // Round 1 (Koda answered it on 2026-11-14; its committed SVG is the record, and redrawing it now would
 // show the new colors as "Now") or round 2, the questions still open.
-const ROUND = process.argv[2] === '1' ? 1 : 2
-const OUT = path.join(here, '../../../docs/mockups', ROUND === 1 ? 'color-choices.svg' : 'color-choices-2.svg')
+const ROUND = Number(process.argv[2] ?? 3)
+const OUT = path.join(here, '../../../docs/mockups', ROUND === 1 ? 'color-choices.svg' : `color-choices-${ROUND}.svg`)
 
 const LABEL_W = 330
 const COL_W = 360
@@ -388,10 +388,105 @@ const rows2 = [
   }
 ]
 
+// ── round 3: H1 · 1 (a quiet frame, the title pill in the tint) with some of the tint on the frame ──
+const PLANET_TINT = '#2f7fd9' // Terrestrial's card color (PLANET_COLORS[0].card)
+const STATION_TINT = '#7d8bc4' // stations (card-theme.js)
+const DARK_TEXT = '#1b1531'
+
+// One card in a frame style: 'corners', 'double', 'ornaments' or 'filigree'.
+function framed(x, y, w, h, tint, title, style) {
+  // the title fits its pill (about 0.58 em a character, bold)
+  const size = Math.max(7, Math.min(Math.round(w / 9), Math.floor((w * 0.72) / (title.length * 0.58))))
+  const rx = Math.max(6, w / 12)
+  let s = ''
+  // the frame underneath: quiet, or (double) a thick purple edge
+  if (style === 'double') {
+    s += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="${CARD_GRAY}" stroke="#5c1aae" stroke-width="${Math.max(3, w / 28)}"/>`
+    const i = Math.max(2.5, w / 36)
+    s += `<rect x="${x + i}" y="${y + i}" width="${w - 2 * i}" height="${h - 2 * i}" rx="${rx - i * 0.6}" fill="none" stroke="${tint}" stroke-width="${Math.max(0.8, w / 120)}"/>`
+  } else {
+    s += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="${CARD_GRAY}" stroke="${NEUTRAL}" stroke-width="${style === 'corners' ? Math.max(1, w / 100) : Math.max(1.5, w / 70)}"/>`
+  }
+  if (style === 'corners') {
+    const L = Math.min(w, h) * 0.22
+    const sw = Math.max(2.5, w / 32)
+    const corner = (cx, cy, dx, dy) =>
+      `M${cx} ${cy + dy * L}V${cy + dy * rx}Q${cx} ${cy} ${cx + dx * rx} ${cy}H${cx + dx * L}`
+    const d = corner(x, y, 1, 1) + corner(x + w, y, -1, 1) + corner(x, y + h, 1, -1) + corner(x + w, y + h, -1, -1)
+    s += `<path d="${d}" fill="none" stroke="${tint}" stroke-width="${sw}" stroke-linecap="round"/>`
+  }
+  if (style === 'ornaments') {
+    const dm = Math.max(4, w / 16)
+    const diamond = (cx, cy) => `<path d="M${cx} ${cy - dm}L${cx + dm} ${cy}L${cx} ${cy + dm}L${cx - dm} ${cy}Z" fill="${tint}" stroke="${CARD_GRAY}" stroke-width="${Math.max(1, w / 90)}"/>`
+    s += diamond(x + w / 2, y) + diamond(x + w / 2, y + h)
+    const g = id('rule')
+    defs.push(`<linearGradient id="${g}"><stop offset="0" stop-color="${tint}" stop-opacity="0"/><stop offset="0.5" stop-color="${tint}"/><stop offset="1" stop-color="${tint}" stop-opacity="0"/></linearGradient>`)
+    s += `<rect x="${x + w * 0.12}" y="${y + 16 + size * 1.55}" width="${w * 0.76}" height="${Math.max(1, w / 90)}" fill="url(#${g})"/>`
+    const r = Math.max(1.6, w / 55)
+    const inset = rx * 0.55
+    for (const [cx, cy] of [[x + inset, y + inset], [x + w - inset, y + inset], [x + inset, y + h - inset], [x + w - inset, y + h - inset]]) {
+      s += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${tint}"/>`
+    }
+  }
+  if (style === 'filigree') {
+    const i = Math.max(3.5, w / 24)
+    const n = Math.max(5, w / 14) // the notch's radius
+    const [l, t, r, b] = [x + i, y + i, x + w - i, y + h - i]
+    const d = `M${l + n} ${t}H${r - n}A${n} ${n} 0 0 0 ${r} ${t + n}V${b - n}A${n} ${n} 0 0 0 ${r - n} ${b}H${l + n}A${n} ${n} 0 0 0 ${l} ${b - n}V${t + n}A${n} ${n} 0 0 0 ${l + n} ${t}Z`
+    s += `<path d="${d}" fill="none" stroke="${tint}" stroke-width="${Math.max(0.8, w / 110)}" stroke-opacity="0.9"/>`
+    const r2 = Math.max(1.3, w / 70)
+    for (const [cx, cy] of [[l, t], [r, t], [l, b], [r, b]]) s += `<circle cx="${cx}" cy="${cy}" r="${r2}" fill="${tint}"/>`
+  }
+  // the title pill in the tint (H1 · 1), and the card's two purple menu buttons
+  const pillY = y + Math.max(10, w / 11)
+  s += `<rect x="${x + w * 0.1}" y="${pillY}" width="${w * 0.8}" height="${size + 11}" rx="${(size + 11) / 2}" fill="${tint}"/>`
+  s += text(x + w / 2, pillY + 5 + size * 0.95, title, { size, anchor: 'middle', weight: 700, fill: DARK_TEXT })
+  const bh = Math.max(10, Math.round(h / 9))
+  for (let k = 0; k < 2; k++) s += `<rect x="${x + w * 0.12}" y="${y + h - 2.6 * bh - 8 + k * 1.3 * bh}" width="${w * 0.76}" height="${bh}" rx="${bh / 2}" fill="#5c1aae" stroke="#5b1aaa"/>`
+  return s
+}
+function closeUp(x, y, w, style) {
+  return framed(x + (w - 200) / 2, y + 8, 200, 270, STAR_CLASSES.G.mid, 'Alpha Centauri A', style)
+}
+function classRow(x, y, w, style) {
+  const cw = 70
+  const gap = (w - 4 * cw) / 5
+  return STAR_SET.map(([k, name], i) => {
+    const cx = x + gap + i * (cw + gap)
+    return framed(cx, y + 60, cw, 100, STAR_CLASSES[k].mid, name, style) + text(cx + cw / 2, y + 180, k + ' star', { size: 10, anchor: 'middle', fill: '#ffffffaa' })
+  }).join('')
+}
+function others(x, y, w, style) {
+  const cw = 120
+  const gap = (w - 2 * cw) / 3
+  return framed(x + gap, y + 30, cw, 165, PLANET_TINT, 'New Avalon', style) + text(x + gap + cw / 2, y + 215, 'Terrestrial planet', { size: 10, anchor: 'middle', fill: '#ffffffaa' }) +
+    framed(x + 2 * gap + cw, y + 30, cw, 165, STATION_TINT, 'Tiangong', style) + text(x + 2 * gap + cw * 1.5, y + 215, 'Station', { size: 10, anchor: 'middle', fill: '#ffffffaa' })
+}
+const APPROACHES = [
+  ['I1', 'Corner brackets', 'corners', 'A thin quiet frame; thicker brackets of the tint around each corner (Koda’s first idea).'],
+  ['I2', 'Double edge', 'double', 'A thick purple edge with a thin line of the tint just inside it, for a fancy edge (Koda’s second idea).'],
+  ['I3', 'Ornaments', 'ornaments', 'Small diamonds on the top and bottom edges, a fading rule under the title, dots in the corners (wingdings and accent lines).'],
+  ['I4', 'Filigree', 'filigree', 'A thin inner line of the tint with notched corners and a dot at each notch, like an old playing card’s border.']
+]
+const rows3 = [
+  { section: 'I. Round 3: color on the frame, building on H1 · 1' },
+  ...APPROACHES.map(([rid, title, style, note]) => ({
+    id: rid,
+    title,
+    note,
+    h: 290,
+    cells: [
+      { label: `${rid} · close-up`, caption: 'a G star’s card, large', draw: (x, y, w) => closeUp(x, y, w, style) },
+      { label: `${rid} · stars`, caption: 'A, G, K and M stars', draw: (x, y, w) => classRow(x, y, w, style) },
+      { label: `${rid} · others`, caption: 'the same frame on a planet and a station', draw: (x, y, w) => others(x, y, w, style) }
+    ]
+  }))
+]
+
 // ── layout ──────────────────────────────────────────────────────────────────
 let y = 150
 let body = ''
-for (const row of ROUND === 1 ? rows : rows2) {
+for (const row of { 1: rows, 2: rows2, 3: rows3 }[ROUND]) {
   if (row.section) {
     body += text(30, y + 26, row.section, { size: 20, weight: 700, fill: LAV })
     body += `<line x1="30" x2="${W - 30}" y1="${y + 36}" y2="${y + 36}" stroke="${LAV}" stroke-opacity="0.3"/>`
@@ -404,7 +499,7 @@ for (const row of ROUND === 1 ? rows : rows2) {
   body += wrap(30, y + 50, row.note, LABEL_W - 50, { size: 11.5, fill: '#ffffffaa' })
   row.cells.forEach((cell, i) => {
     const x = LABEL_W + i * COL_W
-    const label = i === 0 ? `${row.id} · Now` : `${row.id} · ${i}`
+    const label = cell.label ?? (i === 0 ? `${row.id} · Now` : `${row.id} · ${i}`)
     body += box(x + 6, y + 4, COL_W - 12, h - 8, i === 0 ? '#1c0b35' : PANEL, i === 0 ? '#ffffff22' : '#c3b3da55', 10)
     body += text(x + 18, y + 24, label, { size: 13, weight: 700, fill: i === 0 ? '#ffffff' : YELLOW_LIGHT })
     body += wrap(x + 18, y + 40, cell.caption, COL_W - 40, { size: 10.5, fill: '#ffffffaa' })
@@ -415,9 +510,9 @@ for (const row of ROUND === 1 ? rows : rows2) {
 }
 const H = y + 40
 const header =
-  text(30, 52, ROUND === 1 ? 'Orbiter 8 · color choices to review' : 'Orbiter 8 · color choices, round 2', { size: 30, weight: 700 }) +
-  text(30, 82, (ROUND === 1 ? 'Left: the game now. Right: the options. Answer by label, e.g. "A2 · 2" or "D1 · Now".' : 'Left: the game now. Right: the options. Answer by label, e.g. "H1 · 2" or "H2 · Now".') + ' Cells are sketches of the game’s screens in its exact colors (libs/palette.js); drawn by orbiter-client/dev/mockups/color-choices.mjs.', { size: 13, fill: '#ffffffaa' }) +
-  ['Now', 'Option 1', 'Option 2', 'Option 3'].map((c, i) => text(LABEL_W + i * COL_W + COL_W / 2, 132, c, { size: 16, weight: 700, anchor: 'middle', fill: i === 0 ? '#ffffff' : YELLOW_LIGHT })).join('')
+  text(30, 52, ROUND === 1 ? 'Orbiter 8 · color choices to review' : `Orbiter 8 · color choices, round ${ROUND}`, { size: 30, weight: 700 }) +
+  text(30, 82, ({ 1: 'Left: the game now. Right: the options. Answer by label, e.g. "A2 · 2" or "D1 · Now".', 2: 'Left: the game now. Right: the options. Answer by label, e.g. "H1 · 2" or "H2 · Now".', 3: 'Four approaches, one per row, each shown close up, on four star classes, and on a planet and a station. Answer by row, e.g. "I2", or mix: "I1 corners with I3 diamonds".' }[ROUND]) + ' Cells are sketches of the game’s screens in its exact colors (libs/palette.js); drawn by orbiter-client/dev/mockups/color-choices.mjs.', { size: 13, fill: '#ffffffaa' }) +
+  (ROUND === 3 ? ['Close up', 'Star classes', 'Planets and stations', ''] : ['Now', 'Option 1', 'Option 2', 'Option 3']).map((c, i) => text(LABEL_W + i * COL_W + COL_W / 2, 132, c, { size: 16, weight: 700, anchor: 'middle', fill: i === 0 ? '#ffffff' : YELLOW_LIGHT })).join('')
 
 const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" ${FONT}>
 <defs>${defs.join('')}</defs>
