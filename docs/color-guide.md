@@ -215,7 +215,7 @@ possible". Built unless noted.
 | E1 | Today's planets kept. |
 | E2 · 1 | Sol's Mars Ferrous (contracts too). |
 | E3 · 1 | The proposal's pale star tints (`STAR_CLASSES`). |
-| F1 | Neither option; new ones to draw. |
+| F1 | Neither option; new ones in [`mockups/color-choices-2.svg`](mockups/color-choices-2.svg), row H1. |
 | F2 · 1 | A yellow badge on the corner of a card for something you own. |
 | G1 · 1 | Galaxy map: the chosen star's hex glows purple with a pointer; yours stays the yellow outline; under siege, a pink frame inside the hex. |
 | G2 · 1 | Focus: a 2.5 px `BRAND_300` ring, 3 px out. |

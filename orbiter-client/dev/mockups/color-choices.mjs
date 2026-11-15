@@ -2,7 +2,7 @@
 // each, with the game as it is now on the left and the proposed options to its right. Cells are labeled
 // (A1 · Now, A1 · 1, A1 · 2…) so Koda can answer row by row. Colors come from libs/palette.js and
 // libs/card-theme.js, so "Now" is the game's own; the options are written here.
-//   npx vite-node dev/mockups/color-choices.mjs        (from orbiter-client/; vite-node resolves the client's imports)
+//   npx vite-node dev/mockups/color-choices.mjs [1]    (from orbiter-client/; round 2 unless "1"; vite-node resolves the client's imports)
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -10,7 +10,10 @@ import { YELLOW, YELLOW_LIGHT, PINK, PINK_LIGHT, PLANET_COLORS, STAR_CLASSES, HU
 import { shades, CARD_THEMES } from '../../src/libs/card-theme.js'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
-const OUT = path.join(here, '../../../docs/mockups/color-choices.svg')
+// Round 1 (Koda answered it on 2026-11-14; its committed SVG is the record, and redrawing it now would
+// show the new colors as "Now") or round 2, the questions still open.
+const ROUND = process.argv[2] === '1' ? 1 : 2
+const OUT = path.join(here, '../../../docs/mockups', ROUND === 1 ? 'color-choices.svg' : 'color-choices-2.svg')
 
 const LABEL_W = 330
 const COL_W = 360
@@ -64,15 +67,19 @@ const hexPath = (cx, cy, r) =>
   }).join('L') + 'Z'
 
 // A small card: one background, frame and title in a theme (libs/card-theme.js).
-function card(x, y, w, h, theme, title, { bg = CARD_GRAY, swatch = null, badge = false, siege = false, mine = false } = {}) {
-  let s = box(x, y, w, h, bg, theme.base, 10, 2.5)
-  s += `<rect x="${x + 8}" y="${y + 8}" width="${w - 16}" height="24" rx="12" fill="${theme.mid}" stroke="${theme.stroke}"/>`
-  s += text(x + w / 2, y + 25, title, { size: 13, anchor: 'middle', weight: 600 })
+function card(x, y, w, h, theme, title, opts = {}) {
+  const { bg = CARD_GRAY, swatch = null, badge = false, siege = false, mine = false } = opts
+  const { frame = theme.base, frameOpacity = 1, frameWidth = 2.5, titleFill = theme.mid, titleStroke = theme.stroke, titleColor = '#ffffff', stripe = null, size = 13 } = opts
+  let s = `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="10" fill="${bg}" stroke="${frame}" stroke-opacity="${frameOpacity}" stroke-width="${frameWidth}"/>`
+  if (stripe) s += `<rect x="${x + 3}" y="${y + 3}" width="${w - 6}" height="5" rx="2.5" fill="${stripe}"/>`
+  s += `<rect x="${x + 8}" y="${y + 11}" width="${w - 16}" height="${size + 11}" rx="${(size + 11) / 2}" fill="${titleFill}" stroke="${titleStroke}"/>`
+  s += text(x + w / 2, y + 16 + size * 0.95, title, { size, anchor: 'middle', weight: 600, fill: titleColor })
   if (swatch) s += `<circle cx="${x + 22}" cy="${y + 20}" r="7" fill="${swatch}" stroke="#ffffff66"/>`
   if (mine) s += text(x + w / 2, y + 52, 'Mine', { size: 11, anchor: 'middle', fill: YELLOW })
   if (badge) s += `<g transform="translate(${x + w - 2} ${y + 2})"><circle r="10" fill="${YELLOW}"/><text y="4" font-size="11" text-anchor="middle" fill="#1a1a1a" font-weight="700">★</text></g>`
   if (siege) s += `<rect x="${x - 5}" y="${y - 5}" width="${w + 10}" height="${h + 10}" rx="13" fill="none" stroke="${PINK}" stroke-width="2.5" stroke-dasharray="7 5"/>`
-  for (let i = 0; i < 2; i++) s += `<rect x="${x + 14}" y="${y + h - 62 + i * 26}" width="${w - 28}" height="20" rx="10" fill="#5c1aae" stroke="#5b1aaa"/>`
+  const bh = Math.max(10, Math.round(h / 9))
+  for (let i = 0; i < 2; i++) s += `<rect x="${x + 10}" y="${y + h - 2.6 * bh - 6 + i * 1.3 * bh}" width="${w - 20}" height="${bh}" rx="${bh / 2}" fill="#5c1aae" stroke="#5b1aaa"/>`
   return s
 }
 
@@ -323,10 +330,68 @@ function mapHex(cx, cy, opt) {
   return s
 }
 
+// ── round 2: still open after Koda's answers (2026-11-14) ───────────────────
+const STAR_SET = [['A', 'Sirius'], ['G', 'Alpha Cen A'], ['K', 'Alpha Cen B'], ['M', 'Wolf 359']]
+const NEUTRAL = '#5a4c8c' // BORDER_STRONG
+function starCards(x, y, w, style) {
+  const cw = 76
+  const gap = (w - 4 * cw) / 5
+  return STAR_SET.map(([k, name], i) => {
+    const tint = STAR_CLASSES[k].mid
+    const t = shades(tint)
+    const cx = x + gap + i * (cw + gap)
+    const common = { size: 9 }
+    const variants = {
+      now: { ...common, titleColor: '#ffffff' },
+      pill: { ...common, frame: NEUTRAL, titleFill: tint, titleStroke: tint, titleColor: '#1b1531' },
+      thin: { ...common, frame: tint, frameOpacity: 0.55, frameWidth: 1.5, titleFill: '#5c1aae', titleStroke: '#5b1aaa' },
+      stripe: { ...common, frame: NEUTRAL, stripe: tint, titleFill: '#5c1aae', titleStroke: '#5b1aaa' }
+    }
+    return card(cx, y + 10, cw, 108, t, name, variants[style]) + text(cx + cw / 2, y + 134, k + ' star', { size: 10, anchor: 'middle', fill: '#ffffffaa' })
+  }).join('')
+}
+const soft = (hex) => {
+  const c = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16))
+  const [a, b] = [c(hex), c('#8a80a3')]
+  return '#' + a.map((v, i) => Math.round(v + (b[i] - v) * 0.35).toString(16).padStart(2, '0')).join('')
+}
+function hudStates(x, y, w, resting, hovered) {
+  return text(x + 14, y + 12, 'resting', { size: 10, fill: '#ffffffaa' }) + hudRow(x + 10, y + 34, resting, w) +
+    text(x + 14, y + 82, 'under the pointer', { size: 10, fill: '#ffffffaa' }) + hudRow(x + 10, y + 104, hovered, w)
+}
+const SOFT_ALL = Object.fromEntries(Object.entries(HUD_TINT).map(([k, v]) => [k, soft(v)]))
+const FULL_ALL = { ...HUD_TINT, leaderboard: '#ffc94d' }
+
+const rows2 = [
+  { section: 'H. Round 2: still open' },
+  {
+    id: 'H1',
+    title: 'Star cards (was F1)',
+    note: 'Neither of F1’s worked. "Now" is already softer: the cards take the new pale star tints (E3). Each cell shows four classes.',
+    h: 168,
+    cells: [
+      { caption: 'frame and title in the star’s pale tint (since E3)', draw: (x, y, w) => starCards(x, y, w, 'now') },
+      { caption: 'quiet frame; the title pill in the star’s tint', draw: (x, y, w) => starCards(x, y, w, 'pill') },
+      { caption: 'a thin, faint frame in the tint; purple title', draw: (x, y, w) => starCards(x, y, w, 'thin') },
+      { caption: 'quiet frame and purple title; a band of the tint along the top', draw: (x, y, w) => starCards(x, y, w, 'stripe') }
+    ]
+  },
+  {
+    id: 'H2',
+    title: 'HUD buttons on hover',
+    note: 'A2 made the leaderboard soft, brightening on hover. Should every HUD button work that way?',
+    h: 140,
+    cells: [
+      { caption: 'only the leaderboard brightens (as built)', draw: (x, y, w) => hudStates(x, y, w, HUD_TINT, FULL_ALL) },
+      { caption: 'every button soft at rest, full color on hover', draw: (x, y, w) => hudStates(x, y, w, { ...SOFT_ALL, leaderboard: HUD_TINT.leaderboard }, FULL_ALL) }
+    ]
+  }
+]
+
 // ── layout ──────────────────────────────────────────────────────────────────
 let y = 150
 let body = ''
-for (const row of rows) {
+for (const row of ROUND === 1 ? rows : rows2) {
   if (row.section) {
     body += text(30, y + 26, row.section, { size: 20, weight: 700, fill: LAV })
     body += `<line x1="30" x2="${W - 30}" y1="${y + 36}" y2="${y + 36}" stroke="${LAV}" stroke-opacity="0.3"/>`
@@ -350,8 +415,8 @@ for (const row of rows) {
 }
 const H = y + 40
 const header =
-  text(30, 52, 'Orbiter 8 · color choices to review', { size: 30, weight: 700 }) +
-  text(30, 82, 'Left: the game now. Right: the options. Answer by label, e.g. "A2 · 2" or "D1 · Now". Cells are sketches of the game’s screens in its exact colors (libs/palette.js); drawn by orbiter-client/dev/mockups/color-choices.mjs.', { size: 13, fill: '#ffffffaa' }) +
+  text(30, 52, ROUND === 1 ? 'Orbiter 8 · color choices to review' : 'Orbiter 8 · color choices, round 2', { size: 30, weight: 700 }) +
+  text(30, 82, (ROUND === 1 ? 'Left: the game now. Right: the options. Answer by label, e.g. "A2 · 2" or "D1 · Now".' : 'Left: the game now. Right: the options. Answer by label, e.g. "H1 · 2" or "H2 · Now".') + ' Cells are sketches of the game’s screens in its exact colors (libs/palette.js); drawn by orbiter-client/dev/mockups/color-choices.mjs.', { size: 13, fill: '#ffffffaa' }) +
   ['Now', 'Option 1', 'Option 2', 'Option 3'].map((c, i) => text(LABEL_W + i * COL_W + COL_W / 2, 132, c, { size: 16, weight: 700, anchor: 'middle', fill: i === 0 ? '#ffffff' : YELLOW_LIGHT })).join('')
 
 const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" ${FONT}>
