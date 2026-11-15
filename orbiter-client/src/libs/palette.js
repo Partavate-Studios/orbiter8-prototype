@@ -111,15 +111,23 @@ export const HUD_TINT = {
   you: YELLOW_LIGHT,
   help: '#7fd4ff',
   sieges: '#ff8a5c',
-  leaderboard: '#e6cf8f', // soft gold; full gold on hover (HUD_HOVER)
+  leaderboard: '#ffc94d',
   chat: '#4fe0d0',
   settings: '#a59fb3',
   planets: '#6fa8ff',
   ships: '#e6dcf5'
 }
 
-/** HUD buttons whose tint brightens on hover (Koda, 2026-11-14: the leaderboard, row A2). */
-export const HUD_HOVER = { leaderboard: '#ffc94d' }
+/**
+ * The HUD buttons at rest: each tint softened toward a quiet gray, brightening to HUD_TINT under the
+ * pointer (Koda, 2026-11-14, rows A2 and H2). The leaderboard's soft gold is Koda's pick (A2).
+ */
+const softTint = (hex) => {
+  const c = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16))
+  const [a, b] = [c(hex), c('#8a80a3')]
+  return '#' + a.map((v, i) => Math.round(v + (b[i] - v) * 0.35).toString(16).padStart(2, '0')).join('')
+}
+export const HUD_REST = { ...Object.fromEntries(Object.entries(HUD_TINT).map(([k, v]) => [k, softTint(v)])), leaderboard: '#e6cf8f' }
 
 /** The inside of cards and menus: the color system's first surface (row B1). Purple stays for edges and buttons. */
 export const CARD_GRAY = SURFACE_1

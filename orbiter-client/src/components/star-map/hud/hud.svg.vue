@@ -57,7 +57,7 @@
       <g :transform="corner(leftMostX, 50, topMostY, 50)">
         <a cursor="pointer" @click.prevent="selectMyShip()">
           <title>My ship (Space)</title>
-          <tinted :tint="HUD_TINT.you"><avatar-icon /></tinted>
+          <tinted :tint="HUD_TINT.you" :rest="HUD_REST.you"><avatar-icon /></tinted>
         </a>
       </g>
 
@@ -91,7 +91,7 @@
       <g :transform="corner(leftMostX, 50, bottomMostY, -450)">
         <a cursor="pointer" @click.prevent="openMenu('help')">
           <title>First steps</title>
-          <tinted :tint="HUD_TINT.help"><help-icon /></tinted>
+          <tinted :tint="HUD_TINT.help" :rest="HUD_REST.help"><help-icon /></tinted>
           <g v-if="stepsLeft">
             <circle cx="-25" cy="20" fill="#230b41" stroke="#ffffff88" stroke-width="0.5" r="10" />
             <text
@@ -111,7 +111,7 @@
         <a cursor="pointer" @click.prevent="openMenu('feed')">
           <title>Siege feed</title>
           <circle v-if="player.besiegedCells.size" r="27" fill="none" :stroke="PINK_LIGHT" stroke-width="2" />
-          <tinted :tint="HUD_TINT.sieges"><sieges-icon /></tinted>
+          <tinted :tint="HUD_TINT.sieges" :rest="HUD_REST.sieges"><sieges-icon /></tinted>
         </a>
       </g>
       <!-- The session key's time left (yellow: yours) -->
@@ -126,14 +126,14 @@
       <g :transform="corner(leftMostX, 50, bottomMostY, -250)">
         <a cursor="pointer" @click.prevent="showLeaderboard()">
           <title>Leaderboard</title>
-          <tinted :tint="HUD_TINT.leaderboard" :hover-tint="HUD_HOVER.leaderboard"><trophy-icon /></tinted>
+          <tinted :tint="HUD_TINT.leaderboard" :rest="HUD_REST.leaderboard"><trophy-icon /></tinted>
         </a>
       </g>
 
       <g :transform="corner(leftMostX, 50, bottomMostY, -150)">
         <a cursor="pointer" @click.prevent="showChat()">
           <title>Chat</title>
-          <tinted :tint="HUD_TINT.chat"><broadcast-icon /></tinted>
+          <tinted :tint="HUD_TINT.chat" :rest="HUD_REST.chat"><broadcast-icon /></tinted>
           <g v-if="chatEventsCount">
             <circle cx="-25" cy="20" fill="#230b41" stroke="#ffffff88" stroke-width="0.5" r="10" />
             <text
@@ -156,14 +156,14 @@
       <g :transform="corner(leftMostX, 50, bottomMostY, -50)">
         <a cursor="pointer" @click.prevent="showSettings()">
           <title>Settings</title>
-          <tinted :tint="HUD_TINT.settings"><gear-icon /></tinted>
+          <tinted :tint="HUD_TINT.settings" :rest="HUD_REST.settings"><gear-icon /></tinted>
         </a>
       </g>
 
       <g :transform="corner(rightMostX, -50, bottomMostY, -50)">
         <a cursor="pointer" @click.prevent="showShips()">
           <title>Ships in this system</title>
-          <tinted :tint="HUD_TINT.ships"><ships-icon /></tinted>
+          <tinted :tint="HUD_TINT.ships" :rest="HUD_REST.ships"><ships-icon /></tinted>
           <g v-if="shipCount">
             <circle cx="25" cy="20" fill="#230b41" stroke="#ffffff88" stroke-width="0.5" r="10" />
             <text
@@ -180,7 +180,7 @@
       <g :transform="corner(rightMostX, -50, bottomMostY, -150)">
         <a cursor="pointer" @click.prevent="showPlanets()">
           <title>Planets (Tab and Shift+Tab step through them)</title>
-          <tinted :tint="HUD_TINT.planets"><planets-icon /></tinted>
+          <tinted :tint="HUD_TINT.planets" :rest="HUD_REST.planets"><planets-icon /></tinted>
           <g>
             <circle cx="25" cy="20" fill="#230b41" stroke="#ffffff88" stroke-width="0.5" r="10" />
             <text
@@ -279,7 +279,7 @@ import { usePlayerStore } from '@/stores/player'
 import AvatarIcon from './icons/avatar-icon.svg'
 import GearIcon from './icons/gear-icon.svg'
 import Tinted from './icons/tinted.svg.vue'
-import { HUD_TINT, HUD_HOVER, STAR_CLASSES } from '@/libs/palette'
+import { HUD_TINT, HUD_REST, STAR_CLASSES } from '@/libs/palette'
 import JumpIcon from './icons/jump-icon.svg'
 import StarIcon from './icons/star-icon.svg'
 import Minimap from './minimap.svg'
@@ -332,7 +332,7 @@ export default {
     SiegesIcon
   },
   data() {
-    return { now: Date.now(), HUD_TINT, HUD_HOVER }
+    return { now: Date.now(), HUD_TINT, HUD_REST }
   },
   computed: {
     // The pilot panel's call sign and ship name, shrunk or cut to fit (libs/fit-text.js).

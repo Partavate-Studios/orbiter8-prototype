@@ -215,10 +215,12 @@ possible". Built unless noted.
 | E1 | Today's planets kept. |
 | E2 · 1 | Sol's Mars Ferrous (contracts too). |
 | E3 · 1 | The proposal's pale star tints (`STAR_CLASSES`). |
-| F1 | Neither option; new ones in [`mockups/color-choices-2.svg`](mockups/color-choices-2.svg), row H1. |
+| F1 | Neither option; new ones in [`mockups/color-choices-2.svg`](mockups/color-choices-2.svg), row H1 (see H1 · 1 below). |
 | F2 · 1 | A yellow badge on the corner of a card for something you own. |
 | G1 · 1 | Galaxy map: the chosen star's hex glows purple with a pointer; yours stays the yellow outline; under siege, a pink frame inside the hex. |
 | G2 · 1 | Focus: a 2.5 px `BRAND_300` ring, 3 px out. |
+| H2 · 1 | Every HUD button rests soft (`HUD_REST`, its tint 35% toward gray; the leaderboard's soft gold from A2) and shows its full tint (`HUD_TINT`) under the pointer. The star button keeps its star's color. |
+| H1 · 1 | Star cards: a quiet frame with the title pill in the star's tint, plus some of the tint on the frame (four ways in [`mockups/color-choices-3.svg`](mockups/color-choices-3.svg)). |
 
 ## 9. To do
 
