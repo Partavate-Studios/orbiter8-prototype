@@ -6,6 +6,11 @@
 //
 // It prefers unvisited stars farther from Sol, goes through black holes it lands on, and waits for
 // its own scan when every neighbor is still uncharted.
+// Settings from the environment, to run several as neighbors while you play (dev/harness/crowd.sh):
+//   LOCAL_FILE=-8546  the chain started with CHAIN_PORT=8546 (dev/local-deployment-8546.json)
+//   PACE_MS=10000     wait about this long between moves (randomized ±50%), so a person can watch
+//   NAME=Rook SHIP=Kestrel   its call sign and ship's name when it registers
+//   WANDER=1          stay near Sol (within two jumps) instead of exploring outward, to be seen
 import { JsonRpcProvider, Contract } from 'ethers'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { distance } from '../../src/sdk/hex.js'
@@ -13,7 +18,10 @@ import { fetchRound, timeOf } from '../../src/sdk/drand.js'
 
 const [moves = 20, account = 5, out] = process.argv.slice(2)
 const read = (p) => JSON.parse(readFileSync(new URL(p, import.meta.url), 'utf8'))
-const deployment = read('../local-deployment.json')
+const deployment = read(`../local-deployment${process.env.LOCAL_FILE ?? ''}.json`)
+const PACE_MS = Number(process.env.PACE_MS ?? 0)
+/** Between moves: about PACE_MS (±50%), so a pilot moves at a watchable pace. */
+const pause = () => (PACE_MS ? new Promise((r) => setTimeout(r, PACE_MS * (0.5 + Math.random()))) : null)
 const provider = new JsonRpcProvider(deployment.rpc, undefined, { pollingInterval: 250 })
 const signer = await provider.getSigner(Number(account))
 const galaxy = new Contract(deployment.contracts.galaxy, read('../../src/sdk/abi/Galaxy.json'), signer)
@@ -45,10 +53,11 @@ async function proofs(cells) {
 
 const me = await signer.getAddress()
 if (!(await pilots.pilotOf(me)).registered) {
-  await record('register', await pilots.register(`Bot${account}`, 'Surveyor'))
+  await record('register', await pilots.register(process.env.NAME ?? `Bot${account}`, process.env.SHIP ?? 'Surveyor'))
 }
 
 for (let i = 0; i < Number(moves); i++) {
+  await pause()
   const pilot = await pilots.pilotOf(me)
   const here = Number(pilot.ship.cell)
   const range = Number(pilot.ship.range)
@@ -74,7 +83,9 @@ for (let i = 0; i < Number(moves); i++) {
     i--
     continue
   }
-  const score = (c) => (byCell.get(c).visited ? 0 : 100) + distance(0, c) + Math.random() * 3
+  const score = process.env.WANDER
+    ? (c) => Math.random() * 10 - Math.max(0, distance(0, c) - 2) * 50
+    : (c) => (byCell.get(c).visited ? 0 : 100) + distance(0, c) + Math.random() * 3
   const to = options.sort((a, b) => score(b) - score(a))[0]
   const firstVisit = !byCell.get(to).visited
   await record('jump', await pilots.jump(to, proof), { from: here, to, firstVisit, proofs: proof.length })

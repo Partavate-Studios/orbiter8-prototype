@@ -7,13 +7,20 @@
 // Each move is one trade at the port that pays best right now (selling what it buys from the hold,
 // then buying the good with the best margin elsewhere), or a bay purchase at the I.S.S. when the bot
 // has spare credits: the simulator's strategy (dev/sim/economy.mjs), against the real contracts.
+// Settings from the environment, to run several as neighbors while you play (dev/harness/crowd.sh):
+//   LOCAL_FILE=-8546  the chain started with CHAIN_PORT=8546 (dev/local-deployment-8546.json)
+//   PACE_MS=10000     wait about this long between moves (randomized ±50%), so a person can watch
+//   NAME=Rook SHIP=Kestrel   its call sign and ship's name when it registers
 import { JsonRpcProvider, Contract, Wallet, parseEther } from 'ethers'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { buyCost, sellProceeds, fee, baysCost, MODE } from '../../src/sdk/market.js'
 
 const [moves = 40, account = 6, out] = process.argv.slice(2)
 const read = (p) => JSON.parse(readFileSync(new URL(p, import.meta.url), 'utf8'))
-const deployment = read('../local-deployment.json')
+const deployment = read(`../local-deployment${process.env.LOCAL_FILE ?? ''}.json`)
+const PACE_MS = Number(process.env.PACE_MS ?? 0)
+/** Between moves: about PACE_MS (±50%), so a pilot moves at a watchable pace. */
+const pause = () => (PACE_MS ? new Promise((r) => setTimeout(r, PACE_MS * (0.5 + Math.random()))) : null)
 const provider = new JsonRpcProvider(deployment.rpc, undefined, { pollingInterval: 250 })
 const wallet = await provider.getSigner(Number(account))
 const me = (await wallet.getAddress()).toLowerCase()
@@ -31,7 +38,7 @@ async function record(action, send, extra = {}) {
 // Register and start a session from the wallet; everything after goes through the key.
 const pilotsByWallet = new Contract(P, abi('Pilots'), wallet)
 if (!(await pilotsByWallet.pilotOf(me)).registered) {
-  await record('register', () => pilotsByWallet.register(`Trader${account}`, 'Hauler'))
+  await record('register', () => pilotsByWallet.register(process.env.NAME ?? `Trader${account}`, process.env.SHIP ?? 'Hauler'))
 }
 const key = Wallet.createRandom().connect(provider)
 const expiry = Math.floor(Date.now() / 1000) + 3600
@@ -108,6 +115,7 @@ function plan(s, port) {
 }
 
 for (let i = 0; i < Number(moves); i++) {
+  await pause()
   const s = await state()
   const spare = s.credits - 60 * s.bays
   let count = 0
@@ -119,7 +127,11 @@ for (let i = 0; i < Number(moves); i++) {
   }
   const options = s.ports.map((port) => [port, ...plan(s, port)]).sort((a, b) => b[2] - a[2])
   const [port, lines] = options[0]
-  if (!lines.length) break
+  // nothing worth trading now: stop, or (paced, as a neighbor) wait for prices to move
+  if (!lines.length) {
+    if (!PACE_MS) break
+    continue
+  }
   await record('trade', () => market.trade(port.port, lines), {
     port: port.port,
     lines: lines.length,
