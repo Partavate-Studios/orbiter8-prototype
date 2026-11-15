@@ -17,7 +17,7 @@
     <svg class="map" :viewBox="`0 0 ${width} ${height}`">
       <!-- Charted space (Koda, 2026-11-07): a hex around every cell a scan has decided, star or empty;
            space nobody has scanned stays open, so the frontier shows. -->
-      <path v-if="gridPath" :d="gridPath" fill="#2b0c50" fill-opacity="0.35" stroke="#4a2d7a" stroke-width="1" :opacity="gridOpacity" />
+      <path v-if="gridPath" :d="gridPath" :fill="SPACE_NEBULA" fill-opacity="0.35" :stroke="SPACE_ORBIT" stroke-width="1" :opacity="gridOpacity" />
       <!-- your jump range: its cells, dashed in your yellow -->
       <path v-if="rangePath" :d="rangePath" fill="none" :stroke="MAP.route" stroke-opacity="0.35" stroke-width="1" stroke-dasharray="4 4" />
       <!-- stars that are yours to name (you discovered them and nobody owns them) or that you own:
@@ -84,7 +84,19 @@
           :fill="YELLOW_LIGHT"
           opacity="0.9"
         />
-        <circle v-if="star.besieged" :r="star.r + 11" class="besieged" />
+        <!-- under siege: a pink frame inside the hex (a ring when hexes are small) -->
+        <path v-if="star.besieged && scale > 30" :d="hexInner" class="besieged" />
+        <circle v-else-if="star.besieged" :r="star.r + 11" class="besieged" />
+        <!-- the chosen star (Koda, 2026-11-14, row G1): a purple glow on its hex and a pointer above;
+             yours stays the yellow outline, under siege the pink frame inside, so all three can show -->
+        <template v-if="star.cell === chosen">
+          <template v-if="scale > 30">
+            <path :d="hexShape" fill="none" :stroke="BRAND_400" stroke-width="7" stroke-opacity="0.35" />
+            <path :d="hexShape" fill="none" :stroke="BRAND_300" stroke-width="2" />
+            <path :d="pointerShape" :fill="BRAND_300" />
+          </template>
+          <circle v-else :r="star.r + 8" fill="none" :stroke="BRAND_300" stroke-width="2" />
+        </template>
         <portal v-if="star.blackHole" :radius="star.r * 1.15" :animate="false" />
         <template v-else>
           <circle :r="star.r * 2.4" :fill="star.color" opacity="0.14" />
@@ -155,7 +167,7 @@
 import { mapActions } from 'pinia'
 import { game } from '@/sdk/client'
 import { STATE } from '@/sdk/client'
-import { MAP, YELLOW_LIGHT } from '@/libs/palette'
+import { MAP, YELLOW_LIGHT, SPACE_NEBULA, SPACE_ORBIT, BRAND_300, BRAND_400 } from '@/libs/palette'
 import { position, cellAt, distance, neighbors } from '@/sdk/hex'
 import { CARD_THEMES } from '@/libs/card-theme'
 import { fitText } from '@/libs/fit-text'
@@ -220,6 +232,8 @@ export default {
       pinch: null,
       chosen: null,
       preview: null,
+      /** the heliopause's radius when the map opens (set in mounted; declared so the first render has a number) */
+      heliopauseStart: 0,
       waiting: false,
       failed: false,
       now: Date.now(),
@@ -229,6 +243,10 @@ export default {
       touch: window.matchMedia?.('(hover: none)').matches ?? false,
       pointer: { x: 0, y: 0 },
       YELLOW_LIGHT,
+      SPACE_NEBULA,
+      SPACE_ORBIT,
+      BRAND_300,
+      BRAND_400,
       /** the opening, 0 to 1: the heliopause shrinking, the neighbors flying in */
       opening: 0,
       MAP
@@ -251,6 +269,15 @@ export default {
     /** A hex the size of one cell, around (0, 0): a star's pointer area. */
     hexShape() {
       return hexPath(0, 0, HEX_R * this.scale)
+    },
+    /** A smaller hex inside it: the pink frame of a star under siege. */
+    hexInner() {
+      return hexPath(0, 0, HEX_R * this.scale * 0.8)
+    },
+    /** The chosen star's pointer: a small triangle above its hex's top corner. */
+    pointerShape() {
+      const top = HEX_R * this.scale + 5
+      return `M0 ${-top}l-6 -9h12z`
     },
     /** Every decided cell on screen (star, black hole or empty) as one path of hexes. */
     gridPath() {

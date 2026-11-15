@@ -45,6 +45,13 @@
     <g :transform="'rotate(' + spriteRotation + ')'">
       <sprite :object-id="objectId" />
     </g>
+    <!-- yours: a yellow badge on the card's corner (Koda, 2026-11-14, row F2); never the frame, so a
+         planet can be yours and under siege at once -->
+    <g v-if="mine" transform="translate(66 -70)">
+      <circle r="8" :fill="YELLOW" stroke="#1b1531" stroke-width="1.5" />
+      <path d="M0 -4.6L1.35 -1.4L4.4 -1.4L1.9 0.6L2.85 3.9L0 2L-2.85 3.9L-1.9 0.6L-4.4 -1.4L-1.35 -1.4Z" fill="#1b1531" />
+      <title>Yours</title>
+    </g>
   </g>
 </template>
 
@@ -57,7 +64,7 @@ import Sprite from './sprite.svg'
 
 import { useStarMapStore } from '@/stores/starmap'
 import { usePlayerStore } from '@/stores/player'
-import { CARD_GRAY, PINK_LIGHT } from '@/libs/palette'
+import { CARD_GRAY, PINK_LIGHT, YELLOW } from '@/libs/palette'
 import { CARD_THEMES } from '@/libs/card-theme'
 
 export default {
@@ -73,7 +80,7 @@ export default {
     objectId: { type: String, default: null }
   },
   data() {
-    return { CARD_GRAY, PINK_LIGHT }
+    return { CARD_GRAY, PINK_LIGHT, YELLOW }
   },
   computed: {
     /** The card's colors (libs/card-theme.js, from card-ui), purple outside a card. */
@@ -84,6 +91,10 @@ export default {
     titleFill() {
       const key = Object.keys(CARD_THEMES).find((k) => CARD_THEMES[k] === this.theme)
       return key === 'ship' ? 'url(#cardGradient)' : `url(#card-${key})`
+    },
+    /** Something the pilot owns (sdk/system.js isMine): a planet, their ship. */
+    mine() {
+      return Boolean(this.systemObjects[this.objectId]?.isMine)
     },
     /** A planet with a siege running against it. */
     besieged() {

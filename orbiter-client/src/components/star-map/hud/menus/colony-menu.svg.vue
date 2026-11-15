@@ -11,7 +11,7 @@
         <text v-if="planet.building" x="0" y="48" text-anchor="middle" font-size="0.75em" :fill="YELLOW">
           {{ BUILDING_NAMES[planet.building] }} under way: ready {{ readyWords(planet.readyAt) }}
         </text>
-        <text v-if="siege" x="0" y="48" text-anchor="middle" font-size="0.75em" :fill="PINK">
+        <text v-if="siege" x="0" y="48" text-anchor="middle" font-size="0.75em" :fill="PINK_LIGHT">
           Under siege: production has stopped
         </text>
 
@@ -129,7 +129,7 @@
               :y="44 + i * 16"
               text-anchor="middle"
               font-size="0.7em"
-              :fill="PINK"
+              :fill="PINK_LIGHT"
             >
               Needs {{ line }}
             </text>
@@ -216,7 +216,7 @@
           <g v-if="part != null" transform="translate(0 250)">
             <amount-dial v-model:value="count" :label="'How many ' + partPlural(partName)" :max="20" />
             <text x="0" y="50" text-anchor="middle" font-size="0.8em" fill="#ffffffaa">{{ orderNeeds }}</text>
-            <text x="0" y="68" text-anchor="middle" font-size="0.85em" :fill="orderProblem ? PINK : '#ffffff'">
+            <text x="0" y="68" text-anchor="middle" font-size="0.85em" :fill="orderProblem ? PINK_LIGHT : '#ffffff'">
               {{ orderProblem || orderTotal }}
             </text>
             <g transform="translate(0 100)">
@@ -263,7 +263,7 @@ import { usePlayerStore } from '@/stores/player'
 import { planetTypeName } from '@/sdk/game/planet-types'
 import { BUILDING_NAMES } from '@/sdk/client'
 import { partPlural } from '@/sdk/parts'
-import { YELLOW, PINK } from '@/libs/palette'
+import { YELLOW, PINK_LIGHT } from '@/libs/palette'
 import MenuContainer from './menu-container/_menu-container.svg'
 import MenuButton from './menu-button.svg'
 import AmountDial from './widgets/amount-dial.svg'
@@ -310,7 +310,7 @@ export default {
       MOON_MOUNTS,
       MOON_WEAPONS,
       YELLOW,
-      PINK
+      PINK_LIGHT
     }
   },
   computed: {

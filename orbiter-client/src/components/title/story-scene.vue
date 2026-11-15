@@ -211,7 +211,7 @@ export default {
   overflow: hidden;
   display: grid;
   grid-template-rows: auto 1fr auto;
-  background: radial-gradient(ellipse at center, #2b0c50 0%, #160631 70%);
+  background: radial-gradient(ellipse at center, var(--o8-surface-1) 0%, var(--o8-space-deep) 70%);
   color: #e6dcf5;
   font-family: 'Ubuntu', system-ui, sans-serif;
   outline: none;

@@ -85,10 +85,10 @@ colors always come with an icon or a picture of the thing, so they don't need to
 
 | Layer | Today's color | Use |
 |---|---|---|
-| Space | `MAP.spaceCenter` → `MAP.spaceEdge`, the system's glow | the universe |
-| Card and menu insides | `CARD_GRAY` `#25202f` | the same on every card and menu |
-| Readouts inside a card | *(to settle: one step lighter than `CARD_GRAY`)* | balances, cargo tiles, the port table |
-| Hover, selected rows | *(to settle: one more step)* | |
+| Space | `SPACE` `#130e24` → `SPACE_DEEP` `#0b0916`; the backdrop art deepened toward them | the universe |
+| Card and menu insides | `SURFACE_1` `#1b1531` (`CARD_GRAY`) | the same on every card and menu |
+| Readout tiles | `SURFACE_2` `#251d40` | cargo tiles; readouts that are only text have no box (C1) |
+| Hover, selected rows | `SURFACE_3` `#302651` | |
 
 ### Cards and menus (built, `libs/card-theme.js`)
 
@@ -126,7 +126,7 @@ colors always come with an icon or a picture of the thing, so they don't need to
 
 ### Stars (built: `STAR_CLASSES`, three graphics levels)
 
-By real spectral class: blue O and B, white A, yellow-white F, yellow G (Sol), orange K, red M. Each
+By real spectral class, in pale blackbody tints (E3): blue O and B, white A, yellow-white F, pale yellow G (Sol), orange K, red M. Each
 class has a core, a body (also its dot on the galaxy map) and a glow; the glow reaches its system a
 little (22%), so space stays purple. Black holes are drawn with Koda's portal art. Science would call
 Sol white; the game draws it yellow, as people know it.
@@ -155,7 +155,7 @@ and gray). Its station, Tiangong, trades as a Ferrous port.
 - *Idea, later:* corporation liveries as a hull stripe and badge, never yellow or pink. Pirates fly
   unmarked hulls.
 
-## 6. Goods (proposed, not built)
+## 6. Goods (built in the trade menu)
 
 Each of the eight goods gets one muted material color and its icon (`assets/art/good-*.svg` exist),
 used everywhere a good appears: port lists, cargo, sliders, production, recipes, the tech trees. **The
@@ -197,7 +197,30 @@ those are arrows, signs and yellow.
 tinted per selection; a goods color as decoration; color as the only cue; a new hex value written into
 a component (new colors go in `palette.js`; older ones move there as their screens are touched).
 
-## 8. To do
+## 8. Koda's choices (2026-11-14)
+
+From [`mockups/color-choices.svg`](mockups/color-choices.svg), and "use the proposed colors as much as
+possible". Built unless noted.
+
+| Row | Choice |
+|---|---|
+| Space | The proposal's deep space: `SPACE` `#130e24`, `SPACE_DEEP` `#0b0916`; the backdrop art's purples deepened toward it (`deepSpace`), its shapes kept. The title and story darken with it. |
+| A1 | Pink text in `PINK_LIGHT`; `PINK` kept for frames, fills and other uses ("I like the richness"). |
+| A2 | The leaderboard button soft gold `#e6cf8f`, full gold `#ffc94d` on hover. |
+| B1 · 2 | The proposal's purple surfaces: `SURFACE_1/2/3` `#1b1531` / `#251d40` / `#302651` (card insides, readout tiles, hover). |
+| B2 · 1 | Small labels on purple in lavender (`#c3b3da`, headings `#e6dcf5`). |
+| C1 · 2 | Readouts as plain text, no boxes, so buttons stand out; gains yellow, costs plain, can't-afford light pink with an outline; the main action (Make Trade) in `BRAND_500`, with a `BRAND_300` border. |
+| D1 · 1 | The proposal's goods colors (`GOODS_COLORS`), on goods' names and codes in the trade menu ("hard to know until I see it in context"). |
+| D2 · 1 | HUD tints kept. |
+| E1 | Today's planets kept. |
+| E2 · 1 | Sol's Mars Ferrous (contracts too). |
+| E3 · 1 | The proposal's pale star tints (`STAR_CLASSES`). |
+| F1 | Neither option; new ones to draw. |
+| F2 · 1 | A yellow badge on the corner of a card for something you own. |
+| G1 · 1 | Galaxy map: the chosen star's hex glows purple with a pointer; yours stays the yellow outline; under siege, a pink frame inside the hex. |
+| G2 · 1 | Focus: a 2.5 px `BRAND_300` ring, 3 px out. |
+
+## 9. To do
 
 **Under review:** [`mockups/color-choices.svg`](mockups/color-choices.svg) shows each choice below as the
 game is now and its options, labeled by row (A1…G2) for Koda's answers; redraw it with
@@ -216,7 +239,7 @@ a screen).
 - [ ] Measure contrast of today's text colors on their backgrounds; fix what's under 4.5:1.
 - [ ] A lint check for hex colors outside `palette.js` (once most have moved).
 
-## 9. Open questions
+## 10. Open questions
 
 - [ ] **HUD tints vs goods colors:** keep both as proposed (different roles, rarely side by side), or
       move the goods hues away from the HUD's? (Or the reverse, but Koda likes the HUD as it is.)

@@ -31,12 +31,28 @@ export default {
 </script>
 
 <style lang="scss">
-/* The accents, as in libs/palette.js. */
+/* The accents and the color system's tokens, as in libs/palette.js (docs/color-guide.md). */
 :root {
   --o8-pink: #e1177c;
   --o8-pink-light: #ff6fb0;
   --o8-yellow: #ccff00;
   --o8-yellow-light: #ebff99;
+  --o8-space: #130e24;
+  --o8-space-deep: #0b0916;
+  --o8-surface-1: #1b1531;
+  --o8-surface-2: #251d40;
+  --o8-surface-3: #302651;
+  --o8-border: #3f3566;
+  --o8-text: #f1eefa;
+  --o8-text-2: #bdb5d4;
+  --o8-brand-500: #7b4fe6;
+  --o8-brand-400: #8b5cf6;
+  --o8-brand-300: #b9a0ff;
+}
+/* Keyboard and gamepad focus: a lavender ring, set off from what it surrounds (row G2). */
+:focus-visible {
+  outline: 2.5px solid var(--o8-brand-300);
+  outline-offset: 3px;
 }
 #app {
   -webkit-font-smoothing: antialiased;
@@ -49,7 +65,7 @@ body {
   padding: 0;
   color: #c3b3da;
   background-size: cover;
-  background: #310e5c;
+  background: var(--o8-space);
 }
 a {
   color: #aaa;
@@ -73,8 +89,8 @@ a {
   border-color: #5b1aaa;
 }
 .card-pill:focus-visible {
-  outline: 2px solid #c3b3da;
-  outline-offset: 2px;
+  outline: 2.5px solid var(--o8-brand-300);
+  outline-offset: 3px;
 }
 .card-pill:disabled {
   color: #ffffff66;

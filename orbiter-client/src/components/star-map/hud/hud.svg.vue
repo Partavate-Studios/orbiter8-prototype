@@ -126,7 +126,7 @@
       <g :transform="corner(leftMostX, 50, bottomMostY, -250)">
         <a cursor="pointer" @click.prevent="showLeaderboard()">
           <title>Leaderboard</title>
-          <tinted :tint="HUD_TINT.leaderboard"><trophy-icon /></tinted>
+          <tinted :tint="HUD_TINT.leaderboard" :hover-tint="HUD_HOVER.leaderboard"><trophy-icon /></tinted>
         </a>
       </g>
 
@@ -279,7 +279,7 @@ import { usePlayerStore } from '@/stores/player'
 import AvatarIcon from './icons/avatar-icon.svg'
 import GearIcon from './icons/gear-icon.svg'
 import Tinted from './icons/tinted.svg.vue'
-import { HUD_TINT, STAR_CLASSES } from '@/libs/palette'
+import { HUD_TINT, HUD_HOVER, STAR_CLASSES } from '@/libs/palette'
 import JumpIcon from './icons/jump-icon.svg'
 import StarIcon from './icons/star-icon.svg'
 import Minimap from './minimap.svg'
@@ -332,7 +332,7 @@ export default {
     SiegesIcon
   },
   data() {
-    return { now: Date.now(), HUD_TINT }
+    return { now: Date.now(), HUD_TINT, HUD_HOVER }
   },
   computed: {
     // The pilot panel's call sign and ship name, shrunk or cut to fit (libs/fit-text.js).

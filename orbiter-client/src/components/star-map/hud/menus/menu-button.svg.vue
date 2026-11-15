@@ -43,6 +43,7 @@
 
 <script>
 import { unwrapTheme } from '@/libs/card-theme'
+import { BRAND_500, BRAND_400, BRAND_300 } from '@/libs/palette'
 
 export default {
   name: 'MenuButton',
@@ -55,6 +56,11 @@ export default {
     enabled: {
       type: Boolean,
       default: true
+    },
+    /** The menu's main action (Make Trade…): the color system's strongest purple, one per menu. */
+    primary: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['buttonclick'],
@@ -69,9 +75,11 @@ export default {
       return unwrapTheme(this.menuTheme)
     },
     getButtonFill() {
+      if (this.primary) return this.enabled ? (this.hover ? BRAND_400 : BRAND_500) : BRAND_500 + '55'
       return this.hover ? this.theme.deep : this.theme.mid + '44'
     },
     getButtonStroke() {
+      if (this.primary) return this.enabled ? BRAND_300 : BRAND_300 + '55'
       return this.hover ? this.theme.stroke : this.theme.mid
     },
     getTextColor() {

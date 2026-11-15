@@ -1,5 +1,7 @@
 // The star map backdrop art, extracted verbatim from the original backdrop.svg.vue so it can be
 // drawn on canvas. Coordinates are in the art's own 1280x1280 space; see background-canvas.vue.
+import { deepSpace } from '@/libs/palette'
+
 export const BACKDROP_SIZE = 1280
 
 export const backdropShapes = [
@@ -138,10 +140,14 @@ export const backdropShapes = [
 let backdropPaths = null
 
 /** Paints the art in its own 0–BACKDROP_SIZE space; the caller sets the transform. */
+let backdropFills = null
+
 export function paintBackdrop(ctx) {
   backdropPaths ??= backdropShapes.map((shape) => (shape.type === 'path' ? new Path2D(shape.d) : null))
+  // The art's purples, deepened toward deep space (libs/palette.js deepSpace); the shapes are the art's.
+  backdropFills ??= backdropShapes.map((shape) => deepSpace(shape.fill))
   backdropShapes.forEach((shape, index) => {
-    ctx.fillStyle = shape.fill
+    ctx.fillStyle = backdropFills[index]
     if (shape.type === 'path') {
       ctx.fill(backdropPaths[index])
     } else if (shape.type === 'rect') {

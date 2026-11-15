@@ -13,7 +13,7 @@
           Mounts {{ mounts }} of 6 · holds {{ ship.bays - player.freeBays }} of {{ ship.bays }} used · range
           {{ Math.max(1, ship.range - ship.rangeLost) }}
         </text>
-        <text v-if="condition?.retreated" x="0" y="203" text-anchor="middle" font-size="0.8em" :fill="PINK">
+        <text v-if="condition?.retreated" x="0" y="203" text-anchor="middle" font-size="0.8em" :fill="PINK_LIGHT">
           Retreated: repair at a shipyard before attacking again
         </text>
         <text v-else-if="docked" x="0" y="203" text-anchor="middle" font-size="0.8em" fill="#ffffffaa">
@@ -27,7 +27,7 @@
           </text>
           <g v-for="(row, i) in fitted" :key="row.part" :transform="'translate(0 ' + i * 30 + ')'">
             <text x="-170" y="0">{{ row.count }} × {{ row.name }}</text>
-            <text v-if="row.off" x="-20" y="0" :fill="PINK" font-size="0.85em">{{ row.off }} out of action</text>
+            <text v-if="row.off" x="-20" y="0" :fill="PINK_LIGHT" font-size="0.85em">{{ row.off }} out of action</text>
             <text x="60" y="0" fill="#ffffff88" font-size="0.8em">{{ row.space }}</text>
             <g v-if="myPlanetHere" class="can-click" transform="translate(150 0)" @click="unload(row)">
               <rect x="-30" y="-13" width="60" height="26" rx="4" fill="#3d1273" stroke="#ffffff44" />
@@ -40,7 +40,7 @@
             :y="fitted.length * 30 + 10"
             text-anchor="middle"
             font-size="0.85em"
-            :fill="PINK"
+            :fill="PINK_LIGHT"
           >
             Damage: {{ ship.rangeLost }} range, {{ ship.baysLost }} holds lost. A shipyard repairs everything.
           </text>
@@ -56,7 +56,7 @@ import { mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
 import { usePlayerStore } from '@/stores/player'
 import { shipArtParts, SHIP_ART_VIEWBOX } from '@/sdk/ship-art'
-import { PINK } from '@/libs/palette'
+import { PINK_LIGHT } from '@/libs/palette'
 import MenuContainer from './menu-container/_menu-container.svg'
 import { SHIP_PARTS, mountsUsed } from '@/sdk/parts'
 
@@ -64,7 +64,7 @@ export default {
   name: 'LoadoutMenu',
   components: { MenuContainer },
   data() {
-    return { player: usePlayerStore(), PINK, SHIP_ART_VIEWBOX }
+    return { player: usePlayerStore(), PINK_LIGHT, SHIP_ART_VIEWBOX }
   },
   computed: {
     ...mapState(useUIStore, ['viewport']),

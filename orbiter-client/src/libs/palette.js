@@ -11,13 +11,49 @@ export const PINK_LIGHT = '#ff6fb0'
 export const YELLOW = '#ccff00'
 export const YELLOW_LIGHT = '#ebff99'
 
+/*
+ * The color system's tokens (docs/color-guide.md), chosen by Koda on 2026-11-14 from the proposal
+ * (docs/mockups/color-choices.svg). Text in pink uses PINK_LIGHT (PINK is too dark for small text);
+ * PINK stays for frames, fills and large marks.
+ */
+/** Deep space: the universe behind everything; SPACE_DEEP for its darkest edges. */
+export const SPACE = '#130e24'
+export const SPACE_DEEP = '#0b0916'
+/** Faint purple for low-opacity glows in space, and the hex grid's fill. */
+export const SPACE_NEBULA = '#2a1a4a'
+/** Orbit lines and the hex grid's lines. */
+export const SPACE_ORBIT = '#4a3f75'
+/** Inside every card and menu (1), readouts and inputs (2), hover and selected rows (3): steps of lightness. */
+export const SURFACE_1 = '#1b1531'
+export const SURFACE_2 = '#251d40'
+export const SURFACE_3 = '#302651'
+export const BORDER = '#3f3566'
+export const BORDER_STRONG = '#5a4c8c'
+/** Text: main, secondary, and hints (never on SURFACE_3). */
+export const TEXT = '#f1eefa'
+export const TEXT_2 = '#bdb5d4'
+export const TEXT_3 = '#9088aa'
+/** The main action's purple (500), its hover and selection outline (400), focus rings and links (300). */
+export const BRAND_500 = '#7b4fe6'
+export const BRAND_400 = '#8b5cf6'
+export const BRAND_300 = '#b9a0ff'
+
+/**
+ * Each good's color, in the Market's order (Water ice, Metals, Rare elements, Helium-3, Organics,
+ * Silicon, Equipment, Electronics): muted material tones, never yellow, pink or purple. With the good's
+ * code or icon, never alone; it names the good, never buy or sell, or profit.
+ */
+export const GOODS_COLORS = ['#7fddf0', '#a9b3c1', '#d9e1ec', '#6f8cff', '#74cf84', '#7a90a6', '#e08a4f', '#3cc7a8']
+/** A good's color by its index, gray for one added later without a color. */
+export const goodColor = (index) => GOODS_COLORS[index] ?? TEXT_2
+
 /**
  * The galaxy map's colors, in Orbiter 8's: deep purples for space and panels, lavender for what's
  * charted, yellow for you and where you can go, pink-red for what needs someone (sieges).
  */
 export const MAP = {
-  spaceCenter: '#2b0c50',
-  spaceEdge: '#160631',
+  spaceCenter: SPACE,
+  spaceEdge: SPACE_DEEP,
   panel: '#12052af0',
   panelEdge: '#c3b3da44',
   text: '#e6dcf5',
@@ -33,19 +69,20 @@ export const MAP = {
 
 /**
  * Stars by spectral class (sdk/traits.js), hottest to coolest: blue O and B, white A, yellow-white F,
- * yellow G, orange K, red M. A star's color lights its whole system a little (the guides canvas's
- * glow), but the system stays purple: deep space is the game's color. Sol is drawn yellow, as people
- * know it (science would say white).
+ * yellow G, orange K, red M, in pale blackbody tints (Koda, 2026-11-14: the color system's, row E3),
+ * so a star's yellow stays soft beside the flat "yours" yellow. A star's color lights its whole system
+ * a little (the guides canvas's glow), but the system stays purple: deep space is the game's color.
+ * Sol is drawn pale yellow, as people know it (science would say white).
  * - core: the star's center; mid: its body and its dot on the galaxy map; glow: the light around it.
  */
 export const STAR_CLASSES = {
-  O: { name: 'blue', core: '#e6ecff', mid: '#9fb4ff', glow: '#6f8cff' },
-  B: { name: 'blue-white', core: '#eef2ff', mid: '#b6c8ff', glow: '#8fb0ff' },
-  A: { name: 'white', core: '#ffffff', mid: '#e3eaff', glow: '#c4d4ff' },
-  F: { name: 'yellow-white', core: '#fffdf2', mid: '#fff0c8', glow: '#ffe0a0' },
-  G: { name: 'yellow', core: '#fffbe6', mid: '#ffe28a', glow: '#ffb347' },
-  K: { name: 'orange', core: '#fff1de', mid: '#ffbd72', glow: '#ff8f3c' },
-  M: { name: 'red', core: '#ffe4d8', mid: '#ff9472', glow: '#ff5a3c' }
+  O: { name: 'blue', core: '#ffffff', mid: '#9db4ff', glow: '#9db4ff' },
+  B: { name: 'blue-white', core: '#ffffff', mid: '#aabfff', glow: '#aabfff' },
+  A: { name: 'white', core: '#ffffff', mid: '#cad7ff', glow: '#cad7ff' },
+  F: { name: 'yellow-white', core: '#ffffff', mid: '#f8f7ff', glow: '#f8f7ff' },
+  G: { name: 'yellow', core: '#ffffff', mid: '#fff1c4', glow: '#fff1c4' },
+  K: { name: 'orange', core: '#ffffff', mid: '#ffd2a1', glow: '#ffd2a1' },
+  M: { name: 'red', core: '#ffffff', mid: '#ffb08a', glow: '#ffb08a' }
 }
 
 /**
@@ -74,12 +111,27 @@ export const HUD_TINT = {
   you: YELLOW_LIGHT,
   help: '#7fd4ff',
   sieges: '#ff8a5c',
-  leaderboard: '#ffc94d',
+  leaderboard: '#e6cf8f', // soft gold; full gold on hover (HUD_HOVER)
   chat: '#4fe0d0',
   settings: '#a59fb3',
   planets: '#6fa8ff',
   ships: '#e6dcf5'
 }
 
-/** A quiet purple-gray, for the inside of cards and other calm surfaces: purple stays for edges and buttons. */
-export const CARD_GRAY = '#25202f'
+/** HUD buttons whose tint brightens on hover (Koda, 2026-11-14: the leaderboard, row A2). */
+export const HUD_HOVER = { leaderboard: '#ffc94d' }
+
+/** The inside of cards and menus: the color system's first surface (row B1). Purple stays for edges and buttons. */
+export const CARD_GRAY = SURFACE_1
+
+/**
+ * The backdrop art's purples (components/star-map/assets/backdrop-art.js), deepened toward SPACE so
+ * space is dark (Koda, 2026-11-14): the art's base becomes SPACE exactly; its lighter shapes keep
+ * their place and their difference from it, much darker.
+ */
+export function deepSpace(hex) {
+  if (hex.toLowerCase() === '#280b4b') return SPACE
+  const c = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16))
+  const [x, y] = [c(hex), c(SPACE_DEEP)]
+  return '#' + x.map((v, i) => Math.round(v + (y[i] - v) * 0.6).toString(16).padStart(2, '0')).join('')
+}

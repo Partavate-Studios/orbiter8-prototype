@@ -21,7 +21,7 @@ import { STAR_CLASSES, PLANET_COLORS } from '@/libs/palette'
 // A dim glow around the star (normal and high graphics): deep space's purple, warmed or cooled toward
 // the star's own color so its light reaches the whole system a little.
 const GLOW_RADIUS = 2500
-const GLOW_PURPLE = [49, 14, 92] // #310e5c
+const GLOW_PURPLE = [42, 26, 74] // libs/palette.js SPACE_NEBULA, over deep space
 // On high graphics, the star's own light close in.
 const LIGHT_RADIUS = 700
 
