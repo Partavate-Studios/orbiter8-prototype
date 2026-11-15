@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { SHIP_DESIGNS } from './ship-designs'
+import { SHIP_DESIGNS } from '@orbiter8/sdk/ship-designs'
 
 export default {
   name: 'FleetShip',

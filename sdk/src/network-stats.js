@@ -2,9 +2,9 @@
 // network's public RPC, so a player can see where the game is alive before switching. Two calls per
 // network; results are kept for a few minutes.
 import { Contract, JsonRpcProvider } from 'ethers'
-import PilotsAbi from '@/sdk/abi/Pilots.json'
-import GalaxyAbi from '@/sdk/abi/Galaxy.json'
-import { queryChunked } from '@/sdk/event-log'
+import PilotsAbi from './abi/Pilots.json'
+import GalaxyAbi from './abi/Galaxy.json'
+import { queryChunked } from './event-log'
 
 const MAX_AGE_MS = 5 * 60 * 1000
 // A public RPC that hasn't answered by then is treated as unreachable (the next one is tried).

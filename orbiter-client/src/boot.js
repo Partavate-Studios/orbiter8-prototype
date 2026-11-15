@@ -4,4 +4,6 @@ const browserWallet = new URLSearchParams(location.search).get('wallet') === 'br
 if (import.meta.env.DEV && import.meta.env.VITE_DEV_WALLET && !browserWallet) {
   await import('./dev/dev-wallet.js')
 }
+// The local chain, if this build knows one, joins the SDK's networks before anything reads them.
+await import('./dev/local-network.js')
 await import('./main.js')

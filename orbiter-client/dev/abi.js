@@ -1,9 +1,9 @@
 // `npm run abi`: copies the contracts' ABIs from Foundry's build (contracts/out) into the
-// client (src/sdk/abi), so the client builds without Foundry. Run after changing a contract's interface.
+// client (the SDK's abi folder, ../sdk/src/abi), so the client builds without Foundry. Run after changing a contract's interface.
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 
 const OUT = new URL('../../contracts/out/', import.meta.url)
-const DEST = new URL('../src/sdk/abi/', import.meta.url)
+const DEST = new URL('../../sdk/src/abi/', import.meta.url)
 const CONTRACTS = {
   Galaxy: 'Galaxy.sol/Galaxy.json',
   Pilots: 'Pilots.sol/Pilots.json',

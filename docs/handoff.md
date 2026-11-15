@@ -105,8 +105,8 @@ INJECT=0 node dev/harness/explore.mjs "http://localhost:8092/?account=1" /tmp/sh
 
 ## Where the code is
 
-- `src/sdk/client.js`: the game client. It loads the pilot, the system, the map regions and events,
-  schedules scans, and holds every action. `src/sdk/contracts.js` wraps the contracts.
+- `sdk/src/client.js` (the SDK, its own package at the repo root since 2026-11-14): the game client. It loads the pilot, the system, the map regions and events,
+  schedules scans, and holds every action. `sdk/src/contracts.js` wraps the contracts.
   `system-gen.js`, `hex.js`, `market.js` and `ship-art.js` mirror Solidity, with cross-check tests.
 - `src/stores/`: `player.js` (sessions, planets, battle), `gamestate.js`, `starmap.js`, `ui.js`
   (menus, camera, jump animation), `game-bindings.js` (client → stores).
@@ -143,7 +143,7 @@ Known gaps:
 Changed after `docs/review.md` was written, by the session that built the release:
 - **First steps** are a menu now: the HUD's "?" button (with a badge of steps left) opens it, sliding
   up like every menu (Koda: no floating cards in a corner). `hud/menus/help-menu.svg.vue`.
-- **The loadout's ship** is drawn inline (sharp, no background box): `shipArtParts` in `sdk/ship-art.js`.
+- **The loadout's ship** is drawn inline (sharp, no background box): `shipArtParts` in `sdk/src/ship-art.js`.
 - **Moons are free weapons platforms** (D61, B55): six mounts a moon, weapons only, outside the
   planet's shield in a siege. "To moons" on the Colony menu's Factory page; a "Moon guns" bar in the
   Siege menu. Battle is 654 bytes under the size limit.
@@ -185,7 +185,7 @@ with NFT playing cards, big menus, Koda's art, and phones. Don't trade any of th
    sentences. Don't change the backstory.
 5. **Touch and phones.** Tap targets on the new menus and on the galaxy map, where hover doesn't exist
    on touch. Readability at 390 px wide, and portrait layouts (the bottom card).
-6. **An independent code review** of `src/sdk/client.js` and `src/stores/player.js`, the two biggest
+6. **An independent code review** of `sdk/src/client.js` and `src/stores/player.js`, the two biggest
    new files: correctness, races between refreshes and moves, error handling, and anything that would
    break with many pilots. Fix what's clearly wrong; add a test only where it earns its keep.
 

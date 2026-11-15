@@ -29,13 +29,19 @@ export default defineConfig(({ command }) => ({
   },
   resolve: {
     alias: {
+      // The game's SDK, shared by every client (../sdk, its own package: chain access, state, actions, rules)
+      '@orbiter8/sdk': fileURLToPath(new URL('../sdk/src', import.meta.url)),
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
+    // The SDK has no node_modules of its own: its imports (ethers) resolve to this client's copy.
+    dedupe: ['ethers'],
     // Components are imported without their .vue suffix (e.g. './hud/hud.svg').
     extensions: ['.mjs', '.js', '.json', '.vue']
   },
   server: {
     port: 8080,
+    // Serve the SDK from beside this client (../sdk), as well as this folder.
+    fs: { allow: ['..'] },
     // In development the chain and drand are reached through the game's own origin: a Polkadot Desktop
     // Product may only talk to its own localhost port ("Direct network access is blocked" otherwise),
     // so the dev wallet's RPC and drand's relays go through here (dev-wallet.js, sdk/drand.js). The same
@@ -59,6 +65,8 @@ export default defineConfig(({ command }) => ({
     }
   },
   test: {
-    environment: 'happy-dom'
+    environment: 'happy-dom',
+    // This client's tests and the SDK's (../sdk has no runner of its own yet)
+    include: ['src/**/*.test.js', '../sdk/src/**/*.test.js']
   }
 }))

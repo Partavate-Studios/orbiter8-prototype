@@ -55,10 +55,10 @@ import { fitSize } from '@/libs/fit-text'
 import { mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
 import { usePlayerStore } from '@/stores/player'
-import { shipArtParts, SHIP_ART_VIEWBOX } from '@/sdk/ship-art'
+import { shipArtParts, SHIP_ART_VIEWBOX } from '@orbiter8/sdk/ship-art'
 import { PINK_LIGHT } from '@/libs/palette'
 import MenuContainer from './menu-container/_menu-container.svg'
-import { SHIP_PARTS, mountsUsed } from '@/sdk/parts'
+import { SHIP_PARTS, mountsUsed } from '@orbiter8/sdk/parts'
 
 export default {
   name: 'LoadoutMenu',

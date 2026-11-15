@@ -58,7 +58,7 @@ import { usePlayerStore } from '@/stores/player'
 import MenuContainer from './menu-container/_menu-container.svg'
 import MenuButton from './menu-button.svg'
 import AmountDial from './widgets/amount-dial.svg'
-import { SHIP_PARTS, mountsUsed, partPlural } from '@/sdk/parts'
+import { SHIP_PARTS, mountsUsed, partPlural } from '@orbiter8/sdk/parts'
 
 export default {
   name: 'ArmoryMenu',

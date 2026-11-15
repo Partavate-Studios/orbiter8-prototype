@@ -205,7 +205,7 @@ import {
   maxTradable,
   shortGoodName,
   tradeBalance
-} from '@/sdk/game/trade'
+} from '@orbiter8/sdk/game/trade'
 
 import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'

@@ -96,7 +96,7 @@
 import { mapActions, mapState } from 'pinia'
 import { useChainStore } from '@/stores/chain'
 import { useGameStateStore } from '@/stores/gamestate'
-import { networks } from '@/sdk/chain/networks'
+import { networks } from '@orbiter8/sdk/chain/networks'
 import { useOnboardingStore } from '@/stores/onboarding'
 import NetworkStats from './network-stats.vue'
 

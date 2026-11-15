@@ -1,8 +1,9 @@
 # Orbiter 8
 
 Koda's on-chain space trading game: explore a hex galaxy, trade, claim and build up planets, fit
-weapons, lay sieges. Solidity contracts in `contracts/` (Foundry), and a Vue 3 client in
-`orbiter-client/` (Pinia, Vite, ethers 6, Vitest, SVG graphics).
+weapons, lay sieges. Solidity contracts in `contracts/` (Foundry), the game's SDK in `sdk/`
+(chain access, state, actions and rules, shared by every client; `sdk/README.md`), and a Vue 3 client in
+`orbiter-client/` (Pinia, Vite, ethers 6, Vitest, SVG graphics). `client-rnd/` holds experimental clients.
 
 **Direction (2026-11-08): Polkadot Hub only, launched as a Polkadot App mini-app** alongside the App's
 own launch. Read [`docs/polkadot-direction.md`](docs/polkadot-direction.md). Work on branch `polkadot`;
@@ -25,7 +26,7 @@ asking him); and it gives where things stand, how to run and see the game, and w
 - **If Koda or another session may already be running it, use other ports:**
   `CHAIN_PORT=8546 UI_PORT=8092 npm run local`. Stop only your own processes, by PID: a broad
   `pkill -f "dev/local.js"` stops theirs too.
-- Client checks: `npm test`, `npm run lint`, `npx vite build --outDir <scratch dir>`. (`npm run
+- Client checks: `npm test`, `npm run lint` (both cover `sdk/` too), `npx vite build --outDir <scratch dir>`. (`npm run
   build` bumps the version; don't use it for checks.)
 - Contracts, from `contracts/`: `forge test`, `forge build --sizes` (each must stay under 24,576
   bytes). After changing a contract's interface: `npm run abi` in `orbiter-client/`.

@@ -167,13 +167,13 @@
 
 <script>
 import { mapActions } from 'pinia'
-import { game } from '@/sdk/client'
-import { STATE } from '@/sdk/client'
-import { MAP, YELLOW_LIGHT, SPACE_NEBULA, SPACE_ORBIT, BRAND_300, BRAND_400 } from '@/libs/palette'
-import { position, cellAt, distance, neighbors } from '@/sdk/hex'
+import { game } from '@orbiter8/sdk/client'
+import { STATE } from '@orbiter8/sdk/client'
+import { MAP, YELLOW_LIGHT, SPACE_NEBULA, SPACE_ORBIT, BRAND_300, BRAND_400, STAR_CLASSES } from '@/libs/palette'
+import { position, cellAt, distance, neighbors } from '@orbiter8/sdk/hex'
 import { CARD_THEMES } from '@/libs/card-theme'
 import { fitText } from '@/libs/fit-text'
-import { timeOf } from '@/sdk/drand'
+import { timeOf } from '@orbiter8/sdk/drand'
 import { usePlayerStore } from '@/stores/player'
 import { useGameStateStore } from '@/stores/gamestate'
 import { useUIStore } from '@/stores/ui'
@@ -357,7 +357,7 @@ export default {
           x,
           y,
           r: (2.5 + traits.size * 5) * Math.min(1.6, Math.max(0.6, this.camera.zoom)),
-          color: traits.color,
+          color: STAR_CLASSES[traits.spectral].mid,
           blackHole: c.state === STATE.BLACK_HOLE,
           visited: c.visited,
           pending: c.visited && !c.scanned,

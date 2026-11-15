@@ -6,11 +6,11 @@
 // Moves send published pending scans along (D21) and go through the session key while one is live
 // (D41), so neither needs its own wallet approval.
 import { parseEther } from 'ethers'
-import { connectWallet, getSession } from '@/sdk/chain/wallet'
-import { getNativeBalance, waitForTransaction } from '@/sdk/chain/rpc'
-import { networkFor } from '@/sdk/chain/networks'
-import { createBlockWatcher } from '@/sdk/sync'
-import { pendingRegistration, rememberPending, forgetPending } from '@/sdk/pending'
+import { connectWallet, getSession } from './chain/wallet'
+import { getNativeBalance, waitForTransaction } from './chain/rpc'
+import { networkFor } from './chain/networks'
+import { createBlockWatcher } from './sync'
+import { pendingRegistration, rememberPending, forgetPending } from './pending'
 import { createGame, STATE, REGION_RADIUS } from './contracts'
 import { timeOf } from './drand'
 import { distance } from './hex'

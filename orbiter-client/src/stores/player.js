@@ -3,7 +3,7 @@
 // (stores/game-bindings.js keeps it in step); every action shows its progress in the transaction tray.
 import { defineStore } from 'pinia'
 import { markRaw } from 'vue'
-import { game, BUILDING_NAMES, baysQuoteFor, rangeQuoteFor, partPriceFor, missingFor, usedBays } from '@/sdk/client'
+import { game, BUILDING_NAMES, baysQuoteFor, rangeQuoteFor, partPriceFor, missingFor, usedBays } from '@orbiter8/sdk/client'
 import { useTransactionsStore } from '@/stores/transactions'
 
 const track = (words, send) => useTransactionsStore().track(words, send)

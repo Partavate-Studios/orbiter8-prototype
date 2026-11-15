@@ -248,9 +248,9 @@
 
 <script>
 import { fitSize, fitText } from '@/libs/fit-text'
-import { cargoLines, emptyHolds, shortGoodName } from '@/sdk/game/trade'
-import { STAR_KEY } from '@/sdk/system'
-import { game } from '@/sdk/client'
+import { cargoLines, emptyHolds, shortGoodName } from '@orbiter8/sdk/game/trade'
+import { STAR_KEY } from '@orbiter8/sdk/system'
+import { game } from '@orbiter8/sdk/client'
 
 import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'

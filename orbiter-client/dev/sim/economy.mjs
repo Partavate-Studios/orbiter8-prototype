@@ -1,5 +1,5 @@
 // Demo 4's economy simulator (docs/demo4-plan.md, section 9; D29). Plays many pilots trading at Sol's
-// Federation ports with the contracts' own price rules (src/sdk/market.js), and reports when they
+// Federation ports with the contracts' own price rules (sdk/src/market.js), and reports when they
 // reach the play-time targets: range 2, range 3, full holds (250 bays) and range 4.
 //
 //   node dev/sim/economy.mjs [pilots=10] [days=21] ['{"tuning": {...}, "goods": [...]}']
@@ -9,7 +9,7 @@
 // one port (selling what that port buys, then buying something to sell elsewhere) or one purchase
 // at the yard. Purchases follow the order of the targets: range 2 first, then bays; once a pilot has
 // 100 bays it saves for range 3, and with full holds it saves for range 4.
-import { buyCost, sellProceeds, restock, baysCost, fee } from '../../src/sdk/market.js'
+import { buyCost, sellProceeds, restock, baysCost, fee } from '../../../sdk/src/market.js'
 
 const HOURS_PER_DAY = 2
 const SECONDS_PER_MOVE = 15

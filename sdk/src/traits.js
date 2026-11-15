@@ -1,9 +1,8 @@
 // How a star looks, derived from the universe's seed and the cell (docs/demo4-plan.md, D8, D9): its
-// spectral class (and so its color and size), and how far it sits off the grid. Nothing here is
+// spectral class (and so its size; each client colors it), and how far it sits off the grid. Nothing here is
 // stored on chain; every client derives the same values. Names are players' to give, and stored
 // (Planets.nameStar).
 import { keccak256, AbiCoder } from 'ethers'
-import { STAR_CLASSES } from '@/libs/palette'
 import { neighbors } from './hex'
 
 const coder = AbiCoder.defaultAbiCoder()
@@ -68,19 +67,18 @@ export const JITTER = 0.2
  * @param {number} cell
  * @param {string} [genesis]  its genesis name (genesisName), if it has one: Sol's neighbors keep their
  *   real classes
- * @returns {{ spectral: string, color: string, size: number, jitter: [number, number] }}
- *   spectral O–M (libs/palette.js STAR_CLASSES has its colors); color its dot on the galaxy map;
- *   size 0.25–1; jitter in grid units. (Names are players' to give: sdk/client.js starName.)
+ * @returns {{ spectral: string, size: number, jitter: [number, number] }}
+ *   spectral O–M (a client colors it: orbiter-client's libs/palette.js STAR_CLASSES); size 0.25–1;
+ *   jitter in grid units. (Names are players' to give: sdk/client.js starName.)
  */
 export function starTraits(seed, cell, genesis) {
-  if (cell === 0) return { spectral: 'G', color: STAR_CLASSES.G.mid, size: 0.5, jitter: [0, 0] }
+  if (cell === 0) return { spectral: 'G', size: 0.5, jitter: [0, 0] }
   const spectral = REAL_STARS[genesis] ?? drawClass(seed, cell)
   const angle = rnd(seed, cell, 'jitter angle') * 2 * Math.PI
   const reach = JITTER * Math.sqrt(rnd(seed, cell, 'jitter distance'))
   const size = BASE_SIZE[spectral] + 0.16 * (rnd(seed, cell, 'size') - 0.5)
   return {
     spectral,
-    color: STAR_CLASSES[spectral].mid,
     size: Math.min(1, Math.max(0.25, size)),
     jitter: [Math.cos(angle) * reach, Math.sin(angle) * reach]
   }

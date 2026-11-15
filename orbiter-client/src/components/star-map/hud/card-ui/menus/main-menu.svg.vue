@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import { isUnnamed } from '@/sdk/system-gen'
+import { isUnnamed } from '@orbiter8/sdk/system-gen'
 import { useChainStore } from '@/stores/chain'
 import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
@@ -21,7 +21,7 @@ import { useUIStore } from '@/stores/ui'
 import { useDialogStore } from '@/stores/dialog'
 import { usePlayerStore } from '@/stores/player'
 import { cardMenu } from './card-menu'
-import { marketTokenUrl, networkFor } from '@/sdk/chain/networks'
+import { marketTokenUrl, networkFor } from '@orbiter8/sdk/chain/networks'
 import { PILOT_NAME_MIN_LENGTH } from '@/libs/onboarding'
 import CardBackground from '../card-background.svg'
 import CardButton from '../card-button.svg'

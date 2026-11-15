@@ -21,7 +21,7 @@
 
 /** On the dev server, an RPC proxied through the game's own origin (vite.config.js): a Polkadot Desktop
  * Product may only reach its own localhost port. Listed first, before the public address. */
-const devProxy = (route) => (import.meta.env.DEV && typeof location !== 'undefined' ? [location.origin + route] : [])
+const devProxy = (route) => (import.meta.env?.DEV && typeof location !== 'undefined' ? [location.origin + route] : [])
 
 /** Deployed networks. */
 const deployed = [
@@ -54,32 +54,27 @@ const deployed = [
   }
 ]
 
-// Dev builds (and `npm run build:local`) only: the chain started by `npm run local`, with addresses
-// from dev/local-deployment.json (or -<port>.json for a second copy, dev/local.js CHAIN_PORT). Lazy
-// (not eager) so production builds drop the import along with this branch.
-const includeLocal = import.meta.env.DEV || import.meta.env.VITE_LOCAL_NETWORK === '1'
-const localLoaders = includeLocal ? import.meta.glob('/dev/local-deployment*.json', { import: 'default' }) : {}
-const localLoad = localLoaders[`/dev/local-deployment${import.meta.env.VITE_LOCAL_FILE ?? ''}.json`]
-const localDeployment = await localLoad?.()
+/** @type {Network[]} Every network the game knows: the deployed ones, plus a local chain a client registers. */
+export const networks = [...deployed]
 
-/** @type {Network[]} */
-export const networks = [
-  ...deployed,
-  ...(localDeployment
-    ? [
-        {
-          chainId: localDeployment.chainId,
-          name: 'Local Dev Chain',
-          shortName: 'Local',
-          currency: { name: 'Dev Ether', symbol: 'ETH', decimals: 18 },
-          rpc: [...devProxy('/__chain'), localDeployment.rpc],
-          explorer: [],
-          contracts: localDeployment.contracts,
-          funding: [{ text: 'Test accounts on the local chain start with 10,000 ETH.' }]
-        }
-      ]
-    : [])
-]
+/**
+ * A client's local chain (`npm run local` writes its deployment file: { chainId, rpc, contracts }).
+ * Clients register it at startup, before anything reads the networks (orbiter-client's
+ * src/dev/local-network.js), so the SDK doesn't depend on any one client's files or bundler.
+ */
+export function addLocalNetwork(deployment) {
+  if (!deployment || networks.some((n) => n.chainId === deployment.chainId)) return
+  networks.push({
+    chainId: deployment.chainId,
+    name: 'Local Dev Chain',
+    shortName: 'Local',
+    currency: { name: 'Dev Ether', symbol: 'ETH', decimals: 18 },
+    rpc: [...devProxy('/__chain'), deployment.rpc],
+    explorer: [],
+    contracts: deployment.contracts,
+    funding: [{ text: 'Test accounts on the local chain start with 10,000 ETH.' }]
+  })
+}
 
 /** @returns {Network | undefined} */
 export function networkFor(chainId) {

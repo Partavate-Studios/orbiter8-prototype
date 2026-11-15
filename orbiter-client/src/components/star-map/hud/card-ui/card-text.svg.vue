@@ -140,8 +140,8 @@ import { useGameStateStore } from '@/stores/gamestate'
 import { mapState } from 'pinia'
 import { useStarMapStore } from '@/stores/starmap'
 
-import { planetTypeName } from '@/sdk/game/planet-types'
-import { cargoLines, emptyHolds, shortGoodName } from '@/sdk/game/trade'
+import { planetTypeName } from '@orbiter8/sdk/game/planet-types'
+import { cargoLines, emptyHolds, shortGoodName } from '@orbiter8/sdk/game/trade'
 import { YELLOW } from '@/libs/palette'
 import { CARD_THEMES, unwrapTheme } from '@/libs/card-theme'
 

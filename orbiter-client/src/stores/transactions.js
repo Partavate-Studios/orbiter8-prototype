@@ -3,7 +3,7 @@
 // the reason). Done and declined ones clear themselves after a few seconds; failed ones stay a while
 // longer so the reason can be read.
 import { defineStore } from 'pinia'
-import { walletErrorKind } from '@/sdk/chain/wallet'
+import { walletErrorKind } from '@orbiter8/sdk/chain/wallet'
 import { gameAudio } from '@/libs/08audio'
 
 export const SHOWN_MS = { done: 4000, declined: 4000, failed: 15000 }

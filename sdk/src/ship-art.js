@@ -2,7 +2,7 @@
 // contracts/src/art/ShipArt.sol character for character: the NFT's image and the client's
 // picture are the same drawing (sdk/ship-art.test.js pins Solidity's hashes). Only numbers and
 // fixed strings go in, so the result is safe to place in the page.
-import { SHIP_DESIGNS } from '@/components/assets/ship-designs'
+import { SHIP_DESIGNS } from './ship-designs'
 
 const HULL = SHIP_DESIGNS.orbiter8.d
 

@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia'
-import { game } from '@/sdk/client'
+import { game } from '@orbiter8/sdk/client'
 import { useUIStore } from '@/stores/ui'
 import { markRaw } from 'vue'
 import Sprite from '@/libs/sprite.js'
 import { spriteScaleOf } from '@/libs/sprite-types'
-import { buildSystem, STAR_KEY } from '@/sdk/system'
-import { PADS } from '@/sdk/game/docking'
+import { buildSystem, STAR_KEY } from '@orbiter8/sdk/system'
+import { PADS } from '@orbiter8/sdk/game/docking'
 
 let nextWarp = 1
 

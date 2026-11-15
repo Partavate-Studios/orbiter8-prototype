@@ -1,4 +1,4 @@
-import { game } from '@/sdk/client'
+import { game } from '@orbiter8/sdk/client'
 
 /**
  * A new pilot's first goals, ticked off from the pilot's own state (the Player store): shown by

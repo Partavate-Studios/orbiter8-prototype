@@ -1,0 +1,13 @@
+{
+  "name": "@orbiter8/sdk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Orbiter 8's game SDK: chain access, game state, actions and rules, shared by every client",
+  "type": "module",
+  "exports": {
+    "./*": "./src/*"
+  },
+  "peerDependencies": {
+    "ethers": "^6.13.0"
+  }
+}

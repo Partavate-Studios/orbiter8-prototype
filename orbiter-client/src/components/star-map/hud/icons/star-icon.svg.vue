@@ -12,7 +12,7 @@
 <script>
 import Icon from './_icon-container.svg'
 import { useStarMapStore } from '@/stores/starmap'
-import { STAR_KEY } from '@/sdk/system'
+import { STAR_KEY } from '@orbiter8/sdk/system'
 
 // The top-right button while the star isn't selected (it becomes JumpIcon once it is), drawn in the
 // star's spectral colors (sdk/traits.js).

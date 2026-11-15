@@ -51,7 +51,7 @@
 
 <script>
 import { usePlayerStore } from '@/stores/player'
-import { BUILDINGS } from '@/sdk/system-gen'
+import { BUILDINGS } from '@orbiter8/sdk/system-gen'
 
 const UNLOCKS = {
   1: 'People start to grow toward the planet’s cap, and it produces the goods its class sells.',

@@ -31,7 +31,7 @@ function announceBroadcasts(chatEvents, account) {
   if (fresh.length) gameAudio().speak('transmission')
 }
 
-/** @param {ReturnType<import('@/sdk/client').createGameClient>} game */
+/** @param {ReturnType<import('@orbiter8/sdk/client').createGameClient>} game */
 export function bindStoresToGame(game) {
   return game.subscribe((change, state) => {
     const chain = useChainStore()

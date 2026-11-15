@@ -13,7 +13,7 @@
 //   NAME=Rook SHIP=Kestrel   its call sign and ship's name when it registers
 import { JsonRpcProvider, Contract, Wallet, parseEther } from 'ethers'
 import { readFileSync, writeFileSync } from 'node:fs'
-import { buyCost, sellProceeds, fee, baysCost, MODE } from '../../src/sdk/market.js'
+import { buyCost, sellProceeds, fee, baysCost, MODE } from '../../../sdk/src/market.js'
 
 const [moves = 40, account = 6, out] = process.argv.slice(2)
 const read = (p) => JSON.parse(readFileSync(new URL(p, import.meta.url), 'utf8'))
@@ -24,7 +24,7 @@ const pause = () => (PACE_MS ? new Promise((r) => setTimeout(r, PACE_MS * (0.5 +
 const provider = new JsonRpcProvider(deployment.rpc, undefined, { pollingInterval: 250 })
 const wallet = await provider.getSigner(Number(account))
 const me = (await wallet.getAddress()).toLowerCase()
-const abi = (name) => read(`../../src/sdk/abi/${name}.json`)
+const abi = (name) => read(`../../../sdk/src/abi/${name}.json`)
 const { pilots: P, market: M, credits: C } = deployment.contracts
 
 const log = []

@@ -100,9 +100,9 @@
 import { mapActions, mapState } from 'pinia'
 import { useChainStore } from '@/stores/chain'
 import { useOnboardingStore } from '@/stores/onboarding'
-import { networks } from '@/sdk/chain/networks'
-import { walletAppLink } from '@/sdk/chain/wallet'
-import { game } from '@/sdk/client'
+import { networks } from '@orbiter8/sdk/chain/networks'
+import { walletAppLink } from '@orbiter8/sdk/chain/wallet'
+import { game } from '@orbiter8/sdk/client'
 import NetworkStats from './network-stats.vue'
 
 // While waiting for funds, the balance is re-read this often.

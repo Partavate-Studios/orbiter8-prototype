@@ -8,9 +8,9 @@ import {
   isAuthorized,
   walletErrorKind,
   walletRequest
-} from '@/sdk/chain/wallet'
-import { networks, networkFor, chainName } from '@/sdk/chain/networks'
-import { game } from '@/sdk/client'
+} from '@orbiter8/sdk/chain/wallet'
+import { networks, networkFor, chainName } from '@orbiter8/sdk/chain/networks'
+import { game } from '@orbiter8/sdk/client'
 import { useConfigStore } from '@/stores/config'
 
 let blockPoller = null

@@ -66,8 +66,8 @@
 <script>
 import { fitText } from '@/libs/fit-text'
 import { mapState } from 'pinia'
-import { game } from '@/sdk/client'
-import { rankPlayers } from '@/sdk/leaderboard'
+import { game } from '@orbiter8/sdk/client'
+import { rankPlayers } from '@orbiter8/sdk/leaderboard'
 import { useChainStore } from '@/stores/chain'
 import { useUIStore } from '@/stores/ui'
 import MenuContainer from './menu-container/_menu-container.svg'

@@ -62,7 +62,7 @@ import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
 import { usePlayerStore } from '@/stores/player'
 import { PINK_LIGHT } from '@/libs/palette'
-import { game } from '@/sdk/client'
+import { game } from '@orbiter8/sdk/client'
 import MenuContainer from './menu-container/_menu-container.svg'
 import MenuButton from './menu-button.svg'
 

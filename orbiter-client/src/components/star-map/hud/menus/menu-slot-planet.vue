@@ -137,7 +137,7 @@ import Planet from '@/components/star-map/sprites/planet.svg'
 import Ship from '@/components/star-map/sprites/ship.svg'
 import Station from '@/components/star-map/sprites/station.svg'
 import Moon from '@/components/star-map/sprites/moon.svg'
-import { planetTypeName } from '@/sdk/game/planet-types'
+import { planetTypeName } from '@orbiter8/sdk/game/planet-types'
 import { YELLOW } from '@/libs/palette'
 
 export default {

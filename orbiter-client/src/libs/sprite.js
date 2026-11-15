@@ -1,5 +1,5 @@
 import { markRaw } from 'vue'
-import { orbitAt, shipOrbitRadius, SHIP_ORBIT_SPEED } from '@/sdk/game/orbits'
+import { orbitAt, shipOrbitRadius, SHIP_ORBIT_SPEED } from '@orbiter8/sdk/game/orbits'
 import { SPRITE_TYPES, SHIP_SIZE, STATION_START_ROTATION, ART, spriteScaleOf } from '@/libs/sprite-types'
 
 /** How fast a ship slides round its orbit to a new place among the ships sharing it. */
@@ -42,8 +42,8 @@ function padPoseFor(dock, gameTime) {
  */
 export default class Sprite {
   /**
-   * @param {import('@/sdk/system').GameObject} object
-   * @param {Record<string, import('@/sdk/system').GameObject>} [objects]  the whole system, for docking
+   * @param {import('@orbiter8/sdk/system').GameObject} object
+   * @param {Record<string, import('@orbiter8/sdk/system').GameObject>} [objects]  the whole system, for docking
    */
   constructor(object, objects) {
     this.object = object

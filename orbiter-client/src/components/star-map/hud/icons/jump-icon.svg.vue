@@ -26,7 +26,7 @@
 import { mapState } from 'pinia'
 import { useStarMapStore } from '@/stores/starmap'
 import Icon from './_icon-container.svg'
-import { STAR_KEY } from '@/sdk/system'
+import { STAR_KEY } from '@orbiter8/sdk/system'
 
 export default {
   name: 'JumpIcon',

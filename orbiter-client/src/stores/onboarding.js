@@ -4,10 +4,10 @@ import { defineStore } from 'pinia'
 import { useChainStore } from '@/stores/chain'
 import { useGameStateStore } from '@/stores/gamestate'
 import { onboardingStep, titleAction, wizardStepOf } from '@/libs/onboarding'
-import { walletErrorKind } from '@/sdk/chain/wallet'
-import { game } from '@/sdk/client'
-import { networks } from '@/sdk/chain/networks'
-import { loadNetworkStats } from '@/sdk/network-stats'
+import { walletErrorKind } from '@orbiter8/sdk/chain/wallet'
+import { game } from '@orbiter8/sdk/client'
+import { networks } from '@orbiter8/sdk/chain/networks'
+import { loadNetworkStats } from '@orbiter8/sdk/network-stats'
 
 /**
  * @typedef {object} Registration  the callsign or ship registration on screen

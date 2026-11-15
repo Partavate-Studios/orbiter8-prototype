@@ -19,7 +19,7 @@
 
 <script>
 import { mapState } from 'pinia'
-import { game } from '@/sdk/client'
+import { game } from '@orbiter8/sdk/client'
 import { useUIStore } from '@/stores/ui'
 import { useStarMapStore } from '@/stores/starmap'
 import { usePlayerStore } from '@/stores/player'

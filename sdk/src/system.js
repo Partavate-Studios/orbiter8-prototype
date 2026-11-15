@@ -12,8 +12,8 @@ import {
   moonOrbitSpeed,
   stationOrbitSpeed,
   SHIP_ORBIT_RADIUS_AROUND_STAR
-} from '@/sdk/game/orbits'
-import { dockedShips } from '@/sdk/game/docking'
+} from './game/orbits'
+import { dockedShips } from './game/docking'
 
 /** Who owns Sol's planets (D49). */
 const FEDERATION = 'The Federation'

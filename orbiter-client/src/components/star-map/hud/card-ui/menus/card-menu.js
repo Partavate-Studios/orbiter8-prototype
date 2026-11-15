@@ -12,7 +12,7 @@
  */
 
 /**
- * @param {import('@/sdk/system').GameObject} object
+ * @param {import('@orbiter8/sdk/system').GameObject} object
  * @param {{ marketName?: string, pilot?: PilotContext }} [options]  the network's NFT market, if it has one
  *   (planets and ships are NFTs), and the pilot
  * @returns {{ text: string, enabled: boolean, command: string, value?: number }[]}
@@ -35,7 +35,7 @@ const SOL_EARTH = 2
 /**
  * The options: claims with a fee, colonies, trade, yards, armories, the ship's loadout, sessions,
  * sieges, black holes and names.
- * @param {import('@/sdk/system').GameObject} object
+ * @param {import('@orbiter8/sdk/system').GameObject} object
  * @param {PilotContext} d
  */
 function pilotMenu(object, d, marketName) {

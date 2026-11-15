@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url'
 import { JsonRpcProvider, Wallet, Contract } from 'ethers'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
-const abi = (name) => JSON.parse(fs.readFileSync(path.join(here, '../../orbiter-client/src/sdk/abi', name + '.json'), 'utf8'))
+const abi = (name) => JSON.parse(fs.readFileSync(path.join(here, '../../sdk/src/abi', name + '.json'), 'utf8'))
 const [deploymentFile, keyFile] = process.argv.slice(2)
 const addresses = JSON.parse(fs.readFileSync(deploymentFile, 'utf8'))
 let key = JSON.parse(fs.readFileSync(keyFile, 'utf8')).data

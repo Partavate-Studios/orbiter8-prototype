@@ -2,7 +2,7 @@
 // [{ id, name, mode: 'sells' | 'buys', stock, price, curve }] (sdk/client.js), and the ship carries
 // `cargo` (units by good id) with `usedHolds` in use. Prices move with every unit (`curve`,
 // sdk/market.js); a good without a curve has a flat price.
-import { buyCost, sellProceeds, fee } from '@/sdk/market'
+import { buyCost, sellProceeds, fee } from '../market'
 
 /**
  * @typedef {{ holds: number, usedHolds: number, cargo: number[] }} ShipCargo

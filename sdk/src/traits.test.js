@@ -1,14 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { starTraits, genesisName, SPECTRAL, REAL_STARS } from './traits'
 import { neighbors } from './hex'
-import { STAR_CLASSES } from '@/libs/palette'
 
 const seed = '0x' + '11'.repeat(32)
 
 describe('star classes', () => {
   it('draws Sol yellow, as people know it', () => {
     expect(starTraits(seed, 0).spectral).toBe('G')
-    expect(starTraits(seed, 0).color).toBe(STAR_CLASSES.G.mid)
   })
 
   it('keeps the genesis stars real, by their place around Sol, whatever they are called later', () => {
@@ -29,10 +27,9 @@ describe('star classes', () => {
     const counts = Object.fromEntries(SPECTRAL.map((c) => [c, 0]))
     const sizes = Object.fromEntries(SPECTRAL.map((c) => [c, []]))
     for (let cell = 7; cell < 2007; cell++) {
-      const { spectral, size, color } = starTraits(seed, cell)
+      const { spectral, size } = starTraits(seed, cell)
       counts[spectral]++
       sizes[spectral].push(size)
-      expect(color).toBe(STAR_CLASSES[spectral].mid)
       expect(size).toBeGreaterThanOrEqual(0.25)
       expect(size).toBeLessThanOrEqual(1)
     }

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { game } from '@/sdk/client'
+import { game } from '@orbiter8/sdk/client'
 import { useUIStore } from '@/stores/ui'
 import { useTransactionsStore } from '@/stores/transactions'
 import { gameAudio } from '@/libs/08audio'

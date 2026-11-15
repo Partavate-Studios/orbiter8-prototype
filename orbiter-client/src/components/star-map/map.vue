@@ -68,7 +68,7 @@
 
 <script>
 import { CAMERA, WORLD_OFFSET_Y } from '@/constants'
-import { STAR_KEY } from '@/sdk/system'
+import { STAR_KEY } from '@orbiter8/sdk/system'
 
 import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'

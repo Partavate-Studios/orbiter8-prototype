@@ -1,5 +1,5 @@
 // Per-type settings for the objects in a star system.
-import { planetOrbitRadius } from '@/sdk/game/orbits'
+import { planetOrbitRadius } from '@orbiter8/sdk/game/orbits'
 
 /**
  * @typedef {object} SpriteType
@@ -34,8 +34,8 @@ export const ART = { star: 130, planet: 10, moon: 2, station: 7.25, ship: 11.5 }
 
 /**
  * How much a sprite is scaled up from its artwork (world units per sprite unit).
- * @param {import('@/sdk/system').GameObject} object
- * @param {Record<string, import('@/sdk/system').GameObject>} objects  the system (for the parent planet's size)
+ * @param {import('@orbiter8/sdk/system').GameObject} object
+ * @param {Record<string, import('@orbiter8/sdk/system').GameObject>} objects  the system (for the parent planet's size)
  */
 export function spriteScaleOf(object, objects) {
   const size = Number(object.size)

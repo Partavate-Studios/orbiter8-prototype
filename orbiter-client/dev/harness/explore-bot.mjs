@@ -13,8 +13,8 @@
 //   WANDER=1          stay near Sol (within two jumps) instead of exploring outward, to be seen
 import { JsonRpcProvider, Contract } from 'ethers'
 import { readFileSync, writeFileSync } from 'node:fs'
-import { distance } from '../../src/sdk/hex.js'
-import { fetchRound, timeOf } from '../../src/sdk/drand.js'
+import { distance } from '../../../sdk/src/hex.js'
+import { fetchRound, timeOf } from '../../../sdk/src/drand.js'
 
 const [moves = 20, account = 5, out] = process.argv.slice(2)
 const read = (p) => JSON.parse(readFileSync(new URL(p, import.meta.url), 'utf8'))
@@ -24,8 +24,8 @@ const PACE_MS = Number(process.env.PACE_MS ?? 0)
 const pause = () => (PACE_MS ? new Promise((r) => setTimeout(r, PACE_MS * (0.5 + Math.random()))) : null)
 const provider = new JsonRpcProvider(deployment.rpc, undefined, { pollingInterval: 250 })
 const signer = await provider.getSigner(Number(account))
-const galaxy = new Contract(deployment.contracts.galaxy, read('../../src/sdk/abi/Galaxy.json'), signer)
-const pilots = new Contract(deployment.contracts.pilots, read('../../src/sdk/abi/Pilots.json'), signer)
+const galaxy = new Contract(deployment.contracts.galaxy, read('../../../sdk/src/abi/Galaxy.json'), signer)
+const pilots = new Contract(deployment.contracts.pilots, read('../../../sdk/src/abi/Pilots.json'), signer)
 const STAR = 2
 const HOLE = 3
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))

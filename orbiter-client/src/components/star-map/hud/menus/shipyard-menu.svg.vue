@@ -114,7 +114,7 @@
 
 <script>
 import { fitSize } from '@/libs/fit-text'
-import { canAfford, MAX_CARGO_HOLDS } from '@/sdk/game/trade'
+import { canAfford, MAX_CARGO_HOLDS } from '@orbiter8/sdk/game/trade'
 
 import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'

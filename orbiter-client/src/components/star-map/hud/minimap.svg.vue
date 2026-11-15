@@ -75,7 +75,7 @@ import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
 import { writeAttribute } from '@/libs/dom-writes'
 import { WORLD_OFFSET_Y } from '@/constants'
 import { YELLOW, PLANET_COLORS, STAR_CLASSES } from '@/libs/palette'
-import { STAR_KEY } from '@/sdk/system'
+import { STAR_KEY } from '@orbiter8/sdk/system'
 
 // The box is 2 * HALF HUD units across. The outermost orbit, plus a margin, fills a radius of FIT.
 const HALF = 55

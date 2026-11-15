@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { gameAudio } from '@/libs/08audio'
 import Tween from '@/libs/tween'
-import { STAR_KEY } from '@/sdk/system'
+import { STAR_KEY } from '@orbiter8/sdk/system'
 import { CAMERA, MAP_GROUP_SCALE, MAP_RESOLUTION, WORLD_OFFSET_Y, HELIOPAUSE_RADIUS } from '@/constants'
 import { useConfigStore } from '@/stores/config'
 

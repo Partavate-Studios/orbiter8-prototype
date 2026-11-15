@@ -21,7 +21,7 @@
     "prebuild": "npm version patch --no-git-tag-version --silent",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint .",
+    "lint": "eslint . ../sdk",
     "test": "vitest run",
     "local": "node dev/local.js",
     "format": "prettier --write .",

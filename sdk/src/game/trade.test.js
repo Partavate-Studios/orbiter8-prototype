@@ -10,7 +10,7 @@ import {
   canAfford,
   cargoLines
 } from './trade'
-import { buyCost, sellProceeds, fee } from '@/sdk/market'
+import { buyCost, sellProceeds, fee } from '../market'
 
 const ship = { holds: 10, usedHolds: 6, cargo: [2, 1, 3] }
 // flat prices, to keep the arithmetic plain
