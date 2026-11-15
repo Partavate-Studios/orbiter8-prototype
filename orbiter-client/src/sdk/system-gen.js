@@ -7,7 +7,7 @@ import { PLANET_TYPE_NAMES } from './game/planet-types'
 const coder = AbiCoder.defaultAbiCoder()
 const hash = (types, values) => BigInt(keccak256(coder.encode(types, values)))
 
-const SOL_CLASSES = [1, 5, 0, 1, 6, 6, 4, 4, 1]
+const SOL_CLASSES = [1, 5, 0, 7, 6, 6, 4, 4, 1]
 const SOL_SIZES = [3, 12, 12, 6, 54, 36, 24, 24, 1]
 export const SOL_PLANETS = ['Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Pluto']
 const GASEOUS = 6

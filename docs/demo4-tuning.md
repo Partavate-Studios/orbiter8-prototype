@@ -1,7 +1,7 @@
 # Demo 4 tuning: trade, holds and range (milestone 2)
 
 **For Koda's approval** (D29). These are the numbers the contracts start with. They come from
-the simulator, `orbiter-client/dev/sim4/economy.mjs`, which plays pilots against the contracts' own
+the simulator, `orbiter-client/dev/sim/economy.mjs`, which plays pilots against the contracts' own
 price rules. The admin can change any of them later (`Market.setTuning`). "Find the fun" with real
 players comes after this run.
 

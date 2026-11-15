@@ -136,7 +136,7 @@ contract Market is ModuleBase {
         _addGood("Equipment", 200, 100);
         _addGood("Electronics", 260, 130);
         // What each planet class sells and buys (bit g = good g). Every good is both sold and
-        // bought somewhere at Sol, whose ports are Rocky, Volcanic, Terrestrial, Gaseous and Ice.
+        // bought somewhere at Sol, whose ports are Rocky, Volcanic, Terrestrial, Ferrous, Gaseous and Ice.
         _setMix(0, 0xD0, 0x2E); // Terrestrial: sells organics, equipment, electronics; buys metals, rare, He-3, silicon
         _setMix(1, 0x22, 0x19); // Rocky: metals, silicon; buys water, He-3, organics
         _setMix(2, 0x11, 0xC2); // Oceanic: water, organics; buys metals, equipment, electronics
@@ -147,7 +147,7 @@ contract Market is ModuleBase {
         _setMix(7, 0x42, 0x19); // Ferrous: metals, equipment; buys water, He-3, organics
         _setMix(8, 0x24, 0xC1); // Lava: rare, silicon; buys water, equipment, electronics
         _setMix(9, 0x10, 0xC2); // Swamp: organics; buys metals, equipment, electronics
-        // From the simulator (orbiter-client/dev/sim4/economy.mjs, docs/demo4-tuning.md).
+        // From the simulator (orbiter-client/dev/sim/economy.mjs, docs/demo4-tuning.md).
         _setTuning(Tuning(300, 220, 2 hours, 200, 200, 8, [uint64(15_000), 150_000, 600_000]));
     }
 
@@ -206,9 +206,9 @@ contract Market is ModuleBase {
     // ── ports ───────────────────────────────────────────────────────────────────────────────────
 
     /// Sol's nine Federation stations, by planet: Mercury, Venus, Earth, Mars, Jupiter, Saturn,
-    /// Uranus, Neptune, Pluto (Demo 3's classes).
+    /// Uranus, Neptune, Pluto (Demo 3's classes, but Mars is Ferrous: Koda, 2026-11-14).
     function _solClass(uint256 body) internal pure returns (uint8) {
-        return [1, 5, 0, 1, 6, 6, 4, 4, 1][body];
+        return [1, 5, 0, 7, 6, 6, 4, 4, 1][body];
     }
 
     /// A port's class, whether it has a yard, and its owner (address(0): the Federation).

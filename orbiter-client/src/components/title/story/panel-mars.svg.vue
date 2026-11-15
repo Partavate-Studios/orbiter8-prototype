@@ -1,5 +1,5 @@
 <template>
-  <!-- Panel 2: the first colony on Mars. Mars fills the lower left (the game's Rocky class, turning
+  <!-- Panel 2: the first colony on Mars. Mars fills the lower left (the game's Ferrous class, turning
        slowly); Earth and Luna hang far behind. A colony pod comes down from the upper right and lands
        on the limb, where the domes of the colony then light up one by one. -->
   <svg class="art" viewBox="-500 -500 1000 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
@@ -13,7 +13,7 @@
 
     <!-- Mars -->
     <g transform="translate(-120 110)">
-      <story-planet :planet-class="1" :radius="200" :spin="300" />
+      <story-planet :planet-class="7" :radius="200" :spin="300" />
       <g v-for="dome in domes" :key="dome.angle" class="dome" :style="{ animationDelay: dome.at + 's' }">
         <g :transform="'rotate(' + dome.angle + ') translate(0 -200) scale(' + dome.scale + ')'">
           <path d="M-10 0a10 10 0 0 1 20 0z" fill="#e5cfff" stroke="#ffffff" stroke-width="1" />

@@ -35,7 +35,7 @@ export default {
     return {
       route: ROUTE,
       planets: [
-        { name: 'Mars', cls: 1, r: 9, rings: 0, x: -300, y: -62 },
+        { name: 'Mars', cls: 7, r: 9, rings: 0, x: -300, y: -62 },
         { name: 'Jupiter', cls: 6, r: 32, rings: 0, x: -118, y: 80 },
         { name: 'Saturn', cls: 6, r: 25, rings: 10, x: 70, y: -100 },
         { name: 'Uranus', cls: 4, r: 15, rings: 1, x: 236, y: 60 },

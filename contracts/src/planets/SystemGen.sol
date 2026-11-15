@@ -27,7 +27,8 @@ library SystemGen {
     {
         surface = keccak256(abi.encode(seed, cell, body, "surface"));
         if (cell == 0) {
-            class = [1, 5, 0, 1, 6, 6, 4, 4, 1][body];
+            // Demo 3's classes, but Mars is Ferrous, rust red as people know it (Koda, 2026-11-14).
+            class = [1, 5, 0, 7, 6, 6, 4, 4, 1][body];
             size = [3, 12, 12, 6, 54, 36, 24, 24, 1][body];
             return (class, size, surface);
         }

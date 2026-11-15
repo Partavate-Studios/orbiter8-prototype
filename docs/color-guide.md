@@ -139,6 +139,9 @@ marks, and its card's color. Purple stays in the shadows. Volcanic is dark with 
 bright: lightness keeps them apart. Planets may have pink or yellow in their painting (Gaseous bands,
 Desert sand): that's illustration, not a mark. Koda likes these; change them only with him.
 
+Sol's Mars is a Ferrous world, so it's rust red, as people know it (Koda, 2026-11-14; it was Rocky
+and gray). Its station, Tiangong, trades as a Ferrous port.
+
 *Changed from the proposal:* it suggested new planet hex values from the old contracts'
 `PlanetLibrary.sol`; the game's own (liked) palette stays.
 

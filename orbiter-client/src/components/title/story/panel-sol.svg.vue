@@ -40,7 +40,7 @@ const SOL = [
   ['Mercury', 1, 3, 0],
   ['Venus', 5, 12, 0],
   ['Earth', 0, 12, 0, true],
-  ['Mars', 1, 6, 0],
+  ['Mars', 7, 6, 0],
   ['Jupiter', 6, 54, 0, true],
   ['Saturn', 6, 36, 10],
   ['Uranus', 4, 24, 1],

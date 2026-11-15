@@ -49,7 +49,7 @@ export const DEFAULTS = {
     rangePrices: [15_000, 150_000, 600_000]
   },
   start: { credits: 1000, bays: 5 },
-  solClasses: [1, 5, 0, 1, 6, 6, 4, 4, 1],
+  solClasses: [1, 5, 0, 7, 6, 6, 4, 4, 1],
   // Range 3 is saved for from this many bays; range 4 from full holds.
   rangeAfterBays: [0, 100, 250]
 }

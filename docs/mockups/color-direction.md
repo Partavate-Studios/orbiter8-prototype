@@ -69,8 +69,9 @@ the Orbiter 8 ship, we can stick with the purple." Done:
   the game's class colors. **Galaxy map:** the chosen star's card in its colors.
 - Left purple: Minerva's wizard panel, the jump animation and the black hole entry (deep space).
 
-**For Koda:** Sol's Mars is a Rocky world in the contracts, so it's gray in the game and the story. A
-Ferrous Mars would be red, as people know it, but it would change what Mars's port trades.
+**Mars is Ferrous** (Koda, 2026-11-14): Sol's Mars was a Rocky world in the contracts, so gray. It's
+now Ferrous, rust red as people know it, and its station Tiangong trades as a Ferrous port (sells
+equipment where it sold silicon; metals and what it buys are unchanged).
 
 ## To do, later
 
