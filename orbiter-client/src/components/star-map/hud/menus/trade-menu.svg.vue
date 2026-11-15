@@ -72,14 +72,17 @@
               <cargo-tab :before="avatar.ship.holds - avatar.ship.usedHolds" :after="predictedEmptyHolds" label="Empty" />
             </g>
 
-            <!-- readouts are plain text, so the buttons stand out (Koda, 2026-11-14, row C1) -->
+            <!-- readouts: text on a quiet panel with no border, so the buttons stand out (row C1) and the
+                 dock drawing behind doesn't run through the text (Koda, 2026-11-14) -->
             <g transform="translate(105 10)" dominant-baseline="middle">
+              <rect x="-70" y="-10" width="140" height="20" rx="3" ry="3" fill="#251d40" fill-opacity="0.92" />
               <text x="0" y="0" text-anchor="middle" fill="#bdb5d4" font-size="0.7em"
                 >Cargo Load : {{ predictedHolds }} / {{ avatar.ship.holds }}</text
               >
             </g>
 
             <g v-if="avatar.credits != 0" transform="translate(-120 180)" dominant-baseline="middle">
+              <rect x="-55" y="-10" width="110" height="20" rx="3" ry="3" fill="#251d40" fill-opacity="0.92" />
               <text x="0" y="0" text-anchor="middle" fill="#ffffff" font-size="0.7em"
                 >Bal: {{ avatar.credits.toLocaleString('en-US') }}&cent;</text
               >
@@ -87,6 +90,7 @@
 
             <!-- costs are plain; gains are yours, in yellow -->
             <g v-if="currentBalance != 0" transform="translate(0 180)" dominant-baseline="middle">
+              <rect x="-55" y="-10" width="110" height="20" rx="3" ry="3" fill="#251d40" fill-opacity="0.92" />
               <text v-if="currentBalance < 0" x="0" y="0" text-anchor="middle" fill="#ffffff" font-size="0.7em"
                 >Pay: &#8595; {{ Math.abs(currentBalance).toLocaleString('en-US') }}&cent;</text
               >
@@ -100,16 +104,18 @@
               transform="translate(120 180)"
               dominant-baseline="middle"
             >
+              <rect x="-55" y="-10" width="110" height="20" rx="3" ry="3" fill="#251d40" fill-opacity="0.92" />
               <text x="2" y="0" text-anchor="middle" fill="#ffffff" font-size="0.7em"
                 >Fin: {{ (avatar.credits + currentBalance).toLocaleString('en-US') }}&cent;</text
               >
             </g>
             <!-- can't afford: it needs you, so pink (light pink for text, row A1), outlined -->
             <g v-if="avatar.credits + currentBalance < 0" transform="translate(120 180)" dominant-baseline="middle">
-              <rect x="-55" y="-10" width="110" height="20" rx="3" ry="3" fill="none" :stroke="PINK_LIGHT" stroke-width="1.2" />
+              <rect x="-55" y="-10" width="110" height="20" rx="3" ry="3" fill="#251d40" fill-opacity="0.92" :stroke="PINK_LIGHT" stroke-width="1.2" />
               <text x="-2" y="0" text-anchor="middle" :fill="PINK_LIGHT" font-size="0.7em">Insufficient Funds</text>
             </g>
             <g v-if="!nothingToTrade && currentBalance == 0" transform="translate(120 180)" dominant-baseline="middle">
+              <rect x="-55" y="-10" width="110" height="20" rx="3" ry="3" fill="#251d40" fill-opacity="0.92" />
               <text x="-2" y="0" text-anchor="middle" fill="#ffffff" font-size="0.7em">Even Trade</text>
             </g>
           </g>

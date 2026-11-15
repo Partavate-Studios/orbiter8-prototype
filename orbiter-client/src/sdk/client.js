@@ -414,15 +414,19 @@ export function createGameClient() {
     await loadAround(cell, true)
     onProgress(10)
     const star = state.cells.get(cell)
-    const [planets, ports, sieges, here, recentTrades, keeper, naming] = await Promise.all([
+    const [planets, ports, sieges, here, recentTrades, keeper, naming, capacity] = await Promise.all([
       star?.state === STATE.STAR ? game.system(cell, goods) : [],
       game.portsAt(cell),
       game.siegesAt(cell),
       game.shipsAt(cell, pilots),
       game.blockNumber().then((latest) => logs.trades.update(latest)),
       game.keeperOf(cell),
-      state.pilot ? game.mayNameStar(cell, state.account) : { may: false, becomesOwner: false }
+      state.pilot ? game.mayNameStar(cell, state.account) : { may: false, becomesOwner: false },
+      // The capacity grows as pilots register; a stale one makes stocks (capacity - shortfall) go
+      // negative, which flips buying and selling in the trade menu.
+      game.marketCapacity()
     ])
+    state.economy = { ...state.economy, capacity }
     trades = recentTrades
     onProgress(50)
     const names = await Promise.all(planets.map((p) => (p.owner ? game.namesOf(p.id) : null)))
@@ -561,8 +565,8 @@ export function createGameClient() {
         id,
         name: goods[id].name,
         mode: q.mode === MODE.SELLS ? 'sells' : 'buys',
-        // sells: units on offer; buys: units the port will take
-        stock: capacity - q.shortfall,
+        // sells: units on offer; buys: units the port will take (never below none)
+        stock: Math.max(0, capacity - q.shortfall),
         price: q.price,
         curve: { base: goods[id].base, spread: goods[id].spread, capacity, shortfall: q.shortfall, feeBps: tuning.feeBps }
       }))

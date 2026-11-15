@@ -211,6 +211,11 @@ export function createGame(runner, addresses) {
       return (await pilots.cargoOf(address, goods)).map(Number)
     },
 
+    /** The ports' capacity now: it grows as pilots register (Market.capacity), so it's read with each port read. */
+    async marketCapacity() {
+      return Number(await market.capacity())
+    },
+
     /** The goods registry, the tuning and the ports' current capacity: what prices are computed from. */
     async economy() {
       const [goods, tuning, capacity] = await Promise.all([market.goods(), market.tuning(), market.capacity()])
