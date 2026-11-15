@@ -23,8 +23,8 @@
       rx="25"
       width="130"
       height="15"
-      :stroke="theme.stroke"
-      :fill="titleFill"
+      :stroke="theme === CARD_THEMES.ship ? theme.stroke : theme.base"
+      :fill="theme === CARD_THEMES.ship ? titleFill : theme.base"
       stroke-width="0.5"
     />
 
@@ -80,7 +80,7 @@ export default {
     objectId: { type: String, default: null }
   },
   data() {
-    return { CARD_GRAY, PINK_LIGHT, YELLOW }
+    return { CARD_GRAY, PINK_LIGHT, YELLOW, CARD_THEMES }
   },
   computed: {
     /** The card's colors (libs/card-theme.js, from card-ui), purple outside a card. */

@@ -94,9 +94,10 @@ colors always come with an icon or a picture of the thing, so they don't need to
 
 - **Background:** the same purple-gray on every card. No per-selection tint or gradient (Koda disliked
   the gradient cards).
-- **Frame and title:** the selected thing's identity color, in shades of one color: planets by class,
+- **Frame and title** (row I1): a thin quiet frame with thick brackets of the selected thing's identity
+  color around each corner, and its title pill in that color with the name dark on it: planets by class,
   stars by spectral class, moons gray, stations steel blue, black holes amber. **The Orbiter 8 ship keeps
-  Koda's purple.**
+  Koda's purple frame and title.**
 - **Menu buttons in the right-hand card:** one purple on every card.
 - **Menus** take the color of what opened them: a menu about the selection takes its card's; a HUD
   button's menu takes the button's tint; the ship's loadout keeps the purple.
@@ -220,7 +221,7 @@ possible". Built unless noted.
 | G1 · 1 | Galaxy map: the chosen star's hex glows purple with a pointer; yours stays the yellow outline; under siege, a pink frame inside the hex. |
 | G2 · 1 | Focus: a 2.5 px `BRAND_300` ring, 3 px out. |
 | H2 · 1 | Every HUD button rests soft (`HUD_REST`, its tint 35% toward gray; the leaderboard's soft gold from A2) and shows its full tint (`HUD_TINT`) under the pointer. The star button keeps its star's color. |
-| H1 · 1 | Star cards: a quiet frame with the title pill in the star's tint, plus some of the tint on the frame (four ways in [`mockups/color-choices-3.svg`](mockups/color-choices-3.svg)). |
+| H1 · 1, I1 | Every card but the ship's (planets, stars, stations, moons, black holes, the galaxy map's star card, the action card beside them): a thin quiet frame (`BORDER_STRONG`), thick brackets of the selection's color around each corner, and the title pill in that color with the name dark on it. Chosen from four in [`mockups/color-choices-3.svg`](mockups/color-choices-3.svg). The ship's card keeps Koda's purple frame and title. |
 
 ## 9. To do
 

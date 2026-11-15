@@ -133,7 +133,9 @@
     </header>
 
     <!-- The chosen star's card, in the frame the in-game dialog and the tech tree use (game-dialog.vue) -->
-    <aside v-if="chosen !== null" class="card" :style="chosenTheme">
+    <aside v-if="chosen !== null" class="card" :class="{ tinted: chosenTheme }" :style="chosenTheme">
+      <!-- the star's color on the frame's corners, as on the game's cards (row I1) -->
+      <span v-for="corner in ['tl', 'tr', 'bl', 'br']" :key="corner" class="corner" :class="corner" aria-hidden="true" />
       <div class="inside">
       <h3 class="pill">{{ chosenName }}</h3>
       <p class="sub">{{ chosenKind }} · {{ distanceAway }} {{ distanceAway === 1 ? 'step' : 'steps' }} away</p>
@@ -460,7 +462,7 @@ export default {
       if (this.chosen === null) return null
       const theme = this.chosenCell?.state === STATE.BLACK_HOLE ? CARD_THEMES.blackHole : CARD_THEMES['star-' + game.traitsOf(this.chosen).spectral]
       if (!theme) return null
-      return { '--card-mid': theme.mid, '--card-deep': theme.deep, '--card-stroke': theme.stroke }
+      return { '--card-base': theme.base, '--card-mid': theme.mid, '--card-deep': theme.deep, '--card-stroke': theme.stroke }
     },
     distanceAway() {
       return distance(this.shipCell, this.chosen)
@@ -847,6 +849,61 @@ export default {
   );
   box-shadow: 0 1.2em 3em #0009;
   text-align: left;
+}
+/* A star's card (row I1): a thin quiet frame, the star's color on its corners and its title pill. */
+.card.tinted {
+  padding: 2px;
+  background: #5a4c8c;
+}
+.card.tinted .inside {
+  border-color: transparent;
+}
+.card.tinted .pill {
+  border-color: var(--card-base);
+  background: var(--card-base);
+  color: #1b1531;
+  font-weight: bold;
+  text-shadow: none;
+}
+.card .corner {
+  display: none;
+}
+.card.tinted .corner {
+  display: block;
+  position: absolute;
+  width: 2.6em;
+  height: 1.7em;
+  border: 0 solid var(--card-base);
+  pointer-events: none;
+  z-index: 1;
+}
+.card.tinted .corner.tl {
+  top: 0;
+  left: 0;
+  border-top-width: 4px;
+  border-left-width: 4px;
+  border-top-left-radius: 40px 9px;
+}
+.card.tinted .corner.tr {
+  top: 0;
+  right: 0;
+  border-top-width: 4px;
+  border-right-width: 4px;
+  border-top-right-radius: 40px 9px;
+}
+.card.tinted .corner.bl {
+  bottom: 0;
+  left: 0;
+  border-bottom-width: 4px;
+  border-left-width: 4px;
+  border-bottom-left-radius: 40px 9px;
+}
+.card.tinted .corner.br {
+  bottom: 0;
+  right: 0;
+  border-bottom-width: 4px;
+  border-right-width: 4px;
+  border-bottom-right-radius: 40px 9px;
 }
 .card .card-pill:not(.accent) {
   border-color: var(--card-stroke, #5b1aaa);

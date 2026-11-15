@@ -1,6 +1,8 @@
 <template>
   <g transform="translate(-70 -70)">
+    <!-- the name's shadow, on the ship's purple title only; others sit dark on their color (row I1) -->
     <text
+      v-if="!darkTitle"
       fill="#000000"
       x="70"
       y="10"
@@ -15,7 +17,8 @@
       {{ systemObjects[objectId].name }}
     </text>
     <text
-      fill="#ffffff"
+      :fill="darkTitle ? '#1b1531' : '#ffffff'"
+      :font-weight="darkTitle ? 'bold' : 'normal'"
       x="70"
       y="10"
       :font-size="fitSize(systemObjects[objectId].name, 8, 122, 700)"
@@ -140,9 +143,11 @@ import { useStarMapStore } from '@/stores/starmap'
 import { planetTypeName } from '@/sdk/game/planet-types'
 import { cargoLines, emptyHolds, shortGoodName } from '@/sdk/game/trade'
 import { YELLOW } from '@/libs/palette'
+import { CARD_THEMES, unwrapTheme } from '@/libs/card-theme'
 
 export default {
   name: 'SpriteInfo',
+  inject: { cardTheme: { default: null } },
   props: {
     /** The selected object's key (see sdk/system.js objectKey). */
     objectId: { type: String, default: null }
@@ -152,6 +157,11 @@ export default {
   },
   computed: {
     ...mapState(useStarMapStore, ['systemObjects', 'players']),
+    /** Every card but the ship's has its title pill in its color, with the name dark on it (row I1). */
+    darkTitle() {
+      const t = this.cardTheme
+      return typeof t !== 'string' && unwrapTheme(t) !== CARD_THEMES.ship
+    },
     ...mapState(useGameStateStore, ['avatar', 'goods']),
     typeName() {
       switch (this.systemObjects[this.objectId].type) {
