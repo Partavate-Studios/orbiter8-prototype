@@ -2,7 +2,7 @@
 
 Koda's decisions of 2026-11-16, and the plan to build them. Written so a session without the history
 of the one that wrote it can carry it out: read this whole file, then the documents it points to.
-**Status: design agreed in principle; the questions in "Still open" go to Koda before building.**
+**Status: agreed with Koda (2026-11-16): decisions 1–32 below. Nothing built yet.**
 
 ## Read first
 
@@ -58,7 +58,7 @@ of the one that wrote it can carry it out: read this whole file, then the docume
 7. **Sol's belt** belongs to the Federation, like Sol's planets. Players build belts in other systems:
    no land grabs in Sol.
 8. **Building on an asteroid:** platform, then people, then drones, then the port: all one infrastructure
-   on the big asteroid; nothing is built in empty space. (Open: see "Still open" 1.)
+   on the big asteroid; nothing is built in empty space. (The line: decision 22.)
 9. **Mining drones are their own part**, separate from battle drones.
 10. **Production:** the existing goods, by composition. Rates sensible and **tunable** (contract tuning).
 11. **The port is supplied by mining**: an asteroid port's goods come from its drones' mining, the way a
@@ -94,44 +94,52 @@ of the one that wrote it can carry it out: read this whole file, then the docume
 ### Later
 21. **Dwarf planets** (to do; noted in `demo4-plan.md`).
 
-## Still open (ask Koda before building; the suggestion is in brackets)
+## Koda's answers to the open questions (2026-11-16)
 
-1. **The asteroid's building line, compared with a planet's.** A planet goes Citadel → Colony → Station →
-   Port → Yards → Armory (+ Autofactory). [Suggestion: a shorter line on the asteroid, mirroring it:
-   **Platform** (the claim's first building: people may land) → **Mine** (drones work; output to the
-   asteroid's store) → **Port** (trades from the store) → optionally **Armory** (defense mounts). No yards,
-   no autofactory. One line for both kinds of body, with each kind's allowed steps, would keep the code
-   one shape.]
-2. **Planets supplying their ports.** Today every port restocks itself over time. Decision 11 makes a
-   player's port supplied only by its body's production. [Suggestion: player ports (planets and asteroids)
-   are supplied by production; **Sol's Federation ports keep restocking themselves**, so the economy's
-   center never runs dry. A port's sell side comes from its store; its buy side still takes goods up to
-   its capacity.]
-3. **Drones on stations: the mining/defense split.** [Suggestion: a body has one pool of drones (bought or
-   built and landed there, like colonists); the owner sets how many are on defense; the rest mine. Defense
-   drones fight in sieges and can be destroyed; mining drones never are (decision 14). Changing the split
-   takes effect at once outside a siege, and is frozen during one.]
-4. **Bay types.** [Suggestion: two kinds bought separately at a shipyard: **cargo bays** (cargo and
-   colonists, as now) and **drone bays** (one drone each: mining or battle). Armor, shields and repair bots
-   keep using cargo bays for now. The ship's total space stays capped at 250. Existing ships: none, the
-   deploy is fresh.] Should battle drones move to drone bays too?
-5. **The 4 built-in drones.** [Suggestion: they need no bays; mining rate per drone as for mining drones;
-   repair: one hold or one point of range back every N hours (tunable), so a damaged ship heals slowly
-   without a yard.] Do they mine and repair at the same time, or one job at a time?
-6. **Ships mining an empty section.** [Suggestion: an action `startMining(section)` at the ship's star
-   (needs a free slot of 6); output accrues per drone over time into the holds, computed when read; the
-   ship stops when full (no more accrual) or when the pilot calls `stopMining` or jumps (jumping ends
-   it). While mining, the ship is "at" the section.] Do empty sections deplete over time? [Suggestion: no,
-   for now.] Can a ship mine at a section with an asteroid, the owner's or another's? [Suggestion: no.]
-7. **Federation profits to an account.** Federation ports mint what they pay and burn what they're paid.
-   [Suggestion: keep that, and send the fee (now burned) to a `treasury` address set by the admin,
-   defaulting to the deployer.] Or should the treasury also receive the margin?
-8. **Asteroid defense in numbers.** [Suggestion: 6 mounts like a moon, plus a small shield (a moon has
-   none); defense drones from decision 11; no orbital platforms.]
-9. **Names and NFTs.** [Suggestion: asteroids get names like planets (owner-named, derived otherwise) and
-   a deed in the existing Deeds contract.]
-10. **Which client first.** [Suggestion: the SDK and `orbiter-client/`; the experimental clients follow.]
-11. **The contract refactor's scope** (see the proposal below): agree on it before any belt work.
+22. **The asteroid's building line:** Platform (people may land) → Mine (drones work; output to the
+    asteroid's store) → Port (trades from the store) → optionally Armory (defense mounts). No yards, no
+    autofactory. One line for every kind of body, with each kind's allowed steps.
+23. **Ports and production:** a player's port (planet or asteroid) is supplied only by its body's
+    production. **Sol's Federation ports keep restocking themselves, at the top speed the game world
+    allows**: as fast as a station with the most mining drones possible would refill it, and no faster.
+24. **Drones on bodies:** one pool per body (bought or built and landed there, like colonists); the owner
+    sets how many are on defense and the rest mine. Defense drones fight in sieges and can be destroyed;
+    mining drones never are. Changing the split takes effect at once outside a siege, and is frozen during one.
+25. **Bay types:** **cargo bays** (cargo and colonists) and **drone bays**, bought separately at shipyards;
+    the ship's total space stays capped at 250. **One drone per drone bay for now** (Koda expects more
+    drones per bay later: keep the ratio a tunable). Armor, shields and repair bots keep using cargo bays.
+26. **The 4 built-in drones:** they take no bays and can't be bought, sold, traded or lost. Each does one
+    job at a time, **mining or repairing**; the pilot assigns them (e.g. 2 mining, 2 repairing). Repair
+    restores a ship slowly without a yard (rates tunable).
+27. **Ships mining empty sections:** `startMining` at a free slot (6 per empty section); **the pilot's next
+    action stops it** (any move, a jump included). Output accrues per mining drone into the holds, up to a
+    full ship. **A full ship no longer counts toward the 6** (it's just drifting in that part of the belt),
+    so another ship can take the slot. **Empty sections never run out.** Ships mine only in empty
+    sections, never at an asteroid.
+28. **Federation profits:** a player's port pays its fee to its owner today (`Market`, the fee on each
+    trade); Sol's ports belong to the Federation, so **their fee goes to the Federation's treasury**: an
+    address the admin sets, defaulting to the deployer. The game's creators use that income as they wish.
+    (The Federation still mints what it pays and burns what it's paid.)
+29. **Asteroid defense:** a moon's 6 weapon mounts, plus a small shield, plus its defense drones; no
+    orbital platforms. Tunable.
+30. **Names and NFTs:** asteroids are named like planets (by the owner; derived otherwise) and get a deed
+    in the Deeds contract. The discoverer's first-claim window applies as it does to planets.
+31. **Clients:** the SDK and the main client. The HUD redesign (`client-rnd/hud/`) is first **imported into
+    the main client** and then removed as an experimental client; the clean-room client
+    (`client-rnd/fresh/`) is updated later.
+32. **The contract refactor** below is agreed, and lands first.
+
+## Notes for later
+
+- **The HUD's planet picker** (the strip of the system's bodies on top of the selection card, from
+  `client-rnd/hud/`): Koda likes the other HUD changes but not this one yet. Keep it as is when the HUD is
+  imported; revisit later to add much more to it.
+- **A bug to fix** before or with the HUD import: after jumping into a system, a ship is drawn docked at
+  the station of its last trade there, even if that trade was on an earlier visit (seen jumping back to
+  Sol: orbiting Earth instead of the star). A trade should dock a ship only if it came after the pilot's
+  latest move into the system. The SDK reads trades (`sdk/src/client.js` `dockedAt`, `sdk/src/game/
+  docking.js`); it also needs the pilots' `Jumped` and `Traversed` events (Pilots.sol) to compare blocks.
+  Every new arrival orbits the star.
 
 ## The contract refactor (proposal, to agree with Koda)
 
@@ -164,19 +172,20 @@ Each phase ends with: `forge test` and `forge build --sizes` (all under the limi
 `npm run lint` in `orbiter-client/` (covers `sdk/`), a production build, and a play-test like a player
 (desktop and phone). Commit per step; never push. Log guesses in `docs/review.md`.
 
-**Phase 0: agree.** Koda answers "Still open"; record the answers as decisions (D67 onward) in
-`docs/demo4-plan.md`, and add this plan's milestones there.
+**Phase 0: import the HUD.** Bring `client-rnd/hud/` into `orbiter-client/` (decision 31), with the
+docking bug fixed (see "Notes for later"); then remove `client-rnd/hud/`. Record decisions 1–32 as D67
+onward in `docs/demo4-plan.md`, with this plan's milestones.
 
 **Phase 1: contract refactor** (no new features).
 - [ ] Body ids with kinds; `Bodies` derivation (planets as now); SDK mirror and cross-check vectors.
 - [ ] Split Planets (Claims, Settlements) and Battle as agreed; all existing tests pass; sizes recorded.
-- [ ] Treasury address for Federation fees (decision 19, "Still open" 7).
+- [ ] Treasury address for Federation fees (decisions 19 and 28).
 - [ ] Sol fully built: every Sol station has port, yard and armory (decision 18); client shows them.
 - [ ] SDK: contracts.js and client.js on the new modules; the existing client plays end to end.
 
 **Phase 2: ships.**
-- [ ] Bay types (decision 17, "Still open" 4): Pilots, Market's shipyard, Armory's fitting rules.
-- [ ] The 4 built-in multipurpose drones (decision 13): repair over time.
+- [ ] Bay types (decisions 17 and 25): Pilots, Market's shipyard, Armory's fitting rules.
+- [ ] The 4 built-in multipurpose drones (decisions 13 and 26): assigned to mining or repair.
 - [ ] Mining drones as a part (decision 9); never lost in battle (decision 14).
 - [ ] Client: the shipyard sells both bay types; the loadout shows drones and bays by type.
 
@@ -184,10 +193,10 @@ Each phase ends with: `forge test` and `forge build --sizes` (all under the limi
 - [ ] Generation: which stars have a belt, its 8 sections, each section's asteroid (size, composition)
   or empty; Sol's belt fixed and the Federation's. Contract library + SDK mirror + vectors.
 - [ ] Claims, names and deeds for asteroids (not counting toward the star, decision 6).
-- [ ] The asteroid building line ("Still open" 1); drone pools and the mining/defense split.
-- [ ] Ports supplied by production ("Still open" 2), for asteroids and player planets.
-- [ ] Ships mining empty sections: slots of 6, accrual, leaving when full (decision 12).
-- [ ] Sieges on asteroids: a moon's firepower plus (decision 6, "Still open" 8).
+- [ ] The asteroid building line (decision 22); drone pools and the mining/defense split (decision 24).
+- [ ] Ports supplied by production, for asteroids and player planets; Federation ports at the top rate (decision 23).
+- [ ] Ships mining empty sections: slots of 6, accrual, the next action stops it, full ships leave the count (decisions 12 and 27).
+- [ ] Sieges on asteroids: a moon's mounts, a small shield, defense drones (decisions 6 and 29).
 
 **Phase 4: drawing the belt** (orbiter-client; see "Graphics").
 - [ ] The three levels of detail (decision 15), two parallax layers (decision 5), selection (decision 16).
