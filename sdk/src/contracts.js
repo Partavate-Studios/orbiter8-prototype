@@ -381,8 +381,20 @@ export function createGame(runner, addresses) {
         good: Number(l.args[2]),
         units: Number(l.args[3]),
         hash: l.transactionHash,
-        block: l.blockNumber
+        block: l.blockNumber,
+        logIndex: l.index
       }))
+    },
+
+    /** Pilots' arrivals in a system (jumps and black holes) in a block range: [{ pilot, cell, block, logIndex }]. */
+    async arrivals(fromBlock, toBlock) {
+      const [jumps, holes] = await Promise.all([
+        queryChunked(pilots, pilots.filters.Jumped(), fromBlock, toBlock),
+        queryChunked(pilots, pilots.filters.Traversed(), fromBlock, toBlock)
+      ])
+      return [...jumps, ...holes]
+        .map((l) => ({ pilot: l.args[0].toLowerCase(), cell: Number(l.args[2]), block: l.blockNumber, logIndex: l.index }))
+        .sort((a, b) => a.block - b.block || a.logIndex - b.logIndex)
     },
 
     /** Galaxy chat in a block range, oldest first: [{ sender, message, hash, block }]. */

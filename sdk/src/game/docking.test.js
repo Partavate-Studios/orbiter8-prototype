@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { dockedShips, MAX_DOCKED } from './docking'
+import { tradesSinceArrival, dockedShips, MAX_DOCKED } from './docking'
 
 const ship = (id, owner, planetId) => ({ id, owner, planetId })
 const trade = (sender, planetId) => ({ sender, planetId })
@@ -28,5 +28,19 @@ describe('docking at stations', () => {
     expect(new Set(pads).size).toBe(3)
     const again = dockedShips([trade('0xC', 3), trade('0xA', 3), trade('0xB', 3)], ships, [3])
     for (const [id, dock] of first) expect(again.get(id).pad).toBe(dock.pad)
+  })
+})
+
+describe('tradesSinceArrival', () => {
+  const trade = (sender, block, logIndex = 0) => ({ sender, block, logIndex })
+  it('drops a trade from an earlier visit, keeps one after the latest arrival', () => {
+    const trades = [trade('0xA', 10), trade('0xB', 12), trade('0xA', 30)]
+    const arrivals = [{ pilot: '0xa', block: 20 }, { pilot: '0xb', block: 25 }]
+    expect(tradesSinceArrival(trades, arrivals)).toEqual([trades[2]])
+  })
+  it('keeps every trade of a pilot who has not moved, and orders within a block by log index', () => {
+    const trades = [trade('0xC', 5), trade('0xA', 20, 1), trade('0xA', 20, 3)]
+    const arrivals = [{ pilot: '0xA', block: 20, logIndex: 2 }]
+    expect(tradesSinceArrival(trades, arrivals)).toEqual([trades[0], trades[2]])
   })
 })

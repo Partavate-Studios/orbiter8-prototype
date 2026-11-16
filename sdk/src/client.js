@@ -19,6 +19,7 @@ import { planet as derivePlanet, planetCount, looks, moonName, planetName } from
 import { portNames, buyCost, sellProceeds, fee, baysCost, MODE } from './market'
 import { SESSION_HOURS, loadKey, saveKey, forgetKey, newKey, keySigner, sweep } from './session-key'
 import { createEventLog } from './event-log'
+import { tradesSinceArrival } from './game/docking'
 
 /** A trade line's price limit allows this much movement since the prices were read (B23). */
 export const SLIPPAGE = 0.02
@@ -419,7 +420,11 @@ export function createGameClient() {
       game.portsAt(cell),
       game.siegesAt(cell),
       game.shipsAt(cell, pilots),
-      game.blockNumber().then((latest) => logs.trades.update(latest)),
+      // A trade docks its pilot only if it came after the pilot's latest arrival (docking.js).
+      game.blockNumber().then(async (latest) => {
+        const [all, arrivals] = await Promise.all([logs.trades.update(latest), logs.arrivals.update(latest)])
+        return tradesSinceArrival(all, arrivals)
+      }),
       game.keeperOf(cell),
       state.pilot ? game.mayNameStar(cell, state.account) : { may: false, becomesOwner: false },
       // The capacity grows as pilots register; a stale one makes stocks (capacity - shortfall) go
@@ -885,6 +890,7 @@ export function createGameClient() {
       pilotsBlock = discoveredBlock = startBlock - 1
       logs = {
         trades: createEventLog({ read: game.trades, lookback: LOOKBACK_BLOCKS, startBlock }),
+        arrivals: createEventLog({ read: game.arrivals, lookback: LOOKBACK_BLOCKS, startBlock }),
         broadcasts: createEventLog({ read: game.broadcasts, lookback: LOOKBACK_BLOCKS, startBlock }),
         registrations: createEventLog({ read: game.registrations, lookback: LOOKBACK_BLOCKS, startBlock }),
         feed: createEventLog({ read: game.siegeEvents, lookback: FEED_LOOKBACK_BLOCKS, startBlock })

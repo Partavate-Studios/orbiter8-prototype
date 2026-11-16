@@ -3,6 +3,29 @@
 // a station, whose ships are still at that planet, are drawn docked at its pads; the others orbit.
 // No contract stores docking. Plain data; no Vue, DOM or chain access.
 
+/**
+ * The trades that can still dock their pilot: those after the pilot's latest arrival in a system (a
+ * jump or a black hole). A trade from an earlier visit to the same star doesn't count: every new
+ * arrival orbits the star until it trades again.
+ * @param {Array<{ sender: string, block: number, logIndex?: number }>} trades  oldest first
+ * @param {Array<{ pilot: string, block: number, logIndex?: number }>} arrivals  any order
+ */
+export function tradesSinceArrival(trades, arrivals) {
+  const lower = (address) => String(address).toLowerCase()
+  const at = (event) => [event.block, event.logIndex ?? 0]
+  const latest = new Map()
+  for (const arrival of arrivals) {
+    const pilot = lower(arrival.pilot)
+    const before = latest.get(pilot)
+    if (!before || after(at(arrival), before)) latest.set(pilot, at(arrival))
+  }
+  return trades.filter((trade) => {
+    const arrived = latest.get(lower(trade.sender))
+    return !arrived || after(at(trade), arrived)
+  })
+}
+const after = ([block, index], [otherBlock, otherIndex]) => block > otherBlock || (block === otherBlock && index > otherIndex)
+
 /** How many ships a station's pads hold at once. */
 export const MAX_DOCKED = 3
 /** The station art's six docking pads, in degrees round it (the raised middle of each side). */
