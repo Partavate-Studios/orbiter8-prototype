@@ -20,6 +20,7 @@
               :cargo-holds="avatar.ship.holds + holdsToBuy"
               :predicted-load="avatar.ship.holds"
               :existing-load="avatar.ship.holds"
+              :segments="holdSegments"
             />
           </g>
 
@@ -93,6 +94,8 @@
 
           <!-- Engines, for the range of a jump -->
           <g transform="translate(0 700)" fill="#ffffff">
+            <!-- longer jumps: the engines' picture (round 2, item 7) -->
+            <image :href="engineArt" x="-205" y="-26" width="52" height="52" />
             <text v-if="rangePrice != null" font-size="0.9em"
               >Engines: jump range {{ player.ship.range }} → {{ player.ship.range + 1 }} for
               {{ rangePrice.toLocaleString('en-US') }}&cent;</text
@@ -115,6 +118,8 @@
 <script>
 import { fitSize } from '@/libs/fit-text'
 import { canAfford, MAX_CARGO_HOLDS } from '@orbiter8/sdk/game/trade'
+import { goodColor, TEXT_2, TEXT_3, YELLOW_LIGHT } from '@/libs/palette'
+import { shipHolds } from '@/libs/goods'
 
 import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
@@ -125,6 +130,7 @@ import MenuContainer from './menu-container/_menu-container.svg'
 import MenuButton from './menu-button.svg'
 import Arrow from './widgets/arrow.svg'
 import ShipUpgrade from './_trade-menu/ship-upgrade.svg'
+import engineArt from '@/assets/art/engine-range.svg'
 
 export default {
   name: 'ShipyardMenu',
@@ -142,12 +148,22 @@ export default {
     return {
       holdsToBuy: 0,
       pending: false,
-      player: usePlayerStore()
+      player: usePlayerStore(),
+      engineArt
     }
   },
   computed: {
     ...mapState(useStarMapStore, ['systemObjects']),
     ...mapState(useGameStateStore, ['avatar']),
+    /** The ship's holds as they'd be: its cargo, its empty holds, then the holds being bought (yours, yellow). */
+    holdSegments() {
+      const ship = this.avatar.ship
+      return [
+        ...shipHolds(ship, goodColor, { text2: TEXT_2, text3: TEXT_3 }),
+        { count: Math.max(0, ship.holds - ship.usedHolds), kind: 'empty' },
+        { count: this.holdsToBuy, color: YELLOW_LIGHT, kind: 'added' }
+      ]
+    },
     totalCost() {
       return this.costOf(this.holdsToBuy)
     },

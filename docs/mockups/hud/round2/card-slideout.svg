@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 900" font-family="Ubuntu, sans-serif">
+  <!-- Round 2, items 1, 3 and 4: the card's menu slides out from behind the card; a strip of the
+       system's bodies sits on the card; every action has its own slot. -->
+  <defs>
+    <linearGradient id="pill" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5c1aae"/><stop offset="0.1" stop-color="#280b4b"/><stop offset="0.5" stop-color="#5c1aae"/><stop offset="0.9" stop-color="#280b4b"/><stop offset="1" stop-color="#5c1aae"/>
+    </linearGradient>
+    <g id="card">
+      <rect x="0" y="0" width="200" height="290" rx="10" fill="#1b1531" stroke="#5a4c8c" stroke-width="2"/>
+      <path d="M0 40V10Q0 0 10 0H40M160 0H190Q200 0 200 10V40M200 250V280Q200 290 190 290H160M40 290H10Q0 290 0 280V250" fill="none" stroke="#2f7fd9" stroke-width="7"/>
+      <rect x="12" y="10" width="176" height="22" rx="11" fill="#2f7fd9"/>
+      <text x="100" y="26" text-anchor="middle" font-size="12" fill="#1b1531" font-weight="bold">Earth</text>
+      <circle cx="100" cy="100" r="36" fill="#2f7fd9"/><path d="M70 92h40M78 108h44M74 100h18" stroke="#5fd27e" stroke-width="7" stroke-linecap="round"/>
+      <rect x="14" y="160" width="172" height="118" rx="6" fill="#251d40"/>
+      <text x="24" y="180" font-size="9" fill="#c3b3da">Planet · Owner: The Federation</text>
+      <text x="24" y="196" font-size="9" fill="#c3b3da">Class: Terrestrial · Size 12</text>
+    </g>
+    <g id="slot">
+      <rect x="0" y="0" width="200" height="34" rx="14" fill="url(#pill)" stroke="#5b1aaa88"/>
+    </g>
+    <g id="empty-slot">
+      <rect x="0" y="0" width="200" height="34" rx="14" fill="none" stroke="#5a4c8c" stroke-dasharray="4 4" stroke-opacity="0.6"/>
+    </g>
+  </defs>
+  <rect width="1500" height="900" fill="#130e24"/>
+  <text x="30" y="40" font-size="22" fill="#e6dcf5">Round 2 · the selection card: slide-out menu, fixed slots, system strip</text>
+  <text x="30" y="64" font-size="13" fill="#c3b3da">Items 1, 3 and 4. Desktop at the bottom left of 1440×900; the phone's sheet works the same way.</text>
+
+  <!-- A: open -->
+  <g transform="translate(40 120)">
+    <text x="0" y="0" font-size="15" fill="#e6dcf5">A · Open (the default): the menu out beside the card</text>
+    <!-- system strip on the card's top edge -->
+    <g transform="translate(0 22)">
+      <rect x="0" y="0" width="470" height="42" rx="21" fill="#12052ae6" stroke="#3f3566"/>
+      <text x="16" y="26" font-size="16" fill="#c3b3da">‹</text>
+      <circle cx="46" cy="21" r="10" fill="#fff1c4"/>
+      <g fill-opacity="0.95">
+        <circle cx="80" cy="21" r="6" fill="#9a8fb2"/><circle cx="108" cy="21" r="8" fill="#e5823e"/>
+        <circle cx="138" cy="21" r="14" fill="none" stroke="#b9a0ff" stroke-width="2"/><circle cx="138" cy="21" r="8" fill="#2f7fd9"/>
+        <circle cx="168" cy="21" r="7" fill="#a5583c"/><circle cx="198" cy="21" r="11" fill="#e58fb5"/>
+        <circle cx="230" cy="21" r="10" fill="#d97aa8"/><circle cx="260" cy="21" r="8" fill="#5fb8e8"/><circle cx="288" cy="21" r="8" fill="#1e8fd8"/><circle cx="314" cy="21" r="5" fill="#9a8fb2"/>
+      </g>
+      <text x="452" y="26" font-size="16" fill="#c3b3da" text-anchor="end">›</text>
+      <text x="340" y="25" font-size="11" fill="#c3b3da">Tab · [ ] · L1/R1</text>
+    </g>
+    <g transform="translate(0 76)">
+      <!-- the menu, behind the card, out -->
+      <g transform="translate(180 15)">
+        <rect x="0" y="0" width="270" height="260" rx="12" fill="#1b1531f2" stroke="#5a4c8c" stroke-width="1.5"/>
+        <!-- fixed slots: planet -->
+        <g transform="translate(46 14)"><use href="#empty-slot"/><text x="-14" y="22" font-size="10" fill="#c3b3da55">1</text></g>
+        <g transform="translate(46 56)"><use href="#empty-slot"/><text x="-14" y="22" font-size="10" fill="#c3b3da55">2</text></g>
+        <g transform="translate(46 98)"><use href="#slot"/><text x="100" y="22" text-anchor="middle" fill="#fff" font-weight="bold" font-size="13">Recruit Colonists</text><text x="-14" y="22" font-size="10" fill="#c3b3da99">3</text></g>
+        <g transform="translate(46 140)"><use href="#empty-slot"/><text x="-14" y="22" font-size="10" fill="#c3b3da55">4</text></g>
+        <!-- icon row: fixed places too -->
+        <g transform="translate(46 200)">
+          <circle cx="18" cy="18" r="17" fill="#251d40" stroke="#5a4c8c" stroke-dasharray="3 3"/>
+          <circle cx="62" cy="18" r="17" fill="#251d40" stroke="#2f7fd9"/><text x="62" y="23" text-anchor="middle" fill="#fff" font-size="14">⚙</text>
+          <circle cx="106" cy="18" r="17" fill="#251d40" stroke="#2f7fd9"/><circle cx="106" cy="18" r="6" fill="#e6dcf5"/>
+          <text x="18" y="50" text-anchor="middle" font-size="9" fill="#c3b3da">planet</text>
+          <text x="62" y="50" text-anchor="middle" font-size="9" fill="#c3b3da">station</text>
+          <text x="106" y="50" text-anchor="middle" font-size="9" fill="#c3b3da">moons</text>
+        </g>
+        <!-- the tab -->
+        <rect x="256" y="104" width="22" height="52" rx="6" fill="#302651" stroke="#5a4c8c"/>
+        <text x="267" y="135" text-anchor="middle" fill="#e6dcf5" font-size="14">‹</text>
+      </g>
+      <use href="#card"/>
+    </g>
+    <text x="0" y="410" font-size="12" fill="#c3b3da">A planet's slots: 1 Claim / Colony / Attack, 2 Siege,</text>
+    <text x="0" y="428" font-size="12" fill="#c3b3da">3 Recruit (Earth), 4 market, 5 Rename. Empty slots stay as</text>
+    <text x="0" y="446" font-size="12" fill="#c3b3da">faint outlines, so a button never moves. Visit Station /</text>
+    <text x="0" y="464" font-size="12" fill="#c3b3da">Moon / Planet are only the icons now.</text>
+  </g>
+
+  <!-- B: closed -->
+  <g transform="translate(560 120)">
+    <text x="0" y="0" font-size="15" fill="#e6dcf5">B · Closed: just the card, the menu's edge peeking out</text>
+    <g transform="translate(0 22)">
+      <rect x="0" y="0" width="236" height="42" rx="21" fill="#12052ae6" stroke="#3f3566"/>
+      <text x="16" y="26" font-size="16" fill="#c3b3da">‹</text>
+      <circle cx="46" cy="21" r="10" fill="#fff1c4"/><circle cx="80" cy="21" r="6" fill="#9a8fb2"/><circle cx="108" cy="21" r="8" fill="#e5823e"/>
+      <circle cx="138" cy="21" r="14" fill="none" stroke="#b9a0ff" stroke-width="2"/><circle cx="138" cy="21" r="8" fill="#2f7fd9"/>
+      <circle cx="168" cy="21" r="7" fill="#a5583c"/><circle cx="198" cy="21" r="9" fill="#e58fb5" opacity="0.6"/>
+      <text x="220" y="26" font-size="16" fill="#c3b3da" text-anchor="end">›</text>
+    </g>
+    <g transform="translate(0 76)">
+      <g transform="translate(20 15)">
+        <rect x="0" y="0" width="200" height="260" rx="12" fill="#1b1531f2" stroke="#5a4c8c" stroke-width="1.5"/>
+        <rect x="186" y="104" width="22" height="52" rx="6" fill="#302651" stroke="#5a4c8c"/>
+        <text x="197" y="135" text-anchor="middle" fill="#e6dcf5" font-size="14">›</text>
+      </g>
+      <use href="#card"/>
+    </g>
+    <text x="0" y="410" font-size="12" fill="#c3b3da">About 16 px of the menu shows past the card, with its tab; click the tab or the edge</text>
+    <text x="0" y="428" font-size="12" fill="#c3b3da">(or press A) to slide it out. The choice is remembered for every selection.</text>
+  </g>
+
+  <!-- C: phone -->
+  <g transform="translate(1000 120)">
+    <text x="0" y="0" font-size="15" fill="#e6dcf5">C · Phone sheet, open and closed</text>
+    <rect x="0" y="20" width="390" height="250" rx="0" fill="#130e24" stroke="#3f3566"/>
+    <rect x="8" y="30" width="374" height="34" rx="17" fill="#12052ae6" stroke="#3f3566"/>
+    <circle cx="40" cy="47" r="8" fill="#fff1c4"/><circle cx="70" cy="47" r="5" fill="#9a8fb2"/><circle cx="94" cy="47" r="6" fill="#e5823e"/><circle cx="120" cy="47" r="11" fill="none" stroke="#b9a0ff" stroke-width="2"/><circle cx="120" cy="47" r="6" fill="#2f7fd9"/><circle cx="146" cy="47" r="6" fill="#a5583c"/><circle cx="172" cy="47" r="8" fill="#e58fb5"/>
+    <rect x="8" y="70" width="374" height="190" rx="14" fill="#1b1531f2" stroke="#5a4c8c"/>
+    <g transform="translate(16 80) scale(0.58)"><use href="#card"/></g>
+    <g transform="translate(140 84)"><rect width="230" height="38" rx="14" fill="url(#pill)"/><text x="115" y="25" text-anchor="middle" fill="#fff" font-weight="bold" font-size="13">Recruit Colonists</text></g>
+    <g transform="translate(140 128)"><rect width="230" height="38" rx="14" fill="none" stroke="#5a4c8c" stroke-dasharray="4 4"/></g>
+    <g transform="translate(140 172)"><rect width="230" height="38" rx="14" fill="none" stroke="#5a4c8c" stroke-dasharray="4 4"/></g>
+    <g transform="translate(150 222)"><circle cx="16" cy="16" r="15" fill="#251d40" stroke="#5a4c8c" stroke-dasharray="3 3"/><circle cx="54" cy="16" r="15" fill="#251d40" stroke="#2f7fd9"/><circle cx="92" cy="16" r="15" fill="#251d40" stroke="#2f7fd9"/></g>
+    <rect x="128" y="140" width="10" height="44" rx="4" fill="#302651" stroke="#5a4c8c"/>
+
+    <rect x="0" y="300" width="390" height="250" fill="#130e24" stroke="#3f3566"/>
+    <rect x="8" y="310" width="374" height="34" rx="17" fill="#12052ae6" stroke="#3f3566"/>
+    <rect x="8" y="350" width="140" height="190" rx="14" fill="#1b1531f2" stroke="#5a4c8c"/>
+    <g transform="translate(16 360) scale(0.58)"><use href="#card"/></g>
+    <rect x="134" y="420" width="18" height="44" rx="5" fill="#302651" stroke="#5a4c8c"/><text x="143" y="447" text-anchor="middle" fill="#e6dcf5" font-size="12">›</text>
+    <text x="170" y="430" font-size="12" fill="#c3b3da">the map shows here</text>
+    <text x="0" y="580" font-size="12" fill="#c3b3da">Closed, the sheet is only the small card: the map takes the rest.</text>
+  </g>
+
+  <!-- the reasoning for item 3 -->
+  <g transform="translate(40 640)">
+    <text x="0" y="0" font-size="15" fill="#e6dcf5">Item 3 · Why a strip on the card</text>
+    <text x="0" y="24" font-size="12" fill="#c3b3da">You work a planet at the bottom left; to pick the next one you went to the top right (Planets, or the minimap). The strip puts the system's</text>
+    <text x="0" y="42" font-size="12" fill="#c3b3da">star and planets, in orbit order, right on the card: the next body is one short move away, and ‹ › step through them (Tab, [ ], L1/R1 too).</text>
+    <text x="0" y="60" font-size="12" fill="#c3b3da">The selected one is ringed. A planet's own family (its station and moons) stays as the icons in the menu, so nothing is listed twice.</text>
+    <text x="0" y="78" font-size="12" fill="#c3b3da">With nothing selected the strip still sits at the bottom left, so you can start from there. Planets (the full list) stays at the top right.</text>
+    <text x="0" y="110" font-size="12" fill="#c3b3da">Considered: a planets list opening beside the card (a second panel there, and it covers the map); next/previous only (doesn't show what's next);</text>
+    <text x="0" y="128" font-size="12" fill="#c3b3da">moving the minimap to the bottom left (it's "where you are", it belongs with the star and the zoom).</text>
+  </g>
+</svg>

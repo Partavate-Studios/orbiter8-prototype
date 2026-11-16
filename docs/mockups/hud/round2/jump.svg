@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 820" font-family="Ubuntu, sans-serif">
+  <!-- Round 2, item 9: the jump, as a storyboard. The backdrop never moves; the system and the
+       streaks slide over it. -->
+  <defs>
+    <linearGradient id="streak" x1="0" x2="1"><stop offset="0" stop-color="#fff"/><stop offset="0.1" stop-color="#fff" stop-opacity="0.15"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+    <g id="backdrop">
+      <rect width="440" height="250" fill="#130e24"/>
+      <path d="M0 180Q120 120 240 170T440 140V250H0Z" fill="#1c1436"/>
+      <path d="M260 0Q300 60 380 40T440 70V0Z" fill="#1a1232"/>
+      <g fill="#9b78d6"><circle cx="40" cy="30" r="1"/><circle cx="120" cy="70" r="1.2"/><circle cx="300" cy="200" r="1"/><circle cx="400" cy="110" r="1.3"/><circle cx="210" cy="30" r="0.8"/><circle cx="70" cy="210" r="1"/><circle cx="350" cy="20" r="1"/></g>
+    </g>
+    <g id="system">
+      <circle cx="0" cy="0" r="11" fill="#fff1c4"/>
+      <circle r="45" fill="none" stroke="#4a3f75"/><circle r="80" fill="none" stroke="#4a3f75"/><circle r="120" fill="none" stroke="#4a3f75"/>
+      <circle cx="45" cy="0" r="5" fill="#e5823e"/><circle cx="-56" cy="57" r="7" fill="#2f7fd9"/><circle cx="20" cy="-118" r="8" fill="#e58fb5"/>
+    </g>
+    <g id="ship"><path d="M-14 -6H8L16 0L8 6H-14Z" fill="#fff"/><rect x="-10" y="-11" width="8" height="5" fill="#fff"/><rect x="-10" y="6" width="8" height="5" fill="#fff"/></g>
+    <g id="streaks">
+      <rect x="0" y="30" width="120" height="3" rx="1.5" fill="url(#streak)"/><rect x="90" y="70" width="140" height="3" rx="1.5" fill="url(#streak)"/>
+      <rect x="30" y="110" width="100" height="3" rx="1.5" fill="url(#streak)"/><rect x="210" y="150" width="150" height="3" rx="1.5" fill="url(#streak)"/>
+      <rect x="60" y="190" width="130" height="3" rx="1.5" fill="url(#streak)"/><rect x="250" y="40" width="110" height="3" rx="1.5" fill="url(#streak)"/>
+      <rect x="300" y="210" width="120" height="3" rx="1.5" fill="url(#streak)"/><rect x="150" y="225" width="90" height="3" rx="1.5" fill="url(#streak)"/>
+      <rect x="320" y="95" width="100" height="3" rx="1.5" fill="url(#streak)"/>
+    </g>
+    <clipPath id="frame"><rect width="440" height="250"/></clipPath>
+  </defs>
+  <rect width="1500" height="820" fill="#0b0916"/>
+  <text x="30" y="40" font-size="22" fill="#e6dcf5">Round 2 · The jump: the backdrop stays, the system slides away, the streaks slide in</text>
+  <text x="30" y="64" font-size="13" fill="#c3b3da">Item 9. Everything moves left to right, one way, like a carousel; the backdrop (nebula and far stars) never moves. Times for a fast chain.</text>
+
+  <!-- 1 -->
+  <g transform="translate(40 100)">
+    <g clip-path="url(#frame)"><use href="#backdrop"/><g transform="translate(220 125)"><use href="#system"/><g transform="translate(-56 57)"><use href="#ship"/></g></g></g>
+    <rect width="440" height="250" fill="none" stroke="#3f3566"/>
+    <text x="0" y="275" font-size="14" fill="#e6dcf5">1 · Jump sent (0 s)</text>
+    <text x="0" y="294" font-size="12" fill="#c3b3da">The HUD fades out. Minerva: "initiating interstellar jump".</text>
+  </g>
+  <!-- 2 -->
+  <g transform="translate(530 100)">
+    <g clip-path="url(#frame)"><use href="#backdrop"/>
+      <g transform="translate(400 125)" opacity="0.9"><use href="#system"/></g>
+      <g transform="translate(-200 0)"><use href="#streaks"/></g>
+      <g transform="translate(120 125) scale(2)"><use href="#ship"/><rect x="-60" y="-2" width="44" height="4" rx="2" fill="url(#streak)" transform="rotate(180 -38 0)"/></g>
+    </g>
+    <rect width="440" height="250" fill="none" stroke="#3f3566"/>
+    <text x="0" y="275" font-size="14" fill="#e6dcf5">2 · Away (0 – 1 s)</text>
+    <text x="0" y="294" font-size="12" fill="#c3b3da">The system (orbits, planets, ships) slides off to the right; the streaks</text>
+    <text x="0" y="310" font-size="12" fill="#c3b3da">and the ship slide in from the left. No purple wash: the backdrop shows.</text>
+  </g>
+  <!-- 3 -->
+  <g transform="translate(1020 100)">
+    <g clip-path="url(#frame)"><use href="#backdrop"/><use href="#streaks"/><g transform="translate(-220 0)"><use href="#streaks"/></g>
+      <g transform="translate(220 115) scale(2.2)"><use href="#ship"/></g>
+      <text x="220" y="200" text-anchor="middle" font-size="13" fill="#ffffffaa">Traveling to a new star system…</text>
+      <text x="220" y="220" text-anchor="middle" font-size="9" fill="#ffffff88">did you know: colonists travel a hundred to a hold</text>
+    </g>
+    <rect width="440" height="250" fill="none" stroke="#3f3566"/>
+    <text x="0" y="275" font-size="14" fill="#e6dcf5">3 · Cruise (until the new system has loaded, 4.5 s at least)</text>
+    <text x="0" y="294" font-size="12" fill="#c3b3da">As today: streaks race past, the ship bobs, a lore line. At least as long</text>
+    <text x="0" y="310" font-size="12" fill="#c3b3da">as Minerva's jump lines; a failed jump still stalls here and explains.</text>
+  </g>
+  <!-- 4 -->
+  <g transform="translate(40 450)">
+    <g clip-path="url(#frame)"><use href="#backdrop"/><g transform="translate(120 0)"><use href="#streaks"/></g>
+      <g transform="translate(400 115) scale(2.2)"><use href="#ship"/><rect x="-90" y="-2" width="70" height="4" rx="2" fill="#fff" fill-opacity="0.5"/></g>
+    </g>
+    <rect width="440" height="250" fill="none" stroke="#3f3566"/>
+    <text x="0" y="275" font-size="14" fill="#e6dcf5">4 · Arrived: the ship flies off (0 – 0.6 s)</text>
+    <text x="0" y="294" font-size="12" fill="#c3b3da">It speeds off the right edge; the streaks follow it out.</text>
+    <text x="0" y="310" font-size="12" fill="#c3b3da">Minerva: "jump complete".</text>
+  </g>
+  <!-- 5 -->
+  <g transform="translate(530 450)">
+    <g clip-path="url(#frame)"><use href="#backdrop"/><g transform="translate(400 0)"><use href="#streaks"/></g>
+      <g transform="translate(90 125) scale(0.8)"><use href="#system"/></g>
+    </g>
+    <rect width="440" height="250" fill="none" stroke="#3f3566"/>
+    <text x="0" y="275" font-size="14" fill="#e6dcf5">5 · The new system slides in (0.4 – 1.4 s)</text>
+    <text x="0" y="294" font-size="12" fill="#c3b3da">From the left, the whole system in view, then the camera</text>
+    <text x="0" y="310" font-size="12" fill="#c3b3da">flies in to your ship as it does on arriving today.</text>
+  </g>
+  <!-- 6 -->
+  <g transform="translate(1020 450)">
+    <g clip-path="url(#frame)"><use href="#backdrop"/><g transform="translate(220 125) scale(1.6)"><use href="#system"/><g transform="translate(-56 57)"><use href="#ship"/></g></g>
+      <rect x="10" y="10" width="140" height="30" rx="6" fill="#12052ae6" stroke="#7c39cd"/><text x="20" y="30" font-size="11" fill="#fff">Ada · 498,633¢</text>
+      <rect x="10" y="150" width="80" height="90" rx="6" fill="#1b1531" stroke="#5a4c8c"/>
+    </g>
+    <rect width="440" height="250" fill="none" stroke="#3f3566"/>
+    <text x="0" y="275" font-size="14" fill="#e6dcf5">6 · Back in play</text>
+    <text x="0" y="294" font-size="12" fill="#c3b3da">The HUD fades back in with your ship's card; the scan chip starts.</text>
+    <text x="0" y="310" font-size="12" fill="#c3b3da">Reduced motion (the system setting): no slides, as today.</text>
+  </g>
+</svg>

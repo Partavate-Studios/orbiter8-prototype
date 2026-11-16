@@ -39,8 +39,13 @@
           </g>
         </g>
 
+        <!-- what's happening on this page (round 2, item 7) -->
+        <g transform="translate(0 96)">
+          <menu-scene :left="scene.left" :right="scene.right" :arrow="scene.arrow" />
+        </g>
+
         <!-- People: landing colonists from the ship, taking people aboard -->
-        <g v-if="page === 'people'" transform="translate(0 115)">
+        <g v-if="page === 'people'" transform="translate(0 215)">
           <text x="0" y="0" text-anchor="middle" font-size="0.9em">
             {{ planet.population.toLocaleString('en-US') }} people of {{ planet.cap.toLocaleString('en-US') }}
           </text>
@@ -69,7 +74,7 @@
         </g>
 
         <!-- Storage: what the planet makes and holds, and moving goods between it and the ship -->
-        <g v-if="page === 'storage'" transform="translate(0 105)">
+        <g v-if="page === 'storage'" transform="translate(0 205)">
           <g
             v-for="(row, index) in storage"
             :key="row.good"
@@ -112,7 +117,7 @@
         </g>
 
         <!-- Build: the next building in the line, and the Autofactory -->
-        <g v-if="page === 'build'" transform="translate(0 110)">
+        <g v-if="page === 'build'" transform="translate(0 210)">
           <text v-if="planet.building" x="0" y="0" text-anchor="middle" font-size="0.85em">
             One building at a time: the {{ BUILDING_NAMES[planet.building] }} is ready {{ readyWords(planet.readyAt) }}.
           </text>
@@ -147,7 +152,7 @@
         </g>
 
         <!-- Factory: the Autofactory's orders and finished parts -->
-        <g v-if="page === 'factory'" transform="translate(0 110)" font-size="0.8em">
+        <g v-if="page === 'factory'" transform="translate(0 210)" font-size="0.8em">
           <text x="0" y="0" text-anchor="middle">Orders ({{ factory.queue.length }} of 5)</text>
           <text
             v-for="(o, i) in factory.queue"
@@ -192,7 +197,7 @@
         </g>
 
         <!-- Ordering: the Autofactory's parts, what each takes, and how many to queue -->
-        <g v-if="page === 'order'" transform="translate(0 105)" font-size="0.8em">
+        <g v-if="page === 'order'" transform="translate(0 205)" font-size="0.8em">
           <g
             v-for="(row, index) in orderable"
             :key="row.id"
@@ -229,7 +234,7 @@
         </g>
 
         <!-- Defenses: what's installed -->
-        <g v-if="page === 'defenses'" transform="translate(0 110)" font-size="0.85em">
+        <g v-if="page === 'defenses'" transform="translate(0 210)" font-size="0.85em">
           <text v-if="!defenseRows.length" x="0" y="0" text-anchor="middle" fill="#ffffff88">
             No defenses installed. The Autofactory makes them; an Armory sells them.
           </text>
@@ -267,6 +272,21 @@ import { YELLOW, PINK_LIGHT } from '@/libs/palette'
 import MenuContainer from './menu-container/_menu-container.svg'
 import MenuButton from './menu-button.svg'
 import AmountDial from './widgets/amount-dial.svg'
+import MenuScene from './widgets/menu-scene.svg.vue'
+import { goodColor } from '@/libs/palette'
+import colonistsArt from '@/assets/art/colonists.svg'
+import cargoPodArt from '@/assets/art/cargo-pod.svg'
+import autofactoryArt from '@/assets/art/autofactory.svg'
+import armoryArt from '@/assets/art/armory.svg'
+import moonGunsArt from '@/assets/art/moon-guns.svg'
+import citadelArt from '@/assets/art/citadel.svg'
+import colonyArt from '@/assets/art/colony.svg'
+import platformArt from '@/assets/art/orbital-platform.svg'
+import portArt from '@/assets/art/port.svg'
+import yardsArt from '@/assets/art/yards.svg'
+
+/** Each building's picture (BUILDING_NAMES order: Citadel, Colony, Station, Port, Yards, Armory, Autofactory). */
+const BUILDING_ART = [null, citadelArt, colonyArt, platformArt, portArt, yardsArt, armoryArt, autofactoryArt]
 
 const DEFENSES = [
   ['pointDefense', 'Point defense'],
@@ -289,7 +309,7 @@ const MOON_WEAPONS = { 2: 1, 3: 2, 4: 2 }
 
 export default {
   name: 'ColonyMenu',
-  components: { MenuContainer, MenuButton, AmountDial },
+  components: { MenuContainer, MenuButton, AmountDial, MenuScene },
   props: {
     /** The selected planet's key (sdk/system.js objectKey). */
     objectId: { type: String, default: null }
@@ -326,7 +346,7 @@ export default {
     },
     scale() {
       const width = Math.min(this.viewport.width - 100, 700)
-      return Math.min(width > 450 ? 1.5 : 1, (this.viewport.height - 160) / 520)
+      return Math.min(width > 450 ? 1.5 : 1, (this.viewport.height - 160) / 620)
     },
     pages() {
       const list = [
@@ -337,6 +357,59 @@ export default {
       if (this.planet.autofactory) list.push({ key: 'factory', label: 'Factory' })
       if (this.defenseRows.length || this.planet.level >= 6) list.push({ key: 'defenses', label: 'Defenses' })
       return list
+    },
+    /** The page's picture: what moves between your ship and the planet, or what's being built. */
+    scene() {
+      const planet = { sprite: this.objectId, label: this.object.name }
+      const ship = this.avatar.ship.name
+      const n = (count) => count.toLocaleString('en-US')
+      switch (this.page) {
+        case 'people':
+          return {
+            left: { art: colonistsArt, label: n(this.aboard) + ' aboard ' + ship },
+            right: { ...planet, label: n(this.planet.population) + ' people' },
+            arrow: this.board > 0 && !this.land
+              ? { label: 'Take ' + n(this.board) + ' aboard', direction: 'left' }
+              : { label: this.land > 0 ? 'Land ' + n(this.land) : 'Colonists', note: '100 to a hold', direction: this.land > 0 ? 'right' : 'both' }
+          }
+        case 'storage': {
+          const name = this.good == null ? null : this.goodName(this.good)
+          const color = this.good == null ? undefined : goodColor(this.good)
+          let arrow = { label: 'Choose a good', note: 'deliver or collect', direction: 'both' }
+          if (this.deliver > 0) arrow = { label: 'Deliver ' + n(this.deliver) + ' ' + name.toLowerCase(), direction: 'right', color }
+          else if (this.collect > 0) arrow = { label: 'Collect ' + n(this.collect) + ' ' + name.toLowerCase(), direction: 'left', color }
+          else if (name) arrow = { label: name, direction: 'both', color }
+          return { left: { art: cargoPodArt, label: ship }, right: { ...planet, label: 'storage' }, arrow }
+        }
+        case 'build': {
+          const next = this.planet.building || this.nextBuildings[0]?.building
+          return {
+            left: planet,
+            right: next ? { art: BUILDING_ART[next], label: BUILDING_NAMES[next] } : { art: BUILDING_ART[this.planet.level] ?? citadelArt, label: 'every building up' },
+            arrow: this.planet.building
+              ? { label: 'Building', note: 'ready ' + this.readyWords(this.planet.readyAt), direction: 'right' }
+              : next
+                ? { label: 'Next: ' + BUILDING_NAMES[next], note: 'one building at a time', direction: 'right' }
+                : null
+          }
+        }
+        case 'factory':
+        case 'order':
+          return {
+            left: { art: autofactoryArt, label: 'Autofactory' },
+            right: { art: armoryArt, label: 'parts' },
+            arrow: this.page === 'order' && this.part != null
+              ? { label: this.count + ' × ' + (this.count === 1 ? this.partName : partPlural(this.partName)), direction: 'right' }
+              : { label: 'Orders ' + this.factory.queue.length + ' of 5', note: this.finished.length ? 'finished parts waiting' : '', direction: 'right' }
+          }
+        case 'defenses':
+          return {
+            left: { art: moonGunsArt, label: this.moons ? this.moons + (this.moons === 1 ? ' moon' : ' moons') : 'defenses' },
+            right: planet,
+            arrow: { label: this.defenseRows.length ? 'Guarding' : 'Unguarded', direction: 'right' }
+          }
+      }
+      return { left: null, right: planet, arrow: null }
     },
     levelName() {
       if (!this.planet.level) return 'claimed, unsettled'

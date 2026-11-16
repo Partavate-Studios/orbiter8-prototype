@@ -45,8 +45,11 @@ export default {
   computed: {
     ...mapState(useStarMapStore, ['warps', 'sprites'])
   },
-  mounted() {
+  created() {
+    // (before the first render: its refs are set while it renders, if warps are already under way)
     this.elements = new Map()
+  },
+  mounted() {
     this.stopFrames = onFrame(this.writeFrame, FRAME_ORDER.render)
   },
   unmounted() {

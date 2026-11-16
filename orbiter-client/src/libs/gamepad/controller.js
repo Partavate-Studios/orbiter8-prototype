@@ -30,6 +30,8 @@ const DIRECTIONS = { [BUTTON.UP]: 'up', [BUTTON.DOWN]: 'down', [BUTTON.LEFT]: 'l
 function visibleFocusables() {
   return [...document.querySelectorAll(FOCUSABLE)].filter((element) => {
     if (element.closest(EXCLUDED_AREA)) return false
+    // (a selection menu slid in behind its card: there, but not reachable)
+    if (element.closest('[inert]')) return false
     const rect = element.getBoundingClientRect()
     return (
       rect.width > 0 &&

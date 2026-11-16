@@ -4,6 +4,14 @@ Koda's decisions of 2026-11-16, and the plan to build them. Written so a session
 of the one that wrote it can carry it out: read this whole file, then the documents it points to.
 **Status: agreed with Koda (2026-11-16): decisions 1–34 below. Nothing built yet.**
 
+## Progress log (update after every step; newest last)
+
+A session picking this up: read this log, then `git log --oneline -20`, then carry on from the first
+unticked box under "Phases". Each step is committed on its own; an uncommitted change in the tree is
+work in progress from a session that ran out (check `git status` and `git diff` first).
+
+- 2026-11-16: started Phase 0 (HUD import).
+
 ## Read first
 
 1. `CLAUDE.md` (commands, Koda's standing rules), `docs/handoff.md` (how to work without Koda).

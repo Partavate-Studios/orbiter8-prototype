@@ -4,7 +4,7 @@
        larger than the screen: a camera move just shifts it (a whole-pixel CSS translate, which costs
        nothing to composite), and anything else (zoom, selection) redraws it for the live camera.
        It's never stretched, so unlike the world layer it never shows an edge. -->
-  <canvas v-show="mapDataLoaded && !jumpAnimationState" ref="canvas" class="guides-canvas" :style="oversizedBox" />
+  <canvas v-show="mapDataLoaded && !systemHidden" ref="canvas" class="guides-canvas" :style="oversizedBox" />
 </template>
 
 <script>
@@ -51,7 +51,7 @@ export default {
       'groupPixels',
       'selected',
       'hovered',
-      'jumpAnimationState',
+      'systemHidden',
       'neighborView'
     ]),
     ...mapState(useStarMapStore, ['systemObjects', 'mapDataLoaded']),
@@ -90,7 +90,7 @@ export default {
     },
     /** Each frame: shift the drawn canvas to the live camera, or redraw it if a shift won't do. */
     followCamera() {
-      if (!this.mapDataLoaded || this.jumpAnimationState) return
+      if (!this.mapDataLoaded || this.systemHidden) return
       const { x, y, scale } = this.viewport
       const drawn = this.drawn
       // What the picture depends on besides the camera's position. systemObjects is replaced on

@@ -10,7 +10,16 @@
           {{ player.freeBays }}
         </text>
 
-        <g transform="translate(0 70)" font-size="0.8em">
+        <!-- what's happening: the port's armory fitting parts to your ship (round 2, item 7) -->
+        <g transform="translate(0 46)">
+          <menu-scene
+            :left="{ sprite: objectId, label: object.name }"
+            :right="{ art: armoryArt, label: avatar.ship.name }"
+            :arrow="sceneArrow"
+          />
+        </g>
+
+        <g transform="translate(0 170)" font-size="0.8em">
           <g
             v-for="(row, index) in parts"
             :key="row.id"
@@ -34,7 +43,7 @@
           </g>
         </g>
 
-        <g v-if="part != null" transform="translate(0 300)">
+        <g v-if="part != null" transform="translate(0 400)">
           <amount-dial v-model:value="count" :label="'How many ' + partPlural(partName)" :max="20" />
           <text x="0" y="62" text-anchor="middle" font-size="0.85em" :fill="affordable ? '#ffffff' : '#ffffff88'">
             {{ affordable ? 'Total' : 'Insufficient funds' }}: {{ total.toLocaleString('en-US') }}&cent;
@@ -58,17 +67,19 @@ import { usePlayerStore } from '@/stores/player'
 import MenuContainer from './menu-container/_menu-container.svg'
 import MenuButton from './menu-button.svg'
 import AmountDial from './widgets/amount-dial.svg'
+import MenuScene from './widgets/menu-scene.svg.vue'
+import armoryArt from '@/assets/art/armory.svg'
 import { SHIP_PARTS, mountsUsed, partPlural } from '@orbiter8/sdk/parts'
 
 export default {
   name: 'ArmoryMenu',
-  components: { MenuContainer, MenuButton, AmountDial },
+  components: { MenuContainer, MenuButton, AmountDial, MenuScene },
   props: {
     /** The selected station's key: its planet is the port. */
     objectId: { type: String, default: null }
   },
   data() {
-    return { player: usePlayerStore(), part: null, count: 1 }
+    return { player: usePlayerStore(), part: null, count: 1, armoryArt }
   },
   computed: {
     ...mapState(useStarMapStore, ['systemObjects']),
@@ -87,7 +98,7 @@ export default {
     },
     scale() {
       const width = Math.min(this.viewport.width - 100, 700)
-      return Math.min(width > 450 ? 1.5 : 1, (this.viewport.height - 160) / 440)
+      return Math.min(width > 450 ? 1.5 : 1, (this.viewport.height - 160) / 540)
     },
     mounts() {
       return mountsUsed(this.player.ship.loadout)
@@ -105,6 +116,14 @@ export default {
     },
     total() {
       return this.player.partPrice(this.port, this.part, this.count)
+    },
+    sceneArrow() {
+      if (this.part == null) return { label: 'Choose a part', note: 'bought and fitted in one move', direction: 'right' }
+      return {
+        label: this.count + ' × ' + (this.count === 1 ? this.partName : partPlural(this.partName)),
+        note: this.total.toLocaleString('en-US') + '¢',
+        direction: 'right'
+      }
     },
     affordable() {
       return this.total <= this.avatar.credits

@@ -4,6 +4,7 @@ import Tween from '@/libs/tween'
 import { STAR_KEY } from '@orbiter8/sdk/system'
 import { CAMERA, MAP_GROUP_SCALE, MAP_RESOLUTION, WORLD_OFFSET_Y, HELIOPAUSE_RADIUS } from '@/constants'
 import { useConfigStore } from '@/stores/config'
+import { JUMP_DEPART_MS, JUMP_ARRIVE_MS, slidesWanted } from '@/libs/jump-slide'
 
 // Camera zooms this long or longer are flights (arrivals, selections), not wheel steps (ms).
 const CAMERA_FLIGHT_MS = 500
@@ -14,11 +15,25 @@ const OFFSCREEN_MARGIN_PX = 100
 // When the jump animation started, and its pending end (see jumpAnimationOff).
 let jumpAnimationStartedAt = 0
 let jumpAnimationTimer = null
+// The jump's next phase change (away → cruise, arrive → done), and what waits for the cruise (a new
+// system that loaded while the old one was still sliding away).
+let jumpPhaseTimer = null
+let onCruise = []
 
 /**
  * The HUD's full-screen menus (hud.svg.vue), each shown by `menuState[name + 'Menu']`, including
  * colony (a planet's people, storage, buildings and transfers), armory, loadout, siege and the siege feed.
  */
+/** Where the selection menu's open or closed state is remembered. */
+const ACTIONS_OPEN_KEY = 'o8.hud.actionsOpen'
+function readActionsOpen() {
+  try {
+    return typeof localStorage === 'undefined' || localStorage.getItem(ACTIONS_OPEN_KEY) !== '0'
+  } catch {
+    return true
+  }
+}
+
 const MENUS = ['planets', 'ships', 'settings', 'trade', 'shipyard', 'chat', 'leaderboard', 'colony', 'armory', 'loadout', 'siege', 'feed', 'help']
 
 export const useUIStore = defineStore('UI', {
@@ -78,6 +93,9 @@ export const useUIStore = defineStore('UI', {
     // Whether the selected sprite's info card (or, with nothing selected, the scope) is shown.
     // Clicking the selected sprite toggles it.
     showScope: true,
+    // Whether the selection's menu is slid out from behind its card (the tab on its edge, A, pad R3 with
+    // the card shown). Remembered for every selection, and across visits.
+    actionsOpen: readActionsOpen(),
     // Whether the Minerva panel (backtick) is open.
     showMinerva: false,
     // Whether the neighbor-star view is showing (zoomed out past the heliopause; see neighbor-view.svg.vue).
@@ -90,6 +108,15 @@ export const useUIStore = defineStore('UI', {
     jumpPending: false,
     // A sent jump that failed: { at: ms timestamp, reason }. The jump animation stalls (jump-animation.svg.vue).
     jumpStall: null,
+    // The jump's phase (libs/jump-slide.js): 'depart' (the system slides away), 'cruise', 'arrive' (the
+    // new system slides in), or null; when it began (Date.now()); the zoom the jump left at (the new
+    // system arrives at it, so the backdrop never jumps); and whether the ship stalled out (no fly-off).
+    jumpPhase: null,
+    jumpPhaseAt: 0,
+    jumpDepartScale: 1,
+    jumpShipGone: false,
+    // The jump left from the galaxy map: the map slides away with the system.
+    jumpFromMap: false,
     // A wheel zoom with nothing selected keeps this world point under this screen point (pixels from the
     // screen's center) while its zoom tween runs: { screenX, screenY, x, y }.
     zoomAnchor: null,
@@ -135,6 +162,8 @@ export const useUIStore = defineStore('UI', {
     cameraFlying: (state) => (state.viewport.scaleTween?.duration ?? 0) >= CAMERA_FLIGHT_MS,
     minervaHistory: (state) => state.minerva.terminal.history,
     jumpAnimationState: (state) => state.hud.jumpAnimationState,
+    /** Cruising between stars: the star system isn't drawn (it slides away and in around that: libs/jump-slide.js). */
+    systemHidden: (state) => state.hud.jumpAnimationState && (state.jumpPhase === 'cruise' || state.jumpPhase === null),
     selected: (state) => state.selectedSprite,
     menuState: (state) => state.hud.menuState,
     /** A full menu is open (chat excepted: it sits beside the map). */
@@ -201,6 +230,15 @@ export const useUIStore = defineStore('UI', {
     toggleScope() {
       if (this.selectedSprite == null) return
       this.showScope = !this.showScope
+    },
+    /** Slides the selection's menu out from behind its card, or back behind it. */
+    toggleActions(open = !this.actionsOpen) {
+      this.actionsOpen = open
+      try {
+        localStorage.setItem(ACTIONS_OPEN_KEY, open ? '1' : '0')
+      } catch {
+        // (private browsing: remembered for this visit only)
+      }
     },
     toggleMinerva() {
       this.showMinerva = !this.showMinerva
@@ -352,6 +390,22 @@ export const useUIStore = defineStore('UI', {
     },
     scaleTo(scale) {
       this.viewport.scale = scale
+    },
+    /**
+     * The zoom rail (components/hud/zoom-rail.vue): straight to a zoom while its thumb is dragged
+     * (`time` 0), or there over `time` ms. Takes over from any zoom under way, including a flight.
+     */
+    zoomTo(scale, time = 0) {
+      const target = Math.min(CAMERA.MAX_SCALE, Math.max(CAMERA.MIN_SCALE, scale))
+      this.zoomAnchor = null
+      this.neighborViewPending = false
+      if (!time) {
+        this.viewport.scaleTween = null
+        this.viewport.scale = target
+        return
+      }
+      this.viewport.scaleTween = new Tween(this.viewport.scale, target, time)
+      this.viewport.scaleTween.useGeometric()
     },
     scaleAnimateTo({ scale, time }) {
       this.viewport.scaleTween = new Tween(this.viewport.scale, scale, time)
@@ -512,41 +566,88 @@ export const useUIStore = defineStore('UI', {
     },
     // unevaluated
 
-    /** Ends the jump animation, but never before it has played for CAMERA.MIN_JUMP_ANIMATION_MS. */
+    /**
+     * The new system has loaded: ends the cruise, but never before the jump has played for
+     * CAMERA.MIN_JUMP_ANIMATION_MS (Minerva's lines); then the ship flies off and the new system slides in.
+     */
     jumpAnimationOff() {
       // A stalled jump stays on screen until the player has read why (jumpRecover).
-      if (!this.hud.jumpAnimationState || this.jumpStall) return
+      if (!this.hud.jumpAnimationState || this.jumpStall || this.jumpPhase === 'arrive') return
       clearTimeout(jumpAnimationTimer)
-      const wait = jumpAnimationStartedAt + CAMERA.MIN_JUMP_ANIMATION_MS - Date.now()
+      const wait = Math.max(jumpAnimationStartedAt + CAMERA.MIN_JUMP_ANIMATION_MS, this.jumpPhase === 'depart' ? this.jumpPhaseAt + JUMP_DEPART_MS : 0) - Date.now()
       if (wait > 0) {
         jumpAnimationTimer = setTimeout(() => this.jumpAnimationOff(), wait)
         return
       }
-      this.hud.jumpAnimationState = false
       // Arrived: said now, not when the new system loaded, so it doesn't cut off "initiating jump".
       gameAudio().speak('jumpComplete')
+      this.jumpArrive()
+    },
+    /** The ship flies off, the new system slides in (map.vue puts the camera on your ship), then the HUD is back. */
+    jumpArrive({ shipGone = false } = {}) {
+      clearTimeout(jumpPhaseTimer)
+      this.jumpShipGone = shipGone
+      if (!slidesWanted()) return this.jumpEnd()
+      this.jumpPhase = 'arrive'
+      this.jumpPhaseAt = Date.now()
+      jumpPhaseTimer = setTimeout(() => this.jumpEnd(), JUMP_ARRIVE_MS)
+    },
+    jumpEnd() {
+      clearTimeout(jumpPhaseTimer)
+      this.jumpPhase = null
+      this.jumpFromMap = false
+      this.hud.jumpAnimationState = false
     },
     /** A jump that was already under way failed: stall the jump animation and say why. */
     jumpStalled(reason) {
       clearTimeout(jumpAnimationTimer)
       this.jumpStall = { at: Date.now(), reason }
     },
-    /** The player read the stall message: back to the system, right away. */
+    /** The player read the stall message: back to the system, sliding in as an arrival does. */
     jumpRecover() {
       clearTimeout(jumpAnimationTimer)
       this.jumpStall = null
-      this.hud.jumpAnimationState = false
-      this.zoomInToStar()
+      if (this.jumpPhase === 'depart') this.jumpCruise()
+      this.jumpArrive({ shipGone: true })
+    },
+    /** Runs `then` once the old system has slid away (now, if it has). */
+    whenCruising(then) {
+      if (this.jumpPhase === 'depart') onCruise.push(then)
+      else then()
     },
     jumpAnimationOn() {
       jumpAnimationStartedAt = Date.now()
+      clearTimeout(jumpPhaseTimer)
       this.jumpStall = null
+      this.jumpShipGone = false
+      this.jumpFromMap = this.neighborView
+      this.jumpDepartScale = this.viewport.scaleTween?.target ?? this.viewport.scale
       this.neighborView = false
+      this.hud.jumpAnimationState = true
+      if (!slidesWanted()) return this.jumpCruise()
+      // The system (or the galaxy map) slides away first; the camera stays put under it.
+      this.jumpPhase = 'depart'
+      this.jumpPhaseAt = Date.now()
+      jumpPhaseTimer = setTimeout(() => this.jumpCruise(), JUMP_DEPART_MS)
+    },
+    /** The old system is gone: the camera resets for the new one (out of sight), and what waited runs. */
+    jumpCruise() {
+      clearTimeout(jumpPhaseTimer)
+      this.jumpPhase = 'cruise'
+      this.jumpPhaseAt = Date.now()
+      this.jumpFromMap = false
       this.selectedSprite = null
+      this.neighborViewPending = false
+      this.zoomAnchor = null
+      this.viewport.xTween = null
+      this.viewport.yTween = null
+      this.viewport.scaleTween = null
       this.viewport.x = 0
       this.viewport.y = 0
-      this.viewport.scale = CAMERA.JUMP_ANIMATION_SCALE
-      this.hud.jumpAnimationState = true
+      this.viewport.scale = this.jumpDepartScale
+      const waiting = onCruise
+      onCruise = []
+      waiting.forEach((then) => then())
     }
   }
 })

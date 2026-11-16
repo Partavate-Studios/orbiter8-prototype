@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import { game } from '@orbiter8/sdk/client'
 import { useUIStore } from '@/stores/ui'
+import { useChainStore } from '@/stores/chain'
+import { usePortCounts, recordPorts } from '@/libs/port-counts'
 import { markRaw } from 'vue'
 import Sprite from '@/libs/sprite.js'
 import { spriteScaleOf } from '@/libs/sprite-types'
@@ -77,9 +79,17 @@ export const useStarMapStore = defineStore('StarMap', {
         ui.jumpPending = false
         if (!ui.jumpAnimationState) ui.jumpAnimationOn()
       }
+      // The old system is still sliding away (libs/jump-slide.js): the new one waits until it's gone.
+      if (isNewSystem && ui.jumpPhase === 'depart') {
+        ui.whenCruising(() => this.importSystem(system, playerAccount))
+        return
+      }
       this.loadProgress = 99
       this.importStarMapBlockData({ blockData: system, playerAccount })
       this.loadProgress = 100
+      // the galaxy map shows each star's ports (libs/port-counts.js): this one's are its stations
+      usePortCounts(useChainStore().chainId)
+      recordPorts(Number(system.id), this.spriteIds.stations?.length ?? 0)
       if (isNewSystem) {
         // Ends once it has played its minimum time (ui jumpAnimationOff).
         ui.jumpAnimationOff()

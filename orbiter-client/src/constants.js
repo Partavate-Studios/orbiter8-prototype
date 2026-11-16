@@ -48,8 +48,6 @@ export const CAMERA = {
   ARRIVAL_SHIP_SCALE: 0.05,
   ARRIVAL_SYSTEM_SCALE: 0.5,
   ARRIVAL_TWEEN_MS: 5000,
-  /** Zoom behind the jump animation (so the new system starts far out). */
-  JUMP_ANIMATION_SCALE: 1500,
   /** Mouse drags shorter than this (pixels) are clicks, not pans. */
   DRAG_THRESHOLD_PX: 20
 }

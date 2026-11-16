@@ -19,6 +19,7 @@ import { useConfigStore } from '@/stores/config'
 import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
 import { CompositedLayer } from '@/libs/composited-layer'
 import { paintBackdrop, BACKDROP_SIZE } from './assets/backdrop-art'
+import { jumpSlide } from '@/libs/jump-slide'
 
 // Pixels drawn beyond each screen edge, so the layers can pan or shrink a little before a redraw.
 const MARGIN = 256
@@ -26,8 +27,6 @@ const MARGIN = 256
 const BACKDROP_SCALE = 2.5
 const STAR_COLOR = '#af6fff'
 const STAR_GLARE_COLOR = '#af6fff22'
-// Background colour behind the jump animation (it covers the backdrop and stars).
-const JUMP_BACKGROUND = '#280b4b'
 const JUMP_STREAK_COUNT = 50
 const JUMP_STAR_SPEED = 25
 // A stalled jump's streaks coast to a stop over this long (the ship falls behind faster: jump-animation.svg.vue).
@@ -81,7 +80,7 @@ export default {
     screenDimensions() {
       return this.screenSize.width + 'x' + this.screenSize.height + '@' + this.screenSize.dpr
     },
-    ...mapState(useUIStore, ['viewport', 'screenSize', 'jumpAnimationState', 'jumpStall', 'galaxyPan']),
+    ...mapState(useUIStore, ['viewport', 'screenSize', 'jumpAnimationState', 'jumpStall', 'galaxyPan', 'jumpPhase', 'jumpPhaseAt', 'jumpShipGone']),
     ...mapState(useConfigStore, ['graphicsQuality']),
     showStars() {
       return this.graphicsQuality > 1
@@ -236,9 +235,10 @@ export default {
         const speed = (1 - stalled) * (1 - stalled)
         this.jumpDistance = ((this.jumpDistance ?? 0) + speed * JUMP_STAR_SPEED * 100 * seconds) % 10000
         this.drawJump()
-        return
-      }
-      this.lastJumpFrame = null
+        // The backdrop stays put while the system slides away and the ship cruises (Koda, round 2);
+        // arriving, it follows the camera again as the new system slides in.
+        if (this.jumpPhase !== 'arrive') return
+      } else this.lastJumpFrame = null
       const unit = this.unit()
       const centerX = this.screenSize.width / 2 + MARGIN
       const centerY = this.screenSize.height / 2 + MARGIN
@@ -274,17 +274,17 @@ export default {
       }
       if (this.nearLayer.update(nearDelta)) this.drawNearStars()
     },
-    /** The jump animation's star streaks, redrawn every frame while jumping. */
+    /**
+     * The jump animation's star streaks, redrawn every frame while jumping, over the backdrop (no wash
+     * of purple: the backdrop shows through). The streak field slides in from the left as the system
+     * slides away, and out to the right as the new one slides in (libs/jump-slide.js).
+     */
     drawJump() {
       const canvas = this.$refs.jump
       const ctx = this.centeredContext(canvas, 0)
-      ctx.fillStyle = JUMP_BACKGROUND
-      ctx.fillRect(
-        -this.screenSize.width / 2,
-        -this.screenSize.height / 2,
-        this.screenSize.width,
-        this.screenSize.height
-      )
+      const slide = jumpSlide(this.jumpPhase, Date.now() - this.jumpPhaseAt, { shipGone: this.jumpShipGone })
+      if (Math.abs(slide.streaks) >= 1) return
+      ctx.translate(slide.streaks * this.screenSize.width, 0)
 
       // Map units inside the HUD's 1.25x group, as the SVG version used.
       const unit = this.unit() * 1.25

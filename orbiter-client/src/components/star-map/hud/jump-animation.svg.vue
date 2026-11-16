@@ -1,8 +1,8 @@
 <template>
   <g>
     <!-- The background and star streaks are drawn on canvas (background-canvas.vue). -->
-    <g transform="translate(0 -100)">
-      <g v-if="!stall || stall.visible" :transform="stall ? stall.transform : shipTransform">
+    <g :transform="`translate(${shipSlideX} -100)`">
+      <g v-if="(!stall || stall.visible) && slide.ship !== null" :transform="stall ? stall.transform : shipTransform">
         <g transform="scale(15) rotate(90)">
           <ship />
         </g>
@@ -28,6 +28,7 @@
       </g>
     </g>
 
+    <g :opacity="slide.words">
     <text
       v-if="!stall"
       x="0"
@@ -63,6 +64,7 @@
     >
       {{ loreTip }}
     </text>
+    </g>
   </g>
 </template>
 
@@ -72,6 +74,7 @@ import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
 import Ship from '../sprites/ship.svg'
 import MenuButton from './menus/menu-button.svg'
+import { jumpSlide } from '@/libs/jump-slide'
 
 // A stalled ship slides off the left of the screen over STALL_SLIDE_MS, spinning faster and faster
 // (STALL_SPIN turns in all) and shrinking to STALL_SCALE.
@@ -94,7 +97,17 @@ export default {
   },
   computed: {
     ...mapState(useStarMapStore, ['gameTime', 'currentStarSystemName']),
-    ...mapState(useUIStore, ['jumpStall', 'leftMostX']),
+    ...mapState(useUIStore, ['jumpStall', 'leftMostX', 'jumpPhase', 'jumpPhaseAt', 'jumpShipGone', 'screenSize', 'viewport', 'baseScale']),
+    /** Where the slides stand (libs/jump-slide.js); gameTime makes it re-evaluate every frame. */
+    slide() {
+      void this.gameTime
+      return jumpSlide(this.jumpPhase, Date.now() - this.jumpPhaseAt, { shipGone: this.jumpShipGone })
+    },
+    /** The ship's slide, from screen widths to this layer's units (the layer is 1200 units tall, scaled by baseScale). */
+    shipSlideX() {
+      const widthUnits = (this.viewport.resolution * this.screenSize.width) / this.screenSize.height / this.baseScale
+      return ((this.slide.ship ?? 0) * widthUnits).toFixed(1)
+    },
     /** The stalled ship's extra motion, `null` while the jump is going fine (re-evaluated every frame via gameTime). */
     stall() {
       if (!this.jumpStall) return null

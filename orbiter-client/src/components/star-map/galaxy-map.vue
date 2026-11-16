@@ -106,6 +106,14 @@
         <path v-if="scale > 30" :d="hexShape" fill="transparent" />
         <circle v-else :r="Math.max(star.r + 6, touch ? 18 : 12)" fill="transparent" />
         <text :y="star.r + 13" class="name" :style="{ fontSize: star.label.size + 'px' }">{{ star.label.text }}</text>
+        <!-- its ports, where they're known (round 2, item 8): a small station and the count -->
+        <g v-if="star.ports" class="ports" :transform="`translate(${star.r + 8} ${-star.r - 5})`">
+          <title>{{ star.ports }} {{ star.ports === 1 ? 'port' : 'ports' }}</title>
+          <rect x="-8" y="-8" :width="star.ports > 9 ? 33 : 26" height="16" rx="8" />
+          <circle cx="0" cy="0" r="4.2" />
+          <path d="M-4.2 0H4.2M0 -4.2V4.2" />
+          <text x="7" y="0.5">{{ star.ports }}</text>
+        </g>
       </g>
       <!-- your ship, circling your star (racing round while a jump waits for the wallet); placed every frame -->
       <g ref="ship" class="ship" display="none">
@@ -140,6 +148,7 @@
       <h3 class="pill">{{ chosenName }}</h3>
       <p class="sub">{{ chosenKind }} · {{ distanceAway }} {{ distanceAway === 1 ? 'step' : 'steps' }} away</p>
       <p v-if="chosenCell?.discoverer" class="sub">Discovered by {{ discovererName }}</p>
+      <p v-if="chosenPorts != null" class="sub">{{ chosenPorts ? chosenPorts + (chosenPorts === 1 ? ' port' : ' ports') : 'No ports yet' }}</p>
       <p v-if="isPartnerHere && chosen !== shipCell" class="sub">The far side of the black hole you're at.</p>
       <p v-else-if="isPartnerHere" class="sub">You're at this black hole. Its far side: {{ nameOf(partnerHere) }}.</p>
       <p v-if="scanWords" class="scan">{{ scanWords }}</p>
@@ -177,6 +186,8 @@ import { timeOf } from '@orbiter8/sdk/drand'
 import { usePlayerStore } from '@/stores/player'
 import { useGameStateStore } from '@/stores/gamestate'
 import { useUIStore } from '@/stores/ui'
+import { useChainStore } from '@/stores/chain'
+import { usePortCounts, wantPortCounts } from '@/libs/port-counts'
 import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
 import { writeAttribute } from '@/libs/dom-writes'
 import { HELIOPAUSE_RADIUS, WORLD_OFFSET_Y } from '@/constants'
@@ -236,6 +247,8 @@ export default {
       preview: null,
       /** the heliopause's radius when the map opens (set in mounted; declared so the first render has a number) */
       heliopauseStart: 0,
+      /** where the system's world sat when the map opened (set in mounted) */
+      startShift: 0,
       waiting: false,
       failed: false,
       now: Date.now(),
@@ -257,6 +270,14 @@ export default {
   computed: {
     client() {
       return game.state
+    },
+    /** Ports by star, where known (libs/port-counts.js). */
+    portCounts() {
+      return usePortCounts(useChainStore().chainId)
+    },
+    /** The drawn stars someone has been to: the ones whose ports can be counted. */
+    countable() {
+      return this.drawn.filter((star) => star.visited || star.here).map((star) => star.cell)
     },
     scale() {
       return SPACING * this.camera.zoom
@@ -366,6 +387,7 @@ export default {
           besieged: this.player.besiegedCells.has(c.cell),
           owned: ownedDots(this.client.ownedAt?.get(c.cell) ?? 0, (2.5 + traits.size * 5) * Math.min(1.6, Math.max(0.6, this.camera.zoom))),
           name: this.nameOf(c.cell),
+          ports: this.portCounts.get(c.cell)?.count ?? 0,
           // a long name shrunk or cut, so it doesn't run into its neighbors' (libs/fit-text.js)
           label: fitText(this.nameOf(c.cell), 11, Math.min(96, this.scale * 0.95))
         })
@@ -426,6 +448,8 @@ export default {
       else if (c.state === STATE.BLACK_HOLE)
         note = this.isPartnerOf(this.hover) ? 'the far side of this black hole' : inRange ? 'black hole · in range' : 'black hole'
       else if (c.visited) note = inRange ? 'visited · in range' : 'visited'
+      const ports = this.portCounts.get(this.hover)?.count
+      if (ports != null && c.state === STATE.STAR && (c.visited || this.hover === this.shipCell)) note += ports ? ` · ${ports} ${ports === 1 ? 'port' : 'ports'}` : ' · no ports'
       else note = inRange ? 'unsurveyed · in range' : 'unsurveyed'
       const me = this.player.account
       if (c.state === STATE.STAR && (c.keeper === me || (!c.keeper && c.discoverer === me))) note += c.keeper === me ? ' · your star' : ' · yours to name'
@@ -452,6 +476,11 @@ export default {
     },
     chosenName() {
       return this.nameOf(this.chosen)
+    },
+    /** The chosen star's port count, where known. */
+    chosenPorts() {
+      if (this.chosen === null || this.chosenCell?.state !== STATE.STAR) return null
+      return this.portCounts.get(this.chosen)?.count ?? null
     },
     chosenKind() {
       if (this.chosenCell?.state === STATE.BLACK_HOLE) return 'Black hole'
@@ -495,6 +524,15 @@ export default {
         return "Long-range scan: nothing new nearby. It's recorded with your next move."
       const holes = this.preview.holes ? ` and ${this.preview.holes} black hole${this.preview.holes === 1 ? '' : 's'}` : ''
       return `Long-range scan: ${this.preview.stars} new ${this.preview.stars === 1 ? 'star' : 'stars'}${holes} found. It's recorded with your next move.`
+    }
+  },
+  watch: {
+    // Count the ports of the visited stars on screen (read a few at a time, then remembered).
+    countable: {
+      handler(cells) {
+        wantPortCounts(cells)
+      },
+      immediate: true
     }
   },
   created() {
@@ -748,6 +786,31 @@ export default {
 </script>
 
 <style scoped>
+/* The HUD's places (components/hud): the chosen star's card where a selection's card is held, at the
+   bottom left, and the map's buttons at the bottom right where the dock is; the pilot's plate stays
+   at the top left. A portrait phone keeps the card over the buttons, under the pilot's strip. */
+@media (orientation: landscape) {
+  .galaxy-map .card {
+    left: calc(16px + env(safe-area-inset-left));
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    transform: none;
+    width: min(92vw, 24em);
+  }
+  .galaxy-map .controls {
+    left: auto;
+    right: calc(16px + env(safe-area-inset-right));
+    bottom: calc(24px + env(safe-area-inset-bottom));
+  }
+}
+@media (orientation: portrait) {
+  .galaxy-map .title {
+    top: calc(74px + env(safe-area-inset-top));
+    padding: 0 12px;
+  }
+  .galaxy-map .title h2 {
+    font-size: 1.25em;
+  }
+}
 .galaxy-map {
   position: fixed;
   inset: 0;
@@ -767,6 +830,39 @@ export default {
 }
 .star {
   cursor: pointer;
+}
+.ports rect {
+  fill: #12052ae6;
+  stroke: #c3b3da88;
+  stroke-width: 0.8;
+}
+.ports circle,
+.ports path {
+  fill: none;
+  stroke: #e6dcf5;
+  stroke-width: 1;
+}
+.ports text {
+  fill: #e6dcf5;
+  font-size: 11px;
+  dominant-baseline: middle;
+  pointer-events: none;
+}
+/* the jump has started from here: the map slides off to the left, as the system does (libs/jump-slide.js) */
+.galaxy-map.departing {
+  pointer-events: none;
+  animation: depart 1s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+}
+@keyframes depart {
+  to {
+    transform: translateX(-115%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .galaxy-map.departing {
+    animation: none;
+    opacity: 0;
+  }
 }
 .name {
   fill: #e6dcf5aa;

@@ -5,10 +5,12 @@
     <menu-container>
       <g :transform="'translate(0 -400) scale(' + scale + ')'" fill="#ffffff" dominant-baseline="middle">
         <text x="0" y="5" text-anchor="middle" fill="#ffffff88" font-size="1.5em">Siege Feed</text>
-        <text v-if="!player.feed.length" x="0" y="50" text-anchor="middle" font-size="0.85em" fill="#ffffff88">
+        <!-- a picture of what this is about (round 2, item 7) -->
+        <image :href="siegeArt" x="-40" y="22" width="80" height="80" />
+        <text v-if="!player.feed.length" x="0" y="122" text-anchor="middle" font-size="0.85em" fill="#ffffff88">
           Quiet across the galaxy. No sieges yet.
         </text>
-        <g v-for="(e, i) in shown" :key="i" :transform="'translate(0 ' + (45 + i * 26) + ')'" font-size="0.8em">
+        <g v-for="(e, i) in shown" :key="i" :transform="'translate(0 ' + (122 + i * 26) + ')'" font-size="0.8em">
           <rect x="-175" y="-12" width="350" height="24" rx="4" fill="#2e0d56" stroke="#ffffff22" />
           <text x="-165" y="0" :fill="e.event === 'SiegeEnded' ? '#c3b3da' : PINK_LIGHT">{{ words(e) }}</text>
         </g>
@@ -25,12 +27,13 @@ import { useStarMapStore } from '@/stores/starmap'
 import { usePlayerStore } from '@/stores/player'
 import { PINK_LIGHT } from '@/libs/palette'
 import MenuContainer from './menu-container/_menu-container.svg'
+import siegeArt from '@/assets/art/siege.svg'
 
 export default {
   name: 'FeedMenu',
   components: { MenuContainer },
   data() {
-    return { player: usePlayerStore(), PINK_LIGHT }
+    return { player: usePlayerStore(), PINK_LIGHT, siegeArt }
   },
   computed: {
     ...mapState(useUIStore, ['viewport']),

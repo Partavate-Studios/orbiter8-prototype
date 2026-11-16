@@ -59,10 +59,15 @@
       :width="HALF * 2"
       :height="HALF * 2"
       fill="#00000000"
-      cursor="pointer"
-      @click="moveCamera"
+      :cursor="dragging ? 'grabbing' : 'pointer'"
+      style="touch-action: none"
+      @pointerdown="onDown"
+      @pointermove="onMove"
+      @pointerup="onUp"
+      @pointercancel="onUp"
+      @wheel.prevent.stop="onWheel"
     >
-      <title>Minimap: click to look there</title>
+      <title>Minimap: click or drag to look there; scroll to zoom</title>
     </rect>
   </g>
 </template>
@@ -73,7 +78,7 @@ import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
 import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
 import { writeAttribute } from '@/libs/dom-writes'
-import { WORLD_OFFSET_Y } from '@/constants'
+import { CAMERA, WORLD_OFFSET_Y } from '@/constants'
 import { YELLOW, PLANET_COLORS, STAR_CLASSES } from '@/libs/palette'
 import { STAR_KEY } from '@orbiter8/sdk/system'
 
@@ -97,7 +102,7 @@ const DOT_STYLE = {
 export default {
   name: 'Minimap',
   data() {
-    return { HALF }
+    return { HALF, dragging: false }
   },
   computed: {
     ...mapState(useStarMapStore, ['sprites', 'systemObjects']),
@@ -145,7 +150,49 @@ export default {
     this.stopFrames()
   },
   methods: {
-    ...mapActions(useUIStore, ['selectNone', 'viewAnimateMoveTo']),
+    ...mapActions(useUIStore, ['selectNone', 'viewAnimateMoveTo', 'viewTo', 'zoomTo', 'zoomOutToNeighbors']),
+    /** The minimap point under the pointer, in minimap units from its center. */
+    pointOf(event) {
+      const box = event.currentTarget.getBoundingClientRect()
+      return {
+        x: ((event.clientX - box.left) / box.width - 0.5) * HALF * 2,
+        y: ((event.clientY - box.top) / box.height - 0.5) * HALF * 2
+      }
+    },
+    /** The camera position that puts minimap point { x, y } in the middle of the screen. */
+    cameraFor({ x, y }) {
+      // The camera's focus sits WORLD_OFFSET_Y above the screen center; aim so the spot lands in the middle.
+      const offset = (WORLD_OFFSET_Y * this.groupPixels) / this.livePixelsPerUnit
+      return { x: -x / this.scale, y: -offset - y / this.scale }
+    },
+    /** Press: look there (the camera glides); drag: the view follows the pointer, like dragging its box. */
+    onDown(event) {
+      if (event.pointerType === 'mouse' && event.button !== 0) return
+      event.currentTarget.setPointerCapture?.(event.pointerId)
+      this.dragging = true
+      this.dragMoved = false
+      this.moveCamera(event)
+    },
+    onMove(event) {
+      if (!this.dragging) return
+      this.dragMoved = true
+      this.viewTo(this.cameraFor(this.pointOf(event)))
+      useUIStore().viewport.xTween = null
+      useUIStore().viewport.yTween = null
+    },
+    onUp(event) {
+      if (!this.dragging) return
+      this.dragging = false
+      event.currentTarget.releasePointerCapture?.(event.pointerId)
+    },
+    /** Scrolling over the minimap zooms, as over the rail beside it. */
+    onWheel(event) {
+      const ui = useUIStore()
+      const out = event.deltaY > 0
+      if (out && ui.viewport.scale >= ui.neighborSwitchScale * 0.98) return this.zoomOutToNeighbors()
+      const from = ui.viewport.scaleTween?.target ?? ui.viewport.scale
+      this.zoomTo(Math.min(ui.neighborSwitchScale, from * (out ? CAMERA.WHEEL_ZOOM_OUT : CAMERA.WHEEL_ZOOM_IN)), CAMERA.WHEEL_TWEEN_MS)
+    },
     /** The world rectangle on screen right now (see the ui store's isOnScreen for the same mapping). */
     visibleWorld() {
       const pixels = this.livePixelsPerUnit
@@ -191,14 +238,9 @@ export default {
     },
     /** Centers the camera on the clicked spot (and stops following whatever was selected). */
     moveCamera(event) {
-      const box = event.currentTarget.getBoundingClientRect()
-      const x = ((event.clientX - box.left) / box.width - 0.5) * HALF * 2
-      const y = ((event.clientY - box.top) / box.height - 0.5) * HALF * 2
       this.o8audio.playEffect('click')
       this.selectNone()
-      // The camera's focus sits WORLD_OFFSET_Y above the screen center; aim so the spot lands in the middle.
-      const offset = (WORLD_OFFSET_Y * this.groupPixels) / this.livePixelsPerUnit
-      this.viewAnimateMoveTo({ x: -x / this.scale, y: -offset - y / this.scale, time: CAMERA_MOVE_MS })
+      this.viewAnimateMoveTo({ ...this.cameraFor(this.pointOf(event)), time: CAMERA_MOVE_MS })
     }
   }
 }

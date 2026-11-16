@@ -9,7 +9,16 @@
           {{ attackerName }} attacking · rounds every 30 minutes since {{ ago(siege.started) }}
         </text>
 
-        <g transform="translate(-175 70)" font-size="0.8em">
+        <!-- what's happening: the attacker and the planet trading fire (round 2, item 7); pink: it needs someone -->
+        <g transform="translate(0 46)">
+          <menu-scene
+            :left="{ art: armoryArt, label: attackerName }"
+            :right="{ sprite: objectId, label: object.name }"
+            :arrow="{ label: 'Under siege', note: 'a round every 30 minutes', direction: 'both', color: PINK_LIGHT }"
+          />
+        </g>
+
+        <g transform="translate(-175 174)" font-size="0.8em">
           <text x="0" y="0" font-size="1.1em">Planet</text>
           <g v-for="(bar, i) in planetBars" :key="bar.name" :transform="'translate(0 ' + (22 + i * 18) + ')'">
             <text x="0" y="0" fill="#ffffffaa">{{ bar.name }}</text>
@@ -19,7 +28,7 @@
           </g>
           <text x="0" :y="30 + planetBars.length * 18" fill="#ffffff88" font-size="0.85em">{{ weapons(siege.side) }}</text>
         </g>
-        <g transform="translate(10 70)" font-size="0.8em">
+        <g transform="translate(10 174)" font-size="0.8em">
           <text x="0" y="0" font-size="1.1em">Attacker</text>
           <g v-for="(bar, i) in shipBars" :key="bar.name" :transform="'translate(0 ' + (22 + i * 18) + ')'">
             <text x="0" y="0" fill="#ffffffaa">{{ bar.name }}</text>
@@ -34,7 +43,7 @@
           v-for="(line, i) in status"
           :key="i"
           x="0"
-          :y="192 + i * 18"
+          :y="296 + i * 18"
           text-anchor="middle"
           font-size="0.85em"
           :fill="siege.wornAt || defenceless ? PINK_LIGHT : '#ffffffaa'"
@@ -42,7 +51,7 @@
           {{ line }}
         </text>
 
-        <g transform="translate(0 250)">
+        <g transform="translate(0 354)">
           <g v-for="(action, i) in actions" :key="action.text" :transform="'translate(0 ' + i * 50 + ')'">
             <menu-button :enabled="action.enabled" :text="action.text" @buttonclick="action.run" />
           </g>
@@ -65,16 +74,18 @@ import { PINK_LIGHT } from '@/libs/palette'
 import { game } from '@orbiter8/sdk/client'
 import MenuContainer from './menu-container/_menu-container.svg'
 import MenuButton from './menu-button.svg'
+import MenuScene from './widgets/menu-scene.svg.vue'
+import armoryArt from '@/assets/art/armory.svg'
 
 export default {
   name: 'SiegeMenu',
-  components: { MenuContainer, MenuButton },
+  components: { MenuContainer, MenuButton, MenuScene },
   props: {
     /** The besieged planet's key. */
     objectId: { type: String, default: null }
   },
   data() {
-    return { player: usePlayerStore(), PINK_LIGHT }
+    return { player: usePlayerStore(), PINK_LIGHT, armoryArt }
   },
   computed: {
     ...mapState(useStarMapStore, ['systemObjects', 'players']),
@@ -87,7 +98,7 @@ export default {
     },
     scale() {
       const width = Math.min(this.viewport.width - 100, 700)
-      return Math.min(width > 450 ? 1.5 : 1, (this.viewport.height - 160) / 440)
+      return Math.min(width > 450 ? 1.5 : 1, (this.viewport.height - 160) / 540)
     },
     mine() {
       return this.siege.attacker === this.player.account

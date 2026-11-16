@@ -30,12 +30,10 @@
       <line x1="-18" y1="-13" x2="-13" y2="-19" stroke="#ffffff66" stroke-width="0.5" />
       <line x1="26" y1="-13" x2="21" y2="-19" stroke="#ffffff66" stroke-width="0.5" />
 
-      <cargo-holds
-        transform="translate(4 4)"
-        :cargo-holds="cargoHolds"
-        :predicted-load="predictedLoad"
-        :existing-load="existingLoad"
-      />
+      <!-- every hold, the ones being bought in yellow (round 2, item 6) -->
+      <g transform="translate(-3.5 -7)">
+        <hold-grid :total="cargoHolds" :segments="segments" :width="15" :height="14" />
+      </g>
     </g>
     <rect x="-41" y="-21" rx="1" ry="1" width="82" height="42" fill="#00000011" stroke-width="0.5" stroke="#c3b3da44" />
   </g>
@@ -46,7 +44,7 @@ import Ship from '../../../sprites/ship.svg'
 import Station from '../../../sprites/station.svg'
 import ShipOutline from '../../../sprites/ship-outline.svg'
 import StationOutline from '../../../sprites/station-outline.svg'
-import CargoHolds from '../widgets/cargo-holds.svg'
+import HoldGrid from '@/components/hud/hold-grid.svg.vue'
 
 export default {
   name: 'Cargo',
@@ -55,7 +53,7 @@ export default {
     Station,
     ShipOutline,
     StationOutline,
-    CargoHolds
+    HoldGrid
   },
   props: {
     cargoHolds: {
@@ -69,6 +67,11 @@ export default {
     existingLoad: {
       type: Number,
       default: 0
+    },
+    /** The holds in order (hold-grid.svg.vue): the cargo, the empty holds, the ones being bought. */
+    segments: {
+      type: Array,
+      default: () => []
     }
   },
   computed: {},

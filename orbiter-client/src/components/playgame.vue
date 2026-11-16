@@ -3,7 +3,8 @@
     <star-map />
     <layer-html />
     <transaction-tray />
-    <galaxy-map v-if="neighborView && !jumpAnimationState" />
+    <!-- (a jump from the map: the map slides away with the system, libs/jump-slide.js) -->
+    <galaxy-map v-if="(neighborView && !jumpAnimationState) || jumpFromMap" :class="{ departing: jumpFromMap }" />
     <black-hole-entry />
     <tech-tree v-if="techTreeOpen" class="tech-tree-over" @close="techTreeOpen = false" />
     <game-dialog />
@@ -26,8 +27,12 @@ import TechTree from '@/components/star-map/tech-tree.vue'
 import GalaxyMap from '@/components/star-map/galaxy-map.vue'
 import BlackHoleEntry from '@/components/star-map/black-hole-entry.vue'
 import { usePlayerStore } from '@/stores/player'
+import { useDialogStore } from '@/stores/dialog'
 import router from '@/router/router'
 import { onFrame } from '@/libs/frame-loop'
+
+/** Keys for the HUD's menus (their buttons' tooltips name them). */
+const MENU_KEYS = { m: 'map', p: 'planets', h: 'help', c: 'chat', l: 'leaderboard', f: 'feed' }
 
 /** Whether a key went to a text field (chat, names), not the map. */
 function isTyping(event) {
@@ -51,7 +56,7 @@ export default {
   },
   computed: {
     ...mapState(useGameStateStore, ['haveAvatar', 'haveShip']),
-    ...mapState(useUIStore, ['selected', 'jumpAnimationState', 'viewport', 'neighborView', 'neighborSwitchScale']),
+    ...mapState(useUIStore, ['selected', 'jumpAnimationState', 'viewport', 'neighborView', 'neighborSwitchScale', 'menuState', 'jumpFromMap']),
     techTreeOpen: {
       get() {
         return useUIStore().techTreeOpen
@@ -132,7 +137,10 @@ export default {
       'wheelZoomAt',
       'back',
       'stepPlanet',
-      'selectSprite'
+      'selectSprite',
+      'openMenu',
+      'closeMenu',
+      'zoomOutToNeighbors'
     ]),
     onWheel(event) {
       // Over the dialog, the wheel isn't the map's.
@@ -173,8 +181,14 @@ export default {
         case '[':
           this.stepPlanet({ planets: this.spriteIds.planets, step: -1 })
           break
-        default:
-          return
+        default: {
+          // Letters open the HUD's menus (pressed again, close them); M is the galaxy map.
+          const menu = MENU_KEYS[event.key.toLowerCase()]
+          if (event.shiftKey || this.jumpAnimationState || useDialogStore().open) return
+          if (menu === 'map') this.neighborView ? this.exitNeighborView() : this.zoomOutToNeighbors()
+          else if (menu && !this.neighborView) this.menuState[menu + 'Menu'] ? this.closeMenu() : this.openMenu(menu)
+          else return
+        }
       }
       event.preventDefault()
     },

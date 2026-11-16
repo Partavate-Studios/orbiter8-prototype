@@ -3,12 +3,14 @@
        so changes in one layer never make the browser repaint the others. -->
   <div ref="gamelayerContainer" class="layer star-map">
     <background-canvas />
-    <!-- The system fades out under the galaxy map; the background stays (it's the map's too). -->
-    <guides-canvas class="system-part" :class="{ away: neighborView }" />
+    <!-- The system: it fades out under the galaxy map, and slides away and in on a jump (libs/jump-slide.js);
+         the background stays (it's the map's too, and the jump's). -->
+    <div ref="slide" class="system-slide">
+    <guides-canvas class="system-part" :class="{ away: neighborView || jumpFromMap }" />
 
     <!-- The world is drawn for the camera in drawnView and slightly larger than the screen;
          between redraws a CSS transform (composited, no repaint) follows the live camera. -->
-    <div ref="world" class="world-layer system-part" :class="{ away: neighborView }" :style="worldBox">
+    <div ref="world" class="world-layer system-part" :class="{ away: neighborView || jumpFromMap }" :style="worldBox">
       <svg
         id="gamelayer"
         ref="gamelayer"
@@ -18,7 +20,7 @@
         xmlns="http://www.w3.org/2000/svg"
       >
         <g font-family="Ubuntu, sans-serif" :transform="'scale(' + baseScale + ')'">
-          <g v-if="mapDataLoaded && !jumpAnimationState" transform="translate(0 -100)">
+          <g v-if="mapDataLoaded && !systemHidden" transform="translate(0 -100)">
             <rect
               x="-2000"
               y="-1000"
@@ -37,12 +39,14 @@
         </g>
       </svg>
       <planet-layers
-        v-if="mapDataLoaded && !jumpAnimationState"
+        v-if="mapDataLoaded && !systemHidden"
         :drawn-view="drawnView"
         :unit="worldUnit"
         :origin-x="screenSize.width / 2 + worldMargin"
         :origin-y="screenSize.height / 2 + worldMargin + worldUnit * worldOffsetY"
       />
+    </div>
+
     </div>
 
     <svg class="map-layer hud-layer" :viewBox="layerViewBox" xmlns="http://www.w3.org/2000/svg">
@@ -54,7 +58,7 @@
           <!-- the galaxy map draws over the game (components/star-map/galaxy-map.vue) -->
           <g v-else-if="neighborView" />
           <g v-else>
-            <hud></hud>
+            <selection-ring />
           </g>
         </g>
         <g v-else>
@@ -63,6 +67,9 @@
         <connection-status />
       </g>
     </svg>
+    <!-- the HUD itself (components/hud/hud-overlay.vue): HTML over the map's layers; on the galaxy map
+         only the pilot's plate stays -->
+    <hud-overlay v-if="mapDataLoaded && !jumpAnimationState" />
   </div>
 </template>
 
@@ -73,7 +80,8 @@ import { STAR_KEY } from '@orbiter8/sdk/system'
 import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
 import { mapActions, mapState } from 'pinia'
-import Hud from './hud/hud.svg'
+import HudOverlay from '@/components/hud/hud-overlay.vue'
+import SelectionRing from '@/components/hud/selection-ring.svg.vue'
 import JumpAnimation from './hud/jump-animation.svg'
 import BackgroundCanvas from './background-canvas.vue'
 import GuidesCanvas from './guides-canvas.vue'
@@ -84,6 +92,7 @@ import LoadingBar from './hud/loading-bar.svg'
 import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
 import { CompositedLayer } from '@/libs/composited-layer'
 import { placeOfferedLabels } from '@/libs/label-layout'
+import { jumpSlide } from '@/libs/jump-slide'
 
 // Pixels of world drawn beyond each screen edge, so the camera can pan a little before a redraw.
 const WORLD_MARGIN = 256
@@ -93,7 +102,8 @@ const LABEL_LAYOUT_MS = 150
 export default {
   name: 'StarMap',
   components: {
-    Hud,
+    HudOverlay,
+    SelectionRing,
     JumpAnimation,
     BackgroundCanvas,
     GuidesCanvas,
@@ -120,7 +130,10 @@ export default {
       'groupPixels',
       'menuState',
       'isMenuOn',
-      'jumpAnimationState'
+      'jumpAnimationState',
+      'jumpPhase',
+      'jumpFromMap',
+      'systemHidden'
     ]),
     ...mapState(useStarMapStore, ['currentStarSystemId', 'mapDataLoaded', 'myShipId']),
     /**
@@ -156,8 +169,22 @@ export default {
     }
   },
   watch: {
+    // Arriving from a jump: the new system slides in at the zoom the jump left at (so the backdrop
+    // doesn't jump), the camera on your ship, then flying in to it as arriving always has.
+    jumpPhase(phase) {
+      if (phase !== 'arrive') return
+      if (this.myShipId !== STAR_KEY) {
+        this.selectSprite(this.myShipId)
+        if (useUIStore().jumpDepartScale > CAMERA.ARRIVAL_SHIP_SCALE * 1.5) {
+          this.scaleAnimateTo({ scale: CAMERA.ARRIVAL_SHIP_SCALE, time: CAMERA.ARRIVAL_TWEEN_MS })
+        }
+      } else {
+        this.scaleAnimateTo({ scale: CAMERA.ARRIVAL_SYSTEM_SCALE, time: CAMERA.ARRIVAL_TWEEN_MS })
+      }
+    },
     currentStarSystemId: function (val, oldVal) {
-      if (val != oldVal) {
+      // (a jump's arrival places the camera itself, above)
+      if (val != oldVal && !this.jumpAnimationState) {
         if (this.myShipId !== STAR_KEY) {
           this.selectSprite(this.myShipId)
           this.scaleAnimateTo({ scale: CAMERA.ARRIVAL_SHIP_SCALE, time: CAMERA.ARRIVAL_TWEEN_MS })
@@ -215,6 +242,7 @@ export default {
     /** Each frame: show the drawn world at the live camera's position and zoom, redrawing when needed. */
     followCamera(now) {
       if (!this.worldLayer) return
+      this.slideSystem()
       if (!(now - this.labelsLaidOutAt < LABEL_LAYOUT_MS)) {
         this.labelsLaidOutAt = now
         this.setLabelPlacements(placeOfferedLabels())
@@ -231,6 +259,15 @@ export default {
         originY: this.screenSize.height / 2 + WORLD_MARGIN + unit * WORLD_OFFSET_Y
       }
       if (this.worldLayer.update(delta)) this.drawWorld()
+    },
+    /** Slides the system away and in on a jump (libs/jump-slide.js); written only when it moves. */
+    slideSystem() {
+      const ui = useUIStore()
+      const offset = ui.jumpAnimationState ? jumpSlide(ui.jumpPhase, Date.now() - ui.jumpPhaseAt).system : 0
+      const x = Math.round((offset ?? 0) * this.screenSize.width)
+      if (x === this.slidX) return
+      this.slidX = x
+      this.$refs.slide.style.transform = x ? `translateX(${x}px)` : ''
     },
     /** Pixels from the screen's center. */
     fromCenter(point) {
@@ -343,6 +380,10 @@ export default {
 }
 .world-layer {
   position: absolute;
+}
+.system-slide {
+  position: absolute;
+  inset: 0;
 }
 .system-part {
   transition: opacity 0.45s ease;

@@ -185,6 +185,12 @@ export default {
   opacity: 0;
   transform: translateY(-6px);
 }
+/* A portrait phone: under the pilot's strip (components/hud/hud-overlay.vue). */
+@media (orientation: portrait) {
+  .transaction-tray {
+    top: calc(68px + env(safe-area-inset-top));
+  }
+}
 @keyframes turn {
   to {
     transform: rotate(360deg);
