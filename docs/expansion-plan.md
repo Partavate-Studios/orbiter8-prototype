@@ -2,7 +2,7 @@
 
 Koda's decisions of 2026-11-16, and the plan to build them. Written so a session without the history
 of the one that wrote it can carry it out: read this whole file, then the documents it points to.
-**Status: agreed with Koda (2026-11-16): decisions 1–32 below. Nothing built yet.**
+**Status: agreed with Koda (2026-11-16): decisions 1–34 below. Nothing built yet.**
 
 ## Read first
 
@@ -128,6 +128,10 @@ of the one that wrote it can carry it out: read this whole file, then the docume
     the main client** and then removed as an experimental client; the clean-room client
     (`client-rnd/fresh/`) is updated later.
 32. **The contract refactor** below is agreed, and lands first.
+33. **Battle drones move into drone bays too**: every drone (mining or battle) lives in drone bays, so how
+    much of a ship is drones is one number the pilot chooses.
+34. **What stops mining:** any move that changes the ship (a jump, a trade, a purchase, fitting parts…);
+    sending a chat message doesn't.
 
 ## Notes for later
 
@@ -173,7 +177,7 @@ Each phase ends with: `forge test` and `forge build --sizes` (all under the limi
 (desktop and phone). Commit per step; never push. Log guesses in `docs/review.md`.
 
 **Phase 0: import the HUD.** Bring `client-rnd/hud/` into `orbiter-client/` (decision 31), with the
-docking bug fixed (see "Notes for later"); then remove `client-rnd/hud/`. Record decisions 1–32 as D67
+docking bug fixed (see "Notes for later"); then remove `client-rnd/hud/`. Record decisions 1–34 as D67
 onward in `docs/demo4-plan.md`, with this plan's milestones.
 
 **Phase 1: contract refactor** (no new features).
