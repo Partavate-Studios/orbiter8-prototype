@@ -20,6 +20,7 @@ import { portNames, buyCost, sellProceeds, fee, baysCost, MODE, SOL_PORTS } from
 import { SESSION_HOURS, loadKey, saveKey, forgetKey, newKey, keySigner, sweep } from './session-key'
 import { createEventLog } from './event-log'
 import { tradesSinceArrival } from './game/docking'
+import { cellOf, indexOf } from './body-id'
 
 /** A trade line's price limit allows this much movement since the prices were read (B23). */
 export const SLIPPAGE = 0.02
@@ -301,7 +302,7 @@ export function createGameClient() {
   function dockedAt(address, cell) {
     for (let i = trades.length - 1; i >= 0; i--) {
       if (trades[i].sender !== address) continue
-      return Math.floor(trades[i].port / 256) === cell ? trades[i].port : null
+      return cellOf(trades[i].port) === cell ? trades[i].port : null
     }
     // null, not 0: Mercury is planet 0
     return null
@@ -329,7 +330,7 @@ export function createGameClient() {
       ownedFor = deeds
       const ids = deeds ? await game.ownedPlanets(state.account).catch(() => []) : []
       const at = new Map()
-      for (const id of ids) at.set(Math.floor(id / 256), (at.get(Math.floor(id / 256)) ?? 0) + 1)
+      for (const id of ids) at.set(cellOf(id), (at.get(cellOf(id)) ?? 0) + 1)
       state.ownedAt = at
       notify('cells')
     }
@@ -391,11 +392,11 @@ export function createGameClient() {
 
   /** A planet anywhere by its id, unnamed (sdk/system-gen.js planetName): for screens about other stars. */
   function derivedPlanetName(id) {
-    const cell = Math.floor(Number(id) / 256)
+    const cell = cellOf(id)
     const seed = state.universe?.seed
     if (!seed) return 'a planet'
     const classes = Array.from({ length: planetCount(seed, cell) }, (_, body) => derivePlanet(seed, cell, body).class)
-    return planetName(cell, Number(id) % 256, classes)
+    return planetName(cell, indexOf(id), classes)
   }
 
   /** A star's name as given (genesis or a player, Planets.nameStar), else "Star 1234" by its cell. */

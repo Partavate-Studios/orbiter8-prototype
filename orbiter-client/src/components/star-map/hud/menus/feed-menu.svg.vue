@@ -22,6 +22,7 @@
 <script>
 import { mapState } from 'pinia'
 import { game } from '@orbiter8/sdk/client'
+import { cellOf } from '@orbiter8/sdk/body-id'
 import { useUIStore } from '@/stores/ui'
 import { useStarMapStore } from '@/stores/starmap'
 import { usePlayerStore } from '@/stores/player'
@@ -51,7 +52,7 @@ export default {
       // The planet's name when it's at this star; elsewhere its stand-in name and its star's.
       const here = useStarMapStore().systemObjects['planet:' + planet]
       if (here) return here.name
-      return `${game.derivedPlanetName(planet)} at ${game.starName(Math.floor(planet / 256))}`
+      return `${game.derivedPlanetName(planet)} at ${game.starName(cellOf(planet))}`
     },
     who(address) {
       if (!address) return 'someone'

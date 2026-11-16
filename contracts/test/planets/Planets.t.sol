@@ -8,6 +8,7 @@ import {Planets} from "../../src/planets/Planets.sol";
 import {Factory} from "../../src/planets/Factory.sol";
 import {Deeds} from "../../src/tokens/Deeds.sol";
 import {SystemGen} from "../../src/planets/SystemGen.sol";
+import {BodyId} from "../../src/planets/BodyId.sol";
 
 contract PlanetsFixture is GameFixture {
     Planets planets;
@@ -23,7 +24,7 @@ contract PlanetsFixture is GameFixture {
         super.setUp();
         (planets, factory, deeds) = (game.planets, game.factory, game.deeds);
         star = _starAroundSol();
-        home = star << 8;
+        home = star << 16;
     }
 
     function _claim(address who, uint256 planet) internal {
@@ -99,6 +100,21 @@ contract PlanetsTest is PlanetsFixture {
         vm.prank(ada);
         vm.expectRevert(abi.encodeWithSelector(Planets.NoSuchPlanet.selector, home | 9));
         planets.claim(home | 9);
+        // Another kind of body at the star (an asteroid's id) is not a planet.
+        uint256 asteroid = BodyId.make(star, BodyId.ASTEROID, 0);
+        vm.prank(ada);
+        vm.expectRevert(abi.encodeWithSelector(Planets.NoSuchPlanet.selector, asteroid));
+        planets.claim(asteroid);
+    }
+
+    function test_bodyIds() public pure {
+        uint256 id = BodyId.make(1234, BodyId.ASTEROID, 7);
+        assertEq(id, 1234 * 65536 + 256 + 7);
+        assertEq(BodyId.cellOf(id), 1234);
+        assertEq(BodyId.kindOf(id), BodyId.ASTEROID);
+        assertEq(BodyId.indexOf(id), 7);
+        assertEq(BodyId.planet(0, 2), 2, "Sol's planets are ids 0-8");
+        assertTrue(BodyId.isPlanet(BodyId.planet(5, 3)));
     }
 
     function test_solBelongsToTheFederation() public {
@@ -325,7 +341,7 @@ contract PlanetsTest is PlanetsFixture {
         // Bo holds every planet (after the discoverer's first-claim window): naming makes Bo the owner,
         // and Ada loses the right.
         skip(10 minutes);
-        for (uint256 body = 0; body < n; body++) _claim(bo, (star << 8) | body);
+        for (uint256 body = 0; body < n; body++) _claim(bo, (star << 16) | body);
         _pay(bo, fee);
         vm.prank(bo);
         planets.nameStar(star, "Bodo's Reach");
@@ -336,7 +352,7 @@ contract PlanetsTest is PlanetsFixture {
         // Bo loses all but one planet to Ada: still the owner, until Ada holds a majority and names it.
         vm.startPrank(admin);
         planets.grantRole(planets.GAME_MODULE(), admin);
-        for (uint256 body = 1; body < n; body++) planets.seize((star << 8) | body, ada);
+        for (uint256 body = 1; body < n; body++) planets.seize((star << 16) | body, ada);
         vm.stopPrank();
         assertEq(galaxy.keeperOf(star), bo);
         bool owns;

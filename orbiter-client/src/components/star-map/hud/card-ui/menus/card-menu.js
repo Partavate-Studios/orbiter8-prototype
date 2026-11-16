@@ -1,4 +1,5 @@
 // The actions offered in a selected object's card menu, from its game data.
+import { cellOf } from '@orbiter8/sdk/body-id'
 
 /**
  * The pilot, as the options need them (stores/player.js).
@@ -54,7 +55,7 @@ function pilotMenu(object, d, marketName) {
       break
 
     case 'planet': {
-      const sol = Math.floor(object.objectId / 256) === 0
+      const sol = cellOf(object.objectId) === 0
       const siege = d.siegeAt(object.objectId)
       if (sol && object.objectId === SOL_EARTH) add('Recruit Colonists', 'recruit')
       if (!sol && !object.owner) {

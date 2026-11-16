@@ -97,7 +97,7 @@ INJECT=0 node dev/harness/explore.mjs "http://localhost:8092/?account=1" /tmp/sh
   `document.querySelector('#game').__vue_app__.config.globalProperties.$pinia._s.get('UI' | 'StarMap' | 'Player' | 'GameState' | 'Chain')`.
   With that as `$P` in the shell (`P="document.querySelector('#game').__vue_app__.config.globalProperties.\$pinia._s"`),
   `"eval:$P.get('UI').selectSprite('station:2')"` selects the I.S.S.
-  - `ship:1`: your ship. `planet:256`: the first planet of star 1. Planet ids are `cell * 256 + body`.
+  - `ship:1`: your ship. `planet:65536`: the first planet of star 1. Planet ids are `cell * 65536 + body` (`BodyId.sol`, `sdk/src/body-id.js`).
 - Test credits: grant the deployer the Credits contract's `GAME_MODULE` role and mint with
   `cast send --unlocked`. The addresses are in `dev/local-deployment-8546.json`.
 - Skip chain time: `cast rpc evm_increaseTime 3600 --rpc-url http://127.0.0.1:8546`, then `cast rpc evm_mine`.

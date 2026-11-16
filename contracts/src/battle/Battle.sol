@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.38;
 
+import {BodyId} from "../planets/BodyId.sol";
 import {ModuleBase} from "../core/ModuleBase.sol";
 import {Pilots, IMoveHook} from "../pilots/Pilots.sol";
 import {Planets} from "../planets/Planets.sol";
@@ -113,7 +114,7 @@ contract Battle is ModuleBase, IMoveHook {
     function attack(uint256 planet) external {
         BattleStorage storage b = _b();
         address pilot = b.pilots.actorOf(msg.sender);
-        uint256 cell = planet >> 8;
+        uint256 cell = BodyId.cellOf(planet);
         if (cell == 0) revert FederationPlanet(); // D49
         if (b.pilots.shipOf(pilot).cell != cell) revert NotThere();
         address owner = b.planets.ownerOf(planet);
@@ -138,7 +139,7 @@ contract Battle is ModuleBase, IMoveHook {
         address pilot = b.pilots.actorOf(msg.sender);
         Siege storage s = b.sieges[planet];
         if (s.attacker == address(0)) revert NoSiege();
-        if (b.pilots.shipOf(pilot).cell != planet >> 8) revert NotThere();
+        if (b.pilots.shipOf(pilot).cell != BodyId.cellOf(planet)) revert NotThere();
         if (pilot == s.attacker || b.attacking[pilot] != 0) revert CannotAttack();
         if (b.allies[planet].length >= MAX_ALLIES) revert TooManyAllies();
         _advance(planet, type(uint256).max);
@@ -178,7 +179,7 @@ contract Battle is ModuleBase, IMoveHook {
         address[] storage allies = b.allies[planet];
         for (uint256 i = 0; i <= allies.length; i++) {
             address pilot = i == allies.length ? owner : allies[i];
-            if (b.pilots.shipOf(pilot).cell != planet >> 8 || b.conditions[pilot].retreated) continue;
+            if (b.pilots.shipOf(pilot).cell != BodyId.cellOf(planet) || b.conditions[pilot].retreated) continue;
             Combat.Side memory side = shipSide(pilot);
             fire.railguns += side.railguns;
             fire.missiles += side.missiles;
@@ -246,7 +247,7 @@ contract Battle is ModuleBase, IMoveHook {
         if (s.attacker == address(0)) return;
         _keepPlanetLosses(planet, s.planet);
         _keepShipLosses(s.attacker, s.ship);
-        uint256[] storage list = b.siegesAt[planet >> 8];
+        uint256[] storage list = b.siegesAt[BodyId.cellOf(planet)];
         for (uint256 i = 0; i < list.length; i++) {
             if (list[i] == planet) {
                 list[i] = list[list.length - 1];

@@ -140,7 +140,7 @@ export function refreshHoldings() {
     const goods = s.economy.goods.length
     const list = await Promise.all(
       ids.map(async (id) => {
-        const cell = Math.floor(id / 256)
+        const cell = Math.floor(id / 65536) // BodyId: cell << 16 | kind << 8 | index
         const [view, defenses, names, sieges] = await Promise.all([
           r.planetView(id, goods),
           r.defenses(id),
@@ -192,7 +192,7 @@ export async function scoutStore(id) {
 export function planetModel(id) {
   const s = game.state
   id = Number(id)
-  const cell = Math.floor(id / 256)
+  const cell = Math.floor(id / 65536) // BodyId: cell << 16 | kind << 8 | index
   const body = id % 256
   const held = ui.holdings.find((p) => p.id === id)
   const here = s.system?.id === cell ? Object.values(s.system.planets).find((p) => Number(p.id) === id) : null

@@ -6,7 +6,7 @@ import {AccessControlUpgradeable} from "@openzeppelin/contracts-upgradeable/acce
 import {ModuleBase} from "../core/ModuleBase.sol";
 
 /// @title Planet deeds, as NFTs (docs/demo4-plan.md, section 1)
-/// @notice One ERC-721 per claimed planet, its id the planet's (`cell << 8 | body`), minted to whoever
+/// @notice One ERC-721 per claimed planet, its id the planet's (`BodyId`: `cell << 16 | kind << 8 | index`), minted to whoever
 /// claims it. Owners can't trade planets in this run; the game moves a deed when a siege's claim
 /// succeeds (milestone 4).
 contract Deeds is ERC721Upgradeable, ModuleBase {

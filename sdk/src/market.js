@@ -4,6 +4,7 @@
 // A port either sells a good or buys it. Its stock is a shortfall from full that restocks over time.
 // Every unit moves the price, so a big trade pays the average over its units: costs round up,
 // proceeds round down, as on chain.
+import { planetId, cellOf, indexOf } from './body-id'
 
 const ceilDiv = (a, b) => (a === 0 ? 0 : Math.floor((a - 1) / b) + 1)
 
@@ -52,9 +53,9 @@ export function fee(amount, bps) {
 export const MODE = { NONE: 0, SELLS: 1, BUYS: 2 }
 
 /** A port's id: the star, then the planet's place in its system. */
-export const portId = (cell, body) => cell * 256 + body
-export const portCell = (port) => Math.floor(port / 256)
-export const portBody = (port) => port % 256
+export const portId = planetId
+export const portCell = cellOf
+export const portBody = indexOf
 
 /** Sol's nine Federation stations (Market.sol's order), with their planets. Each has a port, a yard and an armory. */
 export const SOL_PORTS = [
@@ -71,7 +72,7 @@ export const SOL_PORTS = [
 
 /** A port's display names. */
 export function portNames(port) {
-  if (portCell(port) === 0 && portBody(port) < SOL_PORTS.length) return SOL_PORTS[portBody(port)]
+  if (Number(port) < SOL_PORTS.length) return SOL_PORTS[Number(port)] // Sol's planets are ids 0–8
   return { station: `Port ${portBody(port) + 1}`, planet: `Planet ${portBody(port) + 1}` }
 }
 

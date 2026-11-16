@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.38;
 
+import {BodyId} from "../planets/BodyId.sol";
 import {ModuleBase} from "../core/ModuleBase.sol";
 import {Pilots} from "../pilots/Pilots.sol";
 import {Planets} from "../planets/Planets.sol";
@@ -187,7 +188,7 @@ contract Armory is ModuleBase {
     function buy(uint256 port, uint256 part, uint256 count, uint256 maxCost) external {
         ArmoryStorage storage a = _a();
         address pilot = a.pilots.actorOf(msg.sender);
-        if (a.pilots.shipOf(pilot).cell != port >> 8) revert NotThere();
+        if (a.pilots.shipOf(pilot).cell != BodyId.cellOf(port)) revert NotThere();
         uint256 unit = a.factory.parts()[part].credits;
         uint256 cost;
         if (port < SOL_PORTS) {
@@ -210,7 +211,7 @@ contract Armory is ModuleBase {
     function repair(uint256 port) external {
         ArmoryStorage storage a = _a();
         address pilot = a.pilots.actorOf(msg.sender);
-        if (a.pilots.shipOf(pilot).cell != port >> 8) revert NotThere();
+        if (a.pilots.shipOf(pilot).cell != BodyId.cellOf(port)) revert NotThere();
         if (a.battle.attackingOf(pilot) != 0) revert InBattle();
         Market.PortView memory v = a.market.portView(port);
         if (!v.yard) revert NoYard();
@@ -230,7 +231,7 @@ contract Armory is ModuleBase {
 
     function _ownerAt(uint256 planet) internal view returns (address pilot) {
         pilot = _owner(planet);
-        if (_a().pilots.shipOf(pilot).cell != planet >> 8) revert NotThere();
+        if (_a().pilots.shipOf(pilot).cell != BodyId.cellOf(planet)) revert NotThere();
     }
 
     function _add(uint256 value, int256 delta) internal pure returns (uint256) {

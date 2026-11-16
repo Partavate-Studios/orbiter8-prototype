@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.38;
 
+import {BodyId} from "./BodyId.sol";
 import {ModuleBase} from "../core/ModuleBase.sol";
 import {Galaxy} from "../galaxy/Galaxy.sol";
 import {Pilots} from "../pilots/Pilots.sol";
@@ -175,11 +176,11 @@ contract Planets is ModuleBase {
 
     /// The planet's class and size, after checking it exists around a charted star.
     function _derive(uint256 id) internal view returns (uint8 class, uint8 size) {
-        uint256 cell = id >> 8;
-        uint256 body = id & 0xff;
+        uint256 cell = BodyId.cellOf(id);
+        uint256 body = BodyId.indexOf(id);
         PlanetsStorage storage s = _s();
         bytes32 seed = _seed();
-        if (s.galaxy.stateOf(cell) != 2 || body >= SystemGen.planetCount(seed, cell)) revert NoSuchPlanet(id);
+        if (!BodyId.isPlanet(id) || s.galaxy.stateOf(cell) != 2 || body >= SystemGen.planetCount(seed, cell)) revert NoSuchPlanet(id);
         (class, size,) = SystemGen.planet(seed, cell, body);
     }
 
@@ -191,7 +192,7 @@ contract Planets is ModuleBase {
     function _pilotAt(uint256 id) internal view returns (address pilot) {
         Pilots p = _s().pilots;
         pilot = p.actorOf(msg.sender);
-        if (p.shipOf(pilot).cell != id >> 8) revert NotThere(id);
+        if (p.shipOf(pilot).cell != BodyId.cellOf(id)) revert NotThere(id);
     }
 
     /// The owner acting, at the planet.
@@ -205,7 +206,7 @@ contract Planets is ModuleBase {
     function claim(uint256 id) external {
         address pilot = _pilotAt(id);
         _derive(id);
-        uint256 cell = id >> 8;
+        uint256 cell = BodyId.cellOf(id);
         if (cell == 0) revert FederationPlanet(id);
         PlanetsStorage storage s = _s();
         Planet storage planet = s.planets[id];
@@ -252,7 +253,7 @@ contract Planets is ModuleBase {
         uint256 mine;
         uint256 best;
         for (uint256 body = 0; body < n; body++) {
-            address o = _s().planets[(cell << 8) | body].owner;
+            address o = _s().planets[BodyId.planet(cell, body)].owner;
             if (o == address(0)) continue;
             if (o == pilot) {
                 mine++;
@@ -287,11 +288,11 @@ contract Planets is ModuleBase {
         PlanetsStorage storage s = _s();
         address pilot = s.pilots.actorOf(msg.sender);
         _derive(id);
-        if (id >> 8 == 0) revert FederationPlanet(id);
+        if (BodyId.cellOf(id) == 0) revert FederationPlanet(id);
         if (s.planets[id].owner != pilot) revert NotYours(id);
         if (part >= NAME_MOON) {
             uint8 orbit = part - NAME_MOON;
-            if (orbit >= 8 || (SystemGen.moonSlots(_seed(), id >> 8, id & 0xff) >> orbit) & 1 == 0) {
+            if (orbit >= 8 || (SystemGen.moonSlots(_seed(), BodyId.cellOf(id), BodyId.indexOf(id)) >> orbit) & 1 == 0) {
                 revert NoSuchMoon(id, orbit);
             }
         }
@@ -303,7 +304,7 @@ contract Planets is ModuleBase {
 
     /// How many moons a planet has: each gives six weapon mounts that can't be destroyed (D61).
     function moonCount(uint256 id) external view returns (uint256 n) {
-        for (uint256 m = SystemGen.moonSlots(_seed(), id >> 8, id & 0xff); m != 0; m >>= 1) n += m & 1;
+        for (uint256 m = SystemGen.moonSlots(_seed(), BodyId.cellOf(id), BodyId.indexOf(id)); m != 0; m >>= 1) n += m & 1;
     }
 
     /// The names an owner has given: the planet, its station, then moons by orbit ("" where unnamed).
@@ -519,7 +520,7 @@ contract Planets is ModuleBase {
     /// A planet as it stands now (time's effects worked out, nothing written), with `goods` stock entries.
     function planetView(uint256 id, uint256 goods) public view returns (PlanetView memory v) {
         (v.class, v.size) = _derive(id);
-        (,, v.surface) = SystemGen.planet(_seed(), id >> 8, id & 0xff);
+        (,, v.surface) = SystemGen.planet(_seed(), BodyId.cellOf(id), BodyId.indexOf(id));
         v.id = id;
         v.cap = SystemGen.populationCap(v.class, v.size);
         Planet memory p = _s().planets[id];
@@ -561,7 +562,7 @@ contract Planets is ModuleBase {
         uint256 n = SystemGen.planetCount(_seed(), cell);
         list = new PlanetView[](n);
         for (uint256 body = 0; body < n; body++) {
-            list[body] = planetView((cell << 8) | body, goods);
+            list[body] = planetView(BodyId.planet(cell, body), goods);
         }
     }
 }

@@ -15,17 +15,12 @@ work in progress from a session that ran out (check `git status` and `git diff` 
   in `sdk/src/game/docking.js`), decisions recorded as D67–D100 in `demo4-plan.md` (Milestone 8).
   Seen at phone size: the zoom rail's "−" looks clipped beside the minimap (not fixed yet).
 - 2026-11-16: Phase 1, treasury and "Sol fully built" done (`e59dd5b`). Calls X1–X6 in `docs/review.md` §9.
-- **Next: Phase 1, body ids with kinds.** Notes for whoever picks it up:
-  - The old encoding `cell << 8 | body` is used in about 27 places in `contracts/src` and `contracts/test`
-    (`grep -rn "<< 8\|>> 8\|& 0xff\|% 256\|/ 256\|\* 256\|& 255" contracts`: Planets, Deeds, Battle,
-    Armory, Market) and about 28 in JS (`sdk/src/market.js` portId/portCell/portBody, `contracts.js`,
-    `client.js`; `orbiter-client/src/stores/player.js`, `card-menu.js`, `feed-menu.svg.vue`;
-    `orbiter-client/dev/tech-trees/build.mjs`; the harness README's "`planet:256`").
-  - Suggested order: a `BodyId` Solidity library (`make(cell, kind, index)`, `cell()`, `kind()`,
-    `index()`) and its JS mirror in `sdk/src/` with cross-check vectors (see `test/vectors/`); then
-    replace each use; keep Sol's ports at `make(0, PLANET, body)`, so the `port < SOL_PORTS` check in
-    `Armory.buy` and `cell == 0 && body < SOL_PORTS` in `Market._port` must change with it.
-  - Commit the id change on its own, with every test passing, before splitting Planets.
+- 2026-11-16: body ids with kinds done: `cell << 16 | kind << 8 | index` (planet 0, asteroid 1); Sol's
+  planets stay ids 0–8. Planet-only moves reject other kinds (`Planets._derive`). Play-tested at Sol and
+  star 1. The clean-room client's two id lines were updated too.
+- **Next: Phase 1, split Planets (Claims, Settlements) and Battle.** Measure first (`forge build --sizes`:
+  Planets 23.3 KB, Battle 23.9 KB of 24.6). Keep each split a commit with all tests passing; the deploy
+  script (`contracts/script/`, `Deployment.deploy` used by the tests) and `npm run abi` change with it.
 
 ## Read first
 
@@ -204,7 +199,7 @@ docking bug fixed (see "Notes for later"); then remove `client-rnd/hud/`. Record
 onward in `docs/demo4-plan.md`, with this plan's milestones.
 
 **Phase 1: contract refactor** (no new features).
-- [ ] Body ids with kinds; `Bodies` derivation (planets as now); SDK mirror and cross-check vectors.
+- [x] Body ids with kinds (`BodyId.sol`, `sdk/src/body-id.js`). *(The `Bodies` derivation of every kind comes with the belts in Phase 3; planets derive as before.)*
 - [ ] Split Planets (Claims, Settlements) and Battle as agreed; all existing tests pass; sizes recorded.
 - [x] Treasury address for Federation fees (decisions 19 and 28).
 - [x] Sol fully built: every Sol station has port, yard and armory (decision 18); client shows them.

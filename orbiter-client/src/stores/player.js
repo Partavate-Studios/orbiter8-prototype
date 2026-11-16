@@ -5,6 +5,7 @@ import { defineStore } from 'pinia'
 import { markRaw } from 'vue'
 import { game, BUILDING_NAMES, baysQuoteFor, rangeQuoteFor, partPriceFor, missingFor, usedBays } from '@orbiter8/sdk/client'
 import { useTransactionsStore } from '@/stores/transactions'
+import { cellOf } from '@orbiter8/sdk/body-id'
 
 const track = (words, send) => useTransactionsStore().track(words, send)
 
@@ -56,7 +57,7 @@ export const usePlayerStore = defineStore('Player', {
         if (e.event === 'SiegeStarted') live.add(e.planet)
         if (e.event === 'SiegeEnded') live.delete(e.planet)
       }
-      return new Set([...live].map((p) => Math.floor(p / 256)))
+      return new Set([...live].map((p) => cellOf(p)))
     },
     planetById: (state) => (id) => state.planets.find((p) => p.id === Number(id)) ?? null,
     siegeAt: (state) => (id) => state.sieges.find((s) => s.planet === Number(id)) ?? null

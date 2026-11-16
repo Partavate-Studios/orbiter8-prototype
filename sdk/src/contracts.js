@@ -12,6 +12,7 @@ import ArmoryAbi from './abi/Armory.json'
 import { fetchRound } from './drand'
 import { parseRevert } from './reverts'
 import { queryChunked } from './event-log'
+import { indexOf } from './body-id'
 
 export const STATE = { UNDECIDED: 0, EMPTY: 1, STAR: 2, BLACK_HOLE: 3 }
 /** Cells per region read; the contracts cap it at 10. */
@@ -53,7 +54,7 @@ function toPort(p) {
 function toPlanet(p) {
   return {
     id: Number(p.id),
-    body: Number(p.id) % 256,
+    body: indexOf(p.id),
     class: Number(p.class),
     size: Number(p.size),
     cap: Number(p.cap),

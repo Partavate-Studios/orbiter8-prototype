@@ -5,6 +5,7 @@ import {ModuleBase} from "../core/ModuleBase.sol";
 import {Pilots} from "../pilots/Pilots.sol";
 import {Credits} from "../tokens/Credits.sol";
 import {Pricing} from "./Pricing.sol";
+import {BodyId} from "../planets/BodyId.sol";
 
 /// @title Goods, ports, trade and the shipyard (docs/demo4-plan.md, section 4; D27, D29)
 /// @notice **Goods are data** (D27): a registry the admin can add to, each with a base price and a
@@ -13,7 +14,7 @@ import {Pricing} from "./Pricing.sol";
 /// trade never fills at a price the player didn't see. Stock is kept as a shortfall from full that
 /// restocks over time (see `Pricing`).
 ///
-/// A port is named by `cell << 8 | body`: the star, then the planet's place in its system. In this
+/// A port is named by its body's id (`BodyId`): the star, then the planet's place in its system. In this
 /// milestone the ports are the Federation's nine stations at Sol; claimed planets open their own in
 /// milestone 3 (`openPort`). The Federation mints what it pays and burns what it's paid; its fee
 /// goes to its treasury (an address the admin sets, the deployer to start). A player-owned port's
@@ -228,9 +229,7 @@ contract Market is ModuleBase {
 
     /// A port's class, whether it has a yard, and its owner (address(0): the Federation).
     function _port(uint256 port) internal view returns (uint8 class, bool yard, address owner) {
-        uint256 cell = port >> 8;
-        uint256 body = port & 0xff;
-        if (cell == 0 && body < SOL_PORTS) return (_solClass(body), true, address(0));
+        if (port < SOL_PORTS) return (_solClass(port), true, address(0)); // Sol's planets are ids 0–8
         if (!_isOpen(port)) revert NoSuchPort(port);
         Opened storage o = _m().opened[port];
         return (o.class, o.yardAt != 0 && o.yardAt <= block.timestamp, o.owner);
@@ -260,7 +259,7 @@ contract Market is ModuleBase {
         Pilots p = _m().pilots;
         pilot = p.actorOf(msg.sender);
         ship = p.shipOf(pilot);
-        if (ship.cell != port >> 8) revert NotAtPort(port);
+        if (ship.cell != BodyId.cellOf(port)) revert NotAtPort(port);
     }
 
     // ── trade ───────────────────────────────────────────────────────────────────────────────────
@@ -388,7 +387,7 @@ contract Market is ModuleBase {
         PortView[] memory found = new PortView[](MAX_BODIES);
         uint256 n;
         for (uint256 body = 0; body < MAX_BODIES; body++) {
-            uint256 port = (cell << 8) | body;
+            uint256 port = BodyId.planet(cell, body);
             bool isSol = cell == 0 && body < SOL_PORTS;
             if (isSol || _isOpen(port)) found[n++] = portView(port);
         }

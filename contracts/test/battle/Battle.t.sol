@@ -190,7 +190,7 @@ contract BattleTest is BattleFixture {
         bytes32 seed = keccak256("test universe");
         uint256 body;
         while (SystemGen.moonSlots(seed, star, body) == 0) body++;
-        uint256 planet = (star << 8) | body;
+        uint256 planet = (star << 16) | body;
         uint256 slots = SystemGen.moonSlots(seed, star, body);
         uint256 moons;
         for (; slots != 0; slots >>= 1) moons += slots & 1;
