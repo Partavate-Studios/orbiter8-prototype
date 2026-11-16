@@ -3,9 +3,10 @@
 // (stores/game-bindings.js keeps it in step); every action shows its progress in the transaction tray.
 import { defineStore } from 'pinia'
 import { markRaw } from 'vue'
-import { game, BUILDING_NAMES, baysQuoteFor, rangeQuoteFor, partPriceFor, missingFor, usedBays } from '@orbiter8/sdk/client'
+import { game, BUILDING_NAMES, baysQuoteFor, rangeQuoteFor, partPriceFor, missingFor, usedBays, totalBays } from '@orbiter8/sdk/client'
 import { useTransactionsStore } from '@/stores/transactions'
 import { cellOf } from '@orbiter8/sdk/body-id'
+import { gameAudio } from '@/libs/08audio'
 
 const track = (words, send) => useTransactionsStore().track(words, send)
 
@@ -91,7 +92,7 @@ export const usePlayerStore = defineStore('Player', {
 
     // ── prices and rules (sdk/client.js), from this store's own copy of the state ─────────────
     baysQuote(count) {
-      return baysQuoteFor(this.economy.tuning, this.pilot.ship.bays, count)
+      return baysQuoteFor(this.economy.tuning, totalBays(this.pilot.ship), count)
     },
     rangeQuote() {
       return rangeQuoteFor(this.economy.tuning, this.pilot.ship.range)
@@ -120,6 +121,15 @@ export const usePlayerStore = defineStore('Player', {
       return track({ doing: `Fitting ${bays}`, done: `${bays} fitted`, failed: "Couldn't fit the bays" }, (o) =>
         game.actions.buyHolds(planetId, count, o)
       )
+    },
+    /** Drone bays (D91): every drone lives in one. */
+    async buyDroneBays(planetId, count) {
+      const bays = count === 1 ? '1 drone bay' : `${count} drone bays`
+      const added = await track({ doing: `Buying ${bays}`, done: `${bays} added`, failed: "Couldn't buy the drone bays" }, (o) =>
+        game.actions.buyDroneBays(planetId, count, o)
+      )
+      if (added) gameAudio().speak('upgraded')
+      return added
     },
     buyRange(planetId) {
       return track({ doing: 'Upgrading the engines', done: 'Range upgraded', failed: "Couldn't upgrade the engines" }, (o) =>

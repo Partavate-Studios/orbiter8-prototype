@@ -4,7 +4,7 @@ export const SHIP_PARTS = [
   { id: 3, field: 'railguns', off: 1, space: '2 mounts each' },
   { id: 4, field: 'missiles', off: 2, space: '2 mounts each' },
   { id: 2, field: 'pointDefense', off: 0, space: '1 mount each' },
-  { id: 0, field: 'drones', off: 3, space: '2 holds each' },
+  { id: 0, field: 'drones', off: 3, space: '1 drone bay each' },
   { id: 1, field: 'repairBots', off: 4, space: '5 holds each' },
   { id: 5, field: 'armor', space: '10 holds a level, up to 5' },
   { id: 6, field: 'shields', space: '20 holds a level, up to 3' }

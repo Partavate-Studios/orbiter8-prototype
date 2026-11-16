@@ -149,6 +149,29 @@
   },
   {
     "type": "function",
+    "name": "buyDroneBays",
+    "inputs": [
+      {
+        "name": "port",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "count",
+        "type": "uint16",
+        "internalType": "uint16"
+      },
+      {
+        "name": "maxCost",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "buyRange",
     "inputs": [
       {
@@ -761,6 +784,37 @@
   {
     "type": "event",
     "name": "BaysBought",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "port",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "bays",
+        "type": "uint16",
+        "indexed": false,
+        "internalType": "uint16"
+      },
+      {
+        "name": "credits",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "DroneBaysBought",
     "inputs": [
       {
         "name": "pilot",

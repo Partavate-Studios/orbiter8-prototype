@@ -43,14 +43,19 @@ const starSize = (cell, size) => (cell === SOL ? 4 : Math.max(1, Math.min(6, Mat
 const asEvent = (hash, block, returnValues) => ({ transactionHash: hash, blockNumber: block, returnValues })
 
 /** Bays in use, as Pilots.sol counts them: cargo, people (100 a bay), fitted parts (D59) and damaged bays. */
+/** Cargo bays in use: cargo, colonists, parts and damage (drones live in drone bays, D91). */
 export function usedBays(ship) {
   const l = ship.loadout
-  const parts = l.drones * 2 + l.repairBots * 5 + l.armor * 10 + l.shields * 20
+  const parts = l.repairBots * 5 + l.armor * 10 + l.shields * 20
   return ship.cargo + Math.ceil(ship.colonists / 100) + parts + ship.baysLost
 }
 
-/** Holds at a yard: each costs more the more a ship has (Market.sol baysCost). */
+/** Bays at a yard, cargo or drone: each costs more the more bays of both kinds a ship has (Market.sol baysCost). */
 export const baysQuoteFor = (tuning, bays, count) => baysCost(tuning.bayBase, tuning.bayStep, bays, count)
+/** Every bay a ship has, cargo and drone (Pilots.MAX_BAYS caps it). */
+export const totalBays = (ship) => ship.bays + (ship.droneBays ?? 0)
+/** Drones a ship has room for: Pilots.dronesPerBay a drone bay. */
+export const droneRoom = (ship, dronesPerBay = 1) => (ship.droneBays ?? 0) * dronesPerBay
 
 /** The next range upgrade's price, or null at full range. */
 export const rangeQuoteFor = (tuning, range) => (range >= 4 ? null : tuning.rangePrices[range - 1])
@@ -650,7 +655,7 @@ export function createGameClient() {
     if (!port) throw new Error('There is no port there')
     return port
   }
-  const baysQuote = (count) => baysQuoteFor(state.economy.tuning, ship().bays, count)
+  const baysQuote = (count) => baysQuoteFor(state.economy.tuning, totalBays(ship()), count)
   const rangeQuote = () => rangeQuoteFor(state.economy.tuning, ship().range)
   const partPrice = (port, part, count) => partPriceFor(state.rules, port, part, count)
 
@@ -704,6 +709,9 @@ export function createGameClient() {
     },
     buyHolds(planetId, amount, options) {
       return move((p, by, o) => by.buyBays(Number(planetId), amount, baysQuote(amount), o), options)
+    },
+    buyDroneBays(planetId, amount, options) {
+      return move((p, by, o) => by.buyDroneBays(Number(planetId), amount, baysQuote(amount), o), options)
     },
     rename({ type, objectId, parentId, name }, options) {
       switch (type) {

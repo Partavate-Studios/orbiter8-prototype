@@ -445,6 +445,14 @@ Calls made building it, for Koda's review:
   tuning buildings no longer changes it.
 - **X9. Testnet:** body ids and Claims change the contracts' interface; the Paseo deployment needs a
   fresh deploy (throwaway key, as before) before the client plays the testnet again. Not done yet.
+- **X10. Drone bays in the shipyard:** a two-way toggle (Cargo Holds / Drone Bays) above the existing
+  stepper, drawn like the stepper's buttons; the menu's art is otherwise unchanged. It's a new control in
+  one of your menus, so look at it (`docs/mockups/` has no mockup for it; screenshots in the commit's
+  play-test). The loadout's summary line adds "drones N of M".
+- **X11. Bay prices count both kinds:** each bay, cargo or drone, costs a little more than the last
+  counting every bay the ship has (the 250 cap counts both too).
+- **X12. Ships start with no drone bays** (and 5 cargo bays, as before). The 4 built-in drones (decision
+  26) will take no bays.
 - **X6. Wording:** the loadout's empty-weapons line says "Every Sol station's armory sells them." (was "The
   I.S.S. armory").
 

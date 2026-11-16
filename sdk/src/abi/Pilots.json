@@ -313,6 +313,24 @@
   },
   {
     "type": "function",
+    "name": "addDroneBays",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "bays",
+        "type": "uint16",
+        "internalType": "uint16"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "broadcast",
     "inputs": [
       {
@@ -389,6 +407,19 @@
         "name": "",
         "type": "address",
         "internalType": "contract Credits"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "dronesPerBay",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint8",
+        "internalType": "uint8"
       }
     ],
     "stateMutability": "view"
@@ -662,6 +693,11 @@
                 "name": "baysLost",
                 "type": "uint16",
                 "internalType": "uint16"
+              },
+              {
+                "name": "droneBays",
+                "type": "uint16",
+                "internalType": "uint16"
               }
             ]
           },
@@ -864,6 +900,19 @@
   },
   {
     "type": "function",
+    "name": "setDronesPerBay",
+    "inputs": [
+      {
+        "name": "dronesPerBay_",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "setLoadout",
     "inputs": [
       {
@@ -1030,6 +1079,11 @@
           },
           {
             "name": "baysLost",
+            "type": "uint16",
+            "internalType": "uint16"
+          },
+          {
+            "name": "droneBays",
             "type": "uint16",
             "internalType": "uint16"
           }
@@ -1253,6 +1307,38 @@
         "type": "uint16",
         "indexed": false,
         "internalType": "uint16"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "DroneBaysAdded",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "droneBays",
+        "type": "uint16",
+        "indexed": false,
+        "internalType": "uint16"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "DronesPerBaySet",
+    "inputs": [
+      {
+        "name": "dronesPerBay",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "uint8"
       }
     ],
     "anonymous": false
@@ -1700,6 +1786,17 @@
     "type": "error",
     "name": "InvalidInitialization",
     "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "NoDroneRoom",
+    "inputs": [
+      {
+        "name": "room",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ]
   },
   {
     "type": "error",

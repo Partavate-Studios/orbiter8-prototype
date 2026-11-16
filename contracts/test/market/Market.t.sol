@@ -7,6 +7,7 @@ import {Deployment} from "../../script/Deploy.s.sol";
 import {Galaxy} from "../../src/galaxy/Galaxy.sol";
 import {Pilots} from "../../src/pilots/Pilots.sol";
 import {Market} from "../../src/market/Market.sol";
+import {Armory} from "../../src/battle/Armory.sol";
 import {Pricing} from "../../src/market/Pricing.sol";
 import {Credits} from "../../src/tokens/Credits.sol";
 import {Ships} from "../../src/tokens/Ships.sol";
@@ -212,6 +213,31 @@ contract MarketTest is GameFixture {
         market.trade(EARTH, _line(ORGANICS, int256(market.capacity()) - 250, type(uint256).max));
         vm.expectRevert(abi.encodeWithSelector(Market.PortFull.selector, ORGANICS, 0));
         market.trade(EARTH, _line(ORGANICS, 1, type(uint256).max));
+        vm.stopPrank();
+    }
+
+    function test_dronesLiveInDroneBays() public {
+        _pay(ada, 10_000_000);
+        Armory armory = game.armory;
+        vm.startPrank(ada);
+        // No drone bays: no room for a drone, though the cargo bays are empty.
+        vm.expectRevert(abi.encodeWithSelector(Pilots.NoDroneRoom.selector, 0));
+        armory.buy(EARTH, 0, 1, type(uint256).max);
+        // Drone bays cost what cargo bays do, counting every bay the ship has.
+        uint256 quote = market.baysQuote(5, 3);
+        market.buyDroneBays(EARTH, 3, quote);
+        assertEq(pilots.shipOf(ada).droneBays, 3);
+        assertEq(pilots.shipOf(ada).bays, 5, "cargo bays unchanged");
+        armory.buy(EARTH, 0, 3, type(uint256).max);
+        assertEq(pilots.shipOf(ada).loadout.drones, 3);
+        vm.expectRevert(abi.encodeWithSelector(Pilots.NoDroneRoom.selector, 3));
+        armory.buy(EARTH, 0, 1, type(uint256).max);
+        // Drones take no cargo bays: all five still hold cargo.
+        market.trade(EARTH, _line(ORGANICS, 5, type(uint256).max));
+        // The 250 cap counts both kinds.
+        market.buyBays(EARTH, 242, type(uint256).max);
+        vm.expectRevert(abi.encodeWithSelector(Pilots.TooManyBays.selector, 250));
+        market.buyDroneBays(EARTH, 1, type(uint256).max);
         vm.stopPrank();
     }
 

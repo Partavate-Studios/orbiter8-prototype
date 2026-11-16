@@ -28,14 +28,14 @@ contract Pilots is ModuleBase {
     uint8 public constant START_RANGE = 1;
     uint8 public constant MAX_RANGE = 4;
     uint16 public constant START_BAYS = 5;
-    uint16 public constant MAX_BAYS = 250;
+    uint16 public constant MAX_BAYS = 250; // cargo bays and drone bays together
     uint256 public constant START_CREDITS = 1_000;
     uint256 public constant CALLSIGN_FEE = 2_000;
     uint256 public constant SHIP_NAME_FEE = 500;
     uint256 public constant MAX_SESSION = 12 hours;
     uint256 public constant COLONISTS_PER_BAY = 100;
-    // The Orbiter 8's limits (D59): 6 weapon mounts; bays for drones (2), repair bots (5), armor
-    // levels (10, up to 5) and shield levels (20, up to 3).
+    // The Orbiter 8's limits (D59): 6 weapon mounts; cargo bays for repair bots (5), armor levels (10,
+    // up to 5) and shield levels (20, up to 3); drones in drone bays (D91, D99).
     uint256 public constant MOUNTS = 6;
     uint256 public constant MAX_ARMOR = 5;
     uint256 public constant MAX_SHIELDS = 3;
@@ -50,6 +50,7 @@ contract Pilots is ModuleBase {
         Loadout loadout;
         uint8 rangeLost; // engine hits (D46): range never drops below 1
         uint16 baysLost; // cargo bay hits: bays that can't be used until repaired
+        uint16 droneBays; // bays for drones (D91): `dronesPerBay` drones each; `bays` are cargo bays
     }
 
     /// What's fitted (D59). Point defense takes 1 mount, railguns and missile racks 2 each.
@@ -103,6 +104,7 @@ contract Pilots is ModuleBase {
         mapping(address => address) sessionKeyOf; // pilot → current session key
         uint256 count;
         IMoveHook battle;
+        uint8 dronesPerBay; // a tunable (D91): one for now
     }
 
     // keccak256(abi.encode(uint256(keccak256("orbiter8.pilots")) - 1)) & ~bytes32(uint256(0xff))
@@ -116,6 +118,8 @@ contract Pilots is ModuleBase {
     event CargoChanged(address indexed pilot, uint256 indexed good, uint256 units);
     event ColonistsChanged(address indexed pilot, uint256 colonists);
     event BaysAdded(address indexed pilot, uint16 bays);
+    event DroneBaysAdded(address indexed pilot, uint16 droneBays);
+    event DronesPerBaySet(uint8 dronesPerBay);
     event RangeChanged(address indexed pilot, uint8 range);
     event LoadoutChanged(address indexed pilot, Loadout loadout);
     event DamageChanged(address indexed pilot, uint8 rangeLost, uint16 baysLost);
@@ -135,6 +139,7 @@ contract Pilots is ModuleBase {
     error BadSession();
     error SendFailed();
     error BadLoadout();
+    error NoDroneRoom(uint256 room);
 
     function _p() internal pure returns (PilotsStorage storage p) {
         assembly {
@@ -148,6 +153,18 @@ contract Pilots is ModuleBase {
         p.galaxy = galaxy_;
         p.credits = credits_;
         p.shipTokens = ships_;
+        p.dronesPerBay = 1;
+    }
+
+    /// How many drones a drone bay holds (D91).
+    function setDronesPerBay(uint8 dronesPerBay_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        if (dronesPerBay_ == 0) revert BadLoadout();
+        _p().dronesPerBay = dronesPerBay_;
+        emit DronesPerBaySet(dronesPerBay_);
+    }
+
+    function dronesPerBay() external view returns (uint8) {
+        return _p().dronesPerBay;
     }
 
     // ── who is acting ───────────────────────────────────────────────────────────────────────────
@@ -374,7 +391,7 @@ contract Pilots is ModuleBase {
     }
 
     function _loadoutBays(Loadout memory l) internal pure returns (uint256) {
-        return uint256(l.drones) * 2 + uint256(l.repairBots) * 5 + uint256(l.armor) * 10 + uint256(l.shields) * 20;
+        return uint256(l.repairBots) * 5 + uint256(l.armor) * 10 + uint256(l.shields) * 20;
     }
 
     /// Replaces what's fitted (the Armory and Battle). Reverts with BadLoadout past the mounts or
@@ -386,6 +403,8 @@ contract Pilots is ModuleBase {
         uint256 free = _freeBays(ship) + _loadoutBays(ship.loadout);
         uint256 needed = _loadoutBays(loadout);
         if (needed > free && needed > _loadoutBays(ship.loadout)) revert NoRoom(free);
+        uint256 droneRoom = uint256(ship.droneBays) * _p().dronesPerBay;
+        if (loadout.drones > droneRoom && loadout.drones > ship.loadout.drones) revert NoDroneRoom(droneRoom);
         ship.loadout = loadout;
         emit LoadoutChanged(pilot, loadout);
     }
@@ -397,11 +416,20 @@ contract Pilots is ModuleBase {
         emit DamageChanged(pilot, rangeLost, baysLost);
     }
 
+    /// More cargo bays (the shipyard).
     function addBays(address pilot, uint16 bays) external onlyRole(GAME_MODULE) {
         Ship storage ship = _ship(pilot);
-        if (uint256(ship.bays) + bays > MAX_BAYS) revert TooManyBays(MAX_BAYS);
+        if (uint256(ship.bays) + ship.droneBays + bays > MAX_BAYS) revert TooManyBays(MAX_BAYS);
         ship.bays += bays;
         emit BaysAdded(pilot, ship.bays);
+    }
+
+    /// More drone bays (the shipyard).
+    function addDroneBays(address pilot, uint16 bays) external onlyRole(GAME_MODULE) {
+        Ship storage ship = _ship(pilot);
+        if (uint256(ship.bays) + ship.droneBays + bays > MAX_BAYS) revert TooManyBays(MAX_BAYS);
+        ship.droneBays += bays;
+        emit DroneBaysAdded(pilot, ship.droneBays);
     }
 
     function setRange(address pilot, uint8 range) external onlyRole(GAME_MODULE) {

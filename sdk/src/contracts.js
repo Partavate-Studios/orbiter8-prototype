@@ -192,6 +192,7 @@ export function createGame(runner, addresses) {
           colonists: Number(p.ship.colonists),
           rangeLost: Number(p.ship.rangeLost),
           baysLost: Number(p.ship.baysLost),
+          droneBays: Number(p.ship.droneBays),
           loadout: {
             drones: Number(p.ship.loadout.drones),
             repairBots: Number(p.ship.loadout.repairBots),
@@ -223,7 +224,12 @@ export function createGame(runner, addresses) {
 
     /** The goods registry, the tuning and the ports' current capacity: what prices are computed from. */
     async economy() {
-      const [goods, tuning, capacity] = await Promise.all([market.goods(), market.tuning(), market.capacity()])
+      const [goods, tuning, capacity, dronesPerBay] = await Promise.all([
+        market.goods(),
+        market.tuning(),
+        market.capacity(),
+        pilots.dronesPerBay()
+      ])
       return {
         goods: goods.map((g) => ({ name: g.name, base: Number(g.base), spread: Number(g.spread) })),
         tuning: {
@@ -235,7 +241,8 @@ export function createGame(runner, addresses) {
           bayStep: Number(tuning.bayStep),
           rangePrices: tuning.rangePrices.map(Number)
         },
-        capacity: Number(capacity)
+        capacity: Number(capacity),
+        dronesPerBay: Number(dronesPerBay)
       }
     },
 
@@ -542,6 +549,10 @@ export function createGame(runner, addresses) {
     },
     async buyBays(port, count, maxCost, options) {
       return sent(market.buyBays(port, count, maxCost), options)
+    },
+    /** Drone bays (D91): every drone lives in one; priced like cargo bays. */
+    async buyDroneBays(port, count, maxCost, options) {
+      return sent(market.buyDroneBays(port, count, maxCost), options)
     },
     async buyRange(port, maxCost, options) {
       return sent(market.buyRange(port, maxCost), options)

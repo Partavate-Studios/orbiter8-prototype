@@ -106,6 +106,7 @@ contract Market is ModuleBase {
     event PortOpened(uint256 indexed port, uint8 class, address owner, uint40 opensAt, uint40 yardAt);
     event Traded(address indexed pilot, uint256 indexed port, uint256 indexed good, int256 units, uint256 credits);
     event BaysBought(address indexed pilot, uint256 indexed port, uint16 bays, uint256 credits);
+    event DroneBaysBought(address indexed pilot, uint256 indexed port, uint16 bays, uint256 credits);
     event RangeBought(address indexed pilot, uint256 indexed port, uint8 range, uint256 credits);
 
     error NoSuchPort(uint256 port);
@@ -315,16 +316,30 @@ contract Market is ModuleBase {
 
     // ── the shipyard ────────────────────────────────────────────────────────────────────────────
 
-    /// Fits `count` more bays (each costs a little more than the last), paying at most `maxCost`.
+    /// Fits `count` more cargo bays, or drone bays (D91), paying at most `maxCost`. Each bay costs a
+    /// little more than the last, counting every bay the ship has, of both kinds.
     function buyBays(uint256 port, uint16 count, uint256 maxCost) external {
+        _buyBays(port, count, maxCost, false);
+    }
+
+    function buyDroneBays(uint256 port, uint16 count, uint256 maxCost) external {
+        _buyBays(port, count, maxCost, true);
+    }
+
+    function _buyBays(uint256 port, uint16 count, uint256 maxCost, bool drones) internal {
         (address pilot, Pilots.Ship memory ship) = _pilotAt(port);
         _yardOwner(port);
         Tuning storage t = _m().tuning;
-        uint256 cost = Pricing.baysCost(t.bayBase, t.bayStep, ship.bays, count);
+        uint256 cost = Pricing.baysCost(t.bayBase, t.bayStep, uint256(ship.bays) + ship.droneBays, count);
         if (cost > maxCost) revert PriceLimit(type(uint256).max, cost);
         _m().credits.burn(pilot, cost);
-        _m().pilots.addBays(pilot, count);
-        emit BaysBought(pilot, port, count, cost);
+        if (drones) {
+            _m().pilots.addDroneBays(pilot, count);
+            emit DroneBaysBought(pilot, port, count, cost);
+        } else {
+            _m().pilots.addBays(pilot, count);
+            emit BaysBought(pilot, port, count, cost);
+        }
     }
 
     /// Upgrades the engines by one range level (D1, D11), paying at most `maxCost`.

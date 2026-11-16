@@ -33,9 +33,15 @@ work in progress from a session that ran out (check `git status` and `git diff` 
   build. Played a whole siege on a fresh chain across two pilots (Ada claims Haven at star 1; Bodo buys
   railguns at Earth, attacks, files a claim; 24 h skipped with `cast rpc evm_increaseTime`; Haven is
   Bodo's, deed and all), plus a yard repair and claims with names.
-- **Next: Phase 2 (ships)**, first box: bay types (decisions 17, 25, 33). Read `Pilots._freeBays` and the
-  ship record in `contracts/src/pilots/Pilots.sol`, `Market.buyBays`, and the Armory's fitting rules
-  first. Drones (battle and mining) live in drone bays; armor, shields and repair bots in cargo bays.
+- 2026-11-16: Phase 2, bay types done: `Ship.droneBays` beside `bays` (now cargo bays); every drone
+  lives in drone bays (`Pilots.dronesPerBay`, admin-tunable, 1); cargo + drone bays ≤ 250;
+  `Market.buyDroneBays`; the shipyard menu's Cargo Holds / Drone Bays toggle; the loadout shows drones
+  of drone room. Play-tested at desktop and phone. Calls X10–X12 in `review.md`.
+- **Next: Phase 2, the 4 built-in multipurpose drones** (decisions 13, 26): no bays, never lost; each
+  mining or repairing, as the pilot assigns. Repair goes in `Repairs` (slowly restores what's out of
+  action, lazily from time, rates tunable); mining waits for Phase 3's empty sections, so for now only
+  the assignment is stored. Then mining drones as a part (decisions 9, 14): a loadout field living in
+  drone bays, never lost in battle (Combat must not count them).
 
 ## Read first
 
@@ -221,7 +227,7 @@ onward in `docs/demo4-plan.md`, with this plan's milestones.
 - [x] SDK: contracts.js and client.js on the new modules; the existing client plays end to end.
 
 **Phase 2: ships.**
-- [ ] Bay types (decisions 17 and 25): Pilots, Market's shipyard, Armory's fitting rules.
+- [x] Bay types (decisions 17 and 25): Pilots, Market's shipyard, Armory's fitting rules.
 - [ ] The 4 built-in multipurpose drones (decisions 13 and 26): assigned to mining or repair.
 - [ ] Mining drones as a part (decision 9); never lost in battle (decision 14).
 - [ ] Client: the shipyard sells both bay types; the loadout shows drones and bays by type.

@@ -17,7 +17,7 @@
 
           <g transform="translate(0 200)">
             <ship-upgrade
-              :cargo-holds="avatar.ship.holds + holdsToBuy"
+              :cargo-holds="avatar.ship.holds + cargoToBuy"
               :predicted-load="avatar.ship.holds"
               :existing-load="avatar.ship.holds"
               :segments="holdSegments"
@@ -28,14 +28,34 @@
             >Credit Balance: {{ avatar.credits.toLocaleString('en-US') }}&cent;</text
           >
           <text transform="translate(0 320)" fill="#ffffff88" font-size="0.9em"
-            >Current Cargo Holds: {{ avatar.ship.holds }}</text
+            >Cargo Holds: {{ avatar.ship.holds }} · Drone Bays: {{ droneBays }}</text
           >
+
+          <!-- What to install: cargo holds, or drone bays (every drone lives in one, D91) -->
+          <g transform="translate(0 355)" font-size="0.85em">
+            <g v-for="(kind, i) in KINDS" :key="kind.key" :transform="`translate(${i === 0 ? -65 : 65} 0)`">
+              <rect
+                x="-60"
+                y="-13"
+                width="120"
+                height="26"
+                rx="3"
+                ry="3"
+                :stroke="kind.key === bayKind ? '#ffffffcc' : '#ffffff44'"
+                stroke-width="0.5"
+                :fill="kind.key === bayKind ? '#ffffff44' : '#ffffff22'"
+                class="can-click"
+                @click="chooseKind(kind.key)"
+              />
+              <text :fill="kind.key === bayKind ? '#ffffff' : '#ffffff88'" pointer-events="none">{{ kind.label }}</text>
+            </g>
+          </g>
 
           <g transform="translate(0 400)" fill="#ffffff">
             <text v-if="shipMax > 0" font-size="0.9em"
-              >Install cargo holds from {{ costOf(1).toLocaleString('en-US') }}&cent; each (each one dearer).</text
+              >Install {{ bayKind === 'drone' ? 'drone bays' : 'cargo holds' }} from {{ costOf(1).toLocaleString('en-US') }}&cent; each (each one dearer).</text
             >
-            <text v-else font-size="0.9em">You are at max capcity.</text>
+            <text v-else font-size="0.9em">You are at max capacity.</text>
 
             <g transform="translate(0 20)">
               <text transform="translate(0 30)" font-size="1.5em">{{ holdsToBuy }}</text>
@@ -147,6 +167,11 @@ export default {
   data() {
     return {
       holdsToBuy: 0,
+      bayKind: 'cargo',
+      KINDS: [
+        { key: 'cargo', label: 'Cargo Holds' },
+        { key: 'drone', label: 'Drone Bays' }
+      ],
       pending: false,
       player: usePlayerStore(),
       engineArt
@@ -161,8 +186,15 @@ export default {
       return [
         ...shipHolds(ship, goodColor, { text2: TEXT_2, text3: TEXT_3 }),
         { count: Math.max(0, ship.holds - ship.usedHolds), kind: 'empty' },
-        { count: this.holdsToBuy, color: YELLOW_LIGHT, kind: 'added' }
+        { count: this.cargoToBuy, color: YELLOW_LIGHT, kind: 'added' }
       ]
+    },
+    /** Cargo holds being bought (drawn in the ship's picture); none while buying drone bays. */
+    cargoToBuy() {
+      return this.bayKind === 'cargo' ? this.holdsToBuy : 0
+    },
+    droneBays() {
+      return this.player.ship?.droneBays ?? 0
     },
     totalCost() {
       return this.costOf(this.holdsToBuy)
@@ -175,9 +207,9 @@ export default {
     rangePrice() {
       return this.player.rangeQuote()
     },
-    /** Holds this ship can still add before reaching the contract's maximum. */
+    /** Bays this ship can still add before reaching the contract's maximum (cargo and drone together). */
     shipMax() {
-      return MAX_CARGO_HOLDS - this.avatar.ship.holds
+      return MAX_CARGO_HOLDS - this.avatar.ship.holds - this.droneBays
     },
     canAfford() {
       return canAfford(this.avatar.credits, this.totalCost)
@@ -197,6 +229,9 @@ export default {
         }
       },
       deep: true
+    },
+    droneBays(now, before) {
+      if (now != before) this.closeMenu()
     }
   },
   methods: {
@@ -207,10 +242,11 @@ export default {
       this.o8audio.playEffect('click')
       if (this.holdsToBuy > 0) {
         this.pending = true
-        const bought = await this.addHoldsToShip({
-          planetId: this.systemObjects[this.objectId].id,
-          amount: this.holdsToBuy
-        })
+        const planetId = this.systemObjects[this.objectId].id
+        const bought =
+          this.bayKind === 'drone'
+            ? await this.player.buyDroneBays(planetId, this.holdsToBuy)
+            : await this.addHoldsToShip({ planetId, amount: this.holdsToBuy })
         if (bought) this.holdsToBuy = 0
         this.pending = false
       }
@@ -226,6 +262,11 @@ export default {
       const upgraded = await this.player.buyRange(this.systemObjects[this.objectId].id)
       if (upgraded) this.o8audio.speak('upgraded')
       this.pending = false
+    },
+    chooseKind(kind) {
+      this.o8audio.playEffect('click')
+      this.bayKind = kind
+      this.holdsToBuy = Math.min(this.holdsToBuy, this.maxHoldsAvailable)
     },
     decrementHolds() {
       this.holdsToBuy = Math.max(0, this.holdsToBuy - 1)
