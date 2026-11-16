@@ -29,8 +29,13 @@ work in progress from a session that ran out (check `git status` and `git diff` 
   in Phase 2). Battle keeps sieges, rounds and planet defenses. Battle 23.9 → 21.8 KB; Repairs 7.4 KB.
   If asteroid sieges need more room, `Combat` (internal, Battle's bulk) can become a linked library;
   check PolkaVM (`resolc`) links libraries first. Play-tested a yard repair.
-- **Next: Phase 1's last box**, the SDK and the end-of-phase checks: production build, a long play-test
-  like a player (desktop and phone), including a siege if possible. Then Phase 2 (ships).
+- 2026-11-16: **Phase 1 done.** End-of-phase checks: 102 forge tests, 138 client tests, lint, production
+  build. Played a whole siege on a fresh chain across two pilots (Ada claims Haven at star 1; Bodo buys
+  railguns at Earth, attacks, files a claim; 24 h skipped with `cast rpc evm_increaseTime`; Haven is
+  Bodo's, deed and all), plus a yard repair and claims with names.
+- **Next: Phase 2 (ships)**, first box: bay types (decisions 17, 25, 33). Read `Pilots._freeBays` and the
+  ship record in `contracts/src/pilots/Pilots.sol`, `Market.buyBays`, and the Armory's fitting rules
+  first. Drones (battle and mining) live in drone bays; armor, shields and repair bots in cargo bays.
 
 ## Read first
 
@@ -208,12 +213,12 @@ Each phase ends with: `forge test` and `forge build --sizes` (all under the limi
 docking bug fixed (see "Notes for later"); then remove `client-rnd/hud/`. Record decisions 1–34 as D67
 onward in `docs/demo4-plan.md`, with this plan's milestones.
 
-**Phase 1: contract refactor** (no new features).
+**Phase 1: contract refactor** (no new features). *(Done 2026-11-16.)*
 - [x] Body ids with kinds (`BodyId.sol`, `sdk/src/body-id.js`). *(The `Bodies` derivation of every kind comes with the belts in Phase 3; planets derive as before.)*
 - [x] Split Planets (Claims, Settlements) and Battle as agreed; all existing tests pass; sizes recorded. *(Claims and Repairs split out 2026-11-16; Planets keeps its name until asteroids make it generic.)*
 - [x] Treasury address for Federation fees (decisions 19 and 28).
 - [x] Sol fully built: every Sol station has port, yard and armory (decision 18); client shows them.
-- [ ] SDK: contracts.js and client.js on the new modules; the existing client plays end to end.
+- [x] SDK: contracts.js and client.js on the new modules; the existing client plays end to end.
 
 **Phase 2: ships.**
 - [ ] Bay types (decisions 17 and 25): Pilots, Market's shipyard, Armory's fitting rules.
