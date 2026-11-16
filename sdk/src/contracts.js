@@ -7,6 +7,7 @@ import MarketAbi from './abi/Market.json'
 import CreditsAbi from './abi/Credits.json'
 import PlanetsAbi from './abi/Planets.json'
 import ClaimsAbi from './abi/Claims.json'
+import RepairsAbi from './abi/Repairs.json'
 import FactoryAbi from './abi/Factory.json'
 import BattleAbi from './abi/Battle.json'
 import ArmoryAbi from './abi/Armory.json'
@@ -101,7 +102,7 @@ const toSiege = (planet, s) => ({
 })
 
 /** The game's ABIs, for putting a refused move into words (sdk/reverts.js). */
-const INTERFACES = [GalaxyAbi, PilotsAbi, MarketAbi, CreditsAbi, PlanetsAbi, ClaimsAbi, FactoryAbi, BattleAbi, ArmoryAbi].map(
+const INTERFACES = [GalaxyAbi, PilotsAbi, MarketAbi, CreditsAbi, PlanetsAbi, ClaimsAbi, FactoryAbi, BattleAbi, RepairsAbi, ArmoryAbi].map(
   (abi) => new Interface(abi)
 )
 
@@ -153,6 +154,7 @@ export function createGame(runner, addresses) {
   const claims = new Contract(addresses.claims, ClaimsAbi, runner)
   const factory = new Contract(addresses.factory, FactoryAbi, runner)
   const battle = new Contract(addresses.battle, BattleAbi, runner)
+  const repairs = new Contract(addresses.repairs, RepairsAbi, runner)
   const armory = new Contract(addresses.armory, ArmoryAbi, runner)
   const deeds = addresses.deeds ? new Contract(addresses.deeds, DEEDS_ABI, runner) : null
   const provider = runner.provider ?? runner
@@ -291,7 +293,7 @@ export function createGame(runner, addresses) {
 
     /** A ship's state between battles: what's out of action, retreat, time in the yard. */
     async condition(address) {
-      const c = await battle.conditionOf(address)
+      const c = await repairs.conditionOf(address)
       return {
         armorLost: Number(c.armorLost),
         off: [

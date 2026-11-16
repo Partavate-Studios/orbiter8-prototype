@@ -8,10 +8,12 @@ import {Planets} from "../../src/planets/Planets.sol";
 import {Battle} from "../../src/battle/Battle.sol";
 import {Armory} from "../../src/battle/Armory.sol";
 import {Combat} from "../../src/battle/Combat.sol";
+import {Repairs} from "../../src/battle/Repairs.sol";
 import {SystemGen} from "../../src/planets/SystemGen.sol";
 
 contract BattleFixture is PlanetsFixture {
     Battle battle;
+    Repairs repairs;
     Armory armory;
 
     uint256 constant RAILGUN = 3;
@@ -21,7 +23,7 @@ contract BattleFixture is PlanetsFixture {
 
     function setUp() public virtual override {
         super.setUp();
-        (battle, armory) = (game.battle, game.armory);
+        (battle, armory, repairs) = (game.battle, game.armory, game.repairs);
         vm.startPrank(admin);
         battle.grantRole(battle.GAME_MODULE(), admin); // the tests set planet defenses directly
         vm.stopPrank();
@@ -103,7 +105,7 @@ contract BattleTest is BattleFixture {
         (Battle.Siege memory s,) = battle.siegeOf(home);
         assertEq(s.attacker, address(0), "the siege ended");
         assertEq(planets.ownerOf(home), ada);
-        Battle.Condition memory c = battle.conditionOf(bo);
+        Repairs.Condition memory c = repairs.conditionOf(bo);
         assertTrue(c.retreated);
         assertEq(c.armorLost, 100);
 
@@ -114,7 +116,7 @@ contract BattleTest is BattleFixture {
         _go(bo, 0);
         vm.prank(bo);
         armory.repair(EARTH);
-        assertFalse(battle.conditionOf(bo).retreated);
+        assertFalse(repairs.conditionOf(bo).retreated);
         _go(bo, star);
         vm.prank(bo);
         vm.expectRevert(Battle.CannotAttack.selector); // still in the yard
@@ -141,7 +143,7 @@ contract BattleTest is BattleFixture {
         battle.advance(home);
         (Battle.Siege memory s,) = battle.siegeOf(home);
         assertEq(s.attacker, address(0), "Ada's railguns drove Bo off");
-        assertTrue(battle.conditionOf(bo).retreated);
+        assertTrue(repairs.conditionOf(bo).retreated);
     }
 
     function test_leavingEndsTheSiege() public {
@@ -156,7 +158,7 @@ contract BattleTest is BattleFixture {
         (Battle.Siege memory s,) = battle.siegeOf(home);
         assertEq(s.attacker, address(0));
         assertLt(battle.defensesOf(home).armor, 20, "the planet kept its losses");
-        assertFalse(battle.conditionOf(bo).retreated);
+        assertFalse(repairs.conditionOf(bo).retreated);
     }
 
     function test_reinforcingMidSiegeJoinsAtOnce() public {

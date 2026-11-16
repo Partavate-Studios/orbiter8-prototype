@@ -6,6 +6,7 @@ import {ModuleBase} from "../core/ModuleBase.sol";
 import {Pilots, IMoveHook} from "../pilots/Pilots.sol";
 import {Planets} from "../planets/Planets.sol";
 import {Combat} from "./Combat.sol";
+import {Repairs} from "./Repairs.sol";
 
 /// @title Sieges (docs/demo4-plan.md, section 6; D44–D54)
 /// @notice An armed ship at a claimed planet outside Sol starts a siege with one transaction (D44,
@@ -42,18 +43,6 @@ contract Battle is ModuleBase, IMoveHook {
         uint16 moonMissiles;
     }
 
-    /// A ship's state between battles: what's out of action until a shipyard repair.
-    struct Condition {
-        uint32 armorLost;
-        uint16 pointDefenseOff;
-        uint16 railgunsOff;
-        uint16 missilesOff;
-        uint16 dronesOff;
-        uint16 botsOff;
-        bool retreated; // can't attack again until repaired (D52)
-        uint40 dockedUntil; // in the yard after a repair
-    }
-
     struct Siege {
         address attacker;
         uint40 started;
@@ -68,8 +57,8 @@ contract Battle is ModuleBase, IMoveHook {
     struct BattleStorage {
         Pilots pilots;
         Planets planets;
+        Repairs repairs; // ships' condition (split out of Battle)
         mapping(uint256 => Defenses) defenses; // planet → defenses
-        mapping(address => Condition) conditions; // pilot → condition
         mapping(uint256 => Siege) sieges; // planet → its siege (attacker 0: none)
         mapping(uint256 => address[]) allies; // planet → ships that joined its defense
         mapping(uint256 => uint256[]) siegesAt; // star → planets under siege there
@@ -86,7 +75,6 @@ contract Battle is ModuleBase, IMoveHook {
     event ClaimFailed(uint256 indexed planet, address indexed attacker);
     event SiegeEnded(uint256 indexed planet, address indexed attacker, bool captured, bool attackerRetreated);
     event DefensesChanged(uint256 indexed planet, Defenses defenses);
-    event ConditionChanged(address indexed pilot, Condition condition);
 
     error NotThere();
     error CannotAttack();
@@ -104,9 +92,9 @@ contract Battle is ModuleBase, IMoveHook {
         }
     }
 
-    function initialize(address admin, Pilots pilots_, Planets planets_) external initializer {
+    function initialize(address admin, Pilots pilots_, Planets planets_, Repairs repairs_) external initializer {
         __ModuleBase_init(admin);
-        (_b().pilots, _b().planets) = (pilots_, planets_);
+        (_b().pilots, _b().planets, _b().repairs) = (pilots_, planets_, repairs_);
     }
 
     // ── starting and joining ────────────────────────────────────────────────────────────────────
@@ -120,7 +108,7 @@ contract Battle is ModuleBase, IMoveHook {
         address owner = b.planets.ownerOf(planet);
         if (owner == address(0) || owner == pilot || b.attacking[pilot] != 0) revert CannotAttack();
         if (b.sieges[planet].attacker != address(0)) revert AlreadyBesieged();
-        Combat.Side memory ship = shipSide(pilot);
+        Combat.Side memory ship = b.repairs.shipSide(pilot);
         if (Combat.spent(ship)) revert CannotAttack();
         Siege storage s = b.sieges[planet];
         s.attacker = pilot;
@@ -179,8 +167,10 @@ contract Battle is ModuleBase, IMoveHook {
         address[] storage allies = b.allies[planet];
         for (uint256 i = 0; i <= allies.length; i++) {
             address pilot = i == allies.length ? owner : allies[i];
-            if (b.pilots.shipOf(pilot).cell != BodyId.cellOf(planet) || b.conditions[pilot].retreated) continue;
-            Combat.Side memory side = shipSide(pilot);
+            if (b.pilots.shipOf(pilot).cell != BodyId.cellOf(planet) || b.repairs.conditionOf(pilot).retreated) {
+                continue;
+            }
+            Combat.Side memory side = b.repairs.shipSide(pilot);
             fire.railguns += side.railguns;
             fire.missiles += side.missiles;
             fire.drones += side.drones;
@@ -246,7 +236,7 @@ contract Battle is ModuleBase, IMoveHook {
         Siege memory s = b.sieges[planet];
         if (s.attacker == address(0)) return;
         _keepPlanetLosses(planet, s.planet);
-        _keepShipLosses(s.attacker, s.ship);
+        b.repairs.keepLosses(s.attacker, s.ship);
         uint256[] storage list = b.siegesAt[BodyId.cellOf(planet)];
         for (uint256 i = 0; i < list.length; i++) {
             if (list[i] == planet) {
@@ -271,24 +261,6 @@ contract Battle is ModuleBase, IMoveHook {
             (side.pointDefense, side.railguns, side.missiles, side.drones, side.repairBots, uint8(side.bfg));
         (d.moonPointDefense, d.moonRailguns, d.moonMissiles) = (side.moonPointDefense, side.moonRailguns, side.moonMissiles);
         emit DefensesChanged(planet, d);
-    }
-
-    function _keepShipLosses(address pilot, Combat.Side memory side) internal {
-        BattleStorage storage b = _b();
-        Pilots.Ship memory ship = b.pilots.shipOf(pilot);
-        Pilots.Loadout memory l = ship.loadout;
-        Condition storage c = b.conditions[pilot];
-        c.armorLost = uint32(uint256(l.armor) * Combat.ARMOR_HP - side.armor);
-        c.pointDefenseOff = l.pointDefense - side.pointDefense;
-        c.railgunsOff = l.railguns - side.railguns;
-        c.missilesOff = l.missiles - side.missiles;
-        c.dronesOff = l.drones - side.drones;
-        c.botsOff = l.repairBots - side.repairBots;
-        c.retreated = c.retreated || side.retreated;
-        if (side.rangeLost > 0 || side.baysLost > 0) {
-            b.pilots.setDamage(pilot, ship.rangeLost + side.rangeLost, ship.baysLost + side.baysLost);
-        }
-        emit ConditionChanged(pilot, c);
     }
 
     // ── for the Armory (GAME_MODULE) ────────────────────────────────────────────────────────────
@@ -325,37 +297,7 @@ contract Battle is ModuleBase, IMoveHook {
         return next > had ? next - had : 0;
     }
 
-    /// A shipyard repair (the Armory): everything restored; in the yard until `until`.
-    function repaired(address pilot, uint40 until) external onlyRole(GAME_MODULE) {
-        Condition storage c = _b().conditions[pilot];
-        delete _b().conditions[pilot];
-        c.dockedUntil = until;
-        _b().pilots.setDamage(pilot, 0, 0);
-        emit ConditionChanged(pilot, c);
-    }
-
     // ── views ───────────────────────────────────────────────────────────────────────────────────
-
-    /// A ship as it would go into battle now: its loadout less what's out of action.
-    function shipSide(address pilot) public view returns (Combat.Side memory side) {
-        BattleStorage storage b = _b();
-        Pilots.Ship memory ship = b.pilots.shipOf(pilot);
-        Pilots.Loadout memory l = ship.loadout;
-        Condition memory c = b.conditions[pilot];
-        side.shieldMax = uint32(uint256(l.shields) * Combat.SHIELD_HP);
-        side.shield = side.shieldMax; // shields regenerate between battles
-        side.armorMax = uint32(uint256(l.armor) * Combat.ARMOR_HP);
-        side.armor = c.armorLost >= side.armorMax ? 0 : side.armorMax - c.armorLost;
-        side.pointDefense = l.pointDefense - c.pointDefenseOff;
-        side.railguns = l.railguns - c.railgunsOff;
-        side.missiles = l.missiles - c.missilesOff;
-        side.drones = l.drones - c.dronesOff;
-        side.repairBots = l.repairBots - c.botsOff;
-        uint256 range = ship.range > ship.rangeLost ? ship.range - ship.rangeLost : 1;
-        side.maxRangeLoss = uint8(range - 1);
-        side.maxBaysLoss = ship.bays > ship.baysLost ? ship.bays - ship.baysLost : 0;
-        side.retreated = c.retreated || block.timestamp < c.dockedUntil;
-    }
 
     /// A planet's defenses as a fresh side: its hull is its tech level's defense grid.
     function planetSide(uint256 planet) public view returns (Combat.Side memory side) {
@@ -373,10 +315,6 @@ contract Battle is ModuleBase, IMoveHook {
 
     function defensesOf(uint256 planet) external view returns (Defenses memory) {
         return _b().defenses[planet];
-    }
-
-    function conditionOf(address pilot) external view returns (Condition memory) {
-        return _b().conditions[pilot];
     }
 
     /// The siege at a planet as stored (call `preview` for it played up to now).

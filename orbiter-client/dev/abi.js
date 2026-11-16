@@ -13,6 +13,7 @@ const CONTRACTS = {
   Claims: 'Claims.sol/Claims.json',
   Factory: 'Factory.sol/Factory.json',
   Battle: 'Battle.sol/Battle.json',
+  Repairs: 'Repairs.sol/Repairs.json',
   Armory: 'Armory.sol/Armory.json'
 }
 

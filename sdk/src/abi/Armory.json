@@ -390,6 +390,11 @@
         "name": "battle_",
         "type": "address",
         "internalType": "contract Battle"
+      },
+      {
+        "name": "repairs_",
+        "type": "address",
+        "internalType": "contract Repairs"
       }
     ],
     "outputs": [],

@@ -150,67 +150,6 @@
   },
   {
     "type": "function",
-    "name": "conditionOf",
-    "inputs": [
-      {
-        "name": "pilot",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "tuple",
-        "internalType": "struct Battle.Condition",
-        "components": [
-          {
-            "name": "armorLost",
-            "type": "uint32",
-            "internalType": "uint32"
-          },
-          {
-            "name": "pointDefenseOff",
-            "type": "uint16",
-            "internalType": "uint16"
-          },
-          {
-            "name": "railgunsOff",
-            "type": "uint16",
-            "internalType": "uint16"
-          },
-          {
-            "name": "missilesOff",
-            "type": "uint16",
-            "internalType": "uint16"
-          },
-          {
-            "name": "dronesOff",
-            "type": "uint16",
-            "internalType": "uint16"
-          },
-          {
-            "name": "botsOff",
-            "type": "uint16",
-            "internalType": "uint16"
-          },
-          {
-            "name": "retreated",
-            "type": "bool",
-            "internalType": "bool"
-          },
-          {
-            "name": "dockedUntil",
-            "type": "uint40",
-            "internalType": "uint40"
-          }
-        ]
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
     "name": "defensesOf",
     "inputs": [
       {
@@ -382,6 +321,11 @@
         "name": "planets_",
         "type": "address",
         "internalType": "contract Planets"
+      },
+      {
+        "name": "repairs_",
+        "type": "address",
+        "internalType": "contract Repairs"
       }
     ],
     "outputs": [],
@@ -882,24 +826,6 @@
   },
   {
     "type": "function",
-    "name": "repaired",
-    "inputs": [
-      {
-        "name": "pilot",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "until",
-        "type": "uint40",
-        "internalType": "uint40"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
     "name": "revokeRole",
     "inputs": [
       {
@@ -995,142 +921,6 @@
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "shipSide",
-    "inputs": [
-      {
-        "name": "pilot",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "side",
-        "type": "tuple",
-        "internalType": "struct Combat.Side",
-        "components": [
-          {
-            "name": "platforms",
-            "type": "uint32",
-            "internalType": "uint32"
-          },
-          {
-            "name": "shield",
-            "type": "uint32",
-            "internalType": "uint32"
-          },
-          {
-            "name": "shieldMax",
-            "type": "uint32",
-            "internalType": "uint32"
-          },
-          {
-            "name": "armor",
-            "type": "uint32",
-            "internalType": "uint32"
-          },
-          {
-            "name": "armorMax",
-            "type": "uint32",
-            "internalType": "uint32"
-          },
-          {
-            "name": "hull",
-            "type": "uint32",
-            "internalType": "uint32"
-          },
-          {
-            "name": "pointDefense",
-            "type": "uint16",
-            "internalType": "uint16"
-          },
-          {
-            "name": "railguns",
-            "type": "uint16",
-            "internalType": "uint16"
-          },
-          {
-            "name": "missiles",
-            "type": "uint16",
-            "internalType": "uint16"
-          },
-          {
-            "name": "drones",
-            "type": "uint16",
-            "internalType": "uint16"
-          },
-          {
-            "name": "repairBots",
-            "type": "uint16",
-            "internalType": "uint16"
-          },
-          {
-            "name": "bfg",
-            "type": "uint16",
-            "internalType": "uint16"
-          },
-          {
-            "name": "bfgCharge",
-            "type": "uint16",
-            "internalType": "uint16"
-          },
-          {
-            "name": "carry",
-            "type": "uint32",
-            "internalType": "uint32"
-          },
-          {
-            "name": "rangeLost",
-            "type": "uint8",
-            "internalType": "uint8"
-          },
-          {
-            "name": "maxRangeLoss",
-            "type": "uint8",
-            "internalType": "uint8"
-          },
-          {
-            "name": "baysLost",
-            "type": "uint16",
-            "internalType": "uint16"
-          },
-          {
-            "name": "maxBaysLoss",
-            "type": "uint16",
-            "internalType": "uint16"
-          },
-          {
-            "name": "retreated",
-            "type": "bool",
-            "internalType": "bool"
-          },
-          {
-            "name": "moonPointDefense",
-            "type": "uint16",
-            "internalType": "uint16"
-          },
-          {
-            "name": "moonRailguns",
-            "type": "uint16",
-            "internalType": "uint16"
-          },
-          {
-            "name": "moonMissiles",
-            "type": "uint16",
-            "internalType": "uint16"
-          },
-          {
-            "name": "moonCarry",
-            "type": "uint32",
-            "internalType": "uint32"
-          }
-        ]
-      }
-    ],
-    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -1536,67 +1326,6 @@
         "type": "uint40",
         "indexed": false,
         "internalType": "uint40"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "ConditionChanged",
-    "inputs": [
-      {
-        "name": "pilot",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "condition",
-        "type": "tuple",
-        "indexed": false,
-        "internalType": "struct Battle.Condition",
-        "components": [
-          {
-            "name": "armorLost",
-            "type": "uint32",
-            "internalType": "uint32"
-          },
-          {
-            "name": "pointDefenseOff",
-            "type": "uint16",
-            "internalType": "uint16"
-          },
-          {
-            "name": "railgunsOff",
-            "type": "uint16",
-            "internalType": "uint16"
-          },
-          {
-            "name": "missilesOff",
-            "type": "uint16",
-            "internalType": "uint16"
-          },
-          {
-            "name": "dronesOff",
-            "type": "uint16",
-            "internalType": "uint16"
-          },
-          {
-            "name": "botsOff",
-            "type": "uint16",
-            "internalType": "uint16"
-          },
-          {
-            "name": "retreated",
-            "type": "bool",
-            "internalType": "bool"
-          },
-          {
-            "name": "dockedUntil",
-            "type": "uint40",
-            "internalType": "uint40"
-          }
-        ]
       }
     ],
     "anonymous": false

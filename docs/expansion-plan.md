@@ -24,9 +24,13 @@ work in progress from a session that ran out (check `git status` and `git diff` 
   Planets 23.3 → 19.1 KB; Claims 10.7 KB. The star-name fee is Claims' own tuning (`starNameFee`, 50,000
   as a Station cost). SDK binds `addresses.claims`. Play-tested a claim with a name at star 1.
   **The testnet (Paseo) runs the old contracts: it needs a fresh deploy before this client plays it.**
-- **Next: Phase 1, split Battle** (23.9 KB, 654 bytes left). Then the SDK box (contracts.js on the new
-  modules is mostly done with each split; check `claimedPlanets`, the feed's events) and the end-of-phase
-  play-test.
+- 2026-11-16: Battle split: **Repairs** (`contracts/src/battle/Repairs.sol`: each ship's condition, a
+  siege's losses kept, shipyard repairs, a ship's battle side; the home for the built-in drones' repairs
+  in Phase 2). Battle keeps sieges, rounds and planet defenses. Battle 23.9 → 21.8 KB; Repairs 7.4 KB.
+  If asteroid sieges need more room, `Combat` (internal, Battle's bulk) can become a linked library;
+  check PolkaVM (`resolc`) links libraries first. Play-tested a yard repair.
+- **Next: Phase 1's last box**, the SDK and the end-of-phase checks: production build, a long play-test
+  like a player (desktop and phone), including a siege if possible. Then Phase 2 (ships).
 
 ## Read first
 
@@ -206,7 +210,7 @@ onward in `docs/demo4-plan.md`, with this plan's milestones.
 
 **Phase 1: contract refactor** (no new features).
 - [x] Body ids with kinds (`BodyId.sol`, `sdk/src/body-id.js`). *(The `Bodies` derivation of every kind comes with the belts in Phase 3; planets derive as before.)*
-- [ ] Split Planets (Claims, Settlements) and Battle as agreed; all existing tests pass; sizes recorded. *(Claims split out 2026-11-16; Planets keeps its name until asteroids make it generic; Battle to do.)*
+- [x] Split Planets (Claims, Settlements) and Battle as agreed; all existing tests pass; sizes recorded. *(Claims and Repairs split out 2026-11-16; Planets keeps its name until asteroids make it generic.)*
 - [x] Treasury address for Federation fees (decisions 19 and 28).
 - [x] Sol fully built: every Sol station has port, yard and armory (decision 18); client shows them.
 - [ ] SDK: contracts.js and client.js on the new modules; the existing client plays end to end.

@@ -10,7 +10,7 @@
  * @property {{ name: string, symbol: string, decimals: number }} currency
  * @property {string[]} rpc
  * @property {string[]} explorer   Block explorer base URLs, without a trailing slash.
- * @property {Record<string, string>} contracts  addresses by module: galaxy, pilots, market, credits, ships, planets, claims, deeds, factory, battle, armory
+ * @property {Record<string, string>} contracts  addresses by module: galaxy, pilots, market, credits, ships, planets, claims, deeds, factory, battle, repairs, armory
  * @property {number} [startBlock]  the block the contracts were deployed at: no game events before it, so
  *   event reads start there (0 when not given; set it for every public network, or the first read walks the chain)
  * @property {string} [sessionFunds]  native currency (decimal string) sent with a session key for gas

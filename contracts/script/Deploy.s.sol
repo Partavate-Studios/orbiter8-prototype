@@ -11,6 +11,7 @@ import {Ships} from "../src/tokens/Ships.sol";
 import {Deeds} from "../src/tokens/Deeds.sol";
 import {Planets} from "../src/planets/Planets.sol";
 import {Claims} from "../src/planets/Claims.sol";
+import {Repairs} from "../src/battle/Repairs.sol";
 import {Factory} from "../src/planets/Factory.sol";
 import {Battle} from "../src/battle/Battle.sol";
 import {Armory} from "../src/battle/Armory.sol";
@@ -28,6 +29,7 @@ library Deployment {
         Claims claims;
         Planets planets;
         Factory factory;
+        Repairs repairs;
         Battle battle;
         Armory armory;
     }
@@ -71,15 +73,20 @@ library Deployment {
                 abi.encodeCall(Factory.initialize, (admin, game.pilots, game.planets, game.credits))
             )
         );
+        game.repairs =
+            Repairs(_proxy(address(new Repairs()), abi.encodeCall(Repairs.initialize, (admin, game.pilots))));
         game.battle = Battle(
-            _proxy(address(new Battle()), abi.encodeCall(Battle.initialize, (admin, game.pilots, game.planets)))
+            _proxy(
+                address(new Battle()),
+                abi.encodeCall(Battle.initialize, (admin, game.pilots, game.planets, game.repairs))
+            )
         );
         game.armory = Armory(
             _proxy(
                 address(new Armory()),
                 abi.encodeCall(
                     Armory.initialize,
-                    (admin, game.pilots, game.planets, game.factory, game.market, game.credits, game.battle)
+                    (admin, game.pilots, game.planets, game.factory, game.market, game.credits, game.battle, game.repairs)
                 )
             )
         );
@@ -105,6 +112,9 @@ library Deployment {
         game.battle.grantRole(role, address(game.pilots));
         game.battle.grantRole(role, address(game.armory));
         game.pilots.grantRole(role, address(game.battle));
+        game.pilots.grantRole(role, address(game.repairs)); // a ship's damage (Pilots.setDamage)
+        game.repairs.grantRole(role, address(game.battle)); // a siege's losses
+        game.repairs.grantRole(role, address(game.armory)); // shipyard repairs
         game.pilots.grantRole(role, address(game.armory));
         game.planets.grantRole(role, address(game.battle));
         game.factory.grantRole(role, address(game.armory));
@@ -137,6 +147,7 @@ contract Deploy is Script {
         vm.serializeAddress(json, "claims", address(game.claims));
         vm.serializeAddress(json, "factory", address(game.factory));
         vm.serializeAddress(json, "battle", address(game.battle));
+        vm.serializeAddress(json, "repairs", address(game.repairs));
         vm.serializeAddress(json, "armory", address(game.armory));
         string memory out = vm.serializeAddress(json, "pilots", address(game.pilots));
         vm.writeJson(out, string.concat("deployments/", vm.toString(block.chainid), ".json"));

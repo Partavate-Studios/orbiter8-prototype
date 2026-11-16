@@ -9,6 +9,7 @@ import {Factory} from "../planets/Factory.sol";
 import {Market} from "../market/Market.sol";
 import {Credits} from "../tokens/Credits.sol";
 import {Battle} from "./Battle.sol";
+import {Repairs} from "./Repairs.sol";
 
 /// @title Fitting, buying and repairing (docs/demo4-plan.md, sections 5 and 6; D55, D56, D58)
 /// @notice Parts come from a planet's Autofactory (its parts store) or an Armory:
@@ -46,6 +47,7 @@ contract Armory is ModuleBase {
         Market market;
         Credits credits;
         Battle battle;
+        Repairs repairs;
     }
 
     // keccak256(abi.encode(uint256(keccak256("orbiter8.armory")) - 1)) & ~bytes32(uint256(0xff))
@@ -78,12 +80,13 @@ contract Armory is ModuleBase {
         Factory factory_,
         Market market_,
         Credits credits_,
-        Battle battle_
+        Battle battle_,
+        Repairs repairs_
     ) external initializer {
         __ModuleBase_init(admin);
         ArmoryStorage storage a = _a();
-        (a.pilots, a.planets, a.factory, a.market, a.credits, a.battle) =
-            (pilots_, planets_, factory_, market_, credits_, battle_);
+        (a.pilots, a.planets, a.factory, a.market, a.credits, a.battle, a.repairs) =
+            (pilots_, planets_, factory_, market_, credits_, battle_, repairs_);
     }
 
     // ── ships ───────────────────────────────────────────────────────────────────────────────────
@@ -218,7 +221,7 @@ contract Armory is ModuleBase {
         if (v.owner == address(0)) a.credits.burn(pilot, REPAIR_COST);
         else a.credits.move(pilot, v.owner, REPAIR_COST);
         uint40 until = uint40(block.timestamp + REPAIR_TIME);
-        a.battle.repaired(pilot, until);
+        a.repairs.repaired(pilot, until);
         emit Repaired(pilot, port, until);
     }
 
