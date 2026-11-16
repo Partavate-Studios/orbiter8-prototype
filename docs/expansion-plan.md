@@ -10,7 +10,11 @@ A session picking this up: read this log, then `git log --oneline -20`, then car
 unticked box under "Phases". Each step is committed on its own; an uncommitted change in the tree is
 work in progress from a session that ran out (check `git status` and `git diff` first).
 
-- 2026-11-16: started Phase 0 (HUD import).
+- 2026-11-16: Phase 0 done. HUD imported (`57d63da`; analysis now `docs/hud-redesign.md`, mockups
+  `docs/mockups/hud/`), `client-rnd/hud/` removed, docking bug fixed in the SDK (`tradesSinceArrival`
+  in `sdk/src/game/docking.js`), decisions recorded as D67–D100 in `demo4-plan.md` (Milestone 8).
+  Seen at phone size: the zoom rail's "−" looks clipped beside the minimap (not fixed yet).
+- Next: Phase 1, first box (body ids with kinds).
 
 ## Read first
 
@@ -184,7 +188,7 @@ Each phase ends with: `forge test` and `forge build --sizes` (all under the limi
 `npm run lint` in `orbiter-client/` (covers `sdk/`), a production build, and a play-test like a player
 (desktop and phone). Commit per step; never push. Log guesses in `docs/review.md`.
 
-**Phase 0: import the HUD.** Bring `client-rnd/hud/` into `orbiter-client/` (decision 31), with the
+**Phase 0: import the HUD.** *(Done 2026-11-16.)* Bring `client-rnd/hud/` into `orbiter-client/` (decision 31), with the
 docking bug fixed (see "Notes for later"); then remove `client-rnd/hud/`. Record decisions 1–34 as D67
 onward in `docs/demo4-plan.md`, with this plan's milestones.
 

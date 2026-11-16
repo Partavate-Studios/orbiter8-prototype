@@ -91,6 +91,40 @@ design doc), [`design-ideas.md`](design-ideas.md) (Koda's working doc), [`cost-e
 | D65 | **Things become tradable:** ships (pilots will have several, so ships are collectibles), planets, and possibly port goods. B15 and B30 hold only for now. | 2026-11-08 |
 | D66 | **The UI may be rethought for the App,** choosing the best-performing approach; explored after the spike. | 2026-11-08 |
 | D61 | **Moons are free weapons platforms** (Koda, 2026-11-07): **six mounts a moon**, for a planet's owner. Built platforms can be destroyed; moons can't, but every weapon on a moon can be. In a siege the weapons on moons are **exposed, outside the planet's shield**. | 2026-11-07 |
+| D67 | Asteroid belts in Sol (between Mars and Jupiter) and about 1 system in 4; at most one belt a system. ([expansion-plan.md](expansion-plan.md), decision 1) | 2026-11-16 |
+| D68 | A belt is a ring of 8 sections. ([expansion-plan.md](expansion-plan.md), decision 2) | 2026-11-16 |
+| D69 | A section usually holds one large asteroid; about 1 in 6 is empty. ([expansion-plan.md](expansion-plan.md), decision 3) | 2026-11-16 |
+| D70 | Asteroids are carbonaceous, silicate or metallic; size sets capacity (people, drones, output). ([expansion-plan.md](expansion-plan.md), decision 4) | 2026-11-16 |
+| D71 | The belt turns slowly (visual only), stations riding their asteroids; two layers at different speeds for parallax, if cheap. ([expansion-plan.md](expansion-plan.md), decision 5) | 2026-11-16 |
+| D72 | Asteroids are claimed and owned like planets (a deed); they don't count toward the star; besieged and defended with about a moon's firepower, a little more high-tech. ([expansion-plan.md](expansion-plan.md), decision 6) | 2026-11-16 |
+| D73 | Sol's belt belongs to the Federation; players build belts elsewhere. ([expansion-plan.md](expansion-plan.md), decision 7) | 2026-11-16 |
+| D74 | Building on an asteroid: one infrastructure on the big asteroid, nothing in empty space (the line: D88). ([expansion-plan.md](expansion-plan.md), decision 8) | 2026-11-16 |
+| D75 | Mining drones are their own part, separate from battle drones. ([expansion-plan.md](expansion-plan.md), decision 9) | 2026-11-16 |
+| D76 | Production: the existing goods, by composition; rates tunable. ([expansion-plan.md](expansion-plan.md), decision 10) | 2026-11-16 |
+| D77 | Ports are supplied by mining: a body's drones (split mining/defense by the owner) set how fast its port replenishes; planets the same on a bigger scale. ([expansion-plan.md](expansion-plan.md), decision 11) | 2026-11-16 |
+| D78 | Empty sections are mined by ships: up to 6 at once (only the count is on chain; the client places them in six hex slots); a full ship has to leave. ([expansion-plan.md](expansion-plan.md), decision 12) | 2026-11-16 |
+| D79 | Every Orbiter 8 has 4 built-in multipurpose drones (mine and repair); never bought, sold, traded or lost. ([expansion-plan.md](expansion-plan.md), decision 13) | 2026-11-16 |
+| D80 | Mining drones are never lost in battle. ([expansion-plan.md](expansion-plan.md), decision 14) | 2026-11-16 |
+| D81 | Belt drawing by level of detail: far a translucent band; mid band and a dot per asteroid and station; close a reused rock field plus the asteroid and station; the graphics setting caps rocks. ([expansion-plan.md](expansion-plan.md), decision 15) | 2026-11-16 |
+| D82 | Every asteroid and station is selectable; an empty section's six mining slots are selectable hexagons. ([expansion-plan.md](expansion-plan.md), decision 16) | 2026-11-16 |
+| D83 | Ships have cargo bays and drone bays; a ship is customized by how its space is divided. ([expansion-plan.md](expansion-plan.md), decision 17) | 2026-11-16 |
+| D84 | Sol is fully built: every Sol station has port, yard and armory. ([expansion-plan.md](expansion-plan.md), decision 18) | 2026-11-16 |
+| D85 | Federation port profits go to the deployment's owner or a configured treasury account. ([expansion-plan.md](expansion-plan.md), decision 19) | 2026-11-16 |
+| D86 | A contract refactor so the game can keep growing, with the fresh deploy these changes need. ([expansion-plan.md](expansion-plan.md), decision 20) | 2026-11-16 |
+| D87 | Dwarf planets: later. ([expansion-plan.md](expansion-plan.md), decision 21) | 2026-11-16 |
+| D88 | The building line on an asteroid: Platform → Mine → Port → optional Armory; no yards or autofactory. One line for every kind of body, each with its allowed steps. ([expansion-plan.md](expansion-plan.md), decision 22) | 2026-11-16 |
+| D89 | A player's port (planet or asteroid) is supplied only by its body's production; Sol's ports restock themselves at the world's top rate (a station with the most mining drones possible). ([expansion-plan.md](expansion-plan.md), decision 23) | 2026-11-16 |
+| D90 | Drones on bodies: one pool a body; the owner sets how many defend, the rest mine; defense drones can be destroyed, mining drones never; the split is frozen during a siege. ([expansion-plan.md](expansion-plan.md), decision 24) | 2026-11-16 |
+| D91 | Cargo bays (cargo, colonists, armor, shields, repair bots) and drone bays, bought separately at shipyards; total capped at 250; one drone a drone bay for now (a tunable). ([expansion-plan.md](expansion-plan.md), decision 25) | 2026-11-16 |
+| D92 | The 4 built-in drones take no bays; each mines or repairs, as the pilot assigns; repair restores a ship slowly without a yard. ([expansion-plan.md](expansion-plan.md), decision 26) | 2026-11-16 |
+| D93 | Ships mine empty sections: startMining at a free slot (6 a section); the pilot's next action stops it; output accrues per mining drone up to a full ship; a full ship leaves the count; sections never run out; never at an asteroid. ([expansion-plan.md](expansion-plan.md), decision 27) | 2026-11-16 |
+| D94 | Federation fees go to a treasury address the admin sets (default the deployer); the Federation still mints what it pays and burns what it's paid. ([expansion-plan.md](expansion-plan.md), decision 28) | 2026-11-16 |
+| D95 | Asteroid defense: a moon's 6 weapon mounts, a small shield, and its defense drones; no orbital platforms; tunable. ([expansion-plan.md](expansion-plan.md), decision 29) | 2026-11-16 |
+| D96 | Asteroids are named like planets and get a deed; the discoverer's first-claim window applies. ([expansion-plan.md](expansion-plan.md), decision 30) | 2026-11-16 |
+| D97 | Clients: the SDK and the main client; the HUD redesign is imported into the main client and `client-rnd/hud/` removed; the clean-room client is updated later. ([expansion-plan.md](expansion-plan.md), decision 31) | 2026-11-16 |
+| D98 | The contract refactor in `expansion-plan.md` is agreed and lands first. ([expansion-plan.md](expansion-plan.md), decision 32) | 2026-11-16 |
+| D99 | Battle drones move into drone bays too: every drone lives in drone bays. ([expansion-plan.md](expansion-plan.md), decision 33) | 2026-11-16 |
+| D100 | What stops mining: any move that changes the ship (jump, trade, purchase, fitting…); a chat message doesn't. ([expansion-plan.md](expansion-plan.md), decision 34) | 2026-11-16 |
 
 ## Features: this run and consider next (proposed, for Koda to choose)
 
@@ -412,6 +446,11 @@ Milestones 1–5 built the new rules on a separate `/galaxy` screen with plain p
 - [ ] The personhood precompile from our contracts.
 - [ ] Mint a ship into Asset Hub's NFT system; see it in the Pocket.
 - [ ] Plan the migration with Koda.
+
+**Milestone 8: the expansion** (asteroid belts, drones, ship bays, a fully built Sol, a contract refactor; D67–D100).
+The steps, with their checkboxes, are in [`expansion-plan.md`](expansion-plan.md) under "Phases", and its progress log.
+- [x] Phase 0: the HUD redesign imported into the main client, the docking bug fixed, `client-rnd/hud/` removed (2026-11-16).
+- [ ] Phase 1: the contract refactor. - [ ] Phase 2: ships. - [ ] Phase 3: belts. - [ ] Phase 4: drawing the belt. - [ ] Phase 5: tuning.
 
 ### 12. Confirm with Koda before building
 
