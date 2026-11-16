@@ -424,6 +424,22 @@ Calls made in your place:
 - **The ticker's codes fall (▼) in lavender, not pink:** pink is reserved for what needs you.
 - **Routes on the last panel are your yellow** (yellow is "where you can go" on the galaxy map).
 
+## 9. The expansion (2026-11-16, `expansion-plan.md`)
+
+Calls made building it, for Koda's review:
+
+- **X1. Only the Federation's port fees go to the treasury** (decision 28 names the fee). The Federation's
+  other income still burns: parts bought at a Sol armory (twice their cost) and repairs at a Sol yard.
+  Sending those to the treasury too is a one-line change each in `Armory.sol` if wanted.
+- **X2. The treasury starts as the deployer** (`Market.initialize`'s admin); `setTreasury` is admin-only
+  and refuses the zero address.
+- **X3. Every Sol station sells parts at the Federation's price** (twice their cost), as the I.S.S. did.
+- **X4. The HUD redesign's analysis** moved to `docs/hud-redesign.md`, its mockups and screenshots to
+  `docs/mockups/hud/`, when `client-rnd/hud/` was removed.
+- **X5. Seen, not fixed:** at phone size the zoom rail's "−" looks clipped beside the minimap.
+- **X6. Wording:** the loadout's empty-weapons line says "Every Sol station's armory sells them." (was "The
+  I.S.S. armory").
+
 ## For Koda to decide
 
 Answered above, bar these:

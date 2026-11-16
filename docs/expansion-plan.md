@@ -14,7 +14,18 @@ work in progress from a session that ran out (check `git status` and `git diff` 
   `docs/mockups/hud/`), `client-rnd/hud/` removed, docking bug fixed in the SDK (`tradesSinceArrival`
   in `sdk/src/game/docking.js`), decisions recorded as D67–D100 in `demo4-plan.md` (Milestone 8).
   Seen at phone size: the zoom rail's "−" looks clipped beside the minimap (not fixed yet).
-- Next: Phase 1, first box (body ids with kinds).
+- 2026-11-16: Phase 1, treasury and "Sol fully built" done (`e59dd5b`). Calls X1–X6 in `docs/review.md` §9.
+- **Next: Phase 1, body ids with kinds.** Notes for whoever picks it up:
+  - The old encoding `cell << 8 | body` is used in about 27 places in `contracts/src` and `contracts/test`
+    (`grep -rn "<< 8\|>> 8\|& 0xff\|% 256\|/ 256\|\* 256\|& 255" contracts`: Planets, Deeds, Battle,
+    Armory, Market) and about 28 in JS (`sdk/src/market.js` portId/portCell/portBody, `contracts.js`,
+    `client.js`; `orbiter-client/src/stores/player.js`, `card-menu.js`, `feed-menu.svg.vue`;
+    `orbiter-client/dev/tech-trees/build.mjs`; the harness README's "`planet:256`").
+  - Suggested order: a `BodyId` Solidity library (`make(cell, kind, index)`, `cell()`, `kind()`,
+    `index()`) and its JS mirror in `sdk/src/` with cross-check vectors (see `test/vectors/`); then
+    replace each use; keep Sol's ports at `make(0, PLANET, body)`, so the `port < SOL_PORTS` check in
+    `Armory.buy` and `cell == 0 && body < SOL_PORTS` in `Market._port` must change with it.
+  - Commit the id change on its own, with every test passing, before splitting Planets.
 
 ## Read first
 
@@ -195,8 +206,8 @@ onward in `docs/demo4-plan.md`, with this plan's milestones.
 **Phase 1: contract refactor** (no new features).
 - [ ] Body ids with kinds; `Bodies` derivation (planets as now); SDK mirror and cross-check vectors.
 - [ ] Split Planets (Claims, Settlements) and Battle as agreed; all existing tests pass; sizes recorded.
-- [ ] Treasury address for Federation fees (decisions 19 and 28).
-- [ ] Sol fully built: every Sol station has port, yard and armory (decision 18); client shows them.
+- [x] Treasury address for Federation fees (decisions 19 and 28).
+- [x] Sol fully built: every Sol station has port, yard and armory (decision 18); client shows them.
 - [ ] SDK: contracts.js and client.js on the new modules; the existing client plays end to end.
 
 **Phase 2: ships.**
