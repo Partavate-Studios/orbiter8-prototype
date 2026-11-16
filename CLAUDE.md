@@ -3,7 +3,7 @@
 Koda's on-chain space trading game: explore a hex galaxy, trade, claim and build up planets, fit
 weapons, lay sieges. Solidity contracts in `contracts/` (Foundry), the game's SDK in `sdk/`
 (chain access, state, actions and rules, shared by every client; `sdk/README.md`), and a Vue 3 client in
-`orbiter-client/` (Pinia, Vite, ethers 6, Vitest, SVG graphics). `client-rnd/` holds experimental clients.
+`orbiter-client/` (Pinia, Vite, ethers 6, Vitest, SVG graphics). `client-rnd/fresh/` holds an experimental clean-room client.
 
 **Direction (2026-11-08): Polkadot Hub only, launched as a Polkadot App mini-app** alongside the App's
 own launch. Read [`docs/polkadot-direction.md`](docs/polkadot-direction.md). Work on branch `polkadot`;
