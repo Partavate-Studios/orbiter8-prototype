@@ -373,7 +373,7 @@ export function createGameClient() {
     for (const c of cells) next.set(c.cell, c)
     state.cells = next
     if (!covered) state.loadedCenters.push(center)
-    // Names change (Planets.nameStar), so a forced read fetches the named stars' names again.
+    // Names change (Claims.nameStar), so a forced read fetches the named stars' names again.
     await Promise.all([
       ...cells
         .filter((c) => c.named && (force || !(c.cell in state.names)))
@@ -399,7 +399,7 @@ export function createGameClient() {
     return planetName(cell, indexOf(id), classes)
   }
 
-  /** A star's name as given (genesis or a player, Planets.nameStar), else "Star 1234" by its cell. */
+  /** A star's name as given (genesis or a player, Claims.nameStar), else "Star 1234" by its cell. */
   function starName(cell) {
     return state.names[cell] || unnamed(cell, state.cells.get(cell)?.state === STATE.BLACK_HOLE)
   }

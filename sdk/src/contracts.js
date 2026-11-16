@@ -6,6 +6,7 @@ import PilotsAbi from './abi/Pilots.json'
 import MarketAbi from './abi/Market.json'
 import CreditsAbi from './abi/Credits.json'
 import PlanetsAbi from './abi/Planets.json'
+import ClaimsAbi from './abi/Claims.json'
 import FactoryAbi from './abi/Factory.json'
 import BattleAbi from './abi/Battle.json'
 import ArmoryAbi from './abi/Armory.json'
@@ -100,7 +101,7 @@ const toSiege = (planet, s) => ({
 })
 
 /** The game's ABIs, for putting a refused move into words (sdk/reverts.js). */
-const INTERFACES = [GalaxyAbi, PilotsAbi, MarketAbi, CreditsAbi, PlanetsAbi, FactoryAbi, BattleAbi, ArmoryAbi].map(
+const INTERFACES = [GalaxyAbi, PilotsAbi, MarketAbi, CreditsAbi, PlanetsAbi, ClaimsAbi, FactoryAbi, BattleAbi, ArmoryAbi].map(
   (abi) => new Interface(abi)
 )
 
@@ -149,6 +150,7 @@ export function createGame(runner, addresses) {
   const market = new Contract(addresses.market, MarketAbi, runner)
   const credits = new Contract(addresses.credits, CreditsAbi, runner)
   const planets = new Contract(addresses.planets, PlanetsAbi, runner)
+  const claims = new Contract(addresses.claims, ClaimsAbi, runner)
   const factory = new Contract(addresses.factory, FactoryAbi, runner)
   const battle = new Contract(addresses.battle, BattleAbi, runner)
   const armory = new Contract(addresses.armory, ArmoryAbi, runner)
@@ -247,13 +249,15 @@ export function createGame(runner, addresses) {
 
     /** What planets cost: buildings 1–7, the claim fee and the colonist price; the Autofactory's parts. */
     async planetRules() {
-      const [tuning, parts, ...costs] = await Promise.all([
+      const [tuning, claimTuning, parts, ...costs] = await Promise.all([
         planets.tuning(),
+        claims.tuning(),
         factory.parts(),
         ...[1, 2, 3, 4, 5, 6, 7].map((b) => planets.costOf(b))
       ])
       return {
-        claimFee: Number(tuning.claimFee),
+        claimFee: Number(claimTuning.claimFee),
+        starNameFee: Number(claimTuning.starNameFee),
         colonistPrice: Number(tuning.colonistPrice),
         growthTime: Number(tuning.growthTime),
         producePerHour: Number(tuning.producePerHour),
@@ -424,7 +428,7 @@ export function createGame(runner, addresses) {
 
     /** Names an owner gave a planet: { planet, station, moons: [8] } ("" where unnamed). */
     async namesOf(planet) {
-      const names = await planets.namesOf(planet)
+      const names = await claims.namesOf(planet)
       return { planet: names[0], station: names[1], moons: names.slice(2) }
     },
 
@@ -444,9 +448,9 @@ export function createGame(runner, addresses) {
 
     /** Every claimed planet's id and owner now, from the claims and seizures. */
     async claimedPlanets() {
-      const claims = await planets.queryFilter(planets.filters.Claimed(), 0)
-      const ids = [...new Set(claims.map((l) => Number(l.args[0])))]
-      const owners = await Promise.all(ids.map((id) => planets.ownerOf(id)))
+      const logs = await claims.queryFilter(claims.filters.Claimed(), 0)
+      const ids = [...new Set(logs.map((l) => Number(l.args[0])))]
+      const owners = await Promise.all(ids.map((id) => claims.ownerOf(id)))
       return ids.map((id, i) => ({ id, owner: owners[i].toLowerCase() }))
     },
 
@@ -472,7 +476,7 @@ export function createGame(runner, addresses) {
 
     /** Whether `address` may name the star at `cell`, and whether doing so makes them its owner. */
     async mayNameStar(cell, address) {
-      const [may, becomesOwner] = await planets.mayNameStar(cell, address)
+      const [may, becomesOwner] = await claims.mayNameStar(cell, address)
       return { may, becomesOwner }
     },
 
@@ -510,9 +514,9 @@ export function createGame(runner, addresses) {
     async traverse(proofs = [], options) {
       return sent(pilots.traverse(proofs), options)
     },
-    /** Names part of the player's planet: Planets.NAME_PLANET (0), NAME_STATION (1), NAME_MOON (2) + orbit. */
+    /** Names part of the player's planet: Claims.NAME_PLANET (0), NAME_STATION (1), NAME_MOON (2) + orbit. */
     async renamePlanet(planet, part, name, options) {
-      return sent(planets.rename(planet, part, name), options)
+      return sent(claims.rename(planet, part, name), options)
     },
     async renameShip(name, options) {
       return sent(pilots.renameShip(name), options)
@@ -523,9 +527,9 @@ export function createGame(runner, addresses) {
     async broadcast(message, options) {
       return sent(pilots.broadcast(message), options)
     },
-    /** Names a star, for the Station's cost, if the pilot may (Planets.mayNameStar). */
+    /** Names a star, for its fee (Claims.tuning), if the pilot may (Claims.mayNameStar). */
     async nameStar(cell, name, options) {
-      return sent(planets.nameStar(cell, name), options)
+      return sent(claims.nameStar(cell, name), options)
     },
     async resolveScans(proofs, options) {
       return sent(pilots.resolveScans(proofs), options)
@@ -548,7 +552,7 @@ export function createGame(runner, addresses) {
       return sent(pilots.endSession(), options)
     },
     async claim(planet, options) {
-      return sent(planets.claim(planet), options)
+      return sent(claims.claim(planet), options)
     },
     async recruit(count, options) {
       return sent(planets.recruit(count), options)

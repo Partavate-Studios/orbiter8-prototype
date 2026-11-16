@@ -18,9 +18,15 @@ work in progress from a session that ran out (check `git status` and `git diff` 
 - 2026-11-16: body ids with kinds done: `cell << 16 | kind << 8 | index` (planet 0, asteroid 1); Sol's
   planets stay ids 0–8. Planet-only moves reject other kinds (`Planets._derive`). Play-tested at Sol and
   star 1. The clean-room client's two id lines were updated too.
-- **Next: Phase 1, split Planets (Claims, Settlements) and Battle.** Measure first (`forge build --sizes`:
-  Planets 23.3 KB, Battle 23.9 KB of 24.6). Keep each split a commit with all tests passing; the deploy
-  script (`contracts/script/`, `Deployment.deploy` used by the tests) and `npm run abi` change with it.
+- 2026-11-16: Planets split: **Claims** (`contracts/src/planets/Claims.sol`: owners, claims, deeds, the
+  discoverer's window, body names, star naming, `transfer` for sieges) and Planets (people, production,
+  storage, buildings; asks Claims for owners; keeps `ownerOf` and `moonCount` for Battle, Armory, Factory).
+  Planets 23.3 → 19.1 KB; Claims 10.7 KB. The star-name fee is Claims' own tuning (`starNameFee`, 50,000
+  as a Station cost). SDK binds `addresses.claims`. Play-tested a claim with a name at star 1.
+  **The testnet (Paseo) runs the old contracts: it needs a fresh deploy before this client plays it.**
+- **Next: Phase 1, split Battle** (23.9 KB, 654 bytes left). Then the SDK box (contracts.js on the new
+  modules is mostly done with each split; check `claimedPlanets`, the feed's events) and the end-of-phase
+  play-test.
 
 ## Read first
 
@@ -200,7 +206,7 @@ onward in `docs/demo4-plan.md`, with this plan's milestones.
 
 **Phase 1: contract refactor** (no new features).
 - [x] Body ids with kinds (`BodyId.sol`, `sdk/src/body-id.js`). *(The `Bodies` derivation of every kind comes with the belts in Phase 3; planets derive as before.)*
-- [ ] Split Planets (Claims, Settlements) and Battle as agreed; all existing tests pass; sizes recorded.
+- [ ] Split Planets (Claims, Settlements) and Battle as agreed; all existing tests pass; sizes recorded. *(Claims split out 2026-11-16; Planets keeps its name until asteroids make it generic; Battle to do.)*
 - [x] Treasury address for Federation fees (decisions 19 and 28).
 - [x] Sol fully built: every Sol station has port, yard and armory (decision 18); client shows them.
 - [ ] SDK: contracts.js and client.js on the new modules; the existing client plays end to end.

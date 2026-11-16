@@ -5,6 +5,7 @@ import {GameFixture} from "../market/Market.t.sol";
 import {Pilots} from "../../src/pilots/Pilots.sol";
 import {Market} from "../../src/market/Market.sol";
 import {Planets} from "../../src/planets/Planets.sol";
+import {Claims} from "../../src/planets/Claims.sol";
 import {Factory} from "../../src/planets/Factory.sol";
 import {Deeds} from "../../src/tokens/Deeds.sol";
 import {SystemGen} from "../../src/planets/SystemGen.sol";
@@ -12,6 +13,7 @@ import {BodyId} from "../../src/planets/BodyId.sol";
 
 contract PlanetsFixture is GameFixture {
     Planets planets;
+    Claims claims;
     Factory factory;
     Deeds deeds;
     uint256 star; // a star next to Sol
@@ -22,15 +24,15 @@ contract PlanetsFixture is GameFixture {
 
     function setUp() public virtual override {
         super.setUp();
-        (planets, factory, deeds) = (game.planets, game.factory, game.deeds);
+        (planets, claims, factory, deeds) = (game.planets, game.claims, game.factory, game.deeds);
         star = _starAroundSol();
         home = star << 16;
     }
 
     function _claim(address who, uint256 planet) internal {
-        _pay(who, planets.tuning().claimFee);
+        _pay(who, claims.tuning().claimFee);
         vm.prank(who);
-        planets.claim(planet);
+        claims.claim(planet);
     }
 
     function _go(address who, uint256 cell) internal {
@@ -56,7 +58,7 @@ contract PlanetsFixture is GameFixture {
         _supply();
         _go(ada, star);
         vm.startPrank(ada);
-        planets.claim(home);
+        claims.claim(home);
         planets.land(home, 100);
         planets.deliver(home, ORGANICS, 40);
         planets.deliver(home, EQUIPMENT, 40);
@@ -84,27 +86,27 @@ contract PlanetsTest is PlanetsFixture {
 
     function test_claimNeedsTheShipThereAndAFee() public {
         vm.prank(ada);
-        vm.expectRevert(abi.encodeWithSelector(Planets.NotThere.selector, home));
-        planets.claim(home);
+        vm.expectRevert(abi.encodeWithSelector(Claims.NotThere.selector, home));
+        claims.claim(home);
         _go(ada, star);
         _pay(ada, 5_000);
         uint256 supply = credits.totalSupply();
         vm.prank(ada);
-        planets.claim(home);
+        claims.claim(home);
         assertEq(planets.ownerOf(home), ada);
         assertEq(deeds.ownerOf(home), ada);
-        assertEq(credits.totalSupply(), supply - planets.tuning().claimFee);
+        assertEq(credits.totalSupply(), supply - claims.tuning().claimFee);
         vm.prank(ada);
-        vm.expectRevert(abi.encodeWithSelector(Planets.AlreadyClaimed.selector, home));
-        planets.claim(home);
+        vm.expectRevert(abi.encodeWithSelector(Claims.AlreadyClaimed.selector, home));
+        claims.claim(home);
         vm.prank(ada);
-        vm.expectRevert(abi.encodeWithSelector(Planets.NoSuchPlanet.selector, home | 9));
-        planets.claim(home | 9);
+        vm.expectRevert(abi.encodeWithSelector(Claims.NoSuchPlanet.selector, home | 9));
+        claims.claim(home | 9);
         // Another kind of body at the star (an asteroid's id) is not a planet.
         uint256 asteroid = BodyId.make(star, BodyId.ASTEROID, 0);
         vm.prank(ada);
-        vm.expectRevert(abi.encodeWithSelector(Planets.NoSuchPlanet.selector, asteroid));
-        planets.claim(asteroid);
+        vm.expectRevert(abi.encodeWithSelector(Claims.NoSuchPlanet.selector, asteroid));
+        claims.claim(asteroid);
     }
 
     function test_bodyIds() public pure {
@@ -119,8 +121,8 @@ contract PlanetsTest is PlanetsFixture {
 
     function test_solBelongsToTheFederation() public {
         vm.prank(ada);
-        vm.expectRevert(abi.encodeWithSelector(Planets.FederationPlanet.selector, EARTH));
-        planets.claim(EARTH);
+        vm.expectRevert(abi.encodeWithSelector(Claims.FederationPlanet.selector, EARTH));
+        claims.claim(EARTH);
     }
 
     function test_theDiscovererClaimsFirstUnlessTheyFlyOn() public {
@@ -130,8 +132,8 @@ contract PlanetsTest is PlanetsFixture {
         _go(bo, star);
         _pay(bo, 5_000);
         vm.prank(bo);
-        vm.expectRevert(abi.encodeWithSelector(Planets.FirstClaimWindow.selector, ada));
-        planets.claim(home);
+        vm.expectRevert(abi.encodeWithSelector(Claims.FirstClaimWindow.selector, ada));
+        claims.claim(home);
         _go(ada, 0); // Ada flies on: the window closes
         _claim(bo, home);
         assertEq(planets.ownerOf(home), bo);
@@ -281,33 +283,33 @@ contract PlanetsTest is PlanetsFixture {
         _go(ada, star);
         _claim(ada, home);
         uint8 slots = SystemGen.moonSlots(keccak256("test universe"), star, 0);
-        uint8 moon = planets.NAME_MOON(); // (read first: a call after expectRevert would take it)
+        uint8 moon = claims.NAME_MOON(); // (read first: a call after expectRevert would take it)
         vm.startPrank(ada);
-        planets.rename(home, planets.NAME_PLANET(), "Haven");
-        planets.rename(home, planets.NAME_STATION(), "Haven Dock");
+        claims.rename(home, claims.NAME_PLANET(), "Haven");
+        claims.rename(home, claims.NAME_STATION(), "Haven Dock");
         for (uint8 orbit = 0; orbit < 8; orbit++) {
             if ((slots >> orbit) & 1 == 1) {
-                planets.rename(home, moon + orbit, "Little One");
-                assertEq(planets.namesOf(home)[2 + orbit], "Little One");
+                claims.rename(home, moon + orbit, "Little One");
+                assertEq(claims.namesOf(home)[2 + orbit], "Little One");
             } else {
-                vm.expectRevert(abi.encodeWithSelector(Planets.NoSuchMoon.selector, home, orbit));
-                planets.rename(home, moon + orbit, "Nothing");
+                vm.expectRevert(abi.encodeWithSelector(Claims.NoSuchMoon.selector, home, orbit));
+                claims.rename(home, moon + orbit, "Nothing");
             }
         }
-        vm.expectRevert(Planets.BadName.selector);
-        planets.rename(home, 0, "");
+        vm.expectRevert(Claims.BadName.selector);
+        claims.rename(home, 0, "");
         vm.stopPrank();
-        assertEq(planets.namesOf(home)[0], "Haven");
-        assertEq(planets.namesOf(home)[1], "Haven Dock");
+        assertEq(claims.namesOf(home)[0], "Haven");
+        assertEq(claims.namesOf(home)[1], "Haven Dock");
 
         vm.prank(bo);
         pilots.register("Bodo", "Raider");
         vm.prank(bo);
-        vm.expectRevert(abi.encodeWithSelector(Planets.NotYours.selector, home));
-        planets.rename(home, 0, "Mine Now");
+        vm.expectRevert(abi.encodeWithSelector(Claims.NotYours.selector, home));
+        claims.rename(home, 0, "Mine Now");
         vm.prank(ada);
-        vm.expectRevert(abi.encodeWithSelector(Planets.FederationPlanet.selector, EARTH));
-        planets.rename(EARTH, 0, "Ada's Earth");
+        vm.expectRevert(abi.encodeWithSelector(Claims.FederationPlanet.selector, EARTH));
+        claims.rename(EARTH, 0, "Ada's Earth");
     }
 
     /// The naming rules (Planets.mayNameStar), on the star next to Sol: a genesis star, so the
@@ -322,7 +324,7 @@ contract PlanetsTest is PlanetsFixture {
         assertEq(galaxy.star(star).discoverer, ada);
 
         // The Federation owns the genesis star: the discoverer can't rename it.
-        (bool may,) = planets.mayNameStar(star, ada);
+        (bool may,) = claims.mayNameStar(star, ada);
         assertFalse(may, "the Federation's");
 
         // A star nobody owns yet: its discoverer may name it, without owning it.
@@ -333,7 +335,7 @@ contract PlanetsTest is PlanetsFixture {
         _pay(ada, fee);
         uint256 supply = credits.totalSupply();
         vm.prank(ada);
-        planets.nameStar(star, "Adaheim");
+        claims.nameStar(star, "Adaheim");
         assertEq(galaxy.nameOf(star), "Adaheim");
         assertEq(galaxy.keeperOf(star), address(0));
         assertEq(credits.totalSupply(), supply - fee, "the fee is burned");
@@ -344,9 +346,9 @@ contract PlanetsTest is PlanetsFixture {
         for (uint256 body = 0; body < n; body++) _claim(bo, (star << 16) | body);
         _pay(bo, fee);
         vm.prank(bo);
-        planets.nameStar(star, "Bodo's Reach");
+        claims.nameStar(star, "Bodo's Reach");
         assertEq(galaxy.keeperOf(star), bo);
-        (may,) = planets.mayNameStar(star, ada);
+        (may,) = claims.mayNameStar(star, ada);
         assertFalse(may, "the discoverer, once there's an owner");
 
         // Bo loses all but one planet to Ada: still the owner, until Ada holds a majority and names it.
@@ -356,20 +358,20 @@ contract PlanetsTest is PlanetsFixture {
         vm.stopPrank();
         assertEq(galaxy.keeperOf(star), bo);
         bool owns;
-        (may, owns) = planets.mayNameStar(star, ada);
+        (may, owns) = claims.mayNameStar(star, ada);
         assertEq(may, (n - 1) * 2 > n);
         if (may) {
             assertTrue(owns);
             _pay(ada, fee);
             vm.prank(ada);
-            planets.nameStar(star, "Adaheim Again");
+            claims.nameStar(star, "Adaheim Again");
             assertEq(galaxy.keeperOf(star), ada);
         }
 
         // Someone with nothing there can't.
         vm.prank(makeAddr("nobody"));
         vm.expectRevert();
-        planets.nameStar(star, "Nope");
+        claims.nameStar(star, "Nope");
     }
 
     function test_solHasItsMoons() public pure {

@@ -147,7 +147,7 @@ export async function runAction(option, object, { showMoons }) {
       return
     }
     case 'nameStar': {
-      const fee = player.rules.buildings[3].credits // a Station's cost (Planets.nameStar)
+      const fee = player.rules.starNameFee // Claims.nameStar
       const owns = object.namingOwns && object.keeper !== player.account
       const name = await ask({
         title: (object.named ? 'Rename ' : 'Name ') + object.name,

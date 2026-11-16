@@ -7,16 +7,14 @@ import {Galaxy} from "../galaxy/Galaxy.sol";
 import {Pilots} from "../pilots/Pilots.sol";
 import {Market} from "../market/Market.sol";
 import {Credits} from "../tokens/Credits.sol";
-import {Deeds} from "../tokens/Deeds.sol";
+import {Claims} from "./Claims.sol";
 import {Fixed} from "../math/Fixed.sol";
 import {SystemGen} from "./SystemGen.sol";
 
-/// @title Planets: claims, people, production and buildings (docs/demo4-plan.md, section 5)
-/// @notice A star's planets are derived (`SystemGen`); this stores only what players change.
+/// @title Planets: people, production and buildings (docs/demo4-plan.md, section 5)
+/// @notice A star's planets are derived (`SystemGen`); this stores only what players change. Who owns a
+/// planet, its deed and its names are in Claims (split out for room to grow, expansion plan).
 ///
-/// - **Claims (D40):** the ship must be at the star, and there's a fee. For 10 minutes after a star is
-///   discovered, only its discoverer may claim there, unless they've flown on. Sol's planets belong
-///   to the Federation (D49).
 /// - **People (D57):** colonists are recruited at Earth and carried 100 to a bay. Landed on a planet
 ///   with a Citadel, they grow toward the planet's cap, worked out lazily from the time.
 /// - **Production:** a settled planet makes the goods its class sells, faster with more people, into
@@ -33,7 +31,6 @@ contract Planets is ModuleBase {
     uint8 public constant YARDS = 5;
     uint8 public constant ARMORY = 6;
     uint8 public constant AUTOFACTORY = 7;
-    uint256 public constant FIRST_CLAIM = 10 minutes;
     uint256 public constant EARTH = 2;
 
     struct Cost {
@@ -45,7 +42,6 @@ contract Planets is ModuleBase {
     }
 
     struct Tuning {
-        uint64 claimFee;
         uint32 colonistPrice; // credits per person recruited at Earth
         uint32 growthTime; // seconds for the gap to the cap to shrink by e (about 63%)
         uint32 producePerHour; // units of each good at a full population
@@ -54,7 +50,6 @@ contract Planets is ModuleBase {
     }
 
     struct Planet {
-        address owner;
         uint8 level; // finished buildings in the line, 0–6
         bool autofactory;
         uint8 building; // under construction (0: none)
@@ -86,31 +81,25 @@ contract Planets is ModuleBase {
         Pilots pilots;
         Market market;
         Credits credits;
-        Deeds deeds;
+        Claims claims;
         mapping(uint256 => Planet) planets;
         mapping(uint256 => mapping(uint256 => uint256)) stock; // planet → good → units
         mapping(uint8 => Cost) costs; // building → cost
         Tuning tuning;
-        mapping(uint256 => mapping(uint8 => string)) names; // planet → part (NAME_PLANET, NAME_STATION, NAME_MOON + orbit) → name
     }
 
     // keccak256(abi.encode(uint256(keccak256("orbiter8.planets")) - 1)) & ~bytes32(uint256(0xff))
     bytes32 private constant PLANETS_SLOT = 0xf621d9cb25ea9a656959194bb7a2b456d42c293144ad14e6211624427211cb00;
 
-    event Claimed(uint256 indexed planet, address indexed owner);
     event Recruited(address indexed pilot, uint256 colonists, uint256 credits);
     event PeopleMoved(uint256 indexed planet, address indexed pilot, int256 people, uint256 population);
     event StockMoved(uint256 indexed planet, uint256 indexed good, int256 units, uint256 stock);
     event BuildingStarted(uint256 indexed planet, uint8 building, uint40 readyAt);
     event CostSet(uint8 indexed building, Cost cost);
     event TuningSet(Tuning tuning);
-    event Named(uint256 indexed planet, uint8 part, string name);
     event PlanetSeized(uint256 indexed planet, address indexed from, address indexed to, uint8 level);
 
     error NoSuchPlanet(uint256 planet);
-    error FederationPlanet(uint256 planet);
-    error AlreadyClaimed(uint256 planet);
-    error FirstClaimWindow(address discoverer);
     error NotYours(uint256 planet);
     error NotThere(uint256 planet);
     error NotAtSol();
@@ -119,9 +108,6 @@ contract Planets is ModuleBase {
     error NeedsPeople(uint256 needed);
     error NotEnoughStock(uint256 good, uint256 have);
     error StorageFull(uint256 good, uint256 room);
-    error BadName();
-    error NoSuchMoon(uint256 planet, uint8 orbit);
-    error CannotNameStar(uint256 cell);
 
     function _s() internal pure returns (PlanetsStorage storage s) {
         assembly {
@@ -135,11 +121,11 @@ contract Planets is ModuleBase {
         Pilots pilots_,
         Market market_,
         Credits credits_,
-        Deeds deeds_
+        Claims claims_
     ) external initializer {
         __ModuleBase_init(admin);
         PlanetsStorage storage s = _s();
-        (s.galaxy, s.pilots, s.market, s.credits, s.deeds) = (galaxy_, pilots_, market_, credits_, deeds_);
+        (s.galaxy, s.pilots, s.market, s.credits, s.claims) = (galaxy_, pilots_, market_, credits_, claims_);
         // Goods: 0 water ice, 1 metals, 2 rare elements, 3 helium-3, 4 organics, 5 silicon, 6 equipment,
         // 7 electronics. Starting values; to be tuned by simulation with the rest of the economy.
         _setCost(CITADEL, Cost(5_000, 10 minutes, 100, [6, 4, 0], [uint32(40), 40, 0]));
@@ -149,7 +135,7 @@ contract Planets is ModuleBase {
         _setCost(YARDS, Cost(150_000, 4 hours, 0, [1, 6, 0], [uint32(200), 100, 0]));
         _setCost(ARMORY, Cost(250_000, 6 hours, 0, [2, 7, 0], [uint32(150), 100, 0]));
         _setCost(AUTOFACTORY, Cost(60_000, 2 hours, 0, [6, 7, 5], [uint32(100), 100, 50]));
-        _setTuning(Tuning(2_000, 10, 8 hours, 20, 5_000, 90));
+        _setTuning(Tuning(10, 8 hours, 20, 5_000, 90));
     }
 
     // ── admin ───────────────────────────────────────────────────────────────────────────────────
@@ -198,119 +184,13 @@ contract Planets is ModuleBase {
     /// The owner acting, at the planet.
     function _ownerAt(uint256 id) internal view returns (address pilot) {
         pilot = _pilotAt(id);
-        if (_s().planets[id].owner != pilot) revert NotYours(id);
-    }
-
-    // ── claims (D40) ────────────────────────────────────────────────────────────────────────────
-
-    function claim(uint256 id) external {
-        address pilot = _pilotAt(id);
-        _derive(id);
-        uint256 cell = BodyId.cellOf(id);
-        if (cell == 0) revert FederationPlanet(id);
-        PlanetsStorage storage s = _s();
-        Planet storage planet = s.planets[id];
-        if (planet.owner != address(0)) revert AlreadyClaimed(id);
-        Galaxy.Star memory star = s.galaxy.star(cell);
-        if (
-            pilot != star.discoverer && block.timestamp < uint256(star.discoveredAt) + FIRST_CLAIM
-                && s.pilots.shipOf(star.discoverer).cell == cell
-        ) revert FirstClaimWindow(star.discoverer);
-        s.credits.burn(pilot, s.tuning.claimFee);
-        planet.owner = pilot;
-        planet.settledAt = uint40(block.timestamp);
-        s.deeds.mint(pilot, id);
-        emit Claimed(id, pilot);
-    }
-
-    // ── star names ──────────────────────────────────────────────────────────────────────────────
-
-    /// Names a star, for a fee filed with Minerva and burned (a Station's cost). Who may, and whether
-    /// naming makes them the star's owner: see mayNameStar.
-    function nameStar(uint256 cell, string calldata name) external {
-        PlanetsStorage storage s = _s();
-        address pilot = s.pilots.actorOf(msg.sender);
-        (bool may, bool owns) = mayNameStar(cell, pilot);
-        if (!may) revert CannotNameStar(cell);
-        s.credits.burn(pilot, s.costs[STATION].credits);
-        s.galaxy.setName(cell, name, owns ? pilot : s.galaxy.keeperOf(cell));
-    }
-
-    /// Who may name a star:
-    /// - its owner, any time;
-    /// - once it has an owner, a pilot holding a majority of its planets, who becomes the owner;
-    /// - while it has none, a pilot holding all its planets, who becomes the owner;
-    /// - while it has none, its discoverer;
-    /// - while it's unnamed, the pilot holding the most of its planets (not on a tie).
-    /// Genesis stars and Sol belong to the Federation (Galaxy itself) from the start.
-    function mayNameStar(uint256 cell, address pilot) public view returns (bool may, bool becomesOwner) {
-        Galaxy galaxy = _s().galaxy;
-        uint8 state = galaxy.stateOf(cell);
-        if (state != 2 && state != 3) return (false, false); // stars and black holes only
-        uint256 n = state == 2 ? SystemGen.planetCount(_seed(), cell) : 0;
-        address[8] memory others;
-        uint256[8] memory counts;
-        uint256 mine;
-        uint256 best;
-        for (uint256 body = 0; body < n; body++) {
-            address o = _s().planets[BodyId.planet(cell, body)].owner;
-            if (o == address(0)) continue;
-            if (o == pilot) {
-                mine++;
-                continue;
-            }
-            for (uint256 k = 0; k < 8; k++) {
-                if (others[k] == o || others[k] == address(0)) {
-                    others[k] = o;
-                    if (++counts[k] > best) best = counts[k];
-                    break;
-                }
-            }
-        }
-        address keeper = galaxy.keeperOf(cell);
-        if (keeper == pilot) return (true, false);
-        if (keeper != address(0)) return (n > 0 && mine * 2 > n, true);
-        if (n > 0 && mine == n) return (true, true);
-        if (galaxy.star(cell).discoverer == pilot && pilot != address(0)) return (true, false);
-        return (bytes(galaxy.nameOf(cell)).length == 0 && mine > 0 && mine > best, false);
-    }
-
-    // ── planet names ────────────────────────────────────────────────────────────────────────────
-
-    /// The parts of a planet that carry a name: the planet, its station, and moons by orbit.
-    uint8 public constant NAME_PLANET = 0;
-    uint8 public constant NAME_STATION = 1;
-    uint8 public constant NAME_MOON = 2; // + the moon's orbit, 0–7
-
-    /// The owner names their planet, its station or one of its moons. Until then the client shows
-    /// derived names. Sol's keep theirs.
-    function rename(uint256 id, uint8 part, string calldata name) external {
-        PlanetsStorage storage s = _s();
-        address pilot = s.pilots.actorOf(msg.sender);
-        _derive(id);
-        if (BodyId.cellOf(id) == 0) revert FederationPlanet(id);
-        if (s.planets[id].owner != pilot) revert NotYours(id);
-        if (part >= NAME_MOON) {
-            uint8 orbit = part - NAME_MOON;
-            if (orbit >= 8 || (SystemGen.moonSlots(_seed(), BodyId.cellOf(id), BodyId.indexOf(id)) >> orbit) & 1 == 0) {
-                revert NoSuchMoon(id, orbit);
-            }
-        }
-        uint256 length = bytes(name).length;
-        if (length == 0 || length > 24) revert BadName();
-        s.names[id][part] = name;
-        emit Named(id, part, name);
+        if (_s().claims.ownerOf(id) != pilot) revert NotYours(id);
     }
 
     /// How many moons a planet has: each gives six weapon mounts that can't be destroyed (D61).
     function moonCount(uint256 id) external view returns (uint256 n) {
-        for (uint256 m = SystemGen.moonSlots(_seed(), BodyId.cellOf(id), BodyId.indexOf(id)); m != 0; m >>= 1) n += m & 1;
-    }
-
-    /// The names an owner has given: the planet, its station, then moons by orbit ("" where unnamed).
-    function namesOf(uint256 id) external view returns (string[10] memory names) {
-        for (uint8 part = 0; part < 10; part++) {
-            names[part] = _s().names[id][part];
+        for (uint256 m = SystemGen.moonSlots(_seed(), BodyId.cellOf(id), BodyId.indexOf(id)); m != 0; m >>= 1) {
+            n += m & 1;
         }
     }
 
@@ -387,7 +267,7 @@ contract Planets is ModuleBase {
         PlanetsStorage storage s = _s();
         address pilot = s.pilots.actorOf(msg.sender);
         Planet storage planet = _settle(id);
-        if (planet.owner != pilot) revert NotYours(id);
+        if (s.claims.ownerOf(id) != pilot) revert NotYours(id);
         if (planet.building != 0) revert Busy(planet.readyAt);
         bool next = building == planet.level + 1 && building <= ARMORY;
         bool factory = building == AUTOFACTORY && planet.level >= COLONY && !planet.autofactory;
@@ -426,8 +306,9 @@ contract Planets is ModuleBase {
             else planet.level = planet.building;
             planet.building = 0;
         }
-        // A Citadel under construction sets the clock to its finish: nothing grows before it.
-        if (planet.owner == address(0) || block.timestamp <= planet.settledAt) return planet;
+        // A Citadel under construction sets the clock to its finish: nothing grows before it. (An
+        // unclaimed planet has no Citadel, so nothing grows there either.)
+        if (block.timestamp <= planet.settledAt) return planet;
         (uint8 class, uint8 size) = _derive(id);
         uint256 cap = SystemGen.populationCap(class, size);
         uint256 before = planet.population;
@@ -481,12 +362,11 @@ contract Planets is ModuleBase {
     /// Hands a planet to a new owner a tech level down (a siege's successful claim, D47).
     function seize(uint256 id, address to) external onlyRole(GAME_MODULE) {
         Planet storage planet = _settle(id);
-        address from = planet.owner;
+        address from = _s().claims.ownerOf(id);
         uint8 had = planet.level;
-        planet.owner = to;
         if (had > CITADEL) planet.level = had - 1;
         planet.building = 0;
-        _s().deeds.seize(to, id);
+        _s().claims.transfer(id, to);
         if (had >= PORT) {
             // The port and its yard follow the level that's left; "never" closes them.
             (uint8 class,) = _derive(id);
@@ -506,9 +386,9 @@ contract Planets is ModuleBase {
         return _s().tuning;
     }
 
-    /// The owner of a planet, or address(0).
+    /// The owner of a planet, or address(0) (Claims keeps it; here for the modules that ask Planets).
     function ownerOf(uint256 id) external view returns (address) {
-        return _s().planets[id].owner;
+        return _s().claims.ownerOf(id);
     }
 
     /// Whether a planet's Autofactory is running.
@@ -529,14 +409,14 @@ contract Planets is ModuleBase {
             else p.level = p.building;
             p.building = 0;
         }
-        (v.owner, v.level, v.autofactory, v.building, v.readyAt) =
-            (p.owner, p.level, p.autofactory, p.building, p.readyAt);
+        v.owner = _s().claims.ownerOf(id);
+        (v.level, v.autofactory, v.building, v.readyAt) = (p.level, p.autofactory, p.building, p.readyAt);
         v.population = p.population;
         v.stock = new uint256[](goods);
         for (uint256 g = 0; g < goods; g++) {
             v.stock[g] = _s().stock[id][g];
         }
-        if (p.owner == address(0) || p.level < CITADEL || block.timestamp <= p.settledAt) return v;
+        if (p.level < CITADEL || block.timestamp <= p.settledAt) return v;
         if (p.besieged) {
             v.population = _grow(p.population, v.cap, block.timestamp - p.settledAt);
             return v;

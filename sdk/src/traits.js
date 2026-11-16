@@ -1,7 +1,7 @@
 // How a star looks, derived from the universe's seed and the cell (docs/demo4-plan.md, D8, D9): its
 // spectral class (and so its size; each client colors it), and how far it sits off the grid. Nothing here is
 // stored on chain; every client derives the same values. Names are players' to give, and stored
-// (Planets.nameStar).
+// (Claims.nameStar).
 import { keccak256, AbiCoder } from 'ethers'
 import { neighbors } from './hex'
 

@@ -437,6 +437,14 @@ Calls made building it, for Koda's review:
 - **X4. The HUD redesign's analysis** moved to `docs/hud-redesign.md`, its mockups and screenshots to
   `docs/mockups/hud/`, when `client-rnd/hud/` was removed.
 - **X5. Seen, not fixed:** at phone size the zoom rail's "−" looks clipped beside the minimap.
+- **X7. Planets keeps its name** after Claims was split out (the plan says "Settlements"). Renaming it
+  touches the deploy script, the SDK, the ABIs and every client; it's cheaper to rename once asteroids
+  make it settle more than planets. Planets keeps an `ownerOf` passthrough so Battle, Armory and Factory
+  didn't change.
+- **X8. The star-name fee** is now Claims' own number (`starNameFee`, 50,000, what a Station cost), so
+  tuning buildings no longer changes it.
+- **X9. Testnet:** body ids and Claims change the contracts' interface; the Paseo deployment needs a
+  fresh deploy (throwaway key, as before) before the client plays the testnet again. Not done yet.
 - **X6. Wording:** the loadout's empty-weapons line says "Every Sol station's armory sells them." (was "The
   I.S.S. armory").
 

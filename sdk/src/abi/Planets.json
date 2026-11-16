@@ -79,19 +79,6 @@
   },
   {
     "type": "function",
-    "name": "FIRST_CLAIM",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
     "name": "GAME_MODULE",
     "inputs": [],
     "outputs": [
@@ -99,45 +86,6 @@
         "name": "",
         "type": "bytes32",
         "internalType": "bytes32"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "NAME_MOON",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint8",
-        "internalType": "uint8"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "NAME_PLANET",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint8",
-        "internalType": "uint8"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "NAME_STATION",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint8",
-        "internalType": "uint8"
       }
     ],
     "stateMutability": "view"
@@ -238,19 +186,6 @@
         "name": "building",
         "type": "uint8",
         "internalType": "uint8"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "claim",
-    "inputs": [
-      {
-        "name": "id",
-        "type": "uint256",
-        "internalType": "uint256"
       }
     ],
     "outputs": [],
@@ -458,9 +393,9 @@
         "internalType": "contract Credits"
       },
       {
-        "name": "deeds_",
+        "name": "claims_",
         "type": "address",
-        "internalType": "contract Deeds"
+        "internalType": "contract Claims"
       }
     ],
     "outputs": [],
@@ -486,35 +421,6 @@
   },
   {
     "type": "function",
-    "name": "mayNameStar",
-    "inputs": [
-      {
-        "name": "cell",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "pilot",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "may",
-        "type": "bool",
-        "internalType": "bool"
-      },
-      {
-        "name": "becomesOwner",
-        "type": "bool",
-        "internalType": "bool"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
     "name": "moonCount",
     "inputs": [
       {
@@ -528,43 +434,6 @@
         "name": "n",
         "type": "uint256",
         "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "nameStar",
-    "inputs": [
-      {
-        "name": "cell",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "name",
-        "type": "string",
-        "internalType": "string"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "namesOf",
-    "inputs": [
-      {
-        "name": "id",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "names",
-        "type": "string[10]",
-        "internalType": "string[10]"
       }
     ],
     "stateMutability": "view"
@@ -702,29 +571,6 @@
   },
   {
     "type": "function",
-    "name": "rename",
-    "inputs": [
-      {
-        "name": "id",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "part",
-        "type": "uint8",
-        "internalType": "uint8"
-      },
-      {
-        "name": "name",
-        "type": "string",
-        "internalType": "string"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
     "name": "renounceRole",
     "inputs": [
       {
@@ -849,11 +695,6 @@
         "type": "tuple",
         "internalType": "struct Planets.Tuning",
         "components": [
-          {
-            "name": "claimFee",
-            "type": "uint64",
-            "internalType": "uint64"
-          },
           {
             "name": "colonistPrice",
             "type": "uint32",
@@ -1014,11 +855,6 @@
         "internalType": "struct Planets.Tuning",
         "components": [
           {
-            "name": "claimFee",
-            "type": "uint64",
-            "internalType": "uint64"
-          },
-          {
             "name": "colonistPrice",
             "type": "uint32",
             "internalType": "uint32"
@@ -1116,25 +952,6 @@
   },
   {
     "type": "event",
-    "name": "Claimed",
-    "inputs": [
-      {
-        "name": "planet",
-        "type": "uint256",
-        "indexed": true,
-        "internalType": "uint256"
-      },
-      {
-        "name": "owner",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
     "name": "CostSet",
     "inputs": [
       {
@@ -1188,31 +1005,6 @@
         "type": "uint64",
         "indexed": false,
         "internalType": "uint64"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "Named",
-    "inputs": [
-      {
-        "name": "planet",
-        "type": "uint256",
-        "indexed": true,
-        "internalType": "uint256"
-      },
-      {
-        "name": "part",
-        "type": "uint8",
-        "indexed": false,
-        "internalType": "uint8"
-      },
-      {
-        "name": "name",
-        "type": "string",
-        "indexed": false,
-        "internalType": "string"
       }
     ],
     "anonymous": false
@@ -1421,11 +1213,6 @@
         "internalType": "struct Planets.Tuning",
         "components": [
           {
-            "name": "claimFee",
-            "type": "uint64",
-            "internalType": "uint64"
-          },
-          {
             "name": "colonistPrice",
             "type": "uint32",
             "internalType": "uint32"
@@ -1502,22 +1289,6 @@
   },
   {
     "type": "error",
-    "name": "AlreadyClaimed",
-    "inputs": [
-      {
-        "name": "planet",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "BadName",
-    "inputs": []
-  },
-  {
-    "type": "error",
     "name": "Busy",
     "inputs": [
       {
@@ -1535,17 +1306,6 @@
         "name": "building",
         "type": "uint8",
         "internalType": "uint8"
-      }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "CannotNameStar",
-    "inputs": [
-      {
-        "name": "cell",
-        "type": "uint256",
-        "internalType": "uint256"
       }
     ]
   },
@@ -1572,28 +1332,6 @@
   },
   {
     "type": "error",
-    "name": "FederationPlanet",
-    "inputs": [
-      {
-        "name": "planet",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "FirstClaimWindow",
-    "inputs": [
-      {
-        "name": "discoverer",
-        "type": "address",
-        "internalType": "address"
-      }
-    ]
-  },
-  {
-    "type": "error",
     "name": "InvalidInitialization",
     "inputs": []
   },
@@ -1605,22 +1343,6 @@
         "name": "needed",
         "type": "uint256",
         "internalType": "uint256"
-      }
-    ]
-  },
-  {
-    "type": "error",
-    "name": "NoSuchMoon",
-    "inputs": [
-      {
-        "name": "planet",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "orbit",
-        "type": "uint8",
-        "internalType": "uint8"
       }
     ]
   },

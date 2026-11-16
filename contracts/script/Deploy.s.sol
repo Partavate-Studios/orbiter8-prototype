@@ -10,6 +10,7 @@ import {Credits} from "../src/tokens/Credits.sol";
 import {Ships} from "../src/tokens/Ships.sol";
 import {Deeds} from "../src/tokens/Deeds.sol";
 import {Planets} from "../src/planets/Planets.sol";
+import {Claims} from "../src/planets/Claims.sol";
 import {Factory} from "../src/planets/Factory.sol";
 import {Battle} from "../src/battle/Battle.sol";
 import {Armory} from "../src/battle/Armory.sol";
@@ -24,6 +25,7 @@ library Deployment {
         Credits credits;
         Ships ships;
         Deeds deeds;
+        Claims claims;
         Planets planets;
         Factory factory;
         Battle battle;
@@ -49,11 +51,17 @@ library Deployment {
             _proxy(address(new Market()), abi.encodeCall(Market.initialize, (admin, game.pilots, game.credits)))
         );
         game.deeds = Deeds(_proxy(address(new Deeds()), abi.encodeCall(Deeds.initialize, (admin))));
+        game.claims = Claims(
+            _proxy(
+                address(new Claims()),
+                abi.encodeCall(Claims.initialize, (admin, game.galaxy, game.pilots, game.credits, game.deeds))
+            )
+        );
         game.planets = Planets(
             _proxy(
                 address(new Planets()),
                 abi.encodeCall(
-                    Planets.initialize, (admin, game.galaxy, game.pilots, game.market, game.credits, game.deeds)
+                    Planets.initialize, (admin, game.galaxy, game.pilots, game.market, game.credits, game.claims)
                 )
             )
         );
@@ -81,7 +89,7 @@ library Deployment {
     function wire(Game memory game) internal {
         bytes32 role = game.galaxy.GAME_MODULE();
         game.galaxy.grantRole(role, address(game.pilots));
-        game.galaxy.grantRole(role, address(game.planets)); // star names (Planets.nameStar)
+        game.galaxy.grantRole(role, address(game.claims)); // star names (Claims.nameStar)
         game.ships.grantRole(role, address(game.pilots));
         game.credits.grantRole(role, address(game.pilots));
         game.credits.grantRole(role, address(game.market));
@@ -90,7 +98,9 @@ library Deployment {
         game.credits.grantRole(role, address(game.factory));
         game.pilots.grantRole(role, address(game.planets));
         game.market.grantRole(role, address(game.planets));
-        game.deeds.grantRole(role, address(game.planets));
+        game.deeds.grantRole(role, address(game.claims));
+        game.credits.grantRole(role, address(game.claims));
+        game.claims.grantRole(role, address(game.planets)); // a siege's seizure (Claims.transfer)
         game.planets.grantRole(role, address(game.factory));
         game.battle.grantRole(role, address(game.pilots));
         game.battle.grantRole(role, address(game.armory));
@@ -124,6 +134,7 @@ contract Deploy is Script {
         vm.serializeAddress(json, "ships", address(game.ships));
         vm.serializeAddress(json, "deeds", address(game.deeds));
         vm.serializeAddress(json, "planets", address(game.planets));
+        vm.serializeAddress(json, "claims", address(game.claims));
         vm.serializeAddress(json, "factory", address(game.factory));
         vm.serializeAddress(json, "battle", address(game.battle));
         vm.serializeAddress(json, "armory", address(game.armory));
