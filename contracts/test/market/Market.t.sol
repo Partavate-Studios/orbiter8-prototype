@@ -97,24 +97,47 @@ contract MarketTest is GameFixture {
         Market.Tuning memory t = market.tuning();
         uint256 cap = market.capacity();
         uint256 cost = Pricing.buyCost(goods[ORGANICS].base, goods[ORGANICS].spread, cap, 0, 5);
-        cost += Pricing.fee(cost, t.feeBps);
+        uint256 cut = Pricing.fee(cost, t.feeBps);
+        cost += cut;
         uint256 supply = credits.totalSupply();
+        uint256 treasury = credits.balanceOf(admin);
+        assertEq(market.treasury(), admin, "the deployer is the treasury to start");
 
         vm.prank(ada);
         market.trade(EARTH, _line(ORGANICS, 5, cost));
         assertEq(credits.balanceOf(ada), 1_000 - cost);
-        assertEq(credits.totalSupply(), supply - cost, "the Federation burns what it's paid, fee included");
+        assertEq(credits.totalSupply(), supply - cost + cut, "the Federation burns what it's paid, less its fee");
+        assertEq(credits.balanceOf(admin), treasury + cut, "the fee goes to the treasury");
         assertEq(_cargo(ada, ORGANICS), 5);
         assertEq(pilots.shipOf(ada).cargo, 5);
         assertEq(market.portView(EARTH).quotes[ORGANICS].shortfall, 5);
 
         uint256 proceeds = Pricing.sellProceeds(goods[ORGANICS].base, goods[ORGANICS].spread, cap, 0, 5);
-        proceeds -= Pricing.fee(proceeds, t.feeBps);
+        uint256 sellCut = Pricing.fee(proceeds, t.feeBps);
+        proceeds -= sellCut;
         vm.prank(ada);
         market.trade(MERCURY, _line(ORGANICS, -5, proceeds));
         assertEq(credits.balanceOf(ada), 1_000 - cost + proceeds);
+        assertEq(credits.balanceOf(admin), treasury + cut + sellCut, "selling's fee is minted to the treasury");
         assertGt(proceeds, cost, "a full port to a needy one pays");
         assertEq(_cargo(ada, ORGANICS), 0);
+    }
+
+    function test_theTreasuryIsTheAdminsToSet() public {
+        address bank = makeAddr("bank");
+        vm.expectRevert();
+        vm.prank(ada);
+        market.setTreasury(bank);
+        vm.startPrank(admin);
+        vm.expectRevert(Market.NoTreasury.selector);
+        market.setTreasury(address(0));
+        market.setTreasury(bank);
+        vm.stopPrank();
+        assertEq(market.treasury(), bank);
+    }
+
+    function test_everySolStationHasAYard() public view {
+        for (uint256 body; body < 9; body++) assertTrue(market.portView(body).yard);
     }
 
     function test_theShipMustBeAtThePort() public {
@@ -196,8 +219,6 @@ contract MarketTest is GameFixture {
         _pay(ada, 1_000_000);
         uint256 quote = market.baysQuote(5, 10);
         vm.startPrank(ada);
-        vm.expectRevert(abi.encodeWithSelector(Market.NoYard.selector, MERCURY));
-        market.buyBays(MERCURY, 10, quote);
         vm.expectPartialRevert(Market.PriceLimit.selector);
         market.buyBays(EARTH, 10, quote - 1);
         market.buyBays(EARTH, 10, quote);

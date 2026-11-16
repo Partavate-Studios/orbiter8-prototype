@@ -1,5 +1,5 @@
 <template>
-  <!-- An armory: Sol's I.S.S. at twice a part's cost, a pilot's Armory at one and a half (paid
+  <!-- An armory: a Sol station at twice a part's cost, a pilot's Armory at one and a half (paid
        to its owner). Parts are bought and fitted to the ship in one move. -->
   <g v-if="object">
     <menu-container>

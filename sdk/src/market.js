@@ -56,7 +56,7 @@ export const portId = (cell, body) => cell * 256 + body
 export const portCell = (port) => Math.floor(port / 256)
 export const portBody = (port) => port % 256
 
-/** Sol's nine Federation stations (Market.sol's order), with their planets. Earth's has the yard. */
+/** Sol's nine Federation stations (Market.sol's order), with their planets. Each has a port, a yard and an armory. */
 export const SOL_PORTS = [
   { station: 'Icarus', planet: 'Mercury' },
   { station: 'Port Hesperus', planet: 'Venus' },

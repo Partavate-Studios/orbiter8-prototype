@@ -16,7 +16,7 @@ import { timeOf } from './drand'
 import { distance } from './hex'
 import { starTraits, genesisName } from './traits'
 import { planet as derivePlanet, planetCount, looks, moonName, planetName } from './system-gen'
-import { portNames, buyCost, sellProceeds, fee, baysCost, MODE } from './market'
+import { portNames, buyCost, sellProceeds, fee, baysCost, MODE, SOL_PORTS } from './market'
 import { SESSION_HOURS, loadKey, saveKey, forgetKey, newKey, keySigner, sweep } from './session-key'
 import { createEventLog } from './event-log'
 import { tradesSinceArrival } from './game/docking'
@@ -54,10 +54,10 @@ export const baysQuoteFor = (tuning, bays, count) => baysCost(tuning.bayBase, tu
 /** The next range upgrade's price, or null at full range. */
 export const rangeQuoteFor = (tuning, range) => (range >= 4 ? null : tuning.rangePrices[range - 1])
 
-/** Parts at an armory: Sol's I.S.S. (port 2) at twice their cost, a pilot's Armory at one and a half. */
+/** Parts at an armory: Sol's stations at twice their cost, a pilot's Armory at one and a half. */
 export const partPriceFor = (rules, port, part, count) => {
   const unit = rules.parts[part].credits
-  return Number(port) === 2 ? unit * 2 * count : Math.floor((unit * 3 * count) / 2)
+  return Number(port) < SOL_PORTS.length ? unit * 2 * count : Math.floor((unit * 3 * count) / 2)
 }
 
 /**
@@ -541,7 +541,7 @@ export function createGameClient() {
           orbitSpeed: 1,
           owner,
           yard: port.yard,
-          armory: cell === SOL ? p.id === 2 : p.level >= 6,
+          armory: cell === SOL ? p.id < SOL_PORTS.length : p.level >= 6,
           goods: stationGoods(port)
         }
       }

@@ -157,7 +157,7 @@
   },
   {
     "type": "function",
-    "name": "SOL_ARMORY",
+    "name": "SOL_PORTS",
     "inputs": [],
     "outputs": [
       {

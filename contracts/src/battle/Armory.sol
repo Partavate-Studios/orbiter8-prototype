@@ -23,7 +23,7 @@ import {Battle} from "./Battle.sol";
 /// Parts, by id (Factory): 0 drone, 1 repair bot, 2 point defense, 3 railgun, 4 missile rack,
 /// 5 armor plating, 6 shield generator, 7 orbital platform, 8 BFG.
 contract Armory is ModuleBase {
-    uint256 public constant SOL_ARMORY = 2; // the I.S.S.
+    uint256 public constant SOL_PORTS = 9; // every Sol station has an armory (Sol is fully built)
     uint256 public constant REPAIR_COST = 3_000;
     uint256 public constant REPAIR_TIME = 3 hours;
 
@@ -190,7 +190,7 @@ contract Armory is ModuleBase {
         if (a.pilots.shipOf(pilot).cell != port >> 8) revert NotThere();
         uint256 unit = a.factory.parts()[part].credits;
         uint256 cost;
-        if (port == SOL_ARMORY) {
+        if (port < SOL_PORTS) {
             cost = unit * 2 * count;
             if (cost > maxCost) revert PriceLimit(cost);
             a.credits.burn(pilot, cost);

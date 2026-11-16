@@ -15,11 +15,11 @@ import {Pricing} from "./Pricing.sol";
 ///
 /// A port is named by `cell << 8 | body`: the star, then the planet's place in its system. In this
 /// milestone the ports are the Federation's nine stations at Sol; claimed planets open their own in
-/// milestone 3 (`openPort`). The Federation mints what it pays and burns what it's paid, and burns
-/// its fee; a player-owned port's fee goes to its owner instead.
+/// milestone 3 (`openPort`). The Federation mints what it pays and burns what it's paid; its fee
+/// goes to its treasury (an address the admin sets, the deployer to start). A player-owned port's
+/// fee goes to its owner. Every Sol station has a yard (Sol is fully built).
 contract Market is ModuleBase {
     uint256 public constant SOL_PORTS = 9;
-    uint256 public constant SOL_YARD = 2; // Earth's station, the I.S.S.
     uint256 public constant MAX_BODIES = 16;
 
     enum Mode {
@@ -92,6 +92,7 @@ contract Market is ModuleBase {
         mapping(uint256 => mapping(uint256 => Stock)) stock; // port → good → stock
         mapping(uint256 => Opened) opened;
         Tuning tuning;
+        address treasury; // the Federation's fees (D85, D94)
     }
 
     // keccak256(abi.encode(uint256(keccak256("orbiter8.market")) - 1)) & ~bytes32(uint256(0xff))
@@ -100,6 +101,7 @@ contract Market is ModuleBase {
     event GoodAdded(uint256 indexed good, string name, uint32 base, uint32 spread);
     event MixSet(uint8 indexed class, uint256 sells, uint256 buys);
     event TuningSet(Tuning tuning);
+    event TreasurySet(address treasury);
     event PortOpened(uint256 indexed port, uint8 class, address owner, uint40 opensAt, uint40 yardAt);
     event Traded(address indexed pilot, uint256 indexed port, uint256 indexed good, int256 units, uint256 credits);
     event BaysBought(address indexed pilot, uint256 indexed port, uint16 bays, uint256 credits);
@@ -113,6 +115,7 @@ contract Market is ModuleBase {
     error NoYard(uint256 port);
     error MaxRange();
     error BadGood();
+    error NoTreasury();
 
     function _m() internal pure returns (MarketStorage storage m) {
         assembly {
@@ -125,6 +128,7 @@ contract Market is ModuleBase {
         MarketStorage storage m = _m();
         m.pilots = pilots_;
         m.credits = credits_;
+        m.treasury = admin;
         // The eight goods (D27). Margins differ, so routes matter (the play session found every
         // good paid the same). Starting values; the simulator tunes them.
         _addGood("Water ice", 40, 30);
@@ -159,6 +163,17 @@ contract Market is ModuleBase {
 
     function setMix(uint8 class, uint256 sells, uint256 buys) external onlyRole(DEFAULT_ADMIN_ROLE) {
         _setMix(class, sells, buys);
+    }
+
+    /// Where the Federation's fees go.
+    function setTreasury(address treasury_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        if (treasury_ == address(0)) revert NoTreasury();
+        _m().treasury = treasury_;
+        emit TreasurySet(treasury_);
+    }
+
+    function treasury() external view returns (address) {
+        return _m().treasury;
     }
 
     function setTuning(Tuning calldata tuning_) external onlyRole(DEFAULT_ADMIN_ROLE) {
@@ -215,7 +230,7 @@ contract Market is ModuleBase {
     function _port(uint256 port) internal view returns (uint8 class, bool yard, address owner) {
         uint256 cell = port >> 8;
         uint256 body = port & 0xff;
-        if (cell == 0 && body < SOL_PORTS) return (_solClass(body), body == SOL_YARD, address(0));
+        if (cell == 0 && body < SOL_PORTS) return (_solClass(body), true, address(0));
         if (!_isOpen(port)) revert NoSuchPort(port);
         Opened storage o = _m().opened[port];
         return (o.class, o.yardAt != 0 && o.yardAt <= block.timestamp, o.owner);
@@ -279,14 +294,14 @@ contract Market is ModuleBase {
         m.stock[port][line.good] = Stock(uint32(shortfall + units), uint40(updated));
 
         Credits credits_ = m.credits;
+        address payee = owner == address(0) ? m.treasury : owner;
         if (buying) {
             uint256 cost = Pricing.buyCost(good.base, good.spread, cap, shortfall, units);
             uint256 cut = Pricing.fee(cost, t.feeBps);
             if (cost + cut > line.limit) revert PriceLimit(line.good, cost + cut);
             m.pilots.addCargo(pilot, line.good, units);
             credits_.burn(pilot, cost);
-            if (owner == address(0)) credits_.burn(pilot, cut);
-            else credits_.move(pilot, owner, cut);
+            credits_.move(pilot, payee, cut);
             emit Traded(pilot, port, line.good, line.units, cost + cut);
         } else {
             uint256 proceeds = Pricing.sellProceeds(good.base, good.spread, cap, shortfall, units);
@@ -294,7 +309,7 @@ contract Market is ModuleBase {
             if (proceeds - cut < line.limit) revert PriceLimit(line.good, proceeds - cut);
             m.pilots.removeCargo(pilot, line.good, units);
             credits_.mint(pilot, proceeds - cut);
-            if (owner != address(0)) credits_.mint(owner, cut);
+            credits_.mint(payee, cut);
             emit Traded(pilot, port, line.good, line.units, proceeds - cut);
         }
     }
