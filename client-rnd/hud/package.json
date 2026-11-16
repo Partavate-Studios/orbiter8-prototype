@@ -1,0 +1,55 @@
+{
+  "name": "orbiter8-hud-rnd",
+  "version": "3.2.1",
+  "description": "A decentralized space game for EVM.",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/partavate/prototype.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://gitlab.com/partavate/prototype/issues"
+  },
+  "author": {
+    "name": "Partavate",
+    "email": "info@partavate.com",
+    "url": "http://partavate.com"
+  },
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "prebuild": "npm version patch --no-git-tag-version --silent",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . ../../sdk",
+    "test": "vitest run",
+    "local": "node dev/local.js",
+    "format": "prettier --write .",
+    "build:local": "VITE_LOCAL_NETWORK=1 vite build --outDir dist-local"
+  },
+  "dependencies": {
+    "ethers": "^6.17.0",
+    "js-cookie": "^3.0.1",
+    "lodash": "^4.18.1",
+    "pinia": "^3.0.4",
+    "vue": "^3.5.44",
+    "vue-router": "^4.6.4"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "eslint": "^10.13.0",
+    "eslint-plugin-vue": "^10.11.1",
+    "globals": "^17.13.0",
+    "happy-dom": "^21.0.4",
+    "prettier": "3.9.10",
+    "puppeteer-core": "23.11.1",
+    "sass": "^1.106.1",
+    "vite": "^8.3.5",
+    "vitest": "^3.2.7"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  }
+}

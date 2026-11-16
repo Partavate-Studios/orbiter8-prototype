@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -60 120 120">
+<!-- Colonists: settlers walking out to their domes on a new world (Orbiter 8 art, 120 units square, centered; drawn for the HUD's colony menu, round 2, and free to use in the game) -->
+<defs>
+  <radialGradient id="colonistsGround" cx="50%" cy="0%" r="90%"><stop offset="0" stop-color="#8c78b4"/><stop offset="1" stop-color="#3c285a"/></radialGradient>
+</defs>
+<path d="M-60 28Q0 8 60 28V60H-60Z" fill="url(#colonistsGround)"/>
+<path d="M-50 22a14 14 0 0 1 28 0Z" fill="#e6dcf5" opacity="0.9"/>
+<path d="M-24 18a9 9 0 0 1 18 0Z" fill="#c3b3da" opacity="0.9"/>
+<g fill="#e6dcf5">
+  <circle cx="6" cy="-6" r="4.5"/><path d="M0 14V3a6 6 0 0 1 12 0V14Z"/>
+  <circle cx="22" cy="-2" r="4"/><path d="M16.5 16V6a5.5 5.5 0 0 1 11 0V16Z"/>
+  <circle cx="37" cy="2" r="3.5"/><path d="M32.5 18V9.5a4.5 4.5 0 0 1 9 0V18Z"/>
+</g>
+<path d="M14 -40v18M8 -28l6 6 6-6" fill="none" stroke="#c3b3da" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+</svg>

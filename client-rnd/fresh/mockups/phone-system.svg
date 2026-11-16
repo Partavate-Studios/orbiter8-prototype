@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 844" font-family="system-ui, sans-serif" fill="#dbe7ee">
+  <title>Phone · System: the orrery, the world rail, a planet's project sheet</title>
+  <rect width="390" height="844" fill="#060d14"/>
+  <!-- top bar -->
+  <text x="12" y="16" font-size="9" fill="#8aa2b1" letter-spacing="1.2">VEGA</text><text x="12" y="34" font-size="15" font-weight="600">Lalande 21185</text>
+  <text x="290" y="16" font-size="9" fill="#8aa2b1" letter-spacing="1.2" text-anchor="end">CREDITS</text><text x="290" y="34" font-size="14" font-family="monospace" text-anchor="end">311,610</text>
+  <text x="340" y="16" font-size="9" fill="#8aa2b1" letter-spacing="1.2" text-anchor="end">BAYS</text><text x="340" y="34" font-size="14" font-family="monospace" text-anchor="end">0/105</text>
+  <path d="M366 11l9.5 5.5v11L366 33l-9.5-5.5v-11z" fill="none" stroke="#8aa2b1" stroke-width="1.5"/><circle cx="366" cy="22" r="2.5" fill="#8aa2b1"/>
+  <line y1="44" y2="44" x2="390" stroke="#1f3442"/>
+  <!-- stage: the system -->
+  <g fill="none" stroke="#8aa2b1" stroke-opacity=".18"><circle cx="195" cy="165" r="34"/><circle cx="195" cy="165" r="52"/><circle cx="195" cy="165" r="70"/><circle cx="195" cy="165" r="88"/><circle cx="195" cy="165" r="106"/></g>
+  <circle cx="195" cy="165" r="30" fill="#ff8a6b" opacity=".18"/><circle cx="195" cy="165" r="10" fill="#ff8a6b"/>
+  <circle cx="222" cy="186" r="6" fill="#d9603f"/><path d="M212 178a13 13 0 0 1 8-5M232 194a13 13 0 0 1-8 5" stroke="#ffb454" stroke-width="1.5" fill="none"/>
+  <g stroke="#6fd3ff" stroke-width="1.5" fill="none"><path d="M208 176a18 18 0 0 1 6-7M230 169a18 18 0 0 1 7 6M240 196a18 18 0 0 1-6 7M214 203a18 18 0 0 1-7-6"/></g>
+  <text x="222" y="216" font-size="10" fill="#ffb454" text-anchor="middle">Cinder</text>
+  <circle cx="148" cy="190" r="5" fill="#b5573f"/><circle cx="196" cy="95" r="5" fill="#d9b36c"/><circle cx="275" cy="200" r="5" fill="#b5573f"/><circle cx="100" cy="215" r="7" fill="#4a90d9"/>
+  <path d="M206 141l7-3-3 7-1-3z" fill="#ffb454"/>
+  <!-- sheet -->
+  <rect y="282" width="390" height="506" fill="#0b1620"/><line y1="282" y2="282" x2="390" stroke="#1f3442"/><rect x="176" y="290" width="38" height="3" rx="1.5" fill="#1f3442"/>
+  <g font-size="12"><rect x="14" y="302" width="130" height="46" rx="3" fill="none" stroke="#1f3442"/><circle cx="32" cy="325" r="7" fill="#ff8a6b"/><text x="46" y="322" font-weight="600">Lalande 21185</text><text x="46" y="338" font-size="10" fill="#8aa2b1">5 worlds</text>
+  <rect x="150" y="302" width="120" height="46" rx="3" fill="#6fd3ff" fill-opacity=".09" stroke="#6fd3ff"/><circle cx="168" cy="325" r="7" fill="#d9603f"/><text x="182" y="322" font-weight="600">Cinder</text><text x="182" y="338" font-size="10" fill="#ffb454">yours</text>
+  <rect x="276" y="302" width="130" height="46" rx="3" fill="none" stroke="#1f3442"/><circle cx="294" cy="325" r="7" fill="#b5573f"/><text x="308" y="322" font-weight="600">Unnamed…</text><text x="308" y="338" font-size="10" fill="#8aa2b1">unclaimed</text></g>
+  <circle cx="22" cy="380" r="7" fill="#d9603f"/><text x="40" y="378" font-size="18" font-weight="600">Cinder</text><text x="40" y="396" font-size="12" fill="#8aa2b1">Volcanic world · size 5 · Lalande 21185</text>
+  <rect x="326" y="368" width="50" height="18" fill="none" stroke="#ffb454" stroke-opacity=".5"/><text x="351" y="381" font-size="9" fill="#ffb454" text-anchor="middle" letter-spacing="1">YOURS</text>
+  <g font-size="12" fill="#8aa2b1"><text x="24" y="436" fill="#dbe7ee">Project</text><text x="88" y="436">People &amp; storage</text><text x="212" y="436">Factory</text><text x="278" y="436">Defenses</text><line x1="14" x2="376" y1="446" y2="446" stroke="#1f3442"/><line x1="14" x2="76" y1="446" y2="446" stroke="#6fd3ff" stroke-width="2"/></g>
+  <g font-size="13"><text x="18" y="476" fill="#7be0a4">✓</text><text x="38" y="476" fill="#8aa2b1">100 people · 100 here</text><line x1="14" x2="376" y1="490" y2="490" stroke="#1f3442"/>
+  <text x="18" y="516" fill="#56707f">·</text><text x="38" y="516">40 Equipment in storage <tspan fill="#8aa2b1">· 0 there, 40 aboard</tspan></text><path d="M291 500h85v22l-7 7h-85v-22z" fill="#ffb454"/><text x="330" y="519" font-size="12" font-weight="600" fill="#1c1203" text-anchor="middle">Deliver 40</text><line x1="14" x2="376" y1="538" y2="538" stroke="#1f3442"/>
+  <text x="18" y="564" fill="#7be0a4">✓</text><text x="38" y="564" fill="#8aa2b1">40 Organics in storage · 40 there</text><line x1="14" x2="376" y1="578" y2="578" stroke="#1f3442"/>
+  <text x="18" y="604" fill="#7be0a4">✓</text><text x="38" y="604" fill="#8aa2b1">5,000 credits</text></g>
+  <path d="M23 628h353v39l-9 9H14v-39z" fill="#2a3a45"/><text x="195" y="649" font-size="14" font-weight="600" fill="#8aa2b1" text-anchor="middle">Build Citadel</text><text x="195" y="665" font-size="10" font-family="monospace" fill="#56707f" text-anchor="middle">needs 40 equipment in storage</text>
+  <text x="195" y="716" font-size="11" fill="#56707f" text-anchor="middle">amber = it writes to the chain; grey = why it can't yet</text>
+  <!-- dock -->
+  <rect y="788" width="390" height="56" fill="#060d14"/><line y1="788" y2="788" x2="390" stroke="#1f3442"/><rect x="25" y="787" width="28" height="2" fill="#6fd3ff"/>
+  <g font-size="10" text-anchor="middle" fill="#56707f"><text x="39" y="830" fill="#6fd3ff">System</text><text x="117" y="830">Galaxy</text><text x="195" y="830">Market</text><text x="273" y="830">Ship</text><text x="351" y="830">Domain</text></g>
+</svg>

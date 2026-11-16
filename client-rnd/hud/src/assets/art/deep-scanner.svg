@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -60 120 120">
+<!-- Deep Scanner (idea): a planet sweeping far (Orbiter 8 art, 120 units square, centered; drawn for docs/tech-trees and free to use in the game) -->
+<defs>
+  <radialGradient id="planetGradient" cx="10%" cy="50%" r="180%" fx="0%" fy="50%"><stop offset="0%" stop-color="#e5cfff"/><stop offset="10%" stop-color="#e5cfff"/><stop offset="20%" stop-color="#c3b3da"/><stop offset="30%" stop-color="rgb(140,120,180)"/><stop offset="40%" stop-color="rgb(60,40,90)"/><stop offset="100%" stop-color="rgb(60,40,90)"/></radialGradient>
+  <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#c3b3da" stop-opacity="0.1"/><stop offset="50%" stop-color="#e5cfff" stop-opacity="0.9"/><stop offset="100%" stop-color="#c3b3da" stop-opacity="0.1"/></linearGradient>
+  <clipPath id="just-the-planet"><circle r="10"/></clipPath>
+  <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#c3b3da"/></marker>
+</defs>
+<g transform="scale(2.2)"><circle r="10" stroke="#c3b3da" stroke-width="0.25" fill="url(#planetGradient)"/><g clip-path="url(#just-the-planet)"><g stroke-width="0.5" stroke="#00000011" fill="#340f6122">
+        <circle cx="-5" cy="-5" r="1" />
+        <circle cx="-4" cy="8" r="0.75" />
+        <circle cx="-8" cy="-5" r="1.5" />
+        <circle cx="3" cy="-7" r="0.5" />
+        <circle cx="-7" cy="-6" r="1" />
+        <circle cx="-3" cy="3" r="1.5" />
+        <circle cx="-5" cy="-5" r="0.75" />
+        <circle cx="2" cy="-1" r="0.5" />
+
+        <circle cx="2" cy="6" r="1" />
+        <circle cx="5" cy="8" r="0.75" />
+        <circle cx="9" cy="-2" r="1.5" />
+        <circle cx="-1" cy="-7" r="0.5" />
+        <circle cx="6" cy="-6" r="1" />
+        <circle cx="4" cy="3" r="1.5" />
+        <circle cx="5" cy="-5" r="0.75" />
+        <circle cx="-2" cy="-1" r="0.5" />
+      </g></g></g><g fill="none" stroke="#7fd4ff"><circle r="32" opacity="0.6"/><circle r="44" opacity="0.35"/><path d="M0 0L38 -24" stroke-width="2"/></g>
+</svg>

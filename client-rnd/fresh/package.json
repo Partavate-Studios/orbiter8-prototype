@@ -1,0 +1,25 @@
+{
+  "name": "orbiter8-fresh",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Orbiter 8: a clean-room client, designed from the rules and the SDK",
+  "scripts": {
+    "local": "node dev/local.js",
+    "dev": "vite --port 8094 --strictPort",
+    "build": "vite build",
+    "test": "vitest run",
+    "lint": "eslint src dev"
+  },
+  "dependencies": {
+    "ethers": "^6.17.0",
+    "preact": "^10.27.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.13.0",
+    "globals": "^17.13.0",
+    "vite": "^8.3.5",
+    "vitest": "^3.2.7"
+  }
+}

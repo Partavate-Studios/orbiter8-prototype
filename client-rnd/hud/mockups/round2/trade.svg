@@ -1,0 +1,190 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 960" font-family="Ubuntu, sans-serif">
+  <!-- Round 2, item 5: the trade menu, one row per good. -->
+  <defs>
+    <g id="hold"><rect width="9" height="9" rx="1.5"/></g>
+  </defs>
+  <rect width="1500" height="960" fill="#130e24"/>
+  <text x="30" y="40" font-size="22" fill="#e6dcf5">Round 2 · Trade: one row per good, the two-way slider kept</text>
+  <text x="30" y="64" font-size="13" fill="#c3b3da">Item 5 (and 6: every hold drawn). Port on the left, your ship on the right, as in the drawing: buying slides a good toward the ship, selling toward the port.</text>
+
+  <!-- desktop sheet -->
+  <g transform="translate(40 90)">
+    <rect width="800" height="840" rx="12" fill="#3a2a66"/>
+    <rect x="10" y="10" width="780" height="820" rx="6" fill="#1d1638" stroke="#ffffff22" stroke-width="3"/>
+    <text x="400" y="52" text-anchor="middle" font-size="24" fill="#ffffffaa">I.S.S.</text>
+    <text x="400" y="76" text-anchor="middle" font-size="13" fill="#c3b3da">Port of Trade · <tspan font-family="monospace" letter-spacing="2">S<tspan fill="#ebff99">B</tspan>BBSBSS</tspan>  · S sells, B buys (yellow: buys what you carry)</text>
+    <rect x="742" y="24" width="34" height="34" rx="8" fill="#291d4f" stroke="#7a5bc0" stroke-width="2"/><path d="M752 34l14 14M766 34l-14 14" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+
+    <!-- illustration: port, flow, ship with every hold -->
+    <g transform="translate(60 96)">
+      <rect width="680" height="150" rx="6" fill="#00000022" stroke="#c3b3da33"/>
+      <!-- port silhouette -->
+      <g transform="translate(70 75)" fill="#e6dcf5" fill-opacity="0.5" stroke="#e6dcf5" stroke-opacity="0.8">
+        <circle r="44" fill-opacity="0.15"/><circle r="18"/><path d="M-44 0H44M0 -44V44" stroke-width="4"/>
+      </g>
+      <!-- flows -->
+      <g font-size="12" fill="#f1eefa">
+        <path d="M150 58H290" stroke="#74cf84" stroke-width="3" stroke-dasharray="8 5"/><path d="M290 52l10 6-10 6z" fill="#74cf84"/>
+        <text x="220" y="48" text-anchor="middle">1 ORG · 56¢</text>
+        <path d="M300 98H160" stroke="#a9b3c1" stroke-width="3" stroke-dasharray="8 5"/><path d="M160 92l-10 6 10 6z" fill="#a9b3c1"/>
+        <text x="225" y="122" text-anchor="middle">2 MET · +238¢</text>
+      </g>
+      <!-- ship outline with every hold inside -->
+      <g transform="translate(330 20)">
+        <path d="M0 55Q0 10 60 10H300Q340 10 340 55Q340 100 300 100H60Q0 100 0 55Z" fill="#e6dcf522" stroke="#e6dcf5aa" stroke-width="2"/>
+        <text x="170" y="128" text-anchor="middle" font-size="12" fill="#bdb5d4">Cargo 4 → 3 of 40 holds</text>
+        <g transform="translate(60 26)">
+          <!-- 40 holds, 20 x 2 rows, each drawn -->
+          <g fill="#74cf84"><use href="#hold" x="0" y="0"/><use href="#hold" x="12" y="0"/><use href="#hold" x="24" y="0"/></g>
+          <g fill="#74cf84" fill-opacity="0.35" stroke="#74cf84"><use href="#hold" x="36" y="0"/></g>
+          <g fill="#e08a4f"><use href="#hold" x="48" y="0"/></g>
+          <g fill="none" stroke="#a9b3c1" stroke-dasharray="2 1.5"><use href="#hold" x="60" y="0"/><use href="#hold" x="72" y="0"/></g>
+          <g fill="#ffffff12" stroke="#ffffff44">
+            <use href="#hold" x="84" y="0"/><use href="#hold" x="96" y="0"/><use href="#hold" x="108" y="0"/><use href="#hold" x="120" y="0"/><use href="#hold" x="132" y="0"/><use href="#hold" x="144" y="0"/><use href="#hold" x="156" y="0"/><use href="#hold" x="168" y="0"/><use href="#hold" x="180" y="0"/><use href="#hold" x="192" y="0"/><use href="#hold" x="204" y="0"/><use href="#hold" x="216" y="0"/><use href="#hold" x="228" y="0"/>
+            <use href="#hold" x="0" y="14"/><use href="#hold" x="12" y="14"/><use href="#hold" x="24" y="14"/><use href="#hold" x="36" y="14"/><use href="#hold" x="48" y="14"/><use href="#hold" x="60" y="14"/><use href="#hold" x="72" y="14"/><use href="#hold" x="84" y="14"/><use href="#hold" x="96" y="14"/><use href="#hold" x="108" y="14"/><use href="#hold" x="120" y="14"/><use href="#hold" x="132" y="14"/><use href="#hold" x="144" y="14"/><use href="#hold" x="156" y="14"/><use href="#hold" x="168" y="14"/><use href="#hold" x="180" y="14"/><use href="#hold" x="192" y="14"/><use href="#hold" x="204" y="14"/><use href="#hold" x="216" y="14"/><use href="#hold" x="228" y="14"/>
+            <use href="#hold" x="0" y="28"/><use href="#hold" x="12" y="28"/><use href="#hold" x="24" y="28"/><use href="#hold" x="36" y="28"/><use href="#hold" x="48" y="28"/>
+          </g>
+        </g>
+      </g>
+    </g>
+
+    <!-- table head -->
+    <g transform="translate(40 290)" font-size="12" fill="#c3b3da">
+      <text x="0" y="0">Good</text>
+      <text x="200" y="0">Port</text>
+      <text x="470" y="0" text-anchor="middle">◂ sell to the port · buy for the ship ▸</text>
+      <text x="720" y="0" text-anchor="end">Aboard</text>
+      <line x1="0" y1="10" x2="720" y2="10" stroke="#5a4c8c"/>
+    </g>
+    <!-- rows -->
+    <g transform="translate(40 330)" font-size="14">
+      <!-- a row: code chip, name, port, slider, aboard -->
+      <g>
+        <rect x="-8" y="-20" width="736" height="44" rx="8" fill="#302651"/>
+        <circle cx="10" cy="2" r="9" fill="#74cf84" fill-opacity="0.25" stroke="#74cf84"/>
+        <text x="28" y="7" fill="#74cf84" font-weight="bold" font-family="monospace">ORG</text>
+        <text x="66" y="7" fill="#f1eefa">Organics</text>
+        <text x="200" y="-1" fill="#f1eefa">Sells 300</text><text x="200" y="15" fill="#bdb5d4" font-size="12">56¢ each</text>
+        <!-- slider: center line, sell half left, buy half right -->
+        <g transform="translate(470 2)">
+          <text x="-200" y="5" fill="#c3b3da" font-size="16">◂</text>
+          <rect x="-180" y="-4" width="360" height="8" rx="4" fill="#00000055" stroke="#5c1aae88" stroke-width="2"/>
+          <rect x="0" y="-3" width="180" height="6" rx="3" fill="#7b4fe655"/>
+          <rect x="0" y="-3" width="20" height="6" rx="3" fill="#b9a0ff"/>
+          <line x1="0" y1="-12" x2="0" y2="12" stroke="#e6dcf5" stroke-width="2"/>
+          <path d="M18 -10l12 10-12 10z" fill="#fff"/>
+          <text x="188" y="5" fill="#c3b3da" font-size="16">▸</text>
+          <text x="40" y="-10" fill="#f1eefa" font-size="11">buy 1</text>
+        </g>
+        <text x="720" y="7" text-anchor="end" fill="#f1eefa">3 → <tspan font-weight="bold">4</tspan></text>
+      </g>
+      <g transform="translate(0 52)">
+        <circle cx="10" cy="2" r="9" fill="#e08a4f" fill-opacity="0.25" stroke="#e08a4f"/>
+        <text x="28" y="7" fill="#e08a4f" font-weight="bold" font-family="monospace">EQP</text>
+        <text x="66" y="7" fill="#f1eefa">Equipment</text>
+        <text x="200" y="-1" fill="#f1eefa">Sells 300</text><text x="200" y="15" fill="#bdb5d4" font-size="12">190¢ each</text>
+        <g transform="translate(470 2)">
+          <text x="-200" y="5" fill="#c3b3da55" font-size="16">◂</text>
+          <rect x="-180" y="-4" width="360" height="8" rx="4" fill="#00000055" stroke="#5c1aae88" stroke-width="2"/>
+          <rect x="0" y="-3" width="180" height="6" rx="3" fill="#7b4fe655"/>
+          <line x1="0" y1="-12" x2="0" y2="12" stroke="#e6dcf5" stroke-width="2"/>
+          <path d="M-2 -10l12 10-12 10z" fill="#fff"/>
+          <text x="188" y="5" fill="#c3b3da" font-size="16">▸</text>
+        </g>
+        <text x="720" y="7" text-anchor="end" fill="#f1eefa">1</text>
+      </g>
+      <g transform="translate(0 104)">
+        <circle cx="10" cy="2" r="9" fill="#a9b3c1" fill-opacity="0.25" stroke="#a9b3c1"/>
+        <text x="28" y="7" fill="#a9b3c1" font-weight="bold" font-family="monospace">MET</text>
+        <text x="66" y="7" fill="#f1eefa">Metals</text>
+        <text x="200" y="-1" fill="#ebff99">Buys 300</text><text x="200" y="15" fill="#bdb5d4" font-size="12">119¢ each</text>
+        <g transform="translate(470 2)">
+          <text x="-200" y="5" fill="#c3b3da" font-size="16">◂</text>
+          <rect x="-180" y="-4" width="360" height="8" rx="4" fill="#00000055" stroke="#5c1aae88" stroke-width="2"/>
+          <rect x="-18" y="-3" width="18" height="6" rx="3" fill="#7b4fe655"/>
+          <rect x="-18" y="-3" width="18" height="6" rx="3" fill="#b9a0ff"/>
+          <line x1="0" y1="-12" x2="0" y2="12" stroke="#e6dcf5" stroke-width="2"/>
+          <path d="M-16 -10l-12 10 12 10z" fill="#fff"/>
+          <text x="188" y="5" fill="#c3b3da55" font-size="16">▸</text>
+          <text x="-90" y="-10" fill="#ebff99" font-size="11">sell 2 · +238¢</text>
+        </g>
+        <text x="720" y="7" text-anchor="end" fill="#f1eefa">2 → <tspan font-weight="bold">0</tspan></text>
+      </g>
+      <g transform="translate(0 156)" opacity="0.9">
+        <circle cx="10" cy="2" r="9" fill="#d9e1ec" fill-opacity="0.25" stroke="#d9e1ec"/>
+        <text x="28" y="7" fill="#d9e1ec" font-weight="bold" font-family="monospace">RAR</text>
+        <text x="66" y="7" fill="#f1eefa">Rare elements</text>
+        <text x="200" y="-1" fill="#f1eefa">Buys 300</text><text x="200" y="15" fill="#bdb5d4" font-size="12">259¢ each</text>
+        <g transform="translate(470 2)">
+          <rect x="-180" y="-4" width="360" height="8" rx="4" fill="#00000055" stroke="#5c1aae55" stroke-width="2"/>
+          <line x1="0" y1="-12" x2="0" y2="12" stroke="#e6dcf5" stroke-width="2"/>
+          <text x="-80" y="5" fill="#9088aa" font-size="11" text-anchor="middle">none aboard</text>
+        </g>
+        <text x="720" y="7" text-anchor="end" fill="#9088aa">0</text>
+      </g>
+      <text x="0" y="214" font-size="12" fill="#9088aa">… one row for each good the port trades (up to eight), then any you carry that it doesn't (no slider).</text>
+    </g>
+
+    <!-- readouts -->
+    <g transform="translate(40 640)" font-size="14">
+      <line x1="0" y1="-20" x2="720" y2="-20" stroke="#5a4c8c"/>
+      <text x="0" y="6" fill="#bdb5d4">Balance <tspan fill="#f1eefa">498,633¢</tspan></text>
+      <text x="230" y="6" fill="#ebff99" font-weight="bold">Gain ↑ 182¢</text>
+      <text x="400" y="6" fill="#bdb5d4">After <tspan fill="#f1eefa">498,815¢</tspan></text>
+      <text x="0" y="34" fill="#9088aa" font-size="12">Costs are plain, gains yellow; "Insufficient funds" in light pink with an outline.</text>
+    </g>
+    <g transform="translate(400 740)">
+      <rect x="-150" y="-22" width="300" height="44" rx="8" fill="#7b4fe6" stroke="#b9a0ff"/>
+      <text x="0" y="7" text-anchor="middle" font-size="18" font-weight="bold" fill="#fff">Make Trade</text>
+    </g>
+    <text x="400" y="800" text-anchor="middle" font-size="12" fill="#9088aa">Drag a slider, tap its ◂ ▸, or focus it and use the arrow keys (gamepad: D-pad to it, then left/right).</text>
+  </g>
+
+  <!-- phone -->
+  <g transform="translate(900 90)">
+    <text x="0" y="0" font-size="15" fill="#e6dcf5">Phone (390 wide): each row on two lines</text>
+    <rect x="0" y="16" width="390" height="660" fill="#1d1638" stroke="#3f3566"/>
+    <text x="195" y="50" text-anchor="middle" font-size="20" fill="#ffffffaa">I.S.S.</text>
+    <text x="195" y="70" text-anchor="middle" font-size="11" fill="#c3b3da" font-family="monospace" letter-spacing="2">S<tspan fill="#ebff99">B</tspan>BBSBSS</text>
+    <rect x="16" y="84" width="358" height="96" rx="6" fill="#00000022" stroke="#c3b3da33"/>
+    <text x="195" y="136" text-anchor="middle" font-size="12" fill="#9088aa">the same drawing, smaller; every hold</text>
+    <g transform="translate(16 210)" font-size="13">
+      <g>
+        <rect x="-6" y="-18" width="370" height="64" rx="8" fill="#302651"/>
+        <text x="0" y="0" fill="#74cf84" font-weight="bold" font-family="monospace">ORG</text>
+        <text x="40" y="0" fill="#f1eefa">Organics</text>
+        <text x="200" y="0" fill="#f1eefa">Sells 300 · 56¢</text>
+        <text x="358" y="0" text-anchor="end" fill="#f1eefa">3→4</text>
+        <g transform="translate(179 28)">
+          <text x="-176" y="5" fill="#c3b3da" font-size="16">◂</text>
+          <rect x="-160" y="-4" width="320" height="8" rx="4" fill="#00000055" stroke="#5c1aae88" stroke-width="2"/>
+          <rect x="0" y="-3" width="160" height="6" rx="3" fill="#7b4fe655"/>
+          <line x1="0" y1="-12" x2="0" y2="12" stroke="#e6dcf5" stroke-width="2"/>
+          <path d="M14 -10l12 10-12 10z" fill="#fff"/>
+          <text x="166" y="5" fill="#c3b3da" font-size="16">▸</text>
+        </g>
+      </g>
+      <g transform="translate(0 76)">
+        <text x="0" y="0" fill="#a9b3c1" font-weight="bold" font-family="monospace">MET</text>
+        <text x="40" y="0" fill="#f1eefa">Metals</text>
+        <text x="200" y="0" fill="#ebff99">Buys 300 · 119¢</text>
+        <text x="358" y="0" text-anchor="end" fill="#f1eefa">2→0</text>
+        <g transform="translate(179 28)">
+          <rect x="-160" y="-4" width="320" height="8" rx="4" fill="#00000055" stroke="#5c1aae88" stroke-width="2"/>
+          <rect x="-16" y="-3" width="16" height="6" rx="3" fill="#b9a0ff"/>
+          <line x1="0" y1="-12" x2="0" y2="12" stroke="#e6dcf5" stroke-width="2"/>
+          <path d="M-14 -10l-12 10 12 10z" fill="#fff"/>
+        </g>
+      </g>
+      <text x="0" y="150" font-size="12" fill="#9088aa">… more rows</text>
+    </g>
+    <text x="16" y="560" font-size="13" fill="#bdb5d4">Bal 498,633¢ · <tspan fill="#ebff99" font-weight="bold">Gain 182¢</tspan> · After 498,815¢</text>
+    <rect x="45" y="584" width="300" height="44" rx="8" fill="#7b4fe6" stroke="#b9a0ff"/>
+    <text x="195" y="612" text-anchor="middle" font-size="17" font-weight="bold" fill="#fff">Make Trade</text>
+    <text x="0" y="710" font-size="12" fill="#c3b3da">Gone: the "Port of Trade" list and the cargo tiles beside the drawing</text>
+    <text x="0" y="728" font-size="12" fill="#c3b3da">(their prices, stock and cargo are in each row now), the Buy/Sell</text>
+    <text x="0" y="746" font-size="12" fill="#c3b3da">columns and the phone's Buy/Sell pages (the rows hold both).</text>
+    <text x="0" y="770" font-size="12" fill="#c3b3da">Kept: the drawing, the port's letters, goods colors, the readouts'</text>
+    <text x="0" y="788" font-size="12" fill="#c3b3da">rules, Make Trade as the one strong button, the two-way slider.</text>
+  </g>
+</svg>

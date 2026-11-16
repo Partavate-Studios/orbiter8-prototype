@@ -1,0 +1,4 @@
+node_modules
+dist
+dev/local-deployment.json
+shots/tmp

@@ -1,0 +1,138 @@
+<template>
+  <!-- The launch pad: the player's new Orbiter 8 on its gantry, a fleet of Orbiter 8-class ships
+       behind it, and smoke while the launch is waiting on the chain. -->
+  <div class="ship-scene">
+    <svg viewBox="-32 -32 64 64" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <g transform="translate(-50 5) scale(5.5)">
+        <ship />
+      </g>
+      <g v-if="warmingUp">
+        <g transform="translate(-50 20)">
+          <circle cx="0" cy="0" r="5" fill="#ffffff44" class="smoke1" />
+          <circle cx="0" cy="0" r="10" fill="#ffffff44" class="smoke2" />
+          <circle cx="0" cy="0" r="15" fill="#ffffff44" class="smoke3" />
+
+          <circle cx="0" cy="10" r="15" fill="#ffffff44" class="smoke1" />
+          <circle cx="0" cy="10" r="15" fill="#ffffff44" class="smoke2" />
+          <circle cx="0" cy="10" r="15" fill="#ffffff44" class="smoke3" />
+        </g>
+
+        <g transform="translate(-75 20)">
+          <circle cx="0" cy="0" r="6" fill="#ffffff66" class="smoke1" />
+          <circle cx="0" cy="0" r="8" fill="#ffffff66" class="smoke2" />
+          <circle cx="0" cy="0" r="10" fill="#ffffff66" class="smoke3" />
+
+          <circle cx="0" cy="10" r="15" fill="#ffffff66" class="smoke1" />
+          <circle cx="0" cy="10" r="15" fill="#ffffff66" class="smoke2" />
+          <circle cx="0" cy="10" r="15" fill="#ffffff66" class="smoke3" />
+        </g>
+        <g transform="translate(-25 20)">
+          <circle cx="0" cy="0" r="6" fill="#ffffff66" class="smoke1" />
+          <circle cx="0" cy="0" r="8" fill="#ffffff66" class="smoke2" />
+          <circle cx="0" cy="0" r="10" fill="#ffffff66" class="smoke3" />
+
+          <circle cx="0" cy="10" r="15" fill="#ffffff66" class="smoke1" />
+          <circle cx="0" cy="10" r="15" fill="#ffffff66" class="smoke2" />
+          <circle cx="0" cy="10" r="15" fill="#ffffff66" class="smoke3" />
+        </g>
+      </g>
+
+      <!-- the fleet: Orbiter 8-class ships of every design, fading into the distance -->
+      <g v-for="x in 6" :key="'ship-' + x">
+        <g :transform="'translate(' + (x * 18 - 25) + ' 1) scale(0.94)'" opacity="0.1">
+          <fleet-ship :type="designFor(x, 0)" />
+        </g>
+        <g :transform="'translate(' + (x * 19 - 20) + ' 6) scale(1.25)'" opacity="0.25">
+          <fleet-ship :type="designFor(x, 1)" />
+        </g>
+        <g :transform="'translate(' + (x * 20 - 15) + ' 12) scale(1.56)'" opacity="0.55">
+          <fleet-ship :type="designFor(x, 2)" />
+        </g>
+      </g>
+
+      <g fill="#ffffff">
+        <rect x="-90" y="25" width="80" height="4" rx="2" ry="2" />
+
+        <rect x="-110" y="-16" width="3" height="45" rx="2" ry="2" />
+        <rect x="-95" y="-16" width="3" height="45" rx="2" ry="2" />
+
+        <g v-if="!warmingUp">
+          <rect x="-110" y="-20" width="45" height="2" rx="2" ry="2" />
+          <rect x="-90" y="-15" width="25" height="2" rx="2" ry="2" />
+        </g>
+
+        <rect x="-105" y="-15" width="8" height="2" rx="2" ry="2" />
+        <rect x="-105" y="-5" width="8" height="2" rx="2" ry="2" />
+        <rect x="-105" y="5" width="8" height="2" rx="2" ry="2" />
+        <rect x="-105" y="15" width="8" height="2" rx="2" ry="2" />
+        <rect x="-105" y="25" width="8" height="2" rx="2" ry="2" />
+      </g>
+    </svg>
+  </div>
+</template>
+
+<script>
+import Ship from '@/components/star-map/sprites/ship.svg.vue'
+import FleetShip from '@/components/assets/fleet-ship.svg'
+
+const DESIGNS = ['orbiter8', 'polygon', 'boba', 'moonbeam']
+
+export default {
+  name: 'LaunchPad',
+  components: {
+    Ship,
+    FleetShip
+  },
+  props: {
+    warmingUp: { type: Boolean, default: false }
+  },
+  methods: {
+    /** A mix of designs across the fleet, the same every time. */
+    designFor(column, row) {
+      return DESIGNS[(column * 3 + row) % DESIGNS.length]
+    }
+  }
+}
+</script>
+
+<style scoped lang="scss">
+div.ship-scene {
+  width: 100%;
+  height: 128px;
+  text-align: center;
+  svg {
+    width: 100%;
+    max-width: 460px;
+    height: 128px;
+  }
+}
+.smoke1 {
+  animation-name: smoke;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+.smoke2 {
+  animation-name: smoke;
+  animation-duration: 6s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+.smoke3 {
+  animation-name: smoke;
+  animation-duration: 12s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+@keyframes smoke {
+  0% {
+    fill: #ffffff;
+    scale: 0;
+  }
+  100% {
+    fill: #ffffff00;
+    scale: 1;
+  }
+}
+</style>

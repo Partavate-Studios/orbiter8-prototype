@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 844" font-family="system-ui, sans-serif" fill="#dbe7ee">
+  <title>Phone · Market: one board for the whole star; routes sized to this ship; a filing in flight</title>
+  <rect width="390" height="844" fill="#060d14"/>
+  <text x="12" y="16" font-size="9" fill="#8aa2b1" letter-spacing="1.2">VEGA</text><text x="12" y="34" font-size="15" font-weight="600">Sol</text>
+  <text x="290" y="34" font-size="14" font-family="monospace" text-anchor="end">1,541</text><text x="340" y="34" font-size="14" font-family="monospace" text-anchor="end">0/5</text>
+  <path d="M366 11l9.5 5.5v11L366 33l-9.5-5.5v-11z" fill="none" stroke="#ffb454" stroke-width="1.5"/><circle cx="366" cy="22" r="2.5" fill="#ffb454"/>
+  <line y1="44" y2="44" x2="390" stroke="#1f3442"/>
+  <!-- ticker: the filing in flight -->
+  <rect x="8" y="52" width="374" height="52" fill="#0f1e29" stroke="#1f3442"/><rect x="8" y="52" width="2" height="52" fill="#ffb454"/><rect x="21" y="74" width="7" height="7" fill="#ffb454" transform="rotate(45 24.5 77.5)"/>
+  <text x="40" y="74" font-size="13" font-weight="600">Sell 5 Equipment · Tycho Station</text><text x="40" y="92" font-size="11" fill="#8aa2b1">sent to Minerva…</text>
+  <g fill="none" stroke="#8aa2b1" stroke-opacity=".18"><circle cx="195" cy="190" r="30"/><circle cx="195" cy="190" r="48"/><circle cx="195" cy="190" r="66"/><circle cx="195" cy="190" r="84"/></g><circle cx="195" cy="190" r="9" fill="#ffe08a"/>
+  <rect y="282" width="390" height="506" fill="#0b1620"/><line y1="282" y2="282" x2="390" stroke="#1f3442"/>
+  <text x="14" y="322" font-size="18" font-weight="600">Market <tspan fill="#8aa2b1">· Sol</tspan></text>
+  <text x="14" y="346" font-size="13" fill="#8aa2b1">Every port at this star is in reach at once. 9 trading.</text>
+  <g font-size="13" fill="#8aa2b1"><text x="24" y="382" fill="#dbe7ee">Routes</text><text x="88" y="382">Cargo</text><text x="146" y="382">Ports</text><line x1="14" x2="376" y1="392" y2="392" stroke="#1f3442"/><line x1="14" x2="76" y1="392" y2="392" stroke="#6fd3ff" stroke-width="2"/></g>
+  <g id="r" font-size="13"><text x="14" y="426" font-weight="600">Electronics</text><circle cx="18" cy="442" r="4" fill="#5fb58c"/><text x="28" y="446" font-size="12" fill="#8aa2b1">I.S.S.  →  Port Hesperus</text><circle cx="78" cy="442" r="4" fill="#d9603f"/>
+  <text x="14" y="464" font-size="11" font-family="monospace" fill="#8aa2b1">5 × <tspan fill="#7be0a4">+132</tspan> · pay 1,298</text>
+  <path d="M267 420h109v32l-9 9H258v-32z" fill="#ffb454"/><text x="317" y="440" font-size="13" font-weight="600" fill="#1c1203" text-anchor="middle">Run  +661</text><text x="317" y="454" font-size="10" font-family="monospace" fill="#1c1203" opacity=".8" text-anchor="middle">buy, then sell</text><line x1="14" x2="376" y1="478" y2="478" stroke="#1f3442"/></g>
+  <use href="#r" y="78"/><use href="#r" y="156"/><use href="#r" y="234"/>
+  <text x="14" y="742" font-size="11" fill="#56707f">Sized to your 5 free bays and 1,541 credits. Every unit moves</text><text x="14" y="757" font-size="11" fill="#56707f">the price, so bigger loads earn less each.</text>
+  <rect y="788" width="390" height="56" fill="#060d14"/><line y1="788" y2="788" x2="390" stroke="#1f3442"/><rect x="181" y="787" width="28" height="2" fill="#6fd3ff"/>
+  <g font-size="10" text-anchor="middle" fill="#56707f"><text x="39" y="830">System</text><text x="117" y="830">Galaxy</text><text x="195" y="830" fill="#6fd3ff">Market</text><text x="273" y="830">Ship</text><text x="351" y="830">Domain</text></g>
+</svg>

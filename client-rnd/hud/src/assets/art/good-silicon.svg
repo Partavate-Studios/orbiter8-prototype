@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -60 120 120">
+<!-- Good: Silicon (Orbiter 8 art, 120 units square, centered; drawn for docs/tech-trees and free to use in the game) -->
+<defs>
+  <radialGradient id="planetGradient" cx="10%" cy="50%" r="180%" fx="0%" fy="50%"><stop offset="0%" stop-color="#e5cfff"/><stop offset="10%" stop-color="#e5cfff"/><stop offset="20%" stop-color="#c3b3da"/><stop offset="30%" stop-color="rgb(140,120,180)"/><stop offset="40%" stop-color="rgb(60,40,90)"/><stop offset="100%" stop-color="rgb(60,40,90)"/></radialGradient>
+  <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#c3b3da" stop-opacity="0.1"/><stop offset="50%" stop-color="#e5cfff" stop-opacity="0.9"/><stop offset="100%" stop-color="#c3b3da" stop-opacity="0.1"/></linearGradient>
+  <clipPath id="just-the-planet"><circle r="10"/></clipPath>
+  <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#c3b3da"/></marker>
+</defs>
+<g transform="scale(3)"><g><circle r="10.5" fill="#8f7fb0" stroke="#e5cfff" stroke-width="1"/><path d="M-7 -3.5H7M-7 0H7M-7 3.5H7M-3.5 -7V7M0 -7V7M3.5 -7V7" stroke="#2b0c50" stroke-width="0.8"/></g></g>
+</svg>
