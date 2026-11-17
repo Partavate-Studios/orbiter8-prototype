@@ -13,6 +13,7 @@ import {Planets} from "../src/planets/Planets.sol";
 import {Claims} from "../src/planets/Claims.sol";
 import {Drones} from "../src/planets/Drones.sol";
 import {IMiningHook} from "../src/pilots/Pilots.sol";
+import {IDronePool} from "../src/battle/Battle.sol";
 import {IDroneOutput} from "../src/planets/Planets.sol";
 import {IPortSupply} from "../src/market/Market.sol";
 import {Repairs} from "../src/battle/Repairs.sol";
@@ -132,6 +133,8 @@ library Deployment {
         game.pilots.grantRole(role, address(game.drones)); // landing and boarding drones
         game.drones.grantRole(role, address(game.pilots)); // a mining ship changing stops its mining
         game.pilots.setMiningHook(IMiningHook(address(game.drones)));
+        game.drones.grantRole(role, address(game.battle)); // an asteroid's defense drones lost in a siege
+        game.battle.setDrones(IDronePool(address(game.drones)));
         game.planets.setDrones(IDroneOutput(address(game.drones)));
         game.planets.grantRole(role, address(game.market)); // players' ports sell from storage
         game.market.setSupply(IPortSupply(address(game.planets)));

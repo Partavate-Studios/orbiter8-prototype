@@ -10,6 +10,9 @@ import {Armory} from "../../src/battle/Armory.sol";
 import {Combat} from "../../src/battle/Combat.sol";
 import {Repairs} from "../../src/battle/Repairs.sol";
 import {SystemGen} from "../../src/planets/SystemGen.sol";
+import {BeltGen} from "../../src/planets/BeltGen.sol";
+import {BodyId} from "../../src/planets/BodyId.sol";
+import {Drones} from "../../src/planets/Drones.sol";
 
 contract BattleFixture is PlanetsFixture {
     Battle battle;
@@ -368,5 +371,75 @@ contract CombatTest is Test {
         guarded.pointDefense = 2; // stops 30 of the 36
         Combat.round(_ship(0, 3, 0, 5, 3), guarded, Combat.Fire(0, 0, 0));
         assertEq(1_000 - guarded.platforms, 12);
+    }
+}
+
+contract AsteroidSiegeTest is BattleFixture {
+    /// Cell 3 is in Sol's genesis ring and has a belt in this universe (see AsteroidClaimsTest).
+    function _universe() internal pure override returns (bytes32) {
+        return keccak256(abi.encode("belt universe", 0));
+    }
+
+    function test_anAsteroidDefendsWithItsDroneAndFallsAStep() public {
+        bytes32 seed = _universe();
+        uint256 rock;
+        for (uint256 i = 0; i < BeltGen.SECTIONS; i++) {
+            (bool a,,) = BeltGen.section(seed, 3, i);
+            if (a) {
+                rock = i;
+                break;
+            }
+        }
+        uint256 asteroid = BodyId.make(3, BodyId.ASTEROID, rock);
+        Drones drones = game.drones;
+        uint256 miner = armory.MINING_DRONE();
+        vm.startPrank(admin);
+        for (uint8 step = 1; step <= 6; step++) {
+            planets.setCost(step + 8, Planets.Cost(1_000, 10 minutes, step == 1 ? 20 : 0, [0, 0, 0], [uint32(0), 0, 0]));
+        }
+        vm.stopPrank();
+        _pay(ada, 1_000_000);
+        vm.startPrank(ada);
+        planets.recruit(20);
+        market.buyDroneBays(EARTH, 14, type(uint256).max);
+        armory.buy(EARTH, miner, 14, type(uint256).max);
+        vm.stopPrank();
+        _go(ada, 3);
+        _claim(ada, asteroid);
+        vm.startPrank(ada);
+        planets.land(asteroid, 20);
+        uint8[4] memory line = [1, 2, 4, 6];
+        for (uint256 i = 0; i < 4; i++) {
+            planets.build(asteroid, line[i]);
+            skip(10 minutes);
+        }
+        drones.land(asteroid, 14);
+        drones.setDefense(asteroid, 4); // four defend, ten mine
+        vm.stopPrank();
+        assertEq(battle.planetSide(asteroid).drones, 4, "the pool's defense drones fight");
+
+        _armBo(4);
+        _go(bo, 3);
+        vm.prank(bo);
+        battle.attack(asteroid);
+        vm.prank(ada);
+        vm.expectRevert(abi.encodeWithSelector(Drones.InSiege.selector, asteroid));
+        drones.setDefense(asteroid, 0); // frozen during a siege
+        skip(6 hours);
+        battle.advance(asteroid);
+        (Battle.Siege memory s,) = battle.siegeOf(asteroid);
+        uint256 dronesLeft = s.planet.drones;
+        assertEq(s.attacker, bo, "Bo held on");
+        assertLt(dronesLeft, 4, "drones were destroyed");
+        vm.prank(bo);
+        battle.fileClaim(asteroid);
+        skip(25 hours);
+        battle.completeClaim(asteroid);
+        assertEq(claims.ownerOf(asteroid), bo);
+        (uint32 total, uint32 defense,) = drones.poolOf(asteroid);
+        assertEq(defense, dronesLeft, "the lost came off the pool");
+        assertEq(total - defense, 10, "the mining drones were never touched");
+        assertEq(planets.planetView(asteroid, 0).level, 4, "the Armory fell to the Port, not to a Yards");
+        assertFalse(market.portView(asteroid).yard);
     }
 }

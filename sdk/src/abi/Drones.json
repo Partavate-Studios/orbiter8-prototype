@@ -206,6 +206,24 @@
   },
   {
     "type": "function",
+    "name": "loseDefense",
+    "inputs": [
+      {
+        "name": "body",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "lost",
+        "type": "uint32",
+        "internalType": "uint32"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "miningOf",
     "inputs": [
       {

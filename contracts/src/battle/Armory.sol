@@ -37,6 +37,9 @@ contract Armory is ModuleBase {
     uint256 public constant PLANET_BOTS = 20;
     uint256 public constant PLANET_ARMOR = 20;
     uint256 public constant PLANET_SHIELDS = 5;
+    // An asteroid's defenses (D95): a moon's six mounts and a small shield; its drones come from its pool.
+    uint256 public constant ASTEROID_MOUNTS = 6;
+    uint256 public constant ASTEROID_SHIELDS = 1;
     uint256 public constant PLANET_PLATFORMS = 3;
     uint256 public constant MOON_MOUNTS = 6; // per moon; moons can't be destroyed (D61)
 
@@ -187,6 +190,11 @@ contract Armory is ModuleBase {
         else if (part == 7) d.platforms = uint8(_add(d.platforms, delta));
         else d.bfg = uint8(_add(d.bfg, delta));
         uint256 mounts = uint256(d.pointDefense) + 2 * uint256(d.railguns) + 2 * uint256(d.missiles);
+        if (
+            !BodyId.isPlanet(planet)
+                && (mounts > ASTEROID_MOUNTS || d.shields > ASTEROID_SHIELDS || d.drones + d.repairBots + d.armor
+                    + d.platforms + d.bfg > 0)
+        ) revert TooMany(part);
         if (
             mounts > PLANET_MOUNTS + PLATFORM_MOUNTS * d.platforms || d.drones > PLANET_DRONES
                 || d.repairBots > PLANET_BOTS || d.armor > PLANET_ARMOR || d.shields > PLANET_SHIELDS

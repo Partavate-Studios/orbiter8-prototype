@@ -166,6 +166,16 @@ contract Drones is ModuleBase {
         return uint256(_d().planets.planetView(body, 0).size) * _d().perSize;
     }
 
+    /// A siege's end (Battle): defense drones destroyed come off the pool. Mining drones never are.
+    function loseDefense(uint256 body, uint32 lost) external onlyRole(GAME_MODULE) {
+        Pool storage pool = _d().pools[body];
+        if (lost > pool.defense) lost = pool.defense;
+        _d().planets.settle(body);
+        pool.defense -= lost;
+        pool.total -= lost;
+        emit PoolChanged(body, address(0), pool.total, pool.defense);
+    }
+
     // ── ships mining empty sections ─────────────────────────────────────────────────────────────
 
     /// Parks the ship at a free slot of an empty section at its star and sets its drones mining.

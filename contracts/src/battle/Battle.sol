@@ -8,6 +8,12 @@ import {Planets} from "../planets/Planets.sol";
 import {Combat} from "./Combat.sol";
 import {Repairs} from "./Repairs.sol";
 
+/// An asteroid's drone pool (Drones, D90, D95): its defense drones fight, and the ones lost come off it.
+interface IDronePool {
+    function poolOf(uint256 body) external view returns (uint32 total, uint32 defense, uint256 room);
+    function loseDefense(uint256 body, uint32 lost) external;
+}
+
 /// @title Sieges (docs/demo4-plan.md, section 6; D44–D54)
 /// @notice An armed ship at a claimed planet outside Sol starts a siege with one transaction (D44,
 /// D49). It's public: every map and the siege feed (these events) show it. The rounds (`Combat`) are
@@ -63,6 +69,7 @@ contract Battle is ModuleBase, IMoveHook {
         mapping(uint256 => address[]) allies; // planet → ships that joined its defense
         mapping(uint256 => uint256[]) siegesAt; // star → planets under siege there
         mapping(address => uint256) attacking; // pilot → planet + 1 (0: none)
+        IDronePool drones;
     }
 
     // keccak256(abi.encode(uint256(keccak256("orbiter8.battle")) - 1)) & ~bytes32(uint256(0xff))
@@ -95,6 +102,16 @@ contract Battle is ModuleBase, IMoveHook {
     function initialize(address admin, Pilots pilots_, Planets planets_, Repairs repairs_) external initializer {
         __ModuleBase_init(admin);
         (_b().pilots, _b().planets, _b().repairs) = (pilots_, planets_, repairs_);
+    }
+
+    function setDrones(IDronePool drones_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _b().drones = drones_;
+    }
+
+    /// An asteroid's defense drones (its pool's), or 0.
+    function _poolDefense(uint256 body) internal view returns (uint32 defense) {
+        if (BodyId.isPlanet(body) || address(_b().drones) == address(0)) return 0;
+        (, defense,) = _b().drones.poolOf(body);
     }
 
     // ── starting and joining ────────────────────────────────────────────────────────────────────
@@ -254,6 +271,12 @@ contract Battle is ModuleBase, IMoveHook {
     }
 
     function _keepPlanetLosses(uint256 planet, Combat.Side memory side) internal {
+        // An asteroid's drones are its pool's (it fits none): the ones lost come off the pool.
+        uint32 pool = _poolDefense(planet);
+        if (pool > 0) {
+            if (side.drones < pool) _b().drones.loseDefense(planet, pool - side.drones);
+            side.drones = 0;
+        }
         Defenses storage d = _b().defenses[planet];
         d.platforms = uint8((side.platforms + Combat.PLATFORM_HP - 1) / Combat.PLATFORM_HP);
         d.armor = uint8((side.armor + Combat.ARMOR_HP - 1) / Combat.ARMOR_HP);
@@ -308,7 +331,7 @@ contract Battle is ModuleBase, IMoveHook {
         side.armorMax = side.armor = uint32(uint256(d.armor) * Combat.ARMOR_HP);
         side.hull = uint32(uint256(level) * Combat.HULL_PER_LEVEL);
         (side.pointDefense, side.railguns, side.missiles, side.drones, side.repairBots, side.bfg) =
-            (d.pointDefense, d.railguns, d.missiles, d.drones, d.repairBots, d.bfg);
+            (d.pointDefense, d.railguns, d.missiles, d.drones + uint16(_poolDefense(planet)), d.repairBots, d.bfg);
         (side.moonPointDefense, side.moonRailguns, side.moonMissiles) =
             (d.moonPointDefense, d.moonRailguns, d.moonMissiles);
     }

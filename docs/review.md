@@ -505,6 +505,12 @@ Calls made building it, for Koda's review:
   change to the ship stops it, through Pilots (every ship-changing function, including a siege's damage
   and reassigning the built-in drones); renaming the ship and chat don't. `stopMining` ends it too.
   Mining is allowed in Sol's belt (only claims are the Federation's).
+- **X21. Asteroid sieges** (decisions 6, 29): an asteroid's defenses are at most six weapon mounts and
+  one shield level, fitted from its store like a planet's; no armor, repair bots, platforms, BFG or
+  fitted drones (its drones are its pool's defense drones, which fight and can be lost; mining ones never
+  are). Its hull is its step × the planets' 60. A captured asteroid falls one step of its own line
+  (Armory → Port → Mine → Platform), never into a Yards. Landing more drones during a siege is allowed
+  (they join as miners: the split is frozen).
 - **X6. Wording:** the loadout's empty-weapons line says "Every Sol station's armory sells them." (was "The
   I.S.S. armory").
 

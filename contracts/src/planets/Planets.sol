@@ -418,14 +418,17 @@ contract Planets is ModuleBase {
         Planet storage planet = _settle(id);
         address from = _s().claims.ownerOf(id);
         uint8 had = planet.level;
-        if (had > CITADEL) planet.level = had - 1;
+        (uint8 class,) = _derive(id);
+        bool asteroid = class >= ASTEROID_CLASS;
+        // a step down its own line: an asteroid's Armory falls to its Port, its Port to its Mine
+        if (had > CITADEL) planet.level = asteroid && had > COLONY ? had - 2 : had - 1;
         planet.building = 0;
         _s().claims.transfer(id, to);
         if (had >= PORT) {
             // The port and its yard follow the level that's left; "never" closes them.
-            (uint8 class,) = _derive(id);
             uint40 never = type(uint40).max;
-            _s().market.openPort(id, class, to, planet.level >= PORT ? 1 : never, planet.level >= YARDS ? 1 : never);
+            bool yard = planet.level >= YARDS && !asteroid;
+            _s().market.openPort(id, class, to, planet.level >= PORT ? 1 : never, yard ? 1 : never);
         }
         emit PlanetSeized(id, from, to, planet.level);
     }

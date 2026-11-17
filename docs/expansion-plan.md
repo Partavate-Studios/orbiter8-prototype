@@ -62,11 +62,16 @@ work in progress from a session that ran out (check `git status` and `git diff` 
 - 2026-11-16: ships mining empty sections done (Drones `startMining`/`stopMining`/`miningOf`/`slotsOf`,
   Pilots `_change` stops mining on every ship change, `BeltGen.dust`; SDK bindings and dust mirror).
   Played in the browser: a new pilot mined Sol's empty section and sold the metal. Call X20.
-- **Next: Phase 3's last box, sieges on asteroids** (decisions 6, 29): a moon's 6 weapon mounts, a small
-  shield, and the pool's defense drones (destroyable; mining ones never). `Battle.planetSide` builds a
-  body's side from `Defenses` and its level; for an asteroid add the pool's defense drones (Drones) and
-  cap mounts at 6 (Armory `_changePlanet`); after a siege, defense drones lost come off the pool.
-  Battle has 2.8 KB.
+- 2026-11-16: asteroid sieges done (Battle reads the pool's defense drones, `Drones.loseDefense`, Armory
+  asteroid limits, `Planets.seize` steps down an asteroid's own line). **Phase 3 done** (contracts and
+  SDK; nothing of it is drawn yet). Battle 22.7 KB (1.9 KB left), Planets 21.3, Market 20.3. Call X21.
+- **Next: Phase 4, drawing the belt** (orbiter-client). Read `docs/ui-guide.md`, `docs/color-guide.md`,
+  the plan's "Graphics" section, and `src/components/star-map/map.vue` and the sprites first. The SDK
+  already gives: `belt-gen.js` (sections, compositions, names, dust), `contracts.belt(cell)` (asteroid
+  views), `dronePool`, `mining`, `miningSlots`, and the actions. The system view needs the belt's objects
+  in `sdk/src/system.js` (like planets and stations), then the three levels of detail, selection, the
+  asteroid's card and menus (claim, build line, drones, port, mining). One Fable request for the art
+  (plan: short and direct). Measure at Sol with `CPU_THROTTLE=4` before and after.
 
 ## Read first
 
@@ -257,14 +262,14 @@ onward in `docs/demo4-plan.md`, with this plan's milestones.
 - [x] Mining drones as a part (decision 9); never lost in battle (decision 14).
 - [x] Client: the shipyard sells both bay types; the loadout shows drones and bays by type.
 
-**Phase 3: belts.**
+**Phase 3: belts.** *(Contracts and SDK done 2026-11-16.)*
 - [x] Generation: which stars have a belt, its 8 sections, each section's asteroid (size, composition)
   or empty; Sol's belt fixed and the Federation's. Contract library + SDK mirror + vectors.
 - [x] Claims, names and deeds for asteroids (not counting toward the star, decision 6).
 - [x] The asteroid building line (decision 22); drone pools and the mining/defense split (decision 24).
 - [x] Ports supplied by production, for asteroids and player planets; Federation ports at the top rate (decision 23).
 - [x] Ships mining empty sections: slots of 6, accrual, the next action stops it, full ships leave the count (decisions 12 and 27).
-- [ ] Sieges on asteroids: a moon's mounts, a small shield, defense drones (decisions 6 and 29).
+- [x] Sieges on asteroids: a moon's mounts, a small shield, defense drones (decisions 6 and 29).
 
 **Phase 4: drawing the belt** (orbiter-client; see "Graphics").
 - [ ] The three levels of detail (decision 15), two parallax layers (decision 5), selection (decision 16).
