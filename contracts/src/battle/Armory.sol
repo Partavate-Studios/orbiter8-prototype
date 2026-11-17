@@ -25,6 +25,7 @@ import {Repairs} from "./Repairs.sol";
 /// Parts, by id (Factory): 0 drone, 1 repair bot, 2 point defense, 3 railgun, 4 missile rack,
 /// 5 armor plating, 6 shield generator, 7 orbital platform, 8 BFG.
 contract Armory is ModuleBase {
+    uint256 public constant MINING_DRONE = 9; // Factory part id
     uint256 public constant SOL_PORTS = 9; // every Sol station has an armory (Sol is fully built)
     uint256 public constant REPAIR_COST = 3_000;
     uint256 public constant REPAIR_TIME = 3 hours;
@@ -59,6 +60,7 @@ contract Armory is ModuleBase {
     error NotYours();
     error NotThere();
     error PlanetOnly(uint256 part);
+    error ShipOnly(uint256 part);
     error TooMany(uint256 part);
     error InBattle();
     error NoArmory();
@@ -106,6 +108,13 @@ contract Armory is ModuleBase {
     }
 
     function _changeShip(address pilot, uint256 part, int256 delta) internal {
+        if (part == MINING_DRONE) {
+            // never in battle, so fitted or unloaded mid-siege too
+            Pilots.Loadout memory m = _a().pilots.shipOf(pilot).loadout;
+            m.miningDrones = uint16(_add(m.miningDrones, delta));
+            _a().pilots.setLoadout(pilot, m);
+            return;
+        }
         if (part >= 7) revert PlanetOnly(part);
         if (_a().battle.attackingOf(pilot) != 0) revert InBattle();
         Pilots.Loadout memory l = _a().pilots.shipOf(pilot).loadout;
@@ -166,6 +175,7 @@ contract Armory is ModuleBase {
     }
 
     function _changePlanet(uint256 planet, uint256 part, int256 delta) internal {
+        if (part == MINING_DRONE) revert ShipOnly(part); // bodies' drone pools come with the belts
         Battle.Defenses memory d = _a().battle.defensesOf(planet);
         if (part == 0) d.drones = uint16(_add(d.drones, delta));
         else if (part == 1) d.repairBots = uint16(_add(d.repairBots, delta));

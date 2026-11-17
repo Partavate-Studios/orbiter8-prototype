@@ -40,10 +40,13 @@ work in progress from a session that ran out (check `git status` and `git diff` 
 - 2026-11-16 (session resumed after a shutdown; nothing was lost): the 4 built-in drones done, in
   `Repairs` (`assignDrones`, `dronesOf`, lazy repairs, `damageOf`); loadout row to assign them.
   Mining by them waits for Phase 3. Calls X13–X14.
-- **Next: Phase 2, mining drones as a part** (decisions 9, 14): a loadout field (`miningDrones`) in drone
-  bays, bought at armories like battle drones (a new part id in Factory's parts, or a separate Armory
-  purchase), never lost in battle (Combat never sees them; `Repairs.keepLosses` leaves them alone).
-  Then the client box (shipyard and loadout by type: mostly done; show mining drones).
+- 2026-11-16: mining drones done (Factory part 9, `Loadout.miningDrones`, shares drone bays, never
+  fights); the client shows them in the armory, loadout and a planet's store. **Phase 2 done.**
+- **Next: Phase 3 (belts)**, first box: generation. Read `contracts/src/planets/SystemGen.sol` and its
+  mirror `sdk/src/system-gen.js` with the vectors in `contracts/test/vectors/SystemVectors.t.sol` first.
+  A belt: about 1 star in 4 (Sol always, between Mars and Jupiter), 8 sections, each an asteroid (size,
+  composition: carbonaceous, silicate, metallic) or empty (about 1 in 6). Asteroid ids:
+  `BodyId.make(cell, ASTEROID, section)`. Keep the per-call lists short (PolkaVM memory).
 
 ## Read first
 
@@ -228,11 +231,11 @@ onward in `docs/demo4-plan.md`, with this plan's milestones.
 - [x] Sol fully built: every Sol station has port, yard and armory (decision 18); client shows them.
 - [x] SDK: contracts.js and client.js on the new modules; the existing client plays end to end.
 
-**Phase 2: ships.**
+**Phase 2: ships.** *(Done 2026-11-16.)*
 - [x] Bay types (decisions 17 and 25): Pilots, Market's shipyard, Armory's fitting rules.
 - [x] The 4 built-in multipurpose drones (decisions 13 and 26): assigned to mining or repair.
-- [ ] Mining drones as a part (decision 9); never lost in battle (decision 14).
-- [ ] Client: the shipyard sells both bay types; the loadout shows drones and bays by type.
+- [x] Mining drones as a part (decision 9); never lost in battle (decision 14).
+- [x] Client: the shipyard sells both bay types; the loadout shows drones and bays by type.
 
 **Phase 3: belts.**
 - [ ] Generation: which stars have a belt, its 8 sections, each section's asteroid (size, composition)

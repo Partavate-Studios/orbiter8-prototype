@@ -27,6 +27,19 @@
   },
   {
     "type": "function",
+    "name": "MINING_DRONE",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "MOON_MOUNTS",
     "inputs": [],
     "outputs": [
@@ -841,6 +854,17 @@
     "inputs": [
       {
         "name": "credits",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "ShipOnly",
+    "inputs": [
+      {
+        "name": "part",
         "type": "uint256",
         "internalType": "uint256"
       }

@@ -63,7 +63,7 @@ beforeEach(() => {
       colonistPrice: 10,
       storageCap: 5000,
       buildings: [null, cost, cost, cost, cost, cost, cost, cost],
-      parts: Array.from({ length: 9 }, (_, i) => ({ name: 'Part ' + i, credits: 1000, time: 60, planetOnly: i > 6, goods: [] }))
+      parts: Array.from({ length: 10 }, (_, i) => ({ name: 'Part ' + i, credits: 1000, time: 60, planetOnly: i === 7 || i === 8, goods: [] }))
     },
     pilot: { callsign: 'Tester', shipId: 5, ship: { name: 'Wanderer', cell: 7, range: 2, bays: 10, cargo: 3, colonists: 50, rangeLost: 0, baysLost: 0, loadout } },
     planets: [{ id: 1, body: 1, class: 0, size: 12, cap: 12000, owner: '0xabc', level: 1, autofactory: true, building: 0, readyAt: 0, population: 100, stock: [0, 0, 0, 0, 0, 0, 40, 0] }],

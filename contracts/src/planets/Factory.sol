@@ -72,6 +72,9 @@ contract Factory is ModuleBase {
         _addPart(Part("Shield generator", 8_000, 1 hours, false, [2, 7], [uint32(20), 30]));
         _addPart(Part("Orbital platform", 40_000, 3 hours, true, [1, 6], [uint32(200), 100]));
         _addPart(Part("BFG", 150_000, 8 hours, true, [2, 7], [uint32(150), 150]));
+        // Mining drones (D75, D80): live in drone bays, never fight, never lost. On ships for now;
+        // bodies' drone pools come with the belts.
+        _addPart(Part("Mining drone", 800, 5 minutes, false, [1, 7], [uint32(5), 3]));
     }
 
     function addPart(Part calldata part) external onlyRole(DEFAULT_ADMIN_ROLE) {

@@ -62,6 +62,7 @@ contract Pilots is ModuleBase {
         uint8 missiles;
         uint8 armor;
         uint8 shields;
+        uint16 miningDrones; // in drone bays beside the battle drones; never fight (D75, D80)
     }
 
     struct Pilot {
@@ -404,7 +405,10 @@ contract Pilots is ModuleBase {
         uint256 needed = _loadoutBays(loadout);
         if (needed > free && needed > _loadoutBays(ship.loadout)) revert NoRoom(free);
         uint256 droneRoom = uint256(ship.droneBays) * _p().dronesPerBay;
-        if (loadout.drones > droneRoom && loadout.drones > ship.loadout.drones) revert NoDroneRoom(droneRoom);
+        uint256 drones = uint256(loadout.drones) + loadout.miningDrones;
+        if (drones > droneRoom && drones > uint256(ship.loadout.drones) + ship.loadout.miningDrones) {
+            revert NoDroneRoom(droneRoom);
+        }
         ship.loadout = loadout;
         emit LoadoutChanged(pilot, loadout);
     }

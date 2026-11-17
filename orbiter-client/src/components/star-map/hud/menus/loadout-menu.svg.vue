@@ -11,7 +11,7 @@
 
         <text x="0" y="185" text-anchor="middle" font-size="0.8em" fill="#ffffffaa">
           Mounts {{ mounts }} of 6 · holds {{ ship.bays - player.freeBays }} of {{ ship.bays }} used · drones
-          {{ ship.loadout.drones }} of {{ (ship.droneBays ?? 0) * (player.economy?.dronesPerBay ?? 1) }} · range
+          {{ ship.loadout.drones + (ship.loadout.miningDrones ?? 0) }} of {{ (ship.droneBays ?? 0) * (player.economy?.dronesPerBay ?? 1) }} · range
           {{ Math.max(1, ship.range - ship.rangeLost) }}
         </text>
         <text v-if="condition?.retreated" x="0" y="203" text-anchor="middle" font-size="0.8em" :fill="PINK_LIGHT">

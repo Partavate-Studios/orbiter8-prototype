@@ -130,6 +130,10 @@ contract BattleTest is BattleFixture {
         _citadel();
         _defend(Battle.Defenses(0, 6, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0));
         _armBo(2);
+        vm.startPrank(bo); // two mining drones aboard: they never fight, so they're never lost
+        market.buyDroneBays(EARTH, 2, type(uint256).max);
+        armory.buy(EARTH, armory.MINING_DRONE(), 2, type(uint256).max);
+        vm.stopPrank();
         _go(bo, star);
         vm.prank(bo);
         battle.attack(home);
@@ -138,6 +142,7 @@ contract BattleTest is BattleFixture {
         Repairs.Condition memory c = repairs.conditionOf(bo);
         assertTrue(c.retreated);
         assertEq(c.armorLost, 100);
+        assertEq(pilots.shipOf(bo).loadout.miningDrones, 2, "mining drones come home");
         (uint8 repairing, uint8 mining) = repairs.dronesOf(bo);
         assertEq(repairing, 0);
         assertEq(mining, 4, "all four mine until assigned");

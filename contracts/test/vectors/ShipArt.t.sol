@@ -18,8 +18,8 @@ contract ShipArtTest is GameFixture {
     }
 
     function test_printVectors() public pure {
-        console.logBytes32(keccak256(bytes(ShipArt.svg(_ship(5, Pilots.Loadout(0, 0, 0, 0, 0, 0, 0), 0), false))));
-        console.logBytes32(keccak256(bytes(ShipArt.svg(_ship(230, Pilots.Loadout(25, 2, 1, 2, 1, 3, 2), 1), false))));
+        console.logBytes32(keccak256(bytes(ShipArt.svg(_ship(5, Pilots.Loadout(0, 0, 0, 0, 0, 0, 0, 0), 0), false))));
+        console.logBytes32(keccak256(bytes(ShipArt.svg(_ship(230, Pilots.Loadout(25, 2, 1, 2, 1, 3, 2, 0), 1), false))));
     }
 
     function test_tokenURIDescribesTheShip() public view {

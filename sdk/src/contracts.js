@@ -200,7 +200,8 @@ export function createGame(runner, addresses) {
             railguns: Number(p.ship.loadout.railguns),
             missiles: Number(p.ship.loadout.missiles),
             armor: Number(p.ship.loadout.armor),
-            shields: Number(p.ship.loadout.shields)
+            shields: Number(p.ship.loadout.shields),
+            miningDrones: Number(p.ship.loadout.miningDrones)
           }
         },
         session: p.sessionKey === ZERO ? null : { key: p.sessionKey.toLowerCase(), expiry: Number(p.sessionExpiry) }

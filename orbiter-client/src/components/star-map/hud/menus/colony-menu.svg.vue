@@ -170,7 +170,7 @@
             <text v-if="!finished.length" x="0" y="18" text-anchor="middle" fill="#ffffff88" font-size="0.9em">None yet</text>
             <g v-for="(row, i) in finished" :key="row.part" :transform="'translate(0 ' + (22 + i * 30) + ')'">
               <text x="-170" y="0" font-size="0.9em">{{ row.count }} × {{ row.name }}</text>
-              <g class="can-click" transform="translate(20 0)" @click="doFitPlanet(row)">
+              <g v-if="row.part !== MINING_DRONE" class="can-click" transform="translate(20 0)" @click="doFitPlanet(row)">
                 <rect x="-32" y="-13" width="64" height="26" rx="4" fill="#3d1273" stroke="#ffffff44" />
                 <text x="0" y="0" text-anchor="middle" font-size="0.85em">Install</text>
               </g>
@@ -185,7 +185,7 @@
                 <rect x="-32" y="-13" width="64" height="26" rx="4" fill="#3d1273" stroke="#ffffff44" />
                 <text x="0" y="0" text-anchor="middle" font-size="0.85em">To moons</text>
               </g>
-              <g v-if="row.part < 7" class="can-click" transform="translate(160 0)" @click="doFitShip(row)">
+              <g v-if="fitsShip(row.part)" class="can-click" transform="translate(160 0)" @click="doFitShip(row)">
                 <rect x="-32" y="-13" width="64" height="26" rx="4" fill="#3d1273" stroke="#ffffff44" />
                 <text x="0" y="0" text-anchor="middle" font-size="0.85em">To ship</text>
               </g>
@@ -267,7 +267,7 @@ import { useUIStore } from '@/stores/ui'
 import { usePlayerStore } from '@/stores/player'
 import { planetTypeName } from '@orbiter8/sdk/game/planet-types'
 import { BUILDING_NAMES } from '@orbiter8/sdk/client'
-import { partPlural } from '@orbiter8/sdk/parts'
+import { partPlural, MINING_DRONE, fitsShip } from '@orbiter8/sdk/parts'
 import { YELLOW, PINK_LIGHT } from '@/libs/palette'
 import MenuContainer from './menu-container/_menu-container.svg'
 import MenuButton from './menu-button.svg'
@@ -317,6 +317,7 @@ export default {
   data() {
     return {
       player: usePlayerStore(),
+      MINING_DRONE,
       page: 'people',
       land: 0,
       board: 0,
@@ -511,6 +512,7 @@ export default {
     }
   },
   methods: {
+    fitsShip,
     fitSize,
     planetTypeName,
     partPlural,

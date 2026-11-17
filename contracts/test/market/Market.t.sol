@@ -232,10 +232,17 @@ contract MarketTest is GameFixture {
         assertEq(pilots.shipOf(ada).loadout.drones, 3);
         vm.expectRevert(abi.encodeWithSelector(Pilots.NoDroneRoom.selector, 3));
         armory.buy(EARTH, 0, 1, type(uint256).max);
+        // Mining drones share the drone bays.
+        uint256 miner = armory.MINING_DRONE();
+        vm.expectRevert(abi.encodeWithSelector(Pilots.NoDroneRoom.selector, 3));
+        armory.buy(EARTH, miner, 1, type(uint256).max);
+        market.buyDroneBays(EARTH, 1, type(uint256).max);
+        armory.buy(EARTH, miner, 1, type(uint256).max);
+        assertEq(pilots.shipOf(ada).loadout.miningDrones, 1);
         // Drones take no cargo bays: all five still hold cargo.
         market.trade(EARTH, _line(ORGANICS, 5, type(uint256).max));
         // The 250 cap counts both kinds.
-        market.buyBays(EARTH, 242, type(uint256).max);
+        market.buyBays(EARTH, 241, type(uint256).max);
         vm.expectRevert(abi.encodeWithSelector(Pilots.TooManyBays.selector, 250));
         market.buyDroneBays(EARTH, 1, type(uint256).max);
         vm.stopPrank();

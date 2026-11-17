@@ -461,6 +461,10 @@ Calls made building it, for Koda's review:
   before the siege's losses.
 - **X14. The loadout's drone row** ("4 × Built-in drone", − / + to move one between repairing and
   mining) uses the Unload button's look. New control in an existing menu: for Koda's eye.
+- **X15. The mining drone** is Factory part 9 ("Mining drone", 800 credits, 5 min, 5 metals and 3
+  electronics; at Sol 1,600 as every part is doubled there), fitted to ships only until bodies get drone
+  pools (Phase 3); a planet's store offers "To ship" for it, not "Install". It may be fitted or unloaded
+  mid-siege, since it never fights.
 - **X6. Wording:** the loadout's empty-weapons line says "Every Sol station's armory sells them." (was "The
   I.S.S. armory").
 
