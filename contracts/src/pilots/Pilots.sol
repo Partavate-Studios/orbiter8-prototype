@@ -22,6 +22,12 @@ interface IMoveHook {
 /// and sending it a little gas money. Until it expires, that key can make game moves for the pilot
 /// (jumps, trades, purchases), but never anything that touches the wallet itself: registering,
 /// changing the call sign or starting sessions stay with the wallet, and a key holds no credits.
+/// Told when a mining ship's pilot changes the ship (Drones, D93, D100): the mining stops, and what was
+/// mined is loaded first.
+interface IMiningHook {
+    function onStop(address pilot) external;
+}
+
 contract Pilots is ModuleBase {
     uint256 public constant MIN_NAME = 3;
     uint256 public constant MAX_NAME = 24;
@@ -106,6 +112,8 @@ contract Pilots is ModuleBase {
         uint256 count;
         IMoveHook battle;
         uint8 dronesPerBay; // a tunable (D91): one for now
+        IMiningHook mining; // ships mining a belt's empty sections (D78, D93)
+        mapping(address => bool) isMining;
     }
 
     // keccak256(abi.encode(uint256(keccak256("orbiter8.pilots")) - 1)) & ~bytes32(uint256(0xff))
@@ -187,6 +195,35 @@ contract Pilots is ModuleBase {
         Pilot storage record = p.pilots[pilot];
         if (!record.registered) revert NotRegistered();
         return p.ships[record.shipId];
+    }
+
+    /// The ship, about to change: any move that changes it stops its mining (D100), what was mined
+    /// loaded first. (Renaming it or chatting doesn't.)
+    function _change(address pilot) internal returns (Ship storage ship) {
+        ship = _ship(pilot);
+        PilotsStorage storage p = _p();
+        if (p.isMining[pilot]) {
+            p.isMining[pilot] = false;
+            p.mining.onStop(pilot);
+        }
+    }
+
+    function setMiningHook(IMiningHook hook) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _p().mining = hook;
+    }
+
+    /// Drones marks a ship mining (or not).
+    function setMining(address pilot, bool on) external onlyRole(GAME_MODULE) {
+        _p().isMining[pilot] = on;
+    }
+
+    function isMining(address pilot) external view returns (bool) {
+        return _p().isMining[pilot];
+    }
+
+    /// Cargo bays free for cargo now.
+    function freeBays(address pilot) external view returns (uint256) {
+        return _freeBays(_ship(pilot));
     }
 
     // ── registering and names ───────────────────────────────────────────────────────────────────
@@ -286,7 +323,7 @@ contract Pilots is ModuleBase {
     function jump(uint256 to, ScanProof[] calldata proofs) external {
         _resolve(proofs);
         address who = actorOf(msg.sender);
-        Ship storage ship = _ship(who);
+        Ship storage ship = _change(who);
         uint256 from = ship.cell;
         uint8 range = ship.range > ship.rangeLost + 1 ? ship.range - ship.rangeLost : 1;
         bool discovered = _p().galaxy.arrive(who, from, to, range);
@@ -310,7 +347,7 @@ contract Pilots is ModuleBase {
     function traverse(ScanProof[] calldata proofs) external {
         _resolve(proofs);
         address who = actorOf(msg.sender);
-        Ship storage ship = _ship(who);
+        Ship storage ship = _change(who);
         uint256 hole = ship.cell;
         (uint256 exit, bool discovered) = _p().galaxy.traverse(who, hole);
         _moved(who, hole, exit);
@@ -344,7 +381,7 @@ contract Pilots is ModuleBase {
 
     /// Loads `units` of a good into the pilot's bays. Reverts with NoRoom if they don't fit.
     function addCargo(address pilot, uint256 good, uint256 units) external onlyRole(GAME_MODULE) {
-        Ship storage ship = _ship(pilot);
+        Ship storage ship = _change(pilot);
         uint256 free = _freeBays(ship);
         if (units > free) revert NoRoom(free);
         ship.cargo += uint16(units);
@@ -355,7 +392,7 @@ contract Pilots is ModuleBase {
 
     /// Unloads `units` of a good. Reverts with NotEnoughCargo if the ship holds fewer.
     function removeCargo(address pilot, uint256 good, uint256 units) external onlyRole(GAME_MODULE) {
-        Ship storage ship = _ship(pilot);
+        Ship storage ship = _change(pilot);
         uint256 shipId = _p().pilots[pilot].shipId;
         uint256 have = _p().cargo[shipId][good];
         if (units > have) revert NotEnoughCargo(good, have);
@@ -366,7 +403,7 @@ contract Pilots is ModuleBase {
 
     /// Takes `count` people aboard, 100 to a bay. Reverts with NoRoom if they don't fit.
     function addColonists(address pilot, uint256 count) external onlyRole(GAME_MODULE) {
-        Ship storage ship = _ship(pilot);
+        Ship storage ship = _change(pilot);
         uint256 before = _baysForColonists(ship.colonists);
         uint256 needed = _baysForColonists(ship.colonists + count) - before;
         uint256 free = _freeBays(ship);
@@ -376,7 +413,7 @@ contract Pilots is ModuleBase {
     }
 
     function removeColonists(address pilot, uint256 count) external onlyRole(GAME_MODULE) {
-        Ship storage ship = _ship(pilot);
+        Ship storage ship = _change(pilot);
         if (count > ship.colonists) revert NotEnoughColonists(ship.colonists);
         ship.colonists -= uint32(count);
         emit ColonistsChanged(pilot, ship.colonists);
@@ -398,7 +435,7 @@ contract Pilots is ModuleBase {
     /// Replaces what's fitted (the Armory and Battle). Reverts with BadLoadout past the mounts or
     /// the armor and shield limits, or NoRoom past the free bays.
     function setLoadout(address pilot, Loadout calldata loadout) external onlyRole(GAME_MODULE) {
-        Ship storage ship = _ship(pilot);
+        Ship storage ship = _change(pilot);
         uint256 mounts = uint256(loadout.pointDefense) + 2 * uint256(loadout.railguns) + 2 * uint256(loadout.missiles);
         if (mounts > MOUNTS || loadout.armor > MAX_ARMOR || loadout.shields > MAX_SHIELDS) revert BadLoadout();
         uint256 free = _freeBays(ship) + _loadoutBays(ship.loadout);
@@ -415,14 +452,14 @@ contract Pilots is ModuleBase {
 
     /// Battle damage to engines and bays (D46), or 0, 0 after a repair.
     function setDamage(address pilot, uint8 rangeLost, uint16 baysLost) external onlyRole(GAME_MODULE) {
-        Ship storage ship = _ship(pilot);
+        Ship storage ship = _change(pilot);
         (ship.rangeLost, ship.baysLost) = (rangeLost, baysLost);
         emit DamageChanged(pilot, rangeLost, baysLost);
     }
 
     /// More cargo bays (the shipyard).
     function addBays(address pilot, uint16 bays) external onlyRole(GAME_MODULE) {
-        Ship storage ship = _ship(pilot);
+        Ship storage ship = _change(pilot);
         if (uint256(ship.bays) + ship.droneBays + bays > MAX_BAYS) revert TooManyBays(MAX_BAYS);
         ship.bays += bays;
         emit BaysAdded(pilot, ship.bays);
@@ -430,7 +467,7 @@ contract Pilots is ModuleBase {
 
     /// More drone bays (the shipyard).
     function addDroneBays(address pilot, uint16 bays) external onlyRole(GAME_MODULE) {
-        Ship storage ship = _ship(pilot);
+        Ship storage ship = _change(pilot);
         if (uint256(ship.bays) + ship.droneBays + bays > MAX_BAYS) revert TooManyBays(MAX_BAYS);
         ship.droneBays += bays;
         emit DroneBaysAdded(pilot, ship.droneBays);
@@ -438,7 +475,7 @@ contract Pilots is ModuleBase {
 
     function setRange(address pilot, uint8 range) external onlyRole(GAME_MODULE) {
         if (range < START_RANGE || range > MAX_RANGE) revert BadRange(range);
-        _ship(pilot).range = range;
+        _change(pilot).range = range;
         emit RangeChanged(pilot, range);
     }
 

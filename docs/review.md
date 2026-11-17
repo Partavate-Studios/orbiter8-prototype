@@ -497,6 +497,14 @@ Calls made building it, for Koda's review:
   restocks faster than any station; for Phase 5. Planets' people still make 20 an hour at most, now far
   below a well-droned asteroid; for Phase 5. The economy simulator only plays Sol's ports, so it can't
   measure this yet. `portsAt` now lists asteroid ports too.
+- **X20. Ships mining empty sections** (in `Drones`): a slot of six, at the bodies' rate (1.875 units an
+  hour a drone: the ship's mining drones plus its built-in drones set to mining; the rate is fixed when it
+  starts). A new ship's four built-in drones fill its five bays in 40 minutes. What an empty section
+  yields: its "dust", a composition from the section's hash (Sol's: silicate between Vesta and Pallas,
+  carbonaceous between Psyche and Juno), split half and half between the composition's two goods. Any
+  change to the ship stops it, through Pilots (every ship-changing function, including a siege's damage
+  and reassigning the built-in drones); renaming the ship and chat don't. `stopMining` ends it too.
+  Mining is allowed in Sol's belt (only claims are the Federation's).
 - **X6. Wording:** the loadout's empty-weapons line says "Every Sol station's armory sells them." (was "The
   I.S.S. armory").
 

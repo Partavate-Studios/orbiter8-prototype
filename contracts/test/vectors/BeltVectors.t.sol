@@ -23,6 +23,12 @@ contract BeltVectors is Test {
         }
     }
 
+    function test_printDust() public pure {
+        uint256 packed;
+        for (uint256 s = 0; s < BeltGen.SECTIONS; s++) packed = packed * 10 + BeltGen.dust(SEED, 400, s);
+        console.log(packed);
+    }
+
     function test_odds() public pure {
         uint256 belts;
         uint256 empty;

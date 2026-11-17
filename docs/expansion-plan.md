@@ -59,10 +59,14 @@ work in progress from a session that ran out (check `git status` and `git diff` 
 - 2026-11-16: ports supplied by production done (Market `IPortSupply`, Planets `supplyOf`/`useStock`;
   the buyer pays the owner; Sol unchanged; drone rate 1.875 so the top asteroid matches Sol's restock;
   `portsAt` lists asteroid ports). Call X19.
-- **Next: Phase 3, ships mining empty sections** (decisions 12, 27, 34): `startMining(cell, section, slot)`
-  at a free slot (6 a section; a full ship doesn't count), output per mining drone (the ship's mining
-  drones + its built-in drones set to mining, `Repairs.dronesOf`) into the holds up to full, the pilot's
-  next ship-changing move stops it (a hook like `IMoveHook`; chat doesn't). Likely in Drones (8.7 KB).
+- 2026-11-16: ships mining empty sections done (Drones `startMining`/`stopMining`/`miningOf`/`slotsOf`,
+  Pilots `_change` stops mining on every ship change, `BeltGen.dust`; SDK bindings and dust mirror).
+  Played in the browser: a new pilot mined Sol's empty section and sold the metal. Call X20.
+- **Next: Phase 3's last box, sieges on asteroids** (decisions 6, 29): a moon's 6 weapon mounts, a small
+  shield, and the pool's defense drones (destroyable; mining ones never). `Battle.planetSide` builds a
+  body's side from `Defenses` and its level; for an asteroid add the pool's defense drones (Drones) and
+  cap mounts at 6 (Armory `_changePlanet`); after a siege, defense drones lost come off the pool.
+  Battle has 2.8 KB.
 
 ## Read first
 
@@ -259,7 +263,7 @@ onward in `docs/demo4-plan.md`, with this plan's milestones.
 - [x] Claims, names and deeds for asteroids (not counting toward the star, decision 6).
 - [x] The asteroid building line (decision 22); drone pools and the mining/defense split (decision 24).
 - [x] Ports supplied by production, for asteroids and player planets; Federation ports at the top rate (decision 23).
-- [ ] Ships mining empty sections: slots of 6, accrual, the next action stops it, full ships leave the count (decisions 12 and 27).
+- [x] Ships mining empty sections: slots of 6, accrual, the next action stops it, full ships leave the count (decisions 12 and 27).
 - [ ] Sieges on asteroids: a moon's mounts, a small shield, defense drones (decisions 6 and 29).
 
 **Phase 4: drawing the belt** (orbiter-client; see "Graphics").

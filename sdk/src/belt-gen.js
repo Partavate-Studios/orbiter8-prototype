@@ -50,6 +50,15 @@ export function section(seed, cell, index) {
   return { asteroid: true, composition, size: 1 + Number((h >> 16n) % 8n) }
 }
 
+/** What an empty section's dust is made of, for ships mining there (BeltGen.dust). */
+export function dust(seed, cell, index) {
+  if (cell === 0) return index === 2 ? COMPOSITION.SILICATE : COMPOSITION.CARBONACEOUS
+  return Number((hash(['bytes32', 'uint256', 'uint256', 'string'], [seed, cell, index, 'asteroid']) >> 8n) % 3n)
+}
+
+/** Slots in an empty section where ships mine (Drones.SLOTS). */
+export const MINING_SLOTS = 6
+
 /** The goods an asteroid yields, by Market index (BeltGen.yields). */
 export const yields = (composition) => [[0, 4], [5, 1], [1, 2]][composition]
 

@@ -12,6 +12,7 @@ import {Deeds} from "../src/tokens/Deeds.sol";
 import {Planets} from "../src/planets/Planets.sol";
 import {Claims} from "../src/planets/Claims.sol";
 import {Drones} from "../src/planets/Drones.sol";
+import {IMiningHook} from "../src/pilots/Pilots.sol";
 import {IDroneOutput} from "../src/planets/Planets.sol";
 import {IPortSupply} from "../src/market/Market.sol";
 import {Repairs} from "../src/battle/Repairs.sol";
@@ -97,7 +98,10 @@ library Deployment {
         game.drones = Drones(
             _proxy(
                 address(new Drones()),
-                abi.encodeCall(Drones.initialize, (admin, game.pilots, game.claims, game.planets, game.battle))
+                abi.encodeCall(
+                    Drones.initialize,
+                    (admin, game.pilots, game.claims, game.planets, game.battle, game.repairs, game.galaxy)
+                )
             )
         );
     }
@@ -126,6 +130,8 @@ library Deployment {
         game.repairs.grantRole(role, address(game.battle)); // a siege's losses
         game.repairs.grantRole(role, address(game.armory)); // shipyard repairs
         game.pilots.grantRole(role, address(game.drones)); // landing and boarding drones
+        game.drones.grantRole(role, address(game.pilots)); // a mining ship changing stops its mining
+        game.pilots.setMiningHook(IMiningHook(address(game.drones)));
         game.planets.setDrones(IDroneOutput(address(game.drones)));
         game.planets.grantRole(role, address(game.market)); // players' ports sell from storage
         game.market.setSupply(IPortSupply(address(game.planets)));

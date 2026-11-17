@@ -433,6 +433,25 @@
   },
   {
     "type": "function",
+    "name": "freeBays",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "galaxy",
     "inputs": [],
     "outputs": [
@@ -532,6 +551,25 @@
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "isMining",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -971,6 +1009,37 @@
             "internalType": "uint16"
           }
         ]
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setMining",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "on",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setMiningHook",
+    "inputs": [
+      {
+        "name": "hook",
+        "type": "address",
+        "internalType": "contract IMiningHook"
       }
     ],
     "outputs": [],

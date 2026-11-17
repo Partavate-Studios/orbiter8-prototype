@@ -658,6 +658,25 @@ export function createGame(runner, addresses) {
       const [total, defense, room] = await drones.poolOf(body)
       return { total: Number(total), defense: Number(defense), room: Number(room) }
     },
+    /** Where the pilot's ship is mining (an empty section and slot), and what it has mined so far. */
+    async mining(address) {
+      if (!drones) return null
+      const [m, mined] = await drones.miningOf(address)
+      if (Number(m.since) === 0) return null
+      return { section: Number(m.section), slot: Number(m.slot), since: Number(m.since), rate: Number(m.rate), room: Number(m.room), mined: Number(mined) }
+    },
+    /** Who holds an empty section's six slots, and which of them are full (and so free to take). */
+    async miningSlots(section) {
+      if (!drones) return []
+      const [holders, full] = await drones.slotsOf(section)
+      return holders.map((h, i) => (h === ZERO ? null : { pilot: h.toLowerCase(), full: full[i] }))
+    },
+    async startMining(section, slot, options) {
+      return sent(drones.startMining(section, slot), options)
+    },
+    async stopMining(options) {
+      return sent(drones.stopMining(), options)
+    },
     async landDrones(body, count, options) {
       return sent(drones.land(body, count), options)
     },

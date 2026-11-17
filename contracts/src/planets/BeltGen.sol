@@ -48,6 +48,13 @@ library BeltGen {
         asteroid = true;
     }
 
+    /// What an empty section's dust is made of, for ships mining there (D78): Sol's two are silicate
+    /// (between Vesta and Pallas) and carbonaceous (between Psyche and Juno).
+    function dust(bytes32 seed, uint256 cell, uint256 index) internal pure returns (uint8) {
+        if (cell == 0) return index == 2 ? SILICATE : CARBONACEOUS;
+        return uint8((uint256(keccak256(abi.encode(seed, cell, index, "asteroid"))) >> 8) % 3);
+    }
+
     /// The goods an asteroid of `composition` yields, as bits by good (Market's order: 0 water ice,
     /// 1 metals, 2 rare elements, 4 organics, 5 silicon).
     function yields(uint8 composition) internal pure returns (uint256) {

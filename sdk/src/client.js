@@ -795,6 +795,12 @@ export function createGameClient() {
     repair(port, options) {
       return move((p, by, o) => by.repair(Number(port), o), options)
     },
+    startMining(section, slot, options) {
+      return move((p, by, o) => by.startMining(Number(section), Number(slot), o), options)
+    },
+    stopMining(options) {
+      return move((p, by, o) => by.stopMining(o), options)
+    },
     landDrones(body, count, options) {
       return move((p, by, o) => by.landDrones(Number(body), count, o), options)
     },

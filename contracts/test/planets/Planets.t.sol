@@ -569,4 +569,47 @@ contract AsteroidClaimsTest is PlanetsFixture {
         (, defense,) = drones.poolOf(asteroid);
         assertEq(defense, 0);
     }
+
+    function test_shipsMineEmptySections() public {
+        Drones drones = game.drones;
+        uint256 dust = BodyId.make(0, BodyId.ASTEROID, 2); // Sol's empty section between Vesta and Pallas
+        // Only empty space is mined by ships.
+        vm.prank(ada);
+        vm.expectRevert(abi.encodeWithSelector(Drones.NotEmptySpace.selector, BodyId.make(0, BodyId.ASTEROID, 0)));
+        drones.startMining(BodyId.make(0, BodyId.ASTEROID, 0), 0);
+        // A new ship: four built-in drones, all mining (7.5 units an hour), five free bays.
+        vm.prank(ada);
+        drones.startMining(dust, 0);
+        assertTrue(pilots.isMining(ada));
+        vm.prank(bo);
+        pilots.register("Bodo", "Barge");
+        vm.prank(bo);
+        vm.expectRevert(abi.encodeWithSelector(Drones.SlotTaken.selector, 0));
+        drones.startMining(dust, 0);
+        skip(30 minutes);
+        (, uint256 mined) = drones.miningOf(ada);
+        assertEq(mined, 3);
+        // Chatting doesn't stop it.
+        vm.prank(ada);
+        pilots.broadcast("mining at Sol");
+        assertTrue(pilots.isMining(ada));
+        skip(1 hours); // full: five bays
+        (, mined) = drones.miningOf(ada);
+        assertEq(mined, 5);
+        (, bool[6] memory full) = drones.slotsOf(dust);
+        assertTrue(full[0], "a full ship no longer holds its slot");
+        vm.prank(bo);
+        drones.startMining(dust, 0);
+        // Any change to the ship ends it, the mined goods loaded first: silicate dust, metals and silicon.
+        _pay(ada, 100_000);
+        vm.prank(ada);
+        market.buyBays(EARTH, 1, type(uint256).max);
+        assertFalse(pilots.isMining(ada));
+        assertEq(pilots.shipOf(ada).cargo, 5);
+        assertEq(_cargo(ada, 1), 3, "metals");
+        assertEq(_cargo(ada, 5), 2, "silicon");
+        vm.prank(bo);
+        drones.stopMining();
+        assertFalse(pilots.isMining(bo));
+    }
 }

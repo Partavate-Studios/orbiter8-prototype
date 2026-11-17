@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { hasBelt, outsidePlanet, section, SECTIONS } from './belt-gen'
+import { hasBelt, outsidePlanet, section, dust, SECTIONS } from './belt-gen'
 import { DEMO_SEED } from './system-gen'
 
 // Printed by contracts/test/vectors/BeltVectors.t.sol (test_printVectors): cell, belt, outside planet
@@ -24,6 +24,11 @@ describe('belts', () => {
       }
       expect(p).toBe(packed)
     }
+  })
+  it('makes the same dust (BeltVectors.t.sol, test_printDust: cell 400)', () => {
+    let p = 0
+    for (let s = 0; s < SECTIONS; s++) p = p * 10 + dust(DEMO_SEED, 400, s)
+    expect(p).toBe(111200)
   })
   it("puts Sol's between Mars and Jupiter, Ceres first", () => {
     expect(hasBelt(DEMO_SEED, 0)).toBe(true)

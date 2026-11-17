@@ -27,6 +27,19 @@
   },
   {
     "type": "function",
+    "name": "SLOTS",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "UPGRADER",
     "inputs": [],
     "outputs": [
@@ -158,6 +171,16 @@
         "name": "battle_",
         "type": "address",
         "internalType": "contract Battle"
+      },
+      {
+        "name": "repairs_",
+        "type": "address",
+        "internalType": "contract Repairs"
+      },
+      {
+        "name": "galaxy_",
+        "type": "address",
+        "internalType": "contract Galaxy"
       }
     ],
     "outputs": [],
@@ -176,6 +199,70 @@
         "name": "count",
         "type": "uint32",
         "internalType": "uint32"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "miningOf",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "m",
+        "type": "tuple",
+        "internalType": "struct Drones.Miner",
+        "components": [
+          {
+            "name": "section",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "slot",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "since",
+            "type": "uint40",
+            "internalType": "uint40"
+          },
+          {
+            "name": "rate",
+            "type": "uint32",
+            "internalType": "uint32"
+          },
+          {
+            "name": "room",
+            "type": "uint16",
+            "internalType": "uint16"
+          }
+        ]
+      },
+      {
+        "name": "mined",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "onStop",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "internalType": "address"
       }
     ],
     "outputs": [],
@@ -316,6 +403,55 @@
   },
   {
     "type": "function",
+    "name": "slotsOf",
+    "inputs": [
+      {
+        "name": "section",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "holders",
+        "type": "address[6]",
+        "internalType": "address[6]"
+      },
+      {
+        "name": "full",
+        "type": "bool[6]",
+        "internalType": "bool[6]"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "startMining",
+    "inputs": [
+      {
+        "name": "section",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "slot",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "stopMining",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "supportsInterface",
     "inputs": [
       {
@@ -360,6 +496,62 @@
         "type": "uint64",
         "indexed": false,
         "internalType": "uint64"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "MiningStarted",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "section",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "slot",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "uint8"
+      },
+      {
+        "name": "rate",
+        "type": "uint32",
+        "indexed": false,
+        "internalType": "uint32"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "MiningStopped",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "section",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "units",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
       }
     ],
     "anonymous": false
@@ -536,6 +728,11 @@
   },
   {
     "type": "error",
+    "name": "AlreadyMining",
+    "inputs": []
+  },
+  {
+    "type": "error",
     "name": "AsteroidsOnly",
     "inputs": [
       {
@@ -584,6 +781,17 @@
   },
   {
     "type": "error",
+    "name": "NotEmptySpace",
+    "inputs": [
+      {
+        "name": "section",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ]
+  },
+  {
+    "type": "error",
     "name": "NotEnoughDrones",
     "inputs": [
       {
@@ -596,6 +804,11 @@
   {
     "type": "error",
     "name": "NotInitializing",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "NotMining",
     "inputs": []
   },
   {
@@ -622,12 +835,28 @@
   },
   {
     "type": "error",
+    "name": "NothingToMineWith",
+    "inputs": []
+  },
+  {
+    "type": "error",
     "name": "PoolFull",
     "inputs": [
       {
         "name": "room",
         "type": "uint256",
         "internalType": "uint256"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "SlotTaken",
+    "inputs": [
+      {
+        "name": "slot",
+        "type": "uint8",
+        "internalType": "uint8"
       }
     ]
   },
