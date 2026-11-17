@@ -14,7 +14,10 @@ export const SPRITE_TYPES = {
   planet: { selectorSize: 14, cameraScale: 0.3 },
   station: { selectorSize: 12, cameraScale: 0.1 },
   moon: { selectorSize: 6, cameraScale: 0.05 },
-  ship: { selectorSize: 10, cameraScale: 0.06 }
+  ship: { selectorSize: 10, cameraScale: 0.06 },
+  asteroid: { selectorSize: 10, cameraScale: 0.08 },
+  // empty space in the belt (D78): its six mining slots are drawn round it
+  section: { selectorSize: 12, cameraScale: 0.08 }
 }
 
 /** Every ship is drawn at this size. */
@@ -30,7 +33,7 @@ export const STATION_START_ROTATION = -15
 // units per sprite unit for that sprite's artwork.
 const SYSTEM_RATIO = planetOrbitRadius(8) / (500 + 480 * 8)
 // The artwork's size at scale 1 (sprites/*.svg.vue): a disc's radius, or a ship's length.
-export const ART = { star: 130, planet: 10, moon: 2, station: 7.25, ship: 11.5 }
+export const ART = { star: 130, planet: 10, moon: 2, station: 7.25, ship: 11.5, asteroid: 10, section: 10 }
 
 /**
  * How much a sprite is scaled up from its artwork (world units per sprite unit).
@@ -54,7 +57,14 @@ export function spriteScaleOf(object, objects) {
       const radius = 4 * (size / 12 + 0.5)
       return ((radius / (65 + 30 * position + 1.5 * (planetSize ?? 0))) * orbit) / ART.moon
     }
+    case 'asteroid':
+      // smaller than any planet (Ceres, size 8, under Mercury): a radius of 2 to 5.5 in Enterprise
+      // Circuit's units, by size (1-8)
+      return (SYSTEM_RATIO * (1.5 + size * 0.5)) / ART.asteroid
+    case 'section':
+      return (SYSTEM_RATIO * 11) / ART.section
     case 'station': {
+      if (parent?.type === 'asteroid') return spriteScaleOf(parent, objects) * 0.55 // built onto its asteroid
       const radius = 290 * (size / 1000 + 0.02)
       return ((radius / (40 + 1.5 * (planetSize ?? 0))) * orbit) / ART.station
     }

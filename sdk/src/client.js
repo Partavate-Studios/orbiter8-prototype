@@ -20,7 +20,8 @@ import { portNames, buyCost, sellProceeds, fee, baysCost, MODE, SOL_PORTS } from
 import { SESSION_HOURS, loadKey, saveKey, forgetKey, newKey, keySigner, sweep } from './session-key'
 import { createEventLog } from './event-log'
 import { tradesSinceArrival } from './game/docking'
-import { cellOf, indexOf, kindOf, KIND } from './body-id'
+import { hasBelt, outsidePlanet, section as beltSection, dust, asteroidName, COMPOSITION_NAMES, SECTIONS } from './belt-gen'
+import { cellOf, indexOf, kindOf, bodyId, KIND } from './body-id'
 
 /** A trade line's price limit allows this much movement since the prices were read (B23). */
 export const SLIPPAGE = 0.02
@@ -554,6 +555,10 @@ export function createGameClient() {
       data.planets[p.body] = planet
     })
 
+    data.belt = star?.state === STATE.STAR && hasBelt(seed, cell) ? await loadBelt(cell, seed, goods, portAt, planets.length) : null
+    const beltOwners = (data.belt?.sections ?? []).map((s) => s.owner).filter((a) => a && !(a in avatarNames))
+    if (beltOwners.length) Object.assign(avatarNames, await game.callsigns([...new Set(beltOwners)]))
+
     for (const s of here) {
       data.ships[s.shipId] = {
         id: s.shipId,
@@ -567,6 +572,50 @@ export function createGameClient() {
   }
 
   /** A port's goods, for the trade menu (sdk/game/trade.js): what it sells or buys, how many, and the price curve. */
+  /**
+   * The star's belt (D67-D73): each of its eight sections, an asteroid as the contracts have it (its
+   * owner, line, people, storage, port and drone pool) or empty space with its six mining slots.
+   */
+  async function loadBelt(cell, seed, goods, portAt, planetCount) {
+    const [views, mine] = await Promise.all([game.belt(cell, goods), state.pilot ? game.mining(state.account) : null])
+    const viewOf = new Map(views.map((v) => [v.id, v]))
+    const sections = await Promise.all(
+      Array.from({ length: SECTIONS }, async (_, index) => {
+        const id = bodyId(cell, KIND.ASTEROID, index)
+        const s = beltSection(seed, cell, index)
+        if (!s.asteroid) {
+          const slots = await game.miningSlots(id).catch(() => [])
+          const d = dust(seed, cell, index)
+          return { index, id, asteroid: false, dust: d, dustName: COMPOSITION_NAMES[d], slots }
+        }
+        const view = viewOf.get(id) ?? null
+        const owner = view?.owner ?? 0
+        const [names, pool] = await Promise.all([
+          owner ? game.namesOf(id) : null,
+          owner ? game.dronePool(id) : { total: 0, defense: 0, room: 0 }
+        ])
+        const name = names?.planet || asteroidName(cell, index, s.composition)
+        const port = portAt.get(id)
+        return {
+          index,
+          id,
+          asteroid: true,
+          name,
+          composition: s.composition,
+          compositionName: COMPOSITION_NAMES[s.composition],
+          size: s.size,
+          owner,
+          federation: cell === SOL,
+          info: view ? { ...view, pool } : null,
+          station: port
+            ? { name: names?.station || `${name} Station`, yard: false, armory: view.level >= 6, goods: stationGoods(port) }
+            : null
+        }
+      })
+    )
+    return { outsidePlanet: outsidePlanet(seed, cell, planetCount), planetCount, sections, mining: mine }
+  }
+
   function stationGoods(port) {
     const { goods, capacity, tuning } = state.economy
     return port.quotes

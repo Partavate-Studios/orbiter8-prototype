@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -60 120 120">
+<!-- Asteroid station: a small mining base (landing pad, drill derrick, two modules, drones) drawn in the top-right quarter to lay over any asteroid-*.svg (Orbiter 8 art, 120 units square, centered; free to use in the game) -->
+<g transform="translate(30 -28)">
+  <ellipse cx="0" cy="17" rx="25" ry="4.5" fill="#000000" opacity="0.28"/>
+  <!-- landing pad -->
+  <g stroke="#8f7fb0" stroke-width="1.4" stroke-linecap="round"><path d="M-21 9V16"/><path d="M-13 11V17"/><path d="M-5 9V16"/></g>
+  <ellipse cx="-13" cy="8" rx="11.5" ry="4" fill="#8f7fb0" stroke="#e5cfff" stroke-width="0.8"/>
+  <ellipse cx="-13" cy="8" rx="7" ry="2.3" fill="none" stroke="#e5cfff" stroke-width="0.6" stroke-dasharray="2 1.2"/>
+  <circle cx="-13" cy="8" r="1" fill="#7fd4ff"/>
+  <rect x="-2.5" y="10" width="13" height="3" fill="#8f7fb0"/>
+  <!-- drill derrick -->
+  <path d="M4 -19V16" stroke="#ffd65c" stroke-width="1.4"/>
+  <path d="M2 15h4l-2 5z" fill="#ffd65c"/>
+  <g fill="none" stroke="#e5cfff" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"><path d="M-2 16L4 -20L10 16"/><path d="M-0.7 8H8.7M0.7 0H7.3M2 -8H6"/><path d="M-0.7 8L7.3 0L2 -8M8.7 8L0.7 0L6 -8"/></g>
+  <circle cx="4" cy="-21" r="1.5" fill="#7fd4ff"/>
+  <!-- modules -->
+  <path d="M14 5V-2" stroke="#e5cfff" stroke-width="0.8"/><circle cx="14" cy="-3" r="1.1" fill="#e5cfff"/>
+  <rect x="10" y="5" width="9.5" height="11" rx="1.5" fill="#b9a6d6" stroke="#e5cfff" stroke-width="0.8"/>
+  <rect x="12" y="8" width="2.2" height="2" fill="#7fd4ff"/><rect x="15.5" y="8" width="2.2" height="2" fill="#7fd4ff"/>
+  <path d="M19.5 16V10A3.5 3.5 0 0 1 26.500 10V16Z" fill="#8f7fb0" stroke="#e5cfff" stroke-width="0.8"/>
+  <rect x="22" y="11" width="2" height="2" fill="#7fd4ff"/>
+  <!-- drones -->
+  <g fill="#e5cfff"><circle cx="-19" cy="-6" r="1.2"/><circle cx="-10" cy="-14" r="1"/><circle cx="-22" cy="-17" r="0.8" opacity="0.7"/><circle cx="17" cy="-12" r="1.1"/><circle cx="22" cy="-20" r="0.8" opacity="0.7"/></g>
+</g>
+</svg>

@@ -11,7 +11,11 @@ import {
   planetOrbitSpeed,
   moonOrbitSpeed,
   stationOrbitSpeed,
-  SHIP_ORBIT_RADIUS_AROUND_STAR
+  SHIP_ORBIT_RADIUS_AROUND_STAR,
+  beltOrbitRadius,
+  BELT_SPEED,
+  sectionPhase,
+  asteroidStationRadius
 } from './game/orbits'
 import { dockedShips } from './game/docking'
 
@@ -24,7 +28,7 @@ export const STAR_KEY = 'star'
 /**
  * A stable identity for an object, built from contract ids, so it stays the same across reloads even
  * when other objects appear or disappear. Moons are numbered per planet, so their key includes the planet.
- * @param {'star' | 'planet' | 'station' | 'moon' | 'ship'} type
+ * @param {'star' | 'planet' | 'station' | 'moon' | 'ship' | 'asteroid' | 'section'} type
  */
 export function objectKey(type, { id, planet }) {
   switch (type) {
@@ -58,6 +62,9 @@ export function objectKey(type, { id, planet }) {
  * - station: size, goods (what the port sells and buys, sdk/game/trade.js), yard, armory
  * - moon: size, class, orbitalPosition, planet (the planet's id)
  * - ship: location (system id)
+ * - asteroid: size, composition, compositionName, section, hasStation, stationKey, federation, info
+ *   (the asteroid as the contracts have it, with its drone pool)
+ * - section (empty space in the belt, D78): section, dust, dustName, slots (six: { pilot, full } or null)
  */
 
 /**
@@ -68,7 +75,7 @@ export function objectKey(type, { id, planet }) {
  */
 export function buildSystem(system, playerAccount) {
   const objects = {}
-  const keys = { planets: [], moons: [], stations: [], ships: [] }
+  const keys = { planets: [], moons: [], stations: [], ships: [], asteroids: [], sections: [] }
   const ownerName = (owner, fallback) => (owner ? system.avatarNames[owner] : fallback)
   const add = (type, fields) => {
     const object = {
@@ -173,6 +180,68 @@ export function buildSystem(system, playerAccount) {
       })
       keys.moons.push(moonObject.key)
       planetObject.moons.push({ moonId: moonObject.key, moonName: moon.name })
+    }
+  }
+
+  // The belt (D67-D73): one ring, turning slowly, its asteroids and their stations riding it.
+  if (system.belt) {
+    const radius = beltOrbitRadius(system.belt.outsidePlanet, system.belt.planetCount)
+    for (const s of system.belt.sections) {
+      const orbit = { radius, speed: BELT_SPEED, phase: sectionPhase(s.index) }
+      if (!s.asteroid) {
+        const empty = add('section', {
+          id: s.id,
+          name: `${s.dustName} dust`,
+          section: s.index,
+          dust: s.dust,
+          dustName: s.dustName,
+          slots: s.slots,
+          orbiting: STAR_KEY,
+          orbit
+        })
+        keys.sections.push(empty.key)
+        continue
+      }
+      const ownerName_ = s.federation ? FEDERATION : ownerName(s.owner, 'unclaimed')
+      const isMine = String(playerAccount) == String(s.owner)
+      const asteroid = add('asteroid', {
+        id: s.id,
+        name: s.name,
+        size: s.size,
+        composition: s.composition,
+        compositionName: s.compositionName,
+        section: s.index,
+        owner: s.owner,
+        ownerName: ownerName_,
+        isMine,
+        federation: s.federation,
+        orbiting: STAR_KEY,
+        orbit,
+        hasStation: Boolean(s.station),
+        info: s.info
+      })
+      keys.asteroids.push(asteroid.key)
+      if (s.station) {
+        const station = add('station', {
+          id: s.id,
+          name: s.station.name,
+          size: 1,
+          owner: s.owner,
+          ownerName: ownerName_,
+          isMine,
+          // it rides its asteroid: a fixed place on it, not an orbit
+          orbiting: asteroid.key,
+          orbit: { radius: asteroidStationRadius(s.size), speed: 0, phase: -45 },
+          orbitalPosition: 0,
+          onAsteroid: true,
+          goods: s.station.goods,
+          yard: false,
+          armory: s.station.armory
+        })
+        keys.stations.push(station.key)
+        asteroid.stationKey = station.key
+        asteroid.stationName = s.station.name
+      }
     }
   }
 

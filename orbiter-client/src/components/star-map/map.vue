@@ -7,6 +7,7 @@
          the background stays (it's the map's too, and the jump's). -->
     <div ref="slide" class="system-slide">
     <guides-canvas class="system-part" :class="{ away: neighborView || jumpFromMap }" />
+    <belt-canvas class="system-part" :class="{ away: neighborView || jumpFromMap }" />
 
     <!-- The world is drawn for the camera in drawnView and slightly larger than the screen;
          between redraws a CSS transform (composited, no repaint) follows the live camera. -->
@@ -85,6 +86,7 @@ import SelectionRing from '@/components/hud/selection-ring.svg.vue'
 import JumpAnimation from './hud/jump-animation.svg'
 import BackgroundCanvas from './background-canvas.vue'
 import GuidesCanvas from './guides-canvas.vue'
+import BeltCanvas from './belt-canvas.vue'
 import SolarSystem from './_solarsystem.svg'
 import PlanetLayers from './planet-layers.vue'
 import ConnectionStatus from './hud/connection-status.svg'
@@ -107,6 +109,7 @@ export default {
     JumpAnimation,
     BackgroundCanvas,
     GuidesCanvas,
+    BeltCanvas,
     SolarSystem,
     PlanetLayers,
     ConnectionStatus,

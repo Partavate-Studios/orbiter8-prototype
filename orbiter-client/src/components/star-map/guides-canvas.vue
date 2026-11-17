@@ -13,10 +13,11 @@ import { useUIStore } from '@/stores/ui'
 import { useStarMapStore } from '@/stores/starmap'
 import { useConfigStore } from '@/stores/config'
 import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
-import { WORLD_OFFSET_Y, HELIOPAUSE_RADIUS } from '@/constants'
+import { WORLD_OFFSET_Y, HELIOPAUSE_RADIUS, BELT_WIDTH } from '@/constants'
 import { writeStyle } from '@/libs/dom-writes'
 import { RING_COLOR, RING_FAINT, ringOpacity, ringWidth } from '@/libs/sprite-types'
-import { STAR_CLASSES, PLANET_COLORS } from '@/libs/palette'
+import { STAR_CLASSES, PLANET_COLORS, BELT } from '@/libs/palette'
+import { BELT_SPEED, ORBIT_SPEED_SCALE } from '@orbiter8/sdk/game/orbits'
 
 // A dim glow around the star (normal and high graphics): deep space's purple, warmed or cooled toward
 // the star's own color so its light reaches the whole system a little.
@@ -148,7 +149,41 @@ export default {
       if (this.graphicsQuality > 2) this.drawStarLight(ctx)
       // In the neighbor view, the heliopause becomes that view's star (neighbor-view.svg.vue).
       if (!this.neighborView) this.drawHeliopause(ctx)
+      this.drawBelt(ctx, pixels)
       this.drawStarOrbits(ctx, pixels)
+    },
+    /**
+     * The asteroid belt far out (D81): a thick translucent band, the same all the way round, so it
+     * needn't turn with the belt; brighter while something in it is selected. Its asteroids are sprites
+     * (dots far out); its rocks are on the belt canvas, close in.
+     */
+    drawBelt(ctx, pixels) {
+      const inBelt = Object.values(this.systemObjects).find((o) => o.type === 'asteroid' || o.type === 'section')
+      if (!inBelt) return
+      const radius = inBelt.orbit.radius
+      const width = BELT_WIDTH
+      const focused = [this.selected, this.hovered].some((k) => ['asteroid', 'section'].includes(this.systemObjects[k]?.type))
+      const peak = (focused ? 0.32 : 0.22) * Math.min(1, ringOpacity(radius * pixels) + 0.2)
+      // Each section tinted by what it holds (an asteroid's composition, or its dust), placed where the
+      // belt has turned to now; it turns so slowly that the redraws on camera moves keep up.
+      const kinds = new Array(8).fill(null)
+      for (const o of Object.values(this.systemObjects)) {
+        if (o.type === 'asteroid' || o.type === 'section') kinds[o.section] = o.type === 'asteroid' ? o.composition : o.dust
+      }
+      const turn = (useStarMapStore().gameTime * BELT_SPEED * ORBIT_SPEED_SCALE) % (Math.PI * 2)
+      ctx.lineWidth = width
+      for (let i = 0; i < 8; i++) {
+        const tint = mix(rgb(BELT.band), rgb(BELT.rock[kinds[i] ?? 0]), 0.6)
+        const band = ctx.createRadialGradient(0, 0, radius - width / 2, 0, 0, radius + width / 2)
+        band.addColorStop(0, rgba(tint, 0))
+        band.addColorStop(0.5, rgba(tint, peak))
+        band.addColorStop(1, rgba(tint, 0))
+        ctx.strokeStyle = band
+        const start = turn + (i * Math.PI) / 4
+        ctx.beginPath()
+        ctx.arc(0, 0, radius, start, start + Math.PI / 4 + 0.002)
+        ctx.stroke()
+      }
     },
     /** The star's class colors (libs/palette.js), or none for a black hole. */
     starColors() {
@@ -191,7 +226,7 @@ export default {
      */
     drawStarOrbits(ctx, pixels) {
       for (const [key, object] of Object.entries(this.systemObjects)) {
-        if (object.orbiting !== 'star') continue
+        if (object.orbiting !== 'star' || object.type === 'asteroid' || object.type === 'section') continue
         const radius = object.orbit.radius
         const emphasized = key === this.selected || key === this.hovered
         const opacity = ringOpacity(radius * pixels) * (emphasized ? 1 : RING_FAINT)

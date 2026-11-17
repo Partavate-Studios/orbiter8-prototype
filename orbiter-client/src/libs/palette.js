@@ -75,6 +75,16 @@ export const MAP = {
  * Sol is drawn pale yellow, as people know it (science would say white).
  * - core: the star's center; mid: its body and its dot on the galaxy map; glow: the light around it.
  */
+/**
+ * The asteroid belt (D67-D71): world colors, muted (the accents stay for what's yours and what needs
+ * attention). Rocks by composition (carbonaceous, silicate, metallic), and the band's haze.
+ */
+export const BELT = {
+  rock: ['#5f544f', '#a8977d', '#8f99a6'],
+  rockLight: ['#8a7d75', '#cdbb9c', '#c3cbd6'],
+  band: '#9a8fae'
+}
+
 export const STAR_CLASSES = {
   O: { name: 'blue', core: '#ffffff', mid: '#9db4ff', glow: '#9db4ff' },
   B: { name: 'blue-white', core: '#ffffff', mid: '#aabfff', glow: '#aabfff' },

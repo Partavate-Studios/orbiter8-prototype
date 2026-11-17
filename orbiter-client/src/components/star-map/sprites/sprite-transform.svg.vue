@@ -12,7 +12,10 @@
         <template v-else>
           <planet v-if="type === 'planet'" :sprite="sprite" />
           <moon v-if="type === 'moon'" />
-          <station v-if="type === 'station'" />
+          <station v-if="type === 'station' && !sprite.object.onAsteroid" />
+          <asteroid-station v-if="type === 'station' && sprite.object.onAsteroid" />
+          <asteroid v-if="type === 'asteroid'" :composition="sprite.object.composition" :section="sprite.object.section" />
+          <mining-slots v-if="type === 'section'" :slots="sprite.object.slots ?? []" :me="playerAccount()" />
           <!-- Docked: a tube from the ship's side to the station's pad, shown once it's there. -->
           <g
             v-if="type === 'ship' && sprite.dock"
@@ -83,7 +86,11 @@ import { offerLabel, withdrawLabel } from '@/libs/label-layout'
 import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
 import { writeAttribute } from '@/libs/dom-writes'
 import { WARP_IN_MS } from '../warp-effects.svg.vue'
-import { YELLOW, YELLOW_LIGHT, PLANET_COLORS, STAR_CLASSES } from '@/libs/palette'
+import { YELLOW, YELLOW_LIGHT, PLANET_COLORS, STAR_CLASSES, BELT } from '@/libs/palette'
+import { usePlayerStore } from '@/stores/player'
+import Asteroid from './asteroid.svg'
+import MiningSlots from './mining-slots.svg'
+import AsteroidStation from './asteroid-station.svg'
 import Star from './star.svg'
 import Ship from './ship.svg'
 import Station from './station.svg'
@@ -117,6 +124,9 @@ const MY_LABEL_FILL = YELLOW_LIGHT + 'aa'
 export default {
   name: 'SpriteTransform',
   components: {
+    Asteroid,
+    AsteroidStation,
+    MiningSlots,
     Ship,
     Station,
     Moon,
@@ -248,6 +258,8 @@ export default {
       const object = this.sprite.object
       if (this.type === 'planet') return PLANET_COLORS[object.class]?.light ?? '#e5cfff'
       if (this.type === 'star' && object.spectral) return STAR_CLASSES[object.spectral].mid
+      if (this.type === 'asteroid') return BELT.rockLight[object.composition] ?? '#e5cfff'
+      if (this.type === 'section') return 'none' // empty space: nothing to see from afar
       return '#e5cfff'
     },
     /** Half the sprite's size, but never under one pixel (in sprite units). */
@@ -293,6 +305,10 @@ export default {
     this.hoverSprite(null, this.objectIndex)
   },
   methods: {
+    /** The connected pilot (lowercase), to show their own mining slot in yellow. */
+    playerAccount() {
+      return usePlayerStore().account ?? ''
+    },
     /** Offers this frame's name to the label layout (libs/label-layout.js), or withdraws it. */
     offerName(visible, x, y) {
       if (!visible || !this.showLabel) return withdrawLabel(this.objectIndex)

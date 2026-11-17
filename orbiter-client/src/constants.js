@@ -67,3 +67,6 @@ export const TIMING = {
 
 /** How long the ship takes to stretch into a black hole (black-hole-entry.vue) before the jump animation. */
 export const BLACK_HOLE_ENTRY_MS = 2200
+
+/** The asteroid belt's band, in world units across (D81). */
+export const BELT_WIDTH = 34

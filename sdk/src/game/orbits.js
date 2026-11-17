@@ -57,6 +57,27 @@ export function planetOrbitRadius(orbitalPosition) {
   return 150 + p * 50 + p * p * 15
 }
 
+/**
+ * Radius of the asteroid belt (D69): halfway between the planet it lies outside of and the next one out,
+ * or a little beyond the last planet.
+ */
+export function beltOrbitRadius(outsidePlanet, planetCount) {
+  const inner = planetOrbitRadius(outsidePlanet)
+  if (Number(outsidePlanet) >= planetCount - 1) return inner + 60
+  return (inner + planetOrbitRadius(Number(outsidePlanet) + 1)) / 2
+}
+
+/** The belt turns slowly, all of it together (D71: visual only), its asteroids and stations riding it. */
+export const BELT_SPEED = 60
+
+/** Where a belt section sits round the star at the start, in degrees (eight sections, 45° each). */
+export const sectionPhase = (index) => Number(index) * 45 + 22.5
+
+/** Radius of the ring an asteroid's station sits on, on the asteroid: it rides it rather than orbiting. */
+export function asteroidStationRadius(asteroidSize) {
+  return 3 + Number(asteroidSize) * 0.9
+}
+
 /** Radius of a moon's orbit around its planet, by planet size and the moon's orbital position. */
 export function moonOrbitRadius(planetSize, moonPosition) {
   const m = Number(moonPosition)
