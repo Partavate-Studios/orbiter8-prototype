@@ -42,11 +42,14 @@ work in progress from a session that ran out (check `git status` and `git diff` 
   Mining by them waits for Phase 3. Calls X13–X14.
 - 2026-11-16: mining drones done (Factory part 9, `Loadout.miningDrones`, shares drone bays, never
   fights); the client shows them in the armory, loadout and a planet's store. **Phase 2 done.**
-- **Next: Phase 3 (belts)**, first box: generation. Read `contracts/src/planets/SystemGen.sol` and its
-  mirror `sdk/src/system-gen.js` with the vectors in `contracts/test/vectors/SystemVectors.t.sol` first.
-  A belt: about 1 star in 4 (Sol always, between Mars and Jupiter), 8 sections, each an asteroid (size,
-  composition: carbonaceous, silicate, metallic) or empty (about 1 in 6). Asteroid ids:
-  `BodyId.make(cell, ASTEROID, section)`. Keep the per-call lists short (PolkaVM memory).
+- 2026-11-16: Phase 3, generation done: `contracts/src/planets/BeltGen.sol` (hasBelt, outsidePlanet,
+  section, yields), mirrored by `sdk/src/belt-gen.js` (plus Sol's asteroid names), pinned by
+  `test/vectors/BeltVectors.t.sol` (vectors and odds). Call X16.
+- **Next: Phase 3, claims, names and deeds for asteroids.** `Claims._check` accepts only planets: let it
+  accept an asteroid id when the star has a belt and the section holds an asteroid (`BeltGen.section`),
+  never in Sol (the Federation's, decision 7). `mayNameStar` already counts only planets. Names: an
+  asteroid has one name part (and its station). Then the building line (decision 22) in Planets
+  (Platform → Mine → Port → Armory for asteroids; one line, allowed steps per kind).
 
 ## Read first
 
@@ -238,7 +241,7 @@ onward in `docs/demo4-plan.md`, with this plan's milestones.
 - [x] Client: the shipyard sells both bay types; the loadout shows drones and bays by type.
 
 **Phase 3: belts.**
-- [ ] Generation: which stars have a belt, its 8 sections, each section's asteroid (size, composition)
+- [x] Generation: which stars have a belt, its 8 sections, each section's asteroid (size, composition)
   or empty; Sol's belt fixed and the Federation's. Contract library + SDK mirror + vectors.
 - [ ] Claims, names and deeds for asteroids (not counting toward the star, decision 6).
 - [ ] The asteroid building line (decision 22); drone pools and the mining/defense split (decision 24).

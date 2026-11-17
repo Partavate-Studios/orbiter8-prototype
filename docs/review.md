@@ -465,6 +465,12 @@ Calls made building it, for Koda's review:
   electronics; at Sol 1,600 as every part is doubled there), fitted to ships only until bodies get drone
   pools (Phase 3); a planet's store offers "To ship" for it, not "Install". It may be fitted or unloaded
   mid-siege, since it never fights.
+- **X16. Belt generation** (`BeltGen.sol`): a belt at a star when its hash says 1 in 4; it lies just
+  outside a planet picked from the hash (Sol's outside Mars). Sections: 1 in 6 empty; compositions
+  carbonaceous 50%, silicate 30%, metallic 20% (gameplay odds; real belts are mostly carbonaceous);
+  size 1–8. **Sol's belt is hand-placed:** Ceres (C 8), Vesta (S 6), empty, Pallas (S 6), Hygiea (C 5),
+  Psyche (M 5), empty, Juno (S 3). Two empty sections so new pilots can mine near home. Yields:
+  carbonaceous water ice and organics; silicate silicon and metals; metallic metals and rare elements.
 - **X6. Wording:** the loadout's empty-weapons line says "Every Sol station's armory sells them." (was "The
   I.S.S. armory").
 
