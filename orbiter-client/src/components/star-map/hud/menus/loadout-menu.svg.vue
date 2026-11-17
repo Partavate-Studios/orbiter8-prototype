@@ -15,7 +15,7 @@
           {{ Math.max(1, ship.range - ship.rangeLost) }}
         </text>
         <text v-if="condition?.retreated" x="0" y="203" text-anchor="middle" font-size="0.8em" :fill="PINK_LIGHT">
-          Retreated: repair at a shipyard before attacking again
+          Retreated: repair before attacking again (a shipyard, or your drones in time)
         </text>
         <text v-else-if="docked" x="0" y="203" text-anchor="middle" font-size="0.8em" fill="#ffffffaa">
           In the yard after repairs: ready {{ docked }}
@@ -36,15 +36,29 @@
             </g>
           </g>
           <text
-            v-if="ship.rangeLost || ship.baysLost"
+            v-if="damage.range || damage.bays"
             x="0"
             :y="fitted.length * 30 + 10"
             text-anchor="middle"
             font-size="0.85em"
             :fill="PINK_LIGHT"
           >
-            Damage: {{ ship.rangeLost }} range, {{ ship.baysLost }} holds lost. A shipyard repairs everything.
+            Damage: {{ damage.range }} range, {{ damage.bays }} holds lost. A shipyard repairs everything.
           </text>
+
+          <!-- The four built-in drones (D79, D92): each repairs the ship slowly, or mines -->
+          <g :transform="'translate(0 ' + dronesRowY + ')'">
+            <text x="-170" y="0">4 × Built-in drone</text>
+            <g class="can-click" transform="translate(-5 0)" @click="setRepairing(repairing - 1)">
+              <rect x="-13" y="-13" width="26" height="26" rx="4" fill="#3d1273" stroke="#ffffff44" />
+              <text x="0" y="0" text-anchor="middle">−</text>
+            </g>
+            <text x="75" y="0" text-anchor="middle" font-size="0.85em">{{ repairing }} repairing · {{ 4 - repairing }} mining</text>
+            <g class="can-click" transform="translate(155 0)" @click="setRepairing(repairing + 1)">
+              <rect x="-13" y="-13" width="26" height="26" rx="4" fill="#3d1273" stroke="#ffffff44" />
+              <text x="0" y="0" text-anchor="middle">+</text>
+            </g>
+          </g>
         </g>
       </g>
     </menu-container>
@@ -87,6 +101,19 @@ export default {
     mounts() {
       return mountsUsed(this.ship.loadout)
     },
+    /** The built-in drones' row: under the parts (or the two-line "nothing fitted" note) and any damage. */
+    dronesRowY() {
+      const parts = this.fitted.length ? this.fitted.length * 30 : 52
+      return parts + (this.damage.range || this.damage.bays ? 40 : 10) + 20
+    },
+    /** How many built-in drones repair (the rest mine). */
+    repairing() {
+      return this.condition?.repairing ?? 0
+    },
+    /** Engine and bay damage now, the drones' repairs counted. */
+    damage() {
+      return { range: this.condition?.rangeLost ?? this.ship.rangeLost, bays: this.condition?.baysLost ?? this.ship.baysLost }
+    },
     docked() {
       const left = (this.condition?.dockedUntil ?? 0) - this.player.now / 1000
       return left > 0 ? `in ${Math.ceil(left / 60)} min` : null
@@ -120,6 +147,11 @@ export default {
     fitSize,
     drawArt() {
       if (this.$refs.art) this.$refs.art.innerHTML = this.art
+    },
+    setRepairing(n) {
+      if (n < 0 || n > 4 || n === this.repairing) return
+      this.o8audio.playEffect('click')
+      this.player.assignDrones(n)
     },
     unload(row) {
       this.o8audio.playEffect('click')

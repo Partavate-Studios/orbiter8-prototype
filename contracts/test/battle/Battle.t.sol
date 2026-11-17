@@ -126,6 +126,48 @@ contract BattleTest is BattleFixture {
         battle.attack(home);
     }
 
+    function test_builtInDronesRepairTheShipSlowly() public {
+        _citadel();
+        _defend(Battle.Defenses(0, 6, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0));
+        _armBo(2);
+        _go(bo, star);
+        vm.prank(bo);
+        battle.attack(home);
+        skip(3 hours);
+        battle.advance(home);
+        Repairs.Condition memory c = repairs.conditionOf(bo);
+        assertTrue(c.retreated);
+        assertEq(c.armorLost, 100);
+        (uint8 repairing, uint8 mining) = repairs.dronesOf(bo);
+        assertEq(repairing, 0);
+        assertEq(mining, 4, "all four mine until assigned");
+
+        vm.prank(bo);
+        vm.expectRevert(Repairs.TooManyDrones.selector);
+        repairs.assignDrones(5);
+        vm.prank(bo);
+        repairs.assignDrones(2); // two repair, two mine
+        skip(2 hours); // 2 drones x 10 hp x 2 h = 40 hp of armor
+        assertEq(repairs.conditionOf(bo).armorLost, 60);
+        assertTrue(repairs.conditionOf(bo).retreated);
+        skip(3 hours); // 60 more: the armor is whole
+        c = repairs.conditionOf(bo);
+        assertEq(c.armorLost, 0);
+        // Systems and bays come next; once nothing is left, the ship may attack again.
+        skip(48 hours);
+        c = repairs.conditionOf(bo);
+        (uint8 rangeLost, uint16 baysLost) = repairs.damageOf(bo);
+        assertEq(c.pointDefenseOff + c.railgunsOff + c.missilesOff + c.dronesOff + c.botsOff, 0);
+        assertEq(uint256(rangeLost) + baysLost, 0);
+        assertFalse(c.retreated);
+        // Reassigning writes the repairs down.
+        vm.prank(bo);
+        repairs.assignDrones(0);
+        assertEq(pilots.shipOf(bo).baysLost, 0);
+        vm.prank(bo);
+        battle.attack(home);
+    }
+
     function test_theOwnersShipDefendsWhenItsThere() public {
         _citadel();
         _defend(Battle.Defenses(0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0)); // armor only: the planet can't shoot

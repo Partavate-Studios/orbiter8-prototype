@@ -37,11 +37,13 @@ work in progress from a session that ran out (check `git status` and `git diff` 
   lives in drone bays (`Pilots.dronesPerBay`, admin-tunable, 1); cargo + drone bays ≤ 250;
   `Market.buyDroneBays`; the shipyard menu's Cargo Holds / Drone Bays toggle; the loadout shows drones
   of drone room. Play-tested at desktop and phone. Calls X10–X12 in `review.md`.
-- **Next: Phase 2, the 4 built-in multipurpose drones** (decisions 13, 26): no bays, never lost; each
-  mining or repairing, as the pilot assigns. Repair goes in `Repairs` (slowly restores what's out of
-  action, lazily from time, rates tunable); mining waits for Phase 3's empty sections, so for now only
-  the assignment is stored. Then mining drones as a part (decisions 9, 14): a loadout field living in
-  drone bays, never lost in battle (Combat must not count them).
+- 2026-11-16 (session resumed after a shutdown; nothing was lost): the 4 built-in drones done, in
+  `Repairs` (`assignDrones`, `dronesOf`, lazy repairs, `damageOf`); loadout row to assign them.
+  Mining by them waits for Phase 3. Calls X13–X14.
+- **Next: Phase 2, mining drones as a part** (decisions 9, 14): a loadout field (`miningDrones`) in drone
+  bays, bought at armories like battle drones (a new part id in Factory's parts, or a separate Armory
+  purchase), never lost in battle (Combat never sees them; `Repairs.keepLosses` leaves them alone).
+  Then the client box (shipyard and loadout by type: mostly done; show mining drones).
 
 ## Read first
 
@@ -228,7 +230,7 @@ onward in `docs/demo4-plan.md`, with this plan's milestones.
 
 **Phase 2: ships.**
 - [x] Bay types (decisions 17 and 25): Pilots, Market's shipyard, Armory's fitting rules.
-- [ ] The 4 built-in multipurpose drones (decisions 13 and 26): assigned to mining or repair.
+- [x] The 4 built-in multipurpose drones (decisions 13 and 26): assigned to mining or repair.
 - [ ] Mining drones as a part (decision 9); never lost in battle (decision 14).
 - [ ] Client: the shipyard sells both bay types; the loadout shows drones and bays by type.
 

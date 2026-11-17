@@ -453,6 +453,14 @@ Calls made building it, for Koda's review:
   counting every bay the ship has (the 250 cap counts both too).
 - **X12. Ships start with no drone bays** (and 5 cargo bays, as before). The 4 built-in drones (decision
   26) will take no bays.
+- **X13. The built-in drones' repairs** (decision 26), in `Repairs`: 10 hit points a repairing drone an
+  hour (`setDroneRate`), so four restore five armor plates (250) in about 6 h, against the yard's 3 h
+  and 3,000 credits. Order: armor, systems (a weapon 30, a drone 10, a bot 20), bays (2 each), range
+  (40 a level). A ship whose damage is all restored is no longer "retreated" (D52 said only a yard
+  cleared it). New ships start with all four mining. Work during a siege is counted when it ends,
+  before the siege's losses.
+- **X14. The loadout's drone row** ("4 × Built-in drone", − / + to move one between repairing and
+  mining) uses the Unload button's look. New control in an existing menu: for Koda's eye.
 - **X6. Wording:** the loadout's empty-weapons line says "Every Sol station's armory sells them." (was "The
   I.S.S. armory").
 

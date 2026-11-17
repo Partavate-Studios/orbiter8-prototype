@@ -1,6 +1,19 @@
 [
   {
     "type": "function",
+    "name": "BUILT_IN_DRONES",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "DEFAULT_ADMIN_ROLE",
     "inputs": [],
     "outputs": [
@@ -53,6 +66,19 @@
   },
   {
     "type": "function",
+    "name": "assignDrones",
+    "inputs": [
+      {
+        "name": "repairing",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "conditionOf",
     "inputs": [
       {
@@ -63,7 +89,7 @@
     ],
     "outputs": [
       {
-        "name": "",
+        "name": "c",
         "type": "tuple",
         "internalType": "struct Repairs.Condition",
         "components": [
@@ -108,6 +134,54 @@
             "internalType": "uint40"
           }
         ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "damageOf",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "rangeLost",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "baysLost",
+        "type": "uint16",
+        "internalType": "uint16"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "dronesOf",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "repairing",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "mining",
+        "type": "uint8",
+        "internalType": "uint8"
       }
     ],
     "stateMutability": "view"
@@ -395,6 +469,19 @@
   },
   {
     "type": "function",
+    "name": "setDroneRate",
+    "inputs": [
+      {
+        "name": "hpPerHour",
+        "type": "uint32",
+        "internalType": "uint32"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "shipSide",
     "inputs": [
       {
@@ -629,6 +716,44 @@
   },
   {
     "type": "event",
+    "name": "DroneRateSet",
+    "inputs": [
+      {
+        "name": "hpPerHour",
+        "type": "uint32",
+        "indexed": false,
+        "internalType": "uint32"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "DronesAssigned",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "repairing",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "uint8"
+      },
+      {
+        "name": "mining",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "uint8"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
     "name": "Initialized",
     "inputs": [
       {
@@ -789,6 +914,11 @@
   {
     "type": "error",
     "name": "NotInitializing",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "TooManyDrones",
     "inputs": []
   },
   {

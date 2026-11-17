@@ -254,6 +254,13 @@ export const usePlayerStore = defineStore('Player', {
       return track({ doing: 'Booking repairs', done: 'Repaired: in the yard for a while', failed: "Couldn't repair" }, (o) =>
         game.actions.repair(port, o)
       )
+    },
+    /** The built-in drones (D92): how many repair the ship; the rest mine. */
+    assignDrones(repairing) {
+      return track(
+        { doing: 'Setting the drones to work', done: `${repairing} repairing, ${4 - repairing} mining`, failed: "Couldn't set the drones" },
+        (o) => game.actions.assignDrones(repairing, o)
+      )
     }
   }
 })

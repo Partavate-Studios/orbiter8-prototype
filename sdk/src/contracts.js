@@ -300,8 +300,18 @@ export function createGame(runner, addresses) {
 
     /** A ship's state between battles: what's out of action, retreat, time in the yard. */
     async condition(address) {
-      const c = await repairs.conditionOf(address)
+      const [c, crew, damage] = await Promise.all([
+        repairs.conditionOf(address),
+        repairs.dronesOf(address),
+        repairs.damageOf(address)
+      ])
       return {
+        // the built-in drones (D92): how many repair, how many mine; and engine and bay damage now,
+        // their repairs counted
+        repairing: Number(crew[0]),
+        mining: Number(crew[1]),
+        rangeLost: Number(damage[0]),
+        baysLost: Number(damage[1]),
         armorLost: Number(c.armorLost),
         off: [
           Number(c.pointDefenseOff),
@@ -624,6 +634,10 @@ export function createGame(runner, addresses) {
     },
     async repair(port, options) {
       return sent(armory.repair(port), options)
+    },
+    /** How many of the four built-in drones repair the ship; the rest mine (D92). */
+    async assignDrones(repairing, options) {
+      return sent(repairs.assignDrones(repairing), options)
     }
   }
   return game

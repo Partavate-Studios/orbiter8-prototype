@@ -795,6 +795,9 @@ export function createGameClient() {
     repair(port, options) {
       return move((p, by, o) => by.repair(Number(port), o), options)
     },
+    assignDrones(repairing, options) {
+      return move((p, by, o) => by.assignDrones(Number(repairing), o), options)
+    },
     /** One wallet approval: a new key may make moves for SESSION_HOURS, with gas money sent along. */
     async startSession(options) {
       const key = newKey()

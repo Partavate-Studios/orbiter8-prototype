@@ -13,6 +13,7 @@ const WORDS = {
   NotEnoughCargo: ([, have]) => `Only ${have} aboard.`,
   NotEnoughColonists: ([have]) => `Only ${have} colonists aboard.`,
   TooManyBays: ([max]) => `A ship has at most ${max} bays, cargo and drone together.`,
+  TooManyDrones: () => 'A ship has four built-in drones.',
   NoDroneRoom: ([room]) => (Number(room) === 0 ? 'No drone bays: buy some at a shipyard.' : `Room for only ${room} drones: buy more drone bays.`),
   BadRange: () => 'That jump is out of range.',
   BadSession: () => 'The session has ended. Start a new one from your ship.',
