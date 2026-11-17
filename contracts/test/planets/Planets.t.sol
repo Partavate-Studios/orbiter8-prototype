@@ -432,4 +432,54 @@ contract AsteroidClaimsTest is PlanetsFixture {
         vm.expectRevert(abi.encodeWithSelector(Claims.FederationPlanet.selector, ceres));
         claims.claim(ceres);
     }
+
+    function test_anAsteroidsLine() public {
+        bytes32 seed = _universe();
+        uint256 rock;
+        for (uint256 i = 0; i < BeltGen.SECTIONS; i++) {
+            (bool a,,) = BeltGen.section(seed, 3, i);
+            if (a) {
+                rock = i;
+                break;
+            }
+        }
+        (, uint8 composition,) = BeltGen.section(seed, 3, rock);
+        uint256 asteroid = BodyId.make(3, BodyId.ASTEROID, rock);
+        // Credits only, to test the line's order (the goods are tested on planets).
+        vm.startPrank(admin);
+        for (uint8 step = 1; step <= 6; step++) {
+            planets.setCost(step + 8, Planets.Cost(1_000, 10 minutes, step == 1 ? 20 : 0, [0, 0, 0], [uint32(0), 0, 0]));
+        }
+        vm.stopPrank();
+        _pay(ada, 1_000_000);
+        vm.prank(ada);
+        planets.recruit(20);
+        _go(ada, 3);
+        _claim(ada, asteroid);
+        vm.startPrank(ada);
+        planets.land(asteroid, 20);
+        vm.expectRevert(abi.encodeWithSelector(Planets.CannotBuild.selector, 7));
+        planets.build(asteroid, 7); // no Autofactory on an asteroid
+        planets.build(asteroid, 1); // Platform
+        skip(10 minutes);
+        planets.build(asteroid, 2); // Mine
+        skip(10 minutes);
+        vm.expectRevert(abi.encodeWithSelector(Planets.CannotBuild.selector, 3));
+        planets.build(asteroid, 3); // no Station
+        planets.build(asteroid, 4); // Port
+        skip(10 minutes);
+        vm.expectRevert(abi.encodeWithSelector(Planets.CannotBuild.selector, 5));
+        planets.build(asteroid, 5); // no Yards
+        planets.build(asteroid, 6); // Armory
+        skip(10 minutes);
+        vm.stopPrank();
+        Planets.PlanetView memory v = planets.planetView(asteroid, 8);
+        assertEq(v.level, 6);
+        assertEq(v.class, 10 + composition);
+        assertEq(planets.moonCount(asteroid), 0);
+        Market.PortView memory port = market.portView(asteroid);
+        assertEq(port.owner, ada, "the asteroid's port trades");
+        assertFalse(port.yard);
+        assertEq(planets.belt(3, 8).length > 0, true);
+    }
 }

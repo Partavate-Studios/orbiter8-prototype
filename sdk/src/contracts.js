@@ -145,6 +145,10 @@ const toCost = (c) => ({
  * @param {import('ethers').ContractRunner} runner
  * @param {{ galaxy: string, pilots: string, market: string, credits: string }} addresses
  */
+/** An asteroid's line (Planets.sol, D88): its steps and their names. Planets take every step 1–6. */
+export const ASTEROID_STEPS = [1, 2, 4, 6]
+export const ASTEROID_BUILDING_NAMES = { 1: 'Platform', 2: 'Mine', 4: 'Port', 6: 'Armory' }
+
 export function createGame(runner, addresses) {
   const galaxy = new Contract(addresses.galaxy, GalaxyAbi, runner)
   const pilots = new Contract(addresses.pilots, PilotsAbi, runner)
@@ -257,14 +261,23 @@ export function createGame(runner, addresses) {
       return (await planets.system(cell, goods)).map(toPlanet)
     },
 
+    /** Every asteroid in a star's belt, as it stands now (none without a belt). */
+    async belt(cell, goods) {
+      return (await planets.belt(cell, goods)).map(toPlanet)
+    },
+
     /** What planets cost: buildings 1–7, the claim fee and the colonist price; the Autofactory's parts. */
     async planetRules() {
       const [tuning, claimTuning, parts, ...costs] = await Promise.all([
         planets.tuning(),
         claims.tuning(),
         factory.parts(),
-        ...[1, 2, 3, 4, 5, 6, 7].map((b) => planets.costOf(b))
+        ...[1, 2, 3, 4, 5, 6, 7].map((b) => planets.costOf(b)),
+        // an asteroid's line (D88): Platform, Mine, Port, Armory, at the step + 8
+        ...ASTEROID_STEPS.map((b) => planets.costOf(b + 8))
       ])
+      const planetCosts = costs.slice(0, 7)
+      const asteroidCosts = costs.slice(7)
       return {
         claimFee: Number(claimTuning.claimFee),
         starNameFee: Number(claimTuning.starNameFee),
@@ -273,7 +286,8 @@ export function createGame(runner, addresses) {
         producePerHour: Number(tuning.producePerHour),
         storageCap: Number(tuning.storageCap),
         colonyShare: Number(tuning.colonyShare),
-        buildings: [null, ...costs.map(toCost)],
+        buildings: [null, ...planetCosts.map(toCost)],
+        asteroidBuildings: Object.fromEntries(ASTEROID_STEPS.map((b, i) => [b, toCost(asteroidCosts[i])])),
         parts: parts.map((p) => ({
           name: p.name,
           credits: Number(p.credits),

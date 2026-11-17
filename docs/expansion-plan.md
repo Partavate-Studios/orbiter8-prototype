@@ -50,10 +50,14 @@ work in progress from a session that ran out (check `git status` and `git diff` 
   toward the star. The leaderboard counts planets only. Test fixtures can override the universe seed
   (`GameFixture._universe`); `AsteroidClaimsTest` uses one whose genesis ring has a belt (cell 3).
   Not played in the browser yet: asteroids are drawn in Phase 4.
-- **Next: Phase 3, the asteroid building line** (decision 22) and drone pools (decision 24). Planets'
-  `_derive` accepts planets only: generalize it to asteroids (class/size from `BeltGen.section`), with
-  the line Platform → Mine → Port → Armory for asteroids (planets keep theirs); `planetView` and
-  `Planets.system` must not break for asteroid ids. Watch Planets' size (19.1 KB).
+- 2026-11-16: the asteroid line done in Planets (`_derive` for both kinds, `_nextStep`, asteroid costs at
+  step + 8, `_cap`, `belt(cell)` view, no moons), Market mixes for classes 10–12, SDK `belt()` and
+  `rules.asteroidBuildings`. Planets 20.9 KB. Call X17.
+- **Next: Phase 3, drone pools on bodies** (decision 24): a body's pool of drones (landed from a ship's
+  mining drones, like colonists), the owner's mining/defense split (frozen in a siege), mining drones
+  producing the composition's goods into the asteroid's store once the Mine stands. Likely a new
+  module (`Drones`?) so Planets keeps its room: per-body pool, split, and a lazy output that Planets'
+  storage receives (or the module keeps its own store and the port reads it in the next box).
 
 ## Read first
 

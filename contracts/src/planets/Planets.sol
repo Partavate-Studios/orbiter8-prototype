@@ -10,6 +10,7 @@ import {Credits} from "../tokens/Credits.sol";
 import {Claims} from "./Claims.sol";
 import {Fixed} from "../math/Fixed.sol";
 import {SystemGen} from "./SystemGen.sol";
+import {BeltGen} from "./BeltGen.sol";
 
 /// @title Planets: people, production and buildings (docs/demo4-plan.md, section 5)
 /// @notice A star's planets are derived (`SystemGen`); this stores only what players change. Who owns a
@@ -32,6 +33,11 @@ contract Planets is ModuleBase {
     uint8 public constant ARMORY = 6;
     uint8 public constant AUTOFACTORY = 7;
     uint256 public constant EARTH = 2;
+    /// Asteroids (D88): their port classes follow the planets' (10 + composition), their line's costs
+    /// are kept at the step + ASTEROID_COSTS, and each unit of size holds this many people.
+    uint8 public constant ASTEROID_CLASS = 10;
+    uint8 public constant ASTEROID_COSTS = 8;
+    uint256 public constant ASTEROID_PEOPLE = 100;
 
     struct Cost {
         uint64 credits;
@@ -135,6 +141,11 @@ contract Planets is ModuleBase {
         _setCost(YARDS, Cost(150_000, 4 hours, 0, [1, 6, 0], [uint32(200), 100, 0]));
         _setCost(ARMORY, Cost(250_000, 6 hours, 0, [2, 7, 0], [uint32(150), 100, 0]));
         _setCost(AUTOFACTORY, Cost(60_000, 2 hours, 0, [6, 7, 5], [uint32(100), 100, 50]));
+        // An asteroid's line (D88): Platform, Mine, Port, Armory, at the step + ASTEROID_COSTS.
+        _setCost(CITADEL + ASTEROID_COSTS, Cost(3_000, 10 minutes, 20, [6, 1, 0], [uint32(20), 20, 0]));
+        _setCost(COLONY + ASTEROID_COSTS, Cost(15_000, 30 minutes, 0, [6, 7, 0], [uint32(60), 30, 0]));
+        _setCost(PORT + ASTEROID_COSTS, Cost(60_000, 2 hours, 0, [6, 7, 0], [uint32(80), 80, 0]));
+        _setCost(ARMORY + ASTEROID_COSTS, Cost(200_000, 6 hours, 0, [2, 7, 0], [uint32(120), 80, 0]));
         _setTuning(Tuning(10, 8 hours, 20, 5_000, 90));
     }
 
@@ -160,14 +171,35 @@ contract Planets is ModuleBase {
 
     // ── where things are ────────────────────────────────────────────────────────────────────────
 
-    /// The planet's class and size, after checking it exists around a charted star.
+    /// The body's class and size, after checking it exists at a charted star. A planet's class is
+    /// 0–9; an asteroid's is ASTEROID_CLASS + its composition (its port's mix, D76).
     function _derive(uint256 id) internal view returns (uint8 class, uint8 size) {
         uint256 cell = BodyId.cellOf(id);
-        uint256 body = BodyId.indexOf(id);
-        PlanetsStorage storage s = _s();
+        uint256 index = BodyId.indexOf(id);
         bytes32 seed = _seed();
-        if (!BodyId.isPlanet(id) || s.galaxy.stateOf(cell) != 2 || body >= SystemGen.planetCount(seed, cell)) revert NoSuchPlanet(id);
-        (class, size,) = SystemGen.planet(seed, cell, body);
+        if (_s().galaxy.stateOf(cell) == 2) {
+            if (BodyId.isPlanet(id)) {
+                if (index < SystemGen.planetCount(seed, cell)) {
+                    (class, size,) = SystemGen.planet(seed, cell, index);
+                    return (class, size);
+                }
+            } else if (BodyId.kindOf(id) == BodyId.ASTEROID && index < BeltGen.SECTIONS && BeltGen.hasBelt(seed, cell)) {
+                (bool asteroid, uint8 composition, uint8 rock) = BeltGen.section(seed, cell, index);
+                if (asteroid) return (ASTEROID_CLASS + composition, rock);
+            }
+        }
+        revert NoSuchPlanet(id);
+    }
+
+    /// The most people a body holds: a planet's by class and size; an asteroid's platforms, by size.
+    function _cap(uint8 class, uint8 size) internal pure returns (uint256) {
+        return class >= ASTEROID_CLASS ? uint256(size) * ASTEROID_PEOPLE : SystemGen.populationCap(class, size);
+    }
+
+    /// The step after `level` in a body's line (D88): planets take every step; asteroids go
+    /// Platform (1) → Mine (2) → Port (4) → Armory (6), with no Station, Yards or Autofactory.
+    function _nextStep(bool asteroid, uint8 level) internal pure returns (uint8) {
+        return asteroid && level >= 2 ? level + 2 : level + 1;
     }
 
     function _seed() internal view returns (bytes32 seed) {
@@ -189,6 +221,7 @@ contract Planets is ModuleBase {
 
     /// How many moons a planet has: each gives six weapon mounts that can't be destroyed (D61).
     function moonCount(uint256 id) external view returns (uint256 n) {
+        if (!BodyId.isPlanet(id)) return 0; // asteroids have none
         for (uint256 m = SystemGen.moonSlots(_seed(), BodyId.cellOf(id), BodyId.indexOf(id)); m != 0; m >>= 1) {
             n += m & 1;
         }
@@ -269,15 +302,14 @@ contract Planets is ModuleBase {
         Planet storage planet = _settle(id);
         if (s.claims.ownerOf(id) != pilot) revert NotYours(id);
         if (planet.building != 0) revert Busy(planet.readyAt);
-        bool next = building == planet.level + 1 && building <= ARMORY;
-        bool factory = building == AUTOFACTORY && planet.level >= COLONY && !planet.autofactory;
+        (uint8 class, uint8 size) = _derive(id);
+        bool asteroid = class >= ASTEROID_CLASS;
+        bool next = building == _nextStep(asteroid, planet.level) && building <= ARMORY;
+        bool factory = building == AUTOFACTORY && planet.level >= COLONY && !planet.autofactory && !asteroid;
         if (!next && !factory) revert CannotBuild(building);
 
-        Cost memory cost = s.costs[building];
-        (uint8 class, uint8 size) = _derive(id);
-        uint256 needed = building == COLONY
-            ? (SystemGen.populationCap(class, size) * cost.people) / 100
-            : cost.people;
+        Cost memory cost = s.costs[asteroid ? building + ASTEROID_COSTS : building];
+        uint256 needed = building == COLONY && !asteroid ? (_cap(class, size) * cost.people) / 100 : cost.people;
         if (planet.population < needed) revert NeedsPeople(needed);
         for (uint256 i = 0; i < 3; i++) {
             if (cost.amounts[i] > 0) _takeStock(id, cost.goods[i], cost.amounts[i]);
@@ -310,14 +342,15 @@ contract Planets is ModuleBase {
         // unclaimed planet has no Citadel, so nothing grows there either.)
         if (block.timestamp <= planet.settledAt) return planet;
         (uint8 class, uint8 size) = _derive(id);
-        uint256 cap = SystemGen.populationCap(class, size);
+        uint256 cap = _cap(class, size);
         uint256 before = planet.population;
         uint256 elapsed = block.timestamp - planet.settledAt;
         planet.settledAt = uint40(block.timestamp);
         if (planet.level < CITADEL) return planet; // nobody grows or works before a Citadel
         uint256 grown = _grow(before, cap, elapsed);
         planet.population = uint32(grown);
-        if (!planet.besieged) _produce(id, planet, class, cap, (before + grown) / 2, elapsed);
+        // Asteroids produce by their mining drones, not their people (D77, D90).
+        if (!planet.besieged && class < ASTEROID_CLASS) _produce(id, planet, class, cap, (before + grown) / 2, elapsed);
     }
 
     /// People after `elapsed` seconds: the gap to the cap shrinks by e every growth time.
@@ -400,9 +433,9 @@ contract Planets is ModuleBase {
     /// A planet as it stands now (time's effects worked out, nothing written), with `goods` stock entries.
     function planetView(uint256 id, uint256 goods) public view returns (PlanetView memory v) {
         (v.class, v.size) = _derive(id);
-        (,, v.surface) = SystemGen.planet(_seed(), BodyId.cellOf(id), BodyId.indexOf(id));
+        if (v.class < ASTEROID_CLASS) (,, v.surface) = SystemGen.planet(_seed(), BodyId.cellOf(id), BodyId.indexOf(id));
         v.id = id;
-        v.cap = SystemGen.populationCap(v.class, v.size);
+        v.cap = _cap(v.class, v.size);
         Planet memory p = _s().planets[id];
         if (p.building != 0 && block.timestamp >= p.readyAt) {
             if (p.building == AUTOFACTORY) p.autofactory = true;
@@ -417,7 +450,7 @@ contract Planets is ModuleBase {
             v.stock[g] = _s().stock[id][g];
         }
         if (p.level < CITADEL || block.timestamp <= p.settledAt) return v;
-        if (p.besieged) {
+        if (p.besieged || v.class >= ASTEROID_CLASS) {
             v.population = _grow(p.population, v.cap, block.timestamp - p.settledAt);
             return v;
         }
@@ -443,6 +476,22 @@ contract Planets is ModuleBase {
         list = new PlanetView[](n);
         for (uint256 body = 0; body < n; body++) {
             list[body] = planetView(BodyId.planet(cell, body), goods);
+        }
+    }
+
+    /// Every asteroid in a star's belt (at most eight; none without a belt).
+    function belt(uint256 cell, uint256 goods) external view returns (PlanetView[] memory list) {
+        bytes32 seed = _seed();
+        if (_s().galaxy.stateOf(cell) != 2 || !BeltGen.hasBelt(seed, cell)) return list;
+        uint256[8] memory found;
+        uint256 n;
+        for (uint256 i = 0; i < BeltGen.SECTIONS; i++) {
+            (bool asteroid,,) = BeltGen.section(seed, cell, i);
+            if (asteroid) found[n++] = i;
+        }
+        list = new PlanetView[](n);
+        for (uint256 k = 0; k < n; k++) {
+            list[k] = planetView(BodyId.make(cell, BodyId.ASTEROID, found[k]), goods);
         }
     }
 }

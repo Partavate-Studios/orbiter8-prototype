@@ -153,6 +153,10 @@ contract Market is ModuleBase {
         _setMix(7, 0x42, 0x19); // Ferrous: metals, equipment; buys water, He-3, organics
         _setMix(8, 0x24, 0xC1); // Lava: rare, silicon; buys water, equipment, electronics
         _setMix(9, 0x10, 0xC2); // Swamp: organics; buys metals, equipment, electronics
+        // Asteroids (D76, Planets.ASTEROID_CLASS + composition): they sell what they mine
+        _setMix(10, 0x11, 0xC8); // Carbonaceous: water, organics; buys He-3, equipment, electronics
+        _setMix(11, 0x22, 0x91); // Silicate: metals, silicon; buys water, organics, electronics
+        _setMix(12, 0x06, 0x49); // Metallic: metals, rare; buys water, He-3, equipment
         // From the simulator (orbiter-client/dev/sim/economy.mjs, docs/demo4-tuning.md).
         _setTuning(Tuning(300, 220, 2 hours, 200, 200, 8, [uint64(15_000), 150_000, 600_000]));
     }

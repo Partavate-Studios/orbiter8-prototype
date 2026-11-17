@@ -471,6 +471,15 @@ Calls made building it, for Koda's review:
   size 1–8. **Sol's belt is hand-placed:** Ceres (C 8), Vesta (S 6), empty, Pallas (S 6), Hygiea (C 5),
   Psyche (M 5), empty, Juno (S 3). Two empty sections so new pilots can mine near home. Yields:
   carbonaceous water ice and organics; silicate silicon and metals; metallic metals and rare elements.
+- **X17. The asteroid line** reuses the planets' step numbers: Platform 1, Mine 2, Port 4, Armory 6 (no
+  Station, Yards or Autofactory), so the Market's port and the Armory's checks work as they are. Costs
+  (keys step + 8, tunable): Platform 3,000 credits, 10 min, 20 people, 20 equipment, 20 metals; Mine
+  15,000, 30 min, 60 equipment, 30 electronics; Port 60,000, 2 h, 80 equipment, 80 electronics; Armory
+  200,000, 6 h, 120 rare elements, 80 electronics. An asteroid holds 100 people a unit of size. Its port
+  class is 10 + composition: carbonaceous sells water and organics and buys He-3, equipment and
+  electronics; silicate sells metals and silicon and buys water, organics and electronics; metallic
+  sells metals and rare elements and buys water, He-3 and equipment. Asteroids don't produce from
+  people; their mining drones will (next step).
 - **X6. Wording:** the loadout's empty-weapons line says "Every Sol station's armory sells them." (was "The
   I.S.S. armory").
 

@@ -14,6 +14,45 @@
   },
   {
     "type": "function",
+    "name": "ASTEROID_CLASS",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "ASTEROID_COSTS",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "ASTEROID_PEOPLE",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "AUTOFACTORY",
     "inputs": [],
     "outputs": [
@@ -151,6 +190,92 @@
         "name": "",
         "type": "uint8",
         "internalType": "uint8"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "belt",
+    "inputs": [
+      {
+        "name": "cell",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "goods",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "list",
+        "type": "tuple[]",
+        "internalType": "struct Planets.PlanetView[]",
+        "components": [
+          {
+            "name": "id",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "class",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "size",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "surface",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "cap",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "owner",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "level",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "autofactory",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "building",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "readyAt",
+            "type": "uint40",
+            "internalType": "uint40"
+          },
+          {
+            "name": "population",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "stock",
+            "type": "uint256[]",
+            "internalType": "uint256[]"
+          }
+        ]
       }
     ],
     "stateMutability": "view"
