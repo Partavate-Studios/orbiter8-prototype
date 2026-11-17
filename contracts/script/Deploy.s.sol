@@ -11,6 +11,8 @@ import {Ships} from "../src/tokens/Ships.sol";
 import {Deeds} from "../src/tokens/Deeds.sol";
 import {Planets} from "../src/planets/Planets.sol";
 import {Claims} from "../src/planets/Claims.sol";
+import {Drones} from "../src/planets/Drones.sol";
+import {IDroneOutput} from "../src/planets/Planets.sol";
 import {Repairs} from "../src/battle/Repairs.sol";
 import {Factory} from "../src/planets/Factory.sol";
 import {Battle} from "../src/battle/Battle.sol";
@@ -32,6 +34,7 @@ library Deployment {
         Repairs repairs;
         Battle battle;
         Armory armory;
+        Drones drones;
     }
 
     function _proxy(address implementation, bytes memory init) private returns (address) {
@@ -90,6 +93,12 @@ library Deployment {
                 )
             )
         );
+        game.drones = Drones(
+            _proxy(
+                address(new Drones()),
+                abi.encodeCall(Drones.initialize, (admin, game.pilots, game.claims, game.planets, game.battle))
+            )
+        );
     }
 
     /// Grants the modules the roles they need on each other (run by the admin).
@@ -115,6 +124,8 @@ library Deployment {
         game.pilots.grantRole(role, address(game.repairs)); // a ship's damage (Pilots.setDamage)
         game.repairs.grantRole(role, address(game.battle)); // a siege's losses
         game.repairs.grantRole(role, address(game.armory)); // shipyard repairs
+        game.pilots.grantRole(role, address(game.drones)); // landing and boarding drones
+        game.planets.setDrones(IDroneOutput(address(game.drones)));
         game.pilots.grantRole(role, address(game.armory));
         game.planets.grantRole(role, address(game.battle));
         game.factory.grantRole(role, address(game.armory));
@@ -148,6 +159,7 @@ contract Deploy is Script {
         vm.serializeAddress(json, "factory", address(game.factory));
         vm.serializeAddress(json, "battle", address(game.battle));
         vm.serializeAddress(json, "repairs", address(game.repairs));
+        vm.serializeAddress(json, "drones", address(game.drones));
         vm.serializeAddress(json, "armory", address(game.armory));
         string memory out = vm.serializeAddress(json, "pilots", address(game.pilots));
         vm.writeJson(out, string.concat("deployments/", vm.toString(block.chainid), ".json"));

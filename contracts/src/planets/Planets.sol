@@ -12,6 +12,11 @@ import {Fixed} from "../math/Fixed.sol";
 import {SystemGen} from "./SystemGen.sol";
 import {BeltGen} from "./BeltGen.sol";
 
+/// What Planets asks the Drones module: a body's mining output, in thousandths of a unit an hour.
+interface IDroneOutput {
+    function outputOf(uint256 body) external view returns (uint256);
+}
+
 /// @title Planets: people, production and buildings (docs/demo4-plan.md, section 5)
 /// @notice A star's planets are derived (`SystemGen`); this stores only what players change. Who owns a
 /// planet, its deed and its names are in Claims (split out for room to grow, expansion plan).
@@ -92,6 +97,7 @@ contract Planets is ModuleBase {
         mapping(uint256 => mapping(uint256 => uint256)) stock; // planet → good → units
         mapping(uint8 => Cost) costs; // building → cost
         Tuning tuning;
+        IDroneOutput drones; // bodies' mining drones (D90), set after both are deployed
     }
 
     // keccak256(abi.encode(uint256(keccak256("orbiter8.planets")) - 1)) & ~bytes32(uint256(0xff))
@@ -153,6 +159,10 @@ contract Planets is ModuleBase {
 
     function setCost(uint8 building, Cost calldata cost) external onlyRole(DEFAULT_ADMIN_ROLE) {
         _setCost(building, cost);
+    }
+
+    function setDrones(IDroneOutput drones_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _s().drones = drones_;
     }
 
     function setTuning(Tuning calldata tuning_) external onlyRole(DEFAULT_ADMIN_ROLE) {
@@ -349,8 +359,18 @@ contract Planets is ModuleBase {
         if (planet.level < CITADEL) return planet; // nobody grows or works before a Citadel
         uint256 grown = _grow(before, cap, elapsed);
         planet.population = uint32(grown);
-        // Asteroids produce by their mining drones, not their people (D77, D90).
-        if (!planet.besieged && class < ASTEROID_CLASS) _produce(id, planet, class, cap, (before + grown) / 2, elapsed);
+        if (!planet.besieged) _produce(id, planet, class, _rate(id, class, planet.level, cap, (before + grown) / 2), elapsed);
+    }
+
+    /// Thousandths of a unit of each good a body makes an hour: a planet by its people; an asteroid
+    /// by its mining drones, once its Mine stands (D77, D90).
+    function _rate(uint256 id, uint8 class, uint8 level, uint256 cap, uint256 people) internal view returns (uint256) {
+        if (class >= ASTEROID_CLASS) {
+            IDroneOutput drones = _s().drones;
+            return level >= COLONY && address(drones) != address(0) ? drones.outputOf(id) : 0;
+        }
+        if (cap == 0) return 0;
+        return (uint256(_s().tuning.producePerHour) * 1000 * (people > cap ? cap : people)) / cap;
     }
 
     /// People after `elapsed` seconds: the gap to the cap shrinks by e every growth time.
@@ -360,13 +380,9 @@ contract Planets is ModuleBase {
         return uint256(int256(cap) - (gap * decay) / Fixed.ONE);
     }
 
-    function _produce(uint256 id, Planet storage planet, uint8 class, uint256 cap, uint256 people, uint256 elapsed)
-        internal
-    {
-        if (cap == 0) return;
+    function _produce(uint256 id, Planet storage planet, uint8 class, uint256 milliPerHour, uint256 elapsed) internal {
         Tuning storage t = _s().tuning;
-        uint256 milli = (uint256(t.producePerHour) * 1000 * elapsed * (people > cap ? cap : people)) / (3600 * cap)
-            + planet.producedMilli;
+        uint256 milli = (milliPerHour * elapsed) / 3600 + planet.producedMilli;
         planet.producedMilli = uint16(milli % 1000);
         uint256 units = milli / 1000;
         if (units == 0) return;
@@ -450,16 +466,14 @@ contract Planets is ModuleBase {
             v.stock[g] = _s().stock[id][g];
         }
         if (p.level < CITADEL || block.timestamp <= p.settledAt) return v;
-        if (p.besieged || v.class >= ASTEROID_CLASS) {
+        if (p.besieged) {
             v.population = _grow(p.population, v.cap, block.timestamp - p.settledAt);
             return v;
         }
         uint256 elapsed = block.timestamp - p.settledAt;
         v.population = _grow(p.population, v.cap, elapsed);
-        uint256 people = (p.population + v.population) / 2;
-        uint256 units =
-            ((uint256(_s().tuning.producePerHour) * 1000 * elapsed * (people > v.cap ? v.cap : people)) / (3600 * v.cap)
-                    + p.producedMilli) / 1000;
+        uint256 rate = _rate(id, v.class, p.level, v.cap, (p.population + v.population) / 2);
+        uint256 units = ((rate * elapsed) / 3600 + p.producedMilli) / 1000;
         (uint256 sells,) = _s().market.mix(v.class);
         for (uint256 g = 0; g < goods; g++) {
             if ((sells >> g) & 1 == 1) {

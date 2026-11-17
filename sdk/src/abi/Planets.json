@@ -813,6 +813,19 @@
   },
   {
     "type": "function",
+    "name": "setDrones",
+    "inputs": [
+      {
+        "name": "drones_",
+        "type": "address",
+        "internalType": "contract IDroneOutput"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "setTuning",
     "inputs": [
       {

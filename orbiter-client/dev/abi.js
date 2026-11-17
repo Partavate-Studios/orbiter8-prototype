@@ -14,6 +14,7 @@ const CONTRACTS = {
   Factory: 'Factory.sol/Factory.json',
   Battle: 'Battle.sol/Battle.json',
   Repairs: 'Repairs.sol/Repairs.json',
+  Drones: 'Drones.sol/Drones.json',
   Armory: 'Armory.sol/Armory.json'
 }
 

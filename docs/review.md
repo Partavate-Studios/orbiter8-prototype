@@ -480,6 +480,12 @@ Calls made building it, for Koda's review:
   electronics; silicate sells metals and silicon and buys water, organics and electronics; metallic
   sells metals and rare elements and buys water, He-3 and equipment. Asteroids don't produce from
   people; their mining drones will (next step).
+- **X18. Drone pools** (`Drones.sol`, decision 24): asteroids only for now; a pool holds 10 drones a unit
+  of size; mining drones are landed from the ship (and boarded back) like colonists; the owner sets how
+  many defend, from anywhere, not during a siege. Once the Mine stands, each mining drone makes 0.25 of a
+  unit an hour of each good the asteroid yields (both tunable: `setRates`). A size-8 asteroid with 80
+  drones makes 20 an hour of each, what a full planet makes. Planets keep their fitted defenses and
+  people-driven production; giving them pools too (decision 11's "bigger scale") is for later.
 - **X6. Wording:** the loadout's empty-weapons line says "Every Sol station's armory sells them." (was "The
   I.S.S. armory").
 

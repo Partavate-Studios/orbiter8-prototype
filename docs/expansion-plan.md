@@ -53,11 +53,13 @@ work in progress from a session that ran out (check `git status` and `git diff` 
 - 2026-11-16: the asteroid line done in Planets (`_derive` for both kinds, `_nextStep`, asteroid costs at
   step + 8, `_cap`, `belt(cell)` view, no moons), Market mixes for classes 10–12, SDK `belt()` and
   `rules.asteroidBuildings`. Planets 20.9 KB. Call X17.
-- **Next: Phase 3, drone pools on bodies** (decision 24): a body's pool of drones (landed from a ship's
-  mining drones, like colonists), the owner's mining/defense split (frozen in a siege), mining drones
-  producing the composition's goods into the asteroid's store once the Mine stands. Likely a new
-  module (`Drones`?) so Planets keeps its room: per-body pool, split, and a lazy output that Planets'
-  storage receives (or the module keeps its own store and the port reads it in the next box).
+- 2026-11-16: drone pools done: `contracts/src/planets/Drones.sol` (land, board, setDefense, poolOf,
+  outputOf); Planets mines by `drones.outputOf` on asteroids past the Mine (`_rate`); SDK bindings
+  (dronePool, landDrones, boardDrones, setDefenseDrones). Planets 21.1 KB, Drones 8.7 KB. Call X18.
+- **Next: Phase 3, ports supplied by production** (decision 23): a player's port (planet or asteroid)
+  stops restocking itself and is supplied from its body's storage; Sol's Federation ports restock at
+  the top rate (the most mining drones possible). Read `Market._stock` and `Pricing.restock`. Risky for
+  the economy: run `orbiter-client/dev/sim/economy.mjs` before and after.
 
 ## Read first
 
@@ -252,7 +254,7 @@ onward in `docs/demo4-plan.md`, with this plan's milestones.
 - [x] Generation: which stars have a belt, its 8 sections, each section's asteroid (size, composition)
   or empty; Sol's belt fixed and the Federation's. Contract library + SDK mirror + vectors.
 - [x] Claims, names and deeds for asteroids (not counting toward the star, decision 6).
-- [ ] The asteroid building line (decision 22); drone pools and the mining/defense split (decision 24).
+- [x] The asteroid building line (decision 22); drone pools and the mining/defense split (decision 24).
 - [ ] Ports supplied by production, for asteroids and player planets; Federation ports at the top rate (decision 23).
 - [ ] Ships mining empty sections: slots of 6, accrual, the next action stops it, full ships leave the count (decisions 12 and 27).
 - [ ] Sieges on asteroids: a moon's mounts, a small shield, defense drones (decisions 6 and 29).

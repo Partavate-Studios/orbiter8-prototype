@@ -11,6 +11,8 @@ import {Deeds} from "../../src/tokens/Deeds.sol";
 import {SystemGen} from "../../src/planets/SystemGen.sol";
 import {BodyId} from "../../src/planets/BodyId.sol";
 import {BeltGen} from "../../src/planets/BeltGen.sol";
+import {Drones} from "../../src/planets/Drones.sol";
+import {Armory} from "../../src/battle/Armory.sol";
 
 contract PlanetsFixture is GameFixture {
     Planets planets;
@@ -481,5 +483,69 @@ contract AsteroidClaimsTest is PlanetsFixture {
         assertEq(port.owner, ada, "the asteroid's port trades");
         assertFalse(port.yard);
         assertEq(planets.belt(3, 8).length > 0, true);
+    }
+
+    function test_miningDronesFillAnAsteroidsStore() public {
+        bytes32 seed = _universe();
+        uint256 rock;
+        for (uint256 i = 0; i < BeltGen.SECTIONS; i++) {
+            (bool a,,) = BeltGen.section(seed, 3, i);
+            if (a) {
+                rock = i;
+                break;
+            }
+        }
+        (, uint8 composition, uint8 size) = BeltGen.section(seed, 3, rock);
+        uint256 asteroid = BodyId.make(3, BodyId.ASTEROID, rock);
+        Drones drones = game.drones;
+        Armory armory = game.armory;
+        uint256 miner = armory.MINING_DRONE();
+        vm.startPrank(admin);
+        for (uint8 step = 1; step <= 2; step++) {
+            planets.setCost(step + 8, Planets.Cost(1_000, 10 minutes, step == 1 ? 20 : 0, [0, 0, 0], [uint32(0), 0, 0]));
+        }
+        vm.stopPrank();
+        _pay(ada, 1_000_000);
+        vm.startPrank(ada);
+        planets.recruit(20);
+        market.buyDroneBays(EARTH, 10, type(uint256).max);
+        armory.buy(EARTH, miner, 10, type(uint256).max);
+        vm.stopPrank();
+        _go(ada, 3);
+        _claim(ada, asteroid);
+        vm.startPrank(ada);
+        planets.land(asteroid, 20);
+        planets.build(asteroid, 1);
+        skip(10 minutes);
+        drones.land(asteroid, 10);
+        assertEq(pilots.shipOf(ada).loadout.miningDrones, 0);
+        vm.stopPrank();
+        // Before the Mine, nothing.
+        skip(4 hours);
+        uint256 good = composition == 0 ? 0 : 1; // water ice (carbonaceous) or metals (silicate, metallic)
+        assertEq(planets.planetView(asteroid, 8).stock[good], 0, "no Mine, no mining");
+        vm.prank(ada);
+        planets.build(asteroid, 2);
+        skip(10 minutes);
+        planets.settle(asteroid);
+        uint256 before = planets.planetView(asteroid, 8).stock[good];
+        skip(4 hours); // 10 drones x 0.25 x 4 h = 10 units
+        assertEq(planets.planetView(asteroid, 8).stock[good] - before, 10);
+        // Defense drones don't mine.
+        vm.prank(ada);
+        drones.setDefense(asteroid, 6);
+        before = planets.planetView(asteroid, 8).stock[good];
+        skip(10 hours); // 4 miners x 0.25 x 10 h = 10 units
+        assertEq(planets.planetView(asteroid, 8).stock[good] - before, 10);
+        (uint32 total, uint32 defense, uint256 room) = drones.poolOf(asteroid);
+        assertEq(total, 10);
+        assertEq(defense, 6);
+        assertEq(room, uint256(size) * 10);
+        // Back aboard.
+        vm.prank(ada);
+        drones.board(asteroid, 10);
+        assertEq(pilots.shipOf(ada).loadout.miningDrones, 10);
+        (, defense,) = drones.poolOf(asteroid);
+        assertEq(defense, 0);
     }
 }

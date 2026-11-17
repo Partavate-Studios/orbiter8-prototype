@@ -795,6 +795,15 @@ export function createGameClient() {
     repair(port, options) {
       return move((p, by, o) => by.repair(Number(port), o), options)
     },
+    landDrones(body, count, options) {
+      return move((p, by, o) => by.landDrones(Number(body), count, o), options)
+    },
+    boardDrones(body, count, options) {
+      return move((p, by, o) => by.boardDrones(Number(body), count, o), options)
+    },
+    setDefenseDrones(body, count, options) {
+      return move((p, by, o) => by.setDefenseDrones(Number(body), count, o), options)
+    },
     assignDrones(repairing, options) {
       return move((p, by, o) => by.assignDrones(Number(repairing), o), options)
     },

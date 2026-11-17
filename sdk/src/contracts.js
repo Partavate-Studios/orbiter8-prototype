@@ -8,6 +8,7 @@ import CreditsAbi from './abi/Credits.json'
 import PlanetsAbi from './abi/Planets.json'
 import ClaimsAbi from './abi/Claims.json'
 import RepairsAbi from './abi/Repairs.json'
+import DronesAbi from './abi/Drones.json'
 import FactoryAbi from './abi/Factory.json'
 import BattleAbi from './abi/Battle.json'
 import ArmoryAbi from './abi/Armory.json'
@@ -102,7 +103,7 @@ const toSiege = (planet, s) => ({
 })
 
 /** The game's ABIs, for putting a refused move into words (sdk/reverts.js). */
-const INTERFACES = [GalaxyAbi, PilotsAbi, MarketAbi, CreditsAbi, PlanetsAbi, ClaimsAbi, FactoryAbi, BattleAbi, RepairsAbi, ArmoryAbi].map(
+const INTERFACES = [GalaxyAbi, PilotsAbi, MarketAbi, CreditsAbi, PlanetsAbi, ClaimsAbi, FactoryAbi, BattleAbi, RepairsAbi, DronesAbi, ArmoryAbi].map(
   (abi) => new Interface(abi)
 )
 
@@ -159,6 +160,7 @@ export function createGame(runner, addresses) {
   const factory = new Contract(addresses.factory, FactoryAbi, runner)
   const battle = new Contract(addresses.battle, BattleAbi, runner)
   const repairs = new Contract(addresses.repairs, RepairsAbi, runner)
+  const drones = addresses.drones ? new Contract(addresses.drones, DronesAbi, runner) : null
   const armory = new Contract(addresses.armory, ArmoryAbi, runner)
   const deeds = addresses.deeds ? new Contract(addresses.deeds, DEEDS_ABI, runner) : null
   const provider = runner.provider ?? runner
@@ -649,6 +651,21 @@ export function createGame(runner, addresses) {
     },
     async repair(port, options) {
       return sent(armory.repair(port), options)
+    },
+    /** A body's drone pool (D90): how many, how many defend (the rest mine), and the most it holds. */
+    async dronePool(body) {
+      if (!drones) return { total: 0, defense: 0, room: 0 }
+      const [total, defense, room] = await drones.poolOf(body)
+      return { total: Number(total), defense: Number(defense), room: Number(room) }
+    },
+    async landDrones(body, count, options) {
+      return sent(drones.land(body, count), options)
+    },
+    async boardDrones(body, count, options) {
+      return sent(drones.board(body, count), options)
+    },
+    async setDefenseDrones(body, count, options) {
+      return sent(drones.setDefense(body, count), options)
     },
     /** How many of the four built-in drones repair the ship; the rest mine (D92). */
     async assignDrones(repairing, options) {
