@@ -8,6 +8,7 @@ import {Pilots} from "../pilots/Pilots.sol";
 import {Credits} from "../tokens/Credits.sol";
 import {Deeds} from "../tokens/Deeds.sol";
 import {SystemGen} from "./SystemGen.sol";
+import {BeltGen} from "./BeltGen.sol";
 
 /// @title Claims: who owns each body, its deed and its names, and who may name a star
 /// @notice Split out of Planets (expansion plan, refactor item 2) so every kind of body is owned the
@@ -19,7 +20,8 @@ import {SystemGen} from "./SystemGen.sol";
 ///   the Federation (D49). A claim mints the body's deed (Deeds).
 /// - **Names:** the owner names their planet, its station and its moons; until then the client shows
 ///   derived names. Sol's keep theirs.
-/// - **Star names:** see `mayNameStar`. Only planets count toward a star (D72).
+/// - **Star names:** see `mayNameStar`. Only planets count toward a star, never asteroids (D72).
+/// - **Asteroids** (D72, D96) are claimed, named and deeded like planets; Sol's belong to the Federation.
 /// - **Transfers (GAME_MODULE):** a siege's successful claim hands a body over (Planets.seize).
 contract Claims is ModuleBase {
     uint256 public constant FIRST_CLAIM = 10 minutes;
@@ -97,13 +99,20 @@ contract Claims is ModuleBase {
         (seed,,,,) = _c().galaxy.universe();
     }
 
-    /// Checks the body exists: a planet around a charted star (asteroids come with the belts).
+    /// Checks the body exists at a charted star: a planet, or a belt section's asteroid (D72, D96).
     function _check(uint256 id) internal view {
         uint256 cell = BodyId.cellOf(id);
-        if (
-            !BodyId.isPlanet(id) || _c().galaxy.stateOf(cell) != 2
-                || BodyId.indexOf(id) >= SystemGen.planetCount(_seed(), cell)
-        ) revert NoSuchPlanet(id);
+        uint256 index = BodyId.indexOf(id);
+        bytes32 seed = _seed();
+        bool exists;
+        if (_c().galaxy.stateOf(cell) == 2) {
+            if (BodyId.isPlanet(id)) {
+                exists = index < SystemGen.planetCount(seed, cell);
+            } else if (BodyId.kindOf(id) == BodyId.ASTEROID && index < BeltGen.SECTIONS && BeltGen.hasBelt(seed, cell)) {
+                (exists,,) = BeltGen.section(seed, cell, index);
+            }
+        }
+        if (!exists) revert NoSuchPlanet(id);
     }
 
     // ── claims (D40) ────────────────────────────────────────────────────────────────────────────
@@ -202,6 +211,7 @@ contract Claims is ModuleBase {
         if (BodyId.cellOf(id) == 0) revert FederationPlanet(id);
         if (c.owners[id] != pilot) revert NotYours(id);
         if (part >= NAME_MOON) {
+            if (!BodyId.isPlanet(id)) revert NoSuchMoon(id, part - NAME_MOON); // asteroids have no moons
             uint8 orbit = part - NAME_MOON;
             if (orbit >= 8 || (_moonSlots(id) >> orbit) & 1 == 0) revert NoSuchMoon(id, orbit);
         }

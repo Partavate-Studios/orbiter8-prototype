@@ -10,6 +10,7 @@ import {Factory} from "../../src/planets/Factory.sol";
 import {Deeds} from "../../src/tokens/Deeds.sol";
 import {SystemGen} from "../../src/planets/SystemGen.sol";
 import {BodyId} from "../../src/planets/BodyId.sol";
+import {BeltGen} from "../../src/planets/BeltGen.sol";
 
 contract PlanetsFixture is GameFixture {
     Planets planets;
@@ -102,12 +103,8 @@ contract PlanetsTest is PlanetsFixture {
         vm.prank(ada);
         vm.expectRevert(abi.encodeWithSelector(Claims.NoSuchPlanet.selector, home | 9));
         claims.claim(home | 9);
-        // Another kind of body at the star (an asteroid's id) is not a planet.
-        uint256 asteroid = BodyId.make(star, BodyId.ASTEROID, 0);
-        vm.prank(ada);
-        vm.expectRevert(abi.encodeWithSelector(Claims.NoSuchPlanet.selector, asteroid));
-        claims.claim(asteroid);
     }
+
 
     function test_bodyIds() public pure {
         uint256 id = BodyId.make(1234, BodyId.ASTEROID, 7);
@@ -387,5 +384,52 @@ contract PlanetsTest is PlanetsFixture {
         assertEq(SystemGen.planetCount(seed, 7), SystemGen.planetCount(seed, 7));
         assertLe(c, 9);
         assertGe(z, 1);
+    }
+}
+
+contract AsteroidClaimsTest is PlanetsFixture {
+    /// Cell 3 is in Sol's genesis ring and has a belt in this universe (found by searching seeds).
+    function _universe() internal pure override returns (bytes32) {
+        return keccak256(abi.encode("belt universe", 0));
+    }
+
+    function test_asteroidsAreClaimedLikePlanets() public {
+        bytes32 seed = _universe();
+        uint256 belted = 3;
+        assertTrue(BeltGen.hasBelt(seed, belted));
+        _go(ada, belted);
+        uint256 rock = type(uint256).max;
+        uint256 hole = type(uint256).max;
+        for (uint256 s = 0; s < BeltGen.SECTIONS; s++) {
+            (bool a,,) = BeltGen.section(seed, belted, s);
+            if (a && rock == type(uint256).max) rock = s;
+            if (!a && hole == type(uint256).max) hole = s;
+        }
+        uint256 asteroid = BodyId.make(belted, BodyId.ASTEROID, rock);
+        _claim(ada, asteroid);
+        assertEq(claims.ownerOf(asteroid), ada);
+        assertEq(deeds.ownerOf(asteroid), ada);
+        vm.prank(ada);
+        claims.rename(asteroid, 0, "Rockhome"); // NAME_PLANET
+        assertEq(claims.namesOf(asteroid)[0], "Rockhome");
+        vm.prank(ada);
+        vm.expectRevert(abi.encodeWithSelector(Claims.NoSuchMoon.selector, asteroid, 0));
+        claims.rename(asteroid, 2, "No Moon");
+        // An asteroid doesn't count toward the star (D72): Ada is no better placed than Bo to name it.
+        (bool may,) = claims.mayNameStar(belted, bo);
+        (bool adaMay,) = claims.mayNameStar(belted, ada);
+        assertEq(may, adaMay);
+        if (hole != type(uint256).max) {
+            uint256 empty = BodyId.make(belted, BodyId.ASTEROID, hole);
+            vm.prank(ada);
+            vm.expectRevert(abi.encodeWithSelector(Claims.NoSuchPlanet.selector, empty));
+            claims.claim(empty);
+        }
+        // Sol's belt is the Federation's (D73).
+        _go(ada, 0);
+        uint256 ceres = BodyId.make(0, BodyId.ASTEROID, 0);
+        vm.prank(ada);
+        vm.expectRevert(abi.encodeWithSelector(Claims.FederationPlanet.selector, ceres));
+        claims.claim(ceres);
     }
 }

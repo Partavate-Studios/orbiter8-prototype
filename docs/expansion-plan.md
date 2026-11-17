@@ -45,11 +45,15 @@ work in progress from a session that ran out (check `git status` and `git diff` 
 - 2026-11-16: Phase 3, generation done: `contracts/src/planets/BeltGen.sol` (hasBelt, outsidePlanet,
   section, yields), mirrored by `sdk/src/belt-gen.js` (plus Sol's asteroid names), pinned by
   `test/vectors/BeltVectors.t.sol` (vectors and odds). Call X16.
-- **Next: Phase 3, claims, names and deeds for asteroids.** `Claims._check` accepts only planets: let it
-  accept an asteroid id when the star has a belt and the section holds an asteroid (`BeltGen.section`),
-  never in Sol (the Federation's, decision 7). `mayNameStar` already counts only planets. Names: an
-  asteroid has one name part (and its station). Then the building line (decision 22) in Planets
-  (Platform → Mine → Port → Armory for asteroids; one line, allowed steps per kind).
+- 2026-11-16: asteroid claims done: `Claims._check` accepts an asteroid id where the star's belt has
+  one (never Sol's); names (no moons), deeds and the first-claim window as for planets; they don't count
+  toward the star. The leaderboard counts planets only. Test fixtures can override the universe seed
+  (`GameFixture._universe`); `AsteroidClaimsTest` uses one whose genesis ring has a belt (cell 3).
+  Not played in the browser yet: asteroids are drawn in Phase 4.
+- **Next: Phase 3, the asteroid building line** (decision 22) and drone pools (decision 24). Planets'
+  `_derive` accepts planets only: generalize it to asteroids (class/size from `BeltGen.section`), with
+  the line Platform → Mine → Port → Armory for asteroids (planets keep theirs); `planetView` and
+  `Planets.system` must not break for asteroid ids. Watch Planets' size (19.1 KB).
 
 ## Read first
 
@@ -243,7 +247,7 @@ onward in `docs/demo4-plan.md`, with this plan's milestones.
 **Phase 3: belts.**
 - [x] Generation: which stars have a belt, its 8 sections, each section's asteroid (size, composition)
   or empty; Sol's belt fixed and the Federation's. Contract library + SDK mirror + vectors.
-- [ ] Claims, names and deeds for asteroids (not counting toward the star, decision 6).
+- [x] Claims, names and deeds for asteroids (not counting toward the star, decision 6).
 - [ ] The asteroid building line (decision 22); drone pools and the mining/defense split (decision 24).
 - [ ] Ports supplied by production, for asteroids and player planets; Federation ports at the top rate (decision 23).
 - [ ] Ships mining empty sections: slots of 6, accrual, the next action stops it, full ships leave the count (decisions 12 and 27).

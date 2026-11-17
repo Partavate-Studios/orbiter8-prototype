@@ -20,7 +20,7 @@ import { portNames, buyCost, sellProceeds, fee, baysCost, MODE, SOL_PORTS } from
 import { SESSION_HOURS, loadKey, saveKey, forgetKey, newKey, keySigner, sweep } from './session-key'
 import { createEventLog } from './event-log'
 import { tradesSinceArrival } from './game/docking'
-import { cellOf, indexOf } from './body-id'
+import { cellOf, indexOf, kindOf, KIND } from './body-id'
 
 /** A trade line's price limit allows this much movement since the prices were read (B23). */
 export const SLIPPAGE = 0.02
@@ -925,7 +925,9 @@ export function createGameClient() {
       const fresh = leaderboard && Date.now() - leaderboard.loadedAt < 60_000
       if (!fresh || refresh) {
         await countPilotsAndStars()
-        const [names, claimed] = await Promise.all([game.callsigns(pilots), game.claimedPlanets()])
+        const [names, bodies] = await Promise.all([game.callsigns(pilots), game.claimedPlanets()])
+        // Planets only: asteroids are claimed too (D72) but don't count as planets here.
+        const claimed = bodies.filter((c) => kindOf(c.id) === KIND.PLANET)
         const views = await Promise.all(claimed.map((c) => game.planetView(c.id)))
         const players = await Promise.all(
           pilots.map(async (address) => ({

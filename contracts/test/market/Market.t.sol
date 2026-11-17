@@ -36,7 +36,7 @@ contract GameFixture is Test {
     function setUp() public virtual {
         vm.warp(1_800_000_000);
         vm.startPrank(admin);
-        game = Deployment.deploy(admin, keccak256("test universe"), 30);
+        game = Deployment.deploy(admin, _universe(), 30);
         Deployment.wire(game);
         // The tests pay pilots directly.
         game.credits.grantRole(game.credits.GAME_MODULE(), admin);
@@ -59,6 +59,11 @@ contract GameFixture is Test {
 
     function _cargo(address who, uint256 good) internal view returns (uint256) {
         return pilots.cargoOf(who, good + 1)[good];
+    }
+
+    /// The universe's seed; a test that needs a particular galaxy overrides it.
+    function _universe() internal pure virtual returns (bytes32) {
+        return keccak256("test universe");
     }
 
     function _starAroundSol() internal view returns (uint256) {

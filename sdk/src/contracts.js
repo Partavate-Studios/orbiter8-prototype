@@ -466,7 +466,7 @@ export function createGame(runner, addresses) {
       return ids.filter((_, i) => owners[i]?.toLowerCase() === address.toLowerCase())
     },
 
-    /** Every claimed planet's id and owner now, from the claims and seizures. */
+    /** Every claimed body's id and owner now (planets and asteroids), from the claims and seizures. */
     async claimedPlanets() {
       const logs = await claims.queryFilter(claims.filters.Claimed(), 0)
       const ids = [...new Set(logs.map((l) => Number(l.args[0])))]
