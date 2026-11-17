@@ -65,13 +65,15 @@ work in progress from a session that ran out (check `git status` and `git diff` 
 - 2026-11-16: asteroid sieges done (Battle reads the pool's defense drones, `Drones.loseDefense`, Armory
   asteroid limits, `Planets.seize` steps down an asteroid's own line). **Phase 3 done** (contracts and
   SDK; nothing of it is drawn yet). Battle 22.7 KB (1.9 KB left), Planets 21.3, Market 20.3. Call X21.
-- **Next: Phase 4, drawing the belt** (orbiter-client). Read `docs/ui-guide.md`, `docs/color-guide.md`,
-  the plan's "Graphics" section, and `src/components/star-map/map.vue` and the sprites first. The SDK
-  already gives: `belt-gen.js` (sections, compositions, names, dust), `contracts.belt(cell)` (asteroid
-  views), `dronePool`, `mining`, `miningSlots`, and the actions. The system view needs the belt's objects
-  in `sdk/src/system.js` (like planets and stations), then the three levels of detail, selection, the
-  asteroid's card and menus (claim, build line, drones, port, mining). One Fable request for the art
-  (plan: short and direct). Measure at Sol with `CPU_THROTTLE=4` before and after.
+- 2026-11-16: Phase 4 drawing done (`5737c8b`): SDK belt objects (`asteroid`, `section`, stations
+  `onAsteroid`), band on `guides-canvas.vue`, rocks on `belt-canvas.vue` (per visible slice), sprites
+  with Fable's art (`assets/art/asteroid-*.svg`), mining-slot hexagons; selectable. Mockup
+  `docs/mockups/belt-levels.svg`.
+- **Next: Phase 4, cards and menus** for asteroids and sections: the card's stats (`card-ui`), the
+  actions (`hud/card-actions.js` SLOTS by type, `card-menu.js`): claim, the asteroid line (colony menu
+  adapted: Platform/Mine/Port/Armory via `rules.asteroidBuildings`), drones (land/board/defense),
+  trade at its station (the station object already works with the trade menu), and on a section: Mine
+  here / Stop mining. Then performance at Sol with `CPU_THROTTLE=4`.
 
 ## Read first
 
@@ -272,7 +274,7 @@ onward in `docs/demo4-plan.md`, with this plan's milestones.
 - [x] Sieges on asteroids: a moon's mounts, a small shield, defense drones (decisions 6 and 29).
 
 **Phase 4: drawing the belt** (orbiter-client; see "Graphics").
-- [ ] The three levels of detail (decision 15), two parallax layers (decision 5), selection (decision 16).
+- [x] The three levels of detail (decision 15), two parallax layers (decision 5), selection (decision 16).
 - [ ] The asteroid's card, menus (claim, build, drones, port, mining) and the ship's mining flow.
 - [ ] Performance measured at Sol, CPU slowed 4× (`CPU_THROTTLE=4` in the harness), before and after.
 
