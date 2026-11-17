@@ -4,7 +4,7 @@
 // A port either sells a good or buys it. Its stock is a shortfall from full that restocks over time.
 // Every unit moves the price, so a big trade pays the average over its units: costs round up,
 // proceeds round down, as on chain.
-import { planetId, cellOf, indexOf } from './body-id'
+import { planetId, cellOf, indexOf } from './body-id.js'
 
 const ceilDiv = (a, b) => (a === 0 ? 0 : Math.floor((a - 1) / b) + 1)
 

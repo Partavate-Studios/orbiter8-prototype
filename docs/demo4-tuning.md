@@ -98,3 +98,42 @@ A unit's margin, from a full selling port to a needy buying port, is 1.2 × its 
   Options: let ships join the attack (their fire and hit points pooled, losses shared at the end), or keep one attacker
   and treat a fully defended planet as a fortress until fleets come (D26). Built as a fortress for now.
 - Approve the numbers, or name what should change.
+
+## The belt (expansion plan, Phase 5; 2026-11-16)
+
+Starting numbers (contracts): a mining drone makes **1.875 units an hour** of each good it yields
+(`Drones.milliPerHour`, chosen so the largest asteroid full of drones, 80, refills 150 an hour: what a
+Sol port restocks at capacity 300 over 2 hours); a body holds **10 drones a unit of size**; the mining
+drone part costs **800** (1,600 at Sol); every ship has **4 built-in drones**; built-in drones repair
+**10 hp an hour** each; the asteroid line costs Platform 3,000, Mine 15,000, Port 60,000, Armory 200,000.
+
+`node orbiter-client/dev/sim/belt.mjs` works out what these make, at a half-full port's prices after
+the fee, against trading (`economy.mjs`: an early trader reaches 15,000 credits in 1.3 hours of play,
+about 12,000 an hour):
+
+| Who | Makes | Pays back |
+|---|---|---|
+| New pilot, 4 built-in drones, on carbonaceous / silicate / metallic dust | 471 / 558 / 1,005 credits an hour (5 bays full in 40 min) | a claim (2,000) in 2–4 h |
+| One more mining drone aboard (Sol's price, 1,600) | +56 / +68 / +94 an hour | 29 / 24 / 17 h |
+| Size 1 asteroid, 10 drones | 1,298 / 1,530 / 2,814 an hour | 74 / 63 / 34 h |
+| Size 4 asteroid, 40 drones | 5,048 / 5,944 / 11,052 an hour | 29 / 24 / 13 h |
+| Size 8 asteroid, 80 drones | 9,801 / 11,547 / 21,596 an hour | 21 / 18 / 10 h |
+
+Payback counts the claim, Platform, Mine, Port and the drones at Sol's price. An asteroid's income is
+an upper bound: it's paid only as other pilots buy from its port, and its store fills (5,000 a good) in
+about 33 hours at the top rate.
+
+Reading (for Koda, not applied):
+- **The floor works** (decision 13): a pilot with nothing can mine Sol's dust and afford a claim in a
+  few hours, far slower than trading, as a floor should be.
+- **Mining drones aboard a ship pay back slowly** (17–29 h of mining). If ship mining should be a real
+  path, halve the part (800 → 400) or double the drone rate for ships only; as it stands, mining drones
+  are mostly for landing on asteroids.
+- **A large metallic asteroid is the best passive asset in the game** (about as much an hour as an early
+  trader, around the clock). Composition matters about 2× (metallic's rare elements); sizes matter
+  linearly. If that's too strong, lower `milliPerHour`: but it also sets the Federation's top rate (X19).
+- **Planets' people make at most 20 an hour** of each good, a small asteroid's worth: planets look weak
+  next to asteroids as producers. Raising `Planets.producePerHour` (to about 60–150) would put a full
+  planet beside a mid-size asteroid.
+- The simulator plays only Sol's ports; extending it with miners and asteroid owners is the next step
+  if these numbers are to be tuned for real.
