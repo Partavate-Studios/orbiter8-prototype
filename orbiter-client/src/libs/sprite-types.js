@@ -69,6 +69,8 @@ export function spriteScaleOf(object, objects) {
       return ((radius / (40 + 1.5 * (planetSize ?? 0))) * orbit) / ART.station
     }
     case 'ship': {
+      // mining at an empty section's slot (D93): small, to sit in its hexagon
+      if (parent?.type === 'section') return 0.1
       // 9.2 long, orbiting 12 + 1.5 x the planet's size out (or 240 from the star).
       const ecOrbit = planetSize === null ? 240 : 12 + 1.5 * planetSize
       return ((9.2 / ecOrbit) * orbit) / ART.ship

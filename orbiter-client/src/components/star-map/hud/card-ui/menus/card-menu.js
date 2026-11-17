@@ -10,6 +10,7 @@ import { cellOf } from '@orbiter8/sdk/body-id'
  * @property {boolean} retreated  the ship must be repaired before attacking
  * @property {boolean} sessionLive
  * @property {(planetId: number) => object | null} siegeAt
+ * @property {string} [account]  the pilot's address (lowercase), to find their own mining slot
  */
 
 /**
@@ -85,8 +86,32 @@ function pilotMenu(object, d, marketName) {
       add('Trade at Port', 'trade')
       if (object.yard) add('Dock at Shipyards', 'shipyards')
       if (object.armory) add('Visit the Armory', 'armory')
-      add('Visit Planet', 'visitPlanet', true, object.objectId)
+      add(object.onAsteroid ? 'Visit Asteroid' : 'Visit Planet', 'visitPlanet', true, object.objectId)
       break
+
+    // An asteroid (D72, D88, D90): claimed, built up and defended like a planet; Sol's are the Federation's.
+    case 'asteroid': {
+      const siege = d.siegeAt(object.objectId)
+      if (!object.owner && !object.federation) {
+        add(`Claim Asteroid (${d.claimFee.toLocaleString('en-US')}¢)`, 'claim', d.credits >= d.claimFee, object.objectId)
+      } else if (object.isMine) {
+        add('Asteroid Works', 'asteroid', true, object.objectId)
+      } else if (!object.federation && !siege) {
+        add('Attack', 'attack', d.armed && !d.retreated, object.objectId)
+      }
+      if (siege) add('Siege Status', 'siege', true, object.objectId)
+      if (object.hasStation) add('Visit Station', 'visitStation', true, object.objectId)
+      break
+    }
+
+    // Empty space in the belt (D78, D93): ships mine here, six at a time.
+    case 'section': {
+      const mine = (object.slots ?? []).some((s) => s && !s.full && s.pilot === d.account)
+      const full = (object.slots ?? []).filter((s) => s && !s.full).length >= 6
+      if (mine) add('Stop Mining', 'stopMining')
+      else add('Mine Here', 'mine', !full, object.objectId)
+      break
+    }
   }
   // Planets, stations, moons and the ship: the owner names them (stars above).
   if (object.isMine && object.type !== 'star')

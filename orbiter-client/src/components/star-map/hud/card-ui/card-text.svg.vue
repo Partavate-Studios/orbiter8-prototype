@@ -110,6 +110,37 @@
         </text>
       </g>
 
+      <!-- An asteroid (D69): owner, composition, size, its line's step and its drones -->
+      <g v-else-if="systemObjects[objectId].type == 'asteroid'">
+        <text x="25" y="15" text-anchor="end" font-size="0.9em"> Owner:</text>
+        <text x="28" y="15" text-anchor="start" font-weight="bold" :font-size="fitSize(ownerName, 6.4, 96, 700)"> {{ ownerName }}</text>
+        <text x="35" y="25" text-anchor="end" font-size="0.9em"> Kind:</text>
+        <text x="38" y="25" text-anchor="start" font-weight="bold"> {{ systemObjects[objectId].compositionName }}</text>
+        <text x="35" y="35" text-anchor="end" font-size="0.9em"> Size:</text>
+        <text x="38" y="35" text-anchor="start" font-weight="bold"> {{ systemObjects[objectId].size }}</text>
+        <text x="35" y="45" text-anchor="end" font-size="0.9em"> Yields:</text>
+        <text x="38" y="45" text-anchor="start" font-weight="bold"> {{ yieldsText }}</text>
+        <template v-if="asteroidInfo">
+          <text x="35" y="55" text-anchor="end" font-size="0.9em"> Built:</text>
+          <text x="38" y="55" text-anchor="start" font-weight="bold"> {{ asteroidStep }}</text>
+          <text x="35" y="65" text-anchor="end" font-size="0.9em"> Drones:</text>
+          <text x="38" y="65" text-anchor="start" font-weight="bold">
+            {{ asteroidInfo.pool.total - asteroidInfo.pool.defense }} mining · {{ asteroidInfo.pool.defense }} defending
+          </text>
+        </template>
+      </g>
+
+      <!-- Empty space in the belt (D78): what its dust yields, and its six mining slots -->
+      <g v-else-if="systemObjects[objectId].type == 'section'">
+        <text x="35" y="15" text-anchor="end" font-size="0.9em"> Dust:</text>
+        <text x="38" y="15" text-anchor="start" font-weight="bold"> {{ systemObjects[objectId].dustName }}</text>
+        <text x="35" y="25" text-anchor="end" font-size="0.9em"> Yields:</text>
+        <text x="38" y="25" text-anchor="start" font-weight="bold"> {{ yieldsText }}</text>
+        <text x="35" y="35" text-anchor="end" font-size="0.9em"> Slots:</text>
+        <text x="38" y="35" text-anchor="start" font-weight="bold"> {{ freeSlots }} of 6 free</text>
+        <text x="65" y="55" text-anchor="middle" font-size="0.85em"> Ships mine here with their drones.</text>
+      </g>
+
       <g v-else-if="systemObjects[objectId].type == 'station'">
         <!-- What the port sells and buys (tighter when there are more than three) -->
         <g
@@ -143,6 +174,8 @@ import { useStarMapStore } from '@/stores/starmap'
 import { planetTypeName } from '@orbiter8/sdk/game/planet-types'
 import { cargoLines, emptyHolds, shortGoodName } from '@orbiter8/sdk/game/trade'
 import { YELLOW } from '@/libs/palette'
+import { yields } from '@orbiter8/sdk/belt-gen'
+import { ASTEROID_BUILDING_NAMES } from '@orbiter8/sdk/contracts'
 import { CARD_THEMES, unwrapTheme } from '@/libs/card-theme'
 
 export default {
@@ -174,9 +207,33 @@ export default {
         case 'planet':
           return 'Planet'
         case 'station':
-          return 'Space Station'
+          return this.systemObjects[this.objectId].onAsteroid ? 'Asteroid Station' : 'Space Station'
+        case 'asteroid':
+          return 'Asteroid'
+        case 'section':
+          return 'Empty Space'
       }
       return null
+    },
+    /** What an asteroid or an empty section's dust yields, by good name. */
+    yieldsText() {
+      const o = this.systemObjects[this.objectId]
+      const kind = o.type === 'asteroid' ? o.composition : o.dust
+      return yields(kind ?? 0)
+        .map((g) => shortGoodName(this.goods?.[g] ?? '', true))
+        .join(', ')
+    },
+    asteroidInfo() {
+      const info = this.systemObjects[this.objectId].info
+      return info?.pool ? info : null
+    },
+    /** The step of its line an asteroid has reached (D88). */
+    asteroidStep() {
+      return ASTEROID_BUILDING_NAMES[this.asteroidInfo?.level] ?? 'nothing yet'
+    },
+    freeSlots() {
+      return (this.systemObjects[this.objectId].slots ?? []).filter((s) => !s || s.full).length +
+        Math.max(0, 6 - (this.systemObjects[this.objectId].slots ?? []).length)
     },
     emptyHolds() {
       return emptyHolds(this.avatar.ship)

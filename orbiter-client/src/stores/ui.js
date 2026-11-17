@@ -34,7 +34,7 @@ function readActionsOpen() {
   }
 }
 
-const MENUS = ['planets', 'ships', 'settings', 'trade', 'shipyard', 'chat', 'leaderboard', 'colony', 'armory', 'loadout', 'siege', 'feed', 'help']
+const MENUS = ['planets', 'ships', 'settings', 'trade', 'shipyard', 'chat', 'leaderboard', 'colony', 'armory', 'loadout', 'siege', 'feed', 'help', 'asteroid']
 
 export const useUIStore = defineStore('UI', {
   state: () => ({

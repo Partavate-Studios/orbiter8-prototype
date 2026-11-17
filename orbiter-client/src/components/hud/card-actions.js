@@ -23,7 +23,9 @@ export const SLOTS = {
   station: [['trade'], ['shipyards'], ['armory'], ['rename']],
   ship: [['jump'], ['loadout'], ['session'], ['market'], ['rename']],
   star: [['jump'], ['traverse'], ['nameStar']],
-  moon: [['rename']]
+  moon: [['rename']],
+  asteroid: [['claim', 'asteroid', 'attack'], ['siege'], ['rename']],
+  section: [['mine', 'stopMining']]
 }
 /** The commands the menu's icons carry instead. */
 const ICON_COMMANDS = new Set(['visitStation', 'visitPlanet', 'visitMoon'])
@@ -55,7 +57,8 @@ export function actionsFor(object) {
     armed: d.armed,
     retreated: Boolean(d.condition?.retreated),
     sessionLive: d.sessionLive,
-    siegeAt: (id) => d.siegeAt(id)
+    siegeAt: (id) => d.siegeAt(id),
+    account: d.account
   }
   return cardMenu(object, { marketName: networkFor(useChainStore().chainId)?.nftMarket?.name, pilot })
 }
@@ -76,6 +79,16 @@ export async function runAction(option, object, { showMoons }) {
       return ui.openMenu('trade')
     case 'shipyards':
       return ui.openMenu('shipyard')
+    case 'asteroid':
+      return ui.openMenu('asteroid')
+    case 'mine': {
+      const slots = object.slots ?? []
+      const free = [0, 1, 2, 3, 4, 5].find((i) => !slots[i] || slots[i].full)
+      if (free === undefined) return tell('Mining', 'All six slots here are taken. Try another empty section.')
+      return player.startMining(object.objectId, free)
+    }
+    case 'stopMining':
+      return player.stopMining()
     case 'colony':
     case 'armory':
     case 'loadout':
@@ -100,12 +113,15 @@ export async function runAction(option, object, { showMoons }) {
     }
     case 'claim': {
       const fee = player.rules.claimFee
+      const asteroid = object.type === 'asteroid'
       const name = await ask({
         title: 'Claim ' + object.name,
-        message: `Make ${object.name} your own for ${credits(fee)} credits, and give it a name. Then bring colonists and supplies to found a Citadel.`,
-        // An unnamed planet's stand-in name isn't offered as its name: the owner gives the first one.
-        input: { label: "Your planet's name", kind: 'name', value: isUnnamed(object.name) ? '' : object.name },
-        confirm: 'Claim Planet'
+        message: asteroid
+          ? `Make ${object.name} your own for ${credits(fee)} credits, and give it a name. Then land people to build a Platform, and mining drones to work it.`
+          : `Make ${object.name} your own for ${credits(fee)} credits, and give it a name. Then bring colonists and supplies to found a Citadel.`,
+        // An unnamed body's stand-in name isn't offered as its name: the owner gives the first one.
+        input: { label: asteroid ? "Your asteroid's name" : "Your planet's name", kind: 'name', value: isUnnamed(object.name) ? '' : object.name },
+        confirm: asteroid ? 'Claim Asteroid' : 'Claim Planet'
       })
       if (name) game.claimPlanet({ planetId: option.value, name: name === object.name ? '' : name })
       return

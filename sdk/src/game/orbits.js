@@ -73,6 +73,9 @@ export const BELT_SPEED = 60
 /** Where a belt section sits round the star at the start, in degrees (eight sections, 45° each). */
 export const sectionPhase = (index) => Number(index) * 45 + 22.5
 
+/** How far from an empty section's middle its six mining slots sit (world units; the hexagons the client draws). */
+export const MINING_SLOT_RADIUS = 2.5
+
 /** Radius of the ring an asteroid's station sits on, on the asteroid: it rides it rather than orbiting. */
 export function asteroidStationRadius(asteroidSize) {
   return 3 + Number(asteroidSize) * 0.9

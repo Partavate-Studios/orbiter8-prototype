@@ -41,6 +41,7 @@ import LeaderboardMenu from '@/components/star-map/hud/menus/leaderboard-menu.sv
 import SettingsMenu from '@/components/star-map/hud/menus/settings-menu.svg'
 import ColonyMenu from '@/components/star-map/hud/menus/colony-menu.svg'
 import ArmoryMenu from '@/components/star-map/hud/menus/armory-menu.svg'
+import AsteroidMenu from '@/components/star-map/hud/menus/asteroid-menu.svg'
 import LoadoutMenu from '@/components/star-map/hud/menus/loadout-menu.svg'
 import SiegeMenu from '@/components/star-map/hud/menus/siege-menu.svg'
 import FeedMenu from '@/components/star-map/hud/menus/feed-menu.svg'
@@ -61,6 +62,7 @@ const MENUS = {
   settings: SettingsMenu,
   colony: ColonyMenu,
   armory: ArmoryMenu,
+  asteroid: AsteroidMenu,
   loadout: LoadoutMenu,
   siege: SiegeMenu,
   feed: FeedMenu,

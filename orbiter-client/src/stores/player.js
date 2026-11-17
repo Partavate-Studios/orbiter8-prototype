@@ -255,6 +255,33 @@ export const usePlayerStore = defineStore('Player', {
         game.actions.repair(port, o)
       )
     },
+    /** Parks the ship at a free slot of an empty belt section and sets its drones mining (D93). */
+    startMining(section, slot) {
+      return track({ doing: 'Starting to mine', done: 'Mining: the holds fill as the drones work', failed: "Couldn't start mining" }, (o) =>
+        game.actions.startMining(section, slot, o)
+      )
+    },
+    stopMining() {
+      return track({ doing: 'Stopping the drones', done: 'Mining done: the ore is aboard', failed: "Couldn't stop mining" }, (o) =>
+        game.actions.stopMining(o)
+      )
+    },
+    /** An asteroid's drone pool (D90): land mining drones, take them back aboard, set how many defend. */
+    landDrones(body, count) {
+      return track({ doing: `Landing ${count} drones`, done: `${count} drones landed`, failed: "Couldn't land the drones" }, (o) =>
+        game.actions.landDrones(body, count, o)
+      )
+    },
+    boardDrones(body, count) {
+      return track({ doing: `Taking ${count} drones aboard`, done: `${count} drones aboard`, failed: "Couldn't take the drones aboard" }, (o) =>
+        game.actions.boardDrones(body, count, o)
+      )
+    },
+    setDefenseDrones(body, count) {
+      return track({ doing: 'Setting the drones', done: `${count} drones defending`, failed: "Couldn't set the drones" }, (o) =>
+        game.actions.setDefenseDrones(body, count, o)
+      )
+    },
     /** The built-in drones (D92): how many repair the ship; the rest mine. */
     assignDrones(repairing) {
       return track(

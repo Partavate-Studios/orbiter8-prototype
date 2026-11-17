@@ -2,7 +2,7 @@
 // represents the thing selected... for the Orbiter 8 ship, we can stick with the purple." The card's
 // frame, title, menu buttons and selection lines take one color in a few shades; ships keep Koda's
 // purple. A planet under siege adds a pink frame (pink needs you); the inside stays purple-gray.
-import { PLANET_COLORS, STAR_CLASSES, HUD_TINT } from './palette'
+import { PLANET_COLORS, STAR_CLASSES, HUD_TINT, BELT } from './palette'
 
 const DARK = '#0b0218'
 
@@ -34,6 +34,8 @@ export const CARD_THEMES = {
   moon: shades('#a59fb3'),
   station: shades('#7d8bc4'),
   blackHole: shades('#d98a2b'),
+  // the belt (D69): its rocks' own colors, lightened (libs/palette.js BELT)
+  ...Object.fromEntries(BELT.rockLight.map((c, i) => ['asteroid-' + i, shades(c)])),
   ...Object.fromEntries(PLANET_COLORS.map((c, i) => ['planet-' + i, shades(c.card)])),
   ...Object.fromEntries(Object.entries(STAR_CLASSES).map(([k, c]) => ['star-' + k, shades(c.glow)]))
 }
@@ -51,6 +53,10 @@ export function cardThemeKey(object) {
       return 'moon'
     case 'station':
       return 'station'
+    case 'asteroid':
+      return 'asteroid-' + (object.composition ?? 0)
+    case 'section':
+      return 'asteroid-' + (object.dust ?? 0)
     default:
       return 'ship'
   }
@@ -79,6 +85,6 @@ const MENU_TINTS = {
  */
 export function menuTheme(menu, selectedObject) {
   if (MENU_TINTS[menu]) return shades(MENU_TINTS[menu])
-  if (['trade', 'shipyard', 'armory', 'colony', 'siege'].includes(menu)) return CARD_THEMES[cardThemeKey(selectedObject)]
+  if (['trade', 'shipyard', 'armory', 'colony', 'siege', 'asteroid', 'mining'].includes(menu)) return CARD_THEMES[cardThemeKey(selectedObject)]
   return SHIP
 }

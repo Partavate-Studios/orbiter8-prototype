@@ -15,7 +15,8 @@ import {
   beltOrbitRadius,
   BELT_SPEED,
   sectionPhase,
-  asteroidStationRadius
+  asteroidStationRadius,
+  MINING_SLOT_RADIUS
 } from './game/orbits'
 import { dockedShips } from './game/docking'
 
@@ -256,6 +257,12 @@ export function buildSystem(system, playerAccount) {
         radius = shipOrbitRadius(object.size)
       }
     }
+    // A ship mining an empty section (D93) sits at its slot there, still, until it moves.
+    let mining = null
+    for (const key of keys.sections) {
+      const slot = (objects[key].slots ?? []).findIndex((s) => s && String(s.pilot) == String(ship.owner))
+      if (slot >= 0) mining = { section: key, slot }
+    }
     const shipObject = add('ship', {
       id: ship.id,
       name: ship.name,
@@ -263,8 +270,13 @@ export function buildSystem(system, playerAccount) {
       owner: ship.owner,
       ownerName: ownerName(ship.owner, 'Unknown'),
       isMine: String(ship.owner) == String(playerAccount),
-      orbiting,
-      orbit: { radius, speed: SHIP_ORBIT_SPEED, phase: 0 }
+      orbiting: mining ? mining.section : orbiting,
+      // the slots turn with the section's sprite (its rotation is its angle round the star), so the
+      // ship turns with the belt too, on its slot's hexagon
+      orbit: mining
+        ? { radius: MINING_SLOT_RADIUS, speed: BELT_SPEED, phase: mining.slot * 60 + sectionPhase(objects[mining.section].section) }
+        : { radius, speed: SHIP_ORBIT_SPEED, phase: 0 },
+      mining
     })
     keys.ships.push(shipObject.key)
   }
@@ -288,7 +300,7 @@ export function buildSystem(system, playerAccount) {
   // The other ships sharing an orbit are spread round it.
   const shipsAround = {}
   for (const key of keys.ships) {
-    if (!objects[key].dock) (shipsAround[objects[key].orbiting] ??= []).push(objects[key])
+    if (!objects[key].dock && !objects[key].mining) (shipsAround[objects[key].orbiting] ??= []).push(objects[key])
   }
   for (const ships of Object.values(shipsAround)) {
     const phases = shipOrbitPhases(ships.map((ship) => ship.id))
