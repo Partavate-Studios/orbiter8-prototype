@@ -511,6 +511,12 @@ Calls made building it, for Koda's review:
   are). Its hull is its step × the planets' 60. A captured asteroid falls one step of its own line
   (Armory → Port → Mine → Platform), never into a Yards. Landing more drones during a siege is allowed
   (they join as miners: the split is frozen).
+- **X22. The belt's screens** (Phase 4), for Koda's eye: the far band tinted by section; the close rock
+  field (small irregular rocks, two layers, normal and high graphics only); Fable's asteroid and station
+  art (`assets/art/asteroid-*.svg`, reference `docs/mockups/belt-levels.svg`); the asteroid card (Owner,
+  Kind, Size, Yields, Built, Drones) and empty space's (Dust, Yields, Slots); the new Asteroid Works menu
+  (in the loadout's row style, not a restyle of an existing screen). Mine Here takes the first free slot;
+  the slots aren't picked one by one.
 - **X6. Wording:** the loadout's empty-weapons line says "Every Sol station's armory sells them." (was "The
   I.S.S. armory").
 

@@ -69,11 +69,19 @@ work in progress from a session that ran out (check `git status` and `git diff` 
   `onAsteroid`), band on `guides-canvas.vue`, rocks on `belt-canvas.vue` (per visible slice), sprites
   with Fable's art (`assets/art/asteroid-*.svg`), mining-slot hexagons; selectable. Mockup
   `docs/mockups/belt-levels.svg`.
-- **Next: Phase 4, cards and menus** for asteroids and sections: the card's stats (`card-ui`), the
-  actions (`hud/card-actions.js` SLOTS by type, `card-menu.js`): claim, the asteroid line (colony menu
-  adapted: Platform/Mine/Port/Armory via `rules.asteroidBuildings`), drones (land/board/defense),
-  trade at its station (the station object already works with the trade menu), and on a section: Mine
-  here / Stop mining. Then performance at Sol with `CPU_THROTTLE=4`.
+- 2026-11-16: Phase 4 cards and menus done (`b682ea3`, `5b27b50`): asteroid and empty-space cards, actions
+  (claim, Asteroid Works, attack, Mine Here / Stop Mining), the Asteroid Works menu (line, people,
+  drones, store), mining ships drawn at their slot. Played in the browser: claim through the card's
+  dialog at star 1, land drones, mine at Sol's empty section.
+- 2026-11-16: performance at 4× CPU throttle (5 s idle traces, Ada at star 1's belt): script 1.10 s with
+  the rock field (normal graphics), 1.42 s without (low), 1.81 s at a planet: the belt adds no measurable
+  cost. The rock canvas redraws about 4 times a second (only for a zoom, a real move, or every 250 ms).
+  Layer compositing is about 3.4 s of 5 s everywhere at 4× (not the belt's). **Phase 4 done.**
+- **Next: Phase 5, tuning** (economy simulator `orbiter-client/dev/sim/economy.mjs`; record numbers in
+  `docs/demo4-tuning.md`). Open questions are in `review.md` X17–X21: mining and drone rates against
+  planets' production (20 an hour), the Federation's restock growing with pilots, asteroid costs. The
+  simulator plays only Sol's ports: extend it with a player who mines and one who owns an asteroid port.
+  Also still to do: the Paseo testnet needs a fresh deploy (X9).
 
 ## Read first
 
@@ -273,10 +281,10 @@ onward in `docs/demo4-plan.md`, with this plan's milestones.
 - [x] Ships mining empty sections: slots of 6, accrual, the next action stops it, full ships leave the count (decisions 12 and 27).
 - [x] Sieges on asteroids: a moon's mounts, a small shield, defense drones (decisions 6 and 29).
 
-**Phase 4: drawing the belt** (orbiter-client; see "Graphics").
+**Phase 4: drawing the belt** (orbiter-client; see "Graphics"). *(Done 2026-11-16.)*
 - [x] The three levels of detail (decision 15), two parallax layers (decision 5), selection (decision 16).
-- [ ] The asteroid's card, menus (claim, build, drones, port, mining) and the ship's mining flow.
-- [ ] Performance measured at Sol, CPU slowed 4× (`CPU_THROTTLE=4` in the harness), before and after.
+- [x] The asteroid's card, menus (claim, build, drones, port, mining) and the ship's mining flow.
+- [x] Performance measured at Sol, CPU slowed 4× (`CPU_THROTTLE=4` in the harness), before and after.
 
 **Phase 5: tuning.** Mining rates, drone prices, port supply against the economy simulator
 (`orbiter-client/dev/sim/economy.mjs`); record numbers in `docs/demo4-tuning.md`.

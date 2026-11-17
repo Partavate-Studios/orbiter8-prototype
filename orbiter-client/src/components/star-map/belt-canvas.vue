@@ -79,6 +79,22 @@ export default {
         this.cleared = true
         return
       }
+      // The belt turns a pixel or two a second up close, and the camera following a selection drifts as
+      // slowly: redraw only for a zoom, a real move, or every quarter second (measured: drawing every
+      // frame cost a third of the main thread at 4x CPU throttling).
+      const now = performance.now()
+      const last = this.last
+      if (
+        last &&
+        !this.cleared &&
+        last.scale === this.viewport.scale &&
+        Math.abs(last.x - this.viewport.x) * pixels < 1.5 &&
+        Math.abs(last.y - this.viewport.y) * pixels < 1.5 &&
+        now - last.time < 250
+      ) {
+        return
+      }
+      this.last = { x: this.viewport.x, y: this.viewport.y, scale: this.viewport.scale, time: now }
       const dpr = window.devicePixelRatio || 1
       const width = Math.round(this.screenSize.width * dpr)
       const height = Math.round(this.screenSize.height * dpr)
