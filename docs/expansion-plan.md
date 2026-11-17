@@ -2,7 +2,7 @@
 
 Koda's decisions of 2026-11-16, and the plan to build them. Written so a session without the history
 of the one that wrote it can carry it out: read this whole file, then the documents it points to.
-**Status: agreed with Koda (2026-11-16): decisions 1–34 below. Nothing built yet.**
+**Status: agreed with Koda (2026-11-16): decisions 1–34 below. Built 2026-11-16, phases 0–5 (see the progress log).**
 
 ## Progress log (update after every step; newest last)
 
@@ -77,11 +77,16 @@ work in progress from a session that ran out (check `git status` and `git diff` 
   the rock field (normal graphics), 1.42 s without (low), 1.81 s at a planet: the belt adds no measurable
   cost. The rock canvas redraws about 4 times a second (only for a zoom, a real move, or every 250 ms).
   Layer compositing is about 3.4 s of 5 s everywhere at 4× (not the belt's). **Phase 4 done.**
-- **Next: Phase 5, tuning** (economy simulator `orbiter-client/dev/sim/economy.mjs`; record numbers in
-  `docs/demo4-tuning.md`). Open questions are in `review.md` X17–X21: mining and drone rates against
-  planets' production (20 an hour), the Federation's restock growing with pilots, asteroid costs. The
-  simulator plays only Sol's ports: extend it with a player who mines and one who owns an asteroid port.
-  Also still to do: the Paseo testnet needs a fresh deploy (X9).
+- 2026-11-16: Phase 5 analysis done: `orbiter-client/dev/sim/belt.mjs` and a "The belt" section in
+  `docs/demo4-tuning.md` (what mining, drones and asteroids earn against trading, with a reading for Koda).
+  No numbers changed: tuning for feel is Koda's call. **The plan's phases are all through.**
+- **Left for Koda / a later session:** (1) review calls X1–X22 in `docs/review.md`, and the mockup
+  `docs/mockups/belt-levels.svg`; (2) the Paseo testnet needs a fresh deploy (X9: body ids, Claims,
+  Repairs, Drones changed the interface); (3) tuning choices in `demo4-tuning.md` "The belt";
+  (4) extending the economy simulator with miners and asteroid owners; (5) dwarf planets (decision 21);
+  (6) the clean-room client (`client-rnd/fresh/`) learns the belt (decision 31); (7) Battle has 1.9 KB left:
+  `Combat` as a linked library if it needs more. Sizes now: Planets 21.3 KB, Battle 22.7, Market 20.3,
+  Pilots 17.5, Drones 13.9, Armory 13.2, Claims 11.3, Repairs 10.4.
 
 ## Read first
 
@@ -286,7 +291,7 @@ onward in `docs/demo4-plan.md`, with this plan's milestones.
 - [x] The asteroid's card, menus (claim, build, drones, port, mining) and the ship's mining flow.
 - [x] Performance measured at Sol, CPU slowed 4× (`CPU_THROTTLE=4` in the harness), before and after.
 
-**Phase 5: tuning.** Mining rates, drone prices, port supply against the economy simulator
+**Phase 5: tuning.** *(Analysis done 2026-11-16; numbers left to Koda.)* Mining rates, drone prices, port supply against the economy simulator
 (`orbiter-client/dev/sim/economy.mjs`); record numbers in `docs/demo4-tuning.md`.
 
 ## Graphics

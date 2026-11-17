@@ -450,7 +450,7 @@ Milestones 1–5 built the new rules on a separate `/galaxy` screen with plain p
 **Milestone 8: the expansion** (asteroid belts, drones, ship bays, a fully built Sol, a contract refactor; D67–D100).
 The steps, with their checkboxes, are in [`expansion-plan.md`](expansion-plan.md) under "Phases", and its progress log.
 - [x] Phase 0: the HUD redesign imported into the main client, the docking bug fixed, `client-rnd/hud/` removed (2026-11-16).
-- [x] Phase 1: the contract refactor (body ids with kinds, Claims and Repairs split out, a treasury, Sol fully built; 2026-11-16). - [x] Phase 2: ships (drone bays, the four built-in drones, mining drones; 2026-11-16). - [x] Phase 3: belts, in the contracts and SDK (generation, claims, the asteroid line, drone pools, supplied ports, ship mining, asteroid sieges; 2026-11-16). - [x] Phase 4: drawing the belt (band, rocks, asteroids, stations, slots; cards, menus, mining; 2026-11-16). - [ ] Phase 5: tuning.
+- [x] Phase 1: the contract refactor (body ids with kinds, Claims and Repairs split out, a treasury, Sol fully built; 2026-11-16). - [x] Phase 2: ships (drone bays, the four built-in drones, mining drones; 2026-11-16). - [x] Phase 3: belts, in the contracts and SDK (generation, claims, the asteroid line, drone pools, supplied ports, ship mining, asteroid sieges; 2026-11-16). - [x] Phase 4: drawing the belt (band, rocks, asteroids, stations, slots; cards, menus, mining; 2026-11-16). - [x] Phase 5: tuning, analysed (`demo4-tuning.md` "The belt"; numbers left to Koda).
 
 ### 12. Confirm with Koda before building
 
