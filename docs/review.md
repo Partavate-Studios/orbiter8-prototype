@@ -480,12 +480,23 @@ Calls made building it, for Koda's review:
   electronics; silicate sells metals and silicon and buys water, organics and electronics; metallic
   sells metals and rare elements and buys water, He-3 and equipment. Asteroids don't produce from
   people; their mining drones will (next step).
-- **X18. Drone pools** (`Drones.sol`, decision 24): asteroids only for now; a pool holds 10 drones a unit
+- **X18. Drone pools** (rate superseded by X19) (`Drones.sol`, decision 24): asteroids only for now; a pool holds 10 drones a unit
   of size; mining drones are landed from the ship (and boarded back) like colonists; the owner sets how
   many defend, from anywhere, not during a siege. Once the Mine stands, each mining drone makes 0.25 of a
   unit an hour of each good the asteroid yields (both tunable: `setRates`). A size-8 asteroid with 80
   drones makes 20 an hour of each, what a full planet makes. Planets keep their fitted defenses and
   people-driven production; giving them pools too (decision 11's "bigger scale") is for later.
+- **X19. Ports supplied by production** (decision 23): a player's port (planet or asteroid) sells only
+  what its body's storage holds, priced by how full that is against the port capacity, and **the buyer
+  pays the owner** (price and fee), where before the price was burned and the port restocked for free.
+  Its buying side is unchanged (goods sold to it are consumed, the seller paid by the Federation as
+  before): putting them into the owner's storage would let an owner sell to their own port forever.
+  **The top rate:** Sol's ports restock as before (capacity 300 over 2 hours: 150 an hour a good), and
+  the drone rate was raised to 1.875 units an hour (from X18's 0.25) so that the largest asteroid full
+  of drones (80) makes exactly that. Capacity grows with pilots and drones don't: past 300 the Federation
+  restocks faster than any station; for Phase 5. Planets' people still make 20 an hour at most, now far
+  below a well-droned asteroid; for Phase 5. The economy simulator only plays Sol's ports, so it can't
+  measure this yet. `portsAt` now lists asteroid ports too.
 - **X6. Wording:** the loadout's empty-weapons line says "Every Sol station's armory sells them." (was "The
   I.S.S. armory").
 

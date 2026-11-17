@@ -397,7 +397,12 @@ contract Planets is ModuleBase {
 
     // ── for other modules (GAME_MODULE): the Autofactory and sieges ─────────────────────────────
 
-    /// Settles and takes goods from a planet's storage (the Autofactory paying for an order).
+    /// What a body's port can sell of a good now: its storage, production counted (Market, D89).
+    function supplyOf(uint256 id, uint256 good) external view returns (uint256) {
+        return planetView(id, good + 1).stock[good];
+    }
+
+    /// Settles and takes goods from a body's storage (the Autofactory paying for an order; its port selling).
     function useStock(uint256 id, uint256 good, uint256 units) external onlyRole(GAME_MODULE) {
         _settle(id);
         _takeStock(id, good, units);

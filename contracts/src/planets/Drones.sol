@@ -58,7 +58,9 @@ contract Drones is ModuleBase {
         __ModuleBase_init(admin);
         DronesStorage storage d = _d();
         (d.pilots, d.claims, d.planets, d.battle) = (pilots_, claims_, planets_, battle_);
-        (d.perSize, d.milliPerHour) = (10, 250);
+        // 80 drones on the largest asteroid make what a Sol port restocks an hour (capacity 300 over
+        // 2 hours: 150), the top rate the world allows (D89)
+        (d.perSize, d.milliPerHour) = (10, 1875);
     }
 
     function setRates(uint32 perSize, uint32 milliPerHour) external onlyRole(DEFAULT_ADMIN_ROLE) {

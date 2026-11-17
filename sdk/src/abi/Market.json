@@ -585,6 +585,19 @@
   },
   {
     "type": "function",
+    "name": "setSupply",
+    "inputs": [
+      {
+        "name": "supply_",
+        "type": "address",
+        "internalType": "contract IPortSupply"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "setTreasury",
     "inputs": [
       {

@@ -13,6 +13,7 @@ import {Planets} from "../src/planets/Planets.sol";
 import {Claims} from "../src/planets/Claims.sol";
 import {Drones} from "../src/planets/Drones.sol";
 import {IDroneOutput} from "../src/planets/Planets.sol";
+import {IPortSupply} from "../src/market/Market.sol";
 import {Repairs} from "../src/battle/Repairs.sol";
 import {Factory} from "../src/planets/Factory.sol";
 import {Battle} from "../src/battle/Battle.sol";
@@ -126,6 +127,8 @@ library Deployment {
         game.repairs.grantRole(role, address(game.armory)); // shipyard repairs
         game.pilots.grantRole(role, address(game.drones)); // landing and boarding drones
         game.planets.setDrones(IDroneOutput(address(game.drones)));
+        game.planets.grantRole(role, address(game.market)); // players' ports sell from storage
+        game.market.setSupply(IPortSupply(address(game.planets)));
         game.pilots.grantRole(role, address(game.armory));
         game.planets.grantRole(role, address(game.battle));
         game.factory.grantRole(role, address(game.armory));

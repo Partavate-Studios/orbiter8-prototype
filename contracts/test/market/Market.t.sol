@@ -272,18 +272,28 @@ contract MarketTest is GameFixture {
         vm.stopPrank();
     }
 
-    function test_anOwnedPortPaysItsOwnerTheFee() public {
+    function test_anOwnedPortSellsFromItsStorageAndPaysItsOwner() public {
         uint256 port = 10; // Sol, body 10: not a Federation station, so opened as a player's port
         vm.prank(admin);
         market.openPort(port, 0, bo, uint40(block.timestamp), 0); // Terrestrial
+        // Its body's storage (Planets) holds 4 units of organics, then 300 (a full port's worth).
+        address store = address(game.planets);
+        vm.mockCall(store, abi.encodeWithSignature("supplyOf(uint256,uint256)", port, ORGANICS), abi.encode(4));
+        vm.mockCall(store, abi.encodeWithSignature("useStock(uint256,uint256,uint256)"), "");
+        vm.prank(ada);
+        vm.expectRevert(abi.encodeWithSelector(Market.PortFull.selector, ORGANICS, 4));
+        market.trade(port, _line(ORGANICS, 5, type(uint256).max));
+        vm.mockCall(store, abi.encodeWithSignature("supplyOf(uint256,uint256)", port, ORGANICS), abi.encode(300));
         Market.Good memory g = market.goods()[ORGANICS];
-        Market.Tuning memory t = market.tuning();
         uint256 cost = Pricing.buyCost(g.base, g.spread, market.capacity(), 0, 5);
-        uint256 cut = Pricing.fee(cost, t.feeBps);
+        uint256 cut = Pricing.fee(cost, market.tuning().feeBps);
+        uint256 supply = credits.totalSupply();
+        vm.expectCall(store, abi.encodeWithSignature("useStock(uint256,uint256,uint256)", port, ORGANICS, 5));
         vm.prank(ada);
         market.trade(port, _line(ORGANICS, 5, cost + cut));
-        assertEq(credits.balanceOf(bo), cut);
+        assertEq(credits.balanceOf(bo), cost + cut, "the owner is paid for what the port sold");
         assertEq(credits.balanceOf(ada), 1_000 - cost - cut);
+        assertEq(credits.totalSupply(), supply, "nothing burned or minted");
     }
 
     function test_portsGrowWithThePopulation() public {

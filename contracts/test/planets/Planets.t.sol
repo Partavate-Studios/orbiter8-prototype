@@ -529,18 +529,39 @@ contract AsteroidClaimsTest is PlanetsFixture {
         skip(10 minutes);
         planets.settle(asteroid);
         uint256 before = planets.planetView(asteroid, 8).stock[good];
-        skip(4 hours); // 10 drones x 0.25 x 4 h = 10 units
-        assertEq(planets.planetView(asteroid, 8).stock[good] - before, 10);
+        skip(4 hours); // 10 drones x 1.875 x 4 h = 75 units
+        assertEq(planets.planetView(asteroid, 8).stock[good] - before, 75);
         // Defense drones don't mine.
         vm.prank(ada);
         drones.setDefense(asteroid, 6);
         before = planets.planetView(asteroid, 8).stock[good];
-        skip(10 hours); // 4 miners x 0.25 x 10 h = 10 units
-        assertEq(planets.planetView(asteroid, 8).stock[good] - before, 10);
+        skip(10 hours); // 4 miners x 1.875 x 10 h = 75 units
+        assertEq(planets.planetView(asteroid, 8).stock[good] - before, 75);
         (uint32 total, uint32 defense, uint256 room) = drones.poolOf(asteroid);
         assertEq(total, 10);
         assertEq(defense, 6);
         assertEq(room, uint256(size) * 10);
+        // Its port sells what the drones mined, and pays Ada for it (D89).
+        vm.prank(admin);
+        planets.setCost(4 + 8, Planets.Cost(1_000, 10 minutes, 0, [0, 0, 0], [uint32(0), 0, 0]));
+        vm.prank(ada);
+        planets.build(asteroid, 4);
+        skip(10 minutes);
+        uint256 stored = planets.supplyOf(asteroid, good);
+        assertGt(stored, 0);
+        vm.prank(bo);
+        pilots.register("Bodo", "Barge");
+        _pay(bo, 100_000);
+        vm.prank(bo);
+        market.buyBays(EARTH, 20, type(uint256).max);
+        _go(bo, 3);
+        uint256 adaHad = credits.balanceOf(ada);
+        Market.Line[] memory lines = new Market.Line[](1);
+        lines[0] = Market.Line(good, 10, type(uint256).max);
+        vm.prank(bo);
+        market.trade(asteroid, lines);
+        assertEq(planets.supplyOf(asteroid, good), stored - 10, "sold from the store");
+        assertGt(credits.balanceOf(ada), adaHad, "the owner was paid");
         // Back aboard.
         vm.prank(ada);
         drones.board(asteroid, 10);

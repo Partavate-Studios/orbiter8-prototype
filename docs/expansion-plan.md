@@ -56,10 +56,13 @@ work in progress from a session that ran out (check `git status` and `git diff` 
 - 2026-11-16: drone pools done: `contracts/src/planets/Drones.sol` (land, board, setDefense, poolOf,
   outputOf); Planets mines by `drones.outputOf` on asteroids past the Mine (`_rate`); SDK bindings
   (dronePool, landDrones, boardDrones, setDefenseDrones). Planets 21.1 KB, Drones 8.7 KB. Call X18.
-- **Next: Phase 3, ports supplied by production** (decision 23): a player's port (planet or asteroid)
-  stops restocking itself and is supplied from its body's storage; Sol's Federation ports restock at
-  the top rate (the most mining drones possible). Read `Market._stock` and `Pricing.restock`. Risky for
-  the economy: run `orbiter-client/dev/sim/economy.mjs` before and after.
+- 2026-11-16: ports supplied by production done (Market `IPortSupply`, Planets `supplyOf`/`useStock`;
+  the buyer pays the owner; Sol unchanged; drone rate 1.875 so the top asteroid matches Sol's restock;
+  `portsAt` lists asteroid ports). Call X19.
+- **Next: Phase 3, ships mining empty sections** (decisions 12, 27, 34): `startMining(cell, section, slot)`
+  at a free slot (6 a section; a full ship doesn't count), output per mining drone (the ship's mining
+  drones + its built-in drones set to mining, `Repairs.dronesOf`) into the holds up to full, the pilot's
+  next ship-changing move stops it (a hook like `IMoveHook`; chat doesn't). Likely in Drones (8.7 KB).
 
 ## Read first
 
@@ -255,7 +258,7 @@ onward in `docs/demo4-plan.md`, with this plan's milestones.
   or empty; Sol's belt fixed and the Federation's. Contract library + SDK mirror + vectors.
 - [x] Claims, names and deeds for asteroids (not counting toward the star, decision 6).
 - [x] The asteroid building line (decision 22); drone pools and the mining/defense split (decision 24).
-- [ ] Ports supplied by production, for asteroids and player planets; Federation ports at the top rate (decision 23).
+- [x] Ports supplied by production, for asteroids and player planets; Federation ports at the top rate (decision 23).
 - [ ] Ships mining empty sections: slots of 6, accrual, the next action stops it, full ships leave the count (decisions 12 and 27).
 - [ ] Sieges on asteroids: a moon's mounts, a small shield, defense drones (decisions 6 and 29).
 

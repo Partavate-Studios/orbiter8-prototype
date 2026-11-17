@@ -7,6 +7,12 @@ import {Credits} from "../tokens/Credits.sol";
 import {Pricing} from "./Pricing.sol";
 import {BodyId} from "../planets/BodyId.sol";
 
+/// Where a player's port gets what it sells: its body's storage (Planets, D89).
+interface IPortSupply {
+    function supplyOf(uint256 body, uint256 good) external view returns (uint256);
+    function useStock(uint256 body, uint256 good, uint256 units) external;
+}
+
 /// @title Goods, ports, trade and the shipyard (docs/demo4-plan.md, section 4; D27, D29)
 /// @notice **Goods are data** (D27): a registry the admin can add to, each with a base price and a
 /// spread. **Ports** sell some goods and buy others, by their planet's class; the class mixes are
@@ -94,6 +100,7 @@ contract Market is ModuleBase {
         mapping(uint256 => Opened) opened;
         Tuning tuning;
         address treasury; // the Federation's fees (D85, D94)
+        IPortSupply supply; // players' ports sell from their body's storage (D89)
     }
 
     // keccak256(abi.encode(uint256(keccak256("orbiter8.market")) - 1)) & ~bytes32(uint256(0xff))
@@ -176,6 +183,10 @@ contract Market is ModuleBase {
         if (treasury_ == address(0)) revert NoTreasury();
         _m().treasury = treasury_;
         emit TreasurySet(treasury_);
+    }
+
+    function setSupply(IPortSupply supply_) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _m().supply = supply_;
     }
 
     function treasury() external view returns (address) {
@@ -293,9 +304,20 @@ contract Market is ModuleBase {
         if (mode != (buying ? Mode.Sells : Mode.Buys)) revert NotTraded(line.good);
 
         Tuning storage t = m.tuning;
-        (uint256 shortfall, uint256 updated) = _stock(port, line.good, cap);
-        if (shortfall + units > cap) revert PortFull(line.good, cap - shortfall);
-        m.stock[port][line.good] = Stock(uint32(shortfall + units), uint40(updated));
+        // A player's port sells only what its body has made (D89), and is paid for it; the Federation's
+        // restock themselves (at the top rate: Market.sol tuning, D89).
+        bool supplied = buying && owner != address(0);
+        uint256 shortfall;
+        if (supplied) {
+            uint256 stored = m.supply.supplyOf(port, line.good);
+            if (units > stored) revert PortFull(line.good, stored);
+            shortfall = stored >= cap ? 0 : cap - stored;
+        } else {
+            uint256 updated;
+            (shortfall, updated) = _stock(port, line.good, cap);
+            if (shortfall + units > cap) revert PortFull(line.good, cap - shortfall);
+            m.stock[port][line.good] = Stock(uint32(shortfall + units), uint40(updated));
+        }
 
         Credits credits_ = m.credits;
         address payee = owner == address(0) ? m.treasury : owner;
@@ -304,8 +326,13 @@ contract Market is ModuleBase {
             uint256 cut = Pricing.fee(cost, t.feeBps);
             if (cost + cut > line.limit) revert PriceLimit(line.good, cost + cut);
             m.pilots.addCargo(pilot, line.good, units);
-            credits_.burn(pilot, cost);
-            credits_.move(pilot, payee, cut);
+            if (supplied) {
+                m.supply.useStock(port, line.good, units);
+                credits_.move(pilot, owner, cost + cut);
+            } else {
+                credits_.burn(pilot, cost);
+                credits_.move(pilot, payee, cut);
+            }
             emit Traded(pilot, port, line.good, line.units, cost + cut);
         } else {
             uint256 proceeds = Pricing.sellProceeds(good.base, good.spread, cap, shortfall, units);
@@ -392,7 +419,13 @@ contract Market is ModuleBase {
         for (uint256 g = 0; g < m.goods.length; g++) {
             Mode mode = _mode(v.class, g);
             if (mode == Mode.None) continue;
-            (uint256 shortfall,) = _stock(port, g, cap);
+            uint256 shortfall;
+            if (mode == Mode.Sells && v.owner != address(0)) {
+                uint256 stored = m.supply.supplyOf(port, g);
+                shortfall = stored >= cap ? 0 : cap - stored;
+            } else {
+                (shortfall,) = _stock(port, g, cap);
+            }
             Good storage good = m.goods[g];
             uint256 price = mode == Mode.Sells
                 ? Pricing.buyCost(good.base, good.spread, cap, shortfall, 1)
@@ -403,10 +436,13 @@ contract Market is ModuleBase {
 
     /// Every port at a star, in one call.
     function portsAt(uint256 cell) external view returns (PortView[] memory list) {
-        PortView[] memory found = new PortView[](MAX_BODIES);
+        PortView[] memory found = new PortView[](MAX_BODIES + 8);
         uint256 n;
-        for (uint256 body = 0; body < MAX_BODIES; body++) {
-            uint256 port = BodyId.planet(cell, body);
+        for (uint256 body = 0; body < MAX_BODIES + 8; body++) {
+            // planets, then the belt's eight sections (asteroid ports, D88)
+            uint256 port = body < MAX_BODIES
+                ? BodyId.planet(cell, body)
+                : BodyId.make(cell, BodyId.ASTEROID, body - MAX_BODIES);
             bool isSol = cell == 0 && body < SOL_PORTS;
             if (isSol || _isOpen(port)) found[n++] = portView(port);
         }
