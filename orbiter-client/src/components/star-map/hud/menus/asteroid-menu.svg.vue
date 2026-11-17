@@ -62,7 +62,7 @@
           Drones mine once the Mine stands.
         </text>
 
-        <!-- The store -->
+        <!-- The store: what it holds (to load aboard), and what's aboard (to unload into it, for building) -->
         <g transform="translate(0 350)">
           <text v-if="!stored.length" x="0" y="0" text-anchor="middle" fill="#ffffff88">The store is empty.</text>
           <g v-for="(row, i) in stored" :key="row.good" :transform="`translate(0 ${i * 30})`">
@@ -70,6 +70,13 @@
             <g v-if="player.freeBays > 0" class="can-click" transform="translate(120 0)" @click="collect(row)">
               <rect x="-50" y="-13" width="100" height="26" rx="4" fill="#3d1273" stroke="#ffffff44" />
               <text x="0" y="0" text-anchor="middle" font-size="0.9em">Load {{ Math.min(row.units, player.freeBays) }}</text>
+            </g>
+          </g>
+          <g v-if="aboard.length" :transform="`translate(0 ${Math.max(1, stored.length) * 30 + 10})`">
+            <text x="-170" y="0" fill="#ffffffaa">Aboard:</text>
+            <g v-for="(row, i) in aboard" :key="row.good" class="can-click" :transform="`translate(${-80 + (i % 3) * 110} ${Math.floor(i / 3) * 32})`" @click="deliver(row)">
+              <rect x="-50" y="-13" width="100" height="26" rx="4" fill="#3d1273" stroke="#ffffff44" />
+              <text x="0" y="0" text-anchor="middle" font-size="0.8em">Unload {{ row.units }} {{ row.short }}</text>
             </g>
           </g>
         </g>
@@ -144,6 +151,12 @@ export default {
     landable() {
       return Math.min(this.shipMiners, Math.max(0, this.pool.room - this.pool.total))
     },
+    /** The ship's cargo, to unload into the store (building takes goods from it). */
+    aboard() {
+      return (this.player.cargo ?? [])
+        .map((units, good) => ({ good, units, name: this.goodNames[good] ?? 'Good ' + good, short: shortGoodName(this.goodNames[good] ?? '', true) }))
+        .filter((row) => row.units > 0)
+    },
     stored() {
       return (this.info.stock ?? [])
         .map((units, good) => ({ good, units, name: this.goodNames[good] ?? 'Good ' + good }))
@@ -190,6 +203,10 @@ export default {
       if (n < 0 || n > this.pool.total || n === this.pool.defense) return
       this.click()
       this.player.setDefenseDrones(this.asteroid.objectId, n)
+    },
+    deliver(row) {
+      this.click()
+      this.player.deliver(this.asteroid.objectId, row.good, row.units, row.name)
     },
     collect(row) {
       this.click()
