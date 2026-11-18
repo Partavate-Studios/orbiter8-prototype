@@ -1,0 +1,16 @@
+{
+  "name": "orbiter8-app-signer-spike",
+  "private": true,
+  "description": "Milestone 7 spike (docs/polkadot-direction.md): the Polkadot App's product-account signer as an EIP-1193 provider for ethers 6, tried on Polkadot Hub TestNet. Not part of the game build.",
+  "type": "module",
+  "dependencies": {
+    "@parity/product-sdk-individuality": "0.11.7",
+    "@parity/product-sdk-keys": "0.5.10",
+    "@parity/product-sdk-tx": "0.5.10",
+    "@polkadot-api/substrate-bindings": "^0.21.2",
+    "@polkadot-labs/hdkd": "^0.0.30",
+    "@polkadot-labs/hdkd-helpers": "^0.0.30",
+    "ethers": "^6.13.0",
+    "polkadot-api": "^3.2.1"
+  }
+}

@@ -1,0 +1,13 @@
+# Milestone 7 spike contracts (docs/polkadot-direction.md): the personhood precompile and the
+# Scarcity NFT precompiles from Solidity. Their own project, so the game's build is untouched.
+# Uses forge-std from ../lib (contracts/setup.sh). From contracts/spikes: forge test
+[profile.default]
+src = "src"
+test = "test"
+out = "out"
+libs = ["../lib"]
+solc_version = "0.8.38"
+evm_version = "prague"
+optimizer = true
+optimizer_runs = 200
+remappings = ["forge-std/=../lib/forge-std/src/"]
