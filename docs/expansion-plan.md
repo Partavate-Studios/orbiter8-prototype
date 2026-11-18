@@ -223,6 +223,23 @@ work in progress from a session that ran out (check `git status` and `git diff` 
 34. **What stops mining:** any move that changes the ship (a jump, a trade, a purchase, fitting parts…);
     sending a chat message doesn't.
 
+## Missed in the first pass: Sol's asteroids fully built (Koda, 2026-11-18)
+
+Koda's answer to question 7 (2026-11-16) was that Sol's belt belongs to the Federation **and** that
+"everything in Sol should be fully built, meaning every space station should have all the things, an
+armory, a port, etc." Decisions 7 and 18 recorded the ownership and the nine planet stations, but not
+that **Sol's asteroids are built up too**, so Phase 3 left them bare (protected from claims, no stations).
+
+- [ ] Every non-empty asteroid in Sol's belt has a Federation station, fully built: everything the asteroid
+  line allows (Platform, Mine, Port, Armory; decision 22), plus a yard if Koda wants Sol's asteroids to
+  have more than the line (ask).
+- [ ] Their ports trade by the asteroid's composition (Market classes 10–12), owned by the Federation:
+  restocking at the top rate like Sol's other ports (decision 23), fees to the treasury (decision 28).
+- [ ] Their armories and yards work like Sol's planet stations'; their defenses are the Federation's
+  (unattackable, as Sol's planets).
+- [ ] SDK: `portsAt(0)` lists them; the client draws a station on each and counts them on the galaxy map.
+- [ ] Sol's empty section stays open to mining.
+
 ## Notes for later
 
 - **The HUD's planet picker** (the strip of the system's bodies on top of the selection card, from
