@@ -17,7 +17,6 @@ import { WORLD_OFFSET_Y, HELIOPAUSE_RADIUS, BELT_WIDTH } from '@/constants'
 import { writeStyle } from '@/libs/dom-writes'
 import { RING_COLOR, RING_FAINT, ringOpacity, ringWidth } from '@/libs/sprite-types'
 import { STAR_CLASSES, PLANET_COLORS, BELT } from '@/libs/palette'
-import { BELT_SPEED, ORBIT_SPEED_SCALE } from '@orbiter8/sdk/game/orbits'
 
 // A dim glow around the star (normal and high graphics): deep space's purple, warmed or cooled toward
 // the star's own color so its light reaches the whole system a little.
@@ -153,37 +152,31 @@ export default {
       this.drawStarOrbits(ctx, pixels)
     },
     /**
-     * The asteroid belt far out (D81): a thick translucent band, the same all the way round, so it
-     * needn't turn with the belt; brighter while something in it is selected. Its asteroids are sprites
-     * (dots far out); its rocks are on the belt canvas, close in.
+     * The asteroid belt far out (D81): a thick translucent band, one circle in a single stroke (Koda,
+     * 2026-11-17: it was eight overlapping arcs, one per section, with seams where they met), tinted by
+     * the average of what its sections hold, so a metallic belt still reads apart from an icy one;
+     * brighter while something in it is selected. Its asteroids are sprites (dots far out); its rocks,
+     * tinted section by section, are on the belt canvas close in.
      */
     drawBelt(ctx, pixels) {
-      const inBelt = Object.values(this.systemObjects).find((o) => o.type === 'asteroid' || o.type === 'section')
-      if (!inBelt) return
-      const radius = inBelt.orbit.radius
+      const parts = Object.values(this.systemObjects).filter((o) => o.type === 'asteroid' || o.type === 'section')
+      if (!parts.length) return
+      const radius = parts[0].orbit.radius
       const width = BELT_WIDTH
       const focused = [this.selected, this.hovered].some((k) => ['asteroid', 'section'].includes(this.systemObjects[k]?.type))
       const peak = (focused ? 0.32 : 0.22) * Math.min(1, ringOpacity(radius * pixels) + 0.2)
-      // Each section tinted by what it holds (an asteroid's composition, or its dust), placed where the
-      // belt has turned to now; it turns so slowly that the redraws on camera moves keep up.
-      const kinds = new Array(8).fill(null)
-      for (const o of Object.values(this.systemObjects)) {
-        if (o.type === 'asteroid' || o.type === 'section') kinds[o.section] = o.type === 'asteroid' ? o.composition : o.dust
-      }
-      const turn = (useStarMapStore().gameTime * BELT_SPEED * ORBIT_SPEED_SCALE) % (Math.PI * 2)
+      const rocks = parts.map((o) => rgb(BELT.rock[(o.type === 'asteroid' ? o.composition : o.dust) ?? 0]))
+      const average = rocks[0].map((_, c) => rocks.reduce((sum, color) => sum + color[c], 0) / rocks.length)
+      const tint = mix(rgb(BELT.band), average, 0.6)
+      const band = ctx.createRadialGradient(0, 0, radius - width / 2, 0, 0, radius + width / 2)
+      band.addColorStop(0, rgba(tint, 0))
+      band.addColorStop(0.5, rgba(tint, peak))
+      band.addColorStop(1, rgba(tint, 0))
+      ctx.strokeStyle = band
       ctx.lineWidth = width
-      for (let i = 0; i < 8; i++) {
-        const tint = mix(rgb(BELT.band), rgb(BELT.rock[kinds[i] ?? 0]), 0.6)
-        const band = ctx.createRadialGradient(0, 0, radius - width / 2, 0, 0, radius + width / 2)
-        band.addColorStop(0, rgba(tint, 0))
-        band.addColorStop(0.5, rgba(tint, peak))
-        band.addColorStop(1, rgba(tint, 0))
-        ctx.strokeStyle = band
-        const start = turn + (i * Math.PI) / 4
-        ctx.beginPath()
-        ctx.arc(0, 0, radius, start, start + Math.PI / 4 + 0.002)
-        ctx.stroke()
-      }
+      ctx.beginPath()
+      ctx.arc(0, 0, radius, 0, Math.PI * 2)
+      ctx.stroke()
     },
     /** The star's class colors (libs/palette.js), or none for a black hole. */
     starColors() {
