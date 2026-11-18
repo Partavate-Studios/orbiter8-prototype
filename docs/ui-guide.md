@@ -33,8 +33,9 @@ mockup and log it in `docs/review.md`.
 - **Over the selection card, two selectors** (Koda, 2026-11-17): the system strip (the star, the
   planets and the asteroid belt, in orbit order) and under it the nearby strip, round icons (no names;
   names are tooltips) for what's around the selection: its planet, port and moons, or the belt's eight
-  places (asteroids, their ports, the empty dust). The slide-out menu opens with big wordless icons,
-  its port and its moons (or its planet, to go back), and the actions below them. The menu's actions wear their pictures from
+  places (asteroids, their ports, the empty dust). A planet's port and moons are buttons on its
+  card's bottom edge: choosing one deals that card out beside the planet's, which waits behind it
+  (X27); the menu slides out from behind the front card. The menu's actions wear their pictures from
   `assets/art/` (`libs/body-art.js`); the 1–9 keys still press them, named in each button's tooltip.
 - **Menus slide up in the middle**, in the shared menu container, opened from a HUD button or a card's
   menu (`stores/ui.js` `MENUS`). **No panels parked in a corner of the game view:** Koda rejected a

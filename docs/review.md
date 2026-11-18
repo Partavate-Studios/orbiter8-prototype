@@ -557,6 +557,23 @@ Calls made building it, for Koda's review:
   star; `libs/body-art.js` ACTION_GLYPH). The ✕ moved up beside the big icons, so five slots fit.
   Shots: `docs/mockups/selection-strips/buttons-*.png`. This is a restyle of the card menu's buttons
   (Koda asked for it directly).
+- **X27. A port's or moon's card is dealt out beside its planet's** (2026-11-17, Koda's idea). The port
+  and moon buttons left the menu for the card's bottom edge (round wells, a count on the moons). Pressing
+  one deals that card out from behind the planet's, which stays, dimmed; pressing the button again or
+  the planet's card puts it back. A moon's card adds ‹ › on the edge to step through the planet's moons
+  (up to eight, too many for one button each). An asteroid with a port works the same way.
+  Impact, and how it's handled:
+  - **The selection is still one thing** (the front card): the camera, the menu's actions, keys 1–9,
+    the trade/shipyard/armory menus and the system strip all act on it as before. Clicking a port or
+    moon on the map deals its card the same way, so the two routes agree.
+  - **Each card keeps its own colors** (`hud/themed-card.vue` supplies each card's theme).
+  - **The menu** comes out from behind the front card; its big icons are gone (the edge has them), the
+    moons list is gone (the ‹ › steps and the nearby strip cover it), and the ✕ is back at its foot.
+  - **Phones:** the dealt card covers its planet's but for a sliver; the edge buttons ride the front
+    card. Tapping the front card still holds it up full size.
+  - **The nearby strip** now partly repeats the edge buttons; worth deciding whether it stays.
+  - Motion: the card slides out in 0.25 s (none with reduced motion).
+  Shots: `docs/mockups/selection-strips/dealt-*.png`.
 - **X6. Wording:** the loadout's empty-weapons line says "Every Sol station's armory sells them." (was "The
   I.S.S. armory").
 

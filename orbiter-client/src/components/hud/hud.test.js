@@ -126,16 +126,17 @@ describe('HUD', () => {
     expect(problems).toEqual([])
   })
 
-  it("goes to a planet's moon from the nearby strip, and back to the planet from the menu's icon", async () => {
+  it("deals a moon's card from the planet card's edge, and puts it back from the planet's card", async () => {
     ui.selectSprite('planet:2')
     await settle()
     // the moon is a chip, not a "Visit Moon" button as well (round 2, item 4)
     expect([...root.querySelectorAll('button.action')].some((button) => /Visit/.test(button.textContent))).toBe(false)
-    const chip = (name) => root.querySelector(`.nearby-strip .chip[aria-label="${name}"]`)
-    chip(useStarMapStore().systemObjects['moon:2:0'].name).click()
+    root.querySelector('.edge .edge-button').click()
     await settle()
     expect(ui.selected).toBe('moon:2:0')
-    root.querySelector('.goes .go').click()
+    // the planet's card stays, behind the moon's
+    expect(root.querySelector('.card.front')).not.toBe(null)
+    root.querySelector('.card.home.behind').click()
     await settle()
     expect(ui.selected).toBe('planet:2')
     expect(problems).toEqual([])

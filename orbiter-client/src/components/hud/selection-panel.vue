@@ -4,10 +4,12 @@
        behind the card and back, by the tab on its edge (A, or pad R3 to put the card away), and when
        it's in, its edge still shows past the card. Every action has its own slot, so a button never
        moves (card-actions.js SLOTS), and wears its picture (libs/body-art.js; the keys 1–9 still press
-       them). Over the card, the system's star, planets and belt (system-strip.vue), and under that what's
+       them). A planet's port and moons are buttons on its card's bottom edge: choosing one deals its card
+       out in front of the planet's, which stays behind it (Koda, 2026-11-17); the selection is the front
+       card, so menus, keys and the camera act on it. Over the cards, the system's star, planets and belt (system-strip.vue), and under that what's
        around the selection: its planet, port and moons, or the belt's places (nearby-strip.vue). On a
        phone the same, smaller, above the tab bar; tap the card to hold it up full size. -->
-  <div class="selection" :class="{ sheet }" :style="themeVars">
+  <div class="selection" :class="{ sheet, fanned: front }" :style="themeVars">
     <system-strip v-if="!sheet || object" class="strip" :class="{ narrow: !drawerOpen || !object || !showScope }" :compact="sheet" />
     <nearby-strip v-if="object && showScope" class="nearby" :compact="sheet" />
 
@@ -15,40 +17,14 @@
       <button v-if="!showScope" type="button" class="bring-back card-pill" title="Show the selection's card" @click="toggleScope()">
         {{ object.name }}
       </button>
-      <div v-else class="hand">
-        <!-- the menu, behind the card: out, or in with its edge showing (clipped at the card's middle,
-             so none of it shows on the card's far side) -->
+      <div v-else class="hand" :class="{ fanned: front }">
+        <!-- the menu, behind the front card: out, or in with its edge showing (clipped at the card's
+             middle, so none of it shows on the card's far side) -->
         <div class="drawer-clip">
         <div class="drawer" :class="{ open: drawerOpen }" @click="!drawerOpen && openDrawer()">
           <div class="inside" :inert="!drawerOpen || undefined">
-            <!-- where to go from here, big and wordless (Koda, 2026-11-17): its port, its moons, or back
-                 to its planet; the actions follow below -->
-            <div class="goes">
-              <button
-                v-for="go in goes"
-                :key="go.kind"
-                type="button"
-                class="go"
-                :class="{ on: go.kind === 'moons' && page === 'moons' }"
-                :title="go.title"
-                :aria-label="go.title"
-                @click="goTo(go)"
-              >
-                <img v-if="go.art" :src="go.art" alt="" />
-                <span v-else class="sphere" :style="go.style" />
-                <b v-if="go.count > 1" class="count">{{ go.count }}</b>
-              </button>
-              <span class="spacer" />
-              <rim-button small bare label="Put the card away" :tint="theme.accent" @press="toggleScope()"><x-icon /></rim-button>
-            </div>
             <div class="list" data-own-scroll>
-              <template v-if="page === 'moons'">
-                <button v-for="moon in family.moons" :key="moon.moonId" type="button" class="action pictured" @click="select(moon.moonId)">
-                  <span class="well"><span class="sphere" :style="moonSphere(moon.moonId)" /></span>
-                  <span class="text">{{ moon.moonName }}</span>
-                </button>
-              </template>
-              <template v-for="(option, index) in slots" v-else :key="index">
+              <template v-for="(option, index) in slots" :key="index">
                 <button
                   v-if="option"
                   type="button"
@@ -68,6 +44,10 @@
               </template>
               <p v-if="!slots.length" class="none">Nothing to do here.</p>
             </div>
+            <div class="foot">
+              <span class="spacer" />
+              <rim-button small bare label="Put the card away" :tint="theme.accent" @press="toggleScope()"><x-icon /></rim-button>
+            </div>
           </div>
           <!-- the tab: always in view, out past the card's edge -->
           <button
@@ -83,23 +63,57 @@
         </div>
         </div>
 
+        <!-- the home card: the planet (or asteroid); with a port's or moon's card dealt out in front of
+             it, it waits behind, and pressing it puts that card back -->
         <component
-          :is="sheet ? 'button' : 'div'"
-          class="card"
-          :type="sheet ? 'button' : undefined"
-          :title="sheet ? 'Look at the card' : undefined"
-          :aria-label="sheet ? 'Look at the card of ' + object.name : undefined"
-          @click="sheet && (heldUp = true)"
+          :is="sheet || front ? 'button' : 'div'"
+          class="card home"
+          :class="{ behind: front }"
+          :type="sheet || front ? 'button' : undefined"
+          :title="front ? 'Back to ' + home.name : sheet ? 'Look at the card' : undefined"
+          :aria-label="front ? 'Back to ' + home.name : sheet ? 'Look at the card of ' + object.name : undefined"
+          @click="front ? select(home.key) : sheet && (heldUp = true)"
         >
-          <svg :viewBox="CARD_BOX" font-family="Ubuntu, sans-serif"><info :object-id="objectId" /></svg>
+          <themed-card :object-id="home.key" />
         </component>
+
+        <!-- a port's or moon's card, dealt out from behind its planet's -->
+        <Transition name="deal">
+          <component
+            :is="sheet ? 'button' : 'div'"
+            v-if="front"
+            :key="objectId"
+            class="card front"
+            :type="sheet ? 'button' : undefined"
+            :title="sheet ? 'Look at the card' : undefined"
+            :aria-label="sheet ? 'Look at the card of ' + object.name : undefined"
+            @click="sheet && (heldUp = true)"
+          >
+            <themed-card :object-id="objectId" />
+          </component>
+        </Transition>
+
+        <!-- on the card's bottom edge: its port and its moons (Koda, 2026-11-17); a moon's card steps
+             through the planet's moons -->
+        <div v-if="edge.length" class="edge">
+          <template v-for="button in edge" :key="button.kind">
+            <button v-if="button.kind === 'prev' || button.kind === 'next'" type="button" class="step" :title="button.title" :aria-label="button.title" @click="select(button.key)">
+              <svg viewBox="-6 -8 12 16" aria-hidden="true"><path :d="button.kind === 'prev' ? 'M3 -6L-3 0L3 6' : 'M-3 -6L3 0L-3 6'" /></svg>
+            </button>
+            <button v-else type="button" class="edge-button" :class="{ on: button.on }" :title="button.title" :aria-label="button.title" :aria-pressed="button.on ? 'true' : 'false'" @click="press(button)">
+              <img v-if="button.art" :src="button.art" alt="" />
+              <span v-else class="sphere" :style="button.style" />
+              <b v-if="button.count > 1" class="count">{{ button.count }}</b>
+            </button>
+          </template>
+        </div>
       </div>
     </template>
 
     <!-- a phone's card, held up -->
     <Transition name="held">
       <button v-if="heldUp && object" type="button" class="held-up" aria-label="Put the card down" @click="heldUp = false">
-        <svg :viewBox="CARD_BOX" font-family="Ubuntu, sans-serif"><info :object-id="objectId" /></svg>
+        <themed-card :object-id="objectId" />
         <small>Tap to put it down</small>
       </button>
     </Transition>
@@ -114,18 +128,18 @@ import { useUIStore } from '@/stores/ui'
 import { useDialogStore } from '@/stores/dialog'
 import { CARD_THEMES, cardThemeKey } from '@/libs/card-theme'
 import { fitSize } from '@/libs/fit-text'
-import Info from '@/components/star-map/hud/card-ui/info.svg'
 import XIcon from '@/components/star-map/hud/icons/x-icon.svg'
-import { ACTION_ART, ACTION_GLYPH, ASTEROID_ART, PORT_ART, bodySphere } from '@/libs/body-art'
+import { ACTION_ART, ACTION_GLYPH, PORT_ART, bodySphere } from '@/libs/body-art'
 import RimButton from './rim-button.vue'
 import SystemStrip from './system-strip.vue'
 import NearbyStrip from './nearby-strip.vue'
+import ThemedCard from './themed-card.vue'
 import { actionsFor, runAction, slotted } from './card-actions'
 import { CARD_WIDTH, CARD_HEIGHT } from './layout'
 
 export default {
   name: 'SelectionPanel',
-  components: { Info, XIcon, RimButton, SystemStrip, NearbyStrip },
+  components: { XIcon, RimButton, SystemStrip, NearbyStrip, ThemedCard },
   // The card's colors (libs/card-theme.js) for everything drawn inside it.
   provide() {
     return {
@@ -143,10 +157,7 @@ export default {
     return {
       ACTION_ART,
       ACTION_GLYPH,
-      page: 'main',
-      heldUp: false,
-      // the card with a margin for its siege frame and its "yours" badge
-      CARD_BOX: '-80 -80 160 230'
+      heldUp: false
     }
   },
   computed: {
@@ -175,49 +186,58 @@ export default {
     slots() {
       return slotted(this.object, this.actions)
     },
-    /** The selection's home body (a planet, or an asteroid), its port, and its moons. */
-    family() {
-      const objects = this.systemObjects
+    /**
+     * The card the selection belongs to: a port's or moon's planet (an asteroid's port: its asteroid),
+     * else the selection itself.
+     */
+    home() {
       const o = this.object
-      let homeKey = null
-      if (o?.type === 'planet' || o?.type === 'asteroid') homeKey = o.key
-      else if (o?.type === 'station' || o?.type === 'moon') homeKey = o.orbiting
-      const home = homeKey ? objects[homeKey] : null
-      return { home, stationKey: home?.hasStation ? home.stationKey : null, moons: home?.moons ?? [] }
+      if (!o) return null
+      if ((o.type === 'station' || o.type === 'moon') && this.systemObjects[o.orbiting]) return this.systemObjects[o.orbiting]
+      return o
     },
-    /** The big icons: its planet (or asteroid) unless that's the selection, its port, its moons. */
-    goes() {
-      const { home, stationKey, moons } = this.family
-      if (!home) return []
+    /** A port's or moon's card is dealt out in front of its planet's. */
+    front() {
+      return Boolean(this.home && this.home.key !== this.objectId)
+    },
+    /**
+     * The buttons on the card's bottom edge: the home's port and its moons (with a count), each lit
+     * while its card is out; on a moon's card, ‹ › to step through the moons.
+     */
+    edge() {
+      const home = this.home
+      if (!home || (home.type !== 'planet' && home.type !== 'asteroid')) return []
       const out = []
-      const asteroid = home.type === 'asteroid'
-      if (home.key !== this.objectId) {
-        out.push({
-          kind: 'home',
-          key: home.key,
-          title: 'Back to ' + home.name,
-          art: asteroid ? ASTEROID_ART[home.composition] ?? ASTEROID_ART[0] : null,
-          style: asteroid ? null : bodySphere(home, 40)
-        })
-      }
-      if (stationKey && stationKey !== this.objectId) {
-        out.push({ kind: 'port', key: stationKey, title: (this.systemObjects[stationKey]?.name ?? 'The port') + ': its port', art: PORT_ART })
+      const moons = home.moons ?? []
+      const moonIndex = moons.findIndex((m) => m.moonId === this.objectId)
+      const station = home.hasStation ? this.systemObjects[home.stationKey] : null
+      if (station) {
+        out.push({ kind: 'port', key: station.key, on: station.key === this.objectId, title: station.name + ': its port', art: PORT_ART })
       }
       if (moons.length) {
-        const first = this.systemObjects[moons[0].moonId]
+        if (moonIndex >= 0 && moons.length > 1) {
+          const prev = moons[(moonIndex - 1 + moons.length) % moons.length]
+          out.push({ kind: 'prev', key: prev.moonId, title: 'Previous moon: ' + prev.moonName })
+        }
+        const shown = moonIndex >= 0 ? moons[moonIndex] : moons[0]
         out.push({
           kind: 'moons',
-          title: moons.length === 1 ? moons[0].moonName : `Its ${moons.length} moons`,
+          key: shown.moonId,
+          on: moonIndex >= 0,
           count: moons.length,
-          style: bodySphere(first, 30)
+          title: moonIndex >= 0 ? shown.moonName : moons.length === 1 ? shown.moonName : `Its ${moons.length} moons`,
+          style: bodySphere(this.systemObjects[shown.moonId], 26)
         })
+        if (moonIndex >= 0 && moons.length > 1) {
+          const next = moons[(moonIndex + 1) % moons.length]
+          out.push({ kind: 'next', key: next.moonId, title: 'Next moon: ' + next.moonName })
+        }
       }
       return out
     }
   },
   watch: {
     selected() {
-      this.page = 'main'
       this.heldUp = false
     }
   },
@@ -233,29 +253,18 @@ export default {
     labelSize(text) {
       return fitSize(text, 15, this.sheet ? 140 : 150, 700)
     },
-    moonSphere(key) {
-      return bodySphere(this.systemObjects[key], 24)
-    },
     select(key) {
       this.o8audio.playEffect('click')
       this.selectSprite(key)
     },
     run(option) {
       this.o8audio.playEffect('click')
-      runAction(option, this.object, { showMoons: this.moons })
+      const moon = this.home?.moons?.[0]
+      runAction(option, this.object, { showMoons: () => moon && this.selectSprite(moon.moonId) })
     },
-    goTo(go) {
-      if (go.kind === 'moons') {
-        this.o8audio.playEffect('click')
-        return this.moons()
-      }
-      this.select(go.key)
-    },
-    /** One moon: go to it. More: list them in the menu (the icon again goes back). */
-    moons() {
-      const moons = this.family.moons
-      if (moons.length === 1) return this.selectSprite(moons[0].moonId)
-      this.page = this.page === 'moons' ? 'main' : 'moons'
+    /** A card-edge button: deals its card out, or, when it's out, puts it back. */
+    press(button) {
+      this.select(button.on ? this.home.key : button.key)
     },
     openDrawer() {
       this.o8audio.playEffect('click')
@@ -279,7 +288,6 @@ export default {
         event.preventDefault()
         return this.toggleDrawer()
       }
-      if (this.page !== 'main') return
       const option = this.slots[Number(event.key) - 1]
       if (!option) return
       // (so the digit doesn't land in a dialog's field that this opens)
@@ -297,14 +305,19 @@ export default {
   --tuck: 14px;
   /* the card's own margin inside its art (its siege frame and badge room) */
   --card-margin: calc(var(--card-w) * 5 / 160);
+  /* how far a port's or moon's card is dealt out from its planet's */
+  --front-x: 0px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 8px;
   text-align: left;
 }
+.selection.fanned {
+  --front-x: calc(var(--card-w) * 0.5);
+}
 .strip {
-  width: calc(var(--card-w) - var(--card-margin) - var(--tuck) + var(--drawer-w) + 12px);
+  width: calc(var(--card-w) + var(--front-x) - var(--card-margin) - var(--tuck) + var(--drawer-w) + 12px);
   max-width: calc(100vw - 32px);
   transition: width 0.25s ease;
 }
@@ -312,11 +325,11 @@ export default {
   max-width: calc(100vw - 32px);
 }
 .strip.narrow {
-  width: calc(var(--card-w) + var(--peek) + 12px);
+  width: calc(var(--card-w) + var(--front-x) + var(--peek) + 12px);
 }
 .hand {
   position: relative;
-  width: var(--card-w);
+  width: calc(var(--card-w) + var(--front-x));
   height: var(--card-h);
 }
 .card {
@@ -329,6 +342,134 @@ export default {
   border: 0;
   background: none;
 }
+/* the planet's card, waiting behind a port's or moon's: dimmed, and pressing it puts that card back */
+.card.behind {
+  cursor: pointer;
+  filter: brightness(0.7) saturate(0.85);
+  transition: filter 0.2s;
+}
+.card.behind:hover {
+  filter: brightness(0.9);
+}
+/* a port's or moon's card, dealt out in front */
+.card.front {
+  position: absolute;
+  z-index: 3;
+  left: var(--front-x);
+  top: 0;
+  filter: drop-shadow(-6px 2px 10px #000a);
+}
+.deal-enter-active,
+.deal-leave-active {
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+.deal-enter-from,
+.deal-leave-to {
+  transform: translateX(calc(-1 * var(--card-w) * 0.5));
+  opacity: 0;
+}
+/* the buttons on the card's bottom edge: the port and the moons, in the menu's round wells */
+.edge {
+  position: absolute;
+  z-index: 4;
+  left: 0;
+  bottom: -12px;
+  width: var(--card-w);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+}
+/* behind a dealt card: along the planet card's visible edge, from its left */
+.fanned .edge {
+  justify-content: flex-start;
+  padding-left: 12px;
+  box-sizing: border-box;
+}
+.edge button {
+  pointer-events: auto;
+}
+.edge-button {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1.5px solid #5a4c8c;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%, #3d2a6e 0%, #1a1331 80%);
+  box-shadow: 0 2px 8px #000a;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.edge-button:hover {
+  border-color: #b9a0ff;
+}
+/* its card is out */
+.edge-button.on {
+  border: 2px solid #b9a0ff;
+  background: radial-gradient(circle at 50% 40%, #5a4596 0%, #2a1f4c 80%);
+  box-shadow: 0 0 0 3px #b9a0ff33, 0 2px 8px #000a;
+}
+.edge-button:focus-visible,
+.step:focus-visible {
+  outline: 2.5px solid var(--o8-brand-300);
+  outline-offset: 2px;
+}
+.edge-button img {
+  width: 34px;
+  height: 34px;
+}
+.edge-button .sphere {
+  display: block;
+  border-radius: 50%;
+}
+/* how many moons */
+.edge-button .count {
+  position: absolute;
+  right: -4px;
+  bottom: -3px;
+  min-width: 18px;
+  height: 18px;
+  box-sizing: border-box;
+  padding: 0 4px;
+  border: 1px solid #b9a0ff;
+  border-radius: 9px;
+  background: #302651;
+  color: #ffffff;
+  font-size: 11px;
+  line-height: 16px;
+}
+/* stepping through the moons */
+.step {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid #5a4c8c;
+  border-radius: 11px;
+  background: #1f173a;
+  cursor: pointer;
+}
+.step:hover {
+  border-color: #b9a0ff;
+}
+.step svg {
+  width: 8px;
+  height: 12px;
+}
+.step path {
+  fill: none;
+  stroke: #d9ccf5;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 .card svg,
 .held-up svg {
   display: block;
@@ -340,7 +481,7 @@ export default {
 .drawer-clip {
   position: absolute;
   z-index: 1;
-  left: calc(var(--card-w) / 2);
+  left: calc(var(--card-w) / 2 + var(--front-x));
   top: 0;
   bottom: 0;
   width: calc(var(--card-w) / 2 + var(--drawer-w) + 20px);
@@ -480,80 +621,19 @@ export default {
   background: none;
   cursor: default;
 }
-/* the big icons at the menu's top: its port, its moons, back to its planet */
-.goes {
-  flex: none;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0 0 8px;
-}
-.go {
-  position: relative;
-  flex: none;
-  display: grid;
-  place-items: center;
-  width: 54px;
-  height: 54px;
-  padding: 0;
-  border: 1.5px solid #5a4c8c;
-  border-radius: 50%;
-  background: radial-gradient(circle at 50% 40%, #3d2a6e 0%, #1f173a 75%);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-.go:hover,
-.go.on {
-  border-color: #b9a0ff;
-  background: radial-gradient(circle at 50% 40%, #4d3a86 0%, #2a1f4c 75%);
-}
-.go:focus-visible {
-  outline: 2.5px solid var(--o8-brand-300);
-  outline-offset: 3px;
-}
-.go img {
-  width: 42px;
-  height: 42px;
-}
-.go .sphere {
-  display: block;
-  border-radius: 50%;
-}
-/* how many moons */
-.go .count {
-  position: absolute;
-  right: -2px;
-  bottom: -2px;
-  min-width: 20px;
-  height: 20px;
-  box-sizing: border-box;
-  padding: 0 5px;
-  border-radius: 10px;
-  background: #302651;
-  border: 1px solid #b9a0ff;
-  color: #ffffff;
-  font-size: 12px;
-  line-height: 18px;
-}
-.sheet .goes {
-  gap: 10px;
-  padding-bottom: 6px;
-}
-.sheet .go {
-  width: 50px;
-  height: 50px;
-}
-.sheet .go img {
-  width: 38px;
-  height: 38px;
-}
 .none {
   margin: 8px;
   color: #bdb5d4;
   font-size: 13px;
   text-align: center;
 }
-.goes .rim-button {
+.foot {
+  flex: none;
+  display: flex;
+  align-items: center;
+  padding-top: 6px;
+}
+.foot .rim-button {
   min-width: 40px;
 }
 .spacer {
@@ -609,6 +689,31 @@ export default {
   --peek: 14px;
   align-items: stretch;
 }
+/* a phone: the dealt card covers its planet's but for a sliver, and the edge buttons ride the front card */
+.sheet.fanned {
+  --front-x: 16px;
+}
+.sheet .card.front {
+  top: auto;
+  bottom: 0;
+}
+.sheet .edge,
+.sheet.fanned .edge {
+  left: var(--front-x);
+  bottom: -8px;
+  width: var(--card-w);
+  justify-content: center;
+  padding-left: 0;
+  gap: 4px;
+}
+.sheet .edge-button {
+  width: 38px;
+  height: 38px;
+}
+.sheet .edge-button img {
+  width: 28px;
+  height: 28px;
+}
 .sheet .strip,
 .sheet .strip.narrow {
   width: auto;
@@ -637,7 +742,7 @@ export default {
   flex: 1;
   width: auto;
   min-width: 0;
-  margin: 0 0 0 calc(-1 * (var(--card-margin) + var(--tuck)));
+  margin: 0 0 0 calc(var(--front-x) - var(--card-margin) - var(--tuck));
   padding: 0 14px 6px 0;
 }
 .sheet .drawer {
@@ -696,7 +801,9 @@ export default {
 }
 @media (prefers-reduced-motion: reduce) {
   .drawer,
-  .strip {
+  .strip,
+  .deal-enter-active,
+  .deal-leave-active {
     transition: none;
   }
 }
