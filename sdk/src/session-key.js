@@ -3,6 +3,7 @@
 // signed here with no wallet popups. The key can only make game moves (the contracts check), never
 // spend credits from the wallet, and it's kept in this browser alone.
 import { Wallet, JsonRpcProvider } from 'ethers'
+import { timedRequest } from './chain/timed-request'
 
 /** How long a session lasts (the contracts allow up to 12 hours). */
 export const SESSION_HOURS = 4
@@ -43,7 +44,7 @@ export function newKey() {
 
 /** A signer for the key, sending through the network's RPC (D43: smoldot replaces this on Polkadot). */
 export function keySigner(privateKey, rpc) {
-  return new Wallet(privateKey, new JsonRpcProvider(rpc, undefined, { pollingInterval: 1000 }))
+  return new Wallet(privateKey, new JsonRpcProvider(timedRequest(rpc), undefined, { pollingInterval: 1000 }))
 }
 
 /** Sends whatever gas money the key has left back to the pilot's wallet. */

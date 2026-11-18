@@ -366,7 +366,7 @@ export function createGameClient() {
     }
     if (stored.pending) saveKey(state.chainId, state.account, { ...stored, pending: undefined })
     keyWallet = keySigner(stored.privateKey, network.rpc[0])
-    keyGame = createGame(keyWallet, network.contracts)
+    keyGame = createGame(keyWallet, network.contracts, { startBlock: network.startBlock })
     state.session = { key: stored.address, expiry: onChain.expiry }
   }
 
@@ -651,6 +651,8 @@ export function createGameClient() {
 
   // ── moving ──────────────────────────────────────────────────────────────────────────────────
 
+  /** How long a landed move waits for the reload that shows it before reporting done anyway. */
+  const MOVE_REFRESH_WAIT_MS = 15_000
   /** Sends a move (with proofs for published scans) from the session key or the wallet, then reloads. */
   async function move(send, options) {
     const published = await proofs()
@@ -664,7 +666,8 @@ export function createGameClient() {
       dropSession()
       receipt = await send(published, game, options)
     }
-    await client.refresh()
+    // The move has landed: wait a little for the reload that shows it, but not on a slow network.
+    await Promise.race([client.refresh(), new Promise((resolve) => setTimeout(resolve, MOVE_REFRESH_WAIT_MS))])
     return receipt
   }
 
@@ -732,7 +735,14 @@ export function createGameClient() {
     },
     /** Claims a planet, then names it (with a session key, neither asks the wallet). */
     async claimPlanet(planetId, name, options) {
-      const receipt = await move((p, by, o) => by.claim(Number(planetId), o), options)
+      let receipt = null
+      try {
+        receipt = await move((p, by, o) => by.claim(Number(planetId), o), options)
+      } catch (error) {
+        // Already ours: an earlier claim landed but the screen hadn't caught up. Name it all the same.
+        if (error.revertName !== 'AlreadyClaimed' || (await game.ownerOf(Number(planetId))) !== state.account) throw error
+        await client.refresh()
+      }
       // The planet is the pilot's either way: a name that doesn't take can be given from its card.
       if (name)
         await move((p, by) => by.renamePlanet(Number(planetId), NAME.PLANET, name)).catch((error) =>
@@ -961,7 +971,7 @@ export function createGameClient() {
       if (!network) return false
       const { signer, provider } = getSession()
       if ((await provider.getCode(network.contracts.pilots)) === '0x') return false
-      game = createGame(signer, network.contracts)
+      game = createGame(signer, network.contracts, { startBlock: network.startBlock })
       state.contracts = { ...network.contracts }
       const startBlock = network.startBlock ?? 0
       pilotsBlock = discoveredBlock = startBlock - 1

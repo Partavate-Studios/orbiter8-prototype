@@ -1,5 +1,7 @@
 // Wallet discovery (EIP-6963) and the connected session.
-import { BrowserProvider } from 'ethers'
+import { AbstractSigner, BrowserProvider, JsonRpcProvider, TransactionResponse } from 'ethers'
+import { networkFor } from './networks'
+import { timedRequest } from './timed-request'
 
 const PREFERRED_WALLET_KEY = 'o8.wallet'
 
@@ -94,9 +96,52 @@ export function rememberWallet(wallet) {
 }
 
 /**
+ * The wallet's signer, with reads and receipt waits sent straight to the network's own RPC instead of
+ * through the wallet. A wallet relays every read to whatever RPC the player gave it for the network
+ * (maybe a lagging or different one) with no time limit, and queues them behind its own work: on the
+ * testnet a read stuck there left moves "waiting for the network" long after they had landed, and the
+ * map showed planets already claimed as free. The wallet still signs and sends.
+ */
+class WalletSigner extends AbstractSigner {
+  constructor(wallet, reader) {
+    super(reader)
+    this.wallet = wallet
+    this.address = wallet.address
+  }
+  connect() {
+    throw new Error('The wallet signer is bound to its own network')
+  }
+  getAddress() {
+    return this.wallet.getAddress()
+  }
+  signTransaction(tx) {
+    return this.wallet.signTransaction(tx)
+  }
+  signMessage(message) {
+    return this.wallet.signMessage(message)
+  }
+  signTypedData(domain, types, value) {
+    return this.wallet.signTypedData(domain, types, value)
+  }
+  async sendTransaction(tx) {
+    const sent = await this.wallet.sendTransaction(tx)
+    return new TransactionResponse(sent, this.provider)
+  }
+}
+
+/** A direct provider for a network the game knows, or null (an unknown network stays with the wallet). */
+function readerFor(chainId) {
+  const url = networkFor(chainId)?.rpc?.[0]
+  if (!url) return null
+  return new JsonRpcProvider(timedRequest(url), chainId, { staticNetwork: true, pollingInterval: 2000, batchMaxCount: 20 })
+}
+
+/**
  * The connected wallet. Module state rather than store state: ethers objects must not be
  * wrapped in Vue reactivity.
- * @type {{ wallet: Wallet, provider: BrowserProvider, signer: import('ethers').JsonRpcSigner, account: string, chainId: number } | null}
+ * `provider` reads (the network's RPC when the game knows the network, else the wallet); `walletProvider`
+ * is the wallet's own.
+ * @type {{ wallet: Wallet, provider: import('ethers').Provider, walletProvider: BrowserProvider, signer: import('ethers').Signer, account: string, chainId: number } | null}
  */
 let session = null
 
@@ -135,7 +180,15 @@ export async function connectWallet(wallet) {
     eip1193.on?.('disconnect', (error) => console.warn('The wallet lost its connection to the chain:', error?.message ?? error))
   }
 
-  session = { wallet, provider, signer, account: signer.address, chainId: Number(chainId) }
+  const reader = readerFor(Number(chainId))
+  session = {
+    wallet,
+    provider: reader ?? provider,
+    walletProvider: provider,
+    signer: reader ? new WalletSigner(signer, reader) : signer,
+    account: signer.address,
+    chainId: Number(chainId)
+  }
   return session
 }
 

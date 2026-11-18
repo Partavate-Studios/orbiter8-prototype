@@ -517,6 +517,17 @@ Calls made building it, for Koda's review:
   Kind, Size, Yields, Built, Drones) and empty space's (Dust, Yields, Slots); the new Asteroid Works menu
   (in the loadout's row style, not a restyle of an existing screen). Mine Here takes the first free slot;
   the slots aren't picked one by one.
+- **X23. Reads go straight to the network, not through the wallet** (2026-11-17, from Koda's first
+  testnet session). Claims sat on "waiting for the network" though they had landed in seconds, and second
+  tries failed with "Someone claimed it first" on planets already his. Cause: after a claim the client
+  re-reads the pilot's planets, and that read walked deed transfers from block 0, 2,000 blocks at a time:
+  about 8,000 reads on the testnet (half an hour), inside the reload every move waits for. Locally the
+  chain starts at 0, so it never showed. Fixes: event reads start at the network's deployment block;
+  reads and receipt waits go to the network's own RPC (`rpc[0]`) instead of through the wallet (which
+  relays them to whatever RPC the player set, with no time limit), and the wallet only signs and sends;
+  RPC requests give up after 30 s; a landed move reports done after at most 15 s of reloading; and a
+  claim refused because the planet is already yours counts as done (and the name is given). The
+  Polkadot App's host may want reads through it later (D43, smoldot).
 - **X6. Wording:** the loadout's empty-weapons line says "Every Sol station's armory sells them." (was "The
   I.S.S. armory").
 

@@ -115,7 +115,7 @@ export function dismiss(id) {
 
 let reader = null
 function getReader() {
-  if (!reader) reader = createGame(getSession().provider, networkFor(game.state.chainId).contracts)
+  if (!reader) reader = createGame(getSession().provider, networkFor(game.state.chainId).contracts, { startBlock: networkFor(game.state.chainId).startBlock })
   return reader
 }
 

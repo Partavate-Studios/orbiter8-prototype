@@ -40,7 +40,7 @@ export function usePortCounts(chainId) {
   }
   reader = () => {
     const provider = new JsonRpcProvider(network.rpc[0], network.chainId, { staticNetwork: true, batchMaxCount: 1 })
-    const game = createGame(provider, network.contracts)
+    const game = createGame(provider, network.contracts, { startBlock: network.startBlock })
     reader = () => game
     return game
   }

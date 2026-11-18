@@ -1,6 +1,7 @@
 // Networks the game is deployed on, with the contract addresses on each (dev/local.js writes the
 // local chain's; testnets and the launch network join with milestone 6, docs/demo4-plan.md).
-// `rpc` is only what we suggest to a wallet when it doesn't know the network yet; game traffic goes through the wallet.
+// `rpc[0]` is where the game reads (sdk/chain/wallet.js: straight to the network, not through the wallet,
+// which only signs and sends), and what we suggest to a wallet that doesn't know the network yet.
 
 /**
  * @typedef {object} Network

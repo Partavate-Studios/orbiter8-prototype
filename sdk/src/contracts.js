@@ -164,7 +164,14 @@ export const ASTEROID_BUILDING_NAMES = { 1: 'Platform', 2: 'Mine', 4: 'Port', 6:
 /** A read that failed with no revert data at all: a node's limit on one call (memory), not the contract's refusal. */
 const overLimit = (error) => error?.code === 'CALL_EXCEPTION' && (error.data == null || error.data === '0x')
 
-export function createGame(runner, addresses) {
+/**
+ * The game's contracts on one network, for reading and moving.
+ * @param {import('ethers').ContractRunner} runner  a signer (to move) or a provider (to read)
+ * @param {Record<string, string>} addresses  the network's contract addresses
+ * @param {{ startBlock?: number }} [options]  the deployment's block: no game events before it, so
+ *   event reads start there (from block 0, a public chain's 16 million blocks took half an hour)
+ */
+export function createGame(runner, addresses, { startBlock = 0 } = {}) {
   const galaxy = new Contract(addresses.galaxy, GalaxyAbi, runner)
   const pilots = new Contract(addresses.pilots, PilotsAbi, runner)
   const market = new Contract(addresses.market, MarketAbi, runner)
@@ -195,6 +202,7 @@ export function createGame(runner, addresses) {
   const provider = runner.provider ?? runner
   /** Events after `fromBlock` (exclusive) up to the latest block, and that block: for reading only what's new. */
   const since = async (contract, filter, fromBlock) => {
+    fromBlock = Math.max(fromBlock, startBlock - 1)
     const latest = await provider.getBlockNumber()
     if (latest <= fromBlock) return { logs: [], toBlock: fromBlock }
     return { logs: await queryChunked(contract, filter, fromBlock + 1, latest), toBlock: latest }
@@ -511,9 +519,14 @@ export function createGame(runner, addresses) {
       return ids.filter((_, i) => owners[i]?.toLowerCase() === address.toLowerCase())
     },
 
+    /** A body's owner (lower case), or the zero address. */
+    async ownerOf(id) {
+      return (await claims.ownerOf(id)).toLowerCase()
+    },
+
     /** Every claimed body's id and owner now (planets and asteroids), from the claims and seizures. */
     async claimedPlanets() {
-      const logs = await claims.queryFilter(claims.filters.Claimed(), 0)
+      const { logs } = await since(claims, claims.filters.Claimed(), -1)
       const ids = [...new Set(logs.map((l) => Number(l.args[0])))]
       const owners = await Promise.all(ids.map((id) => claims.ownerOf(id)))
       return ids.map((id, i) => ({ id, owner: owners[i].toLowerCase() }))
