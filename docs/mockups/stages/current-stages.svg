@@ -1,0 +1,157 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" font-family="Ubuntu, sans-serif"><rect width="100%" height="100%" fill="#0d0a17"/><text x="40" y="44" fill="#e6dcf5" font-size="24" font-weight="500">Colonies and stations by stage, as the star system draws them today</text><text x="40" y="70" fill="#a99bc4" font-size="14">Nothing shows before a Port; from the Port on, every stage draws the same station. (The card lists built stages as icons under the picture; the scene does not.)</text><text x="40" y="110" fill="#e6dcf5" font-size="18" font-weight="500">Planet line (Citadel → Autofactory): the station sprite (sprites/station.svg.vue) orbits once there is a Port</text><rect x="46.0" y="125" width="138.0" height="190" rx="10" fill="#1c1630" stroke="#3a2f57"/><defs><radialGradient id="pg" cx="35%" cy="35%" r="70%"><stop offset="0" stop-color="#c9a77e"/><stop offset="1" stop-color="#5a3f2a"/></radialGradient></defs><circle cx="115.0" cy="210" r="38" fill="url(#pg)"/><text x="115.0" y="300" text-anchor="middle" fill="#e6dcf5" font-size="14">Unclaimed</text><rect x="196.0" y="125" width="138.0" height="190" rx="10" fill="#1c1630" stroke="#3a2f57"/><defs><radialGradient id="pg" cx="35%" cy="35%" r="70%"><stop offset="0" stop-color="#c9a77e"/><stop offset="1" stop-color="#5a3f2a"/></radialGradient></defs><circle cx="265.0" cy="210" r="38" fill="url(#pg)"/><text x="265.0" y="300" text-anchor="middle" fill="#e6dcf5" font-size="14">Citadel</text><rect x="346.0" y="125" width="138.0" height="190" rx="10" fill="#1c1630" stroke="#3a2f57"/><defs><radialGradient id="pg" cx="35%" cy="35%" r="70%"><stop offset="0" stop-color="#c9a77e"/><stop offset="1" stop-color="#5a3f2a"/></radialGradient></defs><circle cx="415.0" cy="210" r="38" fill="url(#pg)"/><text x="415.0" y="300" text-anchor="middle" fill="#e6dcf5" font-size="14">Colony</text><rect x="496.0" y="125" width="138.0" height="190" rx="10" fill="#1c1630" stroke="#3a2f57"/><defs><radialGradient id="pg" cx="35%" cy="35%" r="70%"><stop offset="0" stop-color="#c9a77e"/><stop offset="1" stop-color="#5a3f2a"/></radialGradient></defs><circle cx="565.0" cy="210" r="38" fill="url(#pg)"/><text x="565.0" y="300" text-anchor="middle" fill="#e6dcf5" font-size="14">Station</text><rect x="646.0" y="125" width="138.0" height="190" rx="10" fill="#1c1630" stroke="#3a2f57"/><defs><radialGradient id="pg" cx="35%" cy="35%" r="70%"><stop offset="0" stop-color="#c9a77e"/><stop offset="1" stop-color="#5a3f2a"/></radialGradient></defs><circle cx="715.0" cy="210" r="38" fill="url(#pg)"/><circle cx="715.0" cy="210" r="69" fill="none" stroke="#e6dcf5" stroke-opacity="0.18" stroke-dasharray="3 4"/><g transform="translate(767.0,164) scale(0.045) translate(-290,-301)"><path fill="white" fill-rule="evenodd" d="M291 0l61 35 15 -25 139 80 -15 25 61 36 0 71 28 0 0 160 -28 0 0 70 -63 36 14 24 -139 80 -14 -24 -59 34 -63 -37 -15 26 -139 -80 15 -26 -59 -33 0 -73 -30 0 0 -160 30 0 0 -68 62 -36 -15 -26 139 -81 15 27 60 -35zm83 196c47,36 64,100 42,155l-98 -57 56 -98zm22 188c-36,47 -99,63 -154,42l56 -99 98 57zm-188 22c-46,-36 -63,-100 -41,-154l98 56 -57 98zm-22 -188c37,-46 100,-63 155,-41l-57 98 -98 -57z"/></g><text x="715.0" y="300" text-anchor="middle" fill="#e6dcf5" font-size="14">Port</text><rect x="796.0" y="125" width="138.0" height="190" rx="10" fill="#1c1630" stroke="#3a2f57"/><defs><radialGradient id="pg" cx="35%" cy="35%" r="70%"><stop offset="0" stop-color="#c9a77e"/><stop offset="1" stop-color="#5a3f2a"/></radialGradient></defs><circle cx="865.0" cy="210" r="38" fill="url(#pg)"/><circle cx="865.0" cy="210" r="69" fill="none" stroke="#e6dcf5" stroke-opacity="0.18" stroke-dasharray="3 4"/><g transform="translate(917.0,164) scale(0.045) translate(-290,-301)"><path fill="white" fill-rule="evenodd" d="M291 0l61 35 15 -25 139 80 -15 25 61 36 0 71 28 0 0 160 -28 0 0 70 -63 36 14 24 -139 80 -14 -24 -59 34 -63 -37 -15 26 -139 -80 15 -26 -59 -33 0 -73 -30 0 0 -160 30 0 0 -68 62 -36 -15 -26 139 -81 15 27 60 -35zm83 196c47,36 64,100 42,155l-98 -57 56 -98zm22 188c-36,47 -99,63 -154,42l56 -99 98 57zm-188 22c-46,-36 -63,-100 -41,-154l98 56 -57 98zm-22 -188c37,-46 100,-63 155,-41l-57 98 -98 -57z"/></g><text x="865.0" y="300" text-anchor="middle" fill="#e6dcf5" font-size="14">Yards</text><rect x="946.0" y="125" width="138.0" height="190" rx="10" fill="#1c1630" stroke="#3a2f57"/><defs><radialGradient id="pg" cx="35%" cy="35%" r="70%"><stop offset="0" stop-color="#c9a77e"/><stop offset="1" stop-color="#5a3f2a"/></radialGradient></defs><circle cx="1015.0" cy="210" r="38" fill="url(#pg)"/><circle cx="1015.0" cy="210" r="69" fill="none" stroke="#e6dcf5" stroke-opacity="0.18" stroke-dasharray="3 4"/><g transform="translate(1067.0,164) scale(0.045) translate(-290,-301)"><path fill="white" fill-rule="evenodd" d="M291 0l61 35 15 -25 139 80 -15 25 61 36 0 71 28 0 0 160 -28 0 0 70 -63 36 14 24 -139 80 -14 -24 -59 34 -63 -37 -15 26 -139 -80 15 -26 -59 -33 0 -73 -30 0 0 -160 30 0 0 -68 62 -36 -15 -26 139 -81 15 27 60 -35zm83 196c47,36 64,100 42,155l-98 -57 56 -98zm22 188c-36,47 -99,63 -154,42l56 -99 98 57zm-188 22c-46,-36 -63,-100 -41,-154l98 56 -57 98zm-22 -188c37,-46 100,-63 155,-41l-57 98 -98 -57z"/></g><text x="1015.0" y="300" text-anchor="middle" fill="#e6dcf5" font-size="14">Armory</text><rect x="1096.0" y="125" width="138.0" height="190" rx="10" fill="#1c1630" stroke="#3a2f57"/><defs><radialGradient id="pg" cx="35%" cy="35%" r="70%"><stop offset="0" stop-color="#c9a77e"/><stop offset="1" stop-color="#5a3f2a"/></radialGradient></defs><circle cx="1165.0" cy="210" r="38" fill="url(#pg)"/><circle cx="1165.0" cy="210" r="69" fill="none" stroke="#e6dcf5" stroke-opacity="0.18" stroke-dasharray="3 4"/><g transform="translate(1217.0,164) scale(0.045) translate(-290,-301)"><path fill="white" fill-rule="evenodd" d="M291 0l61 35 15 -25 139 80 -15 25 61 36 0 71 28 0 0 160 -28 0 0 70 -63 36 14 24 -139 80 -14 -24 -59 34 -63 -37 -15 26 -139 -80 15 -26 -59 -33 0 -73 -30 0 0 -160 30 0 0 -68 62 -36 -15 -26 139 -81 15 27 60 -35zm83 196c47,36 64,100 42,155l-98 -57 56 -98zm22 188c-36,47 -99,63 -154,42l56 -99 98 57zm-188 22c-46,-36 -63,-100 -41,-154l98 56 -57 98zm-22 -188c37,-46 100,-63 155,-41l-57 98 -98 -57z"/></g><text x="1165.0" y="300" text-anchor="middle" fill="#e6dcf5" font-size="14">Autofactory</text><text x="40" y="380" fill="#e6dcf5" font-size="18" font-weight="500">Asteroid line (Platform → Armory): one base (assets/art/asteroid-station.svg) laid on the rock once there is a Port</text><rect x="46.0" y="395" width="188.0" height="190" rx="10" fill="#1c1630" stroke="#3a2f57"/><g transform="translate(140.0,480) scale(0.95)">
+<!-- Silicate asteroid: a warm stony tan-grey rock with a few craters (Orbiter 8 art, 120 units square, centered; free to use in the game) -->
+<defs><clipPath id="sil-body"><path d="M-34 -34Q-16 -50 6 -44Q30 -48 40 -28Q52 -10 44 10Q46 32 26 40Q8 52 -14 44Q-38 46 -44 24Q-54 4 -46 -14Q-46 -28 -34 -34Z"/></clipPath></defs>
+<path d="M-34 -34Q-16 -50 6 -44Q30 -48 40 -28Q52 -10 44 10Q46 32 26 40Q8 52 -14 44Q-38 46 -44 24Q-54 4 -46 -14Q-46 -28 -34 -34Z" fill="#786a60"/>
+<g clip-path="url(#sil-body)">
+  <path d="M-34 -34Q-16 -50 6 -44Q30 -48 40 -28Q52 -10 44 10Q46 32 26 40Q8 52 -14 44Q-38 46 -44 24Q-54 4 -46 -14Q-46 -28 -34 -34Z" transform="translate(-8 -7)" fill="#a5917c"/>
+  <path d="M-34 -34Q-16 -50 6 -44Q30 -48 40 -28Q52 -10 44 10Q46 32 26 40Q8 52 -14 44Q-38 46 -44 24Q-54 4 -46 -14Q-46 -28 -34 -34Z" transform="translate(-22 -20) scale(0.9)" fill="#bfab92"/>
+  <g fill="none" stroke="#857363" stroke-width="1" stroke-linecap="round" opacity="0.6"><path d="M-40 6Q-26 12 -12 8"/><path d="M2 -30Q14 -26 20 -34"/><path d="M8 30Q20 26 30 30"/></g>
+  <g fill="#d6c4a8"><ellipse cx="10.9" cy="-7" rx="10" ry="8"/><ellipse cx="-21.3" cy="-17.2" rx="6" ry="4.8"/><ellipse cx="-15.4" cy="24.7" rx="5" ry="4"/><ellipse cx="29.5" cy="18.5" rx="3.5" ry="2.8"/></g>
+  <g fill="#857363"><ellipse cx="10" cy="-8" rx="10" ry="8"/><ellipse cx="-22" cy="-18" rx="6" ry="4.8"/><ellipse cx="-16" cy="24" rx="5" ry="4"/><ellipse cx="29" cy="18" rx="3.5" ry="2.8"/></g>
+  <ellipse cx="11.5" cy="-6.5" rx="6" ry="4.5" fill="#94816f"/>
+  <g fill="#8f7c6a" opacity="0.7"><circle cx="-34" cy="-4" r="1.4"/><circle cx="-4" cy="14" r="1.6"/><circle cx="30" cy="-24" r="1.3"/><circle cx="2" cy="38" r="1.2"/><circle cx="-6" cy="-36" r="1.1"/></g>
+</g>
+<path d="M-34 -34Q-16 -50 6 -44Q30 -48 40 -28Q52 -10 44 10Q46 32 26 40Q8 52 -14 44Q-38 46 -44 24Q-54 4 -46 -14Q-46 -28 -34 -34Z" fill="none" stroke="#dccdb5" stroke-width="1.2"/>
+</g><text x="140.0" y="570" text-anchor="middle" fill="#e6dcf5" font-size="14">Unclaimed</text><rect x="246.0" y="395" width="188.0" height="190" rx="10" fill="#1c1630" stroke="#3a2f57"/><g transform="translate(340.0,480) scale(0.95)">
+<!-- Silicate asteroid: a warm stony tan-grey rock with a few craters (Orbiter 8 art, 120 units square, centered; free to use in the game) -->
+<defs><clipPath id="sil-body"><path d="M-34 -34Q-16 -50 6 -44Q30 -48 40 -28Q52 -10 44 10Q46 32 26 40Q8 52 -14 44Q-38 46 -44 24Q-54 4 -46 -14Q-46 -28 -34 -34Z"/></clipPath></defs>
+<path d="M-34 -34Q-16 -50 6 -44Q30 -48 40 -28Q52 -10 44 10Q46 32 26 40Q8 52 -14 44Q-38 46 -44 24Q-54 4 -46 -14Q-46 -28 -34 -34Z" fill="#786a60"/>
+<g clip-path="url(#sil-body)">
+  <path d="M-34 -34Q-16 -50 6 -44Q30 -48 40 -28Q52 -10 44 10Q46 32 26 40Q8 52 -14 44Q-38 46 -44 24Q-54 4 -46 -14Q-46 -28 -34 -34Z" transform="translate(-8 -7)" fill="#a5917c"/>
+  <path d="M-34 -34Q-16 -50 6 -44Q30 -48 40 -28Q52 -10 44 10Q46 32 26 40Q8 52 -14 44Q-38 46 -44 24Q-54 4 -46 -14Q-46 -28 -34 -34Z" transform="translate(-22 -20) scale(0.9)" fill="#bfab92"/>
+  <g fill="none" stroke="#857363" stroke-width="1" stroke-linecap="round" opacity="0.6"><path d="M-40 6Q-26 12 -12 8"/><path d="M2 -30Q14 -26 20 -34"/><path d="M8 30Q20 26 30 30"/></g>
+  <g fill="#d6c4a8"><ellipse cx="10.9" cy="-7" rx="10" ry="8"/><ellipse cx="-21.3" cy="-17.2" rx="6" ry="4.8"/><ellipse cx="-15.4" cy="24.7" rx="5" ry="4"/><ellipse cx="29.5" cy="18.5" rx="3.5" ry="2.8"/></g>
+  <g fill="#857363"><ellipse cx="10" cy="-8" rx="10" ry="8"/><ellipse cx="-22" cy="-18" rx="6" ry="4.8"/><ellipse cx="-16" cy="24" rx="5" ry="4"/><ellipse cx="29" cy="18" rx="3.5" ry="2.8"/></g>
+  <ellipse cx="11.5" cy="-6.5" rx="6" ry="4.5" fill="#94816f"/>
+  <g fill="#8f7c6a" opacity="0.7"><circle cx="-34" cy="-4" r="1.4"/><circle cx="-4" cy="14" r="1.6"/><circle cx="30" cy="-24" r="1.3"/><circle cx="2" cy="38" r="1.2"/><circle cx="-6" cy="-36" r="1.1"/></g>
+</g>
+<path d="M-34 -34Q-16 -50 6 -44Q30 -48 40 -28Q52 -10 44 10Q46 32 26 40Q8 52 -14 44Q-38 46 -44 24Q-54 4 -46 -14Q-46 -28 -34 -34Z" fill="none" stroke="#dccdb5" stroke-width="1.2"/>
+</g><text x="340.0" y="570" text-anchor="middle" fill="#e6dcf5" font-size="14">Platform</text><rect x="446.0" y="395" width="188.0" height="190" rx="10" fill="#1c1630" stroke="#3a2f57"/><g transform="translate(540.0,480) scale(0.95)">
+<!-- Silicate asteroid: a warm stony tan-grey rock with a few craters (Orbiter 8 art, 120 units square, centered; free to use in the game) -->
+<defs><clipPath id="sil-body"><path d="M-34 -34Q-16 -50 6 -44Q30 -48 40 -28Q52 -10 44 10Q46 32 26 40Q8 52 -14 44Q-38 46 -44 24Q-54 4 -46 -14Q-46 -28 -34 -34Z"/></clipPath></defs>
+<path d="M-34 -34Q-16 -50 6 -44Q30 -48 40 -28Q52 -10 44 10Q46 32 26 40Q8 52 -14 44Q-38 46 -44 24Q-54 4 -46 -14Q-46 -28 -34 -34Z" fill="#786a60"/>
+<g clip-path="url(#sil-body)">
+  <path d="M-34 -34Q-16 -50 6 -44Q30 -48 40 -28Q52 -10 44 10Q46 32 26 40Q8 52 -14 44Q-38 46 -44 24Q-54 4 -46 -14Q-46 -28 -34 -34Z" transform="translate(-8 -7)" fill="#a5917c"/>
+  <path d="M-34 -34Q-16 -50 6 -44Q30 -48 40 -28Q52 -10 44 10Q46 32 26 40Q8 52 -14 44Q-38 46 -44 24Q-54 4 -46 -14Q-46 -28 -34 -34Z" transform="translate(-22 -20) scale(0.9)" fill="#bfab92"/>
+  <g fill="none" stroke="#857363" stroke-width="1" stroke-linecap="round" opacity="0.6"><path d="M-40 6Q-26 12 -12 8"/><path d="M2 -30Q14 -26 20 -34"/><path d="M8 30Q20 26 30 30"/></g>
+  <g fill="#d6c4a8"><ellipse cx="10.9" cy="-7" rx="10" ry="8"/><ellipse cx="-21.3" cy="-17.2" rx="6" ry="4.8"/><ellipse cx="-15.4" cy="24.7" rx="5" ry="4"/><ellipse cx="29.5" cy="18.5" rx="3.5" ry="2.8"/></g>
+  <g fill="#857363"><ellipse cx="10" cy="-8" rx="10" ry="8"/><ellipse cx="-22" cy="-18" rx="6" ry="4.8"/><ellipse cx="-16" cy="24" rx="5" ry="4"/><ellipse cx="29" cy="18" rx="3.5" ry="2.8"/></g>
+  <ellipse cx="11.5" cy="-6.5" rx="6" ry="4.5" fill="#94816f"/>
+  <g fill="#8f7c6a" opacity="0.7"><circle cx="-34" cy="-4" r="1.4"/><circle cx="-4" cy="14" r="1.6"/><circle cx="30" cy="-24" r="1.3"/><circle cx="2" cy="38" r="1.2"/><circle cx="-6" cy="-36" r="1.1"/></g>
+</g>
+<path d="M-34 -34Q-16 -50 6 -44Q30 -48 40 -28Q52 -10 44 10Q46 32 26 40Q8 52 -14 44Q-38 46 -44 24Q-54 4 -46 -14Q-46 -28 -34 -34Z" fill="none" stroke="#dccdb5" stroke-width="1.2"/>
+</g><text x="540.0" y="570" text-anchor="middle" fill="#e6dcf5" font-size="14">Mine</text><rect x="646.0" y="395" width="188.0" height="190" rx="10" fill="#1c1630" stroke="#3a2f57"/><g transform="translate(740.0,480) scale(0.95)">
+<!-- Silicate asteroid: a warm stony tan-grey rock with a few craters (Orbiter 8 art, 120 units square, centered; free to use in the game) -->
+<defs><clipPath id="sil-body"><path d="M-34 -34Q-16 -50 6 -44Q30 -48 40 -28Q52 -10 44 10Q46 32 26 40Q8 52 -14 44Q-38 46 -44 24Q-54 4 -46 -14Q-46 -28 -34 -34Z"/></clipPath></defs>
+<path d="M-34 -34Q-16 -50 6 -44Q30 -48 40 -28Q52 -10 44 10Q46 32 26 40Q8 52 -14 44Q-38 46 -44 24Q-54 4 -46 -14Q-46 -28 -34 -34Z" fill="#786a60"/>
+<g clip-path="url(#sil-body)">
+  <path d="M-34 -34Q-16 -50 6 -44Q30 -48 40 -28Q52 -10 44 10Q46 32 26 40Q8 52 -14 44Q-38 46 -44 24Q-54 4 -46 -14Q-46 -28 -34 -34Z" transform="translate(-8 -7)" fill="#a5917c"/>
+  <path d="M-34 -34Q-16 -50 6 -44Q30 -48 40 -28Q52 -10 44 10Q46 32 26 40Q8 52 -14 44Q-38 46 -44 24Q-54 4 -46 -14Q-46 -28 -34 -34Z" transform="translate(-22 -20) scale(0.9)" fill="#bfab92"/>
+  <g fill="none" stroke="#857363" stroke-width="1" stroke-linecap="round" opacity="0.6"><path d="M-40 6Q-26 12 -12 8"/><path d="M2 -30Q14 -26 20 -34"/><path d="M8 30Q20 26 30 30"/></g>
+  <g fill="#d6c4a8"><ellipse cx="10.9" cy="-7" rx="10" ry="8"/><ellipse cx="-21.3" cy="-17.2" rx="6" ry="4.8"/><ellipse cx="-15.4" cy="24.7" rx="5" ry="4"/><ellipse cx="29.5" cy="18.5" rx="3.5" ry="2.8"/></g>
+  <g fill="#857363"><ellipse cx="10" cy="-8" rx="10" ry="8"/><ellipse cx="-22" cy="-18" rx="6" ry="4.8"/><ellipse cx="-16" cy="24" rx="5" ry="4"/><ellipse cx="29" cy="18" rx="3.5" ry="2.8"/></g>
+  <ellipse cx="11.5" cy="-6.5" rx="6" ry="4.5" fill="#94816f"/>
+  <g fill="#8f7c6a" opacity="0.7"><circle cx="-34" cy="-4" r="1.4"/><circle cx="-4" cy="14" r="1.6"/><circle cx="30" cy="-24" r="1.3"/><circle cx="2" cy="38" r="1.2"/><circle cx="-6" cy="-36" r="1.1"/></g>
+</g>
+<path d="M-34 -34Q-16 -50 6 -44Q30 -48 40 -28Q52 -10 44 10Q46 32 26 40Q8 52 -14 44Q-38 46 -44 24Q-54 4 -46 -14Q-46 -28 -34 -34Z" fill="none" stroke="#dccdb5" stroke-width="1.2"/>
+
+<!-- Asteroid station: a small mining base (landing pad, drill derrick, two modules, drones) drawn in the top-right quarter to lay over any asteroid-*.svg (Orbiter 8 art, 120 units square, centered; free to use in the game) -->
+<g transform="translate(30 -28)">
+  <ellipse cx="0" cy="17" rx="25" ry="4.5" fill="#000000" opacity="0.28"/>
+  <!-- landing pad -->
+  <g stroke="#8f7fb0" stroke-width="1.4" stroke-linecap="round"><path d="M-21 9V16"/><path d="M-13 11V17"/><path d="M-5 9V16"/></g>
+  <ellipse cx="-13" cy="8" rx="11.5" ry="4" fill="#8f7fb0" stroke="#e5cfff" stroke-width="0.8"/>
+  <ellipse cx="-13" cy="8" rx="7" ry="2.3" fill="none" stroke="#e5cfff" stroke-width="0.6" stroke-dasharray="2 1.2"/>
+  <circle cx="-13" cy="8" r="1" fill="#7fd4ff"/>
+  <rect x="-2.5" y="10" width="13" height="3" fill="#8f7fb0"/>
+  <!-- drill derrick -->
+  <path d="M4 -19V16" stroke="#ffd65c" stroke-width="1.4"/>
+  <path d="M2 15h4l-2 5z" fill="#ffd65c"/>
+  <g fill="none" stroke="#e5cfff" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"><path d="M-2 16L4 -20L10 16"/><path d="M-0.7 8H8.7M0.7 0H7.3M2 -8H6"/><path d="M-0.7 8L7.3 0L2 -8M8.7 8L0.7 0L6 -8"/></g>
+  <circle cx="4" cy="-21" r="1.5" fill="#7fd4ff"/>
+  <!-- modules -->
+  <path d="M14 5V-2" stroke="#e5cfff" stroke-width="0.8"/><circle cx="14" cy="-3" r="1.1" fill="#e5cfff"/>
+  <rect x="10" y="5" width="9.5" height="11" rx="1.5" fill="#b9a6d6" stroke="#e5cfff" stroke-width="0.8"/>
+  <rect x="12" y="8" width="2.2" height="2" fill="#7fd4ff"/><rect x="15.5" y="8" width="2.2" height="2" fill="#7fd4ff"/>
+  <path d="M19.5 16V10A3.5 3.5 0 0 1 26.500 10V16Z" fill="#8f7fb0" stroke="#e5cfff" stroke-width="0.8"/>
+  <rect x="22" y="11" width="2" height="2" fill="#7fd4ff"/>
+  <!-- drones -->
+  <g fill="#e5cfff"><circle cx="-19" cy="-6" r="1.2"/><circle cx="-10" cy="-14" r="1"/><circle cx="-22" cy="-17" r="0.8" opacity="0.7"/><circle cx="17" cy="-12" r="1.1"/><circle cx="22" cy="-20" r="0.8" opacity="0.7"/></g>
+</g>
+</g><text x="740.0" y="570" text-anchor="middle" fill="#e6dcf5" font-size="14">Port</text><rect x="846.0" y="395" width="188.0" height="190" rx="10" fill="#1c1630" stroke="#3a2f57"/><g transform="translate(940.0,480) scale(0.95)">
+<!-- Silicate asteroid: a warm stony tan-grey rock with a few craters (Orbiter 8 art, 120 units square, centered; free to use in the game) -->
+<defs><clipPath id="sil-body"><path d="M-34 -34Q-16 -50 6 -44Q30 -48 40 -28Q52 -10 44 10Q46 32 26 40Q8 52 -14 44Q-38 46 -44 24Q-54 4 -46 -14Q-46 -28 -34 -34Z"/></clipPath></defs>
+<path d="M-34 -34Q-16 -50 6 -44Q30 -48 40 -28Q52 -10 44 10Q46 32 26 40Q8 52 -14 44Q-38 46 -44 24Q-54 4 -46 -14Q-46 -28 -34 -34Z" fill="#786a60"/>
+<g clip-path="url(#sil-body)">
+  <path d="M-34 -34Q-16 -50 6 -44Q30 -48 40 -28Q52 -10 44 10Q46 32 26 40Q8 52 -14 44Q-38 46 -44 24Q-54 4 -46 -14Q-46 -28 -34 -34Z" transform="translate(-8 -7)" fill="#a5917c"/>
+  <path d="M-34 -34Q-16 -50 6 -44Q30 -48 40 -28Q52 -10 44 10Q46 32 26 40Q8 52 -14 44Q-38 46 -44 24Q-54 4 -46 -14Q-46 -28 -34 -34Z" transform="translate(-22 -20) scale(0.9)" fill="#bfab92"/>
+  <g fill="none" stroke="#857363" stroke-width="1" stroke-linecap="round" opacity="0.6"><path d="M-40 6Q-26 12 -12 8"/><path d="M2 -30Q14 -26 20 -34"/><path d="M8 30Q20 26 30 30"/></g>
+  <g fill="#d6c4a8"><ellipse cx="10.9" cy="-7" rx="10" ry="8"/><ellipse cx="-21.3" cy="-17.2" rx="6" ry="4.8"/><ellipse cx="-15.4" cy="24.7" rx="5" ry="4"/><ellipse cx="29.5" cy="18.5" rx="3.5" ry="2.8"/></g>
+  <g fill="#857363"><ellipse cx="10" cy="-8" rx="10" ry="8"/><ellipse cx="-22" cy="-18" rx="6" ry="4.8"/><ellipse cx="-16" cy="24" rx="5" ry="4"/><ellipse cx="29" cy="18" rx="3.5" ry="2.8"/></g>
+  <ellipse cx="11.5" cy="-6.5" rx="6" ry="4.5" fill="#94816f"/>
+  <g fill="#8f7c6a" opacity="0.7"><circle cx="-34" cy="-4" r="1.4"/><circle cx="-4" cy="14" r="1.6"/><circle cx="30" cy="-24" r="1.3"/><circle cx="2" cy="38" r="1.2"/><circle cx="-6" cy="-36" r="1.1"/></g>
+</g>
+<path d="M-34 -34Q-16 -50 6 -44Q30 -48 40 -28Q52 -10 44 10Q46 32 26 40Q8 52 -14 44Q-38 46 -44 24Q-54 4 -46 -14Q-46 -28 -34 -34Z" fill="none" stroke="#dccdb5" stroke-width="1.2"/>
+
+<!-- Asteroid station: a small mining base (landing pad, drill derrick, two modules, drones) drawn in the top-right quarter to lay over any asteroid-*.svg (Orbiter 8 art, 120 units square, centered; free to use in the game) -->
+<g transform="translate(30 -28)">
+  <ellipse cx="0" cy="17" rx="25" ry="4.5" fill="#000000" opacity="0.28"/>
+  <!-- landing pad -->
+  <g stroke="#8f7fb0" stroke-width="1.4" stroke-linecap="round"><path d="M-21 9V16"/><path d="M-13 11V17"/><path d="M-5 9V16"/></g>
+  <ellipse cx="-13" cy="8" rx="11.5" ry="4" fill="#8f7fb0" stroke="#e5cfff" stroke-width="0.8"/>
+  <ellipse cx="-13" cy="8" rx="7" ry="2.3" fill="none" stroke="#e5cfff" stroke-width="0.6" stroke-dasharray="2 1.2"/>
+  <circle cx="-13" cy="8" r="1" fill="#7fd4ff"/>
+  <rect x="-2.5" y="10" width="13" height="3" fill="#8f7fb0"/>
+  <!-- drill derrick -->
+  <path d="M4 -19V16" stroke="#ffd65c" stroke-width="1.4"/>
+  <path d="M2 15h4l-2 5z" fill="#ffd65c"/>
+  <g fill="none" stroke="#e5cfff" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"><path d="M-2 16L4 -20L10 16"/><path d="M-0.7 8H8.7M0.7 0H7.3M2 -8H6"/><path d="M-0.7 8L7.3 0L2 -8M8.7 8L0.7 0L6 -8"/></g>
+  <circle cx="4" cy="-21" r="1.5" fill="#7fd4ff"/>
+  <!-- modules -->
+  <path d="M14 5V-2" stroke="#e5cfff" stroke-width="0.8"/><circle cx="14" cy="-3" r="1.1" fill="#e5cfff"/>
+  <rect x="10" y="5" width="9.5" height="11" rx="1.5" fill="#b9a6d6" stroke="#e5cfff" stroke-width="0.8"/>
+  <rect x="12" y="8" width="2.2" height="2" fill="#7fd4ff"/><rect x="15.5" y="8" width="2.2" height="2" fill="#7fd4ff"/>
+  <path d="M19.5 16V10A3.5 3.5 0 0 1 26.500 10V16Z" fill="#8f7fb0" stroke="#e5cfff" stroke-width="0.8"/>
+  <rect x="22" y="11" width="2" height="2" fill="#7fd4ff"/>
+  <!-- drones -->
+  <g fill="#e5cfff"><circle cx="-19" cy="-6" r="1.2"/><circle cx="-10" cy="-14" r="1"/><circle cx="-22" cy="-17" r="0.8" opacity="0.7"/><circle cx="17" cy="-12" r="1.1"/><circle cx="22" cy="-20" r="0.8" opacity="0.7"/></g>
+</g>
+</g><text x="940.0" y="570" text-anchor="middle" fill="#e6dcf5" font-size="14">Armory</text><rect x="1046.0" y="395" width="188.0" height="190" rx="10" fill="#1c1630" stroke="#3a2f57"/><g transform="translate(1140.0,480) scale(0.95)">
+<!-- Silicate asteroid: a warm stony tan-grey rock with a few craters (Orbiter 8 art, 120 units square, centered; free to use in the game) -->
+<defs><clipPath id="sil-body"><path d="M-34 -34Q-16 -50 6 -44Q30 -48 40 -28Q52 -10 44 10Q46 32 26 40Q8 52 -14 44Q-38 46 -44 24Q-54 4 -46 -14Q-46 -28 -34 -34Z"/></clipPath></defs>
+<path d="M-34 -34Q-16 -50 6 -44Q30 -48 40 -28Q52 -10 44 10Q46 32 26 40Q8 52 -14 44Q-38 46 -44 24Q-54 4 -46 -14Q-46 -28 -34 -34Z" fill="#786a60"/>
+<g clip-path="url(#sil-body)">
+  <path d="M-34 -34Q-16 -50 6 -44Q30 -48 40 -28Q52 -10 44 10Q46 32 26 40Q8 52 -14 44Q-38 46 -44 24Q-54 4 -46 -14Q-46 -28 -34 -34Z" transform="translate(-8 -7)" fill="#a5917c"/>
+  <path d="M-34 -34Q-16 -50 6 -44Q30 -48 40 -28Q52 -10 44 10Q46 32 26 40Q8 52 -14 44Q-38 46 -44 24Q-54 4 -46 -14Q-46 -28 -34 -34Z" transform="translate(-22 -20) scale(0.9)" fill="#bfab92"/>
+  <g fill="none" stroke="#857363" stroke-width="1" stroke-linecap="round" opacity="0.6"><path d="M-40 6Q-26 12 -12 8"/><path d="M2 -30Q14 -26 20 -34"/><path d="M8 30Q20 26 30 30"/></g>
+  <g fill="#d6c4a8"><ellipse cx="10.9" cy="-7" rx="10" ry="8"/><ellipse cx="-21.3" cy="-17.2" rx="6" ry="4.8"/><ellipse cx="-15.4" cy="24.7" rx="5" ry="4"/><ellipse cx="29.5" cy="18.5" rx="3.5" ry="2.8"/></g>
+  <g fill="#857363"><ellipse cx="10" cy="-8" rx="10" ry="8"/><ellipse cx="-22" cy="-18" rx="6" ry="4.8"/><ellipse cx="-16" cy="24" rx="5" ry="4"/><ellipse cx="29" cy="18" rx="3.5" ry="2.8"/></g>
+  <ellipse cx="11.5" cy="-6.5" rx="6" ry="4.5" fill="#94816f"/>
+  <g fill="#8f7c6a" opacity="0.7"><circle cx="-34" cy="-4" r="1.4"/><circle cx="-4" cy="14" r="1.6"/><circle cx="30" cy="-24" r="1.3"/><circle cx="2" cy="38" r="1.2"/><circle cx="-6" cy="-36" r="1.1"/></g>
+</g>
+<path d="M-34 -34Q-16 -50 6 -44Q30 -48 40 -28Q52 -10 44 10Q46 32 26 40Q8 52 -14 44Q-38 46 -44 24Q-54 4 -46 -14Q-46 -28 -34 -34Z" fill="none" stroke="#dccdb5" stroke-width="1.2"/>
+
+<!-- Asteroid station: a small mining base (landing pad, drill derrick, two modules, drones) drawn in the top-right quarter to lay over any asteroid-*.svg (Orbiter 8 art, 120 units square, centered; free to use in the game) -->
+<g transform="translate(30 -28)">
+  <ellipse cx="0" cy="17" rx="25" ry="4.5" fill="#000000" opacity="0.28"/>
+  <!-- landing pad -->
+  <g stroke="#8f7fb0" stroke-width="1.4" stroke-linecap="round"><path d="M-21 9V16"/><path d="M-13 11V17"/><path d="M-5 9V16"/></g>
+  <ellipse cx="-13" cy="8" rx="11.5" ry="4" fill="#8f7fb0" stroke="#e5cfff" stroke-width="0.8"/>
+  <ellipse cx="-13" cy="8" rx="7" ry="2.3" fill="none" stroke="#e5cfff" stroke-width="0.6" stroke-dasharray="2 1.2"/>
+  <circle cx="-13" cy="8" r="1" fill="#7fd4ff"/>
+  <rect x="-2.5" y="10" width="13" height="3" fill="#8f7fb0"/>
+  <!-- drill derrick -->
+  <path d="M4 -19V16" stroke="#ffd65c" stroke-width="1.4"/>
+  <path d="M2 15h4l-2 5z" fill="#ffd65c"/>
+  <g fill="none" stroke="#e5cfff" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"><path d="M-2 16L4 -20L10 16"/><path d="M-0.7 8H8.7M0.7 0H7.3M2 -8H6"/><path d="M-0.7 8L7.3 0L2 -8M8.7 8L0.7 0L6 -8"/></g>
+  <circle cx="4" cy="-21" r="1.5" fill="#7fd4ff"/>
+  <!-- modules -->
+  <path d="M14 5V-2" stroke="#e5cfff" stroke-width="0.8"/><circle cx="14" cy="-3" r="1.1" fill="#e5cfff"/>
+  <rect x="10" y="5" width="9.5" height="11" rx="1.5" fill="#b9a6d6" stroke="#e5cfff" stroke-width="0.8"/>
+  <rect x="12" y="8" width="2.2" height="2" fill="#7fd4ff"/><rect x="15.5" y="8" width="2.2" height="2" fill="#7fd4ff"/>
+  <path d="M19.5 16V10A3.5 3.5 0 0 1 26.500 10V16Z" fill="#8f7fb0" stroke="#e5cfff" stroke-width="0.8"/>
+  <rect x="22" y="11" width="2" height="2" fill="#7fd4ff"/>
+  <!-- drones -->
+  <g fill="#e5cfff"><circle cx="-19" cy="-6" r="1.2"/><circle cx="-10" cy="-14" r="1"/><circle cx="-22" cy="-17" r="0.8" opacity="0.7"/><circle cx="17" cy="-12" r="1.1"/><circle cx="22" cy="-20" r="0.8" opacity="0.7"/></g>
+</g>
+</g><text x="1140.0" y="570" text-anchor="middle" fill="#e6dcf5" font-size="14">Sol (Federation)</text></svg>
