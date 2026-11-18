@@ -31,6 +31,7 @@ decisions:** its accounts and signer, personhood, names, NFTs and hosting over o
 | D104 | **Players without PAS sign each move** (a phone approval per move, paid with PGAS) until they hold PAS; then session keys. The game doesn't sponsor session gas. (Koda, 2026-11-18) |
 | D105 | **Ships become native Scarcity NFTs** in the App. Ownership is redesigned around a pilot record the ships' keys are tied to (fits fleets, D26); our ERC-721 stays until mainnet has Scarcity. (Koda, 2026-11-18) |
 | D106 | **A testnet build is published beside Demo 3**, at a subpath of the `orbiter8-demo3-client` Pages site (e.g. `/testnet/`); Demo 3 stays where it is. Prepared locally; Koda pushes. (Koda, 2026-11-18) |
+| D107 | **Every NFT draws itself as an SVG, on chain** (Koda, 2026-11-18): ships already do (`Ships.tokenURI`, `ShipArt.svg`); deeds (planets, moons, asteroids) get theirs, in the card's art; every future NFT too. To find out for Scarcity (D105): its metadata is stored key/value data, so a picture that changes with the ship either is rewritten into it on change (storage deposits) or reaches the Pocket another way (the product's renderer, or a `tokenURI` from our contract): check in the App. |
 
 ## Polkadot's own direction (2026-11-11)
 

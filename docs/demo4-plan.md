@@ -131,6 +131,7 @@ design doc), [`design-ideas.md`](design-ideas.md) (Koda's working doc), [`cost-e
 | D104 | **Players without PAS sign each move** (a phone approval per move, paid with PGAS) until they hold PAS; then session keys. The game doesn't sponsor session gas. ([polkadot-direction.md](polkadot-direction.md)) | 2026-11-18 |
 | D105 | **Ships become native Scarcity NFTs** in the App. Ownership is redesigned around a pilot record the ships' keys are tied to (fits fleets, D26); our ERC-721 stays until mainnet has Scarcity. ([polkadot-direction.md](polkadot-direction.md)) | 2026-11-18 |
 | D106 | **A testnet build is published beside Demo 3**, at a subpath of the `orbiter8-demo3-client` Pages site (e.g. `/testnet/`); Demo 3 stays where it is. Prepared locally; Koda pushes. ([polkadot-direction.md](polkadot-direction.md)) | 2026-11-18 |
+| D107 | **Every NFT draws itself as an SVG, on chain** (Koda, 2026-11-18): ships already do (`Ships.tokenURI`, `ShipArt.svg`); deeds (planets, moons, asteroids) get theirs, in the card's art; every future NFT too. To find out for Scarcity (D105): its metadata is stored key/value data, so a picture that changes with the ship either is rewritten into it on change (storage deposits) or reaches the Pocket another way (the product's renderer, or a `tokenURI` from our contract): check in the App. | 2026-11-18 |
 
 ## Features: this run and consider next (proposed, for Koda to choose)
 
@@ -171,6 +172,7 @@ hard to add later because it shapes the data, low-hanging, or the battle minimum
 - **Analyze the clean-room client's ideas (to do, Koda 2026-11-16):** `client-rnd/fresh/` (its GAME.md and DESIGN.md: one market board per star, planned trade routes and courses, one list of every timer, every move's visible life) "has some great ideas"; study them for the main client after the planned work.
 - **A cheat code for debugging (next release, Koda 2026-11-17):** a way to give the pilot credits, goods, parts or time while testing a deployment (an admin-only contract function, or a debug panel calling the admin's moves). Not in the 2026-11-17 testnet deploy.
 - **The HUD's planet picker (revisit, Koda 2026-11-16):** the strip of the system's bodies on the selection card (from `client-rnd/hud/`). Keep it as is when the HUD comes into the main client; later, give it much more to do.
+- **Deeds draw themselves (to do, D107):** `Deeds.tokenURI` with an on-chain SVG of the planet, moon or asteroid (class colors, size, rings, its station and owner's mark), in the selection card's NFT-card look; mirrors the client's drawing like `ShipArt` ↔ `sdk/src/ship-art.js`. Watch Deeds' size (24,576 bytes): the art may need its own library contract.
 - **Revisit the scan's randomness (Koda 2026-11-18):** the drand scan (D35) feels less than smooth: a
   jump, a wait for the drand round, then another wallet popup to write it. Not happy with drand's use;
   revisit later, guided by the Polkadot App (what randomness Polkadot Hub or the App offers, and moves
