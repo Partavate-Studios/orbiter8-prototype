@@ -550,6 +550,13 @@ Calls made building it, for Koda's review:
   180 px free right of it, the camera eases the selection into the middle of that space, and back when
   it closes (`stores/ui.js` selectionShiftPx, measured from the sheet). Phones are unchanged (their
   sheet spans the screen).
+- **X26. The menu's action buttons, restyled** (2026-11-17, Koda: the bright purple pills didn't sit with
+  the new menu, and their icons were squeezed onto the edge). Now pills in the menu's plum and lavender
+  (dark gradient, lavender outline, lavender on hover), each with its picture in a round well like the
+  big icons above; actions without art get a line glyph (jump, session, rename, market, black hole, name
+  star; `libs/body-art.js` ACTION_GLYPH). The ✕ moved up beside the big icons, so five slots fit.
+  Shots: `docs/mockups/selection-strips/buttons-*.png`. This is a restyle of the card menu's buttons
+  (Koda asked for it directly).
 - **X6. Wording:** the loadout's empty-weapons line says "Every Sol station's armory sells them." (was "The
   I.S.S. armory").
 

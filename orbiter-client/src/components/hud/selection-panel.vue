@@ -23,7 +23,7 @@
           <div class="inside" :inert="!drawerOpen || undefined">
             <!-- where to go from here, big and wordless (Koda, 2026-11-17): its port, its moons, or back
                  to its planet; the actions follow below -->
-            <div v-if="goes.length" class="goes">
+            <div class="goes">
               <button
                 v-for="go in goes"
                 :key="go.kind"
@@ -38,11 +38,14 @@
                 <span v-else class="sphere" :style="go.style" />
                 <b v-if="go.count > 1" class="count">{{ go.count }}</b>
               </button>
+              <span class="spacer" />
+              <rim-button small bare label="Put the card away" :tint="theme.accent" @press="toggleScope()"><x-icon /></rim-button>
             </div>
             <div class="list" data-own-scroll>
               <template v-if="page === 'moons'">
-                <button v-for="moon in family.moons" :key="moon.moonId" type="button" class="action" @click="select(moon.moonId)">
-                  <span>{{ moon.moonName }}</span>
+                <button v-for="moon in family.moons" :key="moon.moonId" type="button" class="action pictured" @click="select(moon.moonId)">
+                  <span class="well"><span class="sphere" :style="moonSphere(moon.moonId)" /></span>
+                  <span class="text">{{ moon.moonName }}</span>
                 </button>
               </template>
               <template v-for="(option, index) in slots" v-else :key="index">
@@ -50,22 +53,20 @@
                   v-if="option"
                   type="button"
                   class="action"
-                  :class="{ dim: !option.enabled, pictured: ACTION_ART[option.command] }"
+                  :class="{ dim: !option.enabled, pictured: ACTION_ART[option.command] || ACTION_GLYPH[option.command] }"
                   :title="index < 9 && !sheet ? `${option.text} (${index + 1})` : undefined"
                   @click="run(option)"
                 >
-                  <img v-if="ACTION_ART[option.command]" class="art" :src="ACTION_ART[option.command]" alt="" />
-                  <span :style="{ fontSize: labelSize(option.text) + 'px' }">{{ option.text }}</span>
+                  <span v-if="ACTION_ART[option.command]" class="well"><img :src="ACTION_ART[option.command]" alt="" /></span>
+                  <span v-else-if="ACTION_GLYPH[option.command]" class="well">
+                    <svg viewBox="-12 -12 24 24" aria-hidden="true"><path :d="ACTION_GLYPH[option.command]" /></svg>
+                  </span>
+                  <span class="text" :style="{ fontSize: labelSize(option.text) + 'px' }">{{ option.text }}</span>
                 </button>
                 <!-- an empty slot keeps its place, so the buttons under it don't move -->
                 <span v-else class="action empty" aria-hidden="true" />
               </template>
               <p v-if="!slots.length" class="none">Nothing to do here.</p>
-            </div>
-            <!-- put the card away -->
-            <div class="icons">
-              <span class="spacer" />
-              <rim-button small bare label="Put the card away" :tint="theme.accent" @press="toggleScope()"><x-icon /></rim-button>
             </div>
           </div>
           <!-- the tab: always in view, out past the card's edge -->
@@ -115,7 +116,7 @@ import { CARD_THEMES, cardThemeKey } from '@/libs/card-theme'
 import { fitSize } from '@/libs/fit-text'
 import Info from '@/components/star-map/hud/card-ui/info.svg'
 import XIcon from '@/components/star-map/hud/icons/x-icon.svg'
-import { ACTION_ART, ASTEROID_ART, PORT_ART, bodySphere } from '@/libs/body-art'
+import { ACTION_ART, ACTION_GLYPH, ASTEROID_ART, PORT_ART, bodySphere } from '@/libs/body-art'
 import RimButton from './rim-button.vue'
 import SystemStrip from './system-strip.vue'
 import NearbyStrip from './nearby-strip.vue'
@@ -141,6 +142,7 @@ export default {
   data() {
     return {
       ACTION_ART,
+      ACTION_GLYPH,
       page: 'main',
       heldUp: false,
       // the card with a margin for its siege frame and its "yours" badge
@@ -229,7 +231,10 @@ export default {
     ...mapActions(useUIStore, ['toggleScope', 'selectSprite', 'toggleActions']),
     /** Long labels ("Claim Planet (2,000¢)", "View on …") shrink to the button. */
     labelSize(text) {
-      return fitSize(text, 15, this.sheet ? 150 : 165, 700)
+      return fitSize(text, 15, this.sheet ? 140 : 150, 700)
+    },
+    moonSphere(key) {
+      return bodySphere(this.systemObjects[key], 24)
     },
     select(key) {
       this.o8audio.playEffect('click')
@@ -383,7 +388,7 @@ export default {
   display: flex;
   flex-direction: column;
   /* five slots (a planet's most) fit the menu without scrolling */
-  gap: 6px;
+  gap: 5px;
   min-height: 0;
   overflow-y: auto;
   scrollbar-width: thin;
@@ -392,72 +397,104 @@ export default {
   padding: 3px;
   margin: -3px;
 }
-/* card-button.svg.vue's pill, at a size to press */
+/* an action: a pill in the menu's own plum and lavender, its picture in a round well like the big
+   icons above it (Koda, 2026-11-17: the old bright purple pills didn't sit with the menu) */
 .action {
   position: relative;
   flex: none;
   display: flex;
   align-items: center;
-  justify-content: center;
-  height: 36px;
+  gap: 9px;
+  height: 38px;
   box-sizing: border-box;
-  padding: 0 22px;
-  border: 1px solid #5b1aaa88;
-  border-radius: 60px / 14px;
-  background: linear-gradient(135deg, #5c1aae 0%, #280b4b 10%, #5c1aae 50%, #280b4b 90%, #5c1aae 100%);
-  color: #ffffff;
+  padding: 0 14px 0 16px;
+  border: 1.5px solid #4a3d7a;
+  border-radius: 19px;
+  background: linear-gradient(180deg, #2e2354 0%, #211839 100%);
+  color: #efe7ff;
   font: inherit;
   font-weight: bold;
+  text-align: left;
   white-space: nowrap;
-  text-shadow: 0 1px 3px #000c;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
+.action.pictured {
+  padding-left: 4px;
+}
 .action:hover {
-  border-color: #5b1aaa;
-  background: linear-gradient(90deg, #5c1aae 0%, #280b4b 10%, #5c1aae 50%, #280b4b 90%, #5c1aae 100%);
-}
-.action.dim {
-  color: #ffffff66;
-}
-/* an empty slot: a faint socket where its button goes */
-.action.empty {
-  border: 1px dashed #5a4c8c66;
-  background: none;
-  cursor: default;
+  border-color: #b9a0ff;
+  background: linear-gradient(180deg, #3a2c69 0%, #2a1f4c 100%);
 }
 .action:focus-visible {
   outline: 2.5px solid var(--o8-brand-300);
   outline-offset: 3px;
 }
-/* an action's picture, at the pill's left end */
-.action.pictured {
-  padding-left: 40px;
+.action.dim {
+  color: #efe7ff66;
 }
-.action .art {
-  position: absolute;
-  left: 8px;
-  width: 26px;
-  height: 26px;
-  filter: drop-shadow(0 1px 2px #000a);
+.action.dim .well img {
+  opacity: 0.4;
 }
-.action.dim .art {
-  opacity: 0.45;
+.action .text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* the picture's round well, as the big icons */
+.well {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #5a4c8c;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%, #3d2a6e 0%, #1a1331 80%);
+}
+.well img {
+  width: 24px;
+  height: 24px;
+}
+.well svg {
+  width: 20px;
+  height: 20px;
+}
+.well path {
+  fill: none;
+  stroke: #d9ccf5;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.action.dim .well svg {
+  opacity: 0.4;
+}
+.well .sphere {
+  display: block;
+  border-radius: 50%;
+}
+/* an empty slot: a faint socket where its button goes */
+.action.empty {
+  border: 1px dashed #5a4c8c55;
+  background: none;
+  cursor: default;
 }
 /* the big icons at the menu's top: its port, its moons, back to its planet */
 .goes {
   flex: none;
   display: flex;
-  justify-content: center;
-  gap: 14px;
-  padding: 2px 0 10px;
+  align-items: center;
+  gap: 10px;
+  padding: 0 0 8px;
 }
 .go {
   position: relative;
+  flex: none;
   display: grid;
   place-items: center;
-  width: 60px;
-  height: 60px;
+  width: 54px;
+  height: 54px;
   padding: 0;
   border: 1.5px solid #5a4c8c;
   border-radius: 50%;
@@ -475,8 +512,8 @@ export default {
   outline-offset: 3px;
 }
 .go img {
-  width: 46px;
-  height: 46px;
+  width: 42px;
+  height: 42px;
 }
 .go .sphere {
   display: block;
@@ -516,14 +553,7 @@ export default {
   font-size: 13px;
   text-align: center;
 }
-.icons {
-  flex: none;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding-top: 8px;
-}
-.icons .rim-button {
+.goes .rim-button {
   min-width: 40px;
 }
 .spacer {
@@ -627,10 +657,6 @@ export default {
 }
 .sheet .action {
   height: 42px;
-  padding: 0 16px;
-}
-.sheet .icons {
-  padding-top: 6px;
 }
 .held-up {
   position: fixed;
