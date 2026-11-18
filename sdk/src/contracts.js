@@ -15,7 +15,7 @@ import ArmoryAbi from './abi/Armory.json'
 import { fetchRound } from './drand'
 import { parseRevert } from './reverts'
 import { queryChunked } from './event-log'
-import { indexOf } from './body-id'
+import { indexOf, bodyId, KIND } from './body-id'
 
 export const STATE = { UNDECIDED: 0, EMPTY: 1, STAR: 2, BLACK_HOLE: 3 }
 /** Cells per region read; the contracts cap it at 10. */
@@ -150,6 +150,9 @@ const toCost = (c) => ({
 export const ASTEROID_STEPS = [1, 2, 4, 6]
 export const ASTEROID_BUILDING_NAMES = { 1: 'Platform', 2: 'Mine', 4: 'Port', 6: 'Armory' }
 
+/** A read that failed with no revert data at all: a node's limit on one call (memory), not the contract's refusal. */
+const overLimit = (error) => error?.code === 'CALL_EXCEPTION' && (error.data == null || error.data === '0x')
+
 export function createGame(runner, addresses) {
   const galaxy = new Contract(addresses.galaxy, GalaxyAbi, runner)
   const pilots = new Contract(addresses.pilots, PilotsAbi, runner)
@@ -157,6 +160,21 @@ export function createGame(runner, addresses) {
   const credits = new Contract(addresses.credits, CreditsAbi, runner)
   const planets = new Contract(addresses.planets, PlanetsAbi, runner)
   const claims = new Contract(addresses.claims, ClaimsAbi, runner)
+  const planetIdOf = (cell, index) => bodyId(cell, KIND.PLANET, index)
+  const asteroidIdOf = (cell, index) => bodyId(cell, KIND.ASTEROID, index)
+  /**
+   * A star's bodies in one call, or, when a node's per-call limit stops that (Polkadot Hub TestNet refused
+   * Sol's nine planets with eight goods: no revert data, 2026-11-17), one call per body.
+   */
+  async function batchOrEach(batch, count, idOf, goods) {
+    try {
+      return (await batch()).map(toPlanet)
+    } catch (error) {
+      if (!overLimit(error) || !count) throw error
+      const ids = Array.from({ length: count }, (_, i) => idOf(i))
+      return Promise.all(ids.map(async (id) => toPlanet(await planets.planetView(id, goods))))
+    }
+  }
   const factory = new Contract(addresses.factory, FactoryAbi, runner)
   const battle = new Contract(addresses.battle, BattleAbi, runner)
   const repairs = new Contract(addresses.repairs, RepairsAbi, runner)
@@ -259,13 +277,13 @@ export function createGame(runner, addresses) {
     },
 
     /** Every planet at a star, as it stands now, with `goods` stock entries. */
-    async system(cell, goods) {
-      return (await planets.system(cell, goods)).map(toPlanet)
+    async system(cell, goods, count) {
+      return batchOrEach(() => planets.system(cell, goods), count, (i) => planetIdOf(cell, i), goods)
     },
 
-    /** Every asteroid in a star's belt, as it stands now (none without a belt). */
-    async belt(cell, goods) {
-      return (await planets.belt(cell, goods)).map(toPlanet)
+    /** Every asteroid in a star's belt, as it stands now (none without a belt). `sections`: the indexes holding one. */
+    async belt(cell, goods, sections) {
+      return batchOrEach(() => planets.belt(cell, goods), sections?.length, (i) => asteroidIdOf(cell, sections[i]), goods)
     },
 
     /** What planets cost: buildings 1–7, the claim fee and the colonist price; the Autofactory's parts. */

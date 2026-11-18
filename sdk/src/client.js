@@ -423,7 +423,7 @@ export function createGameClient() {
     onProgress(10)
     const star = state.cells.get(cell)
     const [planets, ports, sieges, here, recentTrades, keeper, naming, capacity] = await Promise.all([
-      star?.state === STATE.STAR ? game.system(cell, goods) : [],
+      star?.state === STATE.STAR ? game.system(cell, goods, planetCount(seed, cell)) : [],
       game.portsAt(cell),
       game.siegesAt(cell),
       game.shipsAt(cell, pilots),
@@ -577,7 +577,8 @@ export function createGameClient() {
    * owner, line, people, storage, port and drone pool) or empty space with its six mining slots.
    */
   async function loadBelt(cell, seed, goods, portAt, planetCount) {
-    const [views, mine] = await Promise.all([game.belt(cell, goods), state.pilot ? game.mining(state.account) : null])
+    const withAsteroid = Array.from({ length: SECTIONS }, (_, i) => i).filter((i) => beltSection(seed, cell, i).asteroid)
+    const [views, mine] = await Promise.all([game.belt(cell, goods, withAsteroid), state.pilot ? game.mining(state.account) : null])
     const viewOf = new Map(views.map((v) => [v.id, v]))
     const sections = await Promise.all(
       Array.from({ length: SECTIONS }, async (_, index) => {

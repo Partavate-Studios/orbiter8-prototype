@@ -290,3 +290,16 @@ What it means:
 - [paritytech/dotns](https://github.com/paritytech/dotns) (a contract using the personhood precompile)
 - [Polkadot App on Google Play](https://play.google.com/store/apps/details?id=io.pcf.polkadotapp&hl=en_US)
 - The earlier research: [`research/polkadot-hub-2026-11.md`](research/polkadot-hub-2026-11.md)
+
+### Testnet: a per-call memory limit on EVM bytecode too (2026-11-17)
+
+After the expansion's deploy, `Planets.system(0, 8)` (Sol's nine planets, eight goods each) reverted on
+Polkadot Hub TestNet with no revert data, at any gas, though it needs only 426,000 gas locally; with up to
+seven goods it works, and each planet alone works. The new `planetView` calls Claims for each planet's
+owner, and the extra memory took it past the node's per-call limit (the same kind of limit as PolkaVM's,
+"reads that return long lists fail", now met on the EVM engine too). The SDK now falls back to one
+`planetView` per body when a batch read fails with no revert data (`sdk/src/contracts.js` batchOrEach, for
+`system` and `belt`); a planet's view grows as it's built up, so other systems could reach the limit later.
+To do: keep batch reads small by design (count, then fill; fewer external calls per item), and measure
+memory per read.
+
