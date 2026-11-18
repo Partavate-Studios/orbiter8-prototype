@@ -1,6 +1,6 @@
 <template>
   <!-- Where you are: the system's number and name, its star, the minimap with the zoom beside it, what's
-       here (planets, ships) and the way out (jump). On a phone the name, the minimap and the zoom: the
+       here (planets, ports, ships) and the way out (jump). On a phone the name, the minimap and the zoom: the
        rest are tabs. -->
   <div class="system-block" :class="{ compact }">
     <div class="title">
@@ -20,6 +20,9 @@
     <div v-if="!compact" class="here">
       <rim-button label="Planets" title="Planets (P; Tab steps through them)" :tint="HUD_TINT.planets" :rest="HUD_REST.planets" :badge="planetCount" :on="menuState.planetsMenu" @press="$emit('menu', 'planets')">
         <planets-icon />
+      </rim-button>
+      <rim-button label="Ports" title="Ports in this system: prices, yards, armories" :tint="HUD_TINT.ports" :rest="HUD_REST.ports" :badge="portCount" :on="menuState.portsMenu" @press="$emit('menu', 'ports')">
+        <ports-icon />
       </rim-button>
       <rim-button label="Ships" title="Ships in this system" :tint="HUD_TINT.ships" :rest="HUD_REST.ships" :badge="shipCount" :on="menuState.shipsMenu" @press="$emit('menu', 'ships')">
         <ships-icon />
@@ -43,6 +46,7 @@ import StarIcon from '@/components/star-map/hud/icons/star-icon.svg'
 import JumpIcon from '@/components/star-map/hud/icons/jump-icon.svg'
 import PlanetsIcon from '@/components/star-map/hud/icons/planets-icon.svg'
 import ShipsIcon from '@/components/star-map/hud/icons/ships-icon.svg'
+import PortsIcon from '@/components/star-map/hud/icons/ports-icon.svg'
 import RimButton from './rim-button.vue'
 import ZoomRail from './zoom-rail.vue'
 
@@ -54,7 +58,7 @@ export function starTint(star) {
 
 export default {
   name: 'SystemBlock',
-  components: { Minimap, StarIcon, JumpIcon, PlanetsIcon, ShipsIcon, RimButton, ZoomRail },
+  components: { Minimap, StarIcon, JumpIcon, PlanetsIcon, ShipsIcon, PortsIcon, RimButton, ZoomRail },
   props: {
     compact: { type: Boolean, default: false }
   },
@@ -73,6 +77,9 @@ export default {
     },
     starTitle() {
       return this.selected === STAR_KEY ? 'Neighboring stars' : 'The star'
+    },
+    portCount() {
+      return Object.values(this.systemObjects).filter((o) => o.type === 'station').length
     },
     planetCount() {
       return this.spriteIds.planets?.length ?? 0

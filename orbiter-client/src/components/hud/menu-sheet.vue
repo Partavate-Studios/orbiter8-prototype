@@ -47,10 +47,12 @@ import SiegeMenu from '@/components/star-map/hud/menus/siege-menu.svg'
 import FeedMenu from '@/components/star-map/hud/menus/feed-menu.svg'
 import HelpMenu from '@/components/star-map/hud/menus/help-menu.svg'
 import TradePanel from './trade/trade-panel.vue'
+import PortsPanel from './ports/ports-panel.vue'
 
 /** Menus built in HTML rather than the map's SVG units (round 2): they size themselves. */
 const HTML_MENUS = {
-  trade: TradePanel
+  trade: TradePanel,
+  ports: PortsPanel
 }
 
 const MENUS = {

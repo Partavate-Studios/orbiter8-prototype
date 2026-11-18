@@ -36,7 +36,7 @@ function readActionsOpen() {
 
 /** The free space right of an open menu that's worth moving the selection into (CSS pixels). */
 const MIN_ROOM_BESIDE_MENU_PX = 180
-const MENUS = ['planets', 'ships', 'settings', 'trade', 'shipyard', 'chat', 'leaderboard', 'colony', 'armory', 'loadout', 'siege', 'feed', 'help', 'asteroid']
+const MENUS = ['planets', 'ports', 'ships', 'settings', 'trade', 'shipyard', 'chat', 'leaderboard', 'colony', 'armory', 'loadout', 'siege', 'feed', 'help', 'asteroid']
 
 export const useUIStore = defineStore('UI', {
   state: () => ({

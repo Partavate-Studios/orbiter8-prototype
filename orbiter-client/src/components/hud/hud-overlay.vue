@@ -26,6 +26,7 @@
       </nav>
       <template v-else>
         <div v-if="moreOpen" class="more" @click="moreOpen = false">
+          <rim-button label="Ports" :tint="HUD_TINT.ports" :rest="HUD_REST.ports" @press="toggleMenu('ports')"><ports-icon /></rim-button>
           <rim-button label="Ships" :tint="HUD_TINT.ships" :rest="HUD_REST.ships" :badge="shipCount" @press="toggleMenu('ships')"><ships-icon /></rim-button>
           <rim-button label="Jump" :tint="starTint" @press="jump"><jump-icon /></rim-button>
           <rim-button v-for="b in dockButtons.filter((d) => d.menu !== 'chat')" :key="b.menu" v-bind="b.bind" @press="toggleMenu(b.menu)"><component :is="b.icon" /></rim-button>
@@ -60,6 +61,7 @@ import AvatarIcon from '@/components/star-map/hud/icons/avatar-icon.svg'
 import StarIcon from '@/components/star-map/hud/icons/star-icon.svg'
 import JumpIcon from '@/components/star-map/hud/icons/jump-icon.svg'
 import PlanetsIcon from '@/components/star-map/hud/icons/planets-icon.svg'
+import PortsIcon from '@/components/star-map/hud/icons/ports-icon.svg'
 import ShipsIcon from '@/components/star-map/hud/icons/ships-icon.svg'
 import HelpIcon from '@/components/star-map/hud/icons/help-icon.svg'
 import SiegesIcon from '@/components/star-map/hud/icons/sieges-icon.svg'
@@ -91,6 +93,7 @@ export default {
     BroadcastIcon,
     GearIcon,
     MoreIcon,
+    PortsIcon,
     PilotPlate,
     SystemBlock,
     SelectionPanel,

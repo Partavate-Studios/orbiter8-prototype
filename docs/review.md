@@ -574,6 +574,16 @@ Calls made building it, for Koda's review:
   - **The nearby strip** now partly repeats the edge buttons; worth deciding whether it stays.
   - Motion: the card slides out in 0.25 s (none with reduced motion).
   Shots: `docs/mockups/selection-strips/dealt-*.png`.
+- **X28. A Ports menu, and port signs on the planet strip** (2026-11-17, Koda). A fourth button beside
+  Planets, Ships and Jump (under More on a phone) opens every port in the system, in orbit order: where
+  it is and whose, its trade code, what your cargo would fetch there, each good it buys and sells at its
+  next-unit price, and buttons straight to Trade, Yards and Armory (they select the port, so its card is
+  dealt out). On the planet strip, a **green** dot above a planet whose port buys something you carry,
+  and a gray dot below one with shipyards or an armory; the belt shows its asteroids' ports' signs.
+  **To decide:** Koda asked for green, but the color guide makes "good for you" yellow, and the trade
+  panel and this menu's code letters mark "buys what you carry" in yellow. Either the dot turns yellow,
+  or green becomes the "sell here" color everywhere. In Sol every port has yards and an armory, so every
+  planet there has the gray dot. Shots: `docs/mockups/ports/`.
 - **X6. Wording:** the loadout's empty-weapons line says "Every Sol station's armory sells them." (was "The
   I.S.S. armory").
 

@@ -24,6 +24,8 @@
       >
         <span v-if="body.belt" class="belt-ring" />
         <span v-else class="sphere" :style="body.style" />
+        <i v-if="body.buys" class="buys" aria-hidden="true" />
+        <i v-if="body.services" class="services" aria-hidden="true" />
         <i v-if="body.mine" class="mine" aria-hidden="true" />
         <i v-if="body.besieged" class="besieged" aria-hidden="true" />
       </button>
@@ -42,6 +44,7 @@ import { useUIStore } from '@/stores/ui'
 import { usePlayerStore } from '@/stores/player'
 import { PLANET_COLORS, STAR_CLASSES } from '@/libs/palette'
 import { BELT_KEY, beltKeys, homeOf, sphere } from '@/libs/body-art'
+import { portSigns } from './ports/ports'
 
 export default {
   name: 'SystemStrip',
@@ -72,9 +75,18 @@ export default {
     bodies() {
       const player = usePlayerStore()
       const big = this.compact ? 22 : 26
+      const cargo = player.cargo ?? []
+      // Its port's signs (Koda, 2026-11-17): a green dot above when it buys something you carry, a gray
+      // one below when it has shipyards or an armory. The belt's are its asteroids' ports'.
+      const signsOf = (stations) => {
+        const signs = stations.map((station) => portSigns(station, cargo))
+        return { buys: signs.some((x) => x.buys), services: signs.some((x) => x.services) }
+      }
+      const words = ({ buys, services }) => (buys ? ' · buys what you carry' : '') + (services ? ' · shipyards or armory' : '')
       return this.keys.map((key) => {
         if (key === BELT_KEY) {
-          return { key, belt: true, on: false, family: this.selectedPlanet === BELT_KEY, title: 'The asteroid belt' }
+          const signs = signsOf(this.belt.map((k) => this.systemObjects[this.systemObjects[k].stationKey]).filter(Boolean))
+          return { key, belt: true, on: false, family: this.selectedPlanet === BELT_KEY, title: 'The asteroid belt' + words(signs), ...signs }
         }
         const object = this.systemObjects[key]
         const on = key === this.selected
@@ -92,13 +104,19 @@ export default {
           }
         }
         const colors = PLANET_COLORS[object.class] ?? PLANET_COLORS[1]
+        const signs = signsOf(object.hasStation ? [this.systemObjects[object.stationKey]] : [])
         // Planets 4 to 20 across by size (sizes run about 1 to 20).
         const size = Math.round(Math.min(big - 6, 9 + (object.size ?? 8) * 0.6))
         return {
           key,
           on,
           family,
-          title: object.name + (object.hasStation ? ' · port' : '') + (object.moons?.length ? ` · ${object.moons.length} ${object.moons.length === 1 ? 'moon' : 'moons'}` : ''),
+          ...signs,
+          title:
+            object.name +
+            (object.hasStation ? ' · port' : '') +
+            (object.moons?.length ? ` · ${object.moons.length} ${object.moons.length === 1 ? 'moon' : 'moons'}` : '') +
+            words(signs),
           mine: object.isMine,
           besieged: Boolean(player.siegeAt?.(object.objectId)),
           style: sphere(colors.light, colors.mid, colors.dark, size)
@@ -227,6 +245,30 @@ export default {
 .sphere {
   display: block;
   border-radius: 50%;
+}
+/* its port buys something you carry: a green dot above (Koda, 2026-11-17) */
+.buys {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  margin-left: -3px;
+  border-radius: 50%;
+  background: #5be37d;
+  box-shadow: 0 0 0 1px #12052a, 0 0 4px #5be37daa;
+}
+/* its port has shipyards or an armory: a gray dot below */
+.services {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  margin-left: -3px;
+  border-radius: 50%;
+  background: #a9a3bb;
+  box-shadow: 0 0 0 1px #12052a;
 }
 /* the belt: a ring of rocks */
 .belt-ring {

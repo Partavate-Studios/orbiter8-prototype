@@ -125,6 +125,7 @@ export const HUD_TINT = {
   chat: '#4fe0d0',
   settings: '#a59fb3',
   planets: '#6fa8ff',
+  ports: '#c9a8ff',
   ships: '#e6dcf5'
 }
 
