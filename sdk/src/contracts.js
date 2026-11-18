@@ -16,6 +16,17 @@ import { fetchRound } from './drand'
 import { parseRevert } from './reverts'
 import { queryChunked } from './event-log'
 import { indexOf, bodyId, KIND } from './body-id'
+import { toAxial, toIndex, distance } from './hex'
+
+/** The six hex directions in axial (q, r), as sdk/hex.js and HexMath.sol step. */
+const HEX_DIRECTIONS = [
+  [1, 0],
+  [1, -1],
+  [0, -1],
+  [-1, 0],
+  [-1, 1],
+  [0, 1]
+]
 
 export const STATE = { UNDECIDED: 0, EMPTY: 1, STAR: 2, BLACK_HOLE: 3 }
 /** Cells per region read; the contracts cap it at 10. */
@@ -515,7 +526,20 @@ export function createGame(runner, addresses) {
 
     /** Every decided cell within REGION_RADIUS of `center`, in one call. */
     async region(center) {
-      return (await galaxy.region(center, REGION_RADIUS)).map(toCell)
+      try {
+        return (await galaxy.region(center, REGION_RADIUS)).map(toCell)
+      } catch (error) {
+        if (!overLimit(error)) throw error
+        // A node's per-call limit (Polkadot Hub TestNet, once the galaxy filled in around the pilot): the
+        // same area in seven smaller reads, a radius-6 region at the center and one six steps out in each
+        // direction, which together cover every cell within REGION_RADIUS.
+        const [q, r] = toAxial(center)
+        const centers = [center, ...HEX_DIRECTIONS.map(([dq, dr]) => toIndex(q + 6 * dq, r + 6 * dr))]
+        const parts = await Promise.all(centers.map((c) => galaxy.region(c, 6)))
+        const byCell = new Map()
+        for (const c of parts.flat().map(toCell)) if (distance(center, c.cell) <= REGION_RADIUS) byCell.set(c.cell, c)
+        return [...byCell.values()]
+      }
     },
 
     async nameOf(cell) {
