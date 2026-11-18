@@ -152,7 +152,7 @@ contract Planets is ModuleBase {
         _setCost(COLONY + ASTEROID_COSTS, Cost(15_000, 30 minutes, 0, [6, 7, 0], [uint32(60), 30, 0]));
         _setCost(PORT + ASTEROID_COSTS, Cost(60_000, 2 hours, 0, [6, 7, 0], [uint32(80), 80, 0]));
         _setCost(ARMORY + ASTEROID_COSTS, Cost(200_000, 6 hours, 0, [2, 7, 0], [uint32(120), 80, 0]));
-        _setTuning(Tuning(10, 8 hours, 20, 5_000, 90));
+        _setTuning(Tuning(10, 8 hours, 80, 5_000, 90)); // 80 an hour a good: a full planet beside a mid-size asteroid
     }
 
     // ── admin ───────────────────────────────────────────────────────────────────────────────────

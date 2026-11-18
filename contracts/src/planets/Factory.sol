@@ -44,6 +44,7 @@ contract Factory is ModuleBase {
     bytes32 private constant FACTORY_SLOT = 0x7876fc7e7dfa80949afc16d8ecba4b8a2542bc8d3d86778c12de722c49dae400;
 
     event PartAdded(uint256 indexed part, string name);
+    event PartSet(uint256 indexed id, Part part);
     event Ordered(uint256 indexed planet, uint256 indexed part, uint256 count, uint40 readyAt);
     event PartsMoved(uint256 indexed planet, uint256 indexed part, int256 count, uint256 stored);
 
@@ -74,7 +75,13 @@ contract Factory is ModuleBase {
         _addPart(Part("BFG", 150_000, 8 hours, true, [2, 7], [uint32(150), 150]));
         // Mining drones (D75, D80): live in drone bays, never fight, never lost. On ships for now;
         // bodies' drone pools come with the belts.
-        _addPart(Part("Mining drone", 800, 5 minutes, false, [1, 7], [uint32(5), 3]));
+        _addPart(Part("Mining drone", 400, 5 minutes, false, [1, 7], [uint32(5), 3]));
+    }
+
+    /// Retunes a part (its price, build time and goods), keeping its id.
+    function setPart(uint256 id, Part calldata part) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _f().parts[id] = part;
+        emit PartSet(id, part);
     }
 
     function addPart(Part calldata part) external onlyRole(DEFAULT_ADMIN_ROLE) {

@@ -123,7 +123,14 @@ Payback counts the claim, Platform, Mine, Port and the drones at Sol's price. An
 an upper bound: it's paid only as other pilots buy from its port, and its store fills (5,000 a good) in
 about 33 hours at the top rate.
 
-Reading (for Koda, not applied):
+**Applied 2026-11-17 (Koda: "whatever suggestions you made, implement"):** the mining drone part
+800 → **400** (800 at Sol: a drone aboard now pays back in about 9–15 h of mining), and planets'
+`producePerHour` 20 → **80** (a full planet beside a mid-size asteroid). Factory gained `setPart`, so
+part prices can be retuned on a live deployment. The metallic asteroid's strength is left as it is
+until it's been played. Deployed to Polkadot Hub TestNet the same day. The table above is at the old
+numbers; `node orbiter-client/dev/sim/belt.mjs` gives the new ones.
+
+Reading (for Koda; the first two applied, above):
 - **The floor works** (decision 13): a pilot with nothing can mine Sol's dust and afford a claim in a
   few hours, far slower than trading, as a floor should be.
 - **Mining drones aboard a ship pay back slowly** (17–29 h of mining). If ship mining should be a real

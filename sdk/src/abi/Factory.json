@@ -389,6 +389,56 @@
   },
   {
     "type": "function",
+    "name": "setPart",
+    "inputs": [
+      {
+        "name": "id",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "part",
+        "type": "tuple",
+        "internalType": "struct Factory.Part",
+        "components": [
+          {
+            "name": "name",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "credits",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "time",
+            "type": "uint32",
+            "internalType": "uint32"
+          },
+          {
+            "name": "planetOnly",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "goods",
+            "type": "uint8[2]",
+            "internalType": "uint8[2]"
+          },
+          {
+            "name": "amounts",
+            "type": "uint32[2]",
+            "internalType": "uint32[2]"
+          }
+        ]
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "storedAt",
     "inputs": [
       {
@@ -525,6 +575,57 @@
         "type": "string",
         "indexed": false,
         "internalType": "string"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "PartSet",
+    "inputs": [
+      {
+        "name": "id",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "part",
+        "type": "tuple",
+        "indexed": false,
+        "internalType": "struct Factory.Part",
+        "components": [
+          {
+            "name": "name",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "credits",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "time",
+            "type": "uint32",
+            "internalType": "uint32"
+          },
+          {
+            "name": "planetOnly",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "goods",
+            "type": "uint8[2]",
+            "internalType": "uint8[2]"
+          },
+          {
+            "name": "amounts",
+            "type": "uint32[2]",
+            "internalType": "uint32[2]"
+          }
+        ]
       }
     ],
     "anonymous": false
