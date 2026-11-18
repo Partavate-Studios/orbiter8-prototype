@@ -9,7 +9,7 @@
        phone the same, smaller, above the tab bar; tap the card to hold it up full size. -->
   <div class="selection" :class="{ sheet }" :style="themeVars">
     <system-strip v-if="!sheet || object" class="strip" :class="{ narrow: !drawerOpen || !object || !showScope }" :compact="sheet" />
-    <nearby-strip v-if="object && showScope" class="strip" :class="{ narrow: !drawerOpen }" :compact="sheet" />
+    <nearby-strip v-if="object && showScope" class="nearby" :compact="sheet" />
 
     <template v-if="object">
       <button v-if="!showScope" type="button" class="bring-back card-pill" title="Show the selection's card" @click="toggleScope()">
@@ -21,8 +21,31 @@
         <div class="drawer-clip">
         <div class="drawer" :class="{ open: drawerOpen }" @click="!drawerOpen && openDrawer()">
           <div class="inside" :inert="!drawerOpen || undefined">
+            <!-- where to go from here, big and wordless (Koda, 2026-11-17): its port, its moons, or back
+                 to its planet; the actions follow below -->
+            <div v-if="goes.length" class="goes">
+              <button
+                v-for="go in goes"
+                :key="go.kind"
+                type="button"
+                class="go"
+                :class="{ on: go.kind === 'moons' && page === 'moons' }"
+                :title="go.title"
+                :aria-label="go.title"
+                @click="goTo(go)"
+              >
+                <img v-if="go.art" :src="go.art" alt="" />
+                <span v-else class="sphere" :style="go.style" />
+                <b v-if="go.count > 1" class="count">{{ go.count }}</b>
+              </button>
+            </div>
             <div class="list" data-own-scroll>
-              <template v-for="(option, index) in slots" :key="index">
+              <template v-if="page === 'moons'">
+                <button v-for="moon in family.moons" :key="moon.moonId" type="button" class="action" @click="select(moon.moonId)">
+                  <span>{{ moon.moonName }}</span>
+                </button>
+              </template>
+              <template v-for="(option, index) in slots" v-else :key="index">
                 <button
                   v-if="option"
                   type="button"
@@ -92,7 +115,7 @@ import { CARD_THEMES, cardThemeKey } from '@/libs/card-theme'
 import { fitSize } from '@/libs/fit-text'
 import Info from '@/components/star-map/hud/card-ui/info.svg'
 import XIcon from '@/components/star-map/hud/icons/x-icon.svg'
-import { ACTION_ART } from '@/libs/body-art'
+import { ACTION_ART, ASTEROID_ART, PORT_ART, bodySphere } from '@/libs/body-art'
 import RimButton from './rim-button.vue'
 import SystemStrip from './system-strip.vue'
 import NearbyStrip from './nearby-strip.vue'
@@ -118,6 +141,7 @@ export default {
   data() {
     return {
       ACTION_ART,
+      page: 'main',
       heldUp: false,
       // the card with a margin for its siege frame and its "yours" badge
       CARD_BOX: '-80 -80 160 230'
@@ -148,10 +172,50 @@ export default {
     },
     slots() {
       return slotted(this.object, this.actions)
+    },
+    /** The selection's home body (a planet, or an asteroid), its port, and its moons. */
+    family() {
+      const objects = this.systemObjects
+      const o = this.object
+      let homeKey = null
+      if (o?.type === 'planet' || o?.type === 'asteroid') homeKey = o.key
+      else if (o?.type === 'station' || o?.type === 'moon') homeKey = o.orbiting
+      const home = homeKey ? objects[homeKey] : null
+      return { home, stationKey: home?.hasStation ? home.stationKey : null, moons: home?.moons ?? [] }
+    },
+    /** The big icons: its planet (or asteroid) unless that's the selection, its port, its moons. */
+    goes() {
+      const { home, stationKey, moons } = this.family
+      if (!home) return []
+      const out = []
+      const asteroid = home.type === 'asteroid'
+      if (home.key !== this.objectId) {
+        out.push({
+          kind: 'home',
+          key: home.key,
+          title: 'Back to ' + home.name,
+          art: asteroid ? ASTEROID_ART[home.composition] ?? ASTEROID_ART[0] : null,
+          style: asteroid ? null : bodySphere(home, 40)
+        })
+      }
+      if (stationKey && stationKey !== this.objectId) {
+        out.push({ kind: 'port', key: stationKey, title: (this.systemObjects[stationKey]?.name ?? 'The port') + ': its port', art: PORT_ART })
+      }
+      if (moons.length) {
+        const first = this.systemObjects[moons[0].moonId]
+        out.push({
+          kind: 'moons',
+          title: moons.length === 1 ? moons[0].moonName : `Its ${moons.length} moons`,
+          count: moons.length,
+          style: bodySphere(first, 30)
+        })
+      }
+      return out
     }
   },
   watch: {
     selected() {
+      this.page = 'main'
       this.heldUp = false
     }
   },
@@ -167,11 +231,26 @@ export default {
     labelSize(text) {
       return fitSize(text, 15, this.sheet ? 150 : 165, 700)
     },
+    select(key) {
+      this.o8audio.playEffect('click')
+      this.selectSprite(key)
+    },
     run(option) {
       this.o8audio.playEffect('click')
-      // (moons are the nearby strip's: "Visit Moon" goes to the first)
-      const moon = this.systemObjects[this.object?.key]?.moons?.[0]
-      runAction(option, this.object, { showMoons: () => moon && this.selectSprite(moon.moonId) })
+      runAction(option, this.object, { showMoons: this.moons })
+    },
+    goTo(go) {
+      if (go.kind === 'moons') {
+        this.o8audio.playEffect('click')
+        return this.moons()
+      }
+      this.select(go.key)
+    },
+    /** One moon: go to it. More: list them in the menu (the icon again goes back). */
+    moons() {
+      const moons = this.family.moons
+      if (moons.length === 1) return this.selectSprite(moons[0].moonId)
+      this.page = this.page === 'moons' ? 'main' : 'moons'
     },
     openDrawer() {
       this.o8audio.playEffect('click')
@@ -195,6 +274,7 @@ export default {
         event.preventDefault()
         return this.toggleDrawer()
       }
+      if (this.page !== 'main') return
       const option = this.slots[Number(event.key) - 1]
       if (!option) return
       // (so the digit doesn't land in a dialog's field that this opens)
@@ -222,6 +302,9 @@ export default {
   width: calc(var(--card-w) - var(--card-margin) - var(--tuck) + var(--drawer-w) + 12px);
   max-width: calc(100vw - 32px);
   transition: width 0.25s ease;
+}
+.nearby {
+  max-width: calc(100vw - 32px);
 }
 .strip.narrow {
   width: calc(var(--card-w) + var(--peek) + 12px);
@@ -360,6 +443,72 @@ export default {
 }
 .action.dim .art {
   opacity: 0.45;
+}
+/* the big icons at the menu's top: its port, its moons, back to its planet */
+.goes {
+  flex: none;
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  padding: 2px 0 10px;
+}
+.go {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  padding: 0;
+  border: 1.5px solid #5a4c8c;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%, #3d2a6e 0%, #1f173a 75%);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.go:hover,
+.go.on {
+  border-color: #b9a0ff;
+  background: radial-gradient(circle at 50% 40%, #4d3a86 0%, #2a1f4c 75%);
+}
+.go:focus-visible {
+  outline: 2.5px solid var(--o8-brand-300);
+  outline-offset: 3px;
+}
+.go img {
+  width: 46px;
+  height: 46px;
+}
+.go .sphere {
+  display: block;
+  border-radius: 50%;
+}
+/* how many moons */
+.go .count {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  min-width: 20px;
+  height: 20px;
+  box-sizing: border-box;
+  padding: 0 5px;
+  border-radius: 10px;
+  background: #302651;
+  border: 1px solid #b9a0ff;
+  color: #ffffff;
+  font-size: 12px;
+  line-height: 18px;
+}
+.sheet .goes {
+  gap: 10px;
+  padding-bottom: 6px;
+}
+.sheet .go {
+  width: 50px;
+  height: 50px;
+}
+.sheet .go img {
+  width: 38px;
+  height: 38px;
 }
 .none {
   margin: 8px;

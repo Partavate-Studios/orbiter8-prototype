@@ -1,7 +1,7 @@
 <template>
   <!-- What's around the selection, under the system strip (Koda, 2026-11-17): a planet, its port and
        its moons; or, in the belt, its eight places (asteroids, their ports, and the empty space ships
-       mine). Big labeled chips, so going between a planet and its port (and back) is one clear press.
+       mine). Icons only (Koda: names made it too big); each one's name is its tooltip.
        The selection is ringed; yours carry the yellow mark, a siege the pink ring, as in the system strip. -->
   <nav v-if="items.length > 1" class="nearby-strip" :class="{ compact }" :aria-label="home === BELT_KEY ? 'The asteroid belt' : 'This planet, its port and moons'">
     <div ref="row" class="row" data-own-scroll>
@@ -13,6 +13,7 @@
         class="chip"
         :class="{ on: item.key === selected, port: item.port }"
         :title="item.title"
+        :aria-label="item.label"
         :aria-current="item.key === selected ? 'true' : undefined"
         @click="select(item.key)"
       >
@@ -22,7 +23,6 @@
           <i v-if="item.mine" class="mine" aria-hidden="true" />
           <i v-if="item.besieged" class="besieged" aria-hidden="true" />
         </span>
-        <span class="label">{{ item.label }}</span>
       </button>
     </div>
   </nav>
@@ -143,18 +143,17 @@ export default {
 .row::-webkit-scrollbar {
   display: none;
 }
-/* a body's chip: its picture and its name, big enough to aim at */
+/* a body's chip: its picture, big enough to aim at */
 .chip {
   flex: none;
-  display: flex;
-  align-items: center;
-  gap: 7px;
+  display: grid;
+  place-items: center;
+  width: 42px;
   height: 42px;
-  max-width: 150px;
   box-sizing: border-box;
-  padding: 0 14px 0 5px;
+  padding: 0;
   border: 1.5px solid #4a3d7a;
-  border-radius: 21px;
+  border-radius: 50%;
   background: #1f173a;
   color: #e6dcf5;
   font: inherit;
@@ -199,12 +198,6 @@ export default {
   display: block;
   border-radius: 50%;
 }
-.label {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 /* yours: the yellow mark; a siege: the pink ring (as system-strip.vue) */
 .mine {
   position: absolute;
@@ -223,10 +216,8 @@ export default {
   border-radius: 50%;
 }
 .compact .chip {
+  width: 38px;
   height: 38px;
-  max-width: 130px;
-  padding: 0 12px 0 4px;
-  font-size: 13px;
 }
 .compact .pic,
 .compact .pic img {

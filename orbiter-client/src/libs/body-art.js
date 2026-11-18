@@ -40,7 +40,6 @@ export function bodySphere(object, size) {
 /** The picture on each of the menu's actions, by command (none for renaming, sessions and links). */
 export const ACTION_ART = {
   trade: port,
-  tradePort: port,
   shipyards: yards,
   armory,
   claim,

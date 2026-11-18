@@ -540,6 +540,10 @@ Calls made building it, for Koda's review:
   claim, colony, siege, colonists, holds, drones). Untouched: the card, the empty slots that hold each
   button's place, the tab. To check when playing: phones (the strips take ~95 px above the card), and
   whether the port chip should say the port's three-letter code instead of "Port".
+  **Revised the same day (Koda):** the nearby strip is icons only (names in tooltips); "Trade at Port" on
+  planets is gone; instead the menu's top holds big wordless icons, a port and a moon (with a count),
+  or the planet to go back to, and the planet's actions follow below. The moon icon lists the moons in
+  the menu (one moon: straight to it).
 - **X25. The selection beside an open menu** (2026-11-17, Koda: the station and everything round it
   "disappear" when the shipyard opens). They were drawn but under the menu: the camera centers the
   selection, and menus open in the middle. Now, while a menu is open on a wide screen with at least

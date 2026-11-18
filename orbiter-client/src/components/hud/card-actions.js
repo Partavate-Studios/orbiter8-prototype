@@ -16,18 +16,18 @@ const credits = (n) => n.toLocaleString('en-US')
  * Every action has its own place in the selection's menu (Koda, round 2: "each button has a place"):
  * a slot per row, by the kind of thing selected. Actions that never show together share a slot (a
  * planet is claimed, yours, or attacked). Going to a planet's station, its moons or a station's planet
- * isn't a slot: those are the nearby strip's chips (nearby-strip.vue), so nothing is offered twice.
+ * isn't a slot: those are the big icons at the top of the menu, so nothing is offered twice.
  */
 export const SLOTS = {
-  planet: [['claim', 'colony', 'attack'], ['tradePort'], ['siege'], ['recruit'], ['market'], ['rename']],
+  planet: [['claim', 'colony', 'attack'], ['siege'], ['recruit'], ['market'], ['rename']],
   station: [['trade'], ['shipyards'], ['armory'], ['rename']],
   ship: [['jump'], ['loadout'], ['session'], ['market'], ['rename']],
   star: [['jump'], ['traverse'], ['nameStar']],
   moon: [['rename']],
-  asteroid: [['claim', 'asteroid', 'attack'], ['tradePort'], ['siege'], ['rename']],
+  asteroid: [['claim', 'asteroid', 'attack'], ['siege'], ['rename']],
   section: [['mine', 'stopMining']]
 }
-/** The commands the nearby strip carries instead. */
+/** The commands the menu's top icons carry instead. */
 const ICON_COMMANDS = new Set(['visitStation', 'visitPlanet', 'visitMoon'])
 
 /**
@@ -76,10 +76,6 @@ export async function runAction(option, object, { showMoons }) {
   const { ask, tell } = useDialogStore()
   switch (option.command) {
     case 'trade':
-      return ui.openMenu('trade')
-    case 'tradePort':
-      // the trade menu trades at the selected port
-      ui.selectSprite(object.stationKey)
       return ui.openMenu('trade')
     case 'shipyards':
       return ui.openMenu('shipyard')
