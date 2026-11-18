@@ -16,17 +16,8 @@ import { fetchRound } from './drand'
 import { parseRevert } from './reverts'
 import { queryChunked } from './event-log'
 import { indexOf, bodyId, KIND } from './body-id'
-import { toAxial, toIndex, distance } from './hex'
-
-/** The six hex directions in axial (q, r), as sdk/hex.js and HexMath.sol step. */
-const HEX_DIRECTIONS = [
-  [1, 0],
-  [1, -1],
-  [0, -1],
-  [-1, 0],
-  [-1, 1],
-  [0, 1]
-]
+import { SECTIONS } from './belt-gen'
+import { disc } from './hex'
 
 export const STATE = { UNDECIDED: 0, EMPTY: 1, STAR: 2, BLACK_HOLE: 3 }
 /** Cells per region read; the contracts cap it at 10. */
@@ -162,7 +153,41 @@ export const ASTEROID_STEPS = [1, 2, 4, 6]
 export const ASTEROID_BUILDING_NAMES = { 1: 'Platform', 2: 'Mine', 4: 'Port', 6: 'Armory' }
 
 /** A read that failed with no revert data at all: a node's limit on one call (memory), not the contract's refusal. */
-const overLimit = (error) => error?.code === 'CALL_EXCEPTION' && (error.data == null || error.data === '0x')
+/**
+ * Whether a read failed on a node's per-call cap rather than a revert of the game's own: Polkadot Hub
+ * TestNet gives each eth_call a fixed budget (about 39,000 of its gas units, and 1 MiB of memory a call
+ * frame; docs/polkadot-direction.md). Over it, the outer call fails with OutOfGas, or an inner one
+ * does and the outer reverts with no data.
+ */
+const overLimit = (error) =>
+  (error?.code === 'CALL_EXCEPTION' && (error.data == null || error.data === '0x')) ||
+  /OutOfGas|failed to run contract/i.test(String(error?.info?.error?.message ?? error?.error?.message ?? error?.message ?? ''))
+
+/** Port views per read, and cells per read (each cell's view is about five storage reads). */
+export const PORTS_PER_READ = 5
+export const CELLS_PER_READ = 30
+
+/**
+ * Reads `ids` a chunk at a time (`read(chunk)` returns one result per id), all chunks at once. A chunk
+ * that hits a node's per-call cap is split in two and read again, down to single ids: a safety net if
+ * the views grow (a fully built body reads more than a bare one).
+ */
+async function chunked(ids, size, read) {
+  const chunks = []
+  for (let i = 0; i < ids.length; i += size) chunks.push(ids.slice(i, i + size))
+  const parts = await Promise.all(
+    chunks.map(async (chunk) => {
+      try {
+        return await read(chunk)
+      } catch (error) {
+        if (!overLimit(error) || chunk.length === 1) throw error
+        const half = Math.ceil(chunk.length / 2)
+        return chunked(chunk, half, read)
+      }
+    })
+  )
+  return parts.flat()
+}
 
 /**
  * The game's contracts on one network, for reading and moving.
@@ -181,8 +206,9 @@ export function createGame(runner, addresses, { startBlock = 0 } = {}) {
   const planetIdOf = (cell, index) => bodyId(cell, KIND.PLANET, index)
   const asteroidIdOf = (cell, index) => bodyId(cell, KIND.ASTEROID, index)
   /**
-   * A star's bodies in one call, or, when a node's per-call limit stops that (Polkadot Hub TestNet refused
-   * Sol's nine planets with eight goods: no revert data, 2026-11-17), one call per body.
+   * A star's bodies in one call, or, when a node's per-call cap stops that (Polkadot Hub TestNet refused
+   * Sol's nine planets with eight goods: no revert data, 2026-11-17), a few at a time (Planets.views),
+   * down to one a call. The batch views are kept small by design now; this stays as a safety net.
    */
   async function batchOrEach(batch, count, idOf, goods) {
     try {
@@ -190,7 +216,7 @@ export function createGame(runner, addresses, { startBlock = 0 } = {}) {
     } catch (error) {
       if (!overLimit(error) || !count) throw error
       const ids = Array.from({ length: count }, (_, i) => idOf(i))
-      return Promise.all(ids.map(async (id) => toPlanet(await planets.planetView(id, goods))))
+      return (await chunked(ids, 3, (chunk) => planets.views(chunk, goods))).map(toPlanet)
     }
   }
   const factory = new Contract(addresses.factory, FactoryAbi, runner)
@@ -302,7 +328,8 @@ export function createGame(runner, addresses, { startBlock = 0 } = {}) {
 
     /** Every asteroid in a star's belt, as it stands now (none without a belt). `sections`: the indexes holding one. */
     async belt(cell, goods, sections) {
-      return batchOrEach(() => planets.belt(cell, goods), sections?.length, (i) => asteroidIdOf(cell, sections[i]), goods)
+      const ids = (sections ?? []).map((index) => asteroidIdOf(cell, index))
+      return (await chunked(ids, SECTIONS, (chunk) => planets.views(chunk, goods))).map(toPlanet)
     },
 
     /** What planets cost: buildings 1–7, the claim fee and the colonist price; the Autofactory's parts. */
@@ -532,27 +559,28 @@ export function createGame(runner, addresses, { startBlock = 0 } = {}) {
       return ids.map((id, i) => ({ id, owner: owners[i].toLowerCase() }))
     },
 
-    /** Every port at a star, with stock and next-unit prices. */
+    /** Every port at a star, with stock and next-unit prices: their ids, then their views a few at a time. */
     async portsAt(cell) {
-      return (await market.portsAt(cell)).map(toPort)
+      const ids = (await market.portIds(cell)).map(Number)
+      return (await chunked(ids, PORTS_PER_READ, (chunk) => market.portViews(chunk))).map(toPort)
     },
 
-    /** Every decided cell within REGION_RADIUS of `center`, in one call. */
+    /** How many ports a star has (the galaxy map's counts): their ids only. */
+    async portCount(cell) {
+      return (await market.portIds(cell)).length
+    },
+
+    /**
+     * Every decided cell within REGION_RADIUS of `center`: the region's cells are listed here, their
+     * states read in one call (Galaxy.statesOf: a storage read per 128 cells in a row), then the
+     * decided ones' views a few dozen at a time (Galaxy.cellsOf). Each read stays well under a node's
+     * per-call cap however full the galaxy gets (Galaxy.region at radius 10 went over it on the testnet).
+     */
     async region(center) {
-      try {
-        return (await galaxy.region(center, REGION_RADIUS)).map(toCell)
-      } catch (error) {
-        if (!overLimit(error)) throw error
-        // A node's per-call limit (Polkadot Hub TestNet, once the galaxy filled in around the pilot): the
-        // same area in seven smaller reads, a radius-6 region at the center and one six steps out in each
-        // direction, which together cover every cell within REGION_RADIUS.
-        const [q, r] = toAxial(center)
-        const centers = [center, ...HEX_DIRECTIONS.map(([dq, dr]) => toIndex(q + 6 * dq, r + 6 * dr))]
-        const parts = await Promise.all(centers.map((c) => galaxy.region(c, 6)))
-        const byCell = new Map()
-        for (const c of parts.flat().map(toCell)) if (distance(center, c.cell) <= REGION_RADIUS) byCell.set(c.cell, c)
-        return [...byCell.values()]
-      }
+      const ids = disc(center, REGION_RADIUS).sort((a, b) => a - b)
+      const states = await galaxy.statesOf(ids)
+      const decided = ids.filter((_, i) => parseInt(states.slice(2 + i * 2, 4 + i * 2), 16) !== STATE.UNDECIDED)
+      return (await chunked(decided, CELLS_PER_READ, (chunk) => galaxy.cellsOf(chunk))).map(toCell)
     },
 
     async nameOf(cell) {

@@ -1,6 +1,6 @@
 // How many ports each star has, for the galaxy map (Koda, round 2, item 8: "it might be nice to see how
 // many ports a star system has"). Known for the stars someone has been to: the system you're in counts
-// its stations as it loads; other visited stars are read from the Market (`portsAt`) as the map shows
+// its stations as it loads; other visited stars are read from the Market (`portIds`) as the map shows
 // them, a few at a time, over a read-only connection of their own. Unvisited stars have none to count
 // (a port needs a claimed planet). Remembered in this browser per deployment, re-read when old.
 //
@@ -87,9 +87,9 @@ function pump() {
     const cell = queue.shift()
     running++
     reader()
-      .portsAt(cell)
-      .then((ports) => {
-        counts.set(cell, { count: ports.length, at: Date.now() })
+      .portCount(cell)
+      .then((count) => {
+        counts.set(cell, { count, at: Date.now() })
         save()
       })
       .catch(() => {

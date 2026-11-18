@@ -27,19 +27,6 @@
   },
   {
     "type": "function",
-    "name": "MAX_BODIES",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
     "name": "UPGRADER",
     "inputs": [],
     "outputs": [
@@ -374,6 +361,25 @@
   },
   {
     "type": "function",
+    "name": "portIds",
+    "inputs": [
+      {
+        "name": "cell",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "ids",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "portView",
     "inputs": [
       {
@@ -384,7 +390,7 @@
     ],
     "outputs": [
       {
-        "name": "v",
+        "name": "",
         "type": "tuple",
         "internalType": "struct Market.PortView",
         "components": [
@@ -437,12 +443,12 @@
   },
   {
     "type": "function",
-    "name": "portsAt",
+    "name": "portViews",
     "inputs": [
       {
-        "name": "cell",
-        "type": "uint256",
-        "internalType": "uint256"
+        "name": "ports",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
       }
     ],
     "outputs": [

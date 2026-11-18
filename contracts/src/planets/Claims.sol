@@ -149,6 +149,12 @@ contract Claims is ModuleBase {
         return _c().owners[id];
     }
 
+    /// Owners of several bodies in one call (Planets' batch views: one call, not one a body).
+    function ownersOf(uint256[] calldata ids) external view returns (address[] memory owners) {
+        owners = new address[](ids.length);
+        for (uint256 i = 0; i < ids.length; i++) owners[i] = _c().owners[ids[i]];
+    }
+
     // ── star names ──────────────────────────────────────────────────────────────────────────────
 
     /// Names a star, for a fee filed with Minerva and burned. Who may, and whether naming makes them

@@ -98,6 +98,7 @@ contract Planets is ModuleBase {
         mapping(uint8 => Cost) costs; // building → cost
         Tuning tuning;
         IDroneOutput drones; // bodies' mining drones (D90), set after both are deployed
+        bytes32 seed; // the universe's (Galaxy's, fixed at genesis), kept here so reads don't ask for it
     }
 
     // keccak256(abi.encode(uint256(keccak256("orbiter8.planets")) - 1)) & ~bytes32(uint256(0xff))
@@ -138,6 +139,7 @@ contract Planets is ModuleBase {
         __ModuleBase_init(admin);
         PlanetsStorage storage s = _s();
         (s.galaxy, s.pilots, s.market, s.credits, s.claims) = (galaxy_, pilots_, market_, credits_, claims_);
+        (s.seed,,,,) = galaxy_.universe();
         // Goods: 0 water ice, 1 metals, 2 rare elements, 3 helium-3, 4 organics, 5 silicon, 6 equipment,
         // 7 electronics. Starting values; to be tuned by simulation with the rest of the economy.
         _setCost(CITADEL, Cost(5_000, 10 minutes, 100, [6, 4, 0], [uint32(40), 40, 0]));
@@ -184,10 +186,14 @@ contract Planets is ModuleBase {
     /// The body's class and size, after checking it exists at a charted star. A planet's class is
     /// 0–9; an asteroid's is ASTEROID_CLASS + its composition (its port's mix, D76).
     function _derive(uint256 id) internal view returns (uint8 class, uint8 size) {
+        return _deriveAt(id, _seed(), _s().galaxy.stateOf(BodyId.cellOf(id)));
+    }
+
+    /// `_derive` with the seed and the star's state already read (the batch views read them once).
+    function _deriveAt(uint256 id, bytes32 seed, uint8 state) internal pure returns (uint8 class, uint8 size) {
         uint256 cell = BodyId.cellOf(id);
         uint256 index = BodyId.indexOf(id);
-        bytes32 seed = _seed();
-        if (_s().galaxy.stateOf(cell) == 2) {
+        if (state == 2) {
             if (BodyId.isPlanet(id)) {
                 if (index < SystemGen.planetCount(seed, cell)) {
                     (class, size,) = SystemGen.planet(seed, cell, index);
@@ -212,8 +218,8 @@ contract Planets is ModuleBase {
         return asteroid && level >= 2 ? level + 2 : level + 1;
     }
 
-    function _seed() internal view returns (bytes32 seed) {
-        (seed,,,,) = _s().galaxy.universe();
+    function _seed() internal view returns (bytes32) {
+        return _s().seed;
     }
 
     /// The pilot acting (wallet or session key), after checking their ship is at the planet's star.
@@ -397,10 +403,14 @@ contract Planets is ModuleBase {
 
     // ── for other modules (GAME_MODULE): the Autofactory and sieges ─────────────────────────────
 
-    /// What a body's port can sell of a good now: its storage, production counted (Market, D89).
-    function supplyOf(uint256 id, uint256 good) external view returns (uint256) {
-        return planetView(id, good + 1).stock[good];
+    /// What a body's port can sell now, of goods 0 to `goods` - 1: its storage, production counted (Market,
+    /// D89). `sells` is its class's mix, which the Market has at hand (so it isn't asked for it back).
+    function suppliesOf(uint256 id, uint256 goods, uint256 sells) external view returns (uint256[] memory) {
+        uint256[16] memory mixes;
+        for (uint256 c = 0; c < 16; c++) mixes[c] = sells + 1; // the body's one class, whichever it is
+        return _one(id, goods, mixes).stock;
     }
+
 
     /// Settles and takes goods from a body's storage (the Autofactory paying for an order; its port selling).
     function useStock(uint256 id, uint256 good, uint256 units) external onlyRole(GAME_MODULE) {
@@ -455,9 +465,47 @@ contract Planets is ModuleBase {
     }
 
     /// A planet as it stands now (time's effects worked out, nothing written), with `goods` stock entries.
-    function planetView(uint256 id, uint256 goods) public view returns (PlanetView memory v) {
-        (v.class, v.size) = _derive(id);
-        if (v.class < ASTEROID_CLASS) (,, v.surface) = SystemGen.planet(_seed(), BodyId.cellOf(id), BodyId.indexOf(id));
+    function planetView(uint256 id, uint256 goods) public view returns (PlanetView memory) {
+        uint256[16] memory mixes;
+        return _one(id, goods, mixes);
+    }
+
+    /// One body's view; an owned body's star is charted (its claim checked), so it isn't asked again.
+    function _one(uint256 id, uint256 goods, uint256[16] memory mixes) internal view returns (PlanetView memory) {
+        address owner = _s().claims.ownerOf(id);
+        uint8 state = owner != address(0) ? 2 : _s().galaxy.stateOf(BodyId.cellOf(id));
+        return _view(id, _seed(), state, owner, goods, mixes);
+    }
+
+    /// Several bodies (planets or asteroids) at once, in their order: a belt's asteroids are read this
+    /// way, by the ids of the sections holding one (BeltGen, mirrored in the SDK). Batch reads are kept small for
+    /// nodes that cap each call's work (Polkadot Hub TestNet, docs/polkadot-direction.md): the seed, the
+    /// star's state and the owners are read once for the lot, and an unowned body's empty storage isn't.
+    function views(uint256[] calldata ids, uint256 goods) external view returns (PlanetView[] memory) {
+        return _views(ids, _seed(), goods);
+    }
+
+    function _views(uint256[] memory ids, bytes32 seed, uint256 goods) internal view returns (PlanetView[] memory list) {
+        address[] memory owners = _s().claims.ownersOf(ids);
+        list = new PlanetView[](ids.length);
+        uint256 cell = type(uint256).max;
+        uint8 state;
+        uint256[16] memory mixes;
+        for (uint256 i = 0; i < ids.length; i++) {
+            if (BodyId.cellOf(ids[i]) != cell) (cell, state) = (BodyId.cellOf(ids[i]), _s().galaxy.stateOf(BodyId.cellOf(ids[i])));
+            list[i] = _view(ids[i], seed, state, owners[i], goods, mixes);
+        }
+    }
+
+    /// `mixes`: by class, what it sells + 1 (0: not known yet, asked of the Market once and kept for
+    /// the rest of the call).
+    function _view(uint256 id, bytes32 seed, uint8 state, address owner, uint256 goods, uint256[16] memory mixes)
+        internal
+        view
+        returns (PlanetView memory v)
+    {
+        (v.class, v.size) = _deriveAt(id, seed, state);
+        if (v.class < ASTEROID_CLASS) (,, v.surface) = SystemGen.planet(seed, BodyId.cellOf(id), BodyId.indexOf(id));
         v.id = id;
         v.cap = _cap(v.class, v.size);
         Planet memory p = _s().planets[id];
@@ -466,27 +514,32 @@ contract Planets is ModuleBase {
             else p.level = p.building;
             p.building = 0;
         }
-        v.owner = _s().claims.ownerOf(id);
+        v.owner = owner;
         (v.level, v.autofactory, v.building, v.readyAt) = (p.level, p.autofactory, p.building, p.readyAt);
         v.population = p.population;
         v.stock = new uint256[](goods);
+        // Nobody's body has nothing stored and makes nothing: storage is the owner's (claims never lapse).
+        if (owner == address(0)) return v;
         for (uint256 g = 0; g < goods; g++) {
             v.stock[g] = _s().stock[id][g];
         }
         if (p.level < CITADEL || block.timestamp <= p.settledAt) return v;
-        if (p.besieged) {
-            v.population = _grow(p.population, v.cap, block.timestamp - p.settledAt);
-            return v;
-        }
         uint256 elapsed = block.timestamp - p.settledAt;
         v.population = _grow(p.population, v.cap, elapsed);
+        if (p.besieged) return v;
         uint256 rate = _rate(id, v.class, p.level, v.cap, (p.population + v.population) / 2);
         uint256 units = ((rate * elapsed) / 3600 + p.producedMilli) / 1000;
-        (uint256 sells,) = _s().market.mix(v.class);
+        if (units == 0) return v;
+        if (mixes[v.class] == 0) {
+            (uint256 mix,) = _s().market.mix(v.class);
+            mixes[v.class] = mix + 1;
+        }
+        uint256 sells = mixes[v.class] - 1;
+        uint256 storageCap = _s().tuning.storageCap;
         for (uint256 g = 0; g < goods; g++) {
             if ((sells >> g) & 1 == 1) {
                 uint256 total = v.stock[g] + units;
-                v.stock[g] = total > _s().tuning.storageCap ? _s().tuning.storageCap : total;
+                v.stock[g] = total > storageCap ? storageCap : total;
             }
         }
     }
@@ -494,26 +547,10 @@ contract Planets is ModuleBase {
     /// Every planet at a star (none around black holes or uncharted cells).
     function system(uint256 cell, uint256 goods) external view returns (PlanetView[] memory list) {
         if (_s().galaxy.stateOf(cell) != 2) return list;
-        uint256 n = SystemGen.planetCount(_seed(), cell);
-        list = new PlanetView[](n);
-        for (uint256 body = 0; body < n; body++) {
-            list[body] = planetView(BodyId.planet(cell, body), goods);
-        }
+        bytes32 seed = _seed();
+        uint256[] memory ids = new uint256[](SystemGen.planetCount(seed, cell));
+        for (uint256 body = 0; body < ids.length; body++) ids[body] = BodyId.planet(cell, body);
+        return _views(ids, seed, goods);
     }
 
-    /// Every asteroid in a star's belt (at most eight; none without a belt).
-    function belt(uint256 cell, uint256 goods) external view returns (PlanetView[] memory list) {
-        bytes32 seed = _seed();
-        if (_s().galaxy.stateOf(cell) != 2 || !BeltGen.hasBelt(seed, cell)) return list;
-        uint256[8] memory found;
-        uint256 n;
-        for (uint256 i = 0; i < BeltGen.SECTIONS; i++) {
-            (bool asteroid,,) = BeltGen.section(seed, cell, i);
-            if (asteroid) found[n++] = i;
-        }
-        list = new PlanetView[](n);
-        for (uint256 k = 0; k < n; k++) {
-            list[k] = planetView(BodyId.make(cell, BodyId.ASTEROID, found[k]), goods);
-        }
-    }
 }

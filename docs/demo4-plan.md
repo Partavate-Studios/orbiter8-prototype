@@ -233,7 +233,7 @@ impossible or needs a design call goes back to Koda; everything else is decided 
   - Going through charts around the exit, as a first arrival would.
   - Someone reaching the partner's area normally reveals it.
 - **Sol** is preset at cell 0, with its named planets and Federation ports.
-- **Region views:** `region(center, radius ≤ 10)` returns each decided cell's state, discoverer, name and visited flag in one call. `system(cell)` returns a star's stored facts and its planets' owners and buildings.
+- **Region views:** `region(center, radius ≤ 10)` returns each decided cell's state, discoverer, name and visited flag in one call. `system(cell)` returns a star's stored facts and its planets' owners and buildings. *(2026-11-18: the client reads a region as `statesOf` then `cellsOf`, and ports as `portIds` then `portViews`, to stay under Polkadot Hub TestNet's per-read budget: `polkadot-direction.md`.)*
 - **Measured in milestone 1:** gas per first arrival (estimated 100,000–200,000) and storage deposits on the local Polkadot node.
 
 ### 3. Pilots and the ship (D26, D41)

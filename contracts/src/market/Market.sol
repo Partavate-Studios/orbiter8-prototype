@@ -7,10 +7,12 @@ import {Credits} from "../tokens/Credits.sol";
 import {Pricing} from "./Pricing.sol";
 import {BodyId} from "../planets/BodyId.sol";
 import {Sol} from "../planets/Sol.sol";
+import {SystemGen} from "../planets/SystemGen.sol";
+import {BeltGen} from "../planets/BeltGen.sol";
 
 /// Where a player's port gets what it sells: its body's storage (Planets, D89).
 interface IPortSupply {
-    function supplyOf(uint256 body, uint256 good) external view returns (uint256);
+    function suppliesOf(uint256 body, uint256 goods, uint256 sells) external view returns (uint256[] memory);
     function useStock(uint256 body, uint256 good, uint256 units) external;
 }
 
@@ -28,7 +30,6 @@ interface IPortSupply {
 /// fee goes to its owner. Every Sol station, on its planets and on its belt's asteroids, has a yard
 /// (Sol is fully built: `Sol`).
 contract Market is ModuleBase {
-    uint256 public constant MAX_BODIES = 16;
 
     enum Mode {
         None,
@@ -88,6 +89,14 @@ contract Market is ModuleBase {
         bool yard;
         address owner;
         Quote[] quotes;
+    }
+
+    /// What every quote in a view shares, read once per call (views stay small: polkadot-direction.md).
+    struct Shared {
+        uint256 cap;
+        uint256 refill;
+        uint32[] base;
+        uint32[] spread;
     }
 
     /// @custom:storage-location erc7201:orbiter8.market
@@ -304,7 +313,7 @@ contract Market is ModuleBase {
         bool supplied = buying && owner != address(0);
         uint256 shortfall;
         if (supplied) {
-            uint256 stored = m.supply.supplyOf(port, line.good);
+            uint256 stored = m.supply.suppliesOf(port, line.good + 1, m.sells[class])[line.good];
             if (units > stored) revert PortFull(line.good, stored);
             shortfall = stored >= cap ? 0 : cap - stored;
         } else {
@@ -405,44 +414,71 @@ contract Market is ModuleBase {
     }
 
     /// A port's goods, stock and next-unit prices. Reverts with NoSuchPort.
-    function portView(uint256 port) public view returns (PortView memory v) {
-        (v.class, v.yard, v.owner) = _port(port);
-        v.port = port;
-        MarketStorage storage m = _m();
-        uint256 cap = capacity();
-        v.quotes = new Quote[](m.goods.length);
-        for (uint256 g = 0; g < m.goods.length; g++) {
-            Mode mode = _mode(v.class, g);
-            if (mode == Mode.None) continue;
-            uint256 shortfall;
-            if (mode == Mode.Sells && v.owner != address(0)) {
-                uint256 stored = m.supply.supplyOf(port, g);
-                shortfall = stored >= cap ? 0 : cap - stored;
-            } else {
-                (shortfall,) = _stock(port, g, cap);
-            }
-            Good storage good = m.goods[g];
-            uint256 price = mode == Mode.Sells
-                ? Pricing.buyCost(good.base, good.spread, cap, shortfall, 1)
-                : Pricing.sellProceeds(good.base, good.spread, cap, shortfall, 1);
-            v.quotes[g] = Quote(mode, shortfall, price);
+    function portView(uint256 port) public view returns (PortView memory) {
+        return _portView(port, _shared());
+    }
+
+    /// Several ports' views in one call (count, then fill: `portIds` lists a star's ports; a client
+    /// reads them a few at a time, so each call stays under a node's per-call cap). Reverts with
+    /// NoSuchPort if any isn't trading.
+    function portViews(uint256[] calldata ports) external view returns (PortView[] memory list) {
+        Shared memory sh = _shared();
+        list = new PortView[](ports.length);
+        for (uint256 i = 0; i < ports.length; i++) {
+            list[i] = _portView(ports[i], sh);
         }
     }
 
-    /// Every port at a star, in one call.
-    function portsAt(uint256 cell) external view returns (PortView[] memory list) {
-        PortView[] memory found = new PortView[](MAX_BODIES + 8);
+    /// Every port at a star, by id: its planets' in orbit order, then its belt's (asteroid ports, D88).
+    function portIds(uint256 cell) external view returns (uint256[] memory ids) {
+        ids = new uint256[](SystemGen.SOL_PLANETS + BeltGen.SECTIONS);
         uint256 n;
-        for (uint256 body = 0; body < MAX_BODIES + 8; body++) {
-            // planets, then the belt's eight sections (asteroid ports, D88)
-            uint256 port = body < MAX_BODIES
+        for (uint256 body = 0; body < ids.length; body++) {
+            uint256 port = body < SystemGen.SOL_PLANETS // no star has more planets than Sol
                 ? BodyId.planet(cell, body)
-                : BodyId.make(cell, BodyId.ASTEROID, body - MAX_BODIES);
-            if ((cell == 0 && Sol.isStation(port)) || _isOpen(port)) found[n++] = portView(port);
+                : BodyId.make(cell, BodyId.ASTEROID, body - SystemGen.SOL_PLANETS);
+            if ((cell == 0 && Sol.isStation(port)) || _isOpen(port)) ids[n++] = port;
         }
-        list = new PortView[](n);
-        for (uint256 i = 0; i < n; i++) {
-            list[i] = found[i];
+        assembly {
+            mstore(ids, n)
+        }
+    }
+
+    function _shared() internal view returns (Shared memory sh) {
+        MarketStorage storage m = _m();
+        uint256 n = m.goods.length;
+        (sh.cap, sh.refill) = (capacity(), m.tuning.refill);
+        (sh.base, sh.spread) = (new uint32[](n), new uint32[](n));
+        for (uint256 g = 0; g < n; g++) {
+            Good storage good = m.goods[g];
+            (sh.base[g], sh.spread[g]) = (good.base, good.spread);
+        }
+    }
+
+    function _portView(uint256 port, Shared memory sh) internal view returns (PortView memory v) {
+        (v.class, v.yard, v.owner) = _port(port);
+        v.port = port;
+        MarketStorage storage m = _m();
+        (uint256 sells, uint256 buys) = (m.sells[v.class], m.buys[v.class]);
+        uint256 n = sh.base.length;
+        v.quotes = new Quote[](n);
+        // a player's port sells from its body's storage (D89): one call for all of it
+        uint256[] memory stored;
+        if (v.owner != address(0) && sells != 0) stored = m.supply.suppliesOf(port, n, sells);
+        for (uint256 g = 0; g < n; g++) {
+            bool sold = (sells >> g) & 1 == 1;
+            if (!sold && (buys >> g) & 1 == 0) continue;
+            uint256 shortfall;
+            if (sold && v.owner != address(0)) {
+                shortfall = stored[g] >= sh.cap ? 0 : sh.cap - stored[g];
+            } else {
+                Stock memory st = m.stock[port][g];
+                (shortfall,) = Pricing.restock(st.shortfall, st.updated, block.timestamp, sh.cap, sh.refill);
+            }
+            uint256 price = sold
+                ? Pricing.buyCost(sh.base[g], sh.spread[g], sh.cap, shortfall, 1)
+                : Pricing.sellProceeds(sh.base[g], sh.spread[g], sh.cap, shortfall, 1);
+            v.quotes[g] = Quote(sold ? Mode.Sells : Mode.Buys, shortfall, price);
         }
     }
 

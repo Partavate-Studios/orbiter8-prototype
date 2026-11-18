@@ -77,7 +77,7 @@ contract GameFixture is Test {
 
 contract MarketTest is GameFixture {
     function test_solHasFifteenPortsAndEveryGoodTrades() public view {
-        Market.PortView[] memory ports = market.portsAt(0);
+        Market.PortView[] memory ports = market.portViews(market.portIds(0));
         assertEq(ports.length, 15, "nine planets' stations and six asteroids'");
         uint256 sold;
         uint256 bought;
@@ -90,7 +90,7 @@ contract MarketTest is GameFixture {
         assertEq(sold, 0xff, "every good is sold at Sol");
         assertEq(bought, 0xff, "every good is bought at Sol");
         assertTrue(ports[EARTH].yard);
-        assertEq(market.portsAt(_starAroundSol()).length, 0);
+        assertEq(market.portViews(market.portIds(_starAroundSol())).length, 0);
     }
 
     function test_startingCreditsBaysAndShip() public view {
@@ -153,7 +153,7 @@ contract MarketTest is GameFixture {
     /// have none.
     function test_solsAsteroidsAreFederationStations() public {
         uint8[8] memory classes = [10, 11, 0, 11, 10, 12, 0, 11];
-        Market.PortView[] memory ports = market.portsAt(0);
+        Market.PortView[] memory ports = market.portViews(market.portIds(0));
         for (uint256 i; i < 8; i++) {
             uint256 id = BodyId.make(0, BodyId.ASTEROID, i);
             if (classes[i] == 0) {
@@ -167,7 +167,7 @@ contract MarketTest is GameFixture {
             assertEq(v.owner, address(0), "the Federation's");
             bool listed;
             for (uint256 k; k < ports.length; k++) listed = listed || ports[k].port == id;
-            assertTrue(listed, "portsAt(0) lists it");
+            assertTrue(listed, "portIds(0) lists it");
         }
         // Not a station: another star's belt, a section past the eighth.
         assertFalse(_isPort(BodyId.make(0, BodyId.ASTEROID, 8)));
@@ -349,12 +349,12 @@ contract MarketTest is GameFixture {
         market.openPort(port, 0, bo, uint40(block.timestamp), 0); // Terrestrial
         // Its body's storage (Planets) holds 4 units of organics, then 300 (a full port's worth).
         address store = address(game.planets);
-        vm.mockCall(store, abi.encodeWithSignature("supplyOf(uint256,uint256)", port, ORGANICS), abi.encode(4));
+        vm.mockCall(store, abi.encodeWithSignature("suppliesOf(uint256,uint256,uint256)", port, ORGANICS + 1, 0xD0), abi.encode(_supplies(4)));
         vm.mockCall(store, abi.encodeWithSignature("useStock(uint256,uint256,uint256)"), "");
         vm.prank(ada);
         vm.expectRevert(abi.encodeWithSelector(Market.PortFull.selector, ORGANICS, 4));
         market.trade(port, _line(ORGANICS, 5, type(uint256).max));
-        vm.mockCall(store, abi.encodeWithSignature("supplyOf(uint256,uint256)", port, ORGANICS), abi.encode(300));
+        vm.mockCall(store, abi.encodeWithSignature("suppliesOf(uint256,uint256,uint256)", port, ORGANICS + 1, 0xD0), abi.encode(_supplies(300)));
         Market.Good memory g = market.goods()[ORGANICS];
         uint256 cost = Pricing.buyCost(g.base, g.spread, market.capacity(), 0, 5);
         uint256 cut = Pricing.fee(cost, market.tuning().feeBps);
@@ -365,6 +365,12 @@ contract MarketTest is GameFixture {
         assertEq(credits.balanceOf(bo), cost + cut, "the owner is paid for what the port sold");
         assertEq(credits.balanceOf(ada), 1_000 - cost - cut);
         assertEq(credits.totalSupply(), supply, "nothing burned or minted");
+    }
+
+    /// Organics in storage, as Planets.suppliesOf answers for goods 0–4.
+    function _supplies(uint256 organics) internal pure returns (uint256[] memory units) {
+        units = new uint256[](ORGANICS + 1);
+        units[ORGANICS] = organics;
     }
 
     function test_portsGrowWithThePopulation() public {

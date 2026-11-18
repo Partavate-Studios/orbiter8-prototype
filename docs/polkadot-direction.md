@@ -301,5 +301,61 @@ owner, and the extra memory took it past the node's per-call limit (the same kin
 `planetView` per body when a batch read fails with no revert data (`sdk/src/contracts.js` batchOrEach, for
 `system` and `belt`); a planet's view grows as it's built up, so other systems could reach the limit later.
 To do: keep batch reads small by design (count, then fill; fewer external calls per item), and measure
-memory per read.
+memory per read. *(Done 2026-11-18: below.)*
+
+### Testnet: a fixed budget per read, and the reads reshaped to fit (2026-11-18)
+
+**What the limit is.** Probed on Polkadot Hub TestNet with two throwaway contracts (deployed from the
+spike key; not part of the game):
+- **A compute budget per eth_call of about 39,000 of the testnet's gas units**, whatever gas the call
+  sends (a loop of calls passed at 38,569 units and failed by 39,4xx; `--gas-limit` up to 10^15 changes
+  nothing). Over it, the outer call fails with `Module(... OutOfGas)`; when an inner call runs out first,
+  the outer one reverts with no data, which is what `system(0, 8)` showed.
+- **1 MiB of memory per call frame** (a frame allocating 1,048,000 bytes works, 1,048,400 doesn't; three
+  nested frames of 900 KB each work, so it's per frame, not per call). Memory costs no gas units here.
+  None of the game's reads come near it: the largest frame of any read is 57 KB (`portViews` of all 15
+  of Sol's ports). So the 2026-11-17 entry's "memory" was really the compute budget.
+- **What costs what** (testnet units): a read starts at about 1,116; each **storage read 92**, warm or
+  cold (no EVM-style warm discount); each call frame about 80–140; a trivial call into one of the game's
+  proxies about 470 (proxy, delegatecall, the implementation slot); other work about one unit per 120
+  EVM gas. Storage reads and calls between modules dominate, not computation.
+
+`orbiter-client/dev/harness/read-costs.mjs` models these units from a local chain's traces (within about
+6% of the testnet's own estimates) and reports each read's peak frame memory;
+`dev/harness/build-out.mjs` builds a fully built system locally (every planet and asteroid at star 1
+claimed and built to the top, people and drones landed) to measure the worst case.
+
+**What changed** (the reads' shapes, nothing in the game's rules):
+- **Planets:** `planetView`, `system` and the new `views(ids, goods)` read the seed once (Planets keeps
+  the universe's seed itself since its initialize, instead of asking Galaxy on every read), the star's
+  state once per star (and not at all for an owned body), every owner in one call (`Claims.ownersOf`), a
+  class's mix once per call, and **no storage for an unowned body** (it has none). `belt()` is gone: the
+  SDK derives which sections hold an asteroid and reads them with `views` (it saved 1.1 KB of Planets).
+- **Market:** count, then fill. `portIds(cell)` lists a star's ports; `portViews(ids)` reads them with
+  what they share read once (capacity, goods, the refill time), each port's mix once (not twice a good),
+  and a player's port's storage in one call (`Planets.suppliesOf`, given the mix). `portsAt` is gone; the
+  SDK reads five ports a call, in parallel.
+- **Galaxy:** count, then fill. `statesOf(ids)` gives the states of cells the client lists itself (a
+  storage read per 128 cells in a row, and none of `region`'s index math); `cellsOf(ids)` gives the
+  charted ones' views, 30 a call. `region` stays for the bots' small radii.
+- **SDK** (`sdk/src/contracts.js`): `chunked` reads a list a few at a time and **splits a chunk in two when
+  it hits the cap**, down to one id; `batchOrEach` (system) and the belt use it as their safety net.
+  `overLimit` also recognises the top-level `OutOfGas` error.
+
+**Read costs, modeled testnet units (budget about 39,000):**
+
+| Read | Before (2026-11-17 contracts) | After |
+|---|---|---|
+| Sol's planets, `system(0, 8)` | 37,900 (fails on the testnet) | 5,387 |
+| Sol's belt, six asteroids | 20,000 (`belt`) | 4,079 (`views`) |
+| Sol's ports, now 15 | 54,100 in one `portsAt` (9 ports measured 36,983) | `portIds` 1,849 + 3 × `portViews(5)` ≤ 7,740 (all 15 in one: 15,103) |
+| Region, radius 10 | 46,000 (fails) | `statesOf` 3,071 + `cellsOf(30)` about 16,000 each |
+| Star 1 fully built: 5 planets | 13,836 | 11,888 |
+| Star 1 fully built: 8 asteroids | 23,968 (`belt`) | 17,925 (`views`) |
+| Star 1 fully built: 13 ports | 75,336 in one call; 32,292 for five | 45,351 in one call; ≤ 20,815 for five |
+| One owned planet's view | 5,637 | 4,030 |
+
+The heaviest read the client now makes is about 21,000 units, half the budget, for five fully built
+player ports; anything bigger is split by `chunked`. A body's view still grows with goods (one storage
+read each, 8 now): adding goods or per-body data should be checked with `read-costs.mjs`.
 

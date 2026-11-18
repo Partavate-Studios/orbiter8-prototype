@@ -118,6 +118,26 @@ contract GalaxyTest is Test {
         vm.assertTrue(cells[0].state != 0);
     }
 
+    function test_statesThenCellsMatchTheRegion() public view {
+        // Rings 0–2 are cells 0–18; Sol and its ring are decided, ring 2 isn't yet.
+        uint256[] memory ids = new uint256[](19);
+        for (uint256 i; i < 19; i++) ids[i] = i;
+        bytes memory states = galaxy.statesOf(ids);
+        Galaxy.CellView[] memory region = galaxy.region(0, 2);
+        uint256 decided;
+        for (uint256 i; i < 19; i++) {
+            assertEq(uint8(states[i]), galaxy.stateOf(i));
+            if (states[i] != 0) decided++;
+        }
+        assertEq(decided, region.length);
+        uint256[] memory some = new uint256[](2);
+        (some[0], some[1]) = (region[1].cell, region[0].cell);
+        Galaxy.CellView[] memory views = galaxy.cellsOf(some);
+        assertEq(views[0].cell, region[1].cell);
+        assertEq(views[1].state, region[0].state);
+        assertEq(views[1].keeper, region[0].keeper);
+    }
+
     function test_regionIsCapped() public {
         vm.expectRevert(abi.encodeWithSelector(Galaxy.RegionTooLarge.selector, uint256(11)));
         galaxy.region(0, 11);

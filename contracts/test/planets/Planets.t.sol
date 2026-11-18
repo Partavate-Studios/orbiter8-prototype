@@ -237,7 +237,7 @@ contract PlanetsTest is PlanetsFixture {
 
     function test_aPortOpensWhenBuiltAndPaysItsOwner() public {
         _toPort();
-        Market.PortView[] memory ports = market.portsAt(star);
+        Market.PortView[] memory ports = market.portViews(market.portIds(star));
         assertEq(ports.length, 1);
         assertEq(ports[0].owner, ada);
         assertEq(planets.planetView(home, 8).level, planets.PORT());
@@ -482,7 +482,11 @@ contract AsteroidClaimsTest is PlanetsFixture {
         Market.PortView memory port = market.portView(asteroid);
         assertEq(port.owner, ada, "the asteroid's port trades");
         assertFalse(port.yard);
-        assertEq(planets.belt(3, 8).length > 0, true);
+        uint256[] memory ids = new uint256[](2);
+        (ids[0], ids[1]) = (asteroid, home);
+        Planets.PlanetView[] memory both = planets.views(ids, 8);
+        assertEq(both[0].level, planets.ARMORY(), "an asteroid and a planet in one read");
+        assertEq(both[1].id, home);
     }
 
     function test_miningDronesFillAnAsteroidsStore() public {
@@ -547,7 +551,7 @@ contract AsteroidClaimsTest is PlanetsFixture {
         vm.prank(ada);
         planets.build(asteroid, 4);
         skip(10 minutes);
-        uint256 stored = planets.supplyOf(asteroid, good);
+        uint256 stored = _supply(asteroid, good);
         assertGt(stored, 0);
         vm.prank(bo);
         pilots.register("Bodo", "Barge");
@@ -560,7 +564,7 @@ contract AsteroidClaimsTest is PlanetsFixture {
         lines[0] = Market.Line(good, 10, type(uint256).max);
         vm.prank(bo);
         market.trade(asteroid, lines);
-        assertEq(planets.supplyOf(asteroid, good), stored - 10, "sold from the store");
+        assertEq(_supply(asteroid, good), stored - 10, "sold from the store");
         assertGt(credits.balanceOf(ada), adaHad, "the owner was paid");
         // Back aboard.
         vm.prank(ada);
@@ -568,6 +572,12 @@ contract AsteroidClaimsTest is PlanetsFixture {
         assertEq(pilots.shipOf(ada).loadout.miningDrones, 10);
         (, defense,) = drones.poolOf(asteroid);
         assertEq(defense, 0);
+    }
+
+    /// What a body's port can sell of a good now (Planets.suppliesOf, with its class's mix as the Market passes it).
+    function _supply(uint256 body, uint256 good) internal view returns (uint256) {
+        (uint256 sells,) = game.market.mix(planets.planetView(body, 0).class);
+        return planets.suppliesOf(body, good + 1, sells)[good];
     }
 
     function test_shipsMineEmptySections() public {

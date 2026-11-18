@@ -608,6 +608,13 @@ Calls made building it, for Koda's review:
   Fully built" in place of an owner's "Built" step and drone counts, and the line's icons with the yard.
 - **X31. Their names are "Ceres Station", "Vesta Station"…**, not invented names like the planets'
   stations (I.S.S., Tiangong…). Easy to change in `portNames` (`sdk/src/market.js`) if you'd like names.
+- **X32. Reads reshaped for the testnet's per-read budget** (2026-11-18, `polkadot-direction.md`). It's a
+  compute budget (about 39,000 units a read), not memory. Interface changes, all for smaller reads:
+  `Market.portsAt` replaced by `portIds` + `portViews`; `Planets.belt` replaced by `views(ids)` (the SDK
+  derives the sections); `Galaxy.statesOf` + `cellsOf` beside `region`; `Claims.ownersOf`;
+  `Planets.suppliesOf(id, goods, mix)` replaces `supplyOf`. Planets now stores the universe's seed (read
+  from Galaxy once, at initialize). Two dev tools: `dev/harness/read-costs.mjs` (cost model) and
+  `dev/harness/build-out.mjs` (a fully built system, test chain only: it makes buildings free).
 - **X6. Wording:** the loadout's empty-weapons line says "Every Sol station's armory sells them." (was "The
   I.S.S. armory").
 

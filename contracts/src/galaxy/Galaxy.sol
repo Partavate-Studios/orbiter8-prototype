@@ -254,6 +254,26 @@ contract Galaxy is ModuleBase {
         for (uint256 i = 0; i < n; i++) out[i] = found[i];
     }
 
+    /// Several cells' states, a byte each (UNDECIDED, STAR, ...), for a client that lists a region's
+    /// cells itself (sdk/src/hex.js `disc`): count, then fill with `cellsOf`. Cheap per cell: one
+    /// storage read per 128 cells in a row, and none of `region`'s index math. Pass them sorted.
+    function statesOf(uint256[] calldata cells) external view returns (bytes memory states) {
+        states = new bytes(cells.length);
+        uint256 at = type(uint256).max;
+        uint256 word;
+        for (uint256 i = 0; i < cells.length; i++) {
+            uint256 cell = cells[i];
+            if (cell / 128 != at) (at, word) = (cell / 128, _g().cellWords[cell / 128]);
+            states[i] = bytes1(uint8((word >> ((cell % 128) * 2)) & 3));
+        }
+    }
+
+    /// Several cells as `region` reports them (undecided ones too, with state 0).
+    function cellsOf(uint256[] calldata cells) external view returns (CellView[] memory out) {
+        out = new CellView[](cells.length);
+        for (uint256 i = 0; i < cells.length; i++) out[i] = _view(cells[i], stateOf(cells[i]));
+    }
+
     function _view(uint256 cell, uint8 state) internal view returns (CellView memory v) {
         Star storage s = _g().stars[cell];
         v = CellView(

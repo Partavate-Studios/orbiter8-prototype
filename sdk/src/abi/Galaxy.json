@@ -152,6 +152,77 @@
   },
   {
     "type": "function",
+    "name": "cellsOf",
+    "inputs": [
+      {
+        "name": "cells",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "out",
+        "type": "tuple[]",
+        "internalType": "struct Galaxy.CellView[]",
+        "components": [
+          {
+            "name": "cell",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "state",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "visited",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "scanned",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "scanRound",
+            "type": "uint32",
+            "internalType": "uint32"
+          },
+          {
+            "name": "discoverer",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "discoveredAt",
+            "type": "uint40",
+            "internalType": "uint40"
+          },
+          {
+            "name": "partner",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "named",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "keeper",
+            "type": "address",
+            "internalType": "address"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "densityOf",
     "inputs": [
       {
@@ -589,6 +660,25 @@
         "name": "",
         "type": "uint8",
         "internalType": "uint8"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "statesOf",
+    "inputs": [
+      {
+        "name": "cells",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "states",
+        "type": "bytes",
+        "internalType": "bytes"
       }
     ],
     "stateMutability": "view"

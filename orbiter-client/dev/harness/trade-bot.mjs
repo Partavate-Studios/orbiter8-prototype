@@ -58,7 +58,12 @@ async function state() {
     pilots.cargoOf(me, goods.length),
     credits.balanceOf(me),
     market.capacity(),
-    market.portsAt(0)
+    // Sol's ports a few at a time, under a node's per-call cap (sdk/src/contracts.js portsAt)
+    market.portIds(0).then(async (ids) => {
+      const chunks = []
+      for (let i = 0; i < ids.length; i += 5) chunks.push([...ids].slice(i, i + 5))
+      return (await Promise.all(chunks.map((c) => market.portViews(c)))).flat()
+    })
   ])
   return {
     bays: Number(ship.bays),
