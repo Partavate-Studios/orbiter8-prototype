@@ -83,16 +83,21 @@ Parity's `resolc`), because Product tooling assumes it. That raises the code siz
 
 - **Not on mainnet yet.** The Product SDK throws for Polkadot and Kusama because "their Bulletin and
   Individuality chains are not live yet"; Products run on the Products devnet and Paseo. Launching with
-  the App ties our date to theirs, which is the plan (D63).
+  the App ties our date to theirs, which is the plan (D63). *(2026-11-18: Polkadot Hub's runtime has the
+  individuality pallets now, and the personhood precompile answers on mainnet; pallet-scarcity, the
+  App's NFTs, isn't there yet.)*
 - **The docs disagree on auto-signing.** The Allowances page describes AutoSigning; the older Sign In
   page and the glossary say every transaction needs its own approval "by design". To test.
+  *(2026-11-18: both are right. AutoSigning is in the protocol, but the phone wallets return
+  `NotAvailable` for it today; see step 4.)*
 - **Performance inside the App is unknown.** Our client is a heavy animated SVG scene; Products run in
   a sandboxed web view on phones. The first thing to measure.
 - **PolkaVM is young:** upgradeable proxies (UUPS) are unproven there, and Parity's `cdm` deploy tool
   treats contracts as immutable, versioned entries. Our drand check needs the BN254 pairing precompile.
 - **Personhood's Full tier isn't available yet;** Lite (an attested device and a username) is weak.
 - **How collectibles reach the Pocket is undocumented** (the SDK has an `nfts` module; likely Asset
-  Hub's native NFT system).
+  Hub's native NFT system). *(2026-11-18: the NFTs are `pallet-scarcity`, mintable from Solidity; the
+  Pocket itself is still to see. Step 6.)*
 - **The runtime changes often** (the research's finding): contract-visible behavior shifts with
   runtime upgrades every few weeks.
 
@@ -112,6 +117,207 @@ Run on the `polkadot` branch. Throwaway test keys only, never committed.
 The spike's results go in this file; then the migration is planned with Koda.
 
 ## Results
+
+### Step 4: AutoSigning, sponsored calls, and our session keys (2026-11-18)
+
+Researched from the Product SDK's own source (npm `@parity/product-sdk*` 0.45, `@parity/truapi` 0.31,
+read 2026-11-18), the developer docs (`developers.polkadot.com`, where docs.polkadot.com and the PCF's
+docs now redirect), Parity's runtimes, and tried on Polkadot Hub TestNet.
+
+**How a Product signs.** The App gives each Product its own accounts: sr25519 keys at
+`//product//{productId}/{index}`, held by the App on the phone. The Product gets a PAPI "transaction
+creator" for one (`getProductAccountSigner()`, or `SignerManager` → `account.getSigner()`), and every
+transaction it signs **goes to the phone for approval**; on Desktop that's a modal while the phone is
+asked, with no push notification. The docs: "Signing is asynchronous because the Polkadot App runs on a
+separate device." The account's H160 (`keccak256(publicKey)[12:]`) is what contracts see as
+`msg.sender`, after a one-time `Revive.map_account`.
+
+**AutoSigning exists, but not on phones.** A Product asks for allowances once per connection
+(`requestResourceAllocation([{ tag: 'AutoSigning' }, { tag: 'SmartContractAllowance', value: { tag:
+'Index', value: 0 } }])` in `SignerManager`'s `onConnect`); each comes back `Allocated`, `Rejected` or
+`NotAvailable`. AutoSigning hands the Product a signing subtree, so it signs with no prompt (it isn't
+scoped to contract calls). **The docs say plainly that both the Android and iOS wallets return
+`NotAvailable` for it today: "Keep per-transaction signing as the real path."** No lifetime, limit or
+revoke is documented; signing out clears grants; an expired one surfaces as `AllowanceExpiredError`
+("re-pair the wallet"). (The older docs' "every transaction needs its own approval by design" and the
+newer AutoSigning page are both right: one is today, the other is planned.)
+
+**Who pays: PGAS, not the player, and not us.** `SmartContractAllowance` doesn't sponsor fees from the
+Product; it **pre-claims PGAS into the product account**. PGAS (asset 2,000,000,000 on the testnet,
+49,999,999 on Polkadot Hub) is a non-transferable gas allowance that only a **proven person** may claim,
+periodically (`pallet-pgas`: 50,000,000,000 units a claim, up to 100 claims a period for a person, 40 for
+a Lite one, on the testnet; 5,789 accounts hold some). `pallet-pgas-allowance` lets PGAS pay fees (on
+Polkadot Hub, for every call since runtime 2.5.0; on the testnet, for Revive calls), and contract
+storage deposits are PGAS-denominated, "so a person can use contracts without holding DOT." So the
+"free to play" story holds for people with personhood, and ties sponsorship to step 5. (Paseo's
+issue tracker is renaming the allowance to a fee allowance for that reason.)
+
+**How a Product calls our contracts: as Substrate extrinsics, through the host.** No eth-rpc, no
+EIP-1193, no secp256k1. `@parity/product-sdk-contracts` (viem for ABI coding) dry-runs
+`ReviveApi.call` to size the call, then submits `Revive.call(dest, value, weight, depositLimit, data)`
+signed by the product account; `createContractFromClient(client, descriptor, address, abi)` works for
+contracts it didn't deploy (no `cdm.json` needed). The `devnet` descriptors target our testnet (Paseo
+Asset Hub 1000); `paseo` means Paseo Next. **The SDK also ships `SessionKeyManager`**
+(`@parity/product-sdk-keys`): a local sr25519 key from a mnemonic kept in the Product's storage, Parity's
+own answer to prompt-free signing until AutoSigning lands.
+
+**Prototype, run on the testnet** (`orbiter-client/dev/spikes/app-signer/`, outside the game build):
+- `eip1193-adapter.js`: the product-account signer as an **EIP-1193 provider**, so ethers 6 and our SDK
+  (which takes an EIP-1193 provider in `wallet.js`) work unchanged. `eth_call`/`eth_estimateGas` →
+  `ReviveApi.call` dry runs at the best block (reverts come back with their data, so ethers decodes
+  custom errors); `eth_sendTransaction` → `Revive.call` signed by the creator and watched; receipts
+  and transactions for its own sends built from the extrinsic's block and `Revive.ContractEmitted`
+  events; `map_account` on first use; anything else (block numbers, logs) to a fallback provider.
+- `run-testnet.mjs`, with a throwaway sr25519 key standing in for the product account (the same
+  creator type `getProductAccountSigner()` returns), a public WebSocket node standing in for the host's
+  client, and **the game's real testnet contracts** (`Pilots` at `0xacaa…E176`), via plain ethers:
+
+  | Move | Result | Time | Fee |
+  |---|---|---|---|
+  | `map_account`, then `Pilots.register("AppSpike1aa0", …)` | ok, pilot registered | (first run, not timed) | about 0.001 PAS each |
+  | `Pilots.broadcast(…)` from the product account | ok; event's pilot = the account's H160 | 3.8 s | about 0.001 PAS |
+  | `Pilots.register` again (static call) | reverts, ethers decodes `AlreadyRegistered` | instant | none |
+  | `Pilots.startSession(key, 1 h)` with 2 PAS gas money (D41) | ok | 3.2–3.6 s | about 0.001 PAS |
+  | the session key's `broadcast`, an Ethereum-signed tx sent as **`Revive.eth_transact` over the Substrate client** | ok; eth-rpc indexes it normally; event's pilot = the product account | 1.9 s | from the key's gas money |
+
+  The product stand-in was funded from the spike key by a local XCM transfer through the XCM precompile
+  (`0x…000a0000`, `WithdrawAsset` + `DepositAsset` to an AccountId32): moving PAS from an EVM account
+  to a Substrate account works from Solidity-land.
+
+**What the adapter can't know yet (needs the App):** whether the host lets a Product submit a bare
+`Revive.eth_transact` extrinsic (there's a `ChainSubmit` remote permission), how the phone prompt reads
+for a `Revive.call` (it shows a Substrate call, not our function names), and how long a phone approval
+takes in practice.
+
+**Answer to Koda's question: keep session keys (D41), and use AutoSigning when the App offers it: both.**
+- **In the App, AutoSigning allocated:** moves go straight from the product account (`Revive.call`), no
+  session, no gas money; fees in PGAS for players with personhood. This is D64's goal.
+- **In the App, AutoSigning `NotAvailable` (every phone today):** one approval starts a D41 session
+  (already in our contracts: the key can only make game moves); the session key signs its moves as
+  Ethereum transactions and sends them as `Revive.eth_transact` through the host's client. Shown above:
+  no eth-rpc URL, no MetaMask, our existing key code. Its gas money still has to come from somewhere:
+  PGAS can't be sent to it (non-transferable), so the approval forwards PAS as today; a player with no
+  PAS can't start a session. That's the real gap (see open questions).
+- **Outside the App** (a browser, later: D63): today's EIP-1193 wallet and session keys, unchanged.
+- The contracts need nothing new: `actorOf` already maps a session key to its pilot.
+
+**Migration steps** (proposed; nothing built in the game):
+1. Get a product id (our `.dot` name); it fixes product accounts and the personhood context.
+2. SDK: a `ProductAccountProvider` (this adapter, hardened) beside `discoverWallets()`, chosen when the
+   page runs inside a host (`@parity/product-sdk-host` says so); `onConnect` requests
+   `SmartContractAllowance` and `AutoSigning`.
+3. Onboarding: `map_account` (and the personhood binding, step 5) folded into the first approval;
+   batch them with `Utility.batch_all` (`.prepare()` in the contracts SDK) so it's one prompt.
+4. Moves: if AutoSigning is `Allocated`, send directly; otherwise start a session and send the key's
+   moves via `Revive.eth_transact` through the host's client.
+5. Reads: move from eth-rpc to `ReviveApi.call` dry runs over the host's client (already how the
+   adapter does `eth_call`); logs and the event feed need a remote permission for eth-rpc, or an
+   indexer, or Statement Store (to decide).
+6. Measure on Koda's phone: prompt wording, approval time, and whether AutoSigning becomes available.
+
+### Step 5: the personhood precompile from our contracts (2026-11-18)
+
+**It works from Solidity, on the testnet and on mainnet.** The precompile answers at
+`0x000000000000000000000000000000000a010000` on Polkadot Hub TestNet (420420417) and on Polkadot Hub
+itself (420420419; read-only call, nothing deployed there).
+
+```solidity
+interface IPersonhood {
+    struct PersonhoodInfo { uint8 status; bytes32 contextAlias; } // 0 None, 1 Lite, 2 Full
+    function personhoodStatus(address account, bytes32 context) external view returns (PersonhoodInfo memory);
+}
+```
+
+What it proves, read from Parity's source (`paritytech/individuality-community`, `precompiles/personhood`
+and `pallets/alias-accounts`, Apache-2.0; `paritytech/dotns`'s `PopRules.sol` calls it the same way):
+- An account says "I am a person" by binding itself, with a ring-VRF proof made on the player's phone,
+  to an **alias in one context** (`AliasAccounts.set_paid_alias_account`, a small fee in PGAS). The
+  precompile reads that binding: the status is the ring the person is in (People = Full, People Lite =
+  Lite), and `contextAlias` is the person's pseudonym in that context: the same for every account they
+  bind there, unlinkable to their other apps. Nobody learns who they are.
+- **An account holds one binding, in one context.** Ask about any other context and the answer is 0.
+  A person who binds a second account in the same context moves the alias there (the first loses it).
+  So "one ship per person" has to be keyed by the **alias**, not by the account.
+- For a Product the context is fixed by the host: `blake2b-256("product/" ++ productId ++ "/" ++
+  suffix)`, where the product id is our `.dot` name with the network's TLD (`productContext()` in
+  `@parity/product-sdk-individuality`). For "orbiter8.paseo", index 0, that is `0x29ab4713…825b`;
+  the real value waits on our product id. A newer call, `personhoodInfoByProof`, verifies a proof
+  passed in by the caller instead (no binding needed); the testnet's copy of the interface has it,
+  `dotns`'s doesn't yet.
+- The tiers: **Lite** is a device attestation plus a username, which is easy to farm; **Full** (a
+  proven person) isn't widely available yet.
+
+Prototype (`contracts/spikes/`, its own Foundry project): `PersonhoodGate.sol` registers at most one pilot
+per alias, refuses status 0, fails closed on unknown tiers, and has a minimum tier. Forge tests run it
+against a mock etched at the precompile's address (`forge test` in `contracts/spikes`, 5 tests).
+
+On the testnet (throwaway, `0x02D44a6Fd0448fF4F5B01c07561Cef320BD0eC60`): the testnet has exactly one
+account bound to an alias (`orbiter-client/dev/spikes/app-signer/probe-aliases.mjs`): a Lite person,
+`5FgZHX…8Rpm`, H160 `0x8b39…d9f8`. Deployed with that account's context, the gate's `statusOf` returns
+**status 1 and its alias** through the precompile; a simulated `register()` from that account succeeds
+and from our spike key reverts `NotAPerson(0)`. The precompile read costs about 1,200 gas.
+
+**Where the game could use it (for Koda; nothing decided, see `review.md` P3):**
+1. **One pilot per person at registration** (D63's "one human, one pilot"): `Pilots.register` asks
+   the gate. Keeps call signs and the leaderboard human.
+2. **The free claim and other give-aways** (starter credits, a free planet, a first ship) once per
+   person, so bots can't farm them by making accounts.
+3. **Fleet caps**: pilots will own several ships (D65), but a per-person cap on anything scarce (free
+   planet claims per day) is enforceable.
+4. **Anti-bot for sieges and chat**: Lite or better to broadcast or attack.
+5. **Tiers as a dial:** Lite to play at all, Full for anything with real value (rewards, dotUSD
+   prizes). Lite is weak against farms; Full isn't widely issued yet.
+
+The catch: the player must bind their product account first (one phone approval and a little PGAS,
+done by the App's individuality flow), and the contract has to know our product context.
+
+### Step 6: ships in the App's NFT system (2026-11-18)
+
+**Yes: an EVM contract on Polkadot Hub can mint into the App's own NFT system, and it worked on the
+testnet.** The App's collectibles aren't `pallet-nfts`; they are **`pallet-scarcity`** (Parity's
+individuality stack, in polkadot-sdk since stable2609): collections → immutable item definitions →
+minted instances, with three layers of key/value metadata, and a "coinage" ownership model where
+each NFT sits at its own **purse key** (one NFT per key; contracts may hold several on newer runtimes).
+Product SDK reads are in `@parity/product-sdk-nfts`; the host manages purses (`NftPurseClient`:
+create purse, create item keys, cheques to send items, `NftPurseRead` to read another owner's).
+
+Contracts reach it through two precompiles (interfaces in `individuality-community/precompiles/scarcity`):
+- **`IScarcityFactory` at `0x…05210000`**: `createCollection()`, the caller owns it and pays its deposit.
+- **`IScarcityCollection` at `address(uint160(id) << 128 | 0x05200000)`**, one per collection: a real
+  ERC-721 (`ownerOf`, `balanceOf`, `transferFrom`, `tokenURI`, ERC-5192 `locked`, ERC-2981 royalties)
+  plus the owner's admin surface (`defineItem`, `mint`, `forceTransfer`, `forceBurn`, metadata at three
+  scopes). No approvals (so no marketplace contracts moving tokens for you, yet).
+
+Which networks have it (checked 2026-11-18): **Polkadot Hub TestNet (420420417): yes**; Paseo Next and
+Previewnet (the SDK's `paseo` and `previewnet` environments): yes, with other products' collections
+("Living World", "Coffee and Tea"); **Polkadot Hub mainnet: not yet** (the factory has no code there).
+
+Prototype (`contracts/spikes/src/ShipCollection.sol`, forge tests against mocks, 3 tests) deployed on the
+testnet at `0x6E3F58Fc999ec628cc67e82FD9b096ceA422F9E7` with 5 PAS for deposits:
+- `setup()` created **collection 0** (the testnet's first), owned by our contract, named "Orbiter 8
+  Ships (spike)" / "O8SHIP", with one transferable item "ship": 5,394 gas, about 1 PAS of deposit.
+- `mintShip(spikeKey, 1, "Lantern")` minted token 0 with instance metadata `name=Lantern`,
+  `shipId=1`: `ownerOf`, `balanceOf`, `tokenOfOwnerByIndex` and `instanceMetadata` all read back right.
+  About 0.3 PAS of deposit per mint (refundable on burn), paid by the contract.
+- A second mint to the same key reverts "destination purse already holds an instance" (one NFT per
+  purse key), and so does a mint to a contract on this runtime (holding many arrives with a newer one).
+- `transferFrom` by the holder (a plain EOA) to a fresh key worked: ships would be tradable from day one.
+
+**What the Pocket shows: not seen yet.** That needs the App (step 3 on the phone). From the SDK:
+the Pocket is a host tab of cards; a product can list and remove *its* cards but not add one (the host
+decides, from the product's manifest), and drawn faces come from the product's renderer. NFTs reach a
+player through purses the host derives keys for; whether the Pocket lists Scarcity NFTs held by a
+product's purse, by the player's root purse, or by any key the player controls is undocumented. So the
+open question is narrow: **mint to a purse key the host made** (`NftPurseClient.createItems`) and look.
+
+What it means for ships (D65), for Koda (`review.md` P4):
+- Ships can be real Scarcity NFTs, minted by the game's own contract, so they'd appear in the player's
+  App with no bridge or mirror. Our `Ships` contract can own the collection and mint when a ship is
+  bought; the game keeps its own ship state (bays, damage, loadout) keyed by token id.
+- The purse model clashes with how the game tracks ownership today (a pilot's address owns its ship): a
+  ship would sit at a purse key, not the pilot's account, so the contract maps token → pilot itself,
+  or holds the NFT while the ship is "in play" and hands it out to a purse when traded.
+- Not on mainnet yet, so ERC-721 in our own contract stays the fallback, and is what the game has.
 
 ### Step 3, first look: Polkadot Desktop's sandbox (2026-11-13, in progress)
 
@@ -288,6 +494,16 @@ What it means:
 - [Polkadot App docs: Identity and personhood](https://docs.polkadotcommunity.foundation/architecture/identity/)
 - [Polkadot App docs: Platform services from the SDK](https://docs.polkadotcommunity.foundation/guides/platform-services-sdk/)
 - [paritytech/dotns](https://github.com/paritytech/dotns) (a contract using the personhood precompile)
+- Added 2026-11-18 (steps 4–6): [Sign and Submit](https://developers.polkadot.com/apps/build/sign-and-submit/),
+  [Signer](https://developers.polkadot.com/apps/product-sdk/signer/),
+  [Contracts](https://developers.polkadot.com/apps/product-sdk/contracts/),
+  [XCM precompile](https://developers.polkadot.com/smart-contracts/precompiles/xcm/);
+  the npm packages `@parity/product-sdk` 0.45.0 (signer 0.17.10, contracts 0.11.10, nfts 0.4.1, keys,
+  tx, individuality 0.11.7) and `@parity/truapi` 0.31.0;
+  [paritytech/individuality-community](https://github.com/paritytech/individuality-community)
+  (`precompiles/personhood`, `precompiles/scarcity`, `pallets/alias-accounts`, `runtimes/next-asset-hub-paseo`);
+  [polkadot-fellows/runtimes v2.5.0 `individuality.rs`](https://github.com/polkadot-fellows/runtimes/blob/v2.5.0/system-parachains/asset-hubs/asset-hub-polkadot/src/individuality.rs);
+  [trinity-user-agents#1218](https://github.com/paritytech/trinity-user-agents/issues/1218) (PGAS pays every fee).
 - [Polkadot App on Google Play](https://play.google.com/store/apps/details?id=io.pcf.polkadotapp&hl=en_US)
 - The earlier research: [`research/polkadot-hub-2026-11.md`](research/polkadot-hub-2026-11.md)
 

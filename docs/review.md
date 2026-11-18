@@ -600,9 +600,36 @@ Calls made building it, for Koda's review:
 - **X6. Wording:** the loadout's empty-weapons line says "Every Sol station's armory sells them." (was "The
   I.S.S. armory").
 
+## 10. The Polkadot App spikes (2026-11-18, milestone 7 steps 4–6)
+
+Results in `polkadot-direction.md` (steps 4, 5, 6). Calls made on my own:
+
+- **P1. The spikes live outside the game.** Contracts in `contracts/spikes/` (own Foundry project, forge-std
+  from `contracts/lib`), the App-signer prototype in `orbiter-client/dev/spikes/app-signer/` (own
+  `package.json`, `npm install --ignore-scripts`). Nothing in `contracts/src`, `sdk/` or the client changed.
+- **P2. Throwaway keys outside the repo:** the product-account stand-in's mnemonic and the session key are in
+  `~/.config/orbiter8/app-signer-spike.json` and `app-signer-session.json` (mode 600), next to the
+  spike key. The stand-in was funded from the spike key by a local XCM transfer through the XCM precompile
+  (40 PAS, because a stale balance read funded it twice).
+- **P3. Personhood: where to use it is yours to decide.** Proposed in step 5: one pilot per person at
+  registration, once-per-person give-aways (the free claim, starter credits), Lite to play, Full for
+  anything of real value. Whatever is chosen should key on the per-context alias, not the account.
+  Open: our product id (it fixes the context), and whether Lite is enough at launch.
+- **P4. Ships as Scarcity NFTs is a design change for later, not done.** The game keeps its ERC-721-style
+  ships; the spike shows the App's NFT system is reachable from Solidity. Whether ships become Scarcity
+  tokens (and how the purse-key model maps onto pilots) waits for seeing one in the Pocket, and for
+  mainnet to have the pallet.
+- **P5. Session keys stay (D41), as the fallback; recommended in step 4.** AutoSigning returns
+  `NotAvailable` on both phone wallets today, so dropping session keys now would mean a phone approval
+  per move.
+- **P6. The collection on the testnet is called "Orbiter 8 Ships (spike)"**: it's the testnet's
+  collection 0 and visible to anyone browsing Scarcity there. Throwaway, like every testnet address.
+
 ## For Koda to decide
 
 Answered above, bar these:
+- P3–P5 (personhood rules, Scarcity ships, session keys versus AutoSigning) and the product id
+  (`orbiter8.dot`?), which fixes the personhood context and the product accounts.
 - R10: an index by star in the contracts (or an indexer) once pilots number in the hundreds.
 - T7's other half: a real phone's keyboard over the dialogs wasn't checked.
 - The HUD profile card on a portrait phone keeps to three rows of goods ("+N more" past five);
