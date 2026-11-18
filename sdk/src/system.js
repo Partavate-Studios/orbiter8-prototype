@@ -21,7 +21,7 @@ import {
 import { dockedShips } from './game/docking'
 
 /** Who owns Sol's planets (D49). */
-const FEDERATION = 'The Federation'
+export const FEDERATION = 'The Federation'
 
 /** The star at the center of every system has a fixed key. */
 export const STAR_KEY = 'star'

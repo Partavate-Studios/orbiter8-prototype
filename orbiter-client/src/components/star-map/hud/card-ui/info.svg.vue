@@ -45,6 +45,8 @@
     <g :transform="'rotate(' + spriteRotation + ')'">
       <sprite :object-id="objectId" />
     </g>
+    <!-- what's built on it, arced under its picture -->
+    <card-works :object-id="objectId" />
     <!-- yours: a yellow badge on the card's corner (Koda, 2026-11-14, row F2); never the frame, so a
          planet can be yours and under siege at once -->
     <g v-if="mine" transform="translate(66 -70)">
@@ -61,6 +63,7 @@ import { mapState } from 'pinia'
 import CardBackground from './card-background.svg'
 import CardText from './card-text.svg'
 import Sprite from './sprite.svg'
+import CardWorks from './card-works.svg'
 
 import { useStarMapStore } from '@/stores/starmap'
 import { usePlayerStore } from '@/stores/player'
@@ -71,6 +74,7 @@ export default {
   name: 'CardInfo',
   components: {
     Sprite,
+    CardWorks,
     CardBackground,
     CardText
   },

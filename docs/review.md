@@ -584,6 +584,19 @@ Calls made building it, for Koda's review:
   panel and this menu's code letters mark "buys what you carry" in yellow. Either the dot turns yellow,
   or green becomes the "sell here" color everywhere. In Sol every port has yards and an armory, so every
   planet there has the gray dot. Shots: `docs/mockups/ports/`.
+- **X29. The selection card, readable** (2026-11-17, Koda: "hard to read… the data isn't as useful as
+  it could be… make it clear when a planet has infrastructure"). The frame, corner brackets, title pill
+  and picture are kept; the info panel is redone: the kind in the card's own color with a tag at the
+  right (a planet's orbit, a star's class, a ship's number), then label and value rows about twice the
+  old size. Planet: owner (You in yellow, the Federation in lavender), world (class, size, rings), its
+  port's trade code, moons, people, and what's being built. Port: owner, trade code, yards/armory, and
+  every good it trades with ↑ buys / ↓ sells and its next-unit price. Your ship: captain, holds used,
+  where it is, cargo by code. Star, moon, asteroid and empty belt space get their facts the same way.
+  Dropped as low value: the orbital ring line (now the header tag) and the "Mine" word (the yellow badge
+  says it). **Infrastructure** is drawn on the picture: the built buildings' icons arced under the
+  planet or asteroid (Citadel, Colony, Station, Port, Yards, Armory, Autofactory; an asteroid's Platform,
+  Mine, Port, Armory), the one being built dashed. Sol's ports, yards and armories count, though their
+  planets' level is 0 in the contracts. Shots: `docs/mockups/card/`.
 - **X6. Wording:** the loadout's empty-weapons line says "Every Sol station's armory sells them." (was "The
   I.S.S. armory").
 
