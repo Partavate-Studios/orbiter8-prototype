@@ -276,15 +276,14 @@ export default {
     },
     /**
      * The jump animation's star streaks, redrawn every frame while jumping, over the backdrop (no wash
-     * of purple: the backdrop shows through). The streak field slides in from the left as the system
-     * slides away, and out to the right as the new one slides in (libs/jump-slide.js).
+     * of purple: the backdrop shows through). The streaks stream in from the right once the ship is in
+     * place, and out to the left as the new system slides in (libs/jump-slide.js).
      */
     drawJump() {
       const canvas = this.$refs.jump
       const ctx = this.centeredContext(canvas, 0)
-      const slide = jumpSlide(this.jumpPhase, Date.now() - this.jumpPhaseAt, { shipGone: this.jumpShipGone })
-      if (Math.abs(slide.streaks) >= 1) return
-      ctx.translate(slide.streaks * this.screenSize.width, 0)
+      const { from, to } = jumpSlide(this.jumpPhase, Date.now() - this.jumpPhaseAt, { shipGone: this.jumpShipGone }).streaks
+      if (to - from <= 0) return
 
       // Map units inside the HUD's 1.25x group, as the SVG version used.
       const unit = this.unit() * 1.25
@@ -306,6 +305,32 @@ export default {
           ctx.restore()
         }
       }
+      this.hideStreaksOutside(ctx, canvas, from, to)
+    },
+    /**
+     * Wipes the streaks outside the stretch they show in (`from` to `to`, in screen widths), with a soft
+     * edge: the stars stream in from the right and out to the left (libs/jump-slide.js).
+     */
+    hideStreaksOutside(ctx, canvas, from, to) {
+      if (from <= 0 && to >= 1) return
+      const width = canvas.width
+      const soft = width * 0.08
+      ctx.save()
+      ctx.setTransform(1, 0, 0, 1, 0, 0)
+      ctx.globalCompositeOperation = 'destination-out'
+      // Erases fully on the hidden side of `edge`, fading to nothing over the soft band toward `inside`.
+      const wipe = (edge, inside) => {
+        const fade = ctx.createLinearGradient(edge, 0, inside, 0)
+        fade.addColorStop(0, '#000000ff')
+        fade.addColorStop(1, '#00000000')
+        ctx.fillStyle = fade
+        if (inside > edge) ctx.fillRect(0, 0, inside, canvas.height)
+        else ctx.fillRect(inside, 0, width - inside, canvas.height)
+      }
+      // left of the stretch (the streaks not yet in), right of it (the last ones gone out to the left)
+      if (from > 0) wipe(from * width, from * width + soft)
+      if (to < 1) wipe(to * width, to * width - soft)
+      ctx.restore()
     },
     /** One star streak (500 x 8 units, fading out to the right), pre-rendered for the current size. */
     streakSprite(unit) {
