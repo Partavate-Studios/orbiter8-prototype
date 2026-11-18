@@ -80,9 +80,15 @@ work in progress from a session that ran out (check `git status` and `git diff` 
 - 2026-11-16: Phase 5 analysis done: `orbiter-client/dev/sim/belt.mjs` and a "The belt" section in
   `docs/demo4-tuning.md` (what mining, drones and asteroids earn against trading, with a reading for Koda).
   No numbers changed: tuning for feel is Koda's call. **The plan's phases are all through.**
+- 2026-11-17: Koda approved X21; asked for asteroids to roam their sections (done: `asteroidRoam` in
+  `sdk/src/game/orbits.js`); the tuning suggestions applied (mining drone 400, planets 80 an hour,
+  `Factory.setPart`); **deployed to Polkadot Hub TestNet** (addresses in `sdk/src/chain/networks.js`,
+  `contracts/deployments/420420417.json`; about 19 PAS); a GitHub Pages workflow
+  (`.github/workflows/pages.yml`) publishes the client at https://partavate-studios.github.io/orbiter8-prototype/
+  on every push to `polkadot` (Settings → Pages → Source: GitHub Actions). Next release: a debug cheat code
+  (`demo4-plan.md`, Consider next).
 - **Left for Koda / a later session:** (1) review calls X1–X22 in `docs/review.md`, and the mockup
-  `docs/mockups/belt-levels.svg`; (2) the Paseo testnet needs a fresh deploy (X9: body ids, Claims,
-  Repairs, Drones changed the interface); (3) tuning choices in `demo4-tuning.md` "The belt";
+  `docs/mockups/belt-levels.svg`; (3) tuning choices in `demo4-tuning.md` "The belt";
   (4) extending the economy simulator with miners and asteroid owners; (5) dwarf planets (decision 21);
   (6) the clean-room client (`client-rnd/fresh/`) learns the belt (decision 31); (7) Battle has 1.9 KB left:
   `Combat` as a linked library if it needs more. Sizes now: Planets 21.3 KB, Battle 22.7, Market 20.3,

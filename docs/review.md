@@ -443,7 +443,7 @@ Calls made building it, for Koda's review:
   didn't change.
 - **X8. The star-name fee** is now Claims' own number (`starNameFee`, 50,000, what a Station cost), so
   tuning buildings no longer changes it.
-- **X9. Testnet:** body ids and Claims change the contracts' interface; the Paseo deployment needs a
+- **X9. Testnet** (done 2026-11-17: redeployed): body ids and Claims change the contracts' interface; the Paseo deployment needs a
   fresh deploy (throwaway key, as before) before the client plays the testnet again. Not done yet.
 - **X10. Drone bays in the shipyard:** a two-way toggle (Cargo Holds / Drone Bays) above the existing
   stepper, drawn like the stepper's buttons; the menu's art is otherwise unchanged. It's a new control in
@@ -505,7 +505,7 @@ Calls made building it, for Koda's review:
   change to the ship stops it, through Pilots (every ship-changing function, including a siege's damage
   and reassigning the built-in drones); renaming the ship and chat don't. `stopMining` ends it too.
   Mining is allowed in Sol's belt (only claims are the Federation's).
-- **X21. Asteroid sieges** (decisions 6, 29): an asteroid's defenses are at most six weapon mounts and
+- **X21. Asteroid sieges** (approved by Koda, 2026-11-17) (decisions 6, 29): an asteroid's defenses are at most six weapon mounts and
   one shield level, fitted from its store like a planet's; no armor, repair bots, platforms, BFG or
   fitted drones (its drones are its pool's defense drones, which fight and can be lost; mining ones never
   are). Its hull is its step × the planets' 60. A captured asteroid falls one step of its own line

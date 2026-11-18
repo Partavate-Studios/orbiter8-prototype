@@ -73,6 +73,21 @@ export const BELT_SPEED = 60
 /** Where a belt section sits round the star at the start, in degrees (eight sections, 45° each). */
 export const sectionPhase = (index) => Number(index) * 45 + 22.5
 
+/**
+ * An asteroid roams its section (Koda, 2026-11-17: "sorta roamed around its section a little"): a slow
+ * closed loop, a Lissajous figure, out and in across the band and back and forth along it, each
+ * asteroid on its own timing. Visual only, like the belt's turning.
+ * @returns {{ radius: number, phase: number }}  world units added to its distance from the star, and degrees added to its angle
+ */
+export function asteroidRoam(section, gameTime) {
+  const s = Number(section)
+  const t = gameTime / 1000 / ROAM_PERIOD_S
+  const across = 10 * Math.sin(2 * Math.PI * t * (1 + (s % 3) * 0.25) + s * 1.3)
+  const along = 12 * Math.sin(2 * Math.PI * t * 0.5 + s * 2.1)
+  return { radius: across, phase: along }
+}
+const ROAM_PERIOD_S = 240
+
 /** How far from an empty section's middle its six mining slots sit (world units; the hexagons the client draws). */
 export const MINING_SLOT_RADIUS = 2.5
 

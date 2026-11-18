@@ -26,7 +26,7 @@ const devProxy = (route) => (import.meta.env?.DEV && typeof location !== 'undefi
 /** Deployed networks. */
 const deployed = [
   {
-    // Polkadot Hub's testnet (Paseo Asset Hub): the spike's deployment of 2026-11-13 as EVM bytecode
+    // Polkadot Hub's testnet (Paseo Asset Hub): the expansion's deployment of 2026-11-17 as EVM bytecode
     // (contracts/deployments/420420417.json). Not the PolkaVM one: there, reads that return long lists
     // (Sol's ports and planets, the galaxy map) fail on resolc's default memory (docs/polkadot-direction.md).
     // Throwaway: redeployed at will.
@@ -37,18 +37,21 @@ const deployed = [
     rpc: [...devProxy('/__paseo'), 'https://eth-rpc-testnet.polkadot.io/'],
     explorer: ['https://blockscout-testnet.polkadot.io'],
     contracts: {
-      credits: '0x6C7c8cD5c1cd85052170f0Cd3576E54eEe29971C',
-      ships: '0x604367E54eD1ffd6fcA0F0D409b44D3CC405aFeE',
-      galaxy: '0x3c2041e71235eB455717BDA0CbB39D5Ee8EdA262',
-      pilots: '0xC257BED2601b02cab9864aDEEec867022Cb91b48',
-      market: '0x23D7060da9c017960f57D78BC946374092E5Ae00',
-      deeds: '0x82Fe5957866A76424959DD5402Eaf36E1bF0B6eC',
-      planets: '0x81221ABe12217Aa5E0F7c15d55c38E5A943B3b6E',
-      factory: '0x9A50F9610d01b299D30add73278339A0eAFd1fdF',
-      battle: '0xA755158746f968786E8c425BC2DA6F3296b907bF',
-      armory: '0xd199576247ecDc1F0AC23A96fA6e357c94e95c0c'
+      credits: '0xAfAB2AB6C936818a607959df82B04d810824d12E',
+      ships: '0x31181bc0111Fd42dd97c62731955954b62D53561',
+      galaxy: '0xCae9699f87e7EbaA5C2848E6f0645d7B9C91ea54',
+      pilots: '0xacaaA65F0C81A8F1ADDe5375725832268667E176',
+      market: '0x829667186B72b714cBD87C2BCC71Ae8b5964b9BB',
+      deeds: '0x0d87E6D29E4c58af689e131903f1577139774edD',
+      claims: '0x3C05bF51756FeD11f23EBfCdE3bF4Bcb6D067b4E',
+      planets: '0xA978319251D6e6D3E27f1Fc6CB01dE4e2A4C636a',
+      factory: '0xCBD715D2836524a3bf41A9653C332aee6B50B71b',
+      repairs: '0xe1839052a951E995F6f776a187dC06aBA059dd06',
+      battle: '0xa2Cd562aE9308F9386f38525a51e2eEe7C987693',
+      armory: '0xB50793211f47a8F73e9aed78E40f0beb070C6793',
+      drones: '0x1A1a7A4c94Aa180D2b174cFb9689D22c60B5d65e'
     },
-    startBlock: 15_722_500, // a little before the deployment (Credits' proxy is at 15,722,601)
+    startBlock: 15_888_350, // a little before the deployment (its first transaction is after 15,888,360)
     sessionFunds: '2', // a move costs about 0.01–0.04 PAS
     funding: [{ text: 'Polkadot faucet (choose Polkadot Hub TestNet)', url: 'https://faucet.polkadot.io/' }]
   }

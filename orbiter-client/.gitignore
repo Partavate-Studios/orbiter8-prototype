@@ -22,3 +22,4 @@ selenium-debug.log
 dev/harness/snapshot.id
 dev/local-deployment*.json
 dev/harness/.crowd/
+/dist-pages/

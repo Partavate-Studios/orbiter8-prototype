@@ -1,0 +1,49 @@
+# Builds the game client and publishes it on GitHub Pages: https://partavate-studios.github.io/orbiter8-prototype/
+# The build plays Polkadot Hub TestNet (sdk/src/chain/networks.js) with a browser wallet; there's no dev
+# wallet or local chain on a static page. In the repo's Settings → Pages, set Source to "GitHub Actions".
+name: Pages
+
+on:
+  push:
+    branches: [polkadot]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: orbiter-client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: orbiter-client/package-lock.json
+      - run: npm ci
+      # Not `npm run build`: that bumps the version, which is for releases.
+      - run: npx vite build --outDir dist-pages
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: orbiter-client/dist-pages
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

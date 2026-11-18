@@ -1,5 +1,5 @@
 import { markRaw } from 'vue'
-import { orbitAt, shipOrbitRadius, SHIP_ORBIT_SPEED } from '@orbiter8/sdk/game/orbits'
+import { asteroidRoam, orbitAt, shipOrbitRadius, SHIP_ORBIT_SPEED } from '@orbiter8/sdk/game/orbits'
 import { SPRITE_TYPES, SHIP_SIZE, STATION_START_ROTATION, ART, spriteScaleOf } from '@/libs/sprite-types'
 
 /** How fast a ship slides round its orbit to a new place among the ships sharing it. */
@@ -86,7 +86,11 @@ export default class Sprite {
   updateTelemetry(gameTime) {
     const elapsed = this.phaseTime == null ? 0 : Math.max(0, gameTime - this.phaseTime) / 1000
     this.glidePhase(gameTime)
-    const orbit = orbitAt(this.object.orbit.radius, this.object.orbit.speed, gameTime, this.phase)
+    // An asteroid roams its section on a slow loop (sdk/game/orbits.js asteroidRoam).
+    const roam = this.type === 'asteroid' ? asteroidRoam(this.object.section, gameTime) : null
+    const orbit = roam
+      ? orbitAt(this.object.orbit.radius + roam.radius, this.object.orbit.speed, gameTime, this.phase + roam.phase)
+      : orbitAt(this.object.orbit.radius, this.object.orbit.speed, gameTime, this.phase)
     let x = orbit.x
     let y = orbit.y
     // Sprites face along their orbit's radius; stations spin four times as fast, the other way.
@@ -199,7 +203,9 @@ export default class Sprite {
     // At the selected station's pad, turning with it, or in orbit round the planet.
     const pose = this.visitDock
       ? padPoseFor(this.visitDock, gameTime)
-      : (({ x, y, angle }) => ({ x, y, rotation: angle }))(orbitAt(shipOrbitRadius(planet.object.size), SHIP_ORBIT_SPEED, gameTime, this.phase))
+      : (({ x, y, angle }) => ({ x, y, rotation: angle }))(
+          orbitAt(shipOrbitRadius(planet.object.size), SHIP_ORBIT_SPEED, gameTime, this.phase)
+        )
     this.position.x = planet.position.x + pose.x
     this.position.y = planet.position.y + pose.y
     this.telemetry.translatex = this.position.x - home.position.x
