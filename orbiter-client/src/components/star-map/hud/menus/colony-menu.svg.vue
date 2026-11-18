@@ -56,13 +56,13 @@
             Recruit colonists at Earth's hiring hall, in Sol.
           </text>
           <g transform="translate(0 60)">
-            <amount-dial v-model:value="land" label="Land colonists" :max="aboard" :step="10" />
+            <amount-dial v-model:value="land" label="Land colonists" :max="aboard" />
           </g>
           <g transform="translate(0 125)">
             <menu-button :enabled="land > 0" :text="'Land ' + land.toLocaleString('en-US')" @buttonclick="doLand" />
           </g>
           <g transform="translate(0 185)">
-            <amount-dial v-model:value="board" label="Take people aboard" :max="maxBoard" :step="10" />
+            <amount-dial v-model:value="board" label="Take people aboard" :max="maxBoard" />
           </g>
           <g transform="translate(0 250)">
             <menu-button

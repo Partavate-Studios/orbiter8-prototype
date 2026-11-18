@@ -69,7 +69,28 @@
       <g :transform="'translate(' + (sliderLeft + placement) + ' 0) scale(1.5)'"><slider-arrow /></g>
     </g>
 
-    <!-- The arrow buttons: drawn 16 wide, but a thumb-sized area round each takes the tap. -->
+    <!-- Dragging: pointer events, so a finger works as well as a mouse; the pointer is captured, so a
+         drag that leaves the bar keeps going. -->
+    <g>
+      <rect
+        ref="touchArea"
+        :x="touchAreaLeftEdge"
+        :y="-7 - padding"
+        :width="highlight"
+        :height="14 + padding * 2"
+        stroke="#ffffff"
+        stroke-width="0"
+        fill="#00000000"
+        class="can-drag"
+        :class="{ 'is-dragging': mouseHold }"
+        @pointerdown.stop="handlePointerDown"
+        @pointerup.stop="handlePointerUp"
+        @pointercancel.stop="handlePointerUp"
+        @pointermove.stop="handlePointerMove"
+      />
+    </g>
+    <!-- The arrow buttons, over the drag area so a tap on one always steps by one: drawn 16 wide, but
+         a thumb-sized area round each takes the tap. -->
     <g :opacity="opacityLeft">
       <g :transform="'translate(' + (sliderWidth / -2 - 16) + ' 0) rotate(180)'" opacity="0.5"><slider-arrow /></g>
       <rect
@@ -114,26 +135,6 @@
       <rect :x="sliderWidth / 2" y="-15" width="30" height="30" fill="transparent" class="can-click" @click="incrementSlider" />
     </g>
 
-    <!-- Dragging: pointer events, so a finger works as well as a mouse; the pointer is captured, so a
-         drag that leaves the bar keeps going. -->
-    <g>
-      <rect
-        ref="touchArea"
-        :x="touchAreaLeftEdge"
-        :y="-7 - padding"
-        :width="highlight + padding * 2"
-        :height="14 + padding * 2"
-        stroke="#ffffff"
-        stroke-width="0"
-        fill="#00000000"
-        class="can-drag"
-        :class="{ 'is-dragging': mouseHold }"
-        @pointerdown.stop="handlePointerDown"
-        @pointerup.stop="handlePointerUp"
-        @pointercancel.stop="handlePointerUp"
-        @pointermove.stop="handlePointerMove"
-      />
-    </g>
   </g>
 </template>
 
@@ -186,17 +187,23 @@ export default {
     sliderRight() {
       return this.sliderWidth / 2
     },
+    /** The share of the track a value fills, kept on the track (a value past the end, as when what's
+     *  aboard shrinks under a chosen amount, no longer runs the bar off the menu). */
+    share() {
+      return (value) => Math.max(0, Math.min(1, value / Math.max(1e-9, this.highestValue)))
+    },
     placement() {
-      return (this.currentValue / this.highestValue) * this.sliderWidth
+      return this.share(this.currentValue) * this.sliderWidth
     },
     highlight() {
-      return parseInt((this.highlightValue / this.highestValue) * this.sliderWidth)
+      return Math.round(this.share(this.highlightValue) * this.sliderWidth)
     },
+    /** The drag area: the track's live part, no wider (past its ends are the arrows' taps). */
     touchAreaLeftEdge() {
       if (this.reverse) {
-        return this.sliderRight - this.highlight - this.padding
+        return this.sliderRight - this.highlight
       }
-      return this.sliderLeft - this.padding
+      return this.sliderLeft
     },
     opacityLeft() {
       if (
