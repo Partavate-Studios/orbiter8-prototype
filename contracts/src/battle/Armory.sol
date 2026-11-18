@@ -2,6 +2,7 @@
 pragma solidity ^0.8.38;
 
 import {BodyId} from "../planets/BodyId.sol";
+import {Sol} from "../planets/Sol.sol";
 import {ModuleBase} from "../core/ModuleBase.sol";
 import {Pilots} from "../pilots/Pilots.sol";
 import {Planets} from "../planets/Planets.sol";
@@ -16,8 +17,8 @@ import {Repairs} from "./Repairs.sol";
 /// - **Ships** fit parts at their owner's planet, and can drop them off again (D55, D56); the BFG and
 ///   orbital platforms stay planet-side.
 /// - **Planets** fit parts from their own store, from anywhere, even mid-siege (D45).
-/// - **Armories** sell parts to any visiting pilot: Sol's I.S.S. sells the ship parts at twice their
-///   cost (burned), and a player's planet with an Armory sells from its store at one and a half
+/// - **Armories** sell parts to any visiting pilot: every Sol station (`Sol`: its planets' and its
+///   asteroids') sells the ship parts at twice their cost (burned), and a player's planet with an Armory sells from its store at one and a half
 ///   times, paid to the owner (D58).
 /// - **Repairs** at any shipyard restore a ship completely; it then spends a few hours in the yard
 ///   before it can attack again (D46).
@@ -26,7 +27,6 @@ import {Repairs} from "./Repairs.sol";
 /// 5 armor plating, 6 shield generator, 7 orbital platform, 8 BFG.
 contract Armory is ModuleBase {
     uint256 public constant MINING_DRONE = 9; // Factory part id
-    uint256 public constant SOL_PORTS = 9; // every Sol station has an armory (Sol is fully built)
     uint256 public constant REPAIR_COST = 3_000;
     uint256 public constant REPAIR_TIME = 3 hours;
 
@@ -212,7 +212,7 @@ contract Armory is ModuleBase {
         if (a.pilots.shipOf(pilot).cell != BodyId.cellOf(port)) revert NotThere();
         uint256 unit = a.factory.parts()[part].credits;
         uint256 cost;
-        if (port < SOL_PORTS) {
+        if (Sol.isStation(port)) {
             cost = unit * 2 * count;
             if (cost > maxCost) revert PriceLimit(cost);
             a.credits.burn(pilot, cost);

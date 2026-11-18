@@ -236,7 +236,7 @@ export function buildSystem(system, playerAccount) {
           orbitalPosition: 0,
           onAsteroid: true,
           goods: s.station.goods,
-          yard: false,
+          yard: s.station.yard ?? false,
           armory: s.station.armory
         })
         keys.stations.push(station.key)

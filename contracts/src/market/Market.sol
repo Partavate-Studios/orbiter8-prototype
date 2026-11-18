@@ -6,6 +6,7 @@ import {Pilots} from "../pilots/Pilots.sol";
 import {Credits} from "../tokens/Credits.sol";
 import {Pricing} from "./Pricing.sol";
 import {BodyId} from "../planets/BodyId.sol";
+import {Sol} from "../planets/Sol.sol";
 
 /// Where a player's port gets what it sells: its body's storage (Planets, D89).
 interface IPortSupply {
@@ -24,9 +25,9 @@ interface IPortSupply {
 /// milestone the ports are the Federation's nine stations at Sol; claimed planets open their own in
 /// milestone 3 (`openPort`). The Federation mints what it pays and burns what it's paid; its fee
 /// goes to its treasury (an address the admin sets, the deployer to start). A player-owned port's
-/// fee goes to its owner. Every Sol station has a yard (Sol is fully built).
+/// fee goes to its owner. Every Sol station, on its planets and on its belt's asteroids, has a yard
+/// (Sol is fully built: `Sol`).
 contract Market is ModuleBase {
-    uint256 public constant SOL_PORTS = 9;
     uint256 public constant MAX_BODIES = 16;
 
     enum Mode {
@@ -237,15 +238,9 @@ contract Market is ModuleBase {
 
     // ── ports ───────────────────────────────────────────────────────────────────────────────────
 
-    /// Sol's nine Federation stations, by planet: Mercury, Venus, Earth, Mars, Jupiter, Saturn,
-    /// Uranus, Neptune, Pluto (Demo 3's classes, but Mars is Ferrous: Koda, 2026-11-14).
-    function _solClass(uint256 body) internal pure returns (uint8) {
-        return [1, 5, 0, 7, 6, 6, 4, 4, 1][body];
-    }
-
     /// A port's class, whether it has a yard, and its owner (address(0): the Federation).
     function _port(uint256 port) internal view returns (uint8 class, bool yard, address owner) {
-        if (port < SOL_PORTS) return (_solClass(port), true, address(0)); // Sol's planets are ids 0–8
+        if (Sol.isStation(port)) return (Sol.portClass(port), true, address(0));
         if (!_isOpen(port)) revert NoSuchPort(port);
         Opened storage o = _m().opened[port];
         return (o.class, o.yardAt != 0 && o.yardAt <= block.timestamp, o.owner);
@@ -443,8 +438,7 @@ contract Market is ModuleBase {
             uint256 port = body < MAX_BODIES
                 ? BodyId.planet(cell, body)
                 : BodyId.make(cell, BodyId.ASTEROID, body - MAX_BODIES);
-            bool isSol = cell == 0 && body < SOL_PORTS;
-            if (isSol || _isOpen(port)) found[n++] = portView(port);
+            if ((cell == 0 && Sol.isStation(port)) || _isOpen(port)) found[n++] = portView(port);
         }
         list = new PortView[](n);
         for (uint256 i = 0; i < n; i++) {

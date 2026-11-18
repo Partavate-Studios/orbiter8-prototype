@@ -192,7 +192,12 @@ export default {
           return [this.owner, { label: 'Size', value: String(o.size) }, { label: 'Orbits', value: this.systemObjects[o.orbiting]?.name ?? '' }]
         case 'asteroid': {
           const rows = [this.owner, { label: 'Kind', value: `${o.compositionName} · size ${o.size}` }, { label: 'Yields', value: this.yieldsText }]
-          if (this.asteroidInfo) {
+          const station = o.hasStation ? this.systemObjects[o.stationKey] : null
+          if (o.federation) {
+            // Sol's: the Federation's station, fully built (its drones aren't the players' kind of pool)
+            if (station) rows.push({ label: 'Port', letters: portCode(station.goods ?? [], this.goodNames.length, this.cargo) })
+            rows.push({ label: 'Built', value: station ? 'Fully built' : 'nothing', color: station ? undefined : '#a99fc6' })
+          } else if (this.asteroidInfo) {
             const pool = this.asteroidInfo.pool
             rows.push({ label: 'Built', value: this.asteroidStep })
             rows.push({ label: 'Drones', value: `${pool.total - pool.defense} mining · ${pool.defense} guard` })

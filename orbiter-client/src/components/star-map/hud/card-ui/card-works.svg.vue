@@ -53,6 +53,11 @@ export default {
       const level = Number(info?.level ?? 0)
       const building = Number(info?.building ?? 0)
       if (o.type === 'asteroid') {
+        // Sol's are the Federation's, fully built: the whole line, and a yard beside its port
+        if (o.federation && o.hasStation) {
+          const [platformW, mine, port, armoryW] = Object.values(ASTEROID_LINE)
+          return [platformW, mine, port, PLANET_LINE[5], armoryW].map((w) => ({ ...w, building: false }))
+        }
         return Object.entries(ASTEROID_LINE)
           .filter(([n]) => Number(n) <= level || Number(n) === building)
           .map(([n, w]) => ({ ...w, building: Number(n) > level }))

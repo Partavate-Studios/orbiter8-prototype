@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { buyCost, sellProceeds, restocked, restock, baysCost, fee, portId, portCell, portBody } from './market'
+import { buyCost, sellProceeds, restocked, restock, baysCost, fee, portId, portCell, portBody, isSolStation, portNames } from './market'
+import { bodyId, KIND } from './body-id'
 
 describe('market pricing matches the contracts', () => {
   it('reproduces the Solidity values (contracts/test/vectors/PricingVectors.t.sol)', () => {
@@ -26,5 +27,16 @@ describe('market pricing matches the contracts', () => {
     expect(portId(0, 2)).toBe(2)
     expect(portCell(portId(1234, 5))).toBe(1234)
     expect(portBody(portId(1234, 5))).toBe(5)
+  })
+})
+
+describe("Sol's Federation stations (Sol.sol)", () => {
+  it("are its nine planets' and its six asteroids', not its empty sections", () => {
+    const asteroids = [0, 1, 2, 3, 4, 5, 6, 7].filter((i) => isSolStation(bodyId(0, KIND.ASTEROID, i)))
+    expect(asteroids).toEqual([0, 1, 3, 4, 5, 7])
+    expect([...Array(9).keys()].every((p) => isSolStation(p))).toBe(true)
+    expect(isSolStation(9)).toBe(false)
+    expect(isSolStation(bodyId(1, KIND.ASTEROID, 0))).toBe(false)
+    expect(portNames(bodyId(0, KIND.ASTEROID, 0)).station).toBe('Ceres Station')
   })
 })

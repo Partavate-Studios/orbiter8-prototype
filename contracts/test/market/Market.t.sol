@@ -12,6 +12,8 @@ import {Pricing} from "../../src/market/Pricing.sol";
 import {Credits} from "../../src/tokens/Credits.sol";
 import {Ships} from "../../src/tokens/Ships.sol";
 import {HexMath} from "../../src/galaxy/HexMath.sol";
+import {BodyId} from "../../src/planets/BodyId.sol";
+import {Battle} from "../../src/battle/Battle.sol";
 
 contract GameFixture is Test {
     Deployment.Game game;
@@ -74,9 +76,9 @@ contract GameFixture is Test {
 }
 
 contract MarketTest is GameFixture {
-    function test_solHasNinePortsAndEveryGoodTrades() public view {
+    function test_solHasFifteenPortsAndEveryGoodTrades() public view {
         Market.PortView[] memory ports = market.portsAt(0);
-        assertEq(ports.length, 9);
+        assertEq(ports.length, 15, "nine planets' stations and six asteroids'");
         uint256 sold;
         uint256 bought;
         for (uint256 i = 0; i < ports.length; i++) {
@@ -144,6 +146,75 @@ contract MarketTest is GameFixture {
 
     function test_everySolStationHasAYard() public view {
         for (uint256 body; body < 9; body++) assertTrue(market.portView(body).yard);
+    }
+
+    /// Sol is fully built: a Federation station on each of its belt's asteroids (Ceres, Vesta, Pallas,
+    /// Hygiea, Psyche, Juno), trading by composition, with a yard and an armory; its empty sections
+    /// have none.
+    function test_solsAsteroidsAreFederationStations() public {
+        uint8[8] memory classes = [10, 11, 0, 11, 10, 12, 0, 11];
+        Market.PortView[] memory ports = market.portsAt(0);
+        for (uint256 i; i < 8; i++) {
+            uint256 id = BodyId.make(0, BodyId.ASTEROID, i);
+            if (classes[i] == 0) {
+                vm.expectRevert(abi.encodeWithSelector(Market.NoSuchPort.selector, id));
+                market.portView(id);
+                continue;
+            }
+            Market.PortView memory v = market.portView(id);
+            assertEq(v.class, classes[i]);
+            assertTrue(v.yard);
+            assertEq(v.owner, address(0), "the Federation's");
+            bool listed;
+            for (uint256 k; k < ports.length; k++) listed = listed || ports[k].port == id;
+            assertTrue(listed, "portsAt(0) lists it");
+        }
+        // Not a station: another star's belt, a section past the eighth.
+        assertFalse(_isPort(BodyId.make(0, BodyId.ASTEROID, 8)));
+        assertFalse(_isPort(BodyId.make(_starAroundSol(), BodyId.ASTEROID, 0)));
+    }
+
+    function _isPort(uint256 id) internal view returns (bool) {
+        try market.portView(id) returns (Market.PortView memory) {
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
+    function test_solsAsteroidStationsTradeOutfitAndRepair() public {
+        uint256 ceres = BodyId.make(0, BodyId.ASTEROID, 0); // carbonaceous: sells water and organics
+        uint256 psyche = BodyId.make(0, BodyId.ASTEROID, 5); // metallic: buys water
+        _pay(ada, 10_000_000);
+        uint256 treasury = credits.balanceOf(admin);
+        vm.startPrank(ada);
+        market.trade(ceres, _line(WATER, 5, type(uint256).max));
+        assertEq(_cargo(ada, WATER), 5);
+        assertGt(credits.balanceOf(admin), treasury, "its fee goes to the treasury");
+        assertEq(market.portView(ceres).quotes[WATER].shortfall, 5);
+        market.trade(psyche, _line(WATER, -5, 0));
+        assertEq(_cargo(ada, WATER), 0);
+        // The yard: bays, drone bays and range.
+        market.buyBays(psyche, 2, type(uint256).max);
+        market.buyDroneBays(psyche, 1, type(uint256).max);
+        market.buyRange(ceres, type(uint256).max);
+        assertEq(pilots.shipOf(ada).bays, 7);
+        assertEq(pilots.shipOf(ada).range, 2);
+        // The armory, at the Federation's price (twice the part's cost, burned).
+        Armory armory = game.armory;
+        uint256 supply = credits.totalSupply();
+        uint256 price = game.factory.parts()[0].credits * 2;
+        armory.buy(psyche, 0, 1, price);
+        assertEq(pilots.shipOf(ada).loadout.drones, 1);
+        assertEq(credits.totalSupply(), supply - price);
+        // Repairs at its yard.
+        armory.repair(ceres);
+        assertGt(game.repairs.conditionOf(ada).dockedUntil, block.timestamp);
+        vm.stopPrank();
+        // Nobody besieges it, or claims it.
+        vm.prank(ada);
+        vm.expectRevert(Battle.FederationPlanet.selector);
+        game.battle.attack(ceres);
     }
 
     function test_theShipMustBeAtThePort() public {

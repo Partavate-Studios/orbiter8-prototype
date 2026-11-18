@@ -87,6 +87,9 @@ work in progress from a session that ran out (check `git status` and `git diff` 
   (`.github/workflows/pages.yml`) publishes the client at https://partavate-studios.github.io/orbiter8-prototype/
   on every push to `polkadot` (Settings → Pages → Source: GitHub Actions). Next release: a debug cheat code
   (`demo4-plan.md`, Consider next).
+- 2026-11-18: Sol's asteroids fully built (the section below): `contracts/src/planets/Sol.sol` says which
+  bodies are Sol's Federation stations (its nine planets and its six asteroids) and their port classes;
+  Market (ports, yards) and Armory (parts at the Federation's price) ask it. Sol now has 15 ports. Calls X30–X31.
 - **Left for Koda / a later session:** (1) review calls X1–X22 in `docs/review.md`, and the mockup
   `docs/mockups/belt-levels.svg`; (3) tuning choices in `demo4-tuning.md` "The belt";
   (4) extending the economy simulator with miners and asteroid owners; (5) dwarf planets (decision 21);
@@ -230,15 +233,15 @@ Koda's answer to question 7 (2026-11-16) was that Sol's belt belongs to the Fede
 armory, a port, etc." Decisions 7 and 18 recorded the ownership and the nine planet stations, but not
 that **Sol's asteroids are built up too**, so Phase 3 left them bare (protected from claims, no stations).
 
-- [ ] Every non-empty asteroid in Sol's belt has a Federation station, fully built: everything the asteroid
-  line allows (Platform, Mine, Port, Armory; decision 22), plus a yard if Koda wants Sol's asteroids to
-  have more than the line (ask).
-- [ ] Their ports trade by the asteroid's composition (Market classes 10–12), owned by the Federation:
+- [x] Every non-empty asteroid in Sol's belt has a Federation station, fully built: everything the asteroid
+  line allows (Platform, Mine, Port, Armory; decision 22), plus a yard (Koda, 2026-11-18: Sol is fully
+  built; the yard is the Federation's addition, outside the asteroid line: X30).
+- [x] Their ports trade by the asteroid's composition (Market classes 10–12), owned by the Federation:
   restocking at the top rate like Sol's other ports (decision 23), fees to the treasury (decision 28).
-- [ ] Their armories and yards work like Sol's planet stations'; their defenses are the Federation's
+- [x] Their armories and yards work like Sol's planet stations'; their defenses are the Federation's
   (unattackable, as Sol's planets).
-- [ ] SDK: `portsAt(0)` lists them; the client draws a station on each and counts them on the galaxy map.
-- [ ] Sol's empty section stays open to mining.
+- [x] SDK: `portsAt(0)` lists them; the client draws a station on each and counts them on the galaxy map.
+- [x] Sol's empty section stays open to mining.
 
 ## Notes for later
 

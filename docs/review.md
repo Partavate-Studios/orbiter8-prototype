@@ -597,6 +597,17 @@ Calls made building it, for Koda's review:
   planet or asteroid (Citadel, Colony, Station, Port, Yards, Armory, Autofactory; an asteroid's Platform,
   Mine, Port, Armory), the one being built dashed. Sol's ports, yards and armories count, though their
   planets' level is 0 in the contracts. Shots: `docs/mockups/card/`.
+- **X30. Sol's asteroid stations have a yard** (2026-11-18, Koda: Sol is fully built, a yard included). The
+  yard is the Federation's addition, outside the asteroid line: players' asteroids still have none
+  (decision 22). So Ceres, Vesta, Pallas, Hygiea, Psyche and Juno each have a port (by composition), a
+  yard (cargo and drone bays, range, repairs) and an armory (parts at twice their cost, burned), like
+  the nine planet stations. Which bodies are Federation stations is one pure library,
+  `contracts/src/planets/Sol.sol` (mirrored by `isSolStation` in `sdk/src/market.js`). On chain their
+  level stays 0 (as Sol's planets'); they have no drone pool, since their ports restock themselves at
+  the top rate (decision 23), which is what a full pool would give. Their card shows "Port" and "Built:
+  Fully built" in place of an owner's "Built" step and drone counts, and the line's icons with the yard.
+- **X31. Their names are "Ceres Station", "Vesta Station"…**, not invented names like the planets'
+  stations (I.S.S., Tiangong…). Easy to change in `portNames` (`sdk/src/market.js`) if you'd like names.
 - **X6. Wording:** the loadout's empty-weapons line says "Every Sol station's armory sells them." (was "The
   I.S.S. armory").
 

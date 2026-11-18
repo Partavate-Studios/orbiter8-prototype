@@ -16,7 +16,7 @@ import { timeOf } from './drand'
 import { distance } from './hex'
 import { starTraits, genesisName } from './traits'
 import { planet as derivePlanet, planetCount, looks, moonName, planetName } from './system-gen'
-import { portNames, buyCost, sellProceeds, fee, baysCost, MODE, SOL_PORTS } from './market'
+import { portNames, buyCost, sellProceeds, fee, baysCost, MODE, isSolStation } from './market'
 import { SESSION_HOURS, loadKey, saveKey, forgetKey, newKey, keySigner, sweep } from './session-key'
 import { createEventLog } from './event-log'
 import { tradesSinceArrival } from './game/docking'
@@ -61,10 +61,10 @@ export const droneRoom = (ship, dronesPerBay = 1) => (ship.droneBays ?? 0) * dro
 /** The next range upgrade's price, or null at full range. */
 export const rangeQuoteFor = (tuning, range) => (range >= 4 ? null : tuning.rangePrices[range - 1])
 
-/** Parts at an armory: Sol's stations at twice their cost, a pilot's Armory at one and a half. */
+/** Parts at an armory: Sol's stations (planets' and asteroids') at twice their cost, a pilot's Armory at one and a half. */
 export const partPriceFor = (rules, port, part, count) => {
   const unit = rules.parts[part].credits
-  return Number(port) < SOL_PORTS.length ? unit * 2 * count : Math.floor((unit * 3 * count) / 2)
+  return isSolStation(port) ? unit * 2 * count : Math.floor((unit * 3 * count) / 2)
 }
 
 /**
@@ -548,7 +548,7 @@ export function createGameClient() {
           orbitSpeed: 1,
           owner,
           yard: port.yard,
-          armory: cell === SOL ? p.id < SOL_PORTS.length : p.level >= 6,
+          armory: cell === SOL ? isSolStation(p.id) : p.level >= 6,
           goods: stationGoods(port)
         }
       }
@@ -609,7 +609,13 @@ export function createGameClient() {
           federation: cell === SOL,
           info: view ? { ...view, pool } : null,
           station: port
-            ? { name: names?.station || `${name} Station`, yard: false, armory: view.level >= 6, goods: stationGoods(port) }
+            ? {
+                name: names?.station || (cell === SOL ? portNames(id).station : `${name} Station`),
+                // Sol's are the Federation's, fully built (yard and armory; their level stays 0 on chain)
+                yard: port.yard,
+                armory: cell === SOL || view.level >= 6,
+                goods: stationGoods(port)
+              }
             : null
         }
       })
