@@ -26,6 +26,9 @@ const pause = () => (PACE_MS ? new Promise((r) => setTimeout(r, PACE_MS * (0.5 +
 const signer = await signerFor(account)
 const galaxy = new Contract(deployment.contracts.galaxy, read('../../../sdk/src/abi/Galaxy.json'), signer)
 const pilots = new Contract(deployment.contracts.pilots, read('../../../sdk/src/abi/Pilots.json'), signer)
+// Radius 6: what the bot needs (its neighbors and pending scans), and under Polkadot Hub TestNet's
+// per-call memory limit, which refuses radius 10 once the galaxy fills in.
+const REGION = 6
 const STAR = 2
 const HOLE = 3
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -61,7 +64,7 @@ for (let i = 0; i < Number(moves); i++) {
   const pilot = await pilots.pilotOf(me)
   const here = Number(pilot.ship.cell)
   const range = Number(pilot.ship.range)
-  const cells = [...(await galaxy.region(here, 10))]
+  const cells = [...(await galaxy.region(here, REGION))]
   const proof = await proofs(cells)
   const byCell = new Map(cells.map((c) => [Number(c.cell), c]))
 
@@ -78,7 +81,7 @@ for (let i = 0; i < Number(moves); i++) {
     const mine = byCell.get(here)
     const wait = timeOf(Number(mine.scanRound)) * 1000 - Date.now() + 1500
     if (wait > 0) await sleep(wait)
-    const fresh = await proofs([...(await galaxy.region(here, 10))])
+    const fresh = await proofs([...(await galaxy.region(here, REGION))])
     if (fresh.length) await record('resolveScans', await pilots.resolveScans(fresh), { proofs: fresh.length })
     i--
     continue
