@@ -319,6 +319,64 @@ What it means for ships (D65), for Koda (`review.md` P4):
   or holds the NFT while the ship is "in play" and hands it out to a purse when traded.
 - Not on mainnet yet, so ERC-721 in our own contract stays the fallback, and is what the game has.
 
+### After the spike: names, purses, personhood, and becoming a Product (2026-11-18, with Koda)
+
+**Becoming a real Product** (what it takes beyond the dev setup in "Step 3" below, where Desktop's
+"Skip (Dev only)" opens `localhost` and the dev server relays the chain and drand):
+1. A product id and a published bundle the App and `dot.li` can load (publishing waits on Koda's branch
+   strategy).
+2. Chain access through the host (reads as `ReviveApi.call` dry runs, moves as `Revive` extrinsics): the
+   SDK's chain layer is the one place this lands (step 4's migration steps).
+3. The App's per-Product account and signer in place of the dev wallet and MetaMask (step 4's adapter).
+4. drand: a remote permission for `api.drand.sh`, declared by the Product and granted by the player,
+   or the relays behind an address the host already allows.
+5. The layout inside the App on a phone (D66).
+
+**The product id is a dotNS name, with the network's ending:** `orbiter8.paseo` on the testnet,
+`orbiter8.dot` on mainnet. It fixes the product accounts and the personhood context, so pick it once.
+dotNS ([paritytech/dotns](https://github.com/paritytech/dotns), Polkadot Hub's name contracts) sells
+names by length, for one refundable deposit (10 DOT at launch; PAS on the testnet):
+
+| Base length | Who may register on the public path |
+|---|---|
+| 9 or more | anyone |
+| 6 to 8 | a verified person, and only while governance's "short-name switch" is on (meant for testnets; mainnet keeps it off) |
+| 5 or fewer | nobody; governance grants them |
+
+**`orbiter8` is 8 characters:** on the testnet it needs a verified person and the switch on; on mainnet
+the public path won't sell it, leaving a governance grant (or a Product-specific path, if there is one).
+The personhood gateway's names are personal and soulbound, so not for a game. A name of 9 or more
+(`orbiter8game`, `orbitereight`) is open to anyone on both networks. **For Koda:** which name. To check
+before choosing (reads only): the testnet's short-name switch, whether the candidates are free, and
+whether Products get names some other way.
+
+**The purse model, plainly:** a player can own any number of Scarcity NFTs; what's limited is **one NFT
+per key**. The App keeps a purse of keys for the player, makes a key per item, and moves items with
+"cheques", so there's a layer of addresses between the player and what they own. On chain, `ownerOf`
+names the item's key, not the player. Unknown: whether the chain links a purse to its player at all,
+or only the App knows (likely deliberate, for privacy, as with personhood aliases); the Pocket check on
+Koda's phone should show it. For the game: every "is this your ship?" (`msg.sender` against the
+owner) would see the key, not the pilot. Two ways: keep our ERC-721 as the game's truth and mirror
+ships into Scarcity for display, or make the pilot an on-chain record that the ship keys are tied to
+(fits fleets, but a redesign). For the migration plan.
+
+**Who is a verified person:** the App's verification (Koda did it once) puts a person in a ring:
+**Lite** (the phone and a username; most people who finished sign-up) or **Full** (a proven unique
+person; not widely available yet). Once is enough for every Product. The App's profile is the quickest
+place to see it. On chain it shows **per context**: a person binds an account to a Product's context,
+and the precompile answers only there, so a reliable on-chain answer for our game needs our product id
+(and a player opening our Product). Also readable: gateway-issued dotNS names (a device name like
+`name.01`, or a reserved personal name) held by the player's account.
+
+**The public build** at `https://partavate-studios.github.io/orbiter8-demo3-client/`
+(`Partavate-Studios/orbiter8-demo3-client`, last pushed 2026-10-28) is the **Demo 3 client**, on the
+old EVM networks (Base, Moonriver, Moonbase, BSC testnet, Sepolia), not Polkadot Hub. Putting the
+current game there takes a production build pointed at the testnet with a real wallet (the dev
+wallet, its top-ups and the dev server's relays are dev-only, so the build must reach the testnet's
+RPC and drand directly; their CORS is unchecked), committed for Koda to push. It would replace Demo 3
+at that address (Koda's call). A hosted page still can't run inside Desktop's sandbox without a
+product id: it's for browsers.
+
 ### Step 3, first look: Polkadot Desktop's sandbox (2026-11-13, in progress)
 
 Koda installed Polkadot Desktop 0.9.3 and the phone App, and opened the local game (`localhost:8092`)
