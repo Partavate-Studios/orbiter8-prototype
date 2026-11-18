@@ -435,7 +435,7 @@ Milestones 1–5 built the new rules on a separate `/galaxy` screen with plain p
 **Milestone 6: testnets and the decision** *(the decision is made: D62–D66, Polkadot Hub. The L2 is dropped.)*
 - [ ] ~~Deploy to Polkadot Hub's testnet and an L2 testnet.~~ Polkadot Hub's testnet only: milestone 7.
 - [ ] The research's test list on Polkadot (UUPS, drand cost, the read path through smoldot and through RPC, wallets).
-- [ ] The play bot and simulator on both testnets; `cost-estimates.md` updated. *Local gas and money added to `cost-estimates.md` (2026-11-07); testnets wait for Koda (D37).*
+- [x] The play bot and simulator on both testnets; `cost-estimates.md` updated. *Local gas and money added to `cost-estimates.md` (2026-11-07). Polkadot Hub TestNet only (the L2 was dropped): the trade, explore and cost bots played it on 2026-11-18, every kind of move measured in gas and PAS (`cost-estimates.md`, "Polkadot Hub TestNet, measured"). The economy simulator works offline from the contracts' numbers, so it has no testnet run.*
 - [x] The network decision with Koda: **Polkadot Hub, launched in the Polkadot App** (2026-11-08).
 
 **Milestone 7: the Polkadot spike** (branch `polkadot`; details in [`polkadot-direction.md`](polkadot-direction.md))

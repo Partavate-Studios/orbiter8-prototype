@@ -3,6 +3,7 @@
 // and a throwaway key per bot derived from the spike key (~/.config/orbiter8/paseo-spike.json, or
 // ORBITER_TESTNET_KEY), topped up from it to a few PAS. No key is printed or written anywhere.
 import { JsonRpcProvider, Wallet, keccak256, toUtf8Bytes, parseEther, formatEther } from 'ethers'
+import { withGasMargin } from '../../../sdk/src/chain/gas.js'
 import { readFileSync } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
@@ -27,12 +28,12 @@ function spikeKey() {
 
 /** The deployment's admin (the deployer): local account 0, or on the testnet the spike key. */
 export async function adminSigner() {
-  return TESTNET ? new Wallet(spikeKey(), provider) : provider.getSigner(0)
+  return withGasMargin(TESTNET ? new Wallet(spikeKey(), provider) : await provider.getSigner(0))
 }
 
 /** The bot's signer: a local unlocked account, or on the testnet its own funded throwaway key. */
 export async function signerFor(account) {
-  if (!TESTNET) return provider.getSigner(Number(account))
+  if (!TESTNET) return withGasMargin(await provider.getSigner(Number(account)))
   const spike = new Wallet(spikeKey(), provider)
   const bot = new Wallet(keccak256(toUtf8Bytes(`${spike.privateKey}:orbiter8-bot:${account}`)), provider)
   const balance = await provider.getBalance(bot.address)
@@ -40,7 +41,7 @@ export async function signerFor(account) {
     await (await spike.sendTransaction({ to: bot.address, value: TOP_UP - balance })).wait()
     console.log(JSON.stringify({ action: 'funded', bot: bot.address, pas: formatEther(TOP_UP) }))
   }
-  return bot
+  return withGasMargin(bot)
 }
 
 /**

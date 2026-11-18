@@ -124,6 +124,8 @@ class WalletSigner extends AbstractSigner {
     return this.wallet.signTypedData(domain, types, value)
   }
   async sendTransaction(tx) {
+    // The gas limit from our own estimate (with the SDK's margin, chain/gas.js), not the wallet's.
+    if (tx.gasLimit == null) tx = { ...tx, gasLimit: await this.estimateGas({ ...tx, from: this.address }) }
     const sent = await this.wallet.sendTransaction(tx)
     return new TransactionResponse(sent, this.provider)
   }

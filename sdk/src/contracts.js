@@ -18,6 +18,7 @@ import { queryChunked } from './event-log'
 import { indexOf, bodyId, KIND } from './body-id'
 import { SECTIONS } from './belt-gen'
 import { disc } from './hex'
+import { withGasMargin } from './chain/gas.js'
 
 export const STATE = { UNDECIDED: 0, EMPTY: 1, STAR: 2, BLACK_HOLE: 3 }
 /** Cells per region read; the contracts cap it at 10. */
@@ -197,6 +198,7 @@ async function chunked(ids, size, read) {
  *   event reads start there (from block 0, a public chain's 16 million blocks took half an hour)
  */
 export function createGame(runner, addresses, { startBlock = 0 } = {}) {
+  runner = withGasMargin(runner)
   const galaxy = new Contract(addresses.galaxy, GalaxyAbi, runner)
   const pilots = new Contract(addresses.pilots, PilotsAbi, runner)
   const market = new Contract(addresses.market, MarketAbi, runner)

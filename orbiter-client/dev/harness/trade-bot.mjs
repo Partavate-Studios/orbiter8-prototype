@@ -14,6 +14,7 @@
 //   NAME=Rook SHIP=Kestrel   its call sign and ship's name when it registers
 import { Contract, Wallet, parseEther } from 'ethers'
 import { deployment, provider, signerFor, measured } from './bot-chain.mjs'
+import { withGasMargin } from '../../../sdk/src/chain/gas.js'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { buyCost, sellProceeds, fee, baysCost, MODE } from '../../../sdk/src/market.js'
 
@@ -41,7 +42,7 @@ const pilotsByWallet = new Contract(P, abi('Pilots'), wallet)
 if (!(await pilotsByWallet.pilotOf(me)).registered) {
   await record('register', () => pilotsByWallet.register(process.env.NAME ?? `Trader${account}`, process.env.SHIP ?? 'Hauler'))
 }
-const key = Wallet.createRandom().connect(provider)
+const key = withGasMargin(Wallet.createRandom().connect(provider))
 const expiry = Math.floor(Date.now() / 1000) + 3600
 await record('startSession', () => pilotsByWallet.startSession(key.address, expiry, { value: parseEther('0.5') }), {}, parseEther('0.5'))
 payer = key // the session key pays for its moves from here

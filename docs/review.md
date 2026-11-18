@@ -631,6 +631,14 @@ Calls made building it, for Koda's review:
   pilots and planets are gone with it (a fresh galaxy). The two probe contracts used to find the read
   budget (`MemProbe`, `CostProbe`) are also on the testnet, unrelated to the game; they cost about 48 PAS,
   mostly storage deposits for 200 probe slots. The GitHub Pages build plays the new addresses once pushed.
+- **X35. Testnet costs measured, and a 30% gas margin** (2026-11-18, `cost-estimates.md`). The cost bot's
+  pilots got their credits from the deployer (it granted itself the Credits contract's game role on
+  the throwaway testnet deployment, as the handoff does locally), to afford bays, parts and a claim. Two
+  moves sent right after another move into Planets ran out of gas on the testnet's own estimate (a
+  delivery and a Citadel); the same moves estimated higher moments later. So every signer the SDK sends
+  through now asks for 30% more than the node's estimate (`sdk/src/chain/gas.js`; `WalletSigner` fills
+  the gas limit itself instead of leaving it to the wallet). A player pays for gas used, not the limit.
+  Worth knowing for the App's signer later: it may estimate the same way.
 - **X6. Wording:** the loadout's empty-weapons line says "Every Sol station's armory sells them." (was "The
   I.S.S. armory").
 

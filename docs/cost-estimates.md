@@ -109,6 +109,53 @@ trade every 15 seconds (`docs/demo4-tuning.md`), about 240 moves. With a session
 money the wallet sent it. Two ways to bring it down, if wanted: fewer, bigger moves (the tuning could assume a slower
 pace), or cheaper trades (Market holding cargo itself would save the calls between modules, `docs/demo4-plan.md` B24).
 
+## Polkadot Hub TestNet, measured (added 2026-11-18)
+
+Real moves on Polkadot Hub TestNet (Paseo Asset Hub), on the deployment of 2026-11-18 (EVM bytecode),
+made by the bots with `TESTNET=1` (`orbiter-client/dev/harness`: `cost-bot.mjs` for the belt, the yard
+and armory, mining, a claim, a building and a siege; `trade-bot.mjs` for a session and trades;
+`explore-bot.mjs` for new stars, scans and black holes). **PAS** is what the move took from its payer's
+balance (read before and after), so storage deposits are in it; the testnet charges 10⁻⁶ PAS per unit of
+its gas, deposits included, so its gas figure and its PAS agree. A negative figure is a move that freed
+storage and got a deposit back. **USD** values PAS as DOT at $0.955 (this file's price of 2026-11-01),
+assuming mainnet charges what the testnet does; the testnet's gas units aren't the EVM's (compare the
+local column above only through the money).
+
+| Move | Testnet gas | PAS | USD |
+|---|---:|---:|---:|
+| Register (call sign and ship) | 26,600–29,250 | 0.027–0.029 | $0.027 |
+| Start a session (the key's 0.5 PAS of gas money aside) | 17,590 | 0.018 | $0.017 |
+| End a session (the key's storage freed) | 0 | −0.001 | −$0.001 |
+| Trade, one line (Federation port, buying) | 13,780–16,420 | 0.014–0.016 | $0.015 |
+| Trade, one line (Psyche Station, selling) | 8,320 | 0.008 | $0.008 |
+| Trade, two lines | 14,450–18,200 | 0.014–0.018 | $0.017 |
+| Buy cargo bays | 5,470 | 0.005 | $0.005 |
+| Buy a drone bay (Psyche Station's yard) | 8,120 | 0.008 | $0.008 |
+| Buy a part at an armory (mining drone, railgun) | 13,490–14,060 | 0.013–0.014 | $0.013 |
+| Start mining an empty section | 18,190 | 0.018 | $0.017 |
+| Stop mining, loading what was mined (storage freed) | 0 | −0.002 | −$0.002 |
+| Jump, charted (first visit / known star) | 7,310–10,130 / 2,390 | 0.007–0.010 / 0.002 | $0.007 |
+| Record a scan (drand's signature checked) | 9,370 | 0.009 | $0.009 |
+| Black hole, through (with a scan proof / without) | 28,820 / 3,780 | 0.029 / 0.004 | $0.028 |
+| Claim a planet | 14,990 | 0.015 | $0.014 |
+| Land 100 colonists | 8,870 | 0.009 | $0.008 |
+| Deliver goods to a planet | 5,600–6,570 | 0.006–0.007 | $0.006 |
+| Build a Citadel | 1,010 | 0.001 | $0.001 |
+| Lay siege | 27,590 | 0.028 | $0.026 |
+| **The release: every module, proxy and wiring (60 transactions)** | | **17.96** | **$17** |
+
+- **An hour of play is about 3.8 PAS, about $3.70,** at the tuning's pace of about 240 moves an hour,
+  mostly trades at about 0.016 PAS. That's a little above the 2026-11-07 estimate from local gas ($3);
+  the levers are the same (fewer, bigger moves; cheaper trades).
+- **A first arrival at a new star** is a jump (0.010) plus, later, its scan (0.009): about 0.02 PAS.
+- **The release** cost 17.96 PAS, as the first testnet deploy did (17.7), deposits included.
+- **Moves that build storage** (register, start a session, start mining, a siege) cost the most; ones
+  that free it get a deposit back. Building a Citadel cost almost nothing because it only rewrites the
+  planet's record.
+- **The testnet's gas estimates can come out short** (a Citadel's build was sent with 5,466 and needed
+  6,452, and failed), so the SDK and the bots ask for 30% more than the estimate
+  (`sdk/src/chain/gas.js`); a move pays only for what it uses.
+
 ## Load on the network's nodes (RPC)
 
 Reads are free in gas, but they count against the node provider's limits (Infura, Alchemy, a public
