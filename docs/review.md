@@ -624,7 +624,7 @@ Results in `polkadot-direction.md` (steps 4, 5, 6). Calls made on my own:
   per move.
 - **P6. The collection on the testnet is called "Orbiter 8 Ships (spike)"**: it's the testnet's
   collection 0 and visible to anyone browsing Scarcity there. Throwaway, like every testnet address.
-- **P7. Open for Koda after the spikes** (2026-11-18; details in `polkadot-direction.md`, "After the
+- **P7. Open for Koda after the spikes** (*answered 2026-11-18: D101–D106; the phone session still to do*) (2026-11-18; details in `polkadot-direction.md`, "After the
   spike"): the product name (`orbiter8` is in dotNS's restricted 6–8 band: a verified person on the
   testnet, not sold publicly on mainnet; 9+ characters are open to anyone); whether to replace the
   Demo 3 build at `partavate-studios.github.io/orbiter8-demo3-client` with a testnet build; a phone

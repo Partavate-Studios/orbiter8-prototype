@@ -25,6 +25,12 @@ decisions:** its accounts and signer, personhood, names, NFTs and hosting over o
 | D64 | **No clunky wallets.** Players use the App's per-Product account, its signer and its allowances; no MetaMask, no network step, no session keys if AutoSigning does the job. |
 | D65 | **Things become tradable:** ships (pilots will have several, so a ship is a collectible), planets, and possibly the goods traded at ports. Turns B15 and B30 (bound ships and deeds) into "for now". |
 | D66 | **The UI may be rethought for the App,** choosing the best-performing approach for a good UI there. Explored later, after the spike measures how the current client runs inside the App. |
+| D101 | **The Product is named `orbiter8`** (`orbiter8.paseo` on the testnet, `orbiter8.dot` on mainnet): pursue it although it's in dotNS's restricted 6–8 band (a verified person and the short-name switch on the testnet; a governance grant or a Product path on mainnet). (Koda, 2026-11-18) |
+| D102 | **Personhood: one pilot per person**, keyed by the person's alias in our context (`PersonhoodGate`, step 5). Nothing else gated for now. (Koda, 2026-11-18) |
+| D103 | **Signing: both.** AutoSigning when the App grants it; otherwise our session keys (D41), sent through the host. Outside the App, today's wallet and session keys. (Koda, 2026-11-18) |
+| D104 | **Players without PAS sign each move** (a phone approval per move, paid with PGAS) until they hold PAS; then session keys. The game doesn't sponsor session gas. (Koda, 2026-11-18) |
+| D105 | **Ships become native Scarcity NFTs** in the App. Ownership is redesigned around a pilot record the ships' keys are tied to (fits fleets, D26); our ERC-721 stays until mainnet has Scarcity. (Koda, 2026-11-18) |
+| D106 | **A testnet build is published beside Demo 3**, at a subpath of the `orbiter8-demo3-client` Pages site (e.g. `/testnet/`); Demo 3 stays where it is. Prepared locally; Koda pushes. (Koda, 2026-11-18) |
 
 ## Polkadot's own direction (2026-11-11)
 

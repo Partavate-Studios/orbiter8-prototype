@@ -125,6 +125,12 @@ design doc), [`design-ideas.md`](design-ideas.md) (Koda's working doc), [`cost-e
 | D98 | The contract refactor in `expansion-plan.md` is agreed and lands first. ([expansion-plan.md](expansion-plan.md), decision 32) | 2026-11-16 |
 | D99 | Battle drones move into drone bays too: every drone lives in drone bays. ([expansion-plan.md](expansion-plan.md), decision 33) | 2026-11-16 |
 | D100 | What stops mining: any move that changes the ship (jump, trade, purchase, fitting…); a chat message doesn't. ([expansion-plan.md](expansion-plan.md), decision 34) | 2026-11-16 |
+| D101 | **The Product is named `orbiter8`** (`orbiter8.paseo` on the testnet, `orbiter8.dot` on mainnet): pursue it although it's in dotNS's restricted 6–8 band (a verified person and the short-name switch on the testnet; a governance grant or a Product path on mainnet). ([polkadot-direction.md](polkadot-direction.md)) | 2026-11-18 |
+| D102 | **Personhood: one pilot per person**, keyed by the person's alias in our context (`PersonhoodGate`, step 5). Nothing else gated for now. ([polkadot-direction.md](polkadot-direction.md)) | 2026-11-18 |
+| D103 | **Signing: both.** AutoSigning when the App grants it; otherwise our session keys (D41), sent through the host. Outside the App, today's wallet and session keys. ([polkadot-direction.md](polkadot-direction.md)) | 2026-11-18 |
+| D104 | **Players without PAS sign each move** (a phone approval per move, paid with PGAS) until they hold PAS; then session keys. The game doesn't sponsor session gas. ([polkadot-direction.md](polkadot-direction.md)) | 2026-11-18 |
+| D105 | **Ships become native Scarcity NFTs** in the App. Ownership is redesigned around a pilot record the ships' keys are tied to (fits fleets, D26); our ERC-721 stays until mainnet has Scarcity. ([polkadot-direction.md](polkadot-direction.md)) | 2026-11-18 |
+| D106 | **A testnet build is published beside Demo 3**, at a subpath of the `orbiter8-demo3-client` Pages site (e.g. `/testnet/`); Demo 3 stays where it is. Prepared locally; Koda pushes. ([polkadot-direction.md](polkadot-direction.md)) | 2026-11-18 |
 
 ## Features: this run and consider next (proposed, for Koda to choose)
 
