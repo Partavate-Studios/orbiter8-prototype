@@ -3,11 +3,13 @@
        screen like a card in your hand, with its menu behind it (Koda, round 2): the menu slides out from
        behind the card and back, by the tab on its edge (A, or pad R3 to put the card away), and when
        it's in, its edge still shows past the card. Every action has its own slot, so a button never
-       moves (card-actions.js SLOTS); going to the station, moons or planet is the menu's icons. Over
-       the card, the system's star and planets (system-strip.vue), to pick the next one from here. On a
+       moves (card-actions.js SLOTS), and wears its picture (libs/body-art.js; the keys 1–9 still press
+       them). Over the card, the system's star, planets and belt (system-strip.vue), and under that what's
+       around the selection: its planet, port and moons, or the belt's places (nearby-strip.vue). On a
        phone the same, smaller, above the tab bar; tap the card to hold it up full size. -->
   <div class="selection" :class="{ sheet }" :style="themeVars">
     <system-strip v-if="!sheet || object" class="strip" :class="{ narrow: !drawerOpen || !object || !showScope }" :compact="sheet" />
+    <nearby-strip v-if="object && showScope" class="strip" :class="{ narrow: !drawerOpen }" :compact="sheet" />
 
     <template v-if="object">
       <button v-if="!showScope" type="button" class="bring-back card-pill" title="Show the selection's card" @click="toggleScope()">
@@ -20,57 +22,26 @@
         <div class="drawer" :class="{ open: drawerOpen }" @click="!drawerOpen && openDrawer()">
           <div class="inside" :inert="!drawerOpen || undefined">
             <div class="list" data-own-scroll>
-              <template v-if="page === 'moons'">
-                <button v-for="moon in family.moons" :key="moon.moonId" type="button" class="action" @click="select(moon.moonId)">
-                  <span>{{ moon.moonName }}</span>
+              <template v-for="(option, index) in slots" :key="index">
+                <button
+                  v-if="option"
+                  type="button"
+                  class="action"
+                  :class="{ dim: !option.enabled, pictured: ACTION_ART[option.command] }"
+                  :title="index < 9 && !sheet ? `${option.text} (${index + 1})` : undefined"
+                  @click="run(option)"
+                >
+                  <img v-if="ACTION_ART[option.command]" class="art" :src="ACTION_ART[option.command]" alt="" />
+                  <span :style="{ fontSize: labelSize(option.text) + 'px' }">{{ option.text }}</span>
                 </button>
+                <!-- an empty slot keeps its place, so the buttons under it don't move -->
+                <span v-else class="action empty" aria-hidden="true" />
               </template>
-              <template v-else>
-                <template v-for="(option, index) in slots" :key="index">
-                  <button v-if="option" type="button" class="action" :class="{ dim: !option.enabled }" @click="run(option)">
-                    <kbd v-if="index < 9" aria-hidden="true">{{ index + 1 }}</kbd>
-                    <span :style="{ fontSize: labelSize(option.text) + 'px' }">{{ option.text }}</span>
-                  </button>
-                  <!-- an empty slot keeps its place, so the buttons under it don't move -->
-                  <span v-else class="action empty" aria-hidden="true" />
-                </template>
-                <p v-if="!slots.length" class="none">Nothing to do here.</p>
-              </template>
+              <p v-if="!slots.length" class="none">Nothing to do here.</p>
             </div>
-            <!-- the things around this one, each in its own place: planet, station, moons; then put the card away -->
+            <!-- put the card away -->
             <div class="icons">
-              <template v-if="family.planet">
-                <rim-button v-if="family.planetKey !== objectId" small bare label="Its planet" :tint="theme.accent" @press="select(family.planetKey)">
-                  <icon-container><g transform="scale(0.5)"><sprite :object-id="family.planetKey" /></g></icon-container>
-                </rim-button>
-                <span v-else class="icon-slot here" title="This planet" aria-hidden="true" />
-                <rim-button
-                  v-if="family.stationKey && family.stationKey !== objectId"
-                  small
-                  bare
-                  label="Its station"
-                  :tint="theme.accent"
-                  @press="select(family.stationKey)"
-                >
-                  <icon-container><g transform="scale(0.5)"><sprite :object-id="family.stationKey" /></g></icon-container>
-                </rim-button>
-                <span v-else class="icon-slot" :class="{ here: family.stationKey === objectId }" aria-hidden="true" />
-                <rim-button
-                  v-if="family.moons.length"
-                  small
-                  bare
-                  :label="family.moons.length === 1 ? 'Its moon' : 'Its moons'"
-                  :tint="theme.accent"
-                  :badge="family.moons.length > 1 ? family.moons.length : 0"
-                  :on="page === 'moons'"
-                  @press="moons"
-                >
-                  <icon-container><g transform="translate(-2 -2) scale(0.75)"><sprite :object-id="family.moons[0].moonId" /></g></icon-container>
-                </rim-button>
-                <span v-else class="icon-slot" aria-hidden="true" />
-              </template>
               <span class="spacer" />
-              <rim-button v-if="page === 'moons'" small bare label="Back" :tint="theme.accent" @press="page = 'main'"><back-icon /></rim-button>
               <rim-button small bare label="Put the card away" :tint="theme.accent" @press="toggleScope()"><x-icon /></rim-button>
             </div>
           </div>
@@ -120,18 +91,17 @@ import { useDialogStore } from '@/stores/dialog'
 import { CARD_THEMES, cardThemeKey } from '@/libs/card-theme'
 import { fitSize } from '@/libs/fit-text'
 import Info from '@/components/star-map/hud/card-ui/info.svg'
-import Sprite from '@/components/star-map/hud/card-ui/sprite.svg'
-import IconContainer from '@/components/star-map/hud/icons/_icon-container.svg'
 import XIcon from '@/components/star-map/hud/icons/x-icon.svg'
-import BackIcon from '@/components/star-map/hud/icons/back-icon.svg'
+import { ACTION_ART } from '@/libs/body-art'
 import RimButton from './rim-button.vue'
 import SystemStrip from './system-strip.vue'
+import NearbyStrip from './nearby-strip.vue'
 import { actionsFor, runAction, slotted } from './card-actions'
 import { CARD_WIDTH, CARD_HEIGHT } from './layout'
 
 export default {
   name: 'SelectionPanel',
-  components: { Info, Sprite, IconContainer, XIcon, BackIcon, RimButton, SystemStrip },
+  components: { Info, XIcon, RimButton, SystemStrip, NearbyStrip },
   // The card's colors (libs/card-theme.js) for everything drawn inside it.
   provide() {
     return {
@@ -147,7 +117,7 @@ export default {
   },
   data() {
     return {
-      page: 'main',
+      ACTION_ART,
       heldUp: false,
       // the card with a margin for its siege frame and its "yours" badge
       CARD_BOX: '-80 -80 160 230'
@@ -178,23 +148,10 @@ export default {
     },
     slots() {
       return slotted(this.object, this.actions)
-    },
-    /** The selection's planet, its station and its moons: the icons' places. */
-    family() {
-      const object = this.object
-      const planetKey = object?.type === 'planet' ? object.key : object?.type === 'station' || object?.type === 'moon' ? object.orbiting : null
-      const planet = planetKey ? this.systemObjects[planetKey] : null
-      return {
-        planetKey,
-        planet,
-        stationKey: planet?.hasStation ? planet.stationKey : null,
-        moons: planet?.moons ?? []
-      }
     }
   },
   watch: {
     selected() {
-      this.page = 'main'
       this.heldUp = false
     }
   },
@@ -208,21 +165,13 @@ export default {
     ...mapActions(useUIStore, ['toggleScope', 'selectSprite', 'toggleActions']),
     /** Long labels ("Claim Planet (2,000¢)", "View on …") shrink to the button. */
     labelSize(text) {
-      return fitSize(text, 15, this.sheet ? 170 : 190, 700)
-    },
-    select(key) {
-      this.o8audio.playEffect('click')
-      this.selectSprite(key)
+      return fitSize(text, 15, this.sheet ? 150 : 165, 700)
     },
     run(option) {
       this.o8audio.playEffect('click')
-      runAction(option, this.object, { showMoons: this.moons })
-    },
-    /** One moon: go to it. More: list them in the menu. */
-    moons() {
-      const moons = this.family.moons
-      if (moons.length === 1) return this.selectSprite(moons[0].moonId)
-      this.page = this.page === 'moons' ? 'main' : 'moons'
+      // (moons are the nearby strip's: "Visit Moon" goes to the first)
+      const moon = this.systemObjects[this.object?.key]?.moons?.[0]
+      runAction(option, this.object, { showMoons: () => moon && this.selectSprite(moon.moonId) })
     },
     openDrawer() {
       this.o8audio.playEffect('click')
@@ -246,7 +195,6 @@ export default {
         event.preventDefault()
         return this.toggleDrawer()
       }
-      if (this.page !== 'main') return
       const option = this.slots[Number(event.key) - 1]
       if (!option) return
       // (so the digit doesn't land in a dialog's field that this opens)
@@ -399,19 +347,19 @@ export default {
   outline: 2.5px solid var(--o8-brand-300);
   outline-offset: 3px;
 }
-.action kbd {
-  position: absolute;
-  left: 10px;
-  font: inherit;
-  font-size: 10px;
-  font-weight: normal;
-  color: #c3b3da99;
-  text-shadow: none;
+/* an action's picture, at the pill's left end */
+.action.pictured {
+  padding-left: 40px;
 }
-@media (hover: none) {
-  .action kbd {
-    display: none;
-  }
+.action .art {
+  position: absolute;
+  left: 8px;
+  width: 26px;
+  height: 26px;
+  filter: drop-shadow(0 1px 2px #000a);
+}
+.action.dim .art {
+  opacity: 0.45;
 }
 .none {
   margin: 8px;
@@ -428,20 +376,6 @@ export default {
 }
 .icons .rim-button {
   min-width: 40px;
-}
-/* an icon's place when it has nothing to go to (or it's the selection itself) */
-.icon-slot {
-  flex: none;
-  width: 34px;
-  height: 34px;
-  margin: 2px 3px;
-  box-sizing: border-box;
-  border: 1px dashed #5a4c8c66;
-  border-radius: 50%;
-}
-.icon-slot.here {
-  border: 1.5px solid var(--accent);
-  opacity: 0.55;
 }
 .spacer {
   flex: 1;

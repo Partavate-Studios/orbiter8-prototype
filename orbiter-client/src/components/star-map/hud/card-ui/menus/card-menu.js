@@ -67,6 +67,8 @@ function pilotMenu(object, d, marketName) {
         add('Attack', 'attack', d.armed && !d.retreated, object.objectId)
       }
       if (siege) add('Siege Status', 'siege', true, object.objectId)
+      // Straight to its port's trading, without stopping at the port first (Koda, 2026-11-17).
+      if (object.hasStation) add('Trade at Port', 'tradePort', true, object.objectId)
       if (object.hasStation) add('Visit Space Station', 'visitStation', true, object.objectId)
       if (object.moons.length > 0) add('Visit Moon', 'visitMoon', true, object.objectId)
       if (marketName && !sol) menu.push(marketItem(marketName))
@@ -100,6 +102,7 @@ function pilotMenu(object, d, marketName) {
         add('Attack', 'attack', d.armed && !d.retreated, object.objectId)
       }
       if (siege) add('Siege Status', 'siege', true, object.objectId)
+      if (object.hasStation) add('Trade at Port', 'tradePort', true, object.objectId)
       if (object.hasStation) add('Visit Station', 'visitStation', true, object.objectId)
       break
     }

@@ -1,8 +1,9 @@
 <template>
   <!-- The system's bodies on the selection card's edge (Koda, round 2, item 3): the star, then every
        planet in orbit order, so the next one is a short move from the card's buttons instead of a trip
-       to the top right. ‹ › step through them (as Tab, [ ], pad L1/R1 do). A planet's station and moons
-       are the menu's icons, not here, so nothing is listed twice. Each body is a small flat sphere in
+       to the top right. ‹ › step through them (as Tab, [ ], pad L1/R1 do). The asteroid belt has its
+       place among the orbits; a planet's port and moons, and the belt's eight places, are the nearby
+       strip under this one (nearby-strip.vue), so nothing is listed twice. Each body is a small flat sphere in
        its class's colors: cheap, no per-frame art. -->
   <nav class="system-strip" :class="{ compact }" aria-label="This system's star and planets">
     <button type="button" class="step" title="Previous ([ or Shift+Tab)" aria-label="Previous" @click="step(-1)">
@@ -21,7 +22,8 @@
         :aria-current="body.on ? 'true' : undefined"
         @click="select(body.key)"
       >
-        <span class="sphere" :style="body.style" />
+        <span v-if="body.belt" class="belt-ring" />
+        <span v-else class="sphere" :style="body.style" />
         <i v-if="body.mine" class="mine" aria-hidden="true" />
         <i v-if="body.besieged" class="besieged" aria-hidden="true" />
       </button>
@@ -39,13 +41,7 @@ import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
 import { usePlayerStore } from '@/stores/player'
 import { PLANET_COLORS, STAR_CLASSES } from '@/libs/palette'
-
-/** A body's sphere: lit from the upper left, in its light, mid and dark colors (cheap CSS, no SVG). */
-const sphere = (light, mid, dark, size) => ({
-  width: size + 'px',
-  height: size + 'px',
-  background: `radial-gradient(circle at 32% 30%, ${light} 0%, ${mid} 45%, ${dark} 100%)`
-})
+import { BELT_KEY, beltKeys, homeOf, sphere } from '@/libs/body-art'
 
 export default {
   name: 'SystemStrip',
@@ -56,21 +52,30 @@ export default {
   computed: {
     ...mapState(useStarMapStore, ['systemObjects', 'spriteIds']),
     ...mapState(useUIStore, ['selected']),
-    /** The planet the selection belongs to (itself, or a station's or moon's planet). */
+    /** The planet the selection belongs to (itself, or a station's or moon's planet), or the belt. */
     selectedPlanet() {
-      const object = this.systemObjects[this.selected]
-      if (!object) return null
-      if (object.type === 'planet') return object.key
-      if (object.type === 'station' || object.type === 'moon') return object.orbiting
-      return null
+      return homeOf(this.selected, this.systemObjects)
     },
+    belt() {
+      return beltKeys(this.systemObjects)
+    },
+    /** The star, then the planets and the belt in orbit order. */
     keys() {
-      return [STAR_KEY, ...(this.spriteIds.planets ?? [])].filter((key) => this.systemObjects[key])
+      const planets = (this.spriteIds.planets ?? []).filter((key) => this.systemObjects[key])
+      if (this.belt.length) {
+        const radius = this.systemObjects[this.belt[0]].orbit.radius
+        const at = planets.findIndex((key) => this.systemObjects[key].orbit.radius > radius)
+        planets.splice(at === -1 ? planets.length : at, 0, BELT_KEY)
+      }
+      return this.systemObjects[STAR_KEY] ? [STAR_KEY, ...planets] : planets
     },
     bodies() {
       const player = usePlayerStore()
       const big = this.compact ? 22 : 26
       return this.keys.map((key) => {
+        if (key === BELT_KEY) {
+          return { key, belt: true, on: false, family: this.selectedPlanet === BELT_KEY, title: 'The asteroid belt' }
+        }
         const object = this.systemObjects[key]
         const on = key === this.selected
         const family = !on && key === this.selectedPlanet
@@ -102,7 +107,8 @@ export default {
     }
   },
   watch: {
-    selected() {
+    selected(key) {
+      if (this.belt.includes(key)) this.lastInBelt = key
       this.$nextTick(this.scrollToSelected)
     }
   },
@@ -131,7 +137,13 @@ export default {
     },
     select(key) {
       this.o8audio.playEffect('click')
-      this.selectSprite(key)
+      this.go(key)
+    },
+    /** Selects a body; the belt selects the place in it last chosen, else its first. */
+    go(key) {
+      if (key !== BELT_KEY) return this.selectSprite(key)
+      if (this.selectedPlanet === BELT_KEY) return
+      this.selectSprite(this.belt.includes(this.lastInBelt) ? this.lastInBelt : this.belt[0])
     },
     /** The next or previous body; from a station or moon, its planet's neighbor. */
     step(direction) {
@@ -140,7 +152,7 @@ export default {
       const index = this.keys.indexOf(from)
       const next =
         index === -1 ? (direction > 0 ? 0 : this.keys.length - 1) : (index + direction + this.keys.length) % this.keys.length
-      this.selectSprite(this.keys[next])
+      this.go(this.keys[next])
     }
   }
 }
@@ -214,6 +226,15 @@ export default {
 }
 .sphere {
   display: block;
+  border-radius: 50%;
+}
+/* the belt: a ring of rocks */
+.belt-ring {
+  display: block;
+  width: 20px;
+  height: 20px;
+  box-sizing: border-box;
+  border: 3.5px dotted #b8a98f;
   border-radius: 50%;
 }
 /* the selection: ringed in the focus lavender; its planet (when a station or moon is selected) dashed */

@@ -528,6 +528,18 @@ Calls made building it, for Koda's review:
   RPC requests give up after 30 s; a landed move reports done after at most 15 s of reloading; and a
   claim refused because the planet is already yours counts as done (and the name is given). The
   Polkadot App's host may want reads through it later (D43, smoldot).
+- **X24. The selection's selectors and menu** (2026-11-17, Koda asked; designed on Fable, built on Opus;
+  shots in `docs/mockups/selection-strips/`, before and after, wide and phone). Under the planet strip, a
+  second one ("nearby"): the selected planet, its **Port** and its moons as big chips with a picture and
+  a name; for the belt, its places (asteroids by their art, an asteroid's port after it, empty dust).
+  The planet strip gains the belt (a dotted ring) at its orbit; pressing it picks the belt place last
+  chosen, else the first (Ceres at Sol), and the nearby strip lists the rest. A planet (or asteroid) with
+  a port gets **Trade at Port** in its menu, which selects the port and opens trading. The menu loses its
+  small planet/station/moon icons and its moons page (the chips replace them), and its key numbers (the
+  keys still work; the tooltip names them); each action shows its picture instead (port, yards, armory,
+  claim, colony, siege, colonists, holds, drones). Untouched: the card, the empty slots that hold each
+  button's place, the tab. To check when playing: phones (the strips take ~95 px above the card), and
+  whether the port chip should say the port's three-letter code instead of "Port".
 - **X6. Wording:** the loadout's empty-weapons line says "Every Sol station's armory sells them." (was "The
   I.S.S. armory").
 

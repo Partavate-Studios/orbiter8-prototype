@@ -30,6 +30,12 @@ mockup and log it in `docs/review.md`.
 - **Two cards in the star system:** the selection card (left: what you selected, as a playing card)
   and the action card (right: what you can do with it). Card frames and titles take the selection's
   color; insides are the same purple-gray everywhere; menu buttons one purple (`color-guide.md`).
+- **Over the selection card, two selectors** (Koda, 2026-11-17): the system strip (the star, the
+  planets and the asteroid belt, in orbit order) and under it the nearby strip, big labeled chips for
+  what's around the selection: its planet, **Port** and moons, or the belt's eight places (asteroids,
+  their ports, the empty dust). Going between a planet and its port is one press either way, and a planet
+  with a port also has **Trade at Port** in its menu. The menu's actions wear their pictures from
+  `assets/art/` (`libs/body-art.js`); the 1–9 keys still press them, named in each button's tooltip.
 - **Menus slide up in the middle**, in the shared menu container, opened from a HUD button or a card's
   menu (`stores/ui.js` `MENUS`). **No panels parked in a corner of the game view:** Koda rejected a
   corner first-steps card ("keep popups consistent, so have it slide up like all of the other menus
