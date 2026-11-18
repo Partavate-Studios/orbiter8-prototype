@@ -16,3 +16,13 @@ yard frame), so the two read as one family. Mining is a derrick with small drone
 
 Files: `system-x.svg` (the sheet: every stage, at game size, the parts) and `system-x-<part>.svg`
 (standalone, 120 units square, centered, laid over the rock): `platform`, `mine`, `port`, `armory`, `yards`.
+
+## Iteration 2 (Koda's feedback, 2026-11-18)
+
+Koda: A is closest (the base starts in the middle of the rock), with the accessories bunched more
+tightly; and the bold style of the original station and ship.
+
+- **D, Hex base:** the original station, small, set into the middle of the rock on a shadowed footing
+  with three legs (Platform); planet D's parts, smaller, packed tight round it: a derrick and drones
+  (Mine), capsule pods (Port), two guns (Armory), the cradle (Sol's Yards). Sheet `system-d.svg`; parts
+  `system-d-*.svg`. Both together, large: `../overview-2.svg`.

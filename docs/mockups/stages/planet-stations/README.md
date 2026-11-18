@@ -17,3 +17,15 @@ the planet's limb and city lights on its night side.
 Files: `system-x.svg` (the sheet: every stage, at game size, the parts) and `system-x-<part>.svg`
 (standalone, 120 units square, centered): `core`, `port`, `yards`, `armory`, `autofactory`, and
 `colony` (the planet's marks, on a stand-in disc).
+
+## Iteration 2 (Koda's feedback, 2026-11-18)
+
+Koda liked B's hexagon (from the original station), A's attachments all the way round, and A's
+"planet gun" (the citadel's dome and mast); and asked for the bold style of the original station and
+the ship (thick, smooth, solid; few small details) instead of round 1's finer drawing.
+
+- **D, Hex ring:** the original station, unchanged, at the center; bold parts on its faces all the way
+  round: capsule pods left and right (port), two dome-and-barrel guns up top (armory, the planet gun's
+  shape), a heavy cradle with the Orbiter 8 in it (yards), a vented block (autofactory). Laid out
+  unevenly on purpose: a symmetric layout read as a face. The planet keeps A's citadel gun and lights.
+  Sheet `system-d.svg`; parts `system-d-*.svg`.

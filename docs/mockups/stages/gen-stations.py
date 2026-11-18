@@ -23,7 +23,7 @@ SUB = '#a99bc4'
 
 
 def f(x):
-    return f'{x:.2f}'.rstrip('0').rstrip('.')
+    return f'{x:.4f}'.rstrip('0').rstrip('.')
 
 
 def g(content, tx=0, ty=0, rot=0, s=1):
@@ -427,8 +427,181 @@ def overview():
         'with every facility. Each system has its own sheet with every stage.', body))
 
 
+# ---- Iteration 2 (Koda, 2026-11-18): bold, in the original station's and the ship's language ----
+# The original station (sprites/station.svg.vue) is the core: a notched hexagon with an X-crossed window.
+# Parts are solid and chunky like the ship's rounded pods and thick struts; no thin lines.
+
+_STATION = re.search(r'd="(M291 0l61[^"]*)"', open(os.path.join(ROOT, 'orbiter-client', 'src', 'components',
+                     'star-map', 'sprites', 'station.svg.vue')).read()).group(1)
+_SHIP = re.search(r'd="(M2303 0c[^"]*)"', open(os.path.join(ROOT, 'orbiter-client', 'src', 'components',
+                  'star-map', 'sprites', 'ship.svg.vue')).read()).group(1)
+
+
+def hex_core(scale=0.075):
+    """The original station, centered: about 43 units across at 0.075."""
+    return g(f'<path d="{_STATION}" fill="{W}" fill-rule="evenodd"/>', 0, 0, 0, scale).replace(
+        '<g transform="scale', f'<g transform="scale', 1).replace(
+        f'scale({f(scale)})">', f'scale({f(scale)}) translate(-290 -301)">', 1)
+
+
+def strut(length, w=6):
+    return rect(-1, -w / 2, length + 1, w, L, w / 2)
+
+
+def bold_pods():
+    """Trade port: a collar and two capsule pods, rounded like the ship's."""
+    return (strut(6) + rect(5, -11, 5, 22, W, 2.5) +
+            rect(11, -10.5, 15, 9, W, 4.5) + rect(11, 1.5, 15, 9, W, 4.5))
+
+
+def bold_turret():
+    """Armory: a dome with one heavy barrel."""
+    return strut(6) + circ(12, 0, 8, W) + rect(12, -2.8, 18, 5.6, W, 2.8)
+
+
+def bold_yards():
+    """Yards: a heavy open cradle with the Orbiter 8 being built in it."""
+    s = strut(5)
+    s += path('M4 -14 H29 a3 3 0 0 1 0 6 H10 V8 H29 a3 3 0 0 1 0 6 H4 Z', W)
+    s += g(f'<path d="{_SHIP}" fill="{L}" transform="translate(-2300 -2300)"/>', 20, 0, 90, 0.0036)
+    return s
+
+
+def bold_factory():
+    """Autofactory: a chunky block with three vents and a stack."""
+    return (strut(5) + rect(4, -10, 20, 20, W, 4) + ''.join(rect(8 + 5 * i, -6, 2.6, 12, D, 1.3) for i in range(3)) +
+            rect(24, -4, 5, 8, W, 2))
+
+
+def bold_mast():
+    """The citadel gun Koda liked (planet A): a dome and a heavy mast."""
+    return circ(0, 0, 6.5, W) + rect(0, -2.5, 15, 5, W, 2.5) + rect(-7, -1, 3, 2, W)
+
+
+def bold_drill():
+    """Mine: a solid derrick with a cut-out, a heavy bit."""
+    return (rect(-2, -10, 5, 20, W, 2) + path('M2 -8 L20 -4 L20 4 L2 8 Z', W) +
+            path('M5 -4.6 L11 -3.3 L11 3.3 L5 4.6 Z', D) + path('M13 -2.8 L17.5 -2 L17.5 2 L13 2.8 Z', D) +
+            rect(19, -2, 9, 4, W, 2))
+
+
+def bold_drones(pts):
+    return ''.join(g(path('M4 0 L-3 -3.2 L-1.5 0 L-3 3.2 Z', W), x, y, a) for x, y, a in pts)
+
+
+def hexring_parts():
+    """Planet, iteration 2: the original hexagon with attachments all the way round (A's idea)."""
+    r = 22
+    return {
+        'core': hex_core(),
+        'port': on_spoke(bold_pods(), r, 0) + on_spoke(bold_pods(), r, 180),
+        'armory': on_spoke(bold_turret(), r, -60) + on_spoke(bold_turret(), r, -120),
+        'yards': on_spoke(bold_yards(), r, 120),
+        'autofactory': on_spoke(bold_factory(), r, 60),
+    }
+
+
+def planet_marks_bold(stage):
+    s = ''
+    if stage >= 1:  # the citadel gun on the limb
+        a = -50
+        s += g(bold_mast(), 40 * math.cos(math.radians(a)), 40 * math.sin(math.radians(a)), a, 0.85)
+    if stage >= 2:
+        pts = [(-18, 14), (-23, 8), (-13, 21), (-26, 18), (-8, 27), (-19, 27), (-29, 4)]
+        s += ''.join(circ(x, y, 4.2, 'url(#citylight)') + circ(x, y, 1.6, '#fbf6ff') for x, y in pts)
+    return s
+
+
+def base_parts():
+    """Asteroid, iteration 2: the hexagon set into the middle of the rock, facilities bunched tight round it."""
+    r = 14
+    pad = ('<ellipse cx="0" cy="4" rx="22" ry="17" fill="#000000" opacity="0.32"/>' +
+           ''.join(on_spoke(rect(0, -3, 6, 6, L, 2), 13, a) for a in (30, 150, 270)) + hex_core(0.05))
+    return {
+        'platform': pad,
+        'mine': g(bold_drill(), -11, 11, 135, 0.75) + bold_drones([(-24, 22, 135), (-27, 10, 160), (-12, 28, 110)]),
+        'port': on_spoke(g(bold_pods(), 0, 0, 0, 0.8), r, 0),
+        'armory': on_spoke(g(bold_turret(), 0, 0, 0, 0.8), r, -75) + on_spoke(g(bold_turret(), 0, 0, 0, 0.8), r, -145),
+        'yards': on_spoke(g(bold_yards(), 0, 0, 0, 0.8), r, 55),
+    }
+
+
+def iteration_two():
+    pdir = os.path.join(HERE, 'planet-stations')
+    adir = os.path.join(HERE, 'asteroid-stations')
+    parts = hexring_parts()
+    for n, c in parts.items():
+        open(os.path.join(pdir, f'system-d-{n}.svg'), 'w').write(standalone(c, f'Planet station, system D (Hex ring): {n}'))
+    open(os.path.join(pdir, 'system-d-colony.svg'), 'w').write(standalone(
+        planet_disc() + planet_marks_bold(2), 'Planet, system D: the citadel gun and colony lights (the disc is a stand-in)'))
+    order = ['yards', 'autofactory', 'port', 'armory', 'core']
+    stages = [('Citadel', 1, []), ('Colony', 2, []), ('Station', 2, ['core']), ('Port', 2, ['core', 'port']),
+              ('Yards', 2, ['core', 'port', 'yards']), ('Armory', 2, ['core', 'port', 'yards', 'armory']),
+              ('Autofactory', 2, ['core', 'port', 'yards', 'armory', 'autofactory']),
+              ('Sol (Federation)', 2, ['core', 'port', 'yards', 'armory'])]
+    st = lambda names: ''.join(parts[n] for n in order if n in names)
+    body = ''
+    pw, gap = 145, 9
+    x0 = (1280 - (8 * pw + 7 * gap)) / 2
+    for i, (label, colony, names) in enumerate(stages):
+        x = x0 + i * (pw + gap)
+        body += panel(x, 100, pw, 300, label)
+        body += g(planet_disc() + planet_marks_bold(colony), x + 44, 318, 0, 0.9)
+        if names:
+            body += g(st(names), x + pw / 2 + 4, 192, 0, 1.12)
+    body += f'<text x="40" y="452" fill="{TEXT}" font-size="16" font-weight="500">At game size</text>'
+    body += f'<text x="40" y="474" fill="{SUB}" font-size="13">Sol (Federation) has Port + Yards + Armory. The station about 24 px across, beside a planet about 30 px.</text>'
+    for i, (label, colony, names) in enumerate(stages):
+        x = x0 + i * (pw + gap)
+        body += panel(x, 492, pw, 110, label)
+        body += g(planet_disc() + planet_marks_bold(colony), x + pw / 2 - 12, 540, 0, 0.38)
+        if names:
+            body += g(st(names), x + pw / 2 + 14, 526, 0, 0.24)
+    body += f'<text x="40" y="640" fill="{TEXT}" font-size="16" font-weight="500">Parts</text>'
+    for i, n in enumerate(['core', 'port', 'yards', 'armory', 'autofactory']):
+        x = 160 + i * 150
+        body += g(parts[n], x, 664, 0, 0.62) + f'<text x="{x}" y="706" text-anchor="middle" fill="{SUB}" font-size="12">{n}</text>'
+    open(os.path.join(pdir, 'system-d.svg'), 'w').write(sheet_frame(
+        'Planet stations, system D: Hex ring (iteration 2)',
+        'The original station at the center; bold attachments all the way round: pods, turrets, factory blocks, the yard cradle.', body))
+
+    aparts = base_parts()
+    for n, c in aparts.items():
+        open(os.path.join(adir, f'system-d-{n}.svg'), 'w').write(standalone(c, f'Asteroid station, system D (Hex base): {n}, laid over the rock'))
+    a_order = ['mine', 'platform', 'yards', 'port', 'armory']
+    body = ''
+    pw, gap = 232, 10
+    x0 = (1280 - (5 * pw + 4 * gap)) / 2
+    for i, (label, comp, names) in enumerate(ASTEROID_STAGES):
+        x = x0 + i * (pw + gap)
+        body += panel(x, 100, pw, 300, label)
+        body += g(rock(comp) + ''.join(aparts[n] for n in a_order if n in names), x + pw / 2, 240, 0, 1.55)
+    body += f'<text x="40" y="452" fill="{TEXT}" font-size="16" font-weight="500">At game size</text>'
+    body += f'<text x="40" y="474" fill="{SUB}" font-size="13">Sol (Federation) has all four plus Yards. The asteroid and its station about 28 px across.</text>'
+    for i, (label, comp, names) in enumerate(ASTEROID_STAGES):
+        x = x0 + i * (pw + gap)
+        body += panel(x, 492, pw, 110, label)
+        body += g(rock(comp) + ''.join(aparts[n] for n in a_order if n in names), x + pw / 2, 540, 0, 0.25)
+    body += f'<text x="40" y="640" fill="{TEXT}" font-size="16" font-weight="500">Parts</text>'
+    for i, n in enumerate(['platform', 'mine', 'port', 'armory', 'yards']):
+        x = 160 + i * 150
+        body += g(aparts[n], x, 664, 0, 0.62) + f'<text x="{x}" y="706" text-anchor="middle" fill="{SUB}" font-size="12">{n}</text>'
+    open(os.path.join(adir, 'system-d.svg'), 'w').write(sheet_frame(
+        'Asteroid stations, system D: Hex base (iteration 2)',
+        "The original station set into the middle of the rock, its facilities bunched tight around it; the planet D parts, smaller.", body))
+
+    # the pair, large, fully built
+    body = panel(40, 100, 590, 590, 'Planet station D, fully built') + panel(650, 100, 590, 590, 'Asteroid station D, fully built (Sol)')
+    body += g(planet_disc() + planet_marks_bold(2), 150, 560, 0, 1.6)
+    body += g(st(['core', 'port', 'yards', 'armory', 'autofactory']), 370, 330, 0, 3.4)
+    body += g(rock('metallic') + ''.join(aparts[n] for n in a_order), 945, 390, 0, 4.2)
+    open(os.path.join(HERE, 'overview-2.svg'), 'w').write(sheet_frame(
+        'Station proposals, iteration 2', 'Planet D (Hex ring) and asteroid D (Hex base), in the original station\'s and the ship\'s bold style.', body))
+
+
 if __name__ == '__main__':
     planet_sheets()
     asteroid_sheets()
     overview()
+    iteration_two()
     print('written to', HERE)
