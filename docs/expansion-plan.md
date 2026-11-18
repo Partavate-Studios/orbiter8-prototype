@@ -90,6 +90,9 @@ work in progress from a session that ran out (check `git status` and `git diff` 
 - 2026-11-18: Sol's asteroids fully built (the section below): `contracts/src/planets/Sol.sol` says which
   bodies are Sol's Federation stations (its nine planets and its six asteroids) and their port classes;
   Market (ports, yards) and Armory (parts at the Federation's price) ask it. Sol now has 15 ports. Calls X30–X31.
+- 2026-11-18: reads reshaped for the testnet's per-read budget (`polkadot-direction.md`), then
+  **redeployed to Polkadot Hub TestNet** (60 transactions, 17.96 PAS; addresses in `sdk/src/chain/networks.js`).
+  The client plays it and reads Sol whole. Calls X32–X34.
 - **Left for Koda / a later session:** (1) review calls X1–X22 in `docs/review.md`, and the mockup
   `docs/mockups/belt-levels.svg`; (3) tuning choices in `demo4-tuning.md` "The belt";
   (4) extending the economy simulator with miners and asteroid owners; (5) dwarf planets (decision 21);

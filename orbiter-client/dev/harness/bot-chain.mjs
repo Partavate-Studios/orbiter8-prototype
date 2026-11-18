@@ -25,6 +25,11 @@ function spikeKey() {
   return (Array.isArray(json.data) ? json.data[0] : json).private_key
 }
 
+/** The deployment's admin (the deployer): local account 0, or on the testnet the spike key. */
+export async function adminSigner() {
+  return TESTNET ? new Wallet(spikeKey(), provider) : provider.getSigner(0)
+}
+
 /** The bot's signer: a local unlocked account, or on the testnet its own funded throwaway key. */
 export async function signerFor(account) {
   if (!TESTNET) return provider.getSigner(Number(account))
@@ -36,4 +41,18 @@ export async function signerFor(account) {
     console.log(JSON.stringify({ action: 'funded', bot: bot.address, pas: formatEther(TOP_UP) }))
   }
   return bot
+}
+
+/**
+ * Sends a move and measures it: its gas, and what it cost its payer in the chain's coin (PAS on the
+ * testnet), read as the payer's balance before and after, less any value sent along. On Polkadot Hub
+ * that includes storage deposits, which the gas figure alone doesn't show.
+ */
+export async function measured(payer, send, value = 0n) {
+  const address = await payer.getAddress()
+  const before = await provider.getBalance(address)
+  const receipt = await (await send()).wait()
+  const after = await provider.getBalance(address, receipt.blockNumber)
+  const spent = before - after - value
+  return { receipt, gas: Number(receipt.gasUsed), pas: Number(formatEther(spent)), fee: Number(formatEther(receipt.fee)) }
 }

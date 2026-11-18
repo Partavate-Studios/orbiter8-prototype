@@ -626,6 +626,11 @@ Calls made building it, for Koda's review:
     worth capping by the part's room (drone bays, holds, mounts).
   - A Federation asteroid's menu says "Nothing to do here." beside the card (its port is the button on
     the card's edge), as a Federation planet's does.
+- **X34. Polkadot Hub TestNet redeployed** (2026-11-18, throwaway spike key, EVM bytecode as before):
+  `forge script script/Deploy.s.sol`, 60 transactions, all successful, 17.96 PAS. The old deployment's
+  pilots and planets are gone with it (a fresh galaxy). The two probe contracts used to find the read
+  budget (`MemProbe`, `CostProbe`) are also on the testnet, unrelated to the game; they cost about 48 PAS,
+  mostly storage deposits for 200 probe slots. The GitHub Pages build plays the new addresses once pushed.
 - **X6. Wording:** the loadout's empty-weapons line says "Every Sol station's armory sells them." (was "The
   I.S.S. armory").
 

@@ -8,12 +8,17 @@
 //
 // usage (from orbiter-client/): node dev/harness/read-costs.mjs [cell...]
 //   LOCAL_FILE=-8547 picks dev/local-deployment-8547.json; RPC defaults to that file's.
+//   TESTNET=1 asks Polkadot Hub TestNet for its own estimate of each read instead (no traces there).
 import { readFileSync } from 'node:fs'
 import { Interface } from 'ethers'
 import { disc } from '../../../sdk/src/hex.js'
 
 const read = (p) => JSON.parse(readFileSync(new URL(p, import.meta.url), 'utf8'))
-const deployment = read(`../local-deployment${process.env.LOCAL_FILE ?? ''}.json`)
+// TESTNET=1: the testnet's own estimates (eth_estimateGas, its units) instead of the model; no traces there.
+const TESTNET = process.env.TESTNET === '1'
+const deployment = TESTNET
+  ? { rpc: 'https://eth-rpc-testnet.polkadot.io/', contracts: read('../../../contracts/deployments/420420417.json') }
+  : read(`../local-deployment${process.env.LOCAL_FILE ?? ''}.json`)
 const rpc = process.env.RPC ?? deployment.rpc
 const c = deployment.contracts
 const abi = (n) => new Interface(read(`../../../sdk/src/abi/${n}.json`))
@@ -63,6 +68,11 @@ async function trace(to, data) {
 
 async function measure(to, iface, fn, args) {
   const data = iface.encodeFunctionData(fn, args)
+  if (TESTNET) {
+    const units = Number(await rpcCall('eth_estimateGas', [{ to, data }, 'latest']))
+    const result = iface.decodeFunctionResult(fn, await rpcCall('eth_call', [{ to, data }, 'latest']))
+    return { units, sload: '-', calls: '-', gas: '-', peakMem: '-', result }
+  }
   const counts = await trace(to, data)
   const result = iface.decodeFunctionResult(fn, await rpcCall('eth_call', [{ to, data }, 'latest']))
   return { ...counts, units: model(counts), result }

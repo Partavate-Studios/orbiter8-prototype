@@ -13,7 +13,7 @@
 //   NAME=Rook SHIP=Kestrel   its call sign and ship's name when it registers
 //   WANDER=1          stay near Sol (within two jumps) instead of exploring outward, to be seen
 import { Contract } from 'ethers'
-import { deployment, signerFor } from './bot-chain.mjs'
+import { deployment, signerFor, measured } from './bot-chain.mjs'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { distance } from '../../../sdk/src/hex.js'
 import { fetchRound, timeOf } from '../../../sdk/src/drand.js'
@@ -34,9 +34,9 @@ const HOLE = 3
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 const log = []
-async function record(action, tx, extra = {}) {
-  const receipt = await tx.wait()
-  const entry = { action, gas: Number(receipt.gasUsed), ...extra }
+async function record(action, send, extra = {}) {
+  const { receipt, gas, pas } = await measured(signer, send)
+  const entry = { action, gas, pas, ...extra }
   log.push(entry)
   console.log(JSON.stringify(entry))
   return receipt
@@ -56,7 +56,7 @@ async function proofs(cells) {
 
 const me = await signer.getAddress()
 if (!(await pilots.pilotOf(me)).registered) {
-  await record('register', await pilots.register(process.env.NAME ?? `Bot${account}`, process.env.SHIP ?? 'Surveyor'))
+  await record('register', () => pilots.register(process.env.NAME ?? `Bot${account}`, process.env.SHIP ?? 'Surveyor'))
 }
 
 for (let i = 0; i < Number(moves); i++) {
@@ -69,7 +69,7 @@ for (let i = 0; i < Number(moves); i++) {
   const byCell = new Map(cells.map((c) => [Number(c.cell), c]))
 
   if (Number(byCell.get(here)?.state) === HOLE && Math.random() < 0.7) {
-    await record('traverse', await pilots.traverse(proof), { from: here, proofs: proof.length })
+    await record('traverse', () => pilots.traverse(proof), { from: here, proofs: proof.length })
     continue
   }
   const options = cells
@@ -82,7 +82,7 @@ for (let i = 0; i < Number(moves); i++) {
     const wait = timeOf(Number(mine.scanRound)) * 1000 - Date.now() + 1500
     if (wait > 0) await sleep(wait)
     const fresh = await proofs([...(await galaxy.region(here, REGION))])
-    if (fresh.length) await record('resolveScans', await pilots.resolveScans(fresh), { proofs: fresh.length })
+    if (fresh.length) await record('resolveScans', () => pilots.resolveScans(fresh), { proofs: fresh.length })
     i--
     continue
   }
@@ -91,7 +91,7 @@ for (let i = 0; i < Number(moves); i++) {
     : (c) => (byCell.get(c).visited ? 0 : 100) + distance(0, c) + Math.random() * 3
   const to = options.sort((a, b) => score(b) - score(a))[0]
   const firstVisit = !byCell.get(to).visited
-  await record('jump', await pilots.jump(to, proof), { from: here, to, firstVisit, proofs: proof.length })
+  await record('jump', () => pilots.jump(to, proof), { from: here, to, firstVisit, proofs: proof.length })
   await sleep(4000)
 }
 

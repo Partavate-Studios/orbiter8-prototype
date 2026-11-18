@@ -355,6 +355,15 @@ claimed and built to the top, people and drones landed) to measure the worst cas
 | Star 1 fully built: 13 ports | 75,336 in one call; 32,292 for five | 45,351 in one call; ≤ 20,815 for five |
 | One owned planet's view | 5,637 | 4,030 |
 
+**On the testnet itself** (redeployed 2026-11-18 with these contracts; its own `eth_estimateGas`, from
+`TESTNET=1 node dev/harness/read-costs.mjs 0`): Sol's planets 4,794; its six asteroids (`views`) 4,870;
+`portIds(0)` 1,600; `portViews` of five of Sol's ports 7,646–8,015, of all 15 in one call 15,754; one
+planet's view 2,795; `cellsOf(8)` 6,547; `region(0, 10)` 34,782 now that it's fresh (it grows as the
+galaxy fills in; the client no longer uses it). `system(0, 8)`, all 15 ports in one `portViews`, and
+`region(0, 10)` all answer directly, so the client reads Sol whole without any fallback. One oddity:
+`statesOf` with 331 cell ids estimates 55,902, though it answers: the estimate counts the 10.6 KB of
+call data as a transaction's length fee, which a read never pays, and the budget doesn't count it.
+
 The heaviest read the client now makes is about 21,000 units, half the budget, for five fully built
 player ports; anything bigger is split by `chunked`. A body's view still grows with goods (one storage
 read each, 8 now): adding goods or per-body data should be checked with `read-costs.mjs`.

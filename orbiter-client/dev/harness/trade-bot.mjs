@@ -13,7 +13,7 @@
 //   PACE_MS=10000     wait about this long between moves (randomized ±50%), so a person can watch
 //   NAME=Rook SHIP=Kestrel   its call sign and ship's name when it registers
 import { Contract, Wallet, parseEther } from 'ethers'
-import { deployment, provider, signerFor } from './bot-chain.mjs'
+import { deployment, provider, signerFor, measured } from './bot-chain.mjs'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { buyCost, sellProceeds, fee, baysCost, MODE } from '../../../sdk/src/market.js'
 
@@ -28,9 +28,10 @@ const abi = (name) => read(`../../../sdk/src/abi/${name}.json`)
 const { pilots: P, market: M, credits: C } = deployment.contracts
 
 const log = []
-async function record(action, send, extra = {}) {
-  const receipt = await (await send()).wait()
-  const entry = { action, gas: Number(receipt.gasUsed), ...extra }
+let payer = wallet
+async function record(action, send, extra = {}, value = 0n) {
+  const { gas, pas } = await measured(payer, send, value)
+  const entry = { action, gas, pas, ...extra }
   log.push(entry)
   console.log(JSON.stringify(entry))
 }
@@ -42,7 +43,8 @@ if (!(await pilotsByWallet.pilotOf(me)).registered) {
 }
 const key = Wallet.createRandom().connect(provider)
 const expiry = Math.floor(Date.now() / 1000) + 3600
-await record('startSession', () => pilotsByWallet.startSession(key.address, expiry, { value: parseEther('0.5') }))
+await record('startSession', () => pilotsByWallet.startSession(key.address, expiry, { value: parseEther('0.5') }), {}, parseEther('0.5'))
+payer = key // the session key pays for its moves from here
 const pilots = new Contract(P, abi('Pilots'), key)
 const market = new Contract(M, abi('Market'), key)
 const credits = new Contract(C, abi('Credits'), provider)
