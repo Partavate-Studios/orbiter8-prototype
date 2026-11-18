@@ -15,6 +15,9 @@ anything is rebuilt. Decisions D62–D66 in [`demo4-plan.md`](demo4-plan.md) poi
 
 ## The decisions
 
+**Guiding principle (Koda, 2026-11-18): fully embrace the Polkadot App's ecosystem, and let that guide
+decisions:** its accounts and signer, personhood, names, NFTs and hosting over our own substitutes.
+
 | | Decision |
 |---|---|
 | D62 | **Polkadot only.** Give up other EVM networks. Explore the frontier of Polkadot and use what it uniquely offers. Focus on **Polkadot Hub**; our own chain comes only if the game succeeds. |
