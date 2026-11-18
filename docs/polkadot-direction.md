@@ -30,7 +30,7 @@ decisions:** its accounts and signer, personhood, names, NFTs and hosting over o
 | D103 | **Signing: both.** AutoSigning when the App grants it; otherwise our session keys (D41), sent through the host. Outside the App, today's wallet and session keys. (Koda, 2026-11-18) |
 | D104 | **Players without PAS sign each move** (a phone approval per move, paid with PGAS) until they hold PAS; then session keys. The game doesn't sponsor session gas. (Koda, 2026-11-18) |
 | D105 | **Ships become native Scarcity NFTs** in the App. Ownership is redesigned around a pilot record the ships' keys are tied to (fits fleets, D26); our ERC-721 stays until mainnet has Scarcity. (Koda, 2026-11-18) |
-| D106 | **A testnet build is published beside Demo 3**, at a subpath of the `orbiter8-demo3-client` Pages site (e.g. `/testnet/`); Demo 3 stays where it is. Prepared locally; Koda pushes. (Koda, 2026-11-18) |
+| D106 | **Web builds are published at `https://partavate-studios.github.io/orbiter8-prototype/`** (this repo's Pages; already serving a Polkadot Hub TestNet build, 2026-11-18). Demo 3's site (`orbiter8-demo3-client`) stays as it is. Prepared locally; Koda pushes. (Corrected the same day: first recorded as a subpath of the Demo 3 site, from the wrong URL.) (Koda, 2026-11-18) |
 | D107 | **Every NFT draws itself as an SVG, on chain** (Koda, 2026-11-18): ships already do (`Ships.tokenURI`, `ShipArt.svg`); deeds (planets, moons, asteroids) get theirs, in the card's art; every future NFT too. **The picture is generated on demand by the contract whenever it's asked** (`tokenURI` computes it from the current state; Koda, 2026-11-18): never a stored snapshot, nor drawn by the client. For Scarcity (D105), whose metadata is stored key/value data, the App must reach our contract's drawing (e.g. a metadata pointer it resolves by calling our contract): check on the phone. If it can't, D105 and D107 conflict: bring to Koda. |
 
 ## Polkadot's own direction (2026-11-11)
@@ -378,7 +378,7 @@ and the precompile answers only there, so a reliable on-chain answer for our gam
 (and a player opening our Product). Also readable: gateway-issued dotNS names (a device name like
 `name.01`, or a reserved personal name) held by the player's account.
 
-**The public build** at `https://partavate-studios.github.io/orbiter8-demo3-client/`
+**The web builds** are published at `https://partavate-studios.github.io/orbiter8-prototype/` (D106); it served a Polkadot Hub TestNet build on 2026-11-18. The older site at `https://partavate-studios.github.io/orbiter8-demo3-client/`
 (`Partavate-Studios/orbiter8-demo3-client`, last pushed 2026-10-28) is the **Demo 3 client**, on the
 old EVM networks (Base, Moonriver, Moonbase, BSC testnet, Sepolia), not Polkadot Hub. Putting the
 current game there takes a production build pointed at the testnet with a real wallet (the dev
