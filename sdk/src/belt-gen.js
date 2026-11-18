@@ -3,6 +3,7 @@
 // its eight sections, each one large asteroid (composition, size) or, about one in six, empty space
 // that ships can mine. Owners, buildings and drones come from the contracts.
 import { keccak256, AbiCoder } from 'ethers'
+import { SOL_SECTIONS } from './sol-belt.js'
 
 const coder = AbiCoder.defaultAbiCoder()
 const hash = (types, values) => BigInt(keccak256(coder.encode(types, values)))
@@ -11,17 +12,6 @@ export const SECTIONS = 8
 export const COMPOSITION = { CARBONACEOUS: 0, SILICATE: 1, METALLIC: 2 }
 export const COMPOSITION_NAMES = ['Carbonaceous', 'Silicate', 'Metallic']
 
-/** Sol's belt, between Mars and Jupiter: real asteroids, and two empty sections to mine near home. */
-const SOL_SECTIONS = [
-  { name: 'Ceres', composition: 0, size: 8 },
-  { name: 'Vesta', composition: 1, size: 6 },
-  null,
-  { name: 'Pallas', composition: 1, size: 6 },
-  { name: 'Hygiea', composition: 0, size: 5 },
-  { name: 'Psyche', composition: 2, size: 5 },
-  null,
-  { name: 'Juno', composition: 1, size: 3 }
-]
 
 const beltHash = (seed, cell) => hash(['bytes32', 'uint256', 'string'], [seed, cell, 'belt'])
 

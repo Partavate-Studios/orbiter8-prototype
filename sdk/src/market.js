@@ -5,7 +5,7 @@
 // Every unit moves the price, so a big trade pays the average over its units: costs round up,
 // proceeds round down, as on chain.
 import { planetId, cellOf, indexOf, kindOf, KIND } from './body-id.js'
-import { section, asteroidName, SECTIONS } from './belt-gen.js'
+import { SOL_SECTIONS } from './sol-belt.js'
 
 const ceilDiv = (a, b) => (a === 0 ? 0 : Math.floor((a - 1) / b) + 1)
 
@@ -78,15 +78,15 @@ export const SOL_PORTS = [
 export function isSolStation(id) {
   id = Number(id)
   if (id < SOL_PORTS.length) return true
-  if (cellOf(id) !== 0 || kindOf(id) !== KIND.ASTEROID || indexOf(id) >= SECTIONS) return false
-  return section(null, 0, indexOf(id)).asteroid // Sol's belt doesn't depend on the seed
+  if (cellOf(id) !== 0 || kindOf(id) !== KIND.ASTEROID) return false
+  return Boolean(SOL_SECTIONS[indexOf(id)]) // Sol's belt is fixed
 }
 
 /** A port's display names. */
 export function portNames(port) {
   if (Number(port) < SOL_PORTS.length) return SOL_PORTS[Number(port)] // Sol's planets are ids 0–8
   if (isSolStation(port)) {
-    const rock = asteroidName(0, indexOf(port))
+    const rock = SOL_SECTIONS[indexOf(port)].name
     return { station: `${rock} Station`, planet: rock }
   }
   return { station: `Port ${portBody(port) + 1}`, planet: `Planet ${portBody(port) + 1}` }
