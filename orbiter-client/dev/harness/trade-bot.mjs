@@ -9,20 +9,20 @@
 // has spare credits: the simulator's strategy (dev/sim/economy.mjs), against the real contracts.
 // Settings from the environment, to run several as neighbors while you play (dev/harness/crowd.sh):
 //   LOCAL_FILE=-8546  the chain started with CHAIN_PORT=8546 (dev/local-deployment-8546.json)
+//   TESTNET=1         play Polkadot Hub TestNet instead, with a funded throwaway key (bot-chain.mjs)
 //   PACE_MS=10000     wait about this long between moves (randomized ±50%), so a person can watch
 //   NAME=Rook SHIP=Kestrel   its call sign and ship's name when it registers
-import { JsonRpcProvider, Contract, Wallet, parseEther } from 'ethers'
+import { Contract, Wallet, parseEther } from 'ethers'
+import { deployment, provider, signerFor } from './bot-chain.mjs'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { buyCost, sellProceeds, fee, baysCost, MODE } from '../../../sdk/src/market.js'
 
 const [moves = 40, account = 6, out] = process.argv.slice(2)
 const read = (p) => JSON.parse(readFileSync(new URL(p, import.meta.url), 'utf8'))
-const deployment = read(`../local-deployment${process.env.LOCAL_FILE ?? ''}.json`)
 const PACE_MS = Number(process.env.PACE_MS ?? 0)
 /** Between moves: about PACE_MS (±50%), so a pilot moves at a watchable pace. */
 const pause = () => (PACE_MS ? new Promise((r) => setTimeout(r, PACE_MS * (0.5 + Math.random()))) : null)
-const provider = new JsonRpcProvider(deployment.rpc, undefined, { pollingInterval: 250 })
-const wallet = await provider.getSigner(Number(account))
+const wallet = await signerFor(account)
 const me = (await wallet.getAddress()).toLowerCase()
 const abi = (name) => read(`../../../sdk/src/abi/${name}.json`)
 const { pilots: P, market: M, credits: C } = deployment.contracts

@@ -8,22 +8,22 @@
 // its own scan when every neighbor is still uncharted.
 // Settings from the environment, to run several as neighbors while you play (dev/harness/crowd.sh):
 //   LOCAL_FILE=-8546  the chain started with CHAIN_PORT=8546 (dev/local-deployment-8546.json)
+//   TESTNET=1         play Polkadot Hub TestNet instead, with a funded throwaway key (bot-chain.mjs)
 //   PACE_MS=10000     wait about this long between moves (randomized ±50%), so a person can watch
 //   NAME=Rook SHIP=Kestrel   its call sign and ship's name when it registers
 //   WANDER=1          stay near Sol (within two jumps) instead of exploring outward, to be seen
-import { JsonRpcProvider, Contract } from 'ethers'
+import { Contract } from 'ethers'
+import { deployment, signerFor } from './bot-chain.mjs'
 import { readFileSync, writeFileSync } from 'node:fs'
 import { distance } from '../../../sdk/src/hex.js'
 import { fetchRound, timeOf } from '../../../sdk/src/drand.js'
 
 const [moves = 20, account = 5, out] = process.argv.slice(2)
 const read = (p) => JSON.parse(readFileSync(new URL(p, import.meta.url), 'utf8'))
-const deployment = read(`../local-deployment${process.env.LOCAL_FILE ?? ''}.json`)
 const PACE_MS = Number(process.env.PACE_MS ?? 0)
 /** Between moves: about PACE_MS (±50%), so a pilot moves at a watchable pace. */
 const pause = () => (PACE_MS ? new Promise((r) => setTimeout(r, PACE_MS * (0.5 + Math.random()))) : null)
-const provider = new JsonRpcProvider(deployment.rpc, undefined, { pollingInterval: 250 })
-const signer = await provider.getSigner(Number(account))
+const signer = await signerFor(account)
 const galaxy = new Contract(deployment.contracts.galaxy, read('../../../sdk/src/abi/Galaxy.json'), signer)
 const pilots = new Contract(deployment.contracts.pilots, read('../../../sdk/src/abi/Pilots.json'), signer)
 const STAR = 2
