@@ -540,6 +540,12 @@ Calls made building it, for Koda's review:
   claim, colony, siege, colonists, holds, drones). Untouched: the card, the empty slots that hold each
   button's place, the tab. To check when playing: phones (the strips take ~95 px above the card), and
   whether the port chip should say the port's three-letter code instead of "Port".
+- **X25. The selection beside an open menu** (2026-11-17, Koda: the station and everything round it
+  "disappear" when the shipyard opens). They were drawn but under the menu: the camera centers the
+  selection, and menus open in the middle. Now, while a menu is open on a wide screen with at least
+  180 px free right of it, the camera eases the selection into the middle of that space, and back when
+  it closes (`stores/ui.js` selectionShiftPx, measured from the sheet). Phones are unchanged (their
+  sheet spans the screen).
 - **X6. Wording:** the loadout's empty-weapons line says "Every Sol station's armory sells them." (was "The
   I.S.S. armory").
 

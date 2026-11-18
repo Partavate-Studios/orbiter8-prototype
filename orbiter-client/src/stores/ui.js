@@ -34,6 +34,8 @@ function readActionsOpen() {
   }
 }
 
+/** The free space right of an open menu that's worth moving the selection into (CSS pixels). */
+const MIN_ROOM_BESIDE_MENU_PX = 180
 const MENUS = ['planets', 'ships', 'settings', 'trade', 'shipyard', 'chat', 'leaderboard', 'colony', 'armory', 'loadout', 'siege', 'feed', 'help', 'asteroid']
 
 export const useUIStore = defineStore('UI', {
@@ -124,7 +126,12 @@ export const useUIStore = defineStore('UI', {
     // (libs/label-layout.js; laid out by the map a few times a second).
     labelPlacements: {},
     // The sprite under the pointer (its key), so its orbit ring can be drawn bright.
-    hovered: null
+    hovered: null,
+    // Where an open menu's sheet covers the screen ({ left, right } in CSS pixels), or null
+    // (components/hud/menu-sheet.vue): the camera keeps the selection beside it.
+    menuBox: null,
+    // the shift the camera last eased to (selectionShiftPx)
+    cameraShiftPx: 0
   }),
   getters: {
     /** Screen pixels per map-group unit, before the camera's zoom. */
@@ -137,6 +144,18 @@ export const useUIStore = defineStore('UI', {
     /** Screen pixels per world unit as the world layer is drawn (changes only on a redraw). */
     drawnPixelsPerUnit() {
       return this.groupPixels / this.drawnView.scale
+    },
+    /**
+     * How far right of the screen's center the selection sits (CSS pixels): in the middle of the free
+     * space right of an open menu, when there's room for it to be seen there; else 0 (centered).
+     */
+    selectionShiftPx() {
+      const box = this.menuBox
+      const width = this.screenSize.width
+      if (!box || !width || box.left <= 0) return 0
+      const room = width - box.right
+      if (room < MIN_ROOM_BESIDE_MENU_PX) return 0
+      return box.right + room / 2 - width / 2
     },
     /** Screen pixels per world unit for the live camera. */
     livePixelsPerUnit() {
@@ -274,8 +293,18 @@ export const useUIStore = defineStore('UI', {
       this.viewport.xTween = null
       this.viewport.yTween = null
     },
+    setMenuBox(box) {
+      const same = box && this.menuBox && Math.abs(box.left - this.menuBox.left) < 1 && Math.abs(box.right - this.menuBox.right) < 1
+      if (!same && (box || this.menuBox)) this.menuBox = box
+    },
     setSelectedTelemetry(telemetry) {
-      let newX = telemetry.translatex * -1
+      // Beside an open menu, not under it: the camera eases over when the shift changes.
+      const shift = this.selectionShiftPx
+      if (shift !== this.cameraShiftPx) {
+        this.cameraShiftPx = shift
+        if (this.viewport.xTween == null) this.viewport.xTween = new Tween(this.viewport.x, this.viewport.x, CAMERA.SELECT_TWEEN_MS)
+      }
+      let newX = telemetry.translatex * -1 + shift / this.livePixelsPerUnit
       let newY = telemetry.translatey * -1
       if (this.viewport.xTween != null) {
         this.viewport.xTween.updateTarget(newX)

@@ -4,7 +4,7 @@
        map's units; the sheet is only as tall as what the open one draws, and scrolls when that's
        taller than the screen. Its frame takes the menu's colors (libs/card-theme.js menuTheme). -->
   <Transition name="sheet">
-    <div v-if="menu" :key="menu" class="menu-sheet" :class="{ phone }" :style="frame" role="dialog" :aria-label="menu + ' menu'">
+    <div v-if="menu" ref="sheet" :key="menu" class="menu-sheet" :class="{ phone }" :style="frame" role="dialog" :aria-label="menu + ' menu'">
       <!-- a menu built in HTML (the trade menu): as wide and tall as it lays itself out -->
       <div v-if="htmlMenu" ref="scroller" class="inside html" data-own-scroll>
         <component :is="htmlMenu" :object-id="selected" :narrow="phone" />
@@ -124,21 +124,44 @@ export default {
     menu() {
       this.top = -HALF_HEIGHT
       this.bottom = HALF_HEIGHT
-      this.$nextTick(this.watchContent)
+      this.$nextTick(() => {
+        this.watchContent()
+        this.watchPlace()
+      })
     }
   },
   mounted() {
     this.watchContent()
+    this.watchPlace()
   },
   unmounted() {
     this.observer?.disconnect()
+    this.placeObserver?.disconnect()
     cancelAnimationFrame(this.measuring)
+    useUIStore().setMenuBox(null)
   },
   methods: {
     ...mapActions(useUIStore, ['closeMenu']),
     close() {
       this.o8audio.playEffect('click')
       this.closeMenu()
+    },
+    /**
+     * Tells the camera where the sheet covers the screen (stores/ui.js setMenuBox), so the selection
+     * can sit in the free space beside it instead of under it (Koda: the station "disappears" under the
+     * shipyard). Again whenever the sheet's size changes.
+     */
+    watchPlace() {
+      this.placeObserver?.disconnect()
+      const sheet = this.$refs.sheet
+      const report = () => {
+        const box = this.$refs.sheet?.getBoundingClientRect?.()
+        useUIStore().setMenuBox(box && box.width ? { left: box.left, right: box.right } : null)
+      }
+      report()
+      if (!sheet || typeof ResizeObserver === 'undefined') return
+      this.placeObserver = new ResizeObserver(report)
+      this.placeObserver.observe(sheet)
     },
     /** Measures the open menu now, and again whenever what it draws changes (pages, rows, lists). */
     watchContent() {
