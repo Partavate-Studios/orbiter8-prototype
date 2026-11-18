@@ -615,6 +615,17 @@ Calls made building it, for Koda's review:
   `Planets.suppliesOf(id, goods, mix)` replaces `supplyOf`. Planets now stores the universe's seed (read
   from Galaxy once, at initialize). Two dev tools: `dev/harness/read-costs.mjs` (cost model) and
   `dev/harness/build-out.mjs` (a fully built system, test chain only: it makes buildings free).
+- **X33. Play-tested Sol's belt** (2026-11-18, one session at desktop, one at phone size, local chain):
+  bought water at Ceres Station, sold it at Psyche Station (silicate/metallic prices as expected), a drone
+  bay at Ceres' yard, a mining drone at Psyche's armory (800¢, the Federation's price), mined Sol's
+  carbonaceous dust for an hour (5 units, holds full), sold it at Tiangong, jumped to Alpha Centauri and
+  back (the region read through `statesOf`/`cellsOf`; Sol reloads with 15 stations). The Ports menu lists
+  all 15 in orbit order; the galaxy map counts 15. Shots in `docs/mockups/sol-belt/`. Seen, not changed:
+  - **The armory's quantity dial goes to 20 for every part** (`armory-menu.svg.vue`, `:max="20"`), so with
+    one drone bay it offers 20 mining drones; the contract refuses what doesn't fit. Older than this work;
+    worth capping by the part's room (drone bays, holds, mounts).
+  - A Federation asteroid's menu says "Nothing to do here." beside the card (its port is the button on
+    the card's edge), as a Federation planet's does.
 - **X6. Wording:** the loadout's empty-weapons line says "Every Sol station's armory sells them." (was "The
   I.S.S. armory").
 
