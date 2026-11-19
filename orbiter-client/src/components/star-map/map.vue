@@ -75,7 +75,8 @@
 </template>
 
 <script>
-import { CAMERA, WORLD_OFFSET_Y } from '@/constants'
+import { CAMERA, WORLD_OFFSET_Y, BELT_WIDTH } from '@/constants'
+import { orbitAt } from '@orbiter8/sdk/game/orbits'
 import { STAR_KEY } from '@orbiter8/sdk/system'
 
 import { useStarMapStore } from '@/stores/starmap'
@@ -125,6 +126,7 @@ export default {
   },
   computed: {
     ...mapState(useUIStore, [
+      'selected',
       'neighborView',
       'viewport',
       'screenSize',
@@ -138,7 +140,7 @@ export default {
       'jumpFromMap',
       'systemHidden'
     ]),
-    ...mapState(useStarMapStore, ['currentStarSystemId', 'mapDataLoaded', 'myShipId']),
+    ...mapState(useStarMapStore, ['currentStarSystemId', 'mapDataLoaded', 'myShipId', 'systemObjects', 'gameTime']),
     /**
      * Every layer maps 1200 units to the screen's height, centered on the origin (this is
      * what the original single SVG did at any aspect ratio), so the layers line up exactly.
@@ -228,6 +230,7 @@ export default {
       'enterNeighborView',
       'selectNone',
       'selectSprite',
+      'toggleScope',
       'scaleAnimateTo',
       'calculateViewableArea',
       'drawWorldAt',
@@ -278,7 +281,9 @@ export default {
     },
     pointerDown(event) {
       if (event.pointerType === 'mouse' && event.button !== 0) return
-      this.selectNone()
+      // A press inside the belt's band picks its section (selected on release, if it wasn't a drag)
+      const section = this.isMenuOn ? null : this.beltSectionAt(event.clientX, event.clientY)
+      if (!section) this.selectNone()
       if (this.isMenuOn) {
         this.closeMenu()
         return
@@ -287,6 +292,26 @@ export default {
       this.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY })
       this.mouseHold = true
       this.startGesture()
+      if (this.gesture?.type === 'drag') this.gesture.section = section
+    },
+    /**
+     * Which belt section is under a screen point: the whole of each section's slice of the band is a
+     * click target (Koda, 2026-11-18: clicking the little asteroid was very difficult). Its asteroid's
+     * key, or its empty dust's; null off the belt.
+     */
+    beltSectionAt(clientX, clientY) {
+      const { screenX, screenY } = this.fromCenter({ x: clientX, y: clientY })
+      const point = this.worldAt(screenX, screenY)
+      const distance = Math.hypot(point.x, point.y)
+      const angle = (Math.atan2(point.y, point.x) * 180) / Math.PI
+      for (const [key, object] of Object.entries(this.systemObjects ?? {})) {
+        if ((object.type !== 'asteroid' && object.type !== 'section') || !object.orbit) continue
+        // half the band's width, and a little more, since asteroids roam across it
+        if (Math.abs(distance - object.orbit.radius) > BELT_WIDTH / 2 + 4) continue
+        const middle = orbitAt(1, object.orbit.speed, this.gameTime, object.orbit.phase).angle
+        if (Math.abs(((((angle - middle) % 360) + 540) % 360) - 180) <= 22.5) return key
+      }
+      return null
     },
     /**
      * One pointer drags once it has moved past CAMERA.DRAG_THRESHOLD_PX (a smaller move is a click).
@@ -343,6 +368,11 @@ export default {
     },
     pointerUp(event) {
       if (!this.pointers.delete(event.pointerId)) return
+      const { section, dragging } = this.gesture ?? {}
+      if (this.pointers.size === 0 && section && !dragging) {
+        if (this.selected === section) this.toggleScope()
+        else this.selectSprite(section)
+      }
       if (this.pointers.size === 0) {
         this.gesture = null
         this.mouseHold = false
