@@ -8,6 +8,7 @@ import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {ModuleBase} from "../core/ModuleBase.sol";
 import {Pilots} from "../pilots/Pilots.sol";
 import {ShipArt} from "../art/ShipArt.sol";
+import {SafeText} from "../art/SafeText.sol";
 
 /// @title Ships, as NFTs (docs/demo4-plan.md, sections 1 and 3; D26)
 /// @notice Each Orbiter 8 is an ERC-721, minted to its pilot at registration. The ship's data (where
@@ -46,9 +47,9 @@ contract Ships is ERC721Upgradeable, ModuleBase {
         Pilots.Loadout memory l = ship.loadout;
         string memory json = string.concat(
             '{"name":"',
-            ship.name,
+            SafeText.clean(ship.name),
             '","description":"An Orbiter 8 flown by ',
-            pilots.pilotOf(pilot).callsign,
+            SafeText.clean(pilots.pilotOf(pilot).callsign),
             '.","image":"data:image/svg+xml;base64,',
             Base64.encode(bytes(ShipArt.svg(ship, false))),
             '","attributes":[{"trait_type":"Range","value":',

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.38;
 
+import {DeedArt} from "../src/art/DeedArt.sol";
 import {Script, console} from "forge-std/Script.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import {Galaxy} from "../src/galaxy/Galaxy.sol";
@@ -145,6 +146,12 @@ library Deployment {
         game.pilots.setBattle(game.battle);
         game.ships.setPilots(game.pilots);
     }
+
+    /// Deeds draw themselves (D107): their sources, and the drawing. Its own step after `wire` (inside
+    /// it, the tests' fixture runs out of stack).
+    function wireDeeds(Game memory game) internal {
+        game.deeds.setSources(game.galaxy, game.planets, game.claims, game.pilots, new DeedArt());
+    }
 }
 
 /// forge script script/Deploy.s.sol --rpc-url <node> --broadcast  (SEED and SCAN_DELAY optional)
@@ -156,6 +163,7 @@ contract Deploy is Script {
         (, address admin,) = vm.readCallers();
         Deployment.Game memory game = Deployment.deploy(admin, seed, scanDelay);
         Deployment.wire(game);
+        Deployment.wireDeeds(game);
         vm.stopBroadcast();
         console.log("Galaxy", address(game.galaxy));
         console.log("Pilots", address(game.pilots));

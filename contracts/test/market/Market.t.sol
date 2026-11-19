@@ -40,6 +40,7 @@ contract GameFixture is Test {
         vm.startPrank(admin);
         game = Deployment.deploy(admin, _universe(), 30);
         Deployment.wire(game);
+        Deployment.wireDeeds(game);
         // The tests pay pilots directly.
         game.credits.grantRole(game.credits.GAME_MODULE(), admin);
         game.market.grantRole(game.market.GAME_MODULE(), admin);

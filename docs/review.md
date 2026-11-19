@@ -659,6 +659,16 @@ Calls made building it, for Koda's review:
   very difficult"). A click (not a drag) anywhere in a section's slice of the band selects its asteroid,
   or its empty dust; done in the map's own click handling (`map.vue` beltSectionAt), so dragging over
   the belt still pans. Stations, ships and planets keep their own clicks.
+- **X38. Deeds draw themselves** (2026-11-18, D107). `Deeds.tokenURI` builds the card each time it's asked:
+  the body's class colors, the Citadel's gun and Colony's lights, the station and its parts by level
+  (the same design as the game, X36), the asteroid's footing, derrick and drones; name, kind, what's
+  built and the owner's call sign; an unnamed body is called as the game calls it. The drawing is its
+  own contract, `DeedArt` (11 KB; Deeds is 15 KB), set with `Deeds.setSources` in a step of its own
+  after `wire` (inside `wire`, the tests' fixture ran out of stack). Names and call signs go through
+  `SafeText` (quotes, brackets, ampersands and control characters become spaces) in deeds and, since
+  the same gap was there, in ships' metadata. Samples: `docs/mockups/deeds/`. Not on the testnet yet:
+  it needs Deeds upgraded and DeedArt deployed there (or the next redeploy). `polkavm/deploy-polkavm.mjs`
+  (unused, already behind the newer modules) doesn't wire deeds.
 
 ## 10. The Polkadot App spikes (2026-11-18, milestone 7 steps 4–6)
 

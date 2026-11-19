@@ -13,6 +13,7 @@ import {BodyId} from "../../src/planets/BodyId.sol";
 import {BeltGen} from "../../src/planets/BeltGen.sol";
 import {Drones} from "../../src/planets/Drones.sol";
 import {Armory} from "../../src/battle/Armory.sol";
+import {DeedArt} from "../../src/art/DeedArt.sol";
 
 contract PlanetsFixture is GameFixture {
     Planets planets;
@@ -72,6 +73,26 @@ contract PlanetsFixture is GameFixture {
 }
 
 contract PlanetsTest is PlanetsFixture {
+    // ── deeds draw themselves (D107) ──────────────────────────────────────────────────────────
+
+    function test_aDeedDrawsThePlanetAsItIsNow() public {
+        _citadel();
+        DeedArt.Deed memory d = deeds.deedOf(home);
+        assertFalse(d.asteroid);
+        assertEq(d.owner, "Ada");
+        assertEq(d.built, "Citadel");
+        assertEq(vm.indexOf(d.name, "Unnamed "), 0, "an unnamed planet is called as the game calls it");
+        string memory picture = game.deeds.art().svg(d);
+        assertTrue(vm.indexOf(picture, '<circle r="16"/>') != type(uint256).max, "the Citadel's gun");
+        assertTrue(vm.indexOf(picture, "translate(22 0)") == type(uint256).max, "no station yet");
+        assertEq(vm.indexOf(deeds.tokenURI(home), "data:application/json;base64,"), 0);
+        // a name is made safe for the JSON and the SVG
+        uint8 namePart = claims.NAME_PLANET();
+        vm.prank(ada);
+        claims.rename(home, namePart, 'Ha"ven<b>&');
+        assertEq(deeds.deedOf(home).name, "Ha ven b  ");
+    }
+
     function test_systemsAreDerived() public view {
         Planets.PlanetView[] memory sol = planets.system(0, 8);
         assertEq(sol.length, 9);
@@ -414,6 +435,11 @@ contract AsteroidClaimsTest is PlanetsFixture {
         vm.prank(ada);
         claims.rename(asteroid, 0, "Rockhome"); // NAME_PLANET
         assertEq(claims.namesOf(asteroid)[0], "Rockhome");
+        DeedArt.Deed memory deed = deeds.deedOf(asteroid);
+        assertTrue(deed.asteroid);
+        assertEq(deed.name, "Rockhome");
+        assertEq(deed.built, "Claimed");
+        assertGt(bytes(deeds.tokenURI(asteroid)).length, 1000, "its deed draws itself");
         vm.prank(ada);
         vm.expectRevert(abi.encodeWithSelector(Claims.NoSuchMoon.selector, asteroid, 0));
         claims.rename(asteroid, 2, "No Moon");
