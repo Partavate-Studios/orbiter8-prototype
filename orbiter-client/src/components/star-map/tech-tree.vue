@@ -9,7 +9,7 @@
         <button class="close" aria-label="Close" @click="$emit('close')">×</button>
       </header>
       <p class="sub">
-        Claim a planet ({{ rules.claimFee.toLocaleString() }}¢, with your ship at its star). Bring people from Earth
+        Claim a planet ({{ rules.claimFee.toLocaleString() }}¢, with your ship at its star; free in your first ten minutes at a star you discover). Bring people from Earth
         ({{ rules.colonistPrice }}¢ each, 100 to a hold) and goods, then build up the line. Credits are spent when a
         building starts; goods come from the planet's storage.
       </p>

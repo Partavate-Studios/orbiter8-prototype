@@ -671,6 +671,10 @@ Calls made building it, for Koda's review:
   `0x25Bad24e57cA321f9D07dda5ba7ccfF6a0a099d9`), DeedArt at `0x59Ce7965D7338D4c4201D03DeF97057E31b59129`,
   sources set; the cost bot's Ferrous planet draws itself (`tokenURI(393216)`), pilots and claims kept. `polkavm/deploy-polkavm.mjs`
   (unused, already behind the newer modules) doesn't wire deeds.
+- **X39. Contracts upgraded in place on the testnet** (2026-11-18, spike key, no redeploy, pilots kept):
+  Credits for the cheat button (implementation `0x1e30C6D4645cb2f63689483DEB6d57b192b114C2`), Claims for
+  the discoverer's free claims (`0x8Ce494050a66b1a669C1aa263E1E0069B5A7eA40`; its tuning reads 2,000 /
+  50,000 / 0), as Deeds before (X38). The full redeploy before the next push brings everything fresh.
 
 ## 10. The Polkadot App spikes (2026-11-18, milestone 7 steps 4–6)
 

@@ -108,11 +108,34 @@ contract PlanetsTest is PlanetsFixture {
         return 5000;
     }
 
+    /// The discoverer's claims are free in the star's first-claim window, every planet and asteroid
+    /// (Koda, 2026-11-18); after it, or for anyone else, the claim fee.
+    function test_theDiscovererClaimsFree() public {
+        _go(ada, star); // Ada arrives first: the discoverer
+        assertEq(galaxy.star(star).discoverer, ada);
+        uint256 fee = claims.tuning().claimFee;
+        assertEq(claims.claimFeeOf(ada, star), 0);
+        assertEq(claims.claimFeeOf(bo, star), fee);
+        uint256 before = credits.balanceOf(ada);
+        vm.prank(ada);
+        claims.claim(home);
+        assertEq(credits.balanceOf(ada), before, "free");
+        assertEq(deeds.ownerOf(home), ada);
+        skip(claims.FIRST_CLAIM());
+        assertEq(claims.claimFeeOf(ada, star), fee, "the window has passed");
+        _pay(ada, fee);
+        before = credits.balanceOf(ada);
+        vm.prank(ada);
+        claims.claim(home | 1);
+        assertEq(credits.balanceOf(ada), before - fee);
+    }
+
     function test_claimNeedsTheShipThereAndAFee() public {
         vm.prank(ada);
         vm.expectRevert(abi.encodeWithSelector(Claims.NotThere.selector, home));
         claims.claim(home);
         _go(ada, star);
+        skip(claims.FIRST_CLAIM()); // past the discoverer's free window (see test_theDiscovererClaimsFree)
         _pay(ada, 5_000);
         uint256 supply = credits.totalSupply();
         vm.prank(ada);

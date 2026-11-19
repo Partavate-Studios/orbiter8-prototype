@@ -24,6 +24,9 @@ export function cardMenu(object, { marketName, pilot } = {}) {
 }
 
 /** Before the pilot has loaded: nothing to spend, nothing armed. */
+/** A claim's price on its button: free for a discoverer in the first-claim window. */
+const claimPrice = (fee) => (fee === 0 ? 'free' : `${fee.toLocaleString('en-US')}¢`)
+
 const NO_PILOT = { credits: 0, claimFee: 0, armed: false, retreated: false, sessionLive: false, siegeAt: () => null }
 
 /** Opens the object's NFT on the network's market (planets and ships are tokens). */
@@ -60,7 +63,7 @@ function pilotMenu(object, d, marketName) {
       const siege = d.siegeAt(object.objectId)
       if (sol && object.objectId === SOL_EARTH) add('Recruit Colonists', 'recruit')
       if (!sol && !object.owner) {
-        add(`Claim Planet (${d.claimFee.toLocaleString('en-US')}¢)`, 'claim', d.credits >= d.claimFee, object.objectId)
+        add(`Claim Planet (${claimPrice(d.claimFee)})`, 'claim', d.credits >= d.claimFee, object.objectId)
       } else if (object.isMine) {
         add('Colony', 'colony', true, object.objectId)
       } else if (!sol && !siege) {
@@ -93,7 +96,7 @@ function pilotMenu(object, d, marketName) {
     case 'asteroid': {
       const siege = d.siegeAt(object.objectId)
       if (!object.owner && !object.federation) {
-        add(`Claim Asteroid (${d.claimFee.toLocaleString('en-US')}¢)`, 'claim', d.credits >= d.claimFee, object.objectId)
+        add(`Claim Asteroid (${claimPrice(d.claimFee)})`, 'claim', d.credits >= d.claimFee, object.objectId)
       } else if (object.isMine) {
         add('Asteroid Works', 'asteroid', true, object.objectId)
       } else if (!object.federation && !siege) {

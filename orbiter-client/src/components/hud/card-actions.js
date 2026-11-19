@@ -7,6 +7,8 @@ import { useGameStateStore } from '@/stores/gamestate'
 import { useUIStore } from '@/stores/ui'
 import { useDialogStore } from '@/stores/dialog'
 import { usePlayerStore } from '@/stores/player'
+import { useStarMapStore } from '@/stores/starmap'
+import { STAR_KEY } from '@orbiter8/sdk/system'
 import { PILOT_NAME_MIN_LENGTH } from '@/libs/onboarding'
 import { cardMenu } from '@/components/star-map/hud/card-ui/menus/card-menu'
 
@@ -47,13 +49,30 @@ export function slotted(object, actions) {
   return out
 }
 
+/** The star's first-claim window (Claims.FIRST_CLAIM), in seconds. */
+const FIRST_CLAIM_S = 10 * 60
+
+/**
+ * What a claim at the star in view costs the pilot now (Claims.claimFeeOf): free for the star's
+ * discoverer in its first-claim window (Koda, 2026-11-18), the claim fee otherwise.
+ */
+export function claimFeeHere() {
+  const player = usePlayerStore()
+  const rules = player.rules
+  if (!rules) return 0
+  const star = useStarMapStore().systemObjects?.[STAR_KEY]
+  const discoverer = star && String(star.owner).toLowerCase() === String(player.account).toLowerCase()
+  const inWindow = star && Date.now() / 1000 < Number(star.birth) + FIRST_CLAIM_S
+  return discoverer && inWindow ? (rules.discoveryFee ?? 0) : rules.claimFee
+}
+
 /** The actions for a selected object, for the pilot as they are now. */
 export function actionsFor(object) {
   if (!object) return []
   const d = usePlayerStore()
   const pilot = {
     credits: d.credits,
-    claimFee: d.rules?.claimFee ?? 0,
+    claimFee: claimFeeHere(),
     armed: d.armed,
     retreated: Boolean(d.condition?.retreated),
     sessionLive: d.sessionLive,
@@ -112,13 +131,14 @@ export async function runAction(option, object, { showMoons }) {
       return
     }
     case 'claim': {
-      const fee = player.rules.claimFee
+      const fee = claimFeeHere()
+      const price = fee === 0 ? 'free, as its star\'s discoverer' : `for ${credits(fee)} credits`
       const asteroid = object.type === 'asteroid'
       const name = await ask({
         title: 'Claim ' + object.name,
         message: asteroid
-          ? `Make ${object.name} your own for ${credits(fee)} credits, and give it a name. Then land people to build a Platform, and mining drones to work it.`
-          : `Make ${object.name} your own for ${credits(fee)} credits, and give it a name. Then bring colonists and supplies to found a Citadel.`,
+          ? `Make ${object.name} your own ${price}, and give it a name. Then land people to build a Platform, and mining drones to work it.`
+          : `Make ${object.name} your own ${price}, and give it a name. Then bring colonists and supplies to found a Citadel.`,
         // An unnamed body's stand-in name isn't offered as its name: the owner gives the first one.
         input: { label: asteroid ? "Your asteroid's name" : "Your planet's name", kind: 'name', value: isUnnamed(object.name) ? '' : object.name },
         confirm: asteroid ? 'Claim Asteroid' : 'Claim Planet'

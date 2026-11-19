@@ -16,7 +16,8 @@ import {BeltGen} from "./BeltGen.sol";
 /// owns it.
 ///
 /// - **Claims (D40):** the ship must be at the star, and there's a fee. For 10 minutes after a star is
-///   discovered, only its discoverer may claim there, unless they've flown on. Sol's bodies belong to
+///   discovered, only its discoverer may claim there, unless they've flown on; and the discoverer's
+///   claims in that window are free (Koda, 2026-11-18: every planet and asteroid, `discoveryFee`). Sol's bodies belong to
 ///   the Federation (D49). A claim mints the body's deed (Deeds).
 /// - **Names:** the owner names their planet, its station and its moons; until then the client shows
 ///   derived names. Sol's keep theirs.
@@ -34,6 +35,7 @@ contract Claims is ModuleBase {
     struct Tuning {
         uint64 claimFee;
         uint64 starNameFee; // filed with Minerva and burned
+        uint64 discoveryFee; // the discoverer's fee during the first-claim window (0: free)
     }
 
     /// @custom:storage-location erc7201:orbiter8.claims
@@ -79,7 +81,7 @@ contract Claims is ModuleBase {
         ClaimsStorage storage c = _c();
         (c.galaxy, c.pilots, c.credits, c.deeds) = (galaxy_, pilots_, credits_, deeds_);
         // The claim fee as before; a star's name costs what a Station did (50,000).
-        _setTuning(Tuning(2_000, 50_000));
+        _setTuning(Tuning(2_000, 50_000, 0));
     }
 
     function setTuning(Tuning calldata tuning_) external onlyRole(DEFAULT_ADMIN_ROLE) {
@@ -130,10 +132,22 @@ contract Claims is ModuleBase {
             pilot != star.discoverer && block.timestamp < uint256(star.discoveredAt) + FIRST_CLAIM
                 && c.pilots.shipOf(star.discoverer).cell == cell
         ) revert FirstClaimWindow(star.discoverer);
-        c.credits.burn(pilot, c.tuning.claimFee);
+        uint256 fee = _feeFor(pilot, star, c.tuning);
+        if (fee > 0) c.credits.burn(pilot, fee);
         c.owners[id] = pilot;
         c.deeds.mint(pilot, id);
         emit Claimed(id, pilot);
+    }
+
+    /// What `pilot` pays to claim a body at `cell` now: free (`discoveryFee`) for the star's discoverer in
+    /// its first-claim window, the claim fee otherwise.
+    function claimFeeOf(address pilot, uint256 cell) external view returns (uint256) {
+        return _feeFor(pilot, _c().galaxy.star(cell), _c().tuning);
+    }
+
+    function _feeFor(address pilot, Galaxy.Star memory star, Tuning memory tuning_) internal view returns (uint256) {
+        bool discoverer = pilot != address(0) && pilot == star.discoverer;
+        return discoverer && block.timestamp < uint256(star.discoveredAt) + FIRST_CLAIM ? tuning_.discoveryFee : tuning_.claimFee;
     }
 
     /// Hands a body to a new owner, deed and all (a siege's successful claim: Planets.seize).

@@ -348,6 +348,8 @@ export function createGame(runner, addresses, { startBlock = 0 } = {}) {
       const asteroidCosts = costs.slice(7)
       return {
         claimFee: Number(claimTuning.claimFee),
+        // the discoverer's claims in a star's first-claim window (Claims.FIRST_CLAIM, 10 minutes): free by default
+        discoveryFee: Number(claimTuning.discoveryFee ?? 0),
         starNameFee: Number(claimTuning.starNameFee),
         colonistPrice: Number(tuning.colonistPrice),
         growthTime: Number(tuning.growthTime),
