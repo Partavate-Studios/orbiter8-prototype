@@ -77,6 +77,15 @@ contract GameFixture is Test {
 }
 
 contract MarketTest is GameFixture {
+    function test_onlyTheAdminCheats() public {
+        vm.prank(admin);
+        credits.cheat(ada, 10_000_000);
+        assertEq(credits.balanceOf(ada), 10_000_000 + 1_000, "a new pilot's 1,000 and the cheat");
+        vm.prank(ada);
+        vm.expectRevert();
+        credits.cheat(ada, 1);
+    }
+
     function test_solHasFifteenPortsAndEveryGoodTrades() public view {
         Market.PortView[] memory ports = market.portViews(market.portIds(0));
         assertEq(ports.length, 15, "nine planets' stations and six asteroids'");

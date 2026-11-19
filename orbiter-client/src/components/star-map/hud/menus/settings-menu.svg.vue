@@ -151,6 +151,12 @@
       <g transform="translate(0 40)">
         <menu-button text="Back to Title" @buttonclick="backToTitle" />
       </g>
+
+      <!-- Dev builds only: the cheat (dev/cheat.js pays through the deployment's admin) -->
+      <g v-if="canCheat" transform="translate(0 110)">
+        <menu-button :text="cheatLabel" @buttonclick="cheat" />
+        <text v-if="cheatNote" x="0" y="52" font-size="0.9em" text-anchor="middle" fill="#c9b8e6">{{ cheatNote }}</text>
+      </g>
     </menu-container>
   </g>
 </template>
@@ -160,6 +166,9 @@ import { mapActions, mapState } from 'pinia'
 
 import { useConfigStore } from '@/stores/config'
 import { useUIStore } from '@/stores/ui'
+import { usePlayerStore } from '@/stores/player'
+import { useChainStore } from '@/stores/chain'
+import { game } from '@orbiter8/sdk/client'
 import MenuContainer from './menu-container/_menu-container.svg'
 import MenuCheckbox from './menu-checkbox.svg'
 import MenuButton from './menu-button.svg'
@@ -171,8 +180,20 @@ export default {
     MenuCheckbox,
     MenuButton
   },
+  data() {
+    return { cheating: false, cheatNote: '' }
+  },
   computed: {
-    ...mapState(useConfigStore, ['graphicsQuality'])
+    ...mapState(useConfigStore, ['graphicsQuality']),
+    ...mapState(usePlayerStore, ['account']),
+    ...mapState(useChainStore, ['chainId']),
+    /** The cheat button: only in dev builds (the dev server answers it) and with a pilot. */
+    canCheat() {
+      return import.meta.env.DEV && Boolean(this.account)
+    },
+    cheatLabel() {
+      return this.cheating ? 'Cheating…' : 'Cheat: +10,000,000¢'
+    }
   },
   methods: {
     ...mapActions(useConfigStore, ['setGraphicsQuality']),
@@ -180,6 +201,28 @@ export default {
     backToTitle() {
       this.closeMenu()
       this.$router.push('/')
+    },
+    /** Asks the dev server to pay the pilot a pile of credits (dev/cheat.js), then reloads the pilot. */
+    async cheat() {
+      if (this.cheating) return
+      this.o8audio.playEffect('click')
+      this.cheating = true
+      this.cheatNote = ''
+      try {
+        const res = await fetch(location.origin + '/__cheat', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ address: this.account, network: Number(this.chainId) === 420420417 ? 'testnet' : 'local' })
+        })
+        const answer = await res.json()
+        if (answer.error) throw new Error(answer.error)
+        await game.refreshPlayer()
+        this.cheatNote = `+${answer.amount.toLocaleString()}¢`
+      } catch (error) {
+        this.cheatNote = 'No cheat: ' + error.message
+      } finally {
+        this.cheating = false
+      }
     },
     chooseGraphicsQuality(quality) {
       this.o8audio.playEffect('click')

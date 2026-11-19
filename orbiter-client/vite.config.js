@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { testnetFaucet } from './dev/testnet-faucet.js'
+import { cheat } from './dev/cheat.js'
 
 /**
  * The version shown on the title: 3 (demo 3 contracts) . 2 (this client) . build, from package.json.
@@ -23,7 +24,7 @@ function appVersion(command) {
 export default defineConfig(({ command }) => ({
   // Relative asset paths, so the build can be served from any subdirectory (e.g. /demo3).
   base: './',
-  plugins: [vue(), testnetFaucet()],
+  plugins: [vue(), testnetFaucet(), cheat()],
   define: {
     __APP_VERSION__: JSON.stringify(appVersion(command))
   },

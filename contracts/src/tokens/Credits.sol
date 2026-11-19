@@ -9,6 +9,8 @@ import {ModuleBase} from "../core/ModuleBase.sol";
 /// them. The Federation's ports and yards mint what they pay and burn what they're paid; fees are
 /// burned too, as sinks (plan, section 4). Players can send credits to each other.
 contract Credits is ERC20Upgradeable, ModuleBase {
+    event Cheated(address indexed to, uint256 amount);
+
     function initialize(address admin) external initializer {
         __ERC20_init("Orbiter 8 Credits", "O8C");
         __ModuleBase_init(admin);
@@ -21,6 +23,14 @@ contract Credits is ERC20Upgradeable, ModuleBase {
     /// Pays `amount` new credits to `to` (the Federation paying for goods, a pilot's starting money).
     function mint(address to, uint256 amount) external onlyRole(GAME_MODULE) {
         _mint(to, amount);
+    }
+
+    /// A cheat for test deployments (Koda, 2026-11-18: "a cheat button that gives me a huge amount of
+    /// game credits"): the admin pays `amount` new credits to `to`. Logged, so it's never hidden. Admin
+    /// only; remove it, or hand the admin role to a multisig that never uses it, before mainnet.
+    function cheat(address to, uint256 amount) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _mint(to, amount);
+        emit Cheated(to, amount);
     }
 
     /// Takes `amount` credits out of circulation (purchases from the Federation, fees). Reverts with
