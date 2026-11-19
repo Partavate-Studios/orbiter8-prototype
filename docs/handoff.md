@@ -14,7 +14,7 @@ For a Claude Code session picking up from the one that built the current release
 3. `docs/demo4-plan.md`: the goals, decisions D1–D60 (Koda's), the plan, the milestones and what's
    ticked, and calls B1–B54 (guesses made while building; struck-through ones were overruled).
 4. `docs/design.md` and `docs/design-ideas.md`: Koda's design intent, and ideas for later.
-5. `docs/backstory.md`: the story, Minerva, the corporations and the pirates. It's Koda's: change it only when he asks.
+5. `docs/backstory.md`: the story and its world (Minerva, the corporations, pilots as minds, the pirates), with how settled each idea is. The only story file. It's Koda's: change it only when he asks.
 6. `docs/demo4-tuning.md`: the economy and battle numbers.
 7. `docs/cost-estimates.md`, the sections from "Demo 4, measured locally" on: gas and money per move.
 8. `readme.md`, `contracts/README.md` and `orbiter-client/dev/harness/README.md`: setup and tools.

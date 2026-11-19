@@ -42,11 +42,17 @@ The published backstory (2140, Mars colonies, the Great Regrettion, Orbiters in 
 
 **Pirates as cypherpunks (Koda).** Pirates aren't just raiders. They're people who refuse to join any corporation, a counterculture mirroring open source vs. software corporations or Bitcoin vs. banks. See Corporations, law and pirates.
 
-**Digital pilots (Exploring).** The cube and fleet ideas (next section) need a lore beat, since the backstory leans on genetic engineering, not uploading minds. Suggestion: make it the Orbiter 8 breakthrough itself. Interstellar distances are too much for human bodies, so pilots went digital.
+**Digital pilots (Exploring).** The mind-on-Minerva and fleet ideas (next section, and `backstory.md`) need a lore beat, since the backstory leans on genetic engineering, not uploading minds. Suggestion: make it the Orbiter 8 breakthrough itself. Interstellar distances are too much for human bodies, so pilots went digital.
 
 **Why 2140:** it's roughly when the last bitcoin is mined.
 
 ## Pilots, cubes and fleets
+
+> **Superseded (Koda, 2026-11-17):** the cube is dropped, because it's the Bobiverse's signature. The
+> player's mind lives on Minerva, replicated across the network; ships are bodies it focuses on one at
+> a time. The fleet, signal lag, relays and invite-only joining carry over (as Minerva sponsorship);
+> the escape pod and hunting cubes don't. The current version is in [`backstory.md`](backstory.md),
+> "The world". This section is kept as the record of how the idea started.
 
 The player is a consciousness, the "cube." Ships are bodies the cube takes turns inhabiting. This idea, inspired by the Bobiverse, ties several problems together.
 
