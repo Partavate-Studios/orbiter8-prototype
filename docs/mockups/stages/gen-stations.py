@@ -599,9 +599,194 @@ def iteration_two():
         'Station proposals, iteration 2', 'Planet D (Hex ring) and asteroid D (Hex base), in the original station\'s and the ship\'s bold style.', body))
 
 
+# ---- Iteration 3 (Koda, 2026-11-18): lighter lines, smaller parts, room for docked ships ----
+# Docked ships sit side-on at the station's flat faces, about as long as the station is wide, at most
+# three at once (sdk/game/docking.js). So three alternate faces are docking pads (0, 120, 240 degrees:
+# the port's collars) and the facilities take the other three (60, 180, 300), hugging the hull.
+
+PADS3 = (0, 120, 240)
+
+
+def slim_strut(length, w=3.4):
+    return rect(-1, -w / 2, length + 1, w, L, w / 2)
+
+
+def slim_collar():
+    """Port, at a pad: a short docking collar flanked by two cargo pods along the face."""
+    return (slim_strut(3) + rect(2.5, -5, 3, 10, W, 1.5) +
+            g(rect(-3.5, -2.1, 7, 4.2, W, 2.1), -1.5, -9.5, 90) + g(rect(-3.5, -2.1, 7, 4.2, W, 2.1), -1.5, 9.5, 90))
+
+
+def slim_turrets():
+    """Armory: two dome-and-barrel guns on a plate."""
+    s = slim_strut(3) + rect(2.5, -9, 3, 18, W, 1.5)
+    for y in (-4.6, 4.6):
+        s += circ(8.5, y, 4.2, W) + rect(8.5, y - 1.4, 11, 2.8, W, 1.4)
+    return s
+
+
+def slim_yards():
+    """Yards: an open cradle with the Orbiter 8 in it."""
+    s = slim_strut(3)
+    s += path('M2.5 -10 H21 a1.6 1.6 0 0 1 0 3.2 H5.7 V6.8 H21 a1.6 1.6 0 0 1 0 3.2 H2.5 Z', W)
+    s += g(f'<path d="{_SHIP}" fill="{L}" transform="translate(-2300 -2300)"/>', 13.5, 0, 90, 0.0026)
+    return s
+
+
+def slim_factory():
+    """Autofactory: a block with three vents and a stack."""
+    return (slim_strut(3) + rect(2.5, -7, 13, 14, W, 2.5) +
+            ''.join(rect(5 + 3.3 * i, -4, 1.7, 8, D, 0.85) for i in range(3)) + rect(15.5, -2.5, 3.5, 5, W, 1.5))
+
+
+def slim_mast():
+    return circ(0, 0, 5, W) + rect(0, -1.7, 11, 3.4, W, 1.7)
+
+
+def slim_drill():
+    return (rect(-1.5, -7, 3.5, 14, W, 1.5) + path('M1.5 -5.5 L15 -2.6 L15 2.6 L1.5 5.5 Z', W) +
+            path('M4 -3 L8.5 -2.1 L8.5 2.1 L4 3 Z', D) + rect(14, -1.4, 6, 2.8, W, 1.4))
+
+
+def slim_drones(pts):
+    return ''.join(g(path('M3 0 L-2.2 -2.3 L-1.1 0 L-2.2 2.3 Z', W), x, y, a) for x, y, a in pts)
+
+
+def padded_parts(r=22):
+    return {
+        'core': hex_core(),
+        'port': ''.join(on_spoke(slim_collar(), r, a) for a in PADS3),
+        'yards': on_spoke(slim_yards(), r, 180),
+        'armory': on_spoke(slim_turrets(), r, 300),
+        'autofactory': on_spoke(slim_factory(), r, 60),
+    }
+
+
+def docked_ships(r=22, pads=PADS3, ship=36):
+    """Ships at the pads as the game docks them: side-on, on a short tube, about the station's width long."""
+    tube = r * 0.25
+    s = ''
+    for a in pads:
+        d = r + tube + ship / 2
+        tubes = line(r, -2.2, r + tube + 1, -2.2, 1.1, '#e6dcf5', 'stroke-opacity="0.8"') + \
+            line(r, 2.2, r + tube + 1, 2.2, 1.1, '#e6dcf5', 'stroke-opacity="0.8"')
+        body = g(f'<path d="{_SHIP}" fill="#ffffff" transform="translate(-2300 -2300)"/>', d, 0, 180, ship / 4600)
+        s += g(tubes + body, 0, 0, a)
+    return s
+
+
+def planet_marks_slim(stage):
+    s = ''
+    if stage >= 1:
+        a = -50
+        s += g(slim_mast(), 40 * math.cos(math.radians(a)), 40 * math.sin(math.radians(a)), a)
+    if stage >= 2:
+        pts = [(-18, 14), (-23, 8), (-13, 21), (-26, 18), (-8, 27), (-19, 27), (-29, 4)]
+        s += ''.join(circ(x, y, 3.8, 'url(#citylight)') + circ(x, y, 1.3, '#fbf6ff') for x, y in pts)
+    return s
+
+
+def hexbase_parts():
+    """Asteroid, iteration 3: the hexagon in the middle of the rock, the same parts, smaller, tight round it."""
+    r, k = 14.5, 0.68
+    sm = lambda m: g(m, 0, 0, 0, k)
+    return {
+        'platform': ('<ellipse cx="0" cy="3" rx="19" ry="15" fill="#000000" opacity="0.3"/>' +
+                     ''.join(on_spoke(rect(0, -2, 5, 4, L, 1.5), 13.5, a) for a in (90, 210, 330)) + hex_core(0.05)),
+        'mine': g(slim_drill(), -10, 13, 125, 0.75) + slim_drones([(-22, 23, 125), (-25, 12, 150), (-11, 29, 110)]),
+        'port': ''.join(on_spoke(sm(slim_collar()), r, a) for a in PADS3),
+        'armory': on_spoke(sm(slim_turrets()), r, 300),
+        'yards': on_spoke(sm(slim_yards()), r, 180),
+    }
+
+
+def iteration_three():
+    pdir = os.path.join(HERE, 'planet-stations')
+    adir = os.path.join(HERE, 'asteroid-stations')
+    parts = padded_parts()
+    for n, c in parts.items():
+        open(os.path.join(pdir, f'system-e-{n}.svg'), 'w').write(standalone(c, f'Planet station, system E (Hex, three pads): {n}'))
+    open(os.path.join(pdir, 'system-e-colony.svg'), 'w').write(standalone(
+        planet_disc() + planet_marks_slim(2), 'Planet, system E: the citadel gun and colony lights (the disc is a stand-in)'))
+    order = ['yards', 'autofactory', 'armory', 'port', 'core']
+    st = lambda names: ''.join(parts[n] for n in order if n in names)
+    stages = [('Citadel', 1, []), ('Colony', 2, []), ('Station', 2, ['core']), ('Port', 2, ['core', 'port']),
+              ('Yards', 2, ['core', 'port', 'yards']), ('Armory', 2, ['core', 'port', 'yards', 'armory']),
+              ('Autofactory', 2, ['core', 'port', 'yards', 'armory', 'autofactory']),
+              ('Sol (Federation)', 2, ['core', 'port', 'yards', 'armory'])]
+    body = ''
+    pw, gap = 145, 9
+    x0 = (1280 - (8 * pw + 7 * gap)) / 2
+    for i, (label, colony, names) in enumerate(stages):
+        x = x0 + i * (pw + gap)
+        body += panel(x, 100, pw, 300, label)
+        body += g(planet_disc() + planet_marks_slim(colony), x + 44, 318, 0, 0.9)
+        if names:
+            body += g(st(names), x + pw / 2 + 4, 192, 0, 1.25)
+    body += f'<text x="40" y="452" fill="{TEXT}" font-size="16" font-weight="500">At game size</text>'
+    body += f'<text x="40" y="474" fill="{SUB}" font-size="13">Sol (Federation) has Port + Yards + Armory. The station about 24 px across, beside a planet about 30 px.</text>'
+    for i, (label, colony, names) in enumerate(stages):
+        x = x0 + i * (pw + gap)
+        body += panel(x, 492, pw, 110, label)
+        body += g(planet_disc() + planet_marks_slim(colony), x + pw / 2 - 12, 540, 0, 0.38)
+        if names:
+            body += g(st(names), x + pw / 2 + 14, 526, 0, 0.3)
+    body += f'<text x="40" y="640" fill="{TEXT}" font-size="16" font-weight="500">Parts</text>'
+    for i, n in enumerate(['core', 'port', 'yards', 'armory', 'autofactory']):
+        x = 160 + i * 150
+        body += g(parts[n], x, 664, 0, 0.7) + f'<text x="{x}" y="706" text-anchor="middle" fill="{SUB}" font-size="12">{n}</text>'
+    open(os.path.join(pdir, 'system-e.svg'), 'w').write(sheet_frame(
+        'Planet stations, system E: Hex, three pads (iteration 3)',
+        'The original station; ships dock at three faces (the port\'s collars), the yard, guns and factory take the other three.', body))
+
+    aparts = hexbase_parts()
+    for n, c in aparts.items():
+        open(os.path.join(adir, f'system-e-{n}.svg'), 'w').write(standalone(c, f'Asteroid station, system E (Hex base, three pads): {n}, laid over the rock'))
+    a_order = ['mine', 'platform', 'yards', 'armory', 'port']
+    body = ''
+    pw, gap = 232, 10
+    x0 = (1280 - (5 * pw + 4 * gap)) / 2
+    for i, (label, comp, names) in enumerate(ASTEROID_STAGES):
+        x = x0 + i * (pw + gap)
+        body += panel(x, 100, pw, 300, label)
+        body += g(rock(comp) + ''.join(aparts[n] for n in a_order if n in names), x + pw / 2, 240, 0, 1.55)
+    body += f'<text x="40" y="452" fill="{TEXT}" font-size="16" font-weight="500">At game size</text>'
+    body += f'<text x="40" y="474" fill="{SUB}" font-size="13">Sol (Federation) has all four plus Yards. The asteroid and its station about 28 px across.</text>'
+    for i, (label, comp, names) in enumerate(ASTEROID_STAGES):
+        x = x0 + i * (pw + gap)
+        body += panel(x, 492, pw, 110, label)
+        body += g(rock(comp) + ''.join(aparts[n] for n in a_order if n in names), x + pw / 2, 540, 0, 0.25)
+    body += f'<text x="40" y="640" fill="{TEXT}" font-size="16" font-weight="500">Parts</text>'
+    for i, n in enumerate(['platform', 'mine', 'port', 'armory', 'yards']):
+        x = 160 + i * 150
+        body += g(aparts[n], x, 664, 0, 0.7) + f'<text x="{x}" y="706" text-anchor="middle" fill="{SUB}" font-size="12">{n}</text>'
+    open(os.path.join(adir, 'system-e.svg'), 'w').write(sheet_frame(
+        'Asteroid stations, system E: Hex base, three pads (iteration 3)',
+        'The original station in the middle of the rock; the planet E parts, smaller, hugging it; ships dock at three faces.', body))
+
+    # docked ships: the planet station with one, two and three ships; the asteroid station with three
+    body = ''
+    full = st(['core', 'port', 'yards', 'armory', 'autofactory'])
+    for i, n in enumerate((1, 2, 3)):
+        x = 40 + i * 300
+        body += panel(x, 100, 288, 330, f'{n} ship{"s" if n > 1 else ""} docked')
+        body += g(docked_ships(pads=PADS3[:n]) + full, x + 144, 255, 0, 1.75)
+    body += panel(940, 100, 300, 330, 'Asteroid (Sol), 3 docked')
+    body += g(rock('metallic') + ''.join(aparts[n] for n in a_order) + docked_ships(14.5, PADS3, 24), 1090, 255, 0, 1.75)
+    body += (f'<text x="40" y="470" fill="{TEXT}" font-size="16" font-weight="500">Fully built, large</text>')
+    body += panel(40, 486, 1200, 210, '')
+    body += g(planet_disc() + planet_marks_slim(2), 150, 600, 0, 1.4)
+    body += g(full, 420, 590, 0, 1.8) + g(docked_ships() + full, 760, 590, 0, 1.3)
+    body += g(rock('silicate') + ''.join(aparts[n] for n in a_order), 1070, 590, 0, 1.75)
+    open(os.path.join(HERE, 'overview-3.svg'), 'w').write(sheet_frame(
+        'Station proposals, iteration 3: docking',
+        'Ships dock side-on at three faces, about as long as the station is wide (as the game draws them); the facilities keep to the other three.', body))
+
+
 if __name__ == '__main__':
     planet_sheets()
     asteroid_sheets()
     overview()
     iteration_two()
+    iteration_three()
     print('written to', HERE)

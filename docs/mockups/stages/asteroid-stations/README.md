@@ -26,3 +26,8 @@ tightly; and the bold style of the original station and ship.
   with three legs (Platform); planet D's parts, smaller, packed tight round it: a derrick and drones
   (Mine), capsule pods (Port), two guns (Armory), the cradle (Sol's Yards). Sheet `system-d.svg`; parts
   `system-d-*.svg`. Both together, large: `../overview-2.svg`.
+
+## Iteration 3
+
+- **E, Hex base, three pads:** D with planet E's lighter parts, hugging the station at the middle of the
+  rock; ships dock at the same three faces. In `../overview-3.svg` with three ships docked.

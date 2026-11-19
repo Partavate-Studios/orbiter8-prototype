@@ -29,3 +29,13 @@ the ship (thick, smooth, solid; few small details) instead of round 1's finer dr
   shape), a heavy cradle with the Orbiter 8 in it (yards), a vented block (autofactory). Laid out
   unevenly on purpose: a symmetric layout read as a face. The planet keeps A's citadel gun and lights.
   Sheet `system-d.svg`; parts `system-d-*.svg`.
+
+## Iteration 3 (Koda, 2026-11-18: "a little too bold… scale the sections back… multiple ships docked")
+
+- **E, Hex, three pads:** D with lighter parts (struts and barrels about half as thick) set closer to the
+  hull. In the game a docked ship lies side-on at one of the station's six faces, about as long as the
+  station is wide, up to three at once (`sdk/src/game/docking.js`), so parts on every face would collide
+  with ships. E keeps **three alternate faces for docking** (0°, 120°, 240°: the Port's collars, with
+  small cargo pods beside them) and puts the yards (180°), guns (300°) and factory (60°) on the other
+  three. `../overview-3.svg` shows one, two and three ships docked. Building it means `PADS` in
+  `docking.js` becomes those three faces (MAX_DOCKED is already 3).
