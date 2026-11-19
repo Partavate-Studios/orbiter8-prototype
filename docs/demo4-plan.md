@@ -190,6 +190,14 @@ hard to add later because it shapes the data, low-hanging, or the battle minimum
   last bitcoin). Design first: the animated Minerva face (Koda will brief it), then mockups for Minerva in
   the HUD, fleet interfaces, a widget design system and every planned feature's new UI together; the
   title and story art; the title's Story button now that history lives in the library.
+- **Upgrade safety before mainnet (to do, Koda 2026-11-19):** the contracts already upgrade without losing
+  data (UUPS proxies, ERC-7201 namespaced storage; Deeds, Credits and Claims were upgraded in place on the
+  testnet, 2026-11-18). The diamond pattern isn't needed. Missing: an automatic check that a new version
+  keeps every storage layout (e.g. OpenZeppelin's upgrades validation, or a storage-layout diff in CI)
+  before any upgrade of a live deployment.
+- **The GUI redesign goes to a Fable session (Koda 2026-11-19):** Minerva in the HUD, the intro scene,
+  fleet interfaces and the widget system wait for it. First up there: Minerva's animated face, briefed in
+  [`briefs/minerva-face.md`](briefs/minerva-face.md).
 - **Revisit the scan's randomness (Koda 2026-11-18):** the drand scan (D35) feels less than smooth: a
   jump, a wait for the drand round, then another wallet popup to write it. Not happy with drand's use;
   revisit later, guided by the Polkadot App (what randomness Polkadot Hub or the App offers, and moves
