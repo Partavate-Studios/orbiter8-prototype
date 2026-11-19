@@ -360,6 +360,18 @@ The personhood gateway's names are personal and soulbound, so not for a game. A 
 before choosing (reads only): the testnet's short-name switch, whether the candidates are free, and
 whether Products get names some other way.
 
+**Checked 2026-11-18 (reads only, nothing registered):** dotNS is **not on Polkadot Hub TestNet**, the
+network the game runs on: the addresses in dotNS's `deployments/paseo-assethub/420420417.json` hold no
+code there. It is live on **Previewnet** (the Product Preview Network's Asset Hub,
+`https://previewnet.substrate.dev/eth-rpc`, same chain id 420420417, names end in `.testnet`, wiped and
+redeployed from time to time). There, `PopRules.shortNamesEnabled()` is **false**, so `orbiter8` (8
+characters) can't be registered on the public path even by a verified person, while
+`DotnsRegistrarController.available` says both `orbiter8` and `orbiter8game` are free. So for D101
+(`orbiter8`): the testing product id is likely `orbiter8.testnet` on Previewnet (not `.paseo`), and the
+name needs the short-name switch turned on there, the personhood gateway, or a governance grant. It also
+suggests the App's ecosystem (names, products) is tried on Previewnet, while the game's contracts are on
+Polkadot Hub TestNet: worth confirming which network the App's test builds use before moving the game.
+
 **The purse model, plainly:** a player can own any number of Scarcity NFTs; what's limited is **one NFT
 per key**. The App keeps a purse of keys for the player, makes a key per item, and moves items with
 "cheques", so there's a layer of addresses between the player and what they own. On chain, `ownerOf`
