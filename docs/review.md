@@ -666,8 +666,10 @@ Calls made building it, for Koda's review:
   own contract, `DeedArt` (11 KB; Deeds is 15 KB), set with `Deeds.setSources` in a step of its own
   after `wire` (inside `wire`, the tests' fixture ran out of stack). Names and call signs go through
   `SafeText` (quotes, brackets, ampersands and control characters become spaces) in deeds and, since
-  the same gap was there, in ships' metadata. Samples: `docs/mockups/deeds/`. Not on the testnet yet:
-  it needs Deeds upgraded and DeedArt deployed there (or the next redeploy). `polkavm/deploy-polkavm.mjs`
+  the same gap was there, in ships' metadata. Samples: `docs/mockups/deeds/`. On Polkadot Hub TestNet
+  since the same day, without a redeploy: Deeds' proxy upgraded (implementation
+  `0x25Bad24e57cA321f9D07dda5ba7ccfF6a0a099d9`), DeedArt at `0x59Ce7965D7338D4c4201D03DeF97057E31b59129`,
+  sources set; the cost bot's Ferrous planet draws itself (`tokenURI(393216)`), pilots and claims kept. `polkavm/deploy-polkavm.mjs`
   (unused, already behind the newer modules) doesn't wire deeds.
 
 ## 10. The Polkadot App spikes (2026-11-18, milestone 7 steps 4–6)
