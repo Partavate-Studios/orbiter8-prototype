@@ -641,6 +641,23 @@ Calls made building it, for Koda's review:
   Worth knowing for the App's signer later: it may estimate the same way.
 - **X6. Wording:** the loadout's empty-weapons line says "Every Sol station's armory sells them." (was "The
   I.S.S. armory").
+- **X36. Stations show what they have** (2026-11-18, Koda picked system E in `docs/mockups/stages/`, "please
+  integrate"). The station keeps the original hexagon; the port's docking collars sit at three alternate
+  faces, which are now the only docking pads (`sdk/src/game/docking.js` PADS 0°, 120°, 240°; three ships
+  at most, as before), and the yards, armory and autofactory take the other three. Planets show the
+  Citadel's gun on the limb and the Colony's lights on the night side; asteroids show the Platform's
+  footing and the Mine's derrick and drones, and their station now sits at the rock's middle, a third
+  of it across. Sol's Federation worlds and asteroids draw fully built. The parts are standalone art in
+  `assets/art/` (station-*, planet-citadel, planet-colony, asteroid-platform, asteroid-mine; the
+  asteroid-station icon redrawn to match), from `docs/mockups/stages/gen-stations.py`. Calls: the
+  **Station** stage (a planet's level 3, before its Port) still draws nothing, since the game has a
+  station object only once there's a port; the selection card drew a station as a dot since Demo 3
+  (1/30 of its size), now about a planet's size; the title scene's station stays bare, with its own six
+  visitor pads.
+- **X37. A whole belt section is a click target** (2026-11-18, Koda: "clicking the little asteroid is
+  very difficult"). A click (not a drag) anywhere in a section's slice of the band selects its asteroid,
+  or its empty dust; done in the map's own click handling (`map.vue` beltSectionAt), so dragging over
+  the belt still pans. Stations, ships and planets keep their own clicks.
 
 ## 10. The Polkadot App spikes (2026-11-18, milestone 7 steps 4–6)
 

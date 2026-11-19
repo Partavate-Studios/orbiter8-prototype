@@ -15,7 +15,6 @@ import {
   beltOrbitRadius,
   BELT_SPEED,
   sectionPhase,
-  asteroidStationRadius,
   MINING_SLOT_RADIUS
 } from './game/orbits'
 import { dockedShips } from './game/docking'
@@ -156,7 +155,8 @@ export function buildSystem(system, playerAccount) {
         orbitalPosition: 0,
         goods: planet.station.goods ?? [],
         yard: planet.station.yard ?? false,
-        armory: planet.station.armory ?? false
+        armory: planet.station.armory ?? false,
+        autofactory: planet.station.autofactory ?? false
       })
       keys.stations.push(station.key)
       planetObject.stationKey = station.key
@@ -230,9 +230,9 @@ export function buildSystem(system, playerAccount) {
           owner: s.owner,
           ownerName: ownerName_,
           isMine,
-          // it rides its asteroid: a fixed place on it, not an orbit
+          // it rides its asteroid
           orbiting: asteroid.key,
-          orbit: { radius: asteroidStationRadius(s.size), speed: 0, phase: -45 },
+          orbit: { radius: 0, speed: 0, phase: 0 }, // built at its asteroid's middle
           orbitalPosition: 0,
           onAsteroid: true,
           goods: s.station.goods,

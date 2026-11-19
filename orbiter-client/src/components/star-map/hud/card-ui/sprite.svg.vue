@@ -8,18 +8,23 @@
       :spectral="systemObjects[objectId].spectral"
     ></star>
     <ship v-if="systemObjects[objectId].type == 'ship'" transform="rotate(180) scale(4)" :should-show-engines="false" />
-    <station v-if="systemObjects[objectId].type == 'station' && !systemObjects[objectId].onAsteroid" transform="scale(0.075)" />
+    <station v-if="systemObjects[objectId].type == 'station' && !systemObjects[objectId].onAsteroid" transform="scale(2.2)" :station="systemObjects[objectId]" />
     <moon v-if="systemObjects[objectId].type == 'moon'" transform="scale(4)"></moon>
     <asteroid
       v-if="systemObjects[objectId].type == 'asteroid'"
       transform="scale(2.2)"
       :composition="systemObjects[objectId].composition"
       :section="0"
+      :asteroid="systemObjects[objectId]"
     />
     <g v-if="systemObjects[objectId].type == 'asteroid' && systemObjects[objectId].hasStation" transform="scale(2.2)">
-      <asteroid-station transform="translate(6 -6)" />
+      <station transform="scale(0.367)" :station="systemObjects[systemObjects[objectId].stationKey]" />
     </g>
-    <asteroid-station v-if="systemObjects[objectId].type == 'station' && systemObjects[objectId].onAsteroid" transform="scale(2.6)" />
+    <station
+      v-if="systemObjects[objectId].type == 'station' && systemObjects[objectId].onAsteroid"
+      transform="scale(2.2)"
+      :station="systemObjects[objectId]"
+    />
     <mining-slots v-if="systemObjects[objectId].type == 'section'" transform="scale(3)" :slots="systemObjects[objectId].slots ?? []" :me="account" />
   </g>
 </template>
@@ -33,7 +38,6 @@ import Star from '../../sprites/star.svg'
 import Moon from '../../sprites/moon.svg'
 import Planet from '../../sprites/planet.svg'
 import Asteroid from '../../sprites/asteroid.svg'
-import AsteroidStation from '../../sprites/asteroid-station.svg'
 import MiningSlots from '../../sprites/mining-slots.svg'
 
 import { useStarMapStore } from '@/stores/starmap'
@@ -43,7 +47,6 @@ export default {
   name: 'Sprite',
   components: {
     Asteroid,
-    AsteroidStation,
     MiningSlots,
     Ship,
     Star,

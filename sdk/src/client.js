@@ -549,6 +549,7 @@ export function createGameClient() {
           owner,
           yard: port.yard,
           armory: cell === SOL ? isSolStation(p.id) : p.level >= 6,
+          autofactory: cell !== SOL && Boolean(p.autofactory),
           goods: stationGoods(port)
         }
       }

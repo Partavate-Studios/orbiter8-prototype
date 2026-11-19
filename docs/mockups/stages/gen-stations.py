@@ -783,10 +783,47 @@ def iteration_three():
         'Ships dock side-on at three faces, about as long as the station is wide (as the game draws them); the facilities keep to the other three.', body))
 
 
+# ---- The chosen design (system E), written into the game's art (Koda, 2026-11-18: "please integrate") ----
+
+def game_art():
+    """Writes system E's parts to orbiter-client/src/assets/art/, in the 120-unit art frame:
+    - station-port/-yards/-armory/-autofactory.svg: drawn round the original station (core radius 22);
+      the station sprite (sprites/station.svg.vue) lays them under the core;
+    - planet-citadel.svg, planet-colony.svg: on a planet of radius 40, lights on the night side (+x: the
+      game lights planets from -x); the planet sprite draws them at a quarter size;
+    - asteroid-platform.svg, asteroid-mine.svg: over the rock (the asteroid sprite's frame);
+    - asteroid-station.svg (the Platform's and the asteroid action's icon): the hex base and a drill."""
+    parts = padded_parts()
+    head = lambda note: (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -60 120 120">\n'
+                         f'<!-- {note} (Orbiter 8 art, 120 units square, centered; drawn by docs/mockups/stages/gen-stations.py, system E) -->\n')
+    for n in ('port', 'yards', 'armory', 'autofactory'):
+        open(os.path.join(ART, f'station-{n}.svg'), 'w').write(
+            head(f'Space station part: {n}, round the station core (sprites/station.svg.vue, core radius 22)') + parts[n] + '\n</svg>\n')
+    a = -50
+    citadel = g(slim_mast(), 40 * math.cos(math.radians(a)), 40 * math.sin(math.radians(a)), a)
+    open(os.path.join(ART, 'planet-citadel.svg'), 'w').write(
+        head("A planet's citadel: a dome and gun on its limb (planet radius 40)") + citadel + '\n</svg>\n')
+    pts = [(18, 14), (23, 8), (13, 21), (26, 18), (8, 27), (19, 27), (29, 4), (24, -6)]
+    lights = ''.join(circ(x, y, 3.6, '#f3e6ff', 'opacity="0.28"') + circ(x, y, 1.3, '#fbf6ff') for x, y in pts)
+    open(os.path.join(ART, 'planet-colony.svg'), 'w').write(
+        head("A colony's city lights on a planet's night side (planet radius 40, lit from -x)") + lights + '\n</svg>\n')
+    ap = hexbase_parts()
+    footing = ('<ellipse cx="0" cy="3" rx="19" ry="15" fill="#000000" opacity="0.3"/>' +
+               ''.join(on_spoke(rect(0, -2, 5, 4, L, 1.5), 13.5, a) for a in (90, 210, 330)))
+    open(os.path.join(ART, 'asteroid-platform.svg'), 'w').write(
+        head("An asteroid's platform: the station's footing and legs, at the rock's middle") + footing + '\n</svg>\n')
+    open(os.path.join(ART, 'asteroid-mine.svg'), 'w').write(
+        head("An asteroid's mine: a derrick and its drones, beside the base") + ap['mine'] + '\n</svg>\n')
+    icon = g(footing + hex_core(0.05) + ap['mine'], 4, -4, 0, 1.9)
+    open(os.path.join(ART, 'asteroid-station.svg'), 'w').write(
+        head('Asteroid station icon: the hex base on its legs, a derrick and drones') + icon + '\n</svg>\n')
+
+
 if __name__ == '__main__':
     planet_sheets()
     asteroid_sheets()
     overview()
     iteration_two()
     iteration_three()
+    game_art()
     print('written to', HERE)

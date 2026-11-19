@@ -91,11 +91,6 @@ const ROAM_PERIOD_S = 240
 /** How far from an empty section's middle its six mining slots sit (world units; the hexagons the client draws). */
 export const MINING_SLOT_RADIUS = 2.5
 
-/** Radius of the ring an asteroid's station sits on, on the asteroid: it rides it rather than orbiting. */
-export function asteroidStationRadius(asteroidSize) {
-  return 3 + Number(asteroidSize) * 0.9
-}
-
 /** Radius of a moon's orbit around its planet, by planet size and the moon's orbital position. */
 export function moonOrbitRadius(planetSize, moonPosition) {
   const m = Number(moonPosition)

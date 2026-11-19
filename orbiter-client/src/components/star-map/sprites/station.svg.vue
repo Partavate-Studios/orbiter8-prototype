@@ -1,24 +1,43 @@
 <template>
-  <g transform="scale(0.025)">
-    <circle cx="0" cy="0" r="400" stroke-width="0" fill="#c3b3da00" />
-    <g
-      transform="translate(-290,-301)"
-      class="station"
-      style="image-rendering: optimizeQuality; fill-rule: evenodd; clip-rule: evenodd"
-    >
-      <path
-        fill="white"
-        class="fil0"
-        d="M291 0l61 35 15 -25 139 80 -15 25 61 36 0 71 28 0 0 160 -28 0 0 70 -63 36 14 24 -139 80 -14 -24 -59 34 -63 -37 -15 26 -139 -80 15 -26 -59 -33 0 -73 -30 0 0 -160 30 0 0 -68 62 -36 -15 -26 139 -81 15 27 60 -35zm83 196c47,36 64,100 42,155l-98 -57 56 -98zm22 188c-36,47 -99,63 -154,42l56 -99 98 57zm-188 22c-46,-36 -63,-100 -41,-154l98 56 -57 98zm-22 -188c37,-46 100,-63 155,-41l-57 98 -98 -57z"
-      />
+  <!-- A space station: the original notched hexagon, and round it what the station has (Koda's pick,
+       docs/mockups/stages/, system E): the port's docking collars at its three pads (0°, 120°, 240°,
+       where ships dock: sdk/game/docking.js PADS), the yards, armory and autofactory on the other three
+       faces. Without a station (menus, the trade scene) it's the bare hexagon, as before. -->
+  <g>
+    <circle cx="0" cy="0" r="10" stroke-width="0" fill="#c3b3da00" />
+    <!-- the parts are in the art's 120-unit frame, where the core's radius is 22 (this one's is 7.25) -->
+    <!-- eslint-disable-next-line vue/no-v-html, vue/no-v-text-v-html-on-component -->
+    <g v-if="parts" transform="scale(0.33333)" v-html="parts" />
+    <g transform="scale(0.025)">
+      <g
+        transform="translate(-290,-301)"
+        class="station"
+        style="image-rendering: optimizeQuality; fill-rule: evenodd; clip-rule: evenodd"
+      >
+        <path
+          fill="white"
+          class="fil0"
+          d="M291 0l61 35 15 -25 139 80 -15 25 61 36 0 71 28 0 0 160 -28 0 0 70 -63 36 14 24 -139 80 -14 -24 -59 34 -63 -37 -15 26 -139 -80 15 -26 -59 -33 0 -73 -30 0 0 -160 30 0 0 -68 62 -36 -15 -26 139 -81 15 27 60 -35zm83 196c47,36 64,100 42,155l-98 -57 56 -98zm22 188c-36,47 -99,63 -154,42l56 -99 98 57zm-188 22c-46,-36 -63,-100 -41,-154l98 56 -57 98zm-22 -188c37,-46 100,-63 155,-41l-57 98 -98 -57z"
+        />
+      </g>
     </g>
   </g>
 </template>
 
 <script>
+import { stationParts } from '@/libs/station-art'
+
 export default {
   name: 'SpaceStation',
-  props: {}
+  props: {
+    /** The station (sdk/system.js): its yard, armory and autofactory. None: the bare hexagon. */
+    station: { type: Object, default: null }
+  },
+  computed: {
+    parts() {
+      return stationParts(this.station)
+    }
+  }
 }
 </script>
 
@@ -26,7 +45,5 @@ export default {
 .station {
   shape-rendering: optimizeSpeed;
   text-rendering: optimizeSpeed;
-  //shape-rendering:g eometricPrecision;
-  //text-rendering: geometricPrecision;
 }
 </style>

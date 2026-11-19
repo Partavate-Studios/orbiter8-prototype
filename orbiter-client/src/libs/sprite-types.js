@@ -64,7 +64,8 @@ export function spriteScaleOf(object, objects) {
     case 'section':
       return (SYSTEM_RATIO * 11) / ART.section
     case 'station': {
-      if (parent?.type === 'asteroid') return spriteScaleOf(parent, objects) * 0.55 // built onto its asteroid
+      // built at its asteroid's middle, its core about a third of the rock across (libs/station-art.js)
+      if (parent?.type === 'asteroid') return spriteScaleOf(parent, objects) * 0.367
       const radius = 290 * (size / 1000 + 0.02)
       return ((radius / (40 + 1.5 * (planetSize ?? 0))) * orbit) / ART.station
     }

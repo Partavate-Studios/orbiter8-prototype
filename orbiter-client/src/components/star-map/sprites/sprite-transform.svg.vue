@@ -12,9 +12,8 @@
         <template v-else>
           <planet v-if="type === 'planet'" :sprite="sprite" />
           <moon v-if="type === 'moon'" />
-          <station v-if="type === 'station' && !sprite.object.onAsteroid" />
-          <asteroid-station v-if="type === 'station' && sprite.object.onAsteroid" />
-          <asteroid v-if="type === 'asteroid'" :composition="sprite.object.composition" :section="sprite.object.section" />
+          <station v-if="type === 'station'" :station="sprite.object" />
+          <asteroid v-if="type === 'asteroid'" :composition="sprite.object.composition" :section="sprite.object.section" :asteroid="sprite.object" />
           <mining-slots v-if="type === 'section'" :slots="sprite.object.slots ?? []" :me="playerAccount()" />
           <!-- Docked: a tube from the ship's side to the station's pad, shown once it's there. -->
           <g
@@ -90,7 +89,6 @@ import { YELLOW, YELLOW_LIGHT, PLANET_COLORS, STAR_CLASSES, BELT } from '@/libs/
 import { usePlayerStore } from '@/stores/player'
 import Asteroid from './asteroid.svg'
 import MiningSlots from './mining-slots.svg'
-import AsteroidStation from './asteroid-station.svg'
 import Star from './star.svg'
 import Ship from './ship.svg'
 import Station from './station.svg'
@@ -125,7 +123,6 @@ export default {
   name: 'SpriteTransform',
   components: {
     Asteroid,
-    AsteroidStation,
     MiningSlots,
     Ship,
     Station,

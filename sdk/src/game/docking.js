@@ -28,8 +28,9 @@ const after = ([block, index], [otherBlock, otherIndex]) => block > otherBlock |
 
 /** How many ships a station's pads hold at once. */
 export const MAX_DOCKED = 3
-/** The station art's six docking pads, in degrees round it (the raised middle of each side). */
-export const PADS = [0, 60, 120, 180, 240, 300]
+/** The station's three docking pads, in degrees round it: alternate faces, where the port's collars are;
+ * the other three hold its yards, armory and autofactory (orbiter-client sprites/station.svg.vue). */
+export const PADS = [0, 120, 240]
 
 /**
  * @param {Array<{ sender: string, planetId: number | string }>} trades  recent PortTrade events, oldest first

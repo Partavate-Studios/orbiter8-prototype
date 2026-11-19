@@ -52,7 +52,8 @@ mockup and log it in `docs/review.md`.
 
 ## 3. Interaction
 
-- **Big targets.** The whole hex on the galaxy map is clickable, not just the star; buttons are big.
+- **Big targets.** The whole hex on the galaxy map is clickable, not just the star; a whole belt section
+  is clickable, not just its asteroid; buttons are big.
 - **The ship follows your focus.** Select a planet and the ship moves there; select a station and it
   docks; it stays docked through the trade.
 - **One main action per menu**, plainly the strongest button (Make Trade, Take Off, Jump); readouts

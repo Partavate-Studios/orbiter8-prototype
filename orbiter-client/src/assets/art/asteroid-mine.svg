@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -60 120 120">
+<!-- An asteroid's mine: a derrick and its drones, beside the base (Orbiter 8 art, 120 units square, centered; drawn by docs/mockups/stages/gen-stations.py, system E) -->
+<g transform="translate(-10 13) rotate(125) scale(0.75)"><rect x="-1.5" y="-7" width="3.5" height="14" rx="1.5" fill="#f4eefc" /><path d="M1.5 -5.5 L15 -2.6 L15 2.6 L1.5 5.5 Z" fill="#f4eefc" /><path d="M4 -3 L8.5 -2.1 L8.5 2.1 L4 3 Z" fill="#2a2140" /><rect x="14" y="-1.4" width="6" height="2.8" rx="1.4" fill="#f4eefc" /></g><g transform="translate(-22 23) rotate(125)"><path d="M3 0 L-2.2 -2.3 L-1.1 0 L-2.2 2.3 Z" fill="#f4eefc" /></g><g transform="translate(-25 12) rotate(150)"><path d="M3 0 L-2.2 -2.3 L-1.1 0 L-2.2 2.3 Z" fill="#f4eefc" /></g><g transform="translate(-11 29) rotate(110)"><path d="M3 0 L-2.2 -2.3 L-1.1 0 L-2.2 2.3 Z" fill="#f4eefc" /></g>
+</svg>

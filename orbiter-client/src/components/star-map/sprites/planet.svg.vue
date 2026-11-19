@@ -148,6 +148,11 @@
     <!-- High graphics: light and shadow over the surface, turning with the light -->
     <circle v-if="graphicsQuality > 2" cx="0" cy="0" r="10" fill="url(#planetShade)" />
 
+    <!-- What's settled (libs/station-art.js): the Citadel's gun on the limb, the Colony's lights on the
+         night side (the sprite keeps -x toward the star). In the art's frame, where the planet's radius is 40. -->
+    <!-- eslint-disable-next-line vue/no-v-html, vue/no-v-text-v-html-on-component -->
+    <g v-if="marks" transform="scale(0.25)" v-html="marks" />
+
     <g v-if="planet.rings > 0" ref="ringsFront">
       <g transform="rotate(-18)" fill="none" :stroke="'url(#ring-' + planet.class + ')'">
         <path :d="ringArc(ringRx, ringRy, false)" :stroke-width="ringWidth" opacity="0.75" />
@@ -165,6 +170,7 @@ import { writeAttribute } from '@/libs/dom-writes'
 import { mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 import { PLANET_COLORS } from '@/libs/palette'
+import { planetMarks } from '@/libs/station-art'
 
 export default {
   name: 'Planet',
@@ -178,6 +184,9 @@ export default {
     },
     colors() {
       return PLANET_COLORS[this.planet.class] ?? PLANET_COLORS[1]
+    },
+    marks() {
+      return planetMarks(this.planet)
     },
     // The ring band: wider with more rings; its fine lines on high graphics.
     ringRx() {
