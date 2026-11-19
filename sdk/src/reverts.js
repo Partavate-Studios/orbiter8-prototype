@@ -45,7 +45,7 @@ const WORDS = {
   BadGood: () => "There's no such good.",
   // Planets and the Autofactory
   NoSuchPlanet: () => "There's no such planet.",
-  FederationPlanet: () => "That's a Federation planet: it can't be claimed or attacked.",
+  FederationPlanet: () => "That's one of Sol's worlds, and Sol is Minerva's: it can't be claimed or attacked.",
   AlreadyClaimed: () => 'Someone claimed it first.',
   FirstClaimWindow: () => 'Its discoverer has first claim for a few minutes.',
   NotYours: () => "That planet isn't yours.",

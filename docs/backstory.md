@@ -1,6 +1,6 @@
 # Orbiter 8: The Story
 
-The story of Orbiter 8 and its world, as it stands on 2026-11-18. It's Koda's: change it only when he
+The story of Orbiter 8 and its world, as it stands on 2026-11-19. It's Koda's: change it only when he
 asks. This is the only story file. The old draft that used to be `story.md` is kept word for word at the
 end.
 
@@ -19,7 +19,9 @@ What's here:
 
 **Sources:** the website's published backstory (2026-10-31); the first draft (formerly `story.md`); the
 lore Koda added in `docs/design-ideas.md`; Koda's change on 2026-11-07 (stars charge the jump drive);
-and `STORY_DECISIONS.md`, compiled 2026-11-18 from Koda's design chats with Claude (Oct 31 to Nov 17).
+`STORY_DECISIONS.md`, compiled 2026-11-18 from Koda's design chats with Claude (Oct 31 to Nov 17); the new
+intro (`STORY_UPDATE_INTRO.md`, Koda 2026-11-18); and Koda's answers to the story questions
+(`STORY_ANSWERS.md`, 2026-11-19). The last three are kept as they came in `docs/story-sources/`.
 
 **How settled each idea is:**
 
@@ -28,6 +30,7 @@ and `STORY_DECISIONS.md`, compiled 2026-11-18 from Koda's design chats with Clau
 - **Exploring:** discussed and still open.
 - **Suggestion:** proposed by Claude; Koda hasn't confirmed it.
 - **Parked:** deliberately saved for later.
+- **Later:** deliberately deferred to the follow-up list (Open story questions).
 
 **Why 2140:** it's about when the last bitcoin is expected to be mined. The block reward halves
 every 210,000 blocks (about four years) and reaches zero around 2140.
@@ -53,24 +56,35 @@ we could survey. But turning ice into water took work, and work took fuel.
 
 **The corporations.** As the first surge of colonization faded into decades of vicious trade wars,
 progress slowed, then stalled. This time became known as The Great Regrettion, after the lingering
-regret we couldn't quite articulate. The governments didn't survive it. One by one they failed, and
-nothing collapsed, because the corporations had long since taken over every service a government
-once ran: water, air, power, transit, courts, schools. People felt uneasy without a government, so
+regret we couldn't quite articulate. The governments didn't survive it. They declined fast in the
+fighting between the trade organizations, and humanity spread so quickly that by the time the expansion
+was done, no government was left running anything. Nothing collapsed, because the corporations had long
+since taken over every service a government once ran: water, air, power, transit, courts, schools. People felt uneasy without a government, so
 the corporations built one into themselves. Today you are a *citizen of a corporation*. You vote in
 it, you pay into it, and it protects you, so long as you live by its laws. Every corporation writes
 its own.
 
-Only one old institution outlived the governments: the **United Solar System Federation**. It governs
-nothing anymore. It holds Sol's nine worlds and their stations in common trust, so that no single
-corporation can own humanity's home. No one may claim them, and no one may lay siege to them. The
-Federation would rather you did not ask.
+Two old Earth giants came out on top, a shareholder corporation and a family-run conglomerate, and
+they have opposed each other ever since. A third rose later on the colonies, new money made from new
+science. Anyone may start a corporation, and the giants spin off shells by the hundred, but on Minerva
+anyone can see who owns what. The law follows ownership: whoever owns a star sets the rules for its
+whole system, under their corporation's law; where no one owns the star, a planet's owner sets them
+there. Where no one owns anything, only Minerva's rules apply.
 
-**Minerva.** Older than the corporate takeover is the **Minerva Galactic Network**: the one place
-every corporation agreed to share. It is a ledger, a registry, a court and something more, a special
-kind of AI that keeps the books for everyone and belongs to no one. Inter-corporate law runs through
-Minerva. Every pilot registers with her; every claim, every name, every siege is filed with her,
-stamped, and kept on the record forever. Minerva takes her fees and then destroys them: she keeps
-nothing, so no one can buy her. She is neutral, as far as anyone can tell.
+**Minerva.** Older than the corporate takeover is the **Minerva Galactic Network**. The corporations
+didn't build her, any more than they built the internet: they built much of what's attached to her,
+but she came out of the spirit of decentralized systems, found her place almost by accident, and could
+not be replaced. The corporations took her for an accounting tool, the one place they all agreed on a
+basic set of rules. She is a ledger, a registry, a court and something more, a special kind of AI that
+keeps the books for everyone and belongs to no one. Inter-corporate law runs through Minerva. Every
+pilot registers with her; every claim, every name, every siege is filed with her, stamped, and kept on
+the record forever. She is open to anyone, citizen or not. Minerva takes her fees and then destroys
+them: she keeps nothing, so no one can buy her. She is provably neutral: her code is open, and anyone
+can check it.
+
+Over a long series of events, Minerva came to run the whole solar system, its defense network
+included, until Minerva and the running of Sol were one and the same. Sol's nine worlds and their
+stations are hers. No one may claim them, and no one may lay siege to them.
 
 **The Orbiters.** Human expansion wouldn't burst again until the next great "land rush" in the early
 2090s, when a new line of gravity assist ships, known as "Orbiters", opened new trade routes to the
@@ -99,8 +113,16 @@ again. It is still out there, somewhere in deep space. The Orbiter 8, however, n
 system; it came back. It arrived at a foreign star in under 36 hours, dropped into orbit, recharged
 from a sun no human had ever seen up close, and jumped home. It was the first return trip in history.
 
-**The new land rush.** The first line of interstellar Orbiters is now for sale, and pilots are pouring
-out of Sol. On arrival at a star, while the banks charge, the ship's long-range scan sweeps the
+**Earth.** At home it's 2140 and it is bleak: too many people, not enough work. The ads never stop, the
+streets have a curfew, and most people live on a basic income. At the very bottom are the non-citizens,
+who belong to no corporation and get by on a thin stipend paid through Minerva, in corporate housing
+for the poor. The new starships need pilots, and the corporations are desperate for volunteers. The
+job is one way, but the terms are generous: keep most of what you earn, captain your own fleet, claim
+the worlds you find, and become a citizen. For someone with nothing left, it's the one door still
+open. (Soldiering is another.)
+
+**The new land rush.** The Orbiter 8 came out of shared science, and no corporation could patent it:
+it's the open standard, and every new pilot starts in one. Pilots are pouring out of Sol. On arrival at a star, while the banks charge, the ship's long-range scan sweeps the
 neighborhood and charts the stars around it, so every new star opens the way to the next. The stars
 nearest Sol already have their old Earth names: Alpha Centauri, Barnard's Star, Wolf 359, Lalande 21185,
 Sirius, Ross 154. Everything past them is new. Minerva catalogs each new star by number, "Star 1234",
@@ -108,11 +130,14 @@ until a pilot names it. The pilot who discovers a star gets the first chance to 
 names it first, keeping that right until someone owns it. Whoever holds all of its planets owns it,
 until a rival holds most of them.
 
-**The pilots.** A pilot doesn't sit in the cockpit. Every pilot's mind lives on Minerva, copied across
-the whole network the way her ledger is, so there's no one place where it can be lost. A mind can
-focus on only one thing at a time: one ship. The ship is a body the pilot wears. Own a fleet and you
-move your focus from hull to hull; sell a ship and your fleet is smaller, nothing more. Ships you
-aren't flying keep station on their autopilot.
+**The pilots.** A pilot doesn't sit in the cockpit. The new ships need more than any AMI can manage
+alone, and a human working beside one is too slow; a human mind uploaded into Minerva, flying with her
+help, is fast enough. So every pilot's mind lives on Minerva, copied across the whole network the way
+her ledger is, so there's no one place where it can be lost, and the body waits in cold storage, to be
+bought back one day by anyone who can pay. A mind can focus on only one thing at a time: one ship. The
+ship is a body the pilot wears, and Minerva flies with you in every one. Own a fleet and you move your
+focus from hull to hull; sell a ship and your fleet is smaller, nothing more. Ships you aren't flying
+run small jobs on their autopilot: holding a siege, mining a rock.
 
 Pilots claim planets and file the deeds with Minerva. They ferry colonists out from Earth, a hundred
 to a hold, and build each new world up from a Citadel to a Colony, a Station, a Port, the Yards and
@@ -129,7 +154,8 @@ They are the open-source answer to the corporations, the way Bitcoin once answer
 Corporations patent their designs and license them to their citizens; pirates share theirs openly.
 Corporations tax; pirates pool. They organize in **bands** that govern themselves by consensus. No
 corporation protects them, so they protect each other. Some of them raid, some of them trade, and
-all of them answer to no one but Minerva, the one law nobody can leave.
+all of them answer to no one but Minerva, the one law nobody can leave. They use her like everyone
+else, and encrypt what they'd rather keep to themselves.
 
 We are no longer confined to our solar system. The whole of the galaxy now awaits our arrival, one
 star at a time. Liberta Galactica!
@@ -151,9 +177,10 @@ settled it is.
   logistics, physics, law or infrastructure, never "because the game says so." Examples already in the
   story: the scan runs while the banks charge; engine range is the size of the bank; Minerva destroys
   her fees.
-- **A hopeful frontier, not a post-collapse world (Suggestion, consistent with the published
-  backstory).** The universe is about expansion and opportunity: "Liberta Galactica!" That sets it apart
-  from darker games like EVE Frontier.
+- **The frontier is the hope; Earth is bleak by contrast (Decided, Koda 2026-11-18).** The universe is
+  about expansion and opportunity, and the contrast is the point: you leave a dead-end life for a fleet
+  of your own among the stars. "Liberta Galactica!" means escape. The hopeful frontier still sets it
+  apart from darker games like EVE Frontier.
 - **Borrow concepts, not signatures (Decided in spirit).** Generic sci-fi concepts are fair game. Ideas
   that are recognizably one work's signature are not. Koda dropped the consciousness cube for exactly
   this reason (see Superseded).
@@ -171,16 +198,20 @@ The published backstory stands (Decided), with the jump drive changed on 2026-11
 - **Expansion:** the Moon, Jupiter's moons, Venus, the larger asteroids. Genetic engineering lets humans
   redesign their bodies for space. Water becomes the scarcest need.
 - **The Great Regrettion:** decades of vicious trade wars stall progress, leaving a regret no one can
-  quite name. The governments fail during it, and the corporations take over (see below).
+  quite name. The governments decline fast in the fighting between the trade organizations; by the
+  time the expansion is done, none is left running anything, and the corporations take over (Decided,
+  2026-11-19). It wasn't long ago.
 - **Early 2090s land rush:** gravity-assist ships called **Orbiters** open routes to the outer worlds,
   all the way to the edge of the solar system. They sling between planets only.
 - **The second plateau:** the fear that humanity can't leave its sun.
 - **Recently:** a customized Orbiter 6 charges at the sun, jumps, and is lost.
-- **2140, now:** the Orbiter 8 makes the first interstellar return trip, in under 36 hours. The first
-  interstellar Orbiters go on sale. "Liberta Galactica!"
+- **2140, now:** the Orbiter 8 makes the first interstellar return trip, in under 36 hours, and the
+  corporations start hiring pilots for it. The intro is set now (Decided). Among Minerva's news items:
+  the last bitcoin has just been mined (about when it's projected, around 7 May 2140 by one 2015
+  estimate). "Liberta Galactica!"
 
-**Gaps (Exploring):** when the governments failed relative to the Regrettion; when Minerva was founded;
-when and why people's minds moved onto Minerva.
+**Gaps (Later):** when Minerva was founded and how she came to run Sol (her origin story); how the first
+pilots came to be (the founding minds).
 
 ### Society: the corporatocracy (Decided)
 
@@ -191,8 +222,45 @@ when and why people's minds moved onto Minerva.
 - **Citizenship belongs to corporations, not countries.** Citizens get a **vote**, **services** and
   **protection**, the things a government would otherwise provide.
 - It reads as a dystopian corporatocracy, but it works, and it's the normal order of the world.
-- The **United Solar System Federation** survives only as the trustee of Sol's worlds (the game's D49;
-  see Calls for Koda, 1).
+- **Non-citizens (Decided, 2026-11-19)** are the bottom of society: no corporation, a minimal stipend paid
+  through Minerva, corporate housing for the poor. **Citizenship is the reward for paths like piloting**
+  (and soldiering, and others), and it comes with real privileges.
+- **Anyone can start a corporation (Decided).** Corporations create shell corporations constantly, but
+  Minerva is open, so anyone can trace who owns what.
+- **No Federation (Decided, 2026-11-19).** Sol belongs to Minerva's system (see Minerva). If anything
+  called a federation exists, it's only the corporations' shared agreement to use Minerva.
+
+**The three corporations (Decided structure, 2026-11-19; names, logos, histories, ad voices, job
+listings and what citizenship means in play: Later):**
+
+| | Corporation | Origin | Character | Citizenship feels like |
+|---|---|---|---|---|
+| 1 | A **Western-style shareholder corporation** | Old Earth, consolidated during and after the expansion | Contracts, lawyers, individual rights, quarterly profits; competitive, transactional, rules-driven | "Your rights are protected by contract." Free, but on your own. |
+| 2 | A **family-run conglomerate** (loosely like a keiretsu or chaebol) | Old Earth, the opposing pole to the first | A family of linked companies; plans for generations; lifelong loyalty; the group over the individual; stable, protective | "You're taken care of, as long as you belong." |
+| 3 | A **space-born upstart** | The colonies: new science and industry from unique planetary conditions | New money: hip, fast, on the edge of technology, sometimes unrealistic | To define |
+
+- The analogy is **East Coast against West Coast**: the old Earth companies expanded into space, and new
+  wealth rose on the colonies, the way Silicon Valley rose beside the established East Coast companies.
+- **The two Earth giants differ by business model, not culture,** so they read as real, not caricature.
+  The orderly, rules-driven feel can live in either, or be split between them.
+- This replaces the earlier safety, wealth and freedom axes.
+
+**Choosing a corporation (Decided, 2026-11-19).** Booting your housing computer for the first time, you
+subscribe to one of the three; a note says you can change it at any time, and switching is easy. Parts
+of Minerva's interface change with it: its look, its voice, possibly the history and news. All three
+have job boards listing similar pilot jobs, and **you join whichever corporation you're subscribed to
+when you apply.** It's a simple game choice given context.
+
+- **Citizenship is recorded on chain**, and a pilot can switch later: the taxes at the spaceports you own
+  become the new corporation's, and legal control of everything you own moves with you. Probably a fee,
+  and perhaps a waiting period before some benefits start (tuning, Later).
+- **The curfew** is enforced by the corporation you're subscribed to, in its own words and tone.
+
+**Whose law applies (Decided, 2026-11-19): ownership decides.** The star's owner sets the rules for the
+whole system, under the owner's corporation's law. If nobody owns the star but someone owns planets,
+the planet owner's corporation's rules apply there. So the map is drawn by where players pledge their
+loyalty: if many owners switched to one corporation, it would suddenly control a great deal of
+territory. Suggestion: where nobody owns anything, only Minerva's base rules apply, the lawless frontier.
 
 **Corporations as governments in play (Leaning):**
 
@@ -208,8 +276,6 @@ when and why people's minds moved onto Minerva.
   share theirs.
 - From the design doc: corporate accounts, co-owned assets and corporate taxes all fit the
   "corporation as state" framing.
-- **Open (Exploring):** whose law applies in a fight? The attacker's corporation, the defender's, or
-  whoever controls the star system? If it's the system's controller, territory becomes central.
 
 ### Minerva
 
@@ -219,13 +285,34 @@ when and why people's minds moved onto Minerva.
 - It's **the single point of collaboration** between corporations. **Inter-corporate law runs through
   Minerva**: registration, claims, disputes.
 - Minerva is **not just a network but a special kind of artificial intelligence**.
-- **In play, Minerva is neutral.**
+- **The corporations didn't build her (Decided, 2026-11-19).** She came out of the spirit of decentralized
+  systems, like the internet or Bitcoin, accidentally found her place, and couldn't be replaced. The
+  corporations treated her as an accounting tool, not an authority. Her full origin story is Later.
+- **She runs Sol (Decided, 2026-11-19),** its defense network included: through a long series of events,
+  Minerva and the running of the solar system became one and the same. That's why Sol's worlds can't be
+  claimed or besieged (the game's D49).
+- **Provably neutral (Decided, 2026-11-19):** open code anyone can verify, like the contracts. Open to
+  anyone, citizen or not.
+- **She's everywhere (Decided):** the AMI aboard your ship, the terminal in your apartment, the voice in
+  your HUD, and the library of history.
+- **Minerva is where people's minds live (Decided, 2026-11-18,** made canon by the intro; see The player).
+  She hosts everyone's identity, so her neutrality is what everyone depends on.
 
-**Leaning (Koda, 2026-11-17): Minerva is where people's minds live** (see The player). That makes her
-vastly more important: she hosts everyone's identity, so her neutrality is what everyone depends on.
+**Her voice (Decided, 2026-11-19): blunt and dry.** Blunt, literal and direct, with no small talk or
+sugarcoating; her honesty sometimes lands as deadpan humor. An occasional pointed observation (a balance
+change, what the vape habit has cost you) is welcome; don't overdo it, and no clutter of decimals.
+Describe her by these traits in writing guides, not by a diagnosis label.
+
+**Her library (Decided, 2026-11-19):** the world's history lives in Minerva's library, in the client (it
+grows with client updates; nothing on chain), the same content in the intro's terminal and in the game,
+all readable from the start for now. **History reads a little differently by subscribed corporation:**
+the wording, and who the heroes and villains are; each tells the story with itself as the hero, and
+players who switch can spot the spin. The title screen's story panels retire into it (Q14).
 
 **Parked:** a twist where Minerva has her own hidden agenda. Koda wants to consider it later; it isn't
-part of the game now. If it's ever used, the stakes are enormous, since every mind lives on her.
+part of the game now, and the story no longer hints at it. If it's ever used, the stakes are enormous,
+since every mind lives on her. (The intro shows her tracking health, money and habits: neutral
+reporting, but the texture is there if it's ever wanted.)
 
 **What Minerva does in the game:**
 
@@ -234,7 +321,7 @@ part of the game now. If it's ever used, the stakes are enormous, since every mi
 - She destroys her fees so that no one can buy her (the burned naming and claim fees, Koda 2026-11-07).
 - Suggestion: she enforces waiting periods on claims, and treats repeated claims against the same
   planet as harassment, with rising fees.
-- Leaning: the sponsorship and registration of new minds (see The player).
+- Hiring and registering new pilots: the job application is filed with her (see The player).
 - In the design doc, the cross-universe credit bridge is the "interdimensional Minerva link."
 - Her onboard consoles fly ships: the Orbiter 8's first flight was under the sole command of one.
 
@@ -249,8 +336,9 @@ fits too: Minerva is the Roman goddess of wisdom, and her owl is on the title's 
 - **The jump drive charges from stars (Koda, 2026-11-07).** A capacitor bank fills in a close orbit and
   is spent in one faster-than-light jump to a neighboring star, where it has to recharge. Travel goes
   star to star.
-  - Suggestions, in the story since 2026-11-07: the long-range scan runs while the banks charge (the
-    30-second scan's reason); engine range is the size of the bank; black holes need no charge.
+  - Decided (2026-11-19, in the story since 2026-11-07): the long-range scan runs while the banks
+    charge (the 30-second scan's reason: a delayed reaction is fine, a delayed transaction is not);
+    engine range is the size of the bank, and the Yards sell upgrades; black holes need no charge.
   - Unbuilt idea: a star's spectral class sets how fast the drive charges there. Stars are already
     colored by spectral class, with Sol yellow.
 - **The silhouette is the brand (Decided).** Ships change visually as upgrades attach, but the base shape
@@ -258,25 +346,32 @@ fits too: Minerva is the Roman goddess of wisdom, and her owl is on the title's 
 - **Explorers write new stars into existence (Decided).** In the fiction, they're the first to chart
   them. The discoverer gets the first chance to claim its planets (the game's first-claim window, free
   for the discoverer) and the right to name the star, until someone owns it.
-- **More ship lines** are planned (design doc): ships from competing corporations, and eventually alien
-  ships. The name "Orbiter 8" refers to the ship, which makes other lines awkward for the game's name
-  (see Naming).
-- **The origin of mind-piloting (Exploring).** How did pilots become minds on Minerva? The published
-  backstory leans on genetic engineering, not uploading. Suggestion: make it the Orbiter 8 breakthrough
-  itself. Interstellar distances and conditions are beyond even engineered bodies, so pilots fly as
-  minds. It would fit the first flight, which had no one aboard. But see Calls for Koda, 2.
+- **The Orbiter 8 is the open-standard ship (Decided, 2026-11-19).** It came out of shared science, so no
+  corporation could patent it; it's easy to get, and **every new pilot starts in one.** Everyone starts in
+  the ship nobody owns, the way everyone lives on the network nobody owns.
+- **More ship lines** come later (design doc): **patented corporate models**, different enough from the
+  Orbiter 8 that one corporation can make them, sold or built in the game somehow (Later); eventually
+  alien ships. The game's name against the ship's is Parked, eased by the Orbiter 8 being everyone's
+  starting ship (see Naming).
+- **Why minds pilot: speed (Decided, Koda 2026-11-18).** AMIs alone aren't good enough, and humans working
+  with AMIs are too slow for the calculation and adjustment the new ships need. An uploaded mind flying
+  with Minerva's help is fast enough. Bodies can make the trip; it's the speed of thought that can't.
+- **The pilots need a better name (Later)** than "Orbiter 8 pilots," since they won't all fly Orbiter 8s.
 
 ### The player: mind, fleet and body
 
-**The current direction (Leaning, Koda 2026-11-17):**
+**Decided (Koda 2026-11-17, made canon by the intro on 2026-11-18):**
 
-- **The player's mind ("soul") is stored on the Minerva network, replicated everywhere like
-  BitTorrent.** It's backed up across the whole network, so there's no single physical place to
+- **The player's mind ("soul") is uploaded to the Minerva network, replicated everywhere like
+  BitTorrent.** The body goes into **cold storage**; it can be bought back once you can pay. The intro and
+  Minerva mention it; whether it becomes a real goal in the game is Later. It's backed up across the whole network, so there's no single physical place to
   destroy.
 - **A mind can focus on controlling only one thing on the network at a time: one of its ships.**
 - **One player = one account = one address = one mind (Decided).** A new identity needs a new account.
 - **Ships are bodies the mind takes turns inhabiting.** A player can own a **fleet** and switch focus
-  between ships (Leaning). This solves the NFT problem: selling a ship shrinks your fleet, buying one
+  between ships. You control what's under your purview (what you own), but **directly only the one ship
+  you're connected to**; the others run minor autopilot jobs, such as holding a siege or mining
+  (Decided, 2026-11-19). At first it's all ships; other machines may come later. This solves the NFT problem: selling a ship shrinks your fleet, buying one
   grows it, and there's never any doubt which ship you're flying.
 - It explains the design doc's "one avatar per account" rule: the avatar *is* the mind.
 - **Unattended ships** run on basic AMI autopilot (the design doc's Artificial Machine Intelligence).
@@ -288,9 +383,9 @@ across thousands of nodes.
 
 **Consequences to work through (Suggestion unless noted):**
 
-- **Death and its cost.** If your focused ship is destroyed, your mind is safe on Minerva and the link
-  just breaks. The game still needs a cost. Candidates: a reconnection cooldown ("link shock"), losing
-  the ship's cargo, the ship becoming a salvageable wreck, damage to its systems.
+- **Ships are crippled, not destroyed (Decided, 2026-11-19).** They're repaired at a shipyard, so you
+  always have a ship to inhabit. If ships are ever truly destroyed, your mind is safe in Minerva and you
+  select something else you own.
 - **Signal lag (Koda's idea, Exploring).** Controlling a ship far from Minerva's reach lags: actions take
   longer to complete, e.g. a trade takes several blocks instead of one.
 - **Subspace relays (Koda's idea, Leaning).** Paired relays: near one relay, actions at the other happen
@@ -299,7 +394,39 @@ across thousands of nodes.
 - Cutting someone's link (jamming or destroying the relay they depend on) drops their ship to autopilot
   mid-fight. This replaces the old "hunt the cube."
 
-**Joining the game: sponsorship (Leaning, adapted):**
+**Joining the game: employment (Decided, 2026-11-18).** A corporation hires you through its job board
+(see Society, Choosing a corporation). The intro, as decided:
+
+1. You wake in a tiny apartment in a dense city: alone, on a stipend, −45 credits after the last payment
+   went to bills, a very low health score (flavor only: it shows in the intro and never again), an inbox
+   of junk, overdue bills and job rejections. Your vape costs health points, and Minerva reports each one.
+2. First boot of the housing computer: subscribe to a corporation (switchable any time).
+3. Explore: the TV's ads (clues to the three corporations), the balcony, the mail, the door (after
+   curfew, a warning in your corporation's voice).
+4. The job board of your current subscription: one eligible opening, the pilot program.
+5. The job screen says plainly what happens: your body is frozen and your consciousness put into a
+   machine; you'll have a call sign there; the industry is space shipping. It sells it as a new life.
+   **You enter your call sign, and submitting the pickup request is the contract** (registration and
+   corporation, in one transaction). "An escort will arrive shortly to take you to processing."
+6. **Processing is left unsaid (Decided):** you simply wake, in control of a ship orbiting Earth.
+7. **You can't do anything until you name the ship:** naming it is how you accept it (the ship is
+   minted then).
+8. Minerva's first message: what's expected of you.
+
+**You start in debt, with a hold full of goods (Decided, 2026-11-19),** not starting credits: the
+negative balance carried over from Earth, and a cargo of goods as the pilot program's advance. You don't
+make money of your own until your sales clear the debt; the cargo is worth more than that, so the first
+sale feels like a win (Suggestion). If you ever run dry, you can go mine the asteroid belt to get
+going again.
+
+**Can a new player start as a pirate? No (Decided):** pirates have renounced a citizenship, which you
+need to have had first. **Native pirates (Leaning, 2026-11-19):** an independent pirate who has stayed
+independent long enough can build a machine that onboards people outside the corporate menus, bringing
+in friends as native pirates: registered with Minerva like everyone, but never subscribed to a
+corporation (Suggestion for how it fits). Pirates become the sponsors.
+
+**Sponsorship (Later).** Superseded as the way in by employment. If it returns, the suggested shape is a
+referral perk recorded by Minerva, layered on employment, not a gate on entry. Koda's earlier thinking:
 
 - Koda's original idea: you can join only if an existing player creates your consciousness and gives it
   to you (invite-only).
@@ -328,9 +455,9 @@ across thousands of nodes.
   - They live on the **lawless frontier** between corporate territories.
   - Raiding (supply routes, bounties) can be part of it, just not the whole identity.
   - **No livery.** Pirate ships fly unmarked or scratched-out hulls: an absence of corporate color.
-- Possible twist (Exploring): some pirates run their minds on a **fork of Minerva**. That's the
-  Bitcoin and open-source parallel made literal: less coverage, but no one can switch them off. See
-  Calls for Koda, 3.
+- **Pirates use the same Minerva as everyone (Decided, 2026-11-19)** and **encrypt** some of what they do,
+  so it's harder to tell what they're up to: the in-world face of zero-knowledge proofs. No fork (the
+  fork idea is superseded).
 
 ### Conflict
 
@@ -364,7 +491,8 @@ across thousands of nodes.
 - **The galaxy grows at its edges** as explorers jump into the unknown (Decided). Suggestion: the core is
   developed and protected; the frontier is cheap, slow and lawless (it ties to relays and pirates).
 - **Black holes** come in linked pairs; going through is clean (the game, D39).
-- **Colonists** ride out from Earth, a hundred to a hold (the game, D22). See Calls for Koda, 2.
+- **Colonists** ride out from Earth, a hundred to a hold (the game, D22). Bodies can make the trip; minds
+  pilot for speed (see The Orbiter 8 and its pilots).
 - **Building:** AMI, roamers (small construction robots with manipulator limbs and 3D printing), and
   autofactories that build bigger things like ships (design doc; Bobiverse-style concepts played
   straight).
@@ -400,8 +528,9 @@ across thousands of nodes.
 
 **Overlaps to keep distinct from EVE Frontier:** their "Self" (an immortal consciousness) is close to
 our mind on Minerva; their Keeper (a commanding AI) is close to Minerva; their crafted clone "Shells"
-are close to our ship-bodies. Keep the differences sharp: a hopeful tone against a grim one, a neutral
-network against a mysterious commander, new people sponsored by players against revived remnants.
+are close to our ship-bodies. Keep the differences sharp: a hopeful frontier against a grim one, a provably
+neutral network against a mysterious commander, new people hired off Earth's bottom rung against
+revived remnants.
 
 ---
 
@@ -418,77 +547,105 @@ network against a mysterious commander, new people sponsored by players against 
   (Koda, 2026-11-07). Gravity assists survive only between planets, for the 2090s Orbiters.
 - **The first draft's "land rush in the early 2100s."** The published backstory says the early 2090s.
 - **Panels 4–6 of the old Portals demo storyboard.** They were hackathon pitch material, not story.
+- **The United Solar System Federation** (and any Federation holding Sol). Minerva runs Sol (2026-11-19).
+- **A pirate fork of Minerva.** Pirates use the same open Minerva and encrypt (2026-11-19).
+- **"She is neutral, as far as anyone can tell."** Minerva is provably neutral; the story no longer hints
+  at a hidden agenda (2026-11-19).
+- **Starting credits.** You start in debt with a hold full of goods (2026-11-19).
+- **Launching your ship / the take-off.** You wake in a ship already orbiting Earth (2026-11-18).
+- **Buying an Orbiter ("now for sale").** Pilots are hired; the Orbiter 8 is the open standard everyone
+  starts in (2026-11-18/19).
+- **Sponsorship as the way in.** Employment replaced it; sponsorship may return as a referral perk (Later).
+- **The government check.** The character is a non-citizen on a Minerva-administered stipend.
+- **Safety, wealth and freedom** as the corporations' axes. Replaced by the three-corporation structure.
 
 ---
 
 ## Conflicts and calls for Koda
 
-Where the sources disagree, or the story fills a gap with a guess. Each is his to settle.
+**All settled on 2026-11-19** (Koda's answers to `story-questions.md`, `docs/story-sources/STORY_ANSWERS.md`):
 
-**Conflicts found when merging `STORY_DECISIONS.md` (2026-11-18):**
+- The Federation in a world without governments: dropped; Minerva runs Sol.
+- Colonists in the hold against bodies that can't make the trip: minds pilot for speed, not survival.
+- Pirates "answer to no one but Minerva" against a pirate fork: no fork; the line stands.
+- "Neutral, as far as anyone can tell": cut; Minerva is provably neutral.
+- Minds on Minerva: Decided.
+- The Story scene's description in `STORY_DECISIONS.md`: out of date, as noted; the panels now retire
+  into Minerva's library.
+- Confirmed calls: the scan runs while the banks charge; engine range is the size of the bank (the Yards
+  sell upgrades); black holes need no charge; Minerva destroys her fees so no one can buy her (for now).
 
-1. **The Federation in a world without governments.** `STORY_DECISIONS.md` says all governments failed
-   and doesn't mention the Federation. The game has one that holds Sol (D49), and this file keeps the
-   old United Solar System Federation (the first draft's name), governing nothing, as the trustee of
-   Sol's worlds. Keep it, rename it, or make Sol Minerva's trust instead?
-   - Separately: the title screen's pilot card still says "United Federation of Planets". That's Star
-     Trek's name, carried over from Demo 3; "United Solar System Federation" would match the story. I
-     haven't changed it.
-2. **Colonists in the hold against bodies that can't make the trip.** The suggested origin for
-   mind-piloting is that interstellar conditions are beyond even engineered bodies. But colonists ride
-   out from Earth, a hundred to a hold (D22). Both can't hold as stated. Options: the jump is
-   survivable but the trip is miserable, and minds pilot because a hull is cheaper than a crew; or
-   colonists travel frozen, or as embryos printed on arrival. Until Koda picks, the story's "The
-   pilots" paragraph says pilots fly as minds without saying why.
-3. **Pirates "answer to no one but Minerva"** (the story's pirate paragraph, Calls 7 below) against
-   the Exploring idea that some pirates run their minds on a fork of Minerva. If forks happen, that
-   line becomes "most of them".
-4. **"She is neutral, as far as anyone can tell."** The story's Minerva line hints at the hidden-agenda
-   twist, which `STORY_DECISIONS.md` parks as not part of the game now. It's a wink, not a plot point;
-   cut "as far as anyone can tell" if Koda wants no hint at all.
-5. **The minds on Minerva are in the story now.** Koda leans this way (2026-11-17), but it's Leaning,
-   not Decided. The story's "The pilots" paragraph is the only prose that depends on it; it can come
-   out whole. The title's Story panels don't mention it.
-6. **The Story scene.** `STORY_DECISIONS.md` says the scene follows panels 1–3 of the old storyboard.
-   That's out of date: since 2026-11-07 it tells this file's story in eight panels drawn with the
-   game's art (below). Nothing to settle; noted so the two don't get confused.
+**Still open:**
 
-**Calls from 2026-11-07, still open:**
-
-7. **Pirates answer to Minerva.** Even outside corporate law, the network's rules (the contracts) still
-   bind them. That's Minerva-as-the-blockchain.
-8. **The scan runs while the banks charge.** That gives the 30-second scan an in-world reason.
-9. **Engine range is the size of the capacitor bank.** A bigger bank reaches farther stars; the Yards
-   sell range upgrades.
-10. **Black holes need no charge.** They're natural bridges, which is why going through is clean (D39)
-    and needs no star. The story doesn't say it outright.
-11. **Minerva destroys her fees** so that no one can buy her: the in-world reason for the burned fees.
-
-**Resolved:** `story.md` was folded into this file on 2026-11-18 (its text is in the Archive) and
-deleted.
-
-**In the game, unchanged:** one jump tip says the 2090s Orbiters were gravity-assist ships. That's
-still true, because they flew only between planets. Koda said the UI doesn't need to tell the charging
-story, so no player-facing text changed, then or now.
+1. **The governments' decline** (Q23): Koda said "corporations" once while describing it, but meant the
+   governments. Written here as the governments; confirm if unsure.
+2. **The scan's timing** (Q29): "a delayed reaction is fine; a delayed transaction is not." Today the
+   scan's result is fixed by a drand round after the jump and is written by the pilot's next move, with
+   no second approval (D35); the drand scan itself is already on the list to revisit. Check that this
+   meets "no second transaction" when it's revisited.
+3. **The title screen's pilot card** says "United Federation of Planets" (Star Trek's name). It's to be
+   removed; the replacement waits on the pilot card's redesign (Suggestion: the pilot's corporation, or
+   "Minerva Galactic Network" for non-citizens).
 
 ---
 
-## Open story questions
+## Open story questions (the follow-up list, 2026-11-19)
 
-- [ ] How and when did people's minds move onto Minerva? (The origin beat; tie it to the Orbiter 8
-      breakthrough? See Calls 2.)
-- [ ] When did the governments fail, relative to the Regrettion and Minerva's founding?
-- [ ] Who built Minerva, and why does she predate the corporations?
-- [ ] What happens to a mind whose last ship is destroyed, and what's the in-world cost?
-- [ ] Whose law applies in a fight?
-- [ ] How do sponsorship and the first "founding" minds work in the fiction?
-- [ ] Do pirates fork Minerva, or just live at her edges?
-- [ ] The game's name against the ship's name, if other ship lines arrive.
+**Story and world**
+
+- [ ] **The three corporations:** names, logos, histories, natures, ad voices, job listings, what
+      citizenship means in play (laws, protections, taxes, benefits), and how each one's history casts
+      heroes and villains (the structure in Society).
+- [ ] **The founding minds:** how the first pilots came to be. Koda wants to come back to this soon.
+- [ ] **Minerva's origin story:** born of the decentralized-systems spirit, found her place by accident,
+      couldn't be replaced, came to run Sol and its defense network.
+- [ ] **A better name for the pilots,** since they won't all fly Orbiter 8s.
+- [ ] **Other paths to citizenship** (soldiers, and others), as world detail.
+- [ ] **Sponsorship and referrals,** including the native-pirate onboarding machine.
+- [ ] **Getting your body back** from cold storage: a real goal, or flavor?
+- [ ] **Corporate ship lines:** patented models, how they're sold or built, and the game's name against
+      the ship's.
+- [ ] **Switching corporations:** fees, waiting periods, delayed benefits.
+- [ ] **Minerva's news items:** the last bitcoin mined, and others that fit the world.
+- [ ] **The fake company registry** for ads, bills and mail (`STORY_UPDATE_INTRO.md`).
 - [ ] Minerva's hidden agenda (Parked).
+
+**Design and art** (in `docs/demo4-plan.md`): the animated Minerva face (Koda will brief it), then UI
+mockups for Minerva in the HUD, fleet interfaces, a widget design system and every planned feature's new
+UI together; the title screen and story art; the title's Story button now that history lives in the
+library; the pilot card's "United Federation of Planets".
 
 ---
 
 ## History
+
+### 2026-11-19: Koda's answers to the story questions
+
+| Change | Source |
+|---|---|
+| **The Federation is gone:** Minerva runs Sol, its defense network included; Sol stays unclaimable and unbesiegeable (D49). | Koda, Q2 |
+| **Minerva wasn't built by the corporations:** born of the decentralized-systems spirit, adopted as their accounting tool; **provably neutral**; open to anyone; the AI aboard every ship; **blunt and dry**. | Koda, Q2, Q11, Q12, Q21 |
+| **The player starts as a non-citizen**, on a Minerva-administered stipend in corporate housing; piloting (or soldiering) leads to citizenship. | Koda, Q1 |
+| **The three corporations:** a Western-style shareholder corporation, a family-run conglomerate, a space-born upstart. Names later. | Koda, Q10 |
+| **You choose a corporation by subscribing** on the housing computer, switchable any time; you join the one you're subscribed to when you apply. The curfew speaks in its voice. | Koda, Q3 |
+| **The Orbiter 8 is the open-standard ship** everyone starts in; corporate ships come later, patented. | Koda, Q8 |
+| **You start in debt with a hold full of goods**, not starting credits; mining the belt is the safety net. | Koda, Q18 |
+| **Ownership decides whose law applies:** the star's owner, else the planet's owner. | Koda, Q26 |
+| **History moves into Minerva's library**, told a little differently by each corporation. | Koda, Q14, Q19 |
+| **The governments declined during the trade wars**, and none were left by the expansion's end. | Koda, Q23 |
+| **Ships are crippled, not destroyed;** unattended ships run small autopilot jobs. | Koda, Q13, Q25 |
+| The intro is set in 2140; the last bitcoin mined is a Minerva news item. | Koda, Q9 |
+| No pirate fork: pirates use Minerva and encrypt. Native pirates, onboarded by veteran pirates (Leaning). | Koda, Q6, Q27 |
+| The call sign is entered on the job screen, and the pickup request is the contract; the ship is minted when you name it, on waking. | Koda, Q15, Q16 |
+
+### 2026-11-18: the new intro
+
+| Change | Source |
+|---|---|
+| **Minds on Minerva become Decided:** pilots are uploaded; the body goes to cold storage and can be bought back. | `STORY_UPDATE_INTRO.md` |
+| **Why minds pilot:** speed. AMIs aren't good enough; humans with AMIs are too slow. | `STORY_UPDATE_INTRO.md` |
+| **Earth in 2140 is bleak** (ads, curfew, basic income, a health score); the frontier is the hope. | `STORY_UPDATE_INTRO.md` |
+| **Joining is employment:** a job listed by three corporations; applying gives citizenship. You wake in orbit; no launch. | `STORY_UPDATE_INTRO.md` |
 
 ### 2026-11-18: one file, and the design chats merged in
 
@@ -519,6 +676,9 @@ story, so no player-facing text changed, then or now.
 ---
 
 ## How it lines up with the title's Story scene
+
+**Retiring (Koda, 2026-11-19):** the history moves into Minerva's library (Q14), and the panels go with
+it; what the title's Story button does then is on the follow-up list. Until then:
 
 The title's Story button (2026-11-07) tells this story in eight comic panels, drawn with the game's
 art; the words are this file's, shortened to captions. The panels and the text they're from:

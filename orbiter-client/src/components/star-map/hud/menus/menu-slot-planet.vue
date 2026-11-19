@@ -195,7 +195,7 @@ export default {
     },
     ownerName() {
       let address = this.planet.owner
-      if (this.planet?.federation) return 'The Federation'
+      if (this.planet?.federation) return 'Minerva'
       if (!address) return 'unclaimed'
       let name = '[' + address.replace(address.substring(5, 40), '...') + ']'
       if (typeof this.players[address] != 'undefined') {

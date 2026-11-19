@@ -138,11 +138,11 @@ export default {
     goodNames() {
       return this.goods ?? []
     },
-    /** The owner, in words: You (yellow), the Federation, a pilot, or unclaimed. */
+    /** The owner, in words: You (yellow), Minerva (Sol's), a pilot, or unclaimed. */
     owner() {
       const o = this.o
       if (o.isMine) return { label: 'Owner', value: 'You', color: YELLOW_LIGHT }
-      if (o.federation || o.ownerName === FEDERATION) return { label: 'Owner', value: 'The Federation', color: '#c9b6ff' }
+      if (o.federation || o.ownerName === FEDERATION) return { label: 'Owner', value: FEDERATION, color: '#c9b6ff' }
       if (!o.owner) return { label: 'Owner', value: 'Unclaimed', color: '#a99fc6' }
       return { label: 'Owner', value: this.ownerName }
     },
@@ -268,11 +268,11 @@ export default {
     },
     discoveredBy() {
       const o = this.o
-      return o.keeper === 'federation' && this.objectId === 'star' && !o.owner ? 'The Federation' : this.ownerName
+      return o.keeper === 'federation' && this.objectId === 'star' && !o.owner ? FEDERATION : this.ownerName
     },
     ownerName() {
       const address = this.o.owner
-      if (this.o.federation) return 'The Federation'
+      if (this.o.federation) return FEDERATION
       if (!address) return 'unclaimed'
       const short = address.slice(0, 6) + '…' + address.slice(-4)
       return this.players[address] ?? short

@@ -169,7 +169,7 @@ export default {
         'Nobody has ever lost an Orbiter 8. Beaten up, out of range, limping back to a shipyard, sure. Lost, never.',
         'Colonists travel a hundred to a hold. They say it is cosy.',
         'Railguns punch through armor, missiles through shields, and drones chew up point defense. Bring the right tool. Bring all three if you can afford it.',
-        'Sol belongs to the Federation. Its planets are not for sale and not for siege, and the Federation would rather you did not ask.'
+        'Sol is Minerva\'s. Its worlds are not for sale and not for siege. Do not ask twice.'
       ]
       return tips[parseInt(Math.random() * tips.length)]
     }

@@ -176,6 +176,20 @@ hard to add later because it shapes the data, low-hanging, or the battle minimum
 - **A cheat code for debugging (done 2026-11-18: Settings' cheat button in dev builds, +10,000,000¢ through the admin's `Credits.cheat`, `dev/cheat.js`; on the testnet too, Credits upgraded in place):** a way to give the pilot credits, goods, parts or time while testing a deployment (an admin-only contract function, or a debug panel calling the admin's moves). Not in the 2026-11-17 testnet deploy.
 - **The HUD's planet picker (revisit, Koda 2026-11-16):** the strip of the system's bodies on the selection card (from `client-rnd/hud/`). Keep it as is when the HUD comes into the main client; later, give it much more to do.
 - **Deeds draw themselves (done 2026-11-18, D107; samples in `mockups/deeds/`):** `Deeds.tokenURI` with an on-chain SVG of the planet, moon or asteroid (class colors, size, rings, its station and owner's mark), in the selection card's NFT-card look; mirrors the client's drawing like `ShipArt` ↔ `sdk/src/ship-art.js`. Watch Deeds' size (24,576 bytes): the art may need its own library contract.
+- **The new intro and onboarding (decided in story 2026-11-18/19; to design, then build; `backstory.md`,
+  "Joining the game", and `story-sources/PROJECTS_INTRO.md`):** the apartment intro and Minerva's console;
+  subscribing to a corporation on the housing computer (switchable; Minerva's interface re-skins per
+  corporation); the call sign entered on the job screen, with the pickup request as the contract
+  transaction (registration and corporation together); waking in Earth orbit with no launch; **naming the
+  ship accepts and mints it**; Minerva's first message. Contracts (check each with Koda before building):
+  the pilot's corporation on chain, switchable (port taxes and legal control of what you own move with
+  it; a fee, perhaps a waiting period); **starting in debt with a hold full of goods** instead of 1,000
+  credits (Credits is an ERC-20 and can't go negative: the debt needs its own balance, paid down first by
+  sales); ownership-based law (a star's owner's corporation rules its system). Client: Minerva's library
+  (client-side content, history varying by corporation), her blunt and dry voice guide, news items (the
+  last bitcoin). Design first: the animated Minerva face (Koda will brief it), then mockups for Minerva in
+  the HUD, fleet interfaces, a widget design system and every planned feature's new UI together; the
+  title and story art; the title's Story button now that history lives in the library.
 - **Revisit the scan's randomness (Koda 2026-11-18):** the drand scan (D35) feels less than smooth: a
   jump, a wait for the drand round, then another wallet popup to write it. Not happy with drand's use;
   revisit later, guided by the Polkadot App (what randomness Polkadot Hub or the App offers, and moves

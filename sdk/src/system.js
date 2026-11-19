@@ -20,7 +20,8 @@ import {
 import { dockedShips } from './game/docking'
 
 /** Who owns Sol's planets (D49). */
-export const FEDERATION = 'The Federation'
+/** Who holds Sol: Minerva, which runs the solar system (Koda, 2026-11-19; there's no Federation). */
+export const FEDERATION = 'Minerva'
 
 /** The star at the center of every system has a fixed key. */
 export const STAR_KEY = 'star'

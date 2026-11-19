@@ -2,8 +2,10 @@
   <!-- The pilot license, filling in as the player types their callsign. -->
   <div class="pilot-card">
     <div class="issuer">
-      <p class="federation">United Federation of Planets</p>
-      <p class="department">Department of Transportation * Intergalactic Aviation</p>
+      <!-- Issued by Minerva: there are no governments, and a new pilot is not yet a citizen (Koda,
+           2026-11-19, Q2; interim, until the pilot card's redesign) -->
+      <p class="federation">Minerva Galactic Network</p>
+      <p class="department">Pilot Registry</p>
     </div>
     <div class="body">
       <div class="details">
