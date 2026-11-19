@@ -59,7 +59,7 @@ export default class Sprite {
     this.telemetry = {
       translatex: 0,
       translatey: 0,
-      rotation: object.type === 'station' ? STATION_START_ROTATION : 0
+      rotation: object.type === 'station' || object.type === 'shell' ? STATION_START_ROTATION : 0
     }
     // Absolute position in the star system.
     this.position = { x: 0, y: 0 }
@@ -94,7 +94,7 @@ export default class Sprite {
     let x = orbit.x
     let y = orbit.y
     // Sprites face along their orbit's radius; stations spin four times as fast, the other way.
-    let rotation = this.type == 'station' ? -orbit.angle * 4 : orbit.angle
+    let rotation = this.type == 'station' || this.type == 'shell' ? -orbit.angle * 4 : orbit.angle
 
     if (this.type === 'ship') {
       const target = this.dock ? 1 : 0

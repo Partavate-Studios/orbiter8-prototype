@@ -13,6 +13,7 @@
           <planet v-if="type === 'planet'" :sprite="sprite" />
           <moon v-if="type === 'moon'" />
           <station v-if="type === 'station'" :station="sprite.object" />
+          <station v-if="type === 'shell'" />
           <asteroid v-if="type === 'asteroid'" :composition="sprite.object.composition" :section="sprite.object.section" :asteroid="sprite.object" />
           <mining-slots v-if="type === 'section'" :slots="sprite.object.slots ?? []" :me="playerAccount()" />
           <!-- Docked: a tube from the ship's side to the station's pad, shown once it's there. -->
@@ -30,7 +31,7 @@
           <g transform="rotate(180)"><ship v-if="type === 'ship'" :should-show-engines="!sprite.object.dock" /></g>
           <star v-if="type === 'star'" :black-hole="Boolean(sprite.object.blackHole)" :spectral="sprite.object.spectral" />
         </template>
-        <a cursor="pointer" @mouseover="pointerOn(true)" @mouseleave="pointerOn(false)" @click.prevent="spriteAction()">
+        <a v-if="type !== 'shell'" cursor="pointer" @mouseover="pointerOn(true)" @mouseleave="pointerOn(false)" @click.prevent="spriteAction()">
           <circle v-if="hitRadius > sprite.selectorSize" cx="0" cy="0" :r="hitRadius" fill="#ffffff00" />
           <circle
             cx="0"

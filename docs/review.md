@@ -650,8 +650,9 @@ Calls made building it, for Koda's review:
   of it across. Sol's Federation worlds and asteroids draw fully built. The parts are standalone art in
   `assets/art/` (station-*, planet-citadel, planet-colony, asteroid-platform, asteroid-mine; the
   asteroid-station icon redrawn to match), from `docs/mockups/stages/gen-stations.py`. Calls: the
-  **Station** stage (a planet's level 3, before its Port) still draws nothing, since the game has a
-  station object only once there's a port; the selection card drew a station as a dot since Demo 3
+  **Station** stage (a planet's level 3, before its Port) draws the bare hexagon on the station's orbit
+  as a `shell` object: drawn, not selectable, and not a station to anything else (stations still mean
+  ports, as 45 places in the client assume); the selection card drew a station as a dot since Demo 3
   (1/30 of its size), now about a planet's size; the title scene's station stays bare, with its own six
   visitor pads.
 - **X37. A whole belt section is a click target** (2026-11-18, Koda: "clicking the little asteroid is

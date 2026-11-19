@@ -13,6 +13,8 @@ export const SPRITE_TYPES = {
   star: { selectorSize: 40, cameraScale: 0.6 },
   planet: { selectorSize: 14, cameraScale: 0.3 },
   station: { selectorSize: 12, cameraScale: 0.1 },
+  // a station still being built: drawn, not selectable (sdk/system.js)
+  shell: { selectorSize: 12, cameraScale: 0.1 },
   moon: { selectorSize: 6, cameraScale: 0.05 },
   ship: { selectorSize: 10, cameraScale: 0.06 },
   asteroid: { selectorSize: 10, cameraScale: 0.08 },
@@ -63,6 +65,7 @@ export function spriteScaleOf(object, objects) {
       return (SYSTEM_RATIO * (1.5 + size * 0.5)) / ART.asteroid
     case 'section':
       return (SYSTEM_RATIO * 11) / ART.section
+    case 'shell':
     case 'station': {
       // built at its asteroid's middle, its core about a third of the rock across (libs/station-art.js)
       if (parent?.type === 'asteroid') return spriteScaleOf(parent, objects) * 0.367

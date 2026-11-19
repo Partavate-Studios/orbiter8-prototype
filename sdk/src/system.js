@@ -161,6 +161,19 @@ export function buildSystem(system, playerAccount) {
       keys.stations.push(station.key)
       planetObject.stationKey = station.key
       planetObject.stationName = planet.station.name
+    } else if (!planet.federation && Number(planet.info?.level ?? 0) >= 3) {
+      // The Station stage, before its Port: the bare station on its orbit, drawn but not a place to
+      // go (no port, so not a 'station' anything looks for; Koda's station art, X36).
+      add('shell', {
+        id: planet.id,
+        name: `${planet.name} station`,
+        owner: planet.owner,
+        isMine,
+        orbiting: planetObject.key,
+        orbit: { radius: stationOrbitRadius(planet.size), speed: stationOrbitSpeed(planet.size) },
+        orbitalPosition: 0,
+        size: 1
+      })
     }
 
     for (const moonPosition in planet.moons) {
