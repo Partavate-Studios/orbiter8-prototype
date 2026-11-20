@@ -9,7 +9,9 @@
 // Desktop, whose sandbox blocks any other address.
 const TESTNET = 420420417
 const params = new URLSearchParams(location.search)
-const accountIndex = Number(params.get('account') ?? 1)
+// parseInt, so a stray character typed after the number (`?account=2/#/`) still picks account 2
+const picked = parseInt(params.get('account'), 10)
+const accountIndex = Number.isNaN(picked) ? 1 : picked
 const NETWORK_KEY = 'o8.devwallet.network'
 
 const storage = {
