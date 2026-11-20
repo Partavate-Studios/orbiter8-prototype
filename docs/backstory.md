@@ -397,20 +397,25 @@ across thousands of nodes.
 **Joining the game: employment (Decided, 2026-11-18).** A corporation hires you through its job board
 (see Society, Choosing a corporation). The intro, as decided:
 
-1. You wake in a tiny apartment in a dense city: alone, on a stipend, −45 credits after the last payment
-   went to bills, a very low health score (flavor only: it shows in the intro and never again), an inbox
-   of junk, overdue bills and job rejections. Your vape costs health points, and Minerva reports each one.
-2. First boot of the housing computer: subscribe to a corporation (switchable any time).
-3. Explore: the TV's ads (clues to the three corporations), the balcony, the mail, the door (after
+1. You wake in a tiny apartment in a dense city, newly assigned to it: alone, on a stipend, −45 credits
+   after the last payment went to bills, a very low health score (flavor only: it shows in the intro and
+   never again), an inbox of junk, overdue bills and job rejections. Your vape costs health points, and
+   Minerva reports each one.
+2. **An ID-card scanner turns on your new corporate affordable housing unit.** Scanning your card prompts
+   for your name: that's your name in the game, and **the first transaction** (registration with
+   Minerva). (Koda, 2026-11-19; this replaces entering the call sign on the job screen.)
+3. First boot of the housing computer: subscribe to a corporation (switchable any time).
+4. Explore: the TV's ads (clues to the three corporations), the balcony, the mail, the door (after
    curfew, a warning in your corporation's voice).
-4. The job board of your current subscription: one eligible opening, the pilot program.
-5. The job screen says plainly what happens: your body is frozen and your consciousness put into a
-   machine; you'll have a call sign there; the industry is space shipping. It sells it as a new life.
-   **You enter your call sign, and submitting the pickup request is the contract** (registration and
-   corporation, in one transaction). "An escort will arrive shortly to take you to processing."
-6. **Processing is left unsaid (Decided):** you simply wake, in control of a ship orbiting Earth.
-7. **You can't do anything until you name the ship:** naming it is how you accept it (the ship is
-   minted then).
+5. The job board of your current subscription: one eligible opening, the pilot program. The job screen
+   says plainly what happens: your body is frozen and your consciousness put into a machine; you'll
+   have a call sign there; the industry is space shipping. It sells it as a new life.
+6. **Accepting the job is the only way out of the intro** (other than back to the title screen). You're
+   asked to **name your ship before you're picked up: the second transaction**, which mints the ship
+   and joins the corporation you're subscribed to. "An escort will arrive shortly to take you to
+   processing."
+7. **Processing is left unsaid (Decided):** when the transaction goes through, you wake, in control of
+   your ship orbiting Earth.
 8. Minerva's first message: what's expected of you.
 
 **You start in debt, with a hold full of goods (Decided, 2026-11-19),** not starting credits: the
