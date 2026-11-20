@@ -1,5 +1,6 @@
 // The intro mockup's screens: each moment as a desktop and a phone layout. Copy marked "draft" is
-// placeholder in the right voice (the brief: the words are on Koda's to-do list).
+// placeholder in the right voice (the brief: the words are on Koda's to-do list). Minerva's face is drawn
+// from the face widget's poses; a dashed "widget:" tag beside it names the state (a note, not the design).
 
 import {
   C,
@@ -7,16 +8,21 @@ import {
   HOTSPOTS,
   MONO,
   ROOM,
+  SCANNER,
+  TICKER,
   button,
   city,
   consoleFrame,
   corpLogo,
   draft,
   earth,
+  face,
+  faceTag,
   focusRing,
   hand,
   label,
   note,
+  notice,
   owl,
   padGlyph,
   para,
@@ -36,20 +42,32 @@ function roomView(W, H, o = {}) {
   const cx = o.cx ?? ROOM.w / 2
   const tx = phone ? W / 2 - cx * k : 0
   const ty = phone ? 0 : (H - ROOM.h * k) / 2
-  const world = (svg) => `<g transform="translate(${tx} ${ty}) scale(${k})">${svg}</g>`
-  return { k, tx, ty, world, at: (x, y) => [tx + x * k, ty + y * k] }
+  return {
+    k,
+    world: (svg) => `<g transform="translate(${tx} ${ty}) scale(${k})">${svg}</g>`,
+    at: (x, y) => [tx + x * k, ty + y * k]
+  }
 }
-const dim = (W, H, opacity = 0.55) => rect(0, 0, W, H, { fill: '#0b0916', opacity })
+const dim = (W, H, opacity = 0.55) => rect(0, 0, W, H, { fill: C.black, opacity })
+const tagOf = (state, oneOff) => `widget: ${state}${oneOff ? ` + ${oneOff}` : ''}`
 
-/** Phone: the room's things as big round buttons along the bottom (reachable by thumb and by focus). */
+/** The console, with a tag naming her face's state. */
+function minervaConsole(x, y, w, h, o) {
+  const f = consoleFrame(x, y, w, h, o)
+  const tag = tagOf(o.state ?? 'talking', o.oneOffName)
+  f.svg += o.phone ? faceTag(x + 74, y + 46 + 14, tag) : faceTag(x + 160, y + 46 + 18, tag)
+  return f
+}
+
+/** Phone: the room's things as big round buttons along the bottom, left to right as in the room. */
 function phoneStrip(W, H, focused) {
   const items = [
-    ['door', 'Door'],
+    ['balcony', 'Balcony'],
     ['tv', 'TV'],
     ['terminal', 'Terminal'],
-    ['balcony', 'Balcony']
+    ['door', 'Door']
   ]
-  let s = rect(0, H - 128, W, 128, { fill: '#0b0916', opacity: 0.88 }) + rect(0, H - 128, W, 1, { fill: C.border })
+  let s = rect(0, H - 128, W, 128, { fill: C.black, opacity: 0.9 }) + rect(0, H - 128, W, 1, { fill: C.border })
   const step = W / items.length
   items.forEach(([key, name], i) => {
     const cx = step * i + step / 2
@@ -58,11 +76,7 @@ function phoneStrip(W, H, focused) {
     if (on) s += `<circle cx="${cx}" cy="${cy}" r="35" fill="none" stroke="${C.brand300}" stroke-width="2.5"/>`
     s += `<circle cx="${cx}" cy="${cy}" r="29" fill="${on ? C.lavender : C.button}" stroke="#ffffff55" stroke-width="1.2"/>`
     s += stripIcon(key, cx, cy, on ? '#1c0838' : '#ffffff')
-    s += text(cx, H - 22, name, {
-      size: 13,
-      anchor: 'middle',
-      fill: on ? C.text : C.text2
-    })
+    s += text(cx, H - 22, name, { size: 13, anchor: 'middle', fill: on ? C.text : C.text2 })
   })
   return s
 }
@@ -70,15 +84,15 @@ function stripIcon(key, cx, cy, c) {
   if (key === 'door')
     return (
       rect(cx - 9, cy - 15, 18, 30, { r: 2, stroke: c, sw: 2.5 }) +
-      `<circle cx="${cx + 4}" cy="${cy + 2}" r="2" fill="${c}"/>`
+      `<circle cx="${cx - 4}" cy="${cy + 2}" r="2" fill="${c}"/>`
     )
   if (key === 'tv')
     return (
       rect(cx - 15, cy - 11, 30, 20, { r: 3, stroke: c, sw: 2.5 }) +
       `<path d="M${cx - 7} ${cy + 15} l14 0" stroke="${c}" stroke-width="2.5"/>`
     )
-  if (key === 'terminal') return owl(cx, cy, 34, c, { eyes: false })
-  return `<path d="M${cx - 15} ${cy - 4} l30 0 M${cx - 15} ${cy - 4} l0 18 M${cx - 5} ${cy - 4} l0 18 M${cx + 5} ${cy - 4} l0 18 M${cx + 15} ${cy - 4} l0 18" stroke="${c}" stroke-width="2.5" fill="none"/><circle cx="${cx + 8}" cy="${cy - 13}" r="3" fill="${c}"/>`
+  if (key === 'terminal') return owl(cx, cy, 34, c)
+  return `<path d="M${cx - 15} ${cy - 4} l30 0 M${cx - 15} ${cy - 4} l0 18 M${cx - 5} ${cy - 4} l0 18 M${cx + 5} ${cy - 4} l0 18 M${cx + 15} ${cy - 4} l0 18" stroke="${c}" stroke-width="2.5" fill="none"/>`
 }
 const panArrows = (W, H) =>
   [
@@ -87,305 +101,131 @@ const panArrows = (W, H) =>
   ]
     .map(
       ([x, g]) =>
-        `<circle cx="${x}" cy="${H * 0.45}" r="16" fill="#0b0916aa" stroke="#ffffff40"/>` +
+        `<circle cx="${x}" cy="${H * 0.45}" r="16" fill="#030306aa" stroke="#ffffff40"/>` +
         text(x, H * 0.45 + 8, g, { size: 24, anchor: 'middle', fill: C.text2 })
     )
     .join('')
-
-/** A Minerva notice: her owl and a short line. `attention` frames it in pink (it needs you). */
-function notice(x, y, w, title, body, o = {}) {
-  const lines = para(0, 0, body, {
-    size: o.size ?? 14,
-    chars: Math.floor((w - 70) / ((o.size ?? 14) * 0.52))
-  })
-  const h = 46 + lines.height
-  let s = rect(x, y, w, h, {
-    r: 12,
-    fill: '#12052af2',
-    stroke: o.attention ? C.pink : C.borderStrong,
-    sw: o.attention ? 2 : 1.2
-  })
-  s += owl(x + 30, y + 26, 36, '#ffffff', { eyes: false })
-  s += text(x + 58, y + 26, title, {
-    size: (o.size ?? 14) + 1,
-    weight: 700,
-    fill: o.attention ? C.pinkLight : C.text
-  })
-  s += `<g transform="translate(${x + 58} ${y + 48})">${lines.svg.replaceAll('fill="#f1eefa"', `fill="${C.text2}"`)}</g>`
-  if (o.draft !== false) s += draft(x + w - 52, y + 22)
-  return s
+function idCard(x, y, k = 1, rotate = -8) {
+  return `<g transform="translate(${x} ${y}) rotate(${rotate}) scale(${k})">${rect(0, 0, 190, 120, { r: 10, fill: '#b9b4c6', stroke: '#6a6188', sw: 2 })}${rect(14, 18, 50, 62, { r: 4, fill: '#6a6188' })}<circle cx="39" cy="40" r="12" fill="#b9b4c6"/>${rect(26, 56, 26, 20, { r: 8, fill: '#b9b4c6' })}${rect(78, 22, 90, 8, { fill: '#6a6188' })}${rect(78, 40, 70, 6, { fill: '#8f88a6' })}${rect(78, 54, 80, 6, { fill: '#8f88a6' })}${text(14, 104, 'NON-CITIZEN · STIPEND', { size: 10, fill: '#3a3352', weight: 700, family: MONO })}</g>`
 }
 
-// ---------------------------------------------------------------- 1. the apartment
-const apartment = {
-  id: '01-apartment',
-  title: 'the apartment, with what’s interactive',
+// ---------------------------------------------------------------- 1. dark: the power's off until you scan your card
+const dark = {
+  id: '01-dark',
+  title: 'the apartment in the dark: only the ID scanner is lit',
   desktop(W, H) {
     const v = roomView(W, H)
-    let s = v.world(room({ tv: 'X' }))
-    // focus rings on everything you can use; the TV has focus
-    s += v.world(
-      Object.entries(HOTSPOTS)
-        .map(([key, h]) => focusRing(h.x, h.y, h.w, h.h, { focused: key === 'tv', sw: 3.5 }))
-        .join('')
-    )
-    for (const [key, h] of Object.entries(HOTSPOTS)) {
-      const [lx, ly] = v.at(h.x + h.w / 2, h.y - 14)
-      s += label(lx, ly, key === 'door' ? 'Door · ID scanner' : h.label, {
-        anchor: 'middle',
-        focused: key === 'tv'
-      })
-    }
-    // the hand points at the focused thing
-    s += hand(...v.at(845, 662), 0.72)
-    s += statusLine(W)
-    // hints along the bottom
-    s += rect(0, H - 44, W, 44, { fill: '#0b0916', opacity: 0.8 })
-    s += text(24, H - 16, 'Click or tap a thing to use it · Tab, arrows or the D-pad move between things', {
-      size: 14,
-      fill: C.text2
-    })
-    s += padGlyph(W - 280, H - 22, 'A', 11) + text(W - 262, H - 17, 'Use', { size: 14, fill: C.text2 })
-    s += padGlyph(W - 200, H - 22, 'B', 11) + text(W - 182, H - 17, 'Back', { size: 14, fill: C.text2 })
-    s += padGlyph(W - 120, H - 22, '≡', 11) + text(W - 102, H - 17, 'Menu', { size: 14, fill: C.text2 })
-    s += note(24, 64, 470, [
-      'Mockup notes. Layers, back to front: the city (seen through the glass), the balcony, the room, the hand, and Minerva’s console when a terminal opens.',
-      'Dashed rings: things you can use. The solid ring and the hand: what has focus (the TV).'
+    let s = v.world(room({ lights: false, scanner: 'idle' }))
+    const [sx, sy] = v.at(SCANNER.cx, SCANNER.cy)
+    s += focusRing(sx - 60, sy - 80, 120, 160, { focused: true })
+    s += label(sx, sy - 96, 'Scan your ID card', { focused: true })
+    s += hand(sx - 170, sy + 120, 0.9, { pose: 'hold' }) + idCard(sx - 250, sy + 40, 0.9, -12)
+    s += faceTag(sx, sy + 100, tagOf('idle'))
+    s += statusLine(W, { dark: true })
+    s += rect(0, H - 44, W, 44, { fill: C.black, opacity: 0.9 })
+    s += text(24, H - 16, 'Click or tap the scanner · Enter or A to scan', { size: 14, fill: C.text2 })
+    s += note(40, 80, 500, [
+      'The power is off until you scan your card: everything is black but the scanner by the door, Minerva’s face glowing on its screen. It’s the only thing to do.',
+      'The room is there in the dark; the scanner’s glow catches the door’s edge.'
     ])
     return s
   },
   phone(W, H) {
-    const v = roomView(W, H, { cx: 850 })
-    let s = v.world(room({ tv: 'X' }))
-    s += v.world(
-      focusRing(HOTSPOTS.tv.x, HOTSPOTS.tv.y, HOTSPOTS.tv.w, HOTSPOTS.tv.h, {
-        focused: true,
-        sw: 4
-      }) + focusRing(HOTSPOTS.terminal.x, HOTSPOTS.terminal.y, HOTSPOTS.terminal.w, HOTSPOTS.terminal.h, { sw: 4 })
-    )
-    s += label(...v.at(795, 470), 'TV', { anchor: 'middle', focused: true })
-    s += label(...v.at(1022, 500), 'Terminal', { anchor: 'middle' })
-    s += hand(...v.at(845, 664), 0.62)
-    s += panArrows(W, H)
-    s += statusLine(W)
-    s += phoneStrip(W, H, 'tv')
-    s += note(
-      12,
-      54,
-      250,
-      ['Swipe or ‹ › to look around the room. The strip reaches every thing by thumb, focus or gamepad.'],
-      { size: 11 }
-    )
+    const v = roomView(W, H, { cx: 1330 })
+    let s = v.world(room({ lights: false, scanner: 'idle' }))
+    const [sx, sy] = v.at(SCANNER.cx, SCANNER.cy)
+    s += focusRing(sx - 44, sy - 60, 88, 120, { focused: true })
+    s += faceTag(sx, sy + 78, tagOf('idle'))
+    s += statusLine(W, { dark: true })
+    s += button(20, H - 100, W - 40, 60, 'Scan your ID card', { kind: 'primary', size: 19, focus: true })
+    s += note(14, 56, 260, ['All black but the scanner. One thing to do: scan your card.'], { size: 11 })
     return s
   }
 }
 
-// ---------------------------------------------------------------- the door: the curfew, in your corporation's voice
-function doorPanel(x, y, w, key, o = {}) {
-  const corp = CORPS[key]
-  const lines = para(0, 0, corp.curfew, {
-    size: o.size ?? 17,
-    chars: Math.floor((w - 48) / ((o.size ?? 17) * (corp.headFont === MONO ? 0.62 : 0.5))),
-    family: corp.headFont
-  })
-  const h = 110 + lines.height
-  let s = rect(x, y, w, h, {
-    r: 14,
-    fill: '#12052af2',
-    stroke: o.on ? C.lavender : C.border,
-    sw: o.on ? 2 : 1.2
-  })
-  s += rect(x, y, w, 6, { r: 3, fill: corp.color })
-  s +=
-    corpLogo(key, x + 34, y + 44, 30) +
-    text(x + 62, y + 42, `${corp.name} · Curfew`, {
-      size: 15,
-      weight: 600,
-      family: corp.headFont
-    })
-  s += text(x + 62, y + 62, o.on ? 'Your subscription' : 'If you were subscribed', { size: 12, fill: C.text3 })
-  s += `<g transform="translate(${x + 24} ${y + 100})">${lines.svg}</g>`
-  s += draft(x + w - 60, y + 40)
-  return s
-}
-const door = {
-  id: '01b-door-curfew',
-  title: 'the door: the curfew warning, in your corporation’s voice',
-  desktop(W, H) {
-    const v = roomView(W, H)
-    let s = v.world(room({ tv: 'Y' })) + dim(W, H, 0.6)
-    s += v.world(
-      focusRing(HOTSPOTS.door.x, HOTSPOTS.door.y, HOTSPOTS.door.w, HOTSPOTS.door.h, { focused: true, sw: 4 })
-    )
-    s += hand(...v.at(250, 560), 0.72)
-    s += doorPanel(420, 110, 560, 'Y', { on: true, size: 21 })
-    s += text(420, 420, 'The same moment under the other two:', {
-      size: 15,
-      fill: C.text2
-    })
-    s += doorPanel(420, 440, 470, 'X', { size: 15 })
-    s += doorPanel(910, 440, 470, 'Z', { size: 15 })
-    s += button(420, 330, 200, 52, 'OK', {
-      kind: 'primary',
-      size: 18,
-      focus: true
-    })
-    s += statusLine(W)
-    s += note(
-      1010,
-      110,
-      400,
-      [
-        'The door stays locked; its panel speaks for your corporation (it enforces the curfew). Only the subscribed one shows in the game; the other two are here to compare voices.'
-      ],
-      { size: 12 }
-    )
-    return s
-  },
-  phone(W, H) {
-    const v = roomView(W, H, { cx: 220 })
-    let s = v.world(room({ tv: 'Y' })) + dim(W, H, 0.6)
-    s += v.world(
-      focusRing(HOTSPOTS.door.x, HOTSPOTS.door.y, HOTSPOTS.door.w, HOTSPOTS.door.h, { focused: true, sw: 4 })
-    )
-    s += doorPanel(16, 330, W - 32, 'Y', { on: true, size: 16 })
-    s += button(16, 540, W - 32, 52, 'OK', {
-      kind: 'primary',
-      size: 18,
-      focus: true
-    })
-    s += statusLine(W)
-    s += phoneStrip(W, H, 'door')
-    return s
-  }
-}
-
-// ---------------------------------------------------------------- 2. the ID scanner and your name
-/** The scanner's face, big: a lavender device screen, the card in the hand. */
-function scannerDevice(x, y, w, h, inner) {
-  let s = rect(x - 8, y - 8, w + 16, h + 16, { r: 30, fill: '#120d22' })
-  s += rect(x, y, w, h, { r: 24, fill: '#251d40', stroke: '#5a4c8c', sw: 3 })
-  s += rect(x + 20, y + 20, w - 40, h - 110, {
-    r: 14,
-    fill: '#130e24',
-    stroke: '#3f3566',
-    sw: 2
-  })
-  s += rect(x + w / 2 - 90, y + h - 70, 180, 14, { r: 7, fill: '#0b0916' })
-  s += text(x + w / 2, y + h - 30, 'MINERVA · ID', {
-    size: 13,
-    anchor: 'middle',
-    fill: C.text3,
-    ls: 3,
-    weight: 700
-  })
-  return s + inner(x + 20, y + 20, w - 40, h - 110)
-}
-function idCard(x, y, k = 1, o = {}) {
-  return `<g transform="translate(${x} ${y}) rotate(${o.rotate ?? -8}) scale(${k})">${rect(0, 0, 190, 120, { r: 10, fill: '#d9d2ec', stroke: '#9088aa', sw: 2 })}${rect(14, 18, 50, 62, { r: 4, fill: '#9088aa' })}<circle cx="39" cy="40" r="12" fill="#d9d2ec"/>${rect(26, 56, 26, 20, { r: 8, fill: '#d9d2ec' })}${rect(78, 22, 90, 8, { fill: '#9088aa' })}${rect(78, 40, 70, 6, { fill: '#b5acd0' })}${rect(78, 54, 80, 6, { fill: '#b5acd0' })}${text(14, 104, 'NON-CITIZEN · STIPEND', { size: 10, fill: '#5a4c8c', weight: 700, family: MONO })}</g>`
+// ---------------------------------------------------------------- 2. the scanner: your name, the wait, the lights
+/** The scanner's face, close: a device with Minerva's face at the top of its screen. */
+function scannerDevice(x, y, w, h, state, inner, o = {}) {
+  let s = `<ellipse cx="${x + w / 2}" cy="${y + h / 2}" rx="${w}" ry="${h * 0.75}" fill="url(#light)"/>`
+  s += rect(x, y, w, h, { r: 24, fill: '#0c0a14', stroke: C.rimLit, sw: 2.5 })
+  s += rect(x + 18, y + 18, w - 36, h - 76, { r: 14, fill: '#07060b', stroke: C.rim, sw: 1.5 })
+  const fw = o.faceW ?? 170
+  s += face(x + w / 2, y + 30 + fw * 0.32, fw, state, { oneOff: o.oneOff })
+  s += faceTag(x + w / 2, y + 36 + fw * 0.66, tagOf(state, o.oneOff?.[0]))
+  s += text(x + w / 2, y + h - 24, 'MINERVA · ID', { size: 12, anchor: 'middle', fill: C.text3, ls: 3, weight: 700 })
+  return s + inner(x + 18, y + 44 + fw * 0.72, w - 36)
 }
 const scannerName = {
   id: '02a-scanner-name',
-  title: 'the ID scanner asks your name (the first transaction)',
+  title: 'the ID scanner asks your name (the first transaction), in the dark',
   desktop(W, H) {
     const v = roomView(W, H)
-    let s = v.world(room({ tv: 'X' })) + dim(W, H, 0.7)
-    s += scannerDevice(480, 120, 480, 640, (x, y, w) => {
-      let t = text(x + 28, y + 50, 'Card read.', { size: 30, weight: 500 })
-      t += text(x + 28, y + 86, 'No name on file for this card.', {
-        size: 18,
-        fill: C.text2
-      })
-      t += text(x + 28, y + 150, 'Your name', { size: 15, fill: C.text2 })
-      t += rect(x + 22, y + 164, w - 44, 64, {
-        r: 12,
-        fill: '#251d40',
-        stroke: C.brand300,
-        sw: 2.5
-      })
-      t +=
-        text(x + 44, y + 206, 'Rhea Okafor', { size: 26 }) + rect(x + 196, y + 182, 2.5, 30, { fill: C.lavenderLight })
-      t += text(x + 28, y + 258, 'Filed with Minerva. Pilot names are unique.', { size: 14, fill: C.text3 })
-      t += draft(x + w - 70, y + 50)
-      t += button(x + 22, y + 290, w - 44, 66, 'Register with Minerva', {
-        kind: 'primary',
+    let s = v.world(room({ lights: false, scanner: 'listening' })) + dim(W, H, 0.6)
+    s += scannerDevice(500, 100, 440, 640, 'listening', (x, y, w) => {
+      let t = para(x + 24, y + 30, 'Card read. No name on file for this card. What’s your name?', {
         size: 22,
-        focus: true
-      })
-      t += text(x + w / 2, y + 390, 'Your wallet signs this: your first move on chain.', {
+        width: w - 48,
+        lh: 30
+      }).svg
+      t += draft(x + w - 64, y + 4)
+      t += rect(x + 18, y + 112, w - 36, 64, { r: 12, fill: '#120f1c', stroke: C.brand300, sw: 2.5 })
+      t +=
+        text(x + 40, y + 154, 'Rhea Okafor', { size: 26 }) + rect(x + 194, y + 130, 2.5, 30, { fill: C.lavenderLight })
+      t += text(x + 24, y + 204, 'Filed with Minerva. Names are unique.', { size: 14, fill: C.text3 })
+      t += button(x + 18, y + 232, w - 36, 64, 'Register with Minerva', { kind: 'primary', size: 21, focus: true })
+      t += text(x + w / 2, y + 328, 'Your wallet signs this: your first move on chain.', {
         size: 13,
         fill: C.text3,
         anchor: 'middle'
       })
       return t
     })
-    s += idCard(330, 560, 1.2)
-    s += hand(390, 820, 1.1, { pose: 'hold' })
-    s += statusLine(W)
-    s += note(1000, 140, 400, [
-      'The prompt is the scanner’s own screen, not a web form: the room dims, the scanner comes forward.',
-      'Typing: the device’s field takes the keyboard; on a phone the system keyboard opens; with a gamepad the A button opens the platform keyboard (Steam Deck) or an on-screen one.',
-      'Enter or A registers; B or ✕ backs out to the room.'
+    s += hand(290, 700, 1.1, { pose: 'hold' }) + idCard(200, 560, 1.1, -6)
+    s += statusLine(W, { dark: true })
+    s += note(990, 90, 420, [
+      'Still dark: the scanner comes forward and its light is all there is. Minerva asks, face at the top of its screen, listening while you type (each key flashes her eyes).',
+      'Typing: the system keyboard on phones; with a gamepad, A opens the platform or an on-screen keyboard. Enter or A registers; B backs out.'
     ])
     return s
   },
   phone(W, H) {
-    const v = roomView(W, H, { cx: 260 })
-    let s = v.world(room({ tv: 'X' })) + dim(W, H, 0.75)
-    s += scannerDevice(24, 70, W - 48, 470, (x, y, w) => {
-      let t = text(x + 18, y + 40, 'Card read.', { size: 24, weight: 500 })
-      t += text(x + 18, y + 66, 'No name on file for this card.', {
-        size: 14,
-        fill: C.text2
-      })
-      t += draft(x + w - 60, y + 40)
-      t += text(x + 18, y + 108, 'Your name', { size: 13, fill: C.text2 })
-      t += rect(x + 14, y + 118, w - 28, 54, {
-        r: 10,
-        fill: '#251d40',
-        stroke: C.brand300,
-        sw: 2.5
-      })
-      t +=
-        text(x + 30, y + 153, 'Rhea Okafor', { size: 21 }) + rect(x + 154, y + 134, 2.5, 24, { fill: C.lavenderLight })
-      t += button(x + 14, y + 196, w - 28, 56, 'Register with Minerva', {
-        kind: 'primary',
-        size: 18,
-        focus: true
-      })
-      t += text(x + w / 2, y + 282, 'Your wallet signs this.', {
-        size: 12,
-        fill: C.text3,
-        anchor: 'middle'
-      })
-      return t
-    })
-    // the phone's keyboard comes up under it
-    s += rect(0, H - 270, W, 270, { fill: '#26213a' })
-    const rows = ['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM']
-    rows.forEach((row, r) => {
-      const kw = 34
-      const off = (W - row.length * (kw + 4)) / 2
+    const v = roomView(W, H, { cx: 1330 })
+    let s = v.world(room({ lights: false, scanner: 'listening' })) + dim(W, H, 0.7)
+    s += scannerDevice(
+      16,
+      54,
+      W - 32,
+      520,
+      'listening',
+      (x, y, w) => {
+        let t = para(x + 14, y + 10, 'Card read. No name on file. What’s your name?', {
+          size: 17,
+          width: w - 28,
+          lh: 23
+        }).svg
+        t += rect(x + 10, y + 60, w - 20, 52, { r: 10, fill: '#120f1c', stroke: C.brand300, sw: 2.5 })
+        t +=
+          text(x + 26, y + 94, 'Rhea Okafor', { size: 20 }) + rect(x + 146, y + 76, 2.5, 22, { fill: C.lavenderLight })
+        t += button(x + 10, y + 128, w - 20, 54, 'Register with Minerva', { kind: 'primary', size: 17, focus: true })
+        return t
+      },
+      { faceW: 130 }
+    )
+    s += rect(0, H - 262, W, 262, { fill: '#1c1a24' })
+    ;['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'].forEach((row, r) => {
+      const off = (W - row.length * 38) / 2
       ;[...row].forEach(
         (ch, i) =>
           (s +=
-            rect(off + i * (kw + 4), H - 252 + r * 52, kw, 44, {
-              r: 6,
-              fill: '#4a4460'
-            }) +
-            text(off + i * (kw + 4) + kw / 2, H - 222 + r * 52, ch, {
-              size: 18,
-              anchor: 'middle'
-            }))
+            rect(off + i * 38, H - 246 + r * 52, 34, 44, { r: 6, fill: '#34313f' }) +
+            text(off + i * 38 + 17, H - 216 + r * 52, ch, { size: 18, anchor: 'middle' }))
       )
     })
-    s += rect(80, H - 96, W - 160, 44, { r: 6, fill: '#4a4460' })
-    s += statusLine(W)
+    s += rect(80, H - 90, W - 160, 44, { r: 6, fill: '#34313f' })
+    s += statusLine(W, { dark: true })
     return s
   }
 }
-
-/** The three steps of a transaction, as a small row: done, now (pink while it waits on you), next. */
 function steps(x, y, w, items, o = {}) {
   const size = o.size ?? 14
   let s = ''
@@ -406,34 +246,23 @@ function steps(x, y, w, items, o = {}) {
 }
 const scannerWait = {
   id: '02b-scanner-waiting',
-  title: 'the scanner while the first transaction goes through',
+  title: 'the scanner while the first transaction goes through, still dark',
   desktop(W, H) {
     const v = roomView(W, H)
-    let s = v.world(room({ tv: 'X' })) + dim(W, H, 0.7)
-    s += scannerDevice(480, 120, 480, 640, (x, y, w) => {
-      let t = text(x + 28, y + 50, 'Rhea Okafor', { size: 30, weight: 500 })
-      t += text(x + 28, y + 86, 'Filing your name with Minerva.', {
-        size: 18,
-        fill: C.text2
-      })
-      // the card, being read: scan lines over a card outline
-      t += rect(x + 100, y + 120, w - 200, 130, {
-        r: 12,
-        stroke: C.brand300,
-        sw: 2
-      })
-      for (let i = 0; i < 6; i++)
-        t += rect(x + 106, y + 134 + i * 20, w - 212, 3, {
-          fill: C.brand300,
-          opacity: 0.15 + (i === 3 ? 0.7 : 0)
-        })
-      t += steps(x + 28, y + 300, w - 40, [
+    let s = v.world(room({ lights: false, scanner: 'thinking' })) + dim(W, H, 0.6)
+    s += scannerDevice(500, 100, 440, 620, 'thinking', (x, y, w) => {
+      let t = text(x + 24, y + 36, 'Rhea Okafor', { size: 28, weight: 500 })
+      t += text(x + 24, y + 68, 'Filing your name.', { size: 18, fill: C.text2 })
+      t += rect(x + 80, y + 92, w - 160, 100, { r: 12, stroke: C.brand300, sw: 2 })
+      for (let i = 0; i < 5; i++)
+        t += rect(x + 86, y + 104 + i * 18, w - 172, 3, { fill: C.brand300, opacity: i === 2 ? 0.85 : 0.15 })
+      t += steps(x + 24, y + 234, w - 40, [
         ['Card read', 'done'],
         ['Your signature', 'you'],
         ['Filed', 'next']
       ])
-      t += rect(x + 22, y + 368, w - 44, 54, { r: 27, stroke: C.pink, sw: 2 })
-      t += text(x + w / 2, y + 401, 'Confirm it in your wallet', {
+      t += rect(x + 18, y + 298, w - 36, 54, { r: 27, stroke: C.pink, sw: 2 })
+      t += text(x + w / 2, y + 331, 'Confirm it in your wallet', {
         size: 18,
         anchor: 'middle',
         fill: C.pinkLight,
@@ -441,58 +270,177 @@ const scannerWait = {
       })
       return t
     })
-    s += idCard(190, 600, 1.1, { rotate: -4 })
-    s += hand(250, 860, 1.1, { pose: 'hold' })
-    s += statusLine(W)
-    s += note(1000, 140, 400, [
-      'The wait is the card being read: a scan line sweeps it, in time with the chain.',
-      'Three steps: card read, your signature (pink while it waits on you), filed. Once signed, the middle step turns lavender and the line keeps sweeping until the block lands (a few seconds), then “Name on file” and the unit powers up: lights, the TV, the terminal’s first boot.',
-      'Nothing to click while it waits; after 30 s unanswered, a Try again button appears (ui-guide §3).'
+    s += statusLine(W, { dark: true })
+    s += note(990, 90, 420, [
+      'The wait is the scanner reading your card: a scan line sweeps it while Minerva thinks (her parts circle, her eyes scan).',
+      'Signature step pink while it waits on your wallet; then it keeps sweeping until the block lands. Try again after 30 s unanswered.'
     ])
     return s
   },
   phone(W, H) {
-    const v = roomView(W, H, { cx: 260 })
-    let s = v.world(room({ tv: 'X' })) + dim(W, H, 0.75)
-    s += scannerDevice(24, 90, W - 48, 520, (x, y, w) => {
-      let t = text(x + 18, y + 40, 'Rhea Okafor', { size: 24, weight: 500 })
-      t += text(x + 18, y + 66, 'Filing your name with Minerva.', {
-        size: 14,
-        fill: C.text2
-      })
-      t += rect(x + 40, y + 92, w - 80, 100, {
-        r: 10,
-        stroke: C.brand300,
-        sw: 2
-      })
-      for (let i = 0; i < 5; i++)
-        t += rect(x + 46, y + 104 + i * 18, w - 92, 3, {
-          fill: C.brand300,
-          opacity: 0.15 + (i === 2 ? 0.7 : 0)
-        })
-      t += steps(
-        x + 10,
-        y + 232,
-        w - 10,
-        [
-          ['Read', 'done'],
-          ['Sign', 'you'],
-          ['Filed', 'next']
-        ],
-        { size: 13 }
-      )
-      t += rect(x + 14, y + 300, w - 28, 50, { r: 25, stroke: C.pink, sw: 2 })
-      t += text(x + w / 2, y + 331, 'Confirm in your wallet', {
-        size: 16,
-        anchor: 'middle',
-        fill: C.pinkLight,
-        weight: 500
-      })
-      return t
-    })
-    s += idCard(120, 660, 0.8, { rotate: 0 })
-    s += hand(160, 860, 0.8, { pose: 'hold' })
+    const v = roomView(W, H, { cx: 1330 })
+    let s = v.world(room({ lights: false, scanner: 'thinking' })) + dim(W, H, 0.7)
+    s += scannerDevice(
+      16,
+      70,
+      W - 32,
+      540,
+      'thinking',
+      (x, y, w) => {
+        let t =
+          text(x + 14, y + 26, 'Rhea Okafor', { size: 22, weight: 500 }) +
+          text(x + 14, y + 52, 'Filing your name.', { size: 14, fill: C.text2 })
+        t += rect(x + 40, y + 70, w - 80, 86, { r: 10, stroke: C.brand300, sw: 2 })
+        for (let i = 0; i < 4; i++)
+          t += rect(x + 46, y + 82 + i * 18, w - 92, 3, { fill: C.brand300, opacity: i === 1 ? 0.85 : 0.15 })
+        t += steps(
+          x + 10,
+          y + 192,
+          w - 10,
+          [
+            ['Read', 'done'],
+            ['Sign', 'you'],
+            ['Filed', 'next']
+          ],
+          { size: 13 }
+        )
+        t +=
+          rect(x + 10, y + 250, w - 20, 50, { r: 25, stroke: C.pink, sw: 2 }) +
+          text(x + w / 2, y + 281, 'Confirm in your wallet', {
+            size: 16,
+            anchor: 'middle',
+            fill: C.pinkLight,
+            weight: 500
+          })
+        return t
+      },
+      { faceW: 130 }
+    )
+    s += statusLine(W, { dark: true })
+    return s
+  }
+}
+const lightsOn = {
+  id: '02c-lights-on',
+  title: 'name filed: the lights come on, and the room opens up',
+  desktop(W, H) {
+    const v = roomView(W, H)
+    let s = v.world(room({ tv: 'X', scanner: 'talking' }))
+    s += v.world(
+      Object.entries(HOTSPOTS)
+        .map(([key, h]) => focusRing(h.x, h.y, h.w, h.h, { focused: key === 'terminal', sw: 3.5 }))
+        .join('')
+    )
+    for (const [key, h] of Object.entries(HOTSPOTS))
+      s += label(...v.at(h.x + h.w / 2, h.y - 14), h.label, { focused: key === 'terminal' })
+    s += hand(...v.at(1080, 690), 0.72)
+    s += notice(
+      440,
+      64,
+      560,
+      'Name on file: Rhea Okafor',
+      'Power’s on. So are the bills. The terminal on the desk has your account.',
+      { state: 'talking', oneOff: ['nod', 0.35], faceW: 96 }
+    )
+    s += faceTag(500, 158, tagOf('talking', 'nod'))
     s += statusLine(W)
+    s += rect(0, H - 44, W, 44, { fill: C.black, opacity: 0.85 })
+    s += text(24, H - 16, 'Click or tap a thing to use it · Tab, arrows or the D-pad move between things', {
+      size: 14,
+      fill: C.text2
+    })
+    s += padGlyph(W - 280, H - 22, 'A', 11) + text(W - 262, H - 17, 'Use', { size: 14, fill: C.text2 })
+    s += padGlyph(W - 200, H - 22, 'B', 11) + text(W - 182, H - 17, 'Back', { size: 14, fill: C.text2 })
+    s += padGlyph(W - 120, H - 22, '≡', 11) + text(W - 102, H - 17, 'Menu', { size: 14, fill: C.text2 })
+    s += note(
+      1030,
+      64,
+      390,
+      [
+        'Once the name is filed the lights come on: the ceiling strip, the TV, the terminal, in that order. Minerva nods and points you at the terminal (it has focus).',
+        'Dashed rings: things you can use (first visit only?). The balcony door is left, the door out right; both run off the edges.'
+      ],
+      { size: 12 }
+    )
+    return s
+  },
+  phone(W, H) {
+    const v = roomView(W, H, { cx: 960 })
+    let s = v.world(room({ tv: 'X', scanner: 'talking' }))
+    s += v.world(
+      focusRing(HOTSPOTS.terminal.x, HOTSPOTS.terminal.y, HOTSPOTS.terminal.w, HOTSPOTS.terminal.h, {
+        focused: true,
+        sw: 4
+      }) + focusRing(HOTSPOTS.tv.x, HOTSPOTS.tv.y, HOTSPOTS.tv.w, HOTSPOTS.tv.h, { sw: 4 })
+    )
+    s += label(...v.at(1080, 506), 'Terminal', { focused: true })
+    s += hand(...v.at(1080, 690), 0.6)
+    s += panArrows(W, H)
+    s += notice(10, 52, W - 20, 'Name on file', 'Power’s on. So are the bills.', {
+      state: 'talking',
+      oneOff: ['nod', 0.35],
+      faceW: 70,
+      size: 14
+    })
+    s += statusLine(W)
+    s += phoneStrip(W, H, 'terminal')
+    return s
+  }
+}
+
+// ---------------------------------------------------------------- the door: the curfew, in your corporation's voice
+function doorPanel(x, y, w, key, o = {}) {
+  const corp = CORPS[key]
+  const size = o.size ?? 17
+  const lines = para(0, 0, corp.curfew, { size, width: w - 48, family: corp.headFont, lh: size * 1.35 })
+  const h = 96 + lines.height
+  let s = rect(x, y, w, h, { r: 14, fill: '#0b0912f2', stroke: o.on ? C.lavender : C.border, sw: o.on ? 2 : 1.2 })
+  s += rect(x + 14, y, w - 28, 3, { fill: corp.color, opacity: 0.8 })
+  s +=
+    corpLogo(key, x + 34, y + 40, 28) +
+    text(x + 60, y + 38, `${corp.name} · Curfew`, { size: 15, weight: 600, family: corp.headFont })
+  s += text(x + 60, y + 58, o.on ? 'Your subscription' : 'If you were subscribed', { size: 12, fill: C.text3 })
+  s += `<g transform="translate(${x + 24} ${y + 92})">${lines.svg}</g>`
+  s += draft(x + w - 60, y + 36)
+  return s
+}
+const door = {
+  id: '02d-door-curfew',
+  title: 'the door: the curfew warning, in your corporation’s voice',
+  desktop(W, H) {
+    const v = roomView(W, H)
+    let s = v.world(room({ tv: 'Y' })) + dim(W, H, 0.65)
+    s += v.world(
+      focusRing(HOTSPOTS.door.x, HOTSPOTS.door.y, HOTSPOTS.door.w, HOTSPOTS.door.h, { focused: true, sw: 4 })
+    )
+    s += hand(...v.at(1440, 600), 0.72)
+    s += doorPanel(110, 100, 560, 'Y', { on: true, size: 20 })
+    s += button(110, 360, 200, 52, 'OK', { kind: 'primary', size: 18, focus: true })
+    s += text(110, 470, 'The same moment under the other two:', { size: 15, fill: C.text2 })
+    s += doorPanel(110, 490, 470, 'X', { size: 15 })
+    s += doorPanel(600, 490, 470, 'Z', { size: 15 })
+    s += statusLine(W)
+    s += note(
+      700,
+      100,
+      380,
+      [
+        'The door stays locked; its panel speaks for your corporation, which enforces the curfew: violence in the block, and too little security to answer. Only your subscription shows in the game; the other two are here to compare voices.'
+      ],
+      { size: 12 }
+    )
+    return s
+  },
+  phone(W, H) {
+    const v = roomView(W, H, { cx: 1380 })
+    let s = v.world(room({ tv: 'Y' })) + dim(W, H, 0.65)
+    s += v.world(
+      focusRing(HOTSPOTS.door.x, HOTSPOTS.door.y, HOTSPOTS.door.w, HOTSPOTS.door.h, { focused: true, sw: 4 })
+    )
+    s += doorPanel(16, 250, W - 32, 'Y', { on: true, size: 16 })
+    s += button(16, 500, W - 32, 52, 'OK', { kind: 'primary', size: 18, focus: true })
+    s += statusLine(W)
+    s += phoneStrip(W, H, 'door')
     return s
   }
 }
@@ -501,65 +449,22 @@ const scannerWait = {
 function corpCard(x, y, w, h, key, o = {}) {
   const corp = CORPS[key]
   let s = ''
-  if (o.focus)
-    s += rect(x - 6, y - 6, w + 12, h + 12, {
-      r: 20,
-      stroke: C.brand300,
-      sw: 2.5
-    })
-  s += rect(x, y, w, h, {
-    r: 16,
-    fill: '#221a3d',
-    stroke: o.focus ? C.lavender : C.border,
-    sw: o.focus ? 2 : 1.2
-  })
-  s += rect(x, y, w, 8, { r: 4, fill: corp.color })
+  if (o.focus) s += rect(x - 6, y - 6, w + 12, h + 12, { r: 20, stroke: C.brand300, sw: 2.5 })
+  s += rect(x, y, w, h, { r: 16, fill: '#17141f', stroke: o.focus ? C.lavender : C.border, sw: o.focus ? 2 : 1.2 })
+  s += rect(x + 16, y, w - 32, 3, { fill: corp.color, opacity: 0.8 })
   if (o.compact) {
-    s += corpLogo(key, x + 36, y + h / 2 + 4, 34)
-    s += text(x + 70, y + 36, corp.name, {
-      size: 19,
-      weight: 600,
-      family: corp.headFont
-    })
-    s += text(x + 70, y + 58, corp.kind, { size: 12, fill: C.text3 })
-    const p = para(x + 70, y + 80, corp.feels, {
-      size: 13,
-      chars: Math.floor((w - 90) / 7),
-      fill: C.text2,
-      italic: true
-    })
-    s += p.svg
-    return s
+    s += corpLogo(key, x + 36, y + h / 2 + 2, 32)
+    s += text(x + 70, y + 34, corp.name, { size: 19, weight: 600, family: corp.headFont })
+    s += text(x + 70, y + 54, corp.kind, { size: 12, fill: C.text3 })
+    return s + para(x + 70, y + 78, corp.feels, { size: 13, width: w - 90, fill: C.text2, italic: true }).svg
   }
-  s += corpLogo(key, x + w / 2, y + 74, 64)
-  s += text(x + w / 2, y + 146, corp.name, {
-    size: 26,
-    weight: 600,
-    anchor: 'middle',
-    family: corp.headFont
-  })
-  s += text(x + w / 2, y + 172, corp.kind, {
-    size: 13,
-    fill: C.text3,
-    anchor: 'middle'
-  })
-  const p = para(x + 24, y + 214, corp.character, {
-    size: 15,
-    chars: Math.floor((w - 48) / 8),
-    fill: C.text2
-  })
-  s += p.svg
-  s += para(x + 24, y + 222 + p.height, corp.feels, {
-    size: 15,
-    chars: Math.floor((w - 48) / 8),
-    italic: true
-  }).svg
-  s += draft(x + w - 60, y + 26)
-  s += button(x + 24, y + h - 76, w - 48, 54, 'Subscribe', {
-    kind: o.focus ? 'primary' : 'normal',
-    size: 19
-  })
-  return s
+  s += corpLogo(key, x + w / 2, y + 66, 56)
+  s += text(x + w / 2, y + 130, corp.name, { size: 24, weight: 600, anchor: 'middle', family: corp.headFont })
+  s += text(x + w / 2, y + 154, corp.kind, { size: 12, fill: C.text3, anchor: 'middle' })
+  const p = para(x + 22, y + 194, corp.character, { size: 15, width: w - 44, fill: C.text2 })
+  s += p.svg + para(x + 22, y + 204 + p.height, corp.feels, { size: 15, width: w - 44, italic: true }).svg
+  s += draft(x + w - 58, y + 26)
+  return s + button(x + 22, y + h - 72, w - 44, 52, 'Subscribe', { kind: o.focus ? 'primary' : 'normal', size: 18 })
 }
 const firstBoot = {
   id: '03a-first-boot',
@@ -567,119 +472,69 @@ const firstBoot = {
   desktop(W, H) {
     const v = roomView(W, H)
     let s = v.world(room({ tv: 'X' })) + rect(0, 0, W, H, { fill: 'url(#scrim)' })
-    const f = consoleFrame(60, 64, W - 120, H - 100, {
+    const f = minervaConsole(60, 64, W - 120, H - 100, {
       corp: null,
-      tabs: false
+      tabs: false,
+      state: 'talking',
+      say: 'This unit runs through a corporation. Pick one. You can switch later; on Earth it’s free.'
     })
     s += f.svg
     const c = f.content
-    s += text(c.x, c.y + 26, 'Choose a corporation to subscribe to.', {
-      size: 28,
-      weight: 500
-    })
-    s += text(
-      c.x,
-      c.y + 58,
-      'Your unit, your job board and this console run through your corporation. Minerva works the same for everyone.',
-      { size: 16, fill: C.text2 }
-    )
-    s += draft(c.x + c.w - 50, c.y + 22)
-    const cw = (c.w - 40) / 3
+    s += text(c.x, c.y + 20, 'Subscribe to a corporation', { size: 24, weight: 500 })
+    s += draft(c.x + c.w - 50, c.y + 16)
+    const cw = (c.w - 32) / 3
     ;['X', 'Y', 'Z'].forEach(
-      (key, i) =>
-        (s += corpCard(c.x + i * (cw + 20), c.y + 96, cw, 440, key, {
-          focus: key === 'Y'
-        }))
+      (key, i) => (s += corpCard(c.x + i * (cw + 16), c.y + 50, cw, 440, key, { focus: key === 'Y' }))
     )
-    s += rect(c.x, c.y + 562, c.w, 52, {
-      r: 12,
-      fill: '#140f27',
-      stroke: C.border
-    })
-    s += text(
-      c.x + 20,
-      c.y + 594,
-      'You can switch at any time, from Settings in this console. It’s free here, on Earth.',
-      { size: 16, fill: C.text2 }
-    )
-    s += draft(c.x + c.w - 60, c.y + 590)
-    s += statusLine(W, { skip: true })
+    s += para(
+      c.x,
+      c.y + 530,
+      'Your corporation runs this unit, your job board, the curfew and this console’s look. Minerva works the same for everyone.',
+      { size: 15, width: c.w, fill: C.text2 }
+    ).svg
+    s += statusLine(W)
     return s
   },
   phone(W, H) {
-    let s = rect(0, 0, W, H, { fill: '#0b0916' })
-    const f = consoleFrame(0, 44, W, H - 44, {
+    let s = rect(0, 0, W, H, { fill: C.black })
+    const f = minervaConsole(0, 44, W, H - 44, {
       corp: null,
       tabs: false,
-      phone: true
+      phone: true,
+      state: 'talking',
+      say: 'This unit runs through a corporation. Pick one. Switch any time.'
     })
     s += f.svg
     const c = f.content
-    s += para(c.x, c.y + 22, 'Choose a corporation to subscribe to.', {
-      size: 21,
-      chars: 28,
-      weight: 500
-    }).svg
-    s += para(c.x, c.y + 80, 'Your unit, job board and this console run through it. Switch any time.', {
-      size: 13,
-      chars: 46,
-      fill: C.text2
-    }).svg
-    s += draft(c.x + c.w - 50, c.y + 2)
     ;['X', 'Y', 'Z'].forEach(
-      (key, i) =>
-        (s += corpCard(c.x, c.y + 128 + i * 142, c.w, 128, key, {
-          compact: true,
-          focus: key === 'Y'
-        }))
+      (key, i) => (s += corpCard(c.x, c.y + i * 136, c.w, 122, key, { compact: true, focus: key === 'Y' }))
     )
-    s += button(c.x, H - 90, c.w, 56, 'Subscribe to Corp Y', {
-      kind: 'primary',
-      size: 18
-    })
+    s += draft(c.x + c.w - 50, c.y - 4)
+    s += button(c.x, H - 86, c.w, 56, 'Subscribe to Corp Y', { kind: 'primary', size: 18 })
     s += statusLine(W)
     return s
   }
 }
-
-/** A miniature of the console's header band in a corporation's skin, for the switching screen. */
 function skinPreview(x, y, w, key, o = {}) {
   const corp = CORPS[key]
   const h = 150
-  let s = rect(x, y, w, h, {
-    r: 12,
-    fill: '#1b1531',
-    stroke: o.on ? C.lavender : C.border,
-    sw: o.on ? 2 : 1
-  })
+  let s = rect(x, y, w, h, { r: 12, fill: '#120f1c', stroke: o.on ? C.lavender : C.border, sw: o.on ? 2 : 1 })
   s +=
-    rect(x, y, w, 52, {
-      r: 12,
-      fill: key === 'Z' ? 'url(#band-z)' : corp.band
-    }) +
-    rect(x, y + 40, w, 12, { fill: key === 'Z' ? '#0f3540' : corp.band }) +
-    rect(x, y + 50, w, 3, { fill: corp.color })
+    rect(x + 1, y + 1, w - 2, 34, { r: 11, fill: corp.band }) +
+    rect(x, y + 34, w, 2, { fill: corp.color, opacity: 0.8 })
   s +=
-    owl(x + 28, y + 26, 34, '#ffffff', { eyes: false }) +
-    text(x + 52, y + 24, 'MINERVA', { size: 12, weight: 700, ls: 2 }) +
-    text(x + 52, y + 40, `via ${corp.name}`, {
-      size: 10,
-      fill: C.text2,
-      family: corp.headFont
+    corpLogo(key, x + 20, y + 18, 16) +
+    text(x + 36, y + 23, `${corp.name} housing`, { size: 11, fill: C.text2, family: corp.headFont })
+  s += face(x + 44, y + 76, 64, 'idle')
+  s += para(x + 84, y + 64, corp.greeting, { size: 12, width: w - 96, family: corp.headFont }).svg
+  return (
+    s +
+    text(x + 16, y + h - 14, o.on ? 'Subscribed' : 'Switch', {
+      size: 13,
+      fill: o.on ? C.lavender : C.brand300,
+      weight: 600
     })
-  s += corpLogo(key, x + w - 24, y + 26, 22)
-  s += para(x + 16, y + 80, corp.greeting, {
-    size: 13,
-    chars: Math.floor((w - 30) / 7),
-    family: corp.headFont,
-    fill: C.text
-  }).svg
-  s += text(x + 16, y + h - 16, o.on ? 'Subscribed' : 'Switch', {
-    size: 13,
-    fill: o.on ? C.lavender : C.brand300,
-    weight: 600
-  })
-  return s
+  )
 }
 const switching = {
   id: '03b-switching',
@@ -687,93 +542,65 @@ const switching = {
   desktop(W, H) {
     const v = roomView(W, H)
     let s = v.world(room({ tv: 'X' })) + rect(0, 0, W, H, { fill: 'url(#scrim)' })
-    const f = consoleFrame(60, 64, W - 120, H - 100, {
+    const f = minervaConsole(60, 64, W - 120, H - 100, {
       corp: 'Y',
       tab: null,
-      subtitle: 'via Corp Y · Settings'
+      state: 'talking',
+      say: 'Switching is free while you’re on Earth. Out there it costs, and your property moves with you.',
+      bandText: 'Corp Y housing · Settings'
     })
     s += f.svg
     const c = f.content
-    s += text(c.x, c.y + 26, 'Your corporation', { size: 28, weight: 500 })
-    s += text(
-      c.x,
-      c.y + 58,
-      'Switching changes this console’s look and voice, the news, and your job board. Minerva’s records stay the same.',
-      { size: 15, fill: C.text2 }
-    )
-    s += draft(c.x + c.w - 50, c.y + 22)
-    const pw = (c.w - 40) / 3
+    s += text(c.x, c.y + 20, 'Your corporation', { size: 24, weight: 500 })
+    s += draft(c.x + c.w - 50, c.y + 16)
+    const pw = (c.w - 32) / 3
     ;['X', 'Y', 'Z'].forEach((key, i) => {
-      if (key !== 'Y')
-        s += rect(c.x + i * (pw + 20) - 5, c.y + 95, pw + 10, 160, {
-          r: 15,
-          stroke: key === 'Z' ? C.brand300 : 'none',
-          sw: 2.5
-        })
-      s += skinPreview(c.x + i * (pw + 20), c.y + 100, pw, key, {
-        on: key === 'Y'
-      })
+      if (key === 'Z')
+        s += rect(c.x + i * (pw + 16) - 5, c.y + 45, pw + 10, 160, { r: 15, stroke: C.brand300, sw: 2.5 })
+      s += skinPreview(c.x + i * (pw + 16), c.y + 50, pw, key, { on: key === 'Y' })
     })
-    s += text(c.x, c.y + 310, 'What switching to Corp Z would mean', {
-      size: 18,
-      weight: 500
-    })
-    const lines = [
-      ['Here, on Earth', 'Free. Your curfew, ads and job board become Corp Z’s.'],
+    s += text(c.x, c.y + 250, 'What switching to Corp Z changes', { size: 18, weight: 500 })
+    ;[
+      ['Here, on Earth', 'Free. Your curfew warnings, ads, job board and this console’s look become Corp Z’s.'],
       [
         'Later, as a pilot',
         'A fee, and maybe a wait before some benefits start. Your ports’ taxes, and the law over what you own, move with you.'
-      ]
-    ]
-    lines.forEach(([k, val], i) => {
-      s += text(c.x, c.y + 350 + i * 56, k, { size: 15, fill: C.text3 })
-      s += para(c.x + 180, c.y + 350 + i * 56, val, {
-        size: 15,
-        chars: 90,
-        fill: C.text2
-      }).svg
+      ],
+      ['Never', 'Minerva: her face, her records and how she speaks to you.']
+    ].forEach(([k, val], i) => {
+      s += text(c.x, c.y + 290 + i * 60, k, { size: 15, fill: C.text3 })
+      s += para(c.x + 170, c.y + 290 + i * 60, val, { size: 15, width: c.w - 170, fill: C.text2 }).svg
     })
-    s += button(c.x, c.y + 480, 300, 58, 'Switch to Corp Z', {
-      kind: 'normal',
-      size: 19,
-      focus: true
-    })
-    s += button(c.x + 320, c.y + 480, 200, 58, 'Stay with Corp Y', {
-      kind: 'quiet',
-      size: 17
-    })
-    s += note(c.x + 600, c.y + 470, c.w - 600, [
-      'The skin is the corporation’s layer over Minerva: a band color, logo, typeface and greeting. Her owl, layout and buttons never change.'
-    ])
+    s +=
+      button(c.x, c.y + 480, 280, 58, 'Switch to Corp Z', { size: 19, focus: true }) +
+      button(c.x + 300, c.y + 480, 200, 58, 'Stay with Corp Y', { kind: 'quiet', size: 17 })
     s += statusLine(W)
     return s
   },
   phone(W, H) {
-    let s = rect(0, 0, W, H, { fill: '#0b0916' })
-    const f = consoleFrame(0, 44, W, H - 44, {
+    let s = rect(0, 0, W, H, { fill: C.black })
+    const f = minervaConsole(0, 44, W, H - 44, {
       corp: 'Y',
       phone: true,
       tab: null,
-      badges: { Mail: 3 },
-      subtitle: 'via Corp Y · Settings'
+      badges: { Mail: 2 },
+      state: 'talking',
+      say: 'Switching is free while you’re on Earth.',
+      bandText: 'Corp Y housing · Settings'
     })
     s += f.svg
     const c = f.content
-    s += text(c.x, c.y + 22, 'Your corporation', { size: 21, weight: 500 })
-    s += draft(c.x + c.w - 50, c.y + 20)
-    s += skinPreview(c.x, c.y + 44, c.w, 'Y', { on: true })
-    s += rect(c.x - 5, c.y + 205, c.w + 10, 160, {
-      r: 15,
-      stroke: C.brand300,
-      sw: 2.5
-    })
-    s += skinPreview(c.x, c.y + 210, c.w, 'Z')
-    s += para(c.x, c.y + 392, 'Free here on Earth. As a pilot: a fee, and your ports’ taxes and law move with you.', {
+    s += skinPreview(c.x, c.y, c.w, 'Y', { on: true })
+    s +=
+      rect(c.x - 5, c.y + 165, c.w + 10, 160, { r: 15, stroke: C.brand300, sw: 2.5 }) +
+      skinPreview(c.x, c.y + 170, c.w, 'Z')
+    s += para(c.x, c.y + 348, 'Your curfew, ads, job board and this look become Corp Z’s. Minerva doesn’t change.', {
       size: 13,
-      chars: 46,
+      width: c.w,
       fill: C.text2
     }).svg
-    s += button(c.x, c.y + 440, c.w, 54, 'Switch to Corp Z', { size: 18 })
+    s += button(c.x, c.y + 398, c.w, 54, 'Switch to Corp Z', { size: 18 })
+    s += draft(c.x + c.w - 50, c.y + 348)
     s += statusLine(W)
     return s
   }
@@ -782,87 +609,63 @@ const switching = {
 // ---------------------------------------------------------------- 4. the TV
 function tvMoment(key) {
   const corp = CORPS[key]
+  const n = { X: 1, Y: 2, Z: 3 }[key]
   return {
     id: `04${{ X: 'a', Y: 'b', Z: 'c' }[key]}-tv-${key.toLowerCase()}`,
     title: `the TV: a ${corp.name} ad`,
     desktop(W, H) {
       const v = roomView(W, H)
-      let s = v.world(room({ tv: key })) + dim(W, H, 0.8)
-      s += `<ellipse cx="${W / 2}" cy="${H / 2 - 20}" rx="620" ry="380" fill="url(#tv-glow)"/>`
-      // the TV, close: bezel and screen
-      s += rect(W / 2 - 480, 110, 960, 600, {
-        r: 20,
-        fill: '#07060f',
-        stroke: '#4a3f75',
-        sw: 6
-      })
-      s += `<svg x="${W / 2 - 468}" y="122" width="936" height="576" viewBox="0 0 468 288" preserveAspectRatio="xMidYMid slice">${tvAdArt(key)}</svg>`
-      s += draft(W / 2 + 400, 150, { fill: '#000000aa' })
-      // a ticker under the ad: Minerva's public notices run on every channel
-      s += rect(W / 2 - 468, 664, 936, 34, { fill: '#000000b3' })
+      let s = v.world(room({ tv: key })) + dim(W, H, 0.85)
+      s += `<ellipse cx="${W / 2}" cy="${H / 2 - 40}" rx="640" ry="380" fill="url(#light)"/>`
+      s += rect(W / 2 - 480, 90, 960, 600, { r: 20, fill: C.black, stroke: C.rimLit, sw: 4 })
+      s += `<svg x="${W / 2 - 468}" y="102" width="936" height="576" viewBox="0 0 468 288" preserveAspectRatio="xMidYMid slice">${tvAdArt(key)}</svg>`
+      s += draft(W / 2 + 400, 130)
       s +=
-        owl(W / 2 - 440, 681, 28, '#ffffff', { eyes: false }) +
-        text(
-          W / 2 - 416,
-          687,
-          'MINERVA PUBLIC NOTICE · Curfew 22:00–05:00 · Pilot program hiring, all three corporations',
-          { size: 15, fill: C.text2, family: MONO }
-        )
-      s += rect(W / 2 - 60, 716, 120, 26, { fill: '#07060f' })
-      // channel controls, as big buttons under the set
-      s += button(W / 2 - 330, 770, 200, 56, '‹ Previous', { size: 18 })
-      s += button(W / 2 - 100, 770, 200, 56, 'Next ad ›', {
-        size: 18,
-        focus: true
-      })
-      s += button(W / 2 + 130, 770, 200, 56, 'Turn off', {
-        size: 18,
-        kind: 'quiet'
-      })
-      s += text(W / 2, 860, `Ad ${{ X: 1, Y: 2, Z: 3 }[key]} of 3 · they cycle on their own every 8 s`, {
+        rect(W / 2 - 468, 644, 936, 34, { fill: '#000000c0' }) +
+        text(W / 2 - 452, 667, TICKER, { size: 14, fill: C.text2, family: MONO })
+      s +=
+        button(W / 2 - 330, 730, 200, 56, '‹ Previous', { size: 18 }) +
+        button(W / 2 - 100, 730, 200, 56, 'Next ad ›', { size: 18, focus: true }) +
+        button(W / 2 + 130, 730, 200, 56, 'Turn off', { size: 18, kind: 'quiet' })
+      s += text(W / 2, 820, `Ad ${n} of 3 · they cycle on their own every 8 s`, {
         size: 14,
         anchor: 'middle',
         fill: C.text3
       })
       s += statusLine(W)
       if (key === 'X')
-        s += note(W / 2 + 350, 726, 370, [
-          'Each corporation’s ad sells its business model, not a culture: X sells the contract, Y belonging, Z speed.',
-          'The ads are the loudest color in the intro, on purpose (the loud world). The interface around them stays purple.'
-        ])
+        s += note(
+          W / 2 + 350,
+          726,
+          370,
+          [
+            'Each corporation’s ad sells its business model: X the contract, Y belonging, Z speed. Muted, like everything in the city: the noir look. The ticker under every channel is Minerva’s, with the curfew and why.'
+          ],
+          { size: 12 }
+        )
       return s
     },
     phone(W, H) {
-      let s = rect(0, 0, W, H, { fill: '#07060f' })
-      s += `<ellipse cx="${W / 2}" cy="330" rx="300" ry="260" fill="url(#tv-glow)"/>`
-      // the phone turns the TV sideways into a tall crop of the same ad
-      s += rect(12, 120, W - 24, 420, {
-        r: 14,
-        fill: '#07060f',
-        stroke: '#4a3f75',
-        sw: 4
-      })
-      s += `<svg x="20" y="128" width="${W - 40}" height="404" viewBox="0 0 468 300" preserveAspectRatio="xMinYMid slice">${tvAdArt(key, { copy: false })}</svg>`
-      s += `<g>${rect(20, 400, W - 40, 132, { fill: '#000000', opacity: 0.35 })}${text(40, 440, corp.ad.head, { size: 26, weight: 700, family: key === 'Z' ? MONO : corp.headFont })}${text(40, 472, corp.ad.head2, { size: 26, weight: 700, family: key === 'Z' ? MONO : corp.headFont })}${text(40, 504, corp.ad.sub, { size: 14, family: key === 'Z' ? MONO : corp.headFont, fill: '#ffffffd9' })}</g>`
-      s += draft(W - 80, 150)
+      let s = rect(0, 0, W, H, { fill: C.black })
+      s += `<ellipse cx="${W / 2}" cy="320" rx="300" ry="260" fill="url(#light)"/>`
+      s += rect(12, 110, W - 24, 420, { r: 14, fill: C.black, stroke: C.rimLit, sw: 3 })
+      s += `<svg x="20" y="118" width="${W - 40}" height="404" viewBox="0 0 468 300" preserveAspectRatio="xMaxYMid slice">${tvAdArt(key, { copy: false })}</svg>`
+      const fam = corp.headFont
       s +=
-        rect(20, 548, W - 40, 30, { fill: '#000000b3' }) +
-        text(30, 568, 'MINERVA · Curfew 22:00–05:00 · Pilots hiring', {
-          size: 12,
-          fill: C.text2,
-          family: MONO
-        })
-      s += button(20, 610, (W - 52) / 2, 54, '‹ Previous', { size: 16 })
-      s += button(32 + (W - 52) / 2, 610, (W - 52) / 2, 54, 'Next ad ›', {
-        size: 16,
-        focus: true
-      })
-      s += button(20, 680, W - 40, 50, 'Turn off', { size: 16, kind: 'quiet' })
-      s += text(W / 2, 760, `Ad ${{ X: 1, Y: 2, Z: 3 }[key]} of 3`, {
-        size: 13,
-        anchor: 'middle',
-        fill: C.text3
-      })
+        rect(20, 390, W - 40, 132, { fill: '#000000', opacity: 0.72 }) +
+        text(36, 430, corp.ad.head, { size: 25, weight: 700, family: fam, fill: C.smoke }) +
+        text(36, 461, corp.ad.head2, { size: 25, weight: 700, family: fam, fill: C.smoke }) +
+        text(36, 492, corp.ad.sub, { size: 14, family: fam, fill: C.text2 })
+      s += draft(W - 80, 140)
+      s +=
+        rect(20, 538, W - 40, 30, { fill: '#000000c0' }) +
+        text(30, 558, 'MINERVA · Curfew 22:00–05:00 · violence high', { size: 12, fill: C.text2, family: MONO })
+      s +=
+        button(20, 600, (W - 52) / 2, 54, '‹ Previous', { size: 16 }) +
+        button(32 + (W - 52) / 2, 600, (W - 52) / 2, 54, 'Next ad ›', { size: 16, focus: true })
+      s +=
+        button(20, 670, W - 40, 50, 'Turn off', { size: 16, kind: 'quiet' }) +
+        text(W / 2, 750, `Ad ${n} of 3`, { size: 13, anchor: 'middle', fill: C.text3 })
       s += statusLine(W)
       return s
     }
@@ -883,93 +686,77 @@ function vapor(cx, cy, k = 1) {
     .join('')
 }
 function vape(x, y, k = 1) {
-  return `<g transform="translate(${x} ${y}) rotate(-30) scale(${k})">${rect(-8, -60, 16, 70, { r: 6, fill: '#3f3566', stroke: '#5a4c8c', sw: 2 })}${rect(-5, -72, 10, 14, { r: 3, fill: '#5a4c8c' })}<circle cx="0" cy="-30" r="3" fill="${C.brand300}"/></g>`
+  return `<g transform="translate(${x} ${y}) rotate(-30) scale(${k})">${rect(-8, -60, 16, 70, { r: 6, fill: '#1a1726', stroke: C.rimLit, sw: 2 })}${rect(-5, -72, 10, 14, { r: 3, fill: C.rim })}<circle cx="0" cy="-30" r="3" fill="${C.brand300}"/></g>`
+}
+/** The railing across the bottom of the screen, with the terminal mounted on its top rail at `tx`. */
+function railing(W, H, top, gap, tx, k = 1) {
+  let s = rect(0, top + 16, W, H - top, { fill: C.black })
+  for (let x = 8; x < W; x += gap) s += rect(x, top + 14, 7 * k, H - top, { fill: '#0b0a12', stroke: C.rim, sw: 1 })
+  s += rect(-4, top, W + 8, 16 * k, { fill: '#0d0b14', stroke: C.rimLit, sw: 1.5 })
+  // the terminal sits on the rail, on a short bracket
+  const tw = 170 * k
+  const th = 120 * k
+  s += rect(tx + tw / 2 - 12 * k, top - 14 * k, 24 * k, 16 * k, { fill: C.black, stroke: C.rim, sw: 1 })
+  s += `<ellipse cx="${tx + tw / 2}" cy="${top - th / 2 - 14 * k}" rx="${tw}" ry="${th}" fill="url(#light)"/>`
+  s += rect(tx, top - th - 14 * k, tw, th, { r: 10 * k, fill: '#0c0a14', stroke: C.rimLit, sw: 2 })
+  s += rect(tx + 10 * k, top - th - 4 * k, tw - 20 * k, th - 20 * k, { r: 5, fill: '#07060b' })
+  s += face(tx + tw / 2, top - th / 2 - 22 * k, 120 * k, 'skeptical', { glow: false })
+  s += text(tx + tw / 2, top - 30 * k, 'HEALTH −1', {
+    size: 12 * k,
+    anchor: 'middle',
+    fill: C.pinkLight,
+    weight: 700,
+    family: MONO
+  })
+  return s
 }
 const balcony = {
   id: '05-balcony',
   title: 'the balcony: the city, the vape, a health notice',
   desktop(W, H) {
-    let s = city(0, 0, W, H - 120, { zoom: 2, seed: 23, adOffset: 1 })
-    // the balcony floor and railing, in front
-    s += rect(0, H - 130, W, 130, { fill: '#05040b' })
-    s +=
-      Array.from({ length: 30 }, (_, i) =>
-        rect(i * 52 + 10, H - 290, 8, 170, {
-          fill: '#0e0a1c',
-          stroke: '#3f3566',
-          sw: 1.5
-        })
-      ).join('') + rect(0, H - 304, W, 16, { fill: '#120d22', stroke: '#5a4c8c', sw: 2 })
-    // the balcony's terminal, on a post, its screen showing the notice
-    s +=
-      rect(1150, 360, 150, 120, {
-        r: 10,
-        fill: '#120d22',
-        stroke: '#5a4c8c',
-        sw: 3
-      }) +
-      rect(1162, 372, 126, 82, { r: 4, fill: '#1b1531' }) +
-      owl(1225, 400, 60, '#ffffffdd')
-    s += text(1225, 446, 'HEALTH −1', {
-      size: 13,
-      anchor: 'middle',
-      fill: C.pinkLight,
-      weight: 700,
-      family: MONO
-    })
-    s += rect(1215, 480, 20, H - 480, { fill: '#05040b' })
-    s += focusRing(1135, 345, 180, 150, { sw: 3 }) + label(1225, 330, 'Terminal', { anchor: 'middle' })
-    // the vape, in hand, and its cloud
-    s += vapor(900, 430, 1.4)
-    s += hand(820, 760, 1.2, { pose: 'hold', extra: vape(40, 30, 1.3) })
-    // Minerva's notice: it needs you (pink frame), dry
+    let s = city(0, 0, W, H - 200, { zoom: 2, seed: 23, adOffset: 1 })
+    s += railing(W, H, H - 250, 52, 1120)
+    s += focusRing(1105, H - 400, 200, 162, { sw: 3 }) + label(1205, H - 412, 'Terminal')
+    s += faceTag(1205, H - 230, tagOf('skeptical'))
+    s += vapor(760, 420, 1.4) + hand(680, 700, 1.2, { pose: 'hold', extra: vape(40, 30, 1.3) })
     s += notice(
+      60,
       70,
-      90,
-      520,
+      560,
       'Health score 14 (−1)',
       'Vape. Fourth today. At this rate your score reaches zero in 14 days. I’m only counting.',
-      { attention: true, size: 16 }
+      { attention: true, state: 'skeptical', faceW: 96, size: 15 }
     )
-    s += rect(0, 0, W, 0, {})
-    // controls: take a hit, go back inside
-    s += button(70, H - 100, 220, 60, 'Take a hit', { size: 19, focus: true })
-    s += button(310, H - 100, 220, 60, '‹ Inside', { size: 19 })
+    s +=
+      button(60, H - 90, 220, 60, 'Take a hit', { size: 19, focus: true }) +
+      button(300, H - 90, 220, 60, 'Inside ›', { size: 19 })
     s += statusLine(W)
-    s += note(W - 470, 70, 440, [
-      'Going out: the room slides away and scales up past the camera, the city layers move forward at different speeds (parallax) until the railing is in front.',
-      'Each hit costs a health point; the notice pops on the balcony terminal and in the corner. Pink: it needs you. The health score is flavor only and never appears after the intro.'
-    ])
+    s += note(
+      W - 470,
+      70,
+      440,
+      [
+        'Going out: the room slides away to the right and scales up past the camera; the city’s layers move forward at different speeds (parallax) until the railing is in front.',
+        'The terminal sits on the railing. Each hit costs a health point: the notice pops in the corner and on the railing terminal, Minerva skeptical. Pink: it needs you.'
+      ],
+      { size: 12 }
+    )
     return s
   },
   phone(W, H) {
-    let s = city(0, 0, W, H - 140, { zoom: 1.6, seed: 23, adOffset: 1 })
-    s += rect(0, H - 150, W, 150, { fill: '#05040b' })
-    s +=
-      Array.from({ length: 9 }, (_, i) =>
-        rect(i * 46 + 6, H - 280, 7, 140, {
-          fill: '#0e0a1c',
-          stroke: '#3f3566',
-          sw: 1.5
-        })
-      ).join('') + rect(0, H - 292, W, 14, { fill: '#120d22', stroke: '#5a4c8c', sw: 2 })
-    s += vapor(250, 300, 1)
-    s += hand(240, 500, 0.85, { pose: 'hold', extra: vape(40, 30, 1.3) })
-    s += notice(12, 56, W - 24, 'Health score 14 (−1)', 'Vape. Fourth today. I’m only counting.', {
+    let s = city(0, 0, W, H - 200, { zoom: 1.6, seed: 23, adOffset: 1 })
+    s += railing(W, H, H - 310, 46, W - 150, 0.78)
+    s += vapor(150, 330, 1) + hand(130, 520, 0.8, { pose: 'hold', extra: vape(40, 30, 1.3) })
+    s += notice(10, 52, W - 20, 'Health score 14 (−1)', 'Vape. Fourth today. I’m only counting.', {
       attention: true,
+      state: 'skeptical',
+      faceW: 70,
       size: 14
     })
-    s += button(16, H - 120, (W - 44) / 2, 56, 'Take a hit', {
-      size: 17,
-      focus: true
-    })
-    s += button(28 + (W - 44) / 2, H - 120, (W - 44) / 2, 56, 'Terminal', {
-      size: 17
-    })
-    s += button(16, H - 52, W - 32, 40, '‹ Inside', {
-      size: 15,
-      kind: 'quiet'
-    })
+    s +=
+      button(16, H - 120, (W - 44) / 2, 56, 'Take a hit', { size: 17, focus: true }) +
+      button(28 + (W - 44) / 2, H - 120, (W - 44) / 2, 56, 'Terminal', { size: 17 })
+    s += button(16, H - 52, W - 32, 40, 'Inside ›', { size: 15, kind: 'quiet' })
     s += statusLine(W)
     return s
   }
@@ -977,55 +764,28 @@ const balcony = {
 
 // ---------------------------------------------------------------- 6. the Minerva console
 const MAIL = [
-  {
-    from: 'Grid Utility',
-    subject: 'Final notice: 3 cycles unpaid',
-    tag: 'Overdue'
-  },
-  {
-    from: 'Block 7 Housing',
-    subject: 'Unit fee overdue: 2 cycles',
-    tag: 'Overdue'
-  },
-  {
-    from: 'Harlan & Voss Logistics',
-    subject: 'Re: Application 44817',
-    tag: 'Rejection'
-  },
-  {
-    from: 'Talent Intake',
-    subject: 'Your application was not reviewed',
-    tag: 'Rejection'
-  },
+  { from: 'Grid Utility', subject: 'Final notice: 3 cycles unpaid', tag: 'Overdue' },
+  { from: 'Block 7 Housing', subject: 'Unit fee overdue: 2 cycles', tag: 'Overdue' },
+  { from: 'Harlan & Voss Logistics', subject: 'Re: Application 44817', tag: 'Rejection' },
+  { from: 'Talent Intake', subject: 'Your application was not reviewed', tag: 'Rejection' },
   { from: 'NutriLoan', subject: 'You’re pre-approved! 0% for 3 days', tag: '' },
-  { from: 'Minerva', subject: 'Stipend paid. Then spent.', tag: '' },
+  { from: 'Block 7 Security', subject: 'Incident report: 3 assaults, 0 arrests', tag: '' },
   { from: 'OxyPlus', subject: 'Your air could be better', tag: '' }
 ]
 function mailRow(x, y, w, m, o = {}) {
   let s = rect(x, y, w, o.h ?? 62, {
     r: 10,
-    fill: o.open ? '#302651' : '#221a3d',
+    fill: o.open ? '#221d30' : '#17141f',
     stroke: o.open ? C.lavender : 'none',
     sw: 1.5
   })
   const overdue = m.tag === 'Overdue'
-  s += text(x + 16, y + 26, m.from, {
-    size: o.size ?? 15,
-    weight: 600,
-    fill: m.from === 'Minerva' ? C.lavender : C.text
-  })
-  s += text(x + 16, y + 48, m.subject, {
-    size: (o.size ?? 15) - 1,
-    fill: C.text2
-  })
+  s +=
+    text(x + 16, y + 26, m.from, { size: o.size ?? 15, weight: 600 }) +
+    text(x + 16, y + 48, m.subject, { size: (o.size ?? 15) - 1, fill: C.text2 })
   if (m.tag) {
     const tw = m.tag.length * 7.5 + 18
-    s += rect(x + w - tw - 12, y + 12, tw, 22, {
-      r: 11,
-      fill: overdue ? 'none' : '#00000033',
-      stroke: overdue ? C.pink : C.text3,
-      sw: 1.5
-    })
+    s += rect(x + w - tw - 12, y + 12, tw, 22, { r: 11, fill: 'none', stroke: overdue ? C.pink : C.text3, sw: 1.5 })
     s += text(x + w - tw / 2 - 12, y + 27, m.tag, {
       size: 12,
       anchor: 'middle',
@@ -1041,99 +801,57 @@ const consoleMail = {
   desktop(W, H) {
     const v = roomView(W, H)
     let s = v.world(room({ tv: 'X' })) + rect(0, 0, W, H, { fill: 'url(#scrim)' })
-    const f = consoleFrame(60, 64, W - 120, H - 100, {
+    const f = minervaConsole(60, 64, W - 120, H - 100, {
       corp: 'X',
       tab: 'Mail',
-      badges: { Mail: 2 }
+      badges: { Mail: 2 },
+      state: 'talking',
+      say: 'Two bills are overdue. One company said no, politely. Another didn’t read it.'
     })
     s += f.svg
     const c = f.content
-    s += text(c.x, c.y + 20, 'Mail', {
-      size: 26,
-      weight: 500,
-      family: CORPS.X.headFont
-    })
-    s += text(c.x + 90, c.y + 20, '7 messages · 2 overdue', {
-      size: 15,
-      fill: C.text3
-    })
-    s += draft(c.x + 300, c.y + 16)
-    const lw = 420
-    MAIL.forEach((m, i) => (s += mailRow(c.x, c.y + 44 + i * 70, lw, m, { open: i === 2 })))
-    // the reading pane: a rejection, in Corp X's voice
-    const rx = c.x + lw + 30
-    const rw = c.w - lw - 30
-    s += rect(rx, c.y + 44, rw, 480, {
-      r: 12,
-      fill: '#140f27',
-      stroke: C.border
-    })
-    s += text(rx + 24, c.y + 84, 'Re: Application 44817', {
-      size: 22,
-      weight: 500,
-      family: CORPS.X.headFont
-    })
-    s += text(rx + 24, c.y + 110, 'Harlan & Voss Logistics, a Corp X company', {
-      size: 14,
-      fill: C.text3
-    })
-    s += draft(rx + rw - 64, c.y + 80)
-    const body = [
+    s +=
+      text(c.x, c.y + 18, 'Mail', { size: 24, weight: 500, family: CORPS.X.headFont }) +
+      text(c.x + 70, c.y + 18, '7 · 2 overdue', { size: 14, fill: C.text3 }) +
+      draft(c.x + 190, c.y + 14)
+    const lw = 360
+    MAIL.forEach((m, i) => (s += mailRow(c.x, c.y + 40 + i * 70, lw, m, { open: i === 2, size: 14 })))
+    const rx = c.x + lw + 24
+    const rw = c.w - lw - 24
+    s += rect(rx, c.y + 40, rw, 480, { r: 12, fill: '#0d0b15', stroke: C.border })
+    s +=
+      text(rx + 24, c.y + 80, 'Re: Application 44817', { size: 21, weight: 500, family: CORPS.X.headFont }) +
+      text(rx + 24, c.y + 104, 'Harlan & Voss Logistics, a Corp X company', { size: 13, fill: C.text3 })
+    let by = c.y + 150
+    for (const line of [
       'Dear Applicant 7-2216,',
       'After careful review against 9,412 applicants, we have selected candidates whose qualifications more closely match the position.',
-      'Your rights under this decision are set out in Annex C. You may appeal within 3 days, at your own cost.',
-      'We wish you success in your search.'
-    ]
-    let by = c.y + 156
-    for (const line of body) {
-      const p = para(rx + 24, by, line, {
-        size: 16,
-        chars: Math.floor((rw - 48) / 8.4),
-        family: CORPS.X.headFont,
-        fill: C.text2
-      })
+      'Your rights under this decision are set out in Annex C. You may appeal within 3 days, at your own cost.'
+    ]) {
+      const p = para(rx + 24, by, line, { size: 15, width: rw - 48, family: CORPS.X.headFont, fill: C.text2 })
       s += p.svg
-      by += p.height + 14
+      by += p.height + 12
     }
-    s += button(rx + 24, c.y + 456, 160, 48, 'Delete', { size: 16 })
-    s += button(rx + 200, c.y + 456, 160, 48, 'Next ›', { size: 16 })
+    s +=
+      button(rx + 24, c.y + 450, 140, 46, 'Delete', { size: 15 }) +
+      button(rx + 180, c.y + 450, 140, 46, 'Next ›', { size: 15 })
     s += statusLine(W)
-    s += note(
-      c.x + 470,
-      H - 160,
-      470,
-      [
-        'Near full screen; the room stays dim around it. Focus is held inside until ✕ or B closes it. Tabs: big buttons, keys 1–4. Overdue is pink (it needs you), with a word, never color alone.'
-      ],
-      { size: 12 }
-    )
     return s
   },
   phone(W, H) {
-    let s = rect(0, 0, W, H, { fill: '#0b0916' })
-    const f = consoleFrame(0, 44, W, H - 44, {
+    let s = rect(0, 0, W, H, { fill: C.black })
+    const f = minervaConsole(0, 44, W, H - 44, {
       corp: 'X',
       phone: true,
       tab: 'Mail',
-      badges: { Mail: 2 }
+      badges: { Mail: 2 },
+      state: 'talking',
+      say: 'Two bills are overdue. One company said no, politely.'
     })
     s += f.svg
     const c = f.content
-    s += text(c.x, c.y + 20, 'Mail', {
-      size: 22,
-      weight: 500,
-      family: CORPS.X.headFont
-    })
-    s += text(c.x + 66, c.y + 20, '7 · 2 overdue', { size: 13, fill: C.text3 })
-    s += draft(c.x + c.w - 50, c.y + 18)
-    MAIL.slice(0, 7).forEach(
-      (m, i) =>
-        (s += mailRow(c.x, c.y + 40 + i * 74, c.w, m, {
-          size: 14,
-          h: 64,
-          open: i === 0
-        }))
-    )
+    MAIL.slice(0, 6).forEach((m, i) => (s += mailRow(c.x, c.y + i * 72, c.w, m, { size: 14, h: 62, open: i === 0 })))
+    s += draft(c.x + c.w - 50, c.y - 6)
     s += statusLine(W)
     return s
   }
@@ -1144,169 +862,98 @@ const consoleAccount = {
   desktop(W, H) {
     const v = roomView(W, H)
     let s = v.world(room({ tv: 'Z' })) + rect(0, 0, W, H, { fill: 'url(#scrim)' })
-    const f = consoleFrame(60, 64, W - 120, H - 100, {
+    const f = minervaConsole(60, 64, W - 120, H - 100, {
       corp: 'Z',
       tab: 'Account',
       badges: { Mail: 2 },
-      focusTab: true
+      focusTab: true,
+      state: 'skeptical',
+      say: 'You owe 45. The stipend comes in 6 days. The bills come first.'
     })
     s += f.svg
     const c = f.content
-    s += text(c.x, c.y + 20, CORPS.Z.greeting, {
-      size: 18,
-      fill: CORPS.Z.color,
-      family: MONO
-    })
-    s += draft(c.x + 420, c.y + 16)
-    // the balance
-    s += rect(c.x, c.y + 44, 430, 200, {
-      r: 14,
-      fill: '#140f27',
-      stroke: C.border
-    })
-    s += text(c.x + 24, c.y + 84, 'Balance', { size: 16, fill: C.text2 })
-    s += text(c.x + 24, c.y + 160, '−45¢', {
-      size: 72,
-      weight: 500,
-      fill: C.pinkLight
-    })
-    s += text(c.x + 24, c.y + 210, 'Owed. The stipend comes in 6 days.', {
-      size: 15,
-      fill: C.text2
-    })
-    // where the stipend went: costs are neutral text
-    s += rect(c.x + 450, c.y + 44, c.w - 450, 200, {
-      r: 14,
-      fill: '#140f27',
-      stroke: C.border
-    })
-    s += text(c.x + 474, c.y + 84, 'This cycle', { size: 16, fill: C.text2 })
-    const rows = [
+    s +=
+      text(c.x, c.y + 16, CORPS.Z.greeting, { size: 16, fill: CORPS.Z.color, family: MONO }) +
+      draft(c.x + 360, c.y + 12)
+    const half = (c.w - 20) / 2
+    s += rect(c.x, c.y + 36, half, 200, { r: 14, fill: '#0d0b15', stroke: C.border })
+    s +=
+      text(c.x + 22, c.y + 74, 'Balance', { size: 15, fill: C.text2 }) +
+      text(c.x + 22, c.y + 150, '−45¢', { size: 68, weight: 500, fill: C.pinkLight }) +
+      text(c.x + 22, c.y + 200, 'Owed. Stipend in 6 days.', { size: 14, fill: C.text2 })
+    const rx = c.x + half + 20
+    s +=
+      rect(rx, c.y + 36, half, 200, { r: 14, fill: '#0d0b15', stroke: C.border }) +
+      text(rx + 22, c.y + 74, 'This cycle', { size: 15, fill: C.text2 })
+    ;[
       ['Stipend, through Minerva', '+600'],
-      ['Unit fee, Block 7 Housing', '−420'],
+      ['Unit fee', '−420'],
       ['Grid', '−95'],
       ['Nutrition', '−130']
-    ]
-    rows.forEach(([k, val], i) => {
-      s += text(c.x + 474, c.y + 120 + i * 28, k, { size: 15, fill: C.text })
-      s += text(c.x + c.w - 24, c.y + 120 + i * 28, val, {
-        size: 15,
-        fill: C.text,
-        anchor: 'end',
-        family: MONO
-      })
-    })
-    s += rect(c.x + 474, c.y + 222, c.w - 498, 1, { fill: C.border })
-    // health, beside it
-    s += rect(c.x, c.y + 268, c.w, 190, {
-      r: 14,
-      fill: '#140f27',
-      stroke: C.border
-    })
-    s += text(c.x + 24, c.y + 306, 'Health score', { size: 16, fill: C.text2 })
+    ].forEach(
+      ([k, val], i) =>
+        (s +=
+          text(rx + 22, c.y + 110 + i * 28, k, { size: 15 }) +
+          text(rx + half - 22, c.y + 110 + i * 28, val, { size: 15, anchor: 'end', family: MONO }))
+    )
+    s += rect(c.x, c.y + 256, c.w, 160, { r: 14, fill: '#0d0b15', stroke: C.border })
     s +=
-      text(c.x + 24, c.y + 370, '14', {
-        size: 60,
-        weight: 500,
-        fill: C.pinkLight
-      }) + text(c.x + 100, c.y + 370, '/ 100', { size: 20, fill: C.text3 })
+      text(c.x + 22, c.y + 292, 'Health score', { size: 15, fill: C.text2 }) +
+      text(c.x + 22, c.y + 352, '14', { size: 56, weight: 500, fill: C.pinkLight }) +
+      text(c.x + 94, c.y + 352, '/ 100', { size: 18, fill: C.text3 })
     s +=
-      rect(c.x + 200, c.y + 340, c.w - 230, 18, { r: 9, fill: '#251d40' }) +
-      rect(c.x + 200, c.y + 340, (c.w - 230) * 0.14, 18, {
-        r: 9,
-        fill: C.pink
-      })
-    s += text(c.x + 200, c.y + 386, 'Vape −4 today · Sleep −2 · Air quality −1', { size: 15, fill: C.text2 })
-    s += para(c.x + 24, c.y + 426, 'Minerva: “Your score is what your insurer sees. You don’t have an insurer.”', {
-      size: 15,
-      chars: 120,
-      fill: C.text,
-      italic: true
-    }).svg
-    s += draft(c.x + c.w - 64, c.y + 302)
-    s += statusLine(W)
+      rect(c.x + 190, c.y + 324, c.w - 220, 16, { r: 8, fill: '#1a1726' }) +
+      rect(c.x + 190, c.y + 324, (c.w - 220) * 0.14, 16, { r: 8, fill: C.pink })
+    s += text(c.x + 190, c.y + 370, 'Vape −4 today · Sleep −2 · Air quality −1', { size: 14, fill: C.text2 })
     s += note(
       c.x,
-      H - 170,
-      620,
+      c.y + 440,
+      c.w,
       [
-        'Same console as 06a in Corp Z’s skin: the band’s gradient, the logo, a monospace face and its greeting. Minerva’s own words (the italic line) read the same under every skin.',
-        'Owed money and the low score are pink; the cycle’s costs are plain text (color guide: costs are neutral).'
+        'Same console as 06a in Corp Z’s skin: the band, logo, monospace greeting. Minerva’s face and words read the same under every skin. Owed money and the low score are pink; the costs are plain text.'
       ],
       { size: 12 }
     )
+    s += statusLine(W)
     return s
   },
   phone(W, H) {
-    let s = rect(0, 0, W, H, { fill: '#0b0916' })
-    const f = consoleFrame(0, 44, W, H - 44, {
+    let s = rect(0, 0, W, H, { fill: C.black })
+    const f = minervaConsole(0, 44, W, H - 44, {
       corp: 'Z',
       phone: true,
       tab: 'Account',
-      badges: { Mail: 2 }
+      badges: { Mail: 2 },
+      state: 'skeptical',
+      say: 'You owe 45. The stipend comes in 6 days. The bills come first.'
     })
     s += f.svg
     const c = f.content
-    s += text(c.x, c.y + 18, CORPS.Z.greeting, {
-      size: 14,
-      fill: CORPS.Z.color,
-      family: MONO
-    })
-    s += draft(c.x + c.w - 50, c.y + 16)
-    s += rect(c.x, c.y + 36, c.w, 150, {
-      r: 14,
-      fill: '#140f27',
-      stroke: C.border
-    })
-    s += text(c.x + 18, c.y + 66, 'Balance', { size: 14, fill: C.text2 })
-    s += text(c.x + 18, c.y + 130, '−45¢', {
-      size: 56,
-      weight: 500,
-      fill: C.pinkLight
-    })
-    s += text(c.x + 18, c.y + 168, 'Owed. Stipend in 6 days.', {
-      size: 13,
-      fill: C.text2
-    })
-    const rows = [
+    s += text(c.x, c.y + 6, CORPS.Z.greeting, { size: 13, fill: CORPS.Z.color, family: MONO })
+    s +=
+      rect(c.x, c.y + 20, c.w, 130, { r: 14, fill: '#0d0b15', stroke: C.border }) +
+      text(c.x + 18, c.y + 48, 'Balance', { size: 14, fill: C.text2 }) +
+      text(c.x + 18, c.y + 110, '−45¢', { size: 52, weight: 500, fill: C.pinkLight }) +
+      text(c.x + 18, c.y + 138, 'Owed. Stipend in 6 days.', { size: 13, fill: C.text2 })
+    s += rect(c.x, c.y + 162, c.w, 132, { r: 14, fill: '#0d0b15', stroke: C.border })
+    ;[
       ['Stipend', '+600'],
       ['Unit fee', '−420'],
       ['Grid', '−95'],
       ['Nutrition', '−130']
-    ]
-    s += rect(c.x, c.y + 200, c.w, 150, {
-      r: 14,
-      fill: '#140f27',
-      stroke: C.border
-    })
-    rows.forEach(([k, val], i) => {
-      s += text(c.x + 18, c.y + 234 + i * 30, k, { size: 14 })
-      s += text(c.x + c.w - 18, c.y + 234 + i * 30, val, {
-        size: 14,
-        anchor: 'end',
-        family: MONO
-      })
-    })
-    s += rect(c.x, c.y + 364, c.w, 104, {
-      r: 14,
-      fill: '#140f27',
-      stroke: C.border
-    })
+    ].forEach(
+      ([k, val], i) =>
+        (s +=
+          text(c.x + 18, c.y + 192 + i * 28, k, { size: 14 }) +
+          text(c.x + c.w - 18, c.y + 192 + i * 28, val, { size: 14, anchor: 'end', family: MONO }))
+    )
     s +=
-      text(c.x + 18, c.y + 394, 'Health score', { size: 14, fill: C.text2 }) +
-      text(c.x + c.w - 18, c.y + 394, '14 / 100', {
-        size: 15,
-        anchor: 'end',
-        fill: C.pinkLight,
-        weight: 600
-      })
+      rect(c.x, c.y + 306, c.w, 76, { r: 14, fill: '#0d0b15', stroke: C.border }) +
+      text(c.x + 18, c.y + 334, 'Health score', { size: 14, fill: C.text2 }) +
+      text(c.x + c.w - 18, c.y + 334, '14 / 100', { size: 15, anchor: 'end', fill: C.pinkLight, weight: 600 })
     s +=
-      rect(c.x + 18, c.y + 410, c.w - 36, 14, { r: 7, fill: '#251d40' }) +
-      rect(c.x + 18, c.y + 410, (c.w - 36) * 0.14, 14, { r: 7, fill: C.pink })
-    s += text(c.x + 18, c.y + 450, 'Vape −4 today', {
-      size: 13,
-      fill: C.text2
-    })
+      rect(c.x + 18, c.y + 350, c.w - 36, 12, { r: 6, fill: '#1a1726' }) +
+      rect(c.x + 18, c.y + 350, (c.w - 36) * 0.14, 12, { r: 6, fill: C.pink })
     s += statusLine(W)
     return s
   }
@@ -1316,7 +963,7 @@ const consoleAccount = {
 const jobTerms = [
   ['Your body', 'is frozen and kept in cold storage, to be bought back one day.'],
   ['Your mind', 'is uploaded to Minerva. You fly a ship; she flies with you.'],
-  ['Your name', 'out there is a call sign. Your name on file is it.'],
+  ['Your name', 'out there is a call sign: the one on file.'],
   ['The work', 'Space shipping: trade, explore, claim the worlds you find.'],
   ['The terms', 'Keep most of what you earn. The program advances a hold of goods.'],
   ['And', 'citizenship of Corp Y, from the day you’re processed.']
@@ -1327,143 +974,79 @@ const job = {
   desktop(W, H) {
     const v = roomView(W, H)
     let s = v.world(room({ tv: 'Y' })) + rect(0, 0, W, H, { fill: 'url(#scrim)' })
-    const f = consoleFrame(60, 64, W - 120, H - 100, {
+    const f = minervaConsole(60, 64, W - 120, H - 100, {
       corp: 'Y',
       tab: 'Jobs',
-      badges: { Mail: 2 }
+      badges: { Mail: 2 },
+      state: 'listening',
+      say: 'One opening you qualify for. Read all of it before you sign.'
     })
     s += f.svg
     const c = f.content
-    // the board, left: everything else is greyed out
-    const lw = 360
-    s += text(c.x, c.y + 20, 'Corp Y job board', { size: 22, weight: 500 })
-    s += draft(c.x + 250, c.y + 16)
-    const others = ['Warehouse picker', 'Debt collector', 'Clinical trial', 'Security, night', 'Courier']
-    s += rect(c.x - 4, c.y + 40, lw + 8, 92, {
-      r: 14,
-      stroke: C.brand300,
-      sw: 2.5
-    })
-    s += rect(c.x, c.y + 44, lw, 84, {
-      r: 12,
-      fill: '#302651',
-      stroke: C.yellow,
-      sw: 2
-    })
-    s += text(c.x + 18, c.y + 76, 'Pilot · Orbiter 8 program', {
-      size: 18,
-      weight: 600
-    })
+    const lw = 270
+    s += text(c.x, c.y + 18, 'Corp Y job board', { size: 19, weight: 500 }) + draft(c.x + 180, c.y + 14)
     s +=
-      `<circle cx="${c.x + 26}" cy="${c.y + 102}" r="6" fill="${C.yellow}"/>` +
-      text(c.x + 40, c.y + 107, 'You’re eligible', {
-        size: 14,
-        fill: C.yellowLight,
-        weight: 600
-      })
-    others.forEach((name, i) => {
-      s += rect(c.x, c.y + 142 + i * 62, lw, 54, { r: 10, fill: '#1f1838' })
-      s += text(c.x + 18, c.y + 166 + i * 62, name, {
-        size: 15,
-        fill: C.text3
-      })
-      s += text(c.x + 18, c.y + 185 + i * 62, 'Requires citizenship', {
-        size: 12,
-        fill: C.text3
-      })
+      rect(c.x - 4, c.y + 36, lw + 8, 88, { r: 14, stroke: C.brand300, sw: 2.5 }) +
+      rect(c.x, c.y + 40, lw, 80, { r: 12, fill: '#221d30', stroke: C.yellow, sw: 2 })
+    s +=
+      text(c.x + 16, c.y + 70, 'Pilot · Orbiter 8', { size: 17, weight: 600 }) +
+      `<circle cx="${c.x + 23}" cy="${c.y + 96}" r="5" fill="${C.yellow}"/>` +
+      text(c.x + 36, c.y + 101, 'You’re eligible', { size: 13, fill: C.yellowLight, weight: 600 })
+    ;['Warehouse picker', 'Debt collector', 'Clinical trial', 'Security, night', 'Courier'].forEach((name, i) => {
+      s +=
+        rect(c.x, c.y + 136 + i * 60, lw, 52, { r: 10, fill: '#14111c' }) +
+        text(c.x + 16, c.y + 159 + i * 60, name, { size: 14, fill: C.text3 }) +
+        text(c.x + 16, c.y + 177 + i * 60, 'Requires citizenship', { size: 11, fill: C.text3 })
     })
-    // the opening, right
-    const rx = c.x + lw + 30
-    const rw = c.w - lw - 30
-    s += rect(rx, c.y + 4, rw, 610, {
-      r: 14,
-      fill: '#140f27',
-      stroke: C.border
-    })
-    s += ship(rx + rw - 90, c.y + 92, 110, 'none', {
-      stroke: C.yellow,
-      sw: 90,
-      rotate: 30
-    })
-    s += text(rx + 28, c.y + 54, 'Pilot, Orbiter 8 program', {
-      size: 28,
-      weight: 500
-    })
-    s += text(rx + 28, c.y + 82, 'Corp Y Shipping · one opening · starts tonight', { size: 15, fill: C.text2 })
-    s += draft(rx + 28, c.y + 112)
-    s += para(rx + 28, c.y + 150, 'A new life, out there. We’ll be honest about what it takes.', {
-      size: 19,
-      chars: 60
+    const rx = c.x + lw + 24
+    const rw = c.w - lw - 24
+    s += rect(rx, c.y, rw, 620, { r: 14, fill: '#0d0b15', stroke: C.border })
+    s += ship(rx + rw - 70, c.y + 70, 90, 'none', { stroke: C.yellow, sw: 110, rotate: 30 })
+    s +=
+      text(rx + 24, c.y + 46, 'Pilot, Orbiter 8 program', { size: 26, weight: 500 }) +
+      text(rx + 24, c.y + 72, 'Corp Y Shipping · one opening · starts tonight', { size: 14, fill: C.text2 }) +
+      draft(rx + 24, c.y + 100)
+    s += para(rx + 24, c.y + 136, 'A new life, out there. We’ll be honest about what it takes.', {
+      size: 18,
+      width: rw - 48
     }).svg
     jobTerms.forEach(([k, val], i) => {
-      s += text(rx + 28, c.y + 210 + i * 46, k, {
-        size: 15,
-        fill: C.text3,
-        weight: 600
-      })
-      s += text(rx + 150, c.y + 210 + i * 46, val, { size: 16, fill: C.text })
+      s += text(rx + 24, c.y + 196 + i * 46, k, { size: 14, fill: C.text3, weight: 600 })
+      s += para(rx + 130, c.y + 196 + i * 46, val, { size: 15, width: rw - 150 }).svg
     })
-    s += button(rx + 28, c.y + 512, 280, 64, 'Accept the job', {
-      kind: 'primary',
-      size: 22,
-      focus: true
-    })
-    s += button(rx + 328, c.y + 512, 160, 64, 'Not yet', {
-      kind: 'quiet',
-      size: 18
-    })
-    s += text(rx + 28, c.y + 600, 'Accepting is the only way out (or back to the title).', { size: 14, fill: C.text3 })
+    s +=
+      button(rx + 24, c.y + 494, 260, 62, 'Accept the job', { kind: 'primary', size: 21, focus: true }) +
+      button(rx + 300, c.y + 494, 150, 62, 'Not yet', { kind: 'quiet', size: 17 })
+    s += text(rx + 24, c.y + 590, 'Accepting is the only way out (or back to the title).', { size: 13, fill: C.text3 })
     s += statusLine(W)
-    s += note(
-      c.x,
-      H - 140,
-      380,
-      [
-        'Yellow appears here for the first time in the intro: the one opening that’s yours, and your ship to be. Everything else on the board is greyed out.'
-      ],
-      { size: 12 }
-    )
     return s
   },
   phone(W, H) {
-    let s = rect(0, 0, W, H, { fill: '#0b0916' })
-    const f = consoleFrame(0, 44, W, H - 44, {
+    let s = rect(0, 0, W, H, { fill: C.black })
+    const f = minervaConsole(0, 44, W, H - 44, {
       corp: 'Y',
       phone: true,
       tab: 'Jobs',
-      badges: { Mail: 2 }
+      badges: { Mail: 2 },
+      state: 'listening',
+      say: 'One opening you qualify for. Read all of it.'
     })
     s += f.svg
     const c = f.content
-    s += ship(c.x + c.w - 40, c.y + 36, 64, 'none', {
-      stroke: C.yellow,
-      sw: 110,
-      rotate: 30
-    })
-    s += para(c.x, c.y + 22, 'Pilot, Orbiter 8 program', {
-      size: 21,
-      chars: 18,
-      weight: 500
-    }).svg
+    s += ship(c.x + c.w - 30, c.y + 18, 50, 'none', { stroke: C.yellow, sw: 130, rotate: 30 })
     s +=
-      `<circle cx="${c.x + 6}" cy="${c.y + 76}" r="5" fill="${C.yellow}"/>` +
-      text(c.x + 18, c.y + 81, 'You’re eligible · Corp Y Shipping', {
-        size: 13,
-        fill: C.yellowLight
-      })
-    s += draft(c.x + c.w - 50, c.y + 106)
-    let ty = c.y + 132
+      text(c.x, c.y + 8, 'Pilot, Orbiter 8 program', { size: 19, weight: 500 }) +
+      `<circle cx="${c.x + 6}" cy="${c.y + 30}" r="5" fill="${C.yellow}"/>` +
+      text(c.x + 18, c.y + 35, 'You’re eligible · Corp Y Shipping', { size: 13, fill: C.yellowLight })
+    let ty = c.y + 66
     for (const [k, val] of jobTerms) {
-      s += text(c.x, ty, k, { size: 13, fill: C.text3, weight: 600 })
-      const p = para(c.x, ty + 20, val, { size: 14, chars: 44 })
+      s += text(c.x, ty, k, { size: 12, fill: C.text3, weight: 600 })
+      const p = para(c.x, ty + 18, val, { size: 14, width: c.w })
       s += p.svg
-      ty += 20 + p.height + 12
+      ty += 18 + p.height + 8
     }
-    s += button(c.x, H - 170, c.w, 58, 'Accept the job', {
-      kind: 'primary',
-      size: 19,
-      focus: true
-    })
+    s += draft(c.x + c.w - 50, c.y + 60)
+    s += button(c.x, H - 160, c.w, 58, 'Accept the job', { kind: 'primary', size: 19, focus: true })
     s += statusLine(W)
     return s
   }
@@ -1474,148 +1057,74 @@ const shipName = {
   desktop(W, H) {
     const v = roomView(W, H)
     let s = v.world(room({ tv: 'Y' })) + rect(0, 0, W, H, { fill: 'url(#scrim)' })
-    const f = consoleFrame(60, 64, W - 120, H - 100, {
+    const f = minervaConsole(60, 64, W - 120, H - 100, {
       corp: 'Y',
       tab: 'Jobs',
-      badges: { Mail: 2 }
+      badges: { Mail: 2 },
+      state: 'listening',
+      say: 'Name your ship. It’s registered with me before pickup.'
     })
     s += f.svg
     const c = f.content
-    s += `<circle cx="${c.x + c.w / 2}" cy="${c.y + 170}" r="130" fill="url(#screen-glow)"/>`
-    s += ship(c.x + c.w / 2, c.y + 170, 220, 'none', {
-      stroke: C.yellow,
-      sw: 50
-    })
-    s += text(c.x + c.w / 2, c.y + 340, 'Name your ship.', {
-      size: 30,
-      weight: 500,
-      anchor: 'middle'
-    })
-    s += text(c.x + c.w / 2, c.y + 372, 'Every Orbiter 8 is registered with Minerva by name before pickup.', {
-      size: 16,
-      fill: C.text2,
-      anchor: 'middle'
-    })
-    s += draft(c.x + c.w / 2 + 290, c.y + 336)
-    s += rect(c.x + c.w / 2 - 260, c.y + 396, 520, 66, {
-      r: 14,
-      fill: '#251d40',
-      stroke: C.yellow,
-      sw: 2.5
-    })
+    const mx = c.x + c.w / 2
     s +=
-      text(c.x + c.w / 2 - 236, c.y + 440, 'Second Chance', {
-        size: 28,
-        fill: C.yellowLight
-      }) + rect(c.x + c.w / 2 - 50, c.y + 414, 2.5, 32, { fill: C.yellowLight })
-    s += button(c.x + c.w / 2 - 260, c.y + 490, 520, 66, 'Sign and name her', {
-      kind: 'primary',
-      size: 22,
-      focus: true
-    })
-    s += text(c.x + c.w / 2, c.y + 590, 'Your wallet signs: the ship is made, and you join Corp Y.', {
+      `<circle cx="${mx}" cy="${c.y + 150}" r="140" fill="url(#light)"/>` +
+      ship(mx, c.y + 150, 210, 'none', { stroke: C.yellow, sw: 50 })
+    s += text(mx, c.y + 310, 'Name your ship', { size: 28, weight: 500, anchor: 'middle' }) + draft(mx + 140, c.y + 306)
+    s += rect(mx - 250, c.y + 336, 500, 64, { r: 14, fill: '#120f1c', stroke: C.yellow, sw: 2.5 })
+    s +=
+      text(mx - 226, c.y + 379, 'Second Chance', { size: 27, fill: C.yellowLight }) +
+      rect(mx - 40, c.y + 354, 2.5, 30, { fill: C.yellowLight })
+    s += button(mx - 250, c.y + 424, 500, 64, 'Sign and name her', { kind: 'primary', size: 21, focus: true })
+    s += text(mx, c.y + 520, 'Your wallet signs: the ship is made, and you join Corp Y.', {
       size: 14,
       fill: C.text3,
       anchor: 'middle'
     })
     s += statusLine(W)
-    s += note(
-      c.x,
-      c.y + 470,
-      245,
-      [
-        'The yellow outline is your ship: the first thing in the game that’s yours. The field is yellow-edged for the same reason; the button stays lavender.'
-      ],
-      { size: 12 }
-    )
     return s
   },
   phone(W, H) {
-    let s = rect(0, 0, W, H, { fill: '#0b0916' })
-    const f = consoleFrame(0, 44, W, H - 44, {
+    let s = rect(0, 0, W, H, { fill: C.black })
+    const f = minervaConsole(0, 44, W, H - 44, {
       corp: 'Y',
       phone: true,
       tab: 'Jobs',
-      badges: { Mail: 2 }
+      badges: { Mail: 2 },
+      state: 'listening',
+      say: 'Name your ship. It’s registered with me before pickup.'
     })
     s += f.svg
     const c = f.content
-    s += ship(c.x + c.w / 2, c.y + 100, 150, 'none', {
-      stroke: C.yellow,
-      sw: 70
-    })
-    s += text(c.x + c.w / 2, c.y + 220, 'Name your ship.', {
-      size: 24,
-      weight: 500,
-      anchor: 'middle'
-    })
-    s += draft(c.x + c.w - 50, c.y + 248)
-    s += para(c.x + 6, c.y + 250, 'Registered with Minerva by name before pickup.', {
-      size: 13,
-      chars: 38,
-      fill: C.text2
-    }).svg
-    s += rect(c.x, c.y + 280, c.w, 56, {
-      r: 12,
-      fill: '#251d40',
-      stroke: C.yellow,
-      sw: 2.5
-    })
-    s += text(c.x + 18, c.y + 317, 'Second Chance', {
-      size: 22,
-      fill: C.yellowLight
-    })
-    s += button(c.x, c.y + 356, c.w, 58, 'Sign and name her', {
-      kind: 'primary',
-      size: 19,
-      focus: true
-    })
-    // the keyboard is up
-    s += rect(0, H - 250, W, 250, { fill: '#26213a' })
+    s += ship(c.x + c.w / 2, c.y + 60, 110, 'none', { stroke: C.yellow, sw: 80 })
+    s +=
+      rect(c.x, c.y + 140, c.w, 54, { r: 12, fill: '#120f1c', stroke: C.yellow, sw: 2.5 }) +
+      text(c.x + 18, c.y + 176, 'Second Chance', { size: 21, fill: C.yellowLight })
+    s += button(c.x, c.y + 210, c.w, 56, 'Sign and name her', { kind: 'primary', size: 18, focus: true })
+    s += rect(0, H - 250, W, 250, { fill: '#1c1a24' })
     ;['QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM'].forEach((row, r) => {
-      const kw = 34
-      const off = (W - row.length * (kw + 4)) / 2
+      const off = (W - row.length * 38) / 2
       ;[...row].forEach(
         (ch, i) =>
           (s +=
-            rect(off + i * (kw + 4), H - 236 + r * 52, kw, 44, {
-              r: 6,
-              fill: '#4a4460'
-            }) +
-            text(off + i * (kw + 4) + kw / 2, H - 206 + r * 52, ch, {
-              size: 18,
-              anchor: 'middle'
-            }))
+            rect(off + i * 38, H - 236 + r * 52, 34, 44, { r: 6, fill: '#34313f' }) +
+            text(off + i * 38 + 17, H - 206 + r * 52, ch, { size: 18, anchor: 'middle' }))
       )
     })
     s += statusLine(W)
     return s
   }
 }
-/** The street grid outside, with the escort's route: a lit line to your block, the car most of the way. */
 function escortMap(x, y, w, h) {
-  let s = rect(x, y, w, h, { r: 12, fill: '#0e0a1c', stroke: C.border })
-  for (let gx = x + 30; gx < x + w; gx += 60) s += rect(gx, y + 8, 14, h - 16, { fill: '#1b1531' })
-  for (let gy = y + 30; gy < y + h; gy += 56) s += rect(x + 8, gy, w - 16, 12, { fill: '#1b1531' })
-  const route = `M${x + 37} ${y + h - 20} L${x + 37} ${y + 148} L${x + w - 143} ${y + 148} L${x + w - 143} ${y + 36}`
-  s += `<path d="${route}" fill="none" stroke="${C.brand300}" stroke-width="4" stroke-dasharray="2 10" stroke-linecap="round"/>`
+  let s = rect(x, y, w, h, { r: 12, fill: '#0a0910', stroke: C.border })
+  for (let gx = x + 30; gx < x + w; gx += 60) s += rect(gx, y + 8, 14, h - 16, { fill: '#16131f' })
+  for (let gy = y + 30; gy < y + h; gy += 56) s += rect(x + 8, gy, w - 16, 12, { fill: '#16131f' })
+  s += `<path d="M${x + 37} ${y + h - 20} L${x + 37} ${y + 148} L${x + w - 143} ${y + 148} L${x + w - 143} ${y + 36}" fill="none" stroke="${C.brand300}" stroke-width="4" stroke-dasharray="2 10" stroke-linecap="round"/>`
   s += `<path d="M${x + 37} ${y + h - 20} L${x + 37} ${y + 148} L${x + w * 0.45} ${y + 148}" fill="none" stroke="${C.brand300}" stroke-width="4"/>`
-  s += rect(x + w * 0.45 - 12, y + 140, 24, 16, {
-    r: 4,
-    fill: C.lavenderLight
-  })
+  s += rect(x + w * 0.45 - 12, y + 140, 24, 16, { r: 4, fill: C.lavenderLight })
   s +=
-    rect(x + w - 160, y + 14, 34, 34, {
-      r: 4,
-      fill: '#302651',
-      stroke: C.lavender,
-      sw: 2
-    }) +
-    text(x + w - 143, y + 64, 'Block 7', {
-      size: 12,
-      anchor: 'middle',
-      fill: C.text2
-    })
+    rect(x + w - 160, y + 14, 34, 34, { r: 4, fill: '#221d30', stroke: C.lavender, sw: 2 }) +
+    text(x + w - 143, y + 64, 'Block 7', { size: 12, anchor: 'middle', fill: C.text2 })
   return s
 }
 const escort = {
@@ -1624,27 +1133,20 @@ const escort = {
   desktop(W, H) {
     const v = roomView(W, H)
     let s = v.world(room({ tv: 'Y' })) + rect(0, 0, W, H, { fill: 'url(#scrim)' })
-    const f = consoleFrame(60, 64, W - 120, H - 100, {
+    const f = minervaConsole(60, 64, W - 120, H - 100, {
       corp: 'Y',
       tab: 'Jobs',
-      badges: { Mail: 2 }
+      badges: { Mail: 2 },
+      state: 'thinking',
+      say: 'Application filed. An escort will arrive shortly to take you to processing.'
     })
     s += f.svg
     const c = f.content
-    s += owl(c.x + 80, c.y + 70, 130, '#ffffff')
-    s += text(c.x + 170, c.y + 56, 'Application filed.', {
-      size: 30,
-      weight: 500
-    })
-    s += text(c.x + 170, c.y + 92, 'An escort will arrive shortly to take you to processing.', {
-      size: 19,
-      fill: C.text2
-    })
-    s += draft(c.x + 720, c.y + 52)
+    s += text(c.x, c.y + 20, 'Pickup', { size: 24, weight: 500 }) + draft(c.x + 100, c.y + 16)
     s += steps(
-      c.x + 20,
-      c.y + 170,
-      700,
+      c.x + 10,
+      c.y + 70,
+      c.w - 20,
       [
         ['Signed', 'done'],
         ['Ship registered: Second Chance', 'now'],
@@ -1652,65 +1154,42 @@ const escort = {
       ],
       { size: 15 }
     )
-    s += escortMap(c.x, c.y + 240, 700, 330)
-    s += rect(c.x + 730, c.y + 240, c.w - 730, 330, {
-      r: 12,
-      fill: '#140f27',
-      stroke: C.border
-    })
-    s += text(c.x + 754, c.y + 280, 'While you wait', {
-      size: 16,
-      fill: C.text2
-    })
-    const tips = [
+    s += escortMap(c.x, c.y + 130, 560, 330)
+    s +=
+      rect(c.x + 580, c.y + 130, c.w - 580, 330, { r: 12, fill: '#0d0b15', stroke: C.border }) +
+      text(c.x + 600, c.y + 168, 'While you wait', { size: 15, fill: C.text2 })
+    ;[
       'Nothing to pack. They take the body as it is.',
-      'Your mail, your debts and your name go with you.',
-      'The door unlocks when they arrive.'
-    ]
-    tips.forEach(
-      (t, i) =>
-        (s += para(c.x + 754, c.y + 318 + i * 62, t, {
-          size: 15,
-          chars: Math.floor((c.w - 780) / 8)
-        }).svg)
-    )
-    s += draft(c.x + c.w - 64, c.y + 276)
-    s += statusLine(W, { skip: false })
+      'Your debts and your name go with you.',
+      'The door unlocks when they arrive. Curfew doesn’t apply to them.'
+    ].forEach((t, i) => (s += para(c.x + 600, c.y + 204 + i * 72, t, { size: 15, width: c.w - 620 }).svg))
     s += note(
-      W - 520,
-      H - 150,
-      480,
+      c.x,
+      c.y + 490,
+      c.w,
       [
-        'The wait is the escort’s car crossing the city: it moves with the chain (signed, registered, at your door). When the block lands, the door’s light turns, the screen fades to white: processing, left unsaid. Then the ship.'
+        'The wait is the escort’s car crossing the block, in step with the chain (signed, registered, at your door), and Minerva thinking. When the block lands the door’s light turns and the screen fades through white: processing, left unsaid.'
       ],
       { size: 12 }
     )
+    s += statusLine(W, { skip: false })
     return s
   },
   phone(W, H) {
-    let s = rect(0, 0, W, H, { fill: '#0b0916' })
-    const f = consoleFrame(0, 44, W, H - 44, {
+    let s = rect(0, 0, W, H, { fill: C.black })
+    const f = minervaConsole(0, 44, W, H - 44, {
       corp: 'Y',
       phone: true,
       tab: 'Jobs',
-      badges: { Mail: 2 }
+      badges: { Mail: 2 },
+      state: 'thinking',
+      say: 'Filed. An escort will arrive shortly to take you to processing.'
     })
     s += f.svg
     const c = f.content
-    s += owl(c.x + 44, c.y + 40, 80, '#ffffff')
-    s += text(c.x + 98, c.y + 36, 'Application filed.', {
-      size: 20,
-      weight: 500
-    })
-    s += draft(c.x + c.w - 50, c.y + 60)
-    s += para(c.x, c.y + 96, 'An escort will arrive shortly to take you to processing.', {
-      size: 15,
-      chars: 40,
-      fill: C.text2
-    }).svg
     s += steps(
       c.x,
-      c.y + 166,
+      c.y + 14,
       c.w,
       [
         ['Signed', 'done'],
@@ -1719,7 +1198,7 @@ const escort = {
       ],
       { size: 13 }
     )
-    s += escortMap(c.x, c.y + 226, c.w, 300)
+    s += escortMap(c.x, c.y + 70, c.w, 300) + draft(c.x + c.w - 50, c.y + 392)
     s += statusLine(W, { skip: false })
     return s
   }
@@ -1728,130 +1207,91 @@ const escort = {
 // ---------------------------------------------------------------- 8. waking in orbit
 const FIRST =
   'You’re awake. This is your ship, the Second Chance, in orbit over Earth. Your body is in storage. Your mind is here, with me. You owe the pilot program 45 credits. The hold carries the program’s advance: Helium-3 and Electronics. Sell them at the I.S.S., clear the debt, then go find a star nobody has. That’s the job.'
-function hudHints(W, H, phone) {
-  let s = ''
-  // the pilot card, top left, and the star and minimap, top right, as faint placeholders of the game's HUD
-  s += rect(phone ? 10 : 20, phone ? 54 : 20, phone ? 150 : 250, phone ? 50 : 76, {
+function stars(W, H, n) {
+  const r = (i) => ((i * 9301 + 49297) % 233280) / 233280
+  return Array.from(
+    { length: n },
+    (_, i) =>
+      `<circle cx="${r(i) * W}" cy="${r(i + 999) * H}" r="${r(i + 77) * 1.4 + 0.3}" fill="#e6dcf5" opacity="${0.3 + r(i + 5) * 0.5}"/>`
+  ).join('')
+}
+function hudHints(W, phone) {
+  let s = rect(phone ? 10 : 20, phone ? 54 : 20, phone ? 150 : 250, phone ? 50 : 76, {
     r: 12,
     fill: '#12052acc',
     stroke: '#ffffff30'
   })
-  s += text(phone ? 22 : 36, phone ? 76 : 50, 'Rhea Okafor', {
-    size: phone ? 13 : 16,
-    weight: 600,
-    fill: C.yellowLight
-  })
-  s += text(phone ? 22 : 36, phone ? 94 : 74, '−45¢ · Corp Y', {
-    size: phone ? 12 : 14,
-    fill: C.pinkLight
-  })
-  s += `<circle cx="${phone ? W - 40 : W - 70}" cy="${phone ? 80 : 70}" r="${phone ? 24 : 44}" fill="#12052acc" stroke="#ffffff30"/>`
-  s += text(phone ? W - 40 : W - 70, phone ? 84 : 75, 'Sol', {
-    size: phone ? 12 : 14,
-    anchor: 'middle',
-    fill: C.text2
-  })
-  return s
+  s +=
+    text(phone ? 22 : 36, phone ? 76 : 50, 'Rhea Okafor', { size: phone ? 13 : 16, weight: 600, fill: C.yellowLight }) +
+    text(phone ? 22 : 36, phone ? 94 : 74, '−45¢ · Corp Y', { size: phone ? 12 : 14, fill: C.pinkLight })
+  return (
+    s +
+    `<circle cx="${phone ? W - 40 : W - 70}" cy="${phone ? 80 : 70}" r="${phone ? 24 : 44}" fill="#12052acc" stroke="#ffffff30"/>` +
+    text(phone ? W - 40 : W - 70, phone ? 84 : 75, 'Sol', { size: phone ? 12 : 14, anchor: 'middle', fill: C.text2 })
+  )
 }
 const wake = {
   id: '08-wake-in-orbit',
   title: 'waking in your ship over Earth, with Minerva’s first message',
   desktop(W, H) {
-    let s = rect(0, 0, W, H, { fill: C.space })
-    const r = (n) => ((n * 9301 + 49297) % 233280) / 233280
-    for (let i = 0; i < 160; i++)
-      s += `<circle cx="${r(i) * W}" cy="${r(i + 999) * H}" r="${r(i + 77) * 1.4 + 0.3}" fill="#e6dcf5" opacity="${0.3 + r(i + 5) * 0.5}"/>`
-    s += earth(330, 560, 420)
-    // your ship, in orbit: white like every ship, with your yellow mark and name
+    let s = rect(0, 0, W, H, { fill: C.space }) + stars(W, H, 160) + earth(330, 560, 420)
     s += `<ellipse cx="330" cy="560" rx="560" ry="200" fill="none" stroke="${C.orbit}" stroke-width="1.5" stroke-dasharray="4 8" transform="rotate(-12 330 560)"/>`
-    s += ship(880, 360, 90, '#ffffff', { rotate: 70 })
-    s += `<circle cx="880" cy="360" r="66" fill="none" stroke="${C.yellow}" stroke-width="2"/>`
-    s += text(880, 452, 'Second Chance', {
-      size: 16,
-      anchor: 'middle',
-      fill: C.yellowLight,
-      weight: 600
-    })
-    s += hudHints(W, H, false)
-    // Minerva's first message: the menu container sliding up from the bottom, as every menu does
-    const mx = W / 2 - 60
-    const my = 520
-    const mw = 640
-    s += rect(mx, my, mw, 340, {
-      r: 18,
-      fill: '#1b1531f2',
-      stroke: '#5a4c8c',
-      sw: 2
-    })
     s +=
-      rect(mx, my, mw, 64, { r: 18, fill: '#164336' }) +
-      rect(mx, my + 46, mw, 18, { fill: '#164336' }) +
-      rect(mx, my + 61, mw, 3, { fill: CORPS.Y.color })
-    s += owl(mx + 46, my + 32, 60, '#ffffff') + text(mx + 86, my + 38, 'MINERVA', { size: 17, weight: 700, ls: 3 })
-    s += draft(mx + mw - 64, my + 36)
-    s += para(mx + 28, my + 100, FIRST, { size: 17, chars: 66, lh: 25 }).svg
-    s += button(mx + 28, my + 262, 220, 54, 'Understood', {
-      kind: 'primary',
-      size: 19,
-      focus: true
-    })
-    s += button(mx + 266, my + 262, 200, 54, 'Show me the I.S.S.', {
-      size: 16
-    })
+      ship(880, 330, 90, '#ffffff', { rotate: 70 }) +
+      `<circle cx="880" cy="330" r="66" fill="none" stroke="${C.yellow}" stroke-width="2"/>` +
+      text(880, 422, 'Second Chance', { size: 16, anchor: 'middle', fill: C.yellowLight, weight: 600 })
+    s += hudHints(W, false)
+    // Minerva's first message, sliding up like every menu: her face beside her words
+    const mx = 560
+    const my = 500
+    const mw = 820
+    s += rect(mx, my, mw, 360, { r: 18, fill: '#120f1cf2', stroke: C.border, sw: 1.5 })
+    s +=
+      rect(mx + 1, my + 1, mw - 2, 40, { r: 17, fill: CORPS.Y.band }) +
+      rect(mx, my + 40, mw, 2, { fill: CORPS.Y.color, opacity: 0.8 }) +
+      corpLogo('Y', mx + 26, my + 21, 20) +
+      text(mx + 46, my + 26, 'Minerva · aboard the Second Chance', { size: 13, fill: C.text2 })
+    s +=
+      face(mx + 140, my + 150, 220, 'talking') +
+      text(mx + 140, my + 248, 'MINERVA', { size: 12, ls: 4, anchor: 'middle', fill: C.text3, weight: 700 }) +
+      faceTag(mx + 140, my + 280, tagOf('talking'))
+    s += para(mx + 280, my + 82, FIRST, { size: 17, width: mw - 310, lh: 25 }).svg + draft(mx + mw - 64, my + 70)
+    s +=
+      button(mx + 280, my + 280, 220, 54, 'Understood', { kind: 'primary', size: 19, focus: true }) +
+      button(mx + 516, my + 280, 210, 54, 'Show me the I.S.S.', { size: 16 })
     s += note(
       20,
-      H - 150,
+      H - 120,
       470,
       [
-        'Processing is a fade through white; the ship fades in already in orbit, engines quiet. The HUD arrives piece by piece after the message (not shown). Your ship is white like every ship; yellow marks it as yours.'
+        'Processing is a fade through white; the ship fades in already in orbit. Minerva speaks first, face and all, then the HUD arrives (not drawn). Your ship is white like every ship; yellow marks it as yours.'
       ],
       { size: 12 }
     )
     return s
   },
   phone(W, H) {
-    let s = rect(0, 0, W, H, { fill: C.space })
-    const r = (n) => ((n * 9301 + 49297) % 233280) / 233280
-    for (let i = 0; i < 70; i++)
-      s += `<circle cx="${r(i) * W}" cy="${r(i + 999) * H}" r="${r(i + 77) * 1.3 + 0.3}" fill="#e6dcf5" opacity="${0.3 + r(i + 5) * 0.5}"/>`
-    s += earth(120, 330, 190)
-    s += ship(300, 190, 54, '#ffffff', { rotate: 70 })
-    s += `<circle cx="300" cy="190" r="40" fill="none" stroke="${C.yellow}" stroke-width="2"/>`
-    s += text(300, 248, 'Second Chance', {
-      size: 13,
-      anchor: 'middle',
-      fill: C.yellowLight,
-      weight: 600
-    })
-    s += hudHints(W, H, true)
-    const my = 470
-    s += rect(0, my, W, H - my, {
-      r: 18,
-      fill: '#1b1531f2',
-      stroke: '#5a4c8c',
-      sw: 2
-    })
+    let s = rect(0, 0, W, H, { fill: C.space }) + stars(W, H, 70) + earth(110, 300, 170)
     s +=
-      rect(0, my, W, 56, { r: 18, fill: '#164336' }) +
-      rect(0, my + 40, W, 16, { fill: '#164336' }) +
-      rect(0, my + 53, W, 3, { fill: CORPS.Y.color })
-    s += owl(36, my + 28, 50, '#ffffff') + text(70, my + 34, 'MINERVA', { size: 15, weight: 700, ls: 3 })
-    s += draft(W - 64, my + 32)
-    s += para(18, my + 86, FIRST, { size: 14, chars: 46, lh: 20 }).svg
-    s += button(18, H - 76, W - 36, 54, 'Understood', {
-      kind: 'primary',
-      size: 18,
-      focus: true
-    })
+      ship(300, 180, 54, '#ffffff', { rotate: 70 }) +
+      `<circle cx="300" cy="180" r="40" fill="none" stroke="${C.yellow}" stroke-width="2"/>` +
+      text(300, 238, 'Second Chance', { size: 13, anchor: 'middle', fill: C.yellowLight, weight: 600 })
+    s += hudHints(W, true)
+    const my = 420
+    s += rect(0, my, W, H - my, { r: 18, fill: '#120f1cf2', stroke: C.border, sw: 1.5 })
+    s += face(W / 2, my + 64, 150, 'talking') + faceTag(W / 2, my + 132, tagOf('talking'))
+    s += para(18, my + 164, FIRST, { size: 14, width: W - 36, lh: 20 }).svg
+    s += button(18, H - 72, W - 36, 54, 'Understood', { kind: 'primary', size: 18, focus: true })
     return s
   }
 }
 
 export const SCREENS = [
-  apartment,
-  door,
+  dark,
   scannerName,
   scannerWait,
+  lightsOn,
+  door,
   firstBoot,
   switching,
   tvMoment('X'),
