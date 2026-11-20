@@ -84,6 +84,32 @@ phone shows a single big **Scan your ID card** button.
 **Going to the balcony:** the room slides away to the right and scales up past the camera while the
 city's layers move forward at different speeds (parallax), until the railing is in front.
 
+## Motion and transitions
+
+Every change of scene or state is animated; nothing cuts. Times are starting points to tune by feel.
+
+| Moment | What moves | About |
+|---|---|---|
+| Dark → the name prompt | The camera eases in on the scanner; it grows into the prompt while the black deepens around it | 0.4 s |
+| Name filed → lights on | The ceiling strip flickers on (two or three cold blinks), the room fades up from black, the TV powers on (a line opening into the picture), then the terminal boots with Minerva's face assembling | 1.5 s in all; you can act after the first 0.6 s |
+| Room ↔ balcony | A camera move through the glass door: the room slides right and scales up past the camera as it fades; the city's layers come forward at different speeds (parallax); the railing rises into the foreground. Back inside reverses it | 0.8 s |
+| Moving focus | The hand glides to the next thing; the focus ring fades across | 0.2 s |
+| Phone: looking around | The room pans under your finger and settles with momentum; tapping the strip pans to that thing | 0.3 s |
+| Opening a terminal | Her console grows out of the terminal's screen to near full screen while the room dims behind it; her face assembles. Closing shrinks it back into the screen | 0.35 s |
+| The door's warning | Its panel slides up from the door's lock light | 0.25 s |
+| The TV | On and off like an old set (a line opening, and collapsing to a dot); the ads cross-fade every 8 s | 0.3 s |
+| Minerva's notices | Slide in from the corner with her face, stay a few seconds, slide out | 0.25 s |
+| The vape | A hit draws the glow up the pen, then vapor rises, spreads and thins | 2 s |
+| The waits | The scan line sweeps the card; the escort's car drives the route in step with the chain | while waiting |
+| The escort arrives → orbit | The door's light turns, the door opens a crack and the corridor's light wedges in, then everything fades to white. Out of the white: Earth, your ship already in orbit, then Minerva's first message slides up like every menu | 1.2 s to white, a held beat, 1.5 s in |
+| Always | The city lives: billboards flicker now and then, air traffic drifts, smog moves; Minerva's face breathes in its current state | looping |
+
+**How it's built** (the game's rules, `docs/ui-guide.md` §4 and §6): moves, fades and scales only, on the
+shared frame loop or CSS; no SVG filters, glows are gradients. **Motion explains, it never holds you up:**
+any press skips a transition to its end, and nothing waits on an animation that a wait on the chain doesn't
+already cause. **Reduced motion:** cross-fades in place of camera moves and parallax, no flicker, calmer
+ambience, Minerva's face in its reduced mode.
+
 ## How you use things
 
 - **Mouse and touch:** click or tap a thing. Everything usable has a generous hit area.
