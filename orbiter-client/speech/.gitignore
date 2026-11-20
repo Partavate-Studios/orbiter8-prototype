@@ -1,0 +1,3 @@
+# Piper output: the MP3s are copied to public/audio/voice/, the rest is scratch
+*.wav
+*.mp3
