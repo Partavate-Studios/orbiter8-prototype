@@ -887,6 +887,63 @@ Calls I made:
 - **Z10. The balcony keeps one way back** you can touch (the glass's frame at the left edge), as well as
   Esc and B; the bottom line says how, in words, not buttons.
 
+## 15. Music: the apartment's radio, and a track for a new star (2026-11-20, `briefs/music.md`)
+
+What I built:
+- **The radio** (`libs/08audio.js`): a channel of its own beside the game's music (`radio`, reactive;
+  `startRadio`, `tuneRadio`, `setRadioVolume`, `muffleRadio`, `stopRadio`), with the three tracks in
+  `RADIO_TRACKS` under the titles in the brief.
+- **Music in Minerva's console** (`intro-console.vue`): a fifth tab, Music, with a note in its well. One big
+  pill per track (title and composer, the playing one marked, its picture animated bars, "Playing"), Off,
+  and the volume: a slider (mouse, touch, arrow keys; a visible focus ring) between − and + buttons, since
+  the gamepad reaches buttons only. Keys 1–5 pick the tabs; the phone's tab bar has five tiles.
+- **Reflections in the Wind** (`08audio.js` `music['discovery']`, `playgame.vue`): when a jump ends at a
+  star with a pending scan for it (a first visit), it plays instead of the map's music.
+
+Calls:
+- **M1. Off when you enter** (Koda, mid-build: "music should be off when entering the apartment"). The
+  brief's suggestion (the first track on with the lights, like a radio left on) was built, then changed:
+  the radio is off on every entry, and the console's Music page turns it on. Nothing plays in the dark.
+  The title's music already stops when the intro starts.
+- **M2. Remembered:** the radio's volume, in local storage (`o8.radio`). Not the track, since it's off on
+  entry anyway.
+- **M3. The tracks play in turn**, one after another and round again, like a station.
+- **M4. Where it's heard:** the apartment, with the power on. On the balcony it's quieter (45%, behind
+  the glass); through the window, as loud as in the room. It fades out over 1.5 s as the escort arrives
+  (the white of processing), and stops whenever the intro is left; the star map's music takes over.
+- **M5. Settings' music level doesn't touch it:** not its volume, and not whether it plays. The Music page
+  says so in a line under the slider ("The radio has its own volume: the music level in Settings doesn't
+  change it").
+- **M6. The new-star track plays out** (2:49, not looped), then the map's music comes back
+  (`08audio.js` `THEN`), unless a jump starts first (then the jump's, as now). Each first visit plays it
+  from the start; a reload mid-scan plays it again (the brief allows it).
+- **M7. "A pending scan at the ship's star"** is `player.scan.cell` equal to the ship's cell. The scan is
+  often scheduled after the jump's animation ends (when the jump is mined), so the track can also start a
+  moment after the map's music has begun. On a local chain (`SCAN_DELAY=4`) the scan can be scheduled and
+  recorded before the animation ends; a scan seen during the jump for the star you land at counts too, so
+  a fast network still gets the track. (Found in play-testing: the first run, on the 4 s local default,
+  never caught a pending scan.)
+- **M8. Minerva's line** on the Music page (draft, in her voice): "The building's radio. It came with
+  the unit, like the damp. Pick something, or give me some quiet."
+
+Koda's other notes from the same message, done here too:
+- **The windows are translucent:** the glass door and the window are frosted panes (the city's light
+  coming through), no picture of the city in them. Clicking them still pushes through to the view.
+- **The wheel selects:** scrolling in while over a thing, once the camera is all the way in, uses it as a
+  click would (the TV, the terminal, the glass…); scrolling out of a zoomed thing steps back. A short
+  rest after a scroll-in reaches the room keeps one long scroll from opening something by accident.
+- **Welcome back:** entering the apartment with the lights already on (a reload) plays Minerva's "welcome
+  back" line (`VOICE_LINES.welcomeBack`).
+
+Checked in one long session on a local chain with the testnet's 30 s scan delay (`SCAN_DELAY=30`), with
+`HTMLMediaElement.play` hooked (the harness runs muted): the radio off on entry and in the dark; tuning,
+the slider's arrow keys, − and +, Off, a track again; Settings' music off leaving the radio playing at
+its own level; quieter on the balcony; the TV opened by scrolling in over it and closed by scrolling out;
+a reload with "welcome back" and the radio off again; the job, waking, the map's music; a jump to a new
+star playing Reflections in the Wind while its scan was pending and on after it landed; back to Sol, the
+map's; a second new star, Reflections again; the track's end handing back to the map's (sought to its
+last seconds). The Music page at 390×844. `npm test`, `npm run lint` and a scratch build pass.
+
 ## For Koda to decide
 
 Answered above, bar these:
@@ -904,3 +961,4 @@ Answered above, bar these:
   the I.S.S.); N10, the Story-scene paths in `backstory.md`.
 - The diorama intro (section 14): Z1–Z10; whether `.o8-pill` should spread beyond Minerva's screens; and
   the city's motion (signs flickering, traffic drifting) left still for now.
+- Music (section 15): M1–M8, and Minerva's draft line on the Music page.

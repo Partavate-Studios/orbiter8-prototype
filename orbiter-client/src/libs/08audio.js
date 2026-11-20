@@ -25,6 +25,36 @@ export const VOICE_LINES = {
   introWelcome: 'intro-welcome',
   introSignedIn: 'intro-signed-in'
 }
+/**
+ * The apartment's radio (the intro; Minerva's console, Music): three tracks Koda supplied
+ * (docs/briefs/music.md). It's a channel of its own beside the game's music, at its own volume: the
+ * Settings music level doesn't touch it. The tracks play in turn, like a station.
+ */
+export const RADIO_TRACKS = [
+  {
+    key: 'murmurings',
+    title: 'Sweaty Electronic Murmurings',
+    composer: 'Schmidt',
+    file: 'SweatyElectronicMurmurings.mp3'
+  },
+  { key: 'funkytunz', title: 'Funkytunz', composer: 'Guerrier', file: 'Funkytunz.mp3' },
+  { key: 'carrier', title: 'Carrier of Life', composer: 'Bennie', file: 'CarrierOfLife.mp3' }
+]
+/** Where the radio's volume is kept between visits (it's always off when you enter: Koda, 2026-11-20). */
+const RADIO_KEY = 'o8.radio'
+/** Music that plays once, then hands back to another (the new-star track, then the map's). */
+const THEN = { discovery: 'map' }
+
+function loadRadio() {
+  try {
+    const saved = JSON.parse(globalThis.localStorage?.getItem(RADIO_KEY) ?? 'null')
+    const volume = Number.isFinite(saved?.volume) ? Math.max(0, Math.min(1, saved.volume)) : 0.5
+    return { track: 'off', volume }
+  } catch {
+    return { track: 'off', volume: 0.5 }
+  }
+}
+
 /** A line isn't repeated sooner than this (ms), so a burst of chat or failures speaks once. */
 const VOICE_REPEAT_MS = 30000
 
@@ -55,6 +85,20 @@ export default class Sound {
 
     this.music['title'] = new Audio('./audio/music/title/WhereNoManHasGoneBefore.mp3')
     this.music['title'].loop = true
+
+    // Reflections in the Wind, for a first visit to a star while its scan is pending (playgame.vue):
+    // played once, then the map's music comes back
+    this.music['discovery'] = new Audio('./audio/music/discovery/ReflectionsInTheWind.mp3')
+    this.music['discovery'].preload = 'none'
+    for (const [song, next] of Object.entries(THEN))
+      this.music[song].addEventListener('ended', () => {
+        if (this.currentMusic === song) this.playMusic(next)
+      })
+
+    // The radio: which track (or 'off'), its volume, and whether it's on now (it plays only in the
+    // apartment, with the power on). Reactive, for the console's Music page.
+    this.radio = reactive({ ...loadRadio(), playing: false, muffled: false })
+    this.radioAudio = {}
 
     this.effects = []
     this.effects['click'] = new Audio('./audio/effects/beep.mp3')
@@ -166,6 +210,99 @@ export default class Sound {
   /** Call from a click or key press: starts music the browser blocked earlier. */
   unlock() {
     if (this.blocked && this.musicVolume > 0) this.resumeMusic()
+    if (this.radioBlocked && this.radio.playing)
+      this.radioElement()
+        ?.play()
+        ?.catch?.(() => {})
+  }
+
+  // ---- the apartment's radio: its own channel and volume
+
+  /** The playing track's element (made on first use: the tracks are large), or null when off. */
+  radioElement(key = this.radio.track) {
+    const track = RADIO_TRACKS.find((t) => t.key === key)
+    if (!track) return null
+    if (!this.radioAudio[key]) {
+      const audio = new Audio(`./audio/music/apartment/${track.file}`)
+      // the tracks play in turn
+      audio.addEventListener('ended', () => {
+        if (this.radio.track !== key || !this.radio.playing) return
+        const next = RADIO_TRACKS[(RADIO_TRACKS.indexOf(track) + 1) % RADIO_TRACKS.length]
+        this.radio.track = next.key
+        this.saveRadio()
+        this.startRadioTrack()
+      })
+      this.radioAudio[key] = audio
+    }
+    return this.radioAudio[key]
+  }
+  saveRadio() {
+    try {
+      globalThis.localStorage?.setItem(RADIO_KEY, JSON.stringify({ volume: this.radio.volume }))
+    } catch {
+      // private windows may refuse storage: the level lasts this visit
+    }
+  }
+  radioLevel() {
+    return this.radio.volume * (this.radio.muffled ? 0.45 : 1)
+  }
+  startRadioTrack() {
+    clearInterval(this.radioFade)
+    for (const [key, audio] of Object.entries(this.radioAudio)) if (key !== this.radio.track) audio.pause()
+    const audio = this.radioElement()
+    if (!audio) return
+    audio.volume = this.radioLevel()
+    this.radioBlocked = false
+    audio.play()?.catch?.((error) => {
+      if (error.name === 'NotAllowedError') this.radioBlocked = true
+    })
+  }
+  /** You're in the apartment with the power on: the radio can play (it starts off; the console tunes it). */
+  startRadio() {
+    this.radio.playing = true
+    this.radio.muffled = false
+    this.startRadioTrack()
+  }
+  /** Tunes to a track from its start, or 'off'. */
+  tuneRadio(key) {
+    if (key !== 'off' && !RADIO_TRACKS.some((t) => t.key === key)) return
+    const element = this.radioElement(key)
+    if (element) element.currentTime = 0
+    this.radio.track = key
+    this.saveRadio()
+    if (key === 'off') Object.values(this.radioAudio).forEach((audio) => audio.pause())
+    else if (this.radio.playing) this.startRadioTrack()
+  }
+  /** @param {number} volume  0 to 1; remembered */
+  setRadioVolume(volume) {
+    this.radio.volume = Math.max(0, Math.min(1, Math.round(volume * 100) / 100))
+    this.saveRadio()
+    const audio = this.radioElement()
+    if (audio) audio.volume = this.radioLevel()
+  }
+  /** Quieter, as through the glass (the balcony). */
+  muffleRadio(muffled) {
+    this.radio.muffled = muffled
+    const audio = this.radioElement()
+    if (audio) audio.volume = this.radioLevel()
+  }
+  /** Leaving the apartment: the radio stops, faded over `ms`. The choice is kept. */
+  stopRadio(ms = 0) {
+    this.radio.playing = false
+    clearInterval(this.radioFade)
+    const audio = this.radioElement()
+    const all = Object.values(this.radioAudio)
+    if (!audio || ms <= 0) return all.forEach((a) => a.pause())
+    const from = audio.volume
+    const start = Date.now()
+    this.radioFade = setInterval(() => {
+      const t = Math.min(1, (Date.now() - start) / ms)
+      audio.volume = from * (1 - t)
+      if (t === 1) {
+        clearInterval(this.radioFade)
+        all.forEach((a) => a.pause())
+      }
+    }, 50)
   }
 
   playEffect(effect) {

@@ -137,8 +137,8 @@
         :tabindex="spotsReachable ? 0 : -1"
         @click.stop="use(spot.key)"
         @focus="focusKey = spot.key"
-        @mouseenter="focusKey = spot.key"
-        @mouseleave="focusKey = focusKey === spot.key && !spotFocused() ? null : focusKey"
+        @mouseenter="hoverKey = focusKey = spot.key"
+        @mouseleave="leaveSpot(spot.key)"
       >
         <span class="spot-name">{{ spot.label }}</span>
       </button>
@@ -328,6 +328,7 @@ export default {
       consoleTab: 'Account',
       jobStep: 'board',
       focusKey: null,
+      hoverKey: null,
       lightsOn: false,
       tvOn: false,
       terminalOn: false,
@@ -433,7 +434,7 @@ export default {
       return tvPicture(artDefs('tv-') + adArt('tv-', look.key, look))
     },
     roomSvg() {
-      return roomSvg({ vista: this.vistaUrl, vapeInHand: this.vapeInHand, escort: this.escortHere })
+      return roomSvg({ vapeInHand: this.vapeInHand, escort: this.escortHere })
     },
 
     // ---- the camera
@@ -550,6 +551,10 @@ export default {
       if (reg.kind === 'callsign' && status === 'done') this.powerOn()
       if (reg.kind === 'ship' && status === 'done') this.escortArrives()
     },
+    /** On the balcony the radio is behind the glass: quieter. */
+    vista(view) {
+      this.o8audio?.muffleRadio(view === 'balcony')
+    },
     camera(next, prev) {
       if (!prev || (next.k === prev.k && next.cx === prev.cx && next.cy === prev.cy)) return
       this.moving = !this.instant
@@ -598,6 +603,7 @@ export default {
   beforeUnmount() {
     this.gone = true
     this.o8audio?.speaking?.pause() // her intro lines end with the room
+    this.o8audio?.stopRadio()
     window.removeEventListener('resize', this.onResize)
     window.removeEventListener('o8-intro', this.onIntroCommand)
     window.removeEventListener('keydown', this.onKeyDown)
@@ -672,8 +678,9 @@ export default {
     spotFocused() {
       return document.activeElement?.classList?.contains('hotspot')
     },
-    /** Any press while something animates skips it to its end. */
+    /** Any press while something animates skips it to its end (and lets the browser start the radio). */
     skipTransition() {
+      this.o8audio?.unlock()
       if (!this.animating) return
       this.instant = true
       requestAnimationFrame(() => requestAnimationFrame(() => (this.instant = false)))
@@ -753,9 +760,36 @@ export default {
       clearTimeout(this.easeTimer)
       this.easeTimer = setTimeout(() => (this.ease = 'move'), 300)
     },
+    /**
+     * The wheel is the camera: out pulls back toward the block, in comes back to the room, and in again
+     * while over a thing uses it, as a click would (Koda, 2026-11-20). Out of a zoomed thing steps back.
+     */
     onWheel(event) {
+      const now = performance.now()
+      if (now < (this.wheelQuietUntil ?? 0)) return
+      const zoomIn = event.deltaY < 0
+      if (
+        !zoomIn &&
+        ['tv', 'door', 'vape', 'scanner'].includes(this.view) &&
+        this.phase === 'lit' &&
+        !this.overlayOpen
+      ) {
+        this.wheelQuietUntil = now + 600
+        return this.back()
+      }
       if (!this.canPull()) return
+      // already all the way in, and the wheel has rested a moment since it got there: use the thing under it
+      if (zoomIn && this.pull === 0 && this.hoverKey && now - (this.lastPullAt ?? 0) > 300) {
+        this.wheelQuietUntil = now + 700
+        return this.use(this.hoverKey)
+      }
+      const before = this.pull
       this.pullBy(Math.max(-0.2, Math.min(0.2, event.deltaY * 0.0012)))
+      if (this.pull !== before) this.lastPullAt = now
+    },
+    leaveSpot(key) {
+      if (this.hoverKey === key) this.hoverKey = null
+      if (this.focusKey === key && !this.spotFocused()) this.focusKey = null
     },
     onPointerDown(event) {
       if (event.pointerType !== 'touch') return
@@ -809,9 +843,14 @@ export default {
       if (quietly) {
         this.tvOn = true
         this.terminalOn = true
+        // back in the apartment after a reload: Minerva welcomes you back
+        this.o8audio?.speak('welcomeBack')
+        this.o8audio?.startRadio()
         return
       }
       this.focusKey = 'terminal'
+      // the radio can be tuned now (it starts off: Minerva's console, Music)
+      this.o8audio?.startRadio()
       this.later(700, () => (this.tvOn = true))
       this.later(1000, () => (this.terminalOn = true))
       this.later(1400, () => {
@@ -911,6 +950,8 @@ export default {
         this.overlay = null
         this.vista = null
         this.whiteout = true
+        // the apartment's radio fades with the room; the ship's music takes over in the game
+        this.o8audio?.stopRadio(1500)
       })
       this.later(2900, () => {
         this.phase = 'wake'

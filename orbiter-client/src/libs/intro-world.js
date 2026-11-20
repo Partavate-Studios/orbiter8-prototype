@@ -105,6 +105,7 @@ export function worldDefs() {
   s += `<linearGradient id="w-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#05041a"/><stop offset="0.55" stop-color="#140f45"/><stop offset="1" stop-color="#2c2290"/></linearGradient>`
   s += `<radialGradient id="w-light"><stop offset="0" stop-color="#d8d4e4" stop-opacity="0.22"/><stop offset="1" stop-color="#d8d4e4" stop-opacity="0"/></radialGradient>`
   s += `<radialGradient id="w-light-strong"><stop offset="0" stop-color="#e6dcf5" stop-opacity="0.45"/><stop offset="1" stop-color="#e6dcf5" stop-opacity="0"/></radialGradient>`
+  s += `<linearGradient id="w-pane" x1="0" y1="0" x2="0.4" y2="1"><stop offset="0" stop-color="#3a3170" stop-opacity="0.78"/><stop offset="0.6" stop-color="#2a2358" stop-opacity="0.82"/><stop offset="1" stop-color="#4a3a8a" stop-opacity="0.72"/></linearGradient>`
   s += `<linearGradient id="w-glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d8d4e4" stop-opacity="0.12"/><stop offset="0.5" stop-color="#d8d4e4" stop-opacity="0.02"/><stop offset="1" stop-color="#d8d4e4" stop-opacity="0.08"/></linearGradient>`
   BB.forEach((c, i) => {
     s += `<radialGradient id="bb-glow-${i}"><stop offset="0" stop-color="${c}" stop-opacity="0.7"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></radialGradient>`
@@ -536,17 +537,14 @@ function backWall(o) {
   return onY(U.x, U.y, T.zu + U.h, s)
 }
 
-/** The unit's outside wall from inside: the sliding glass door and the window, each showing the view. */
-function outsideWall(o) {
+/** The unit's outside wall from inside: the sliding glass door and the window, translucent. */
+function outsideWall() {
   const g = GLASS
   const wd = WINDOW
   const holes = `M${g.u} ${g.v} h${g.w} V${U.h} h${-g.w} Z M${wd.u} ${wd.v} h${wd.w} v${wd.h} h${-wd.w} Z`
   let s = `<path d="M0 0 H${U.d} V${U.h} H0 Z ${holes}" fill="#141120" fill-rule="evenodd"/>`
-  if (o.vista) {
-    // the view, cut to the panes (u across the 1440 × 900 picture, from its middle)
-    s += `<svg x="${g.u}" y="${g.v}" width="${g.w}" height="${U.h - g.v}" viewBox="420 0 600 900" preserveAspectRatio="xMidYMid slice"><image href="${o.vista}" width="1440" height="900"/></svg>`
-    s += `<svg x="${wd.u}" y="${wd.v}" width="${wd.w}" height="${wd.h}" viewBox="0 120 1440 700" preserveAspectRatio="xMidYMid slice"><image href="${o.vista}" width="1440" height="900"/></svg>`
-  }
+  // translucent glass (Koda, 2026-11-20): frosted, the city's light coming through, no picture in it
+  s += rect(g.u, g.v, g.w, U.h - g.v, { fill: 'url(#w-pane)' }) + rect(wd.u, wd.v, wd.w, wd.h, { fill: 'url(#w-pane)' })
   s +=
     rect(g.u, g.v, g.w, U.h - g.v, { fill: 'url(#w-glass)', stroke: '#2a2540', sw: 0.12 }) +
     rect(g.u + g.w / 2 - 0.04, g.v, 0.08, U.h - g.v, { fill: '#2a2540' })
@@ -619,14 +617,14 @@ function furniture(o) {
 }
 
 /**
- * The room, live: o.vista (the view's picture, for the panes), o.vapeInHand, o.escort (the door's light
- * turned). The lights and the dark are classes on the layer (intro-screen.vue).
+ * The room, live: o.vapeInHand, o.escort (the door's light turned). The lights and the dark are classes
+ * on the layer (intro-screen.vue).
  */
 export function roomSvg(o = {}) {
   let s = worldDefs()
   s += backWall(o)
   s += poly(FLOOR_CORNERS, C.floor)
-  s += outsideWall(o)
+  s += outsideWall()
   s += box(null, 0, U.y + U.d, T.zu, 0.4, 0.001, U.h, { top: '#1d1a2a' })
   s += furniture(o)
   s += `<path d="M${pts([ws(0, T.y1, T.zu)])} L${pts([ws(T.x1, T.y1, T.zu)])} L${pts([ws(T.x1, U.y, T.zu)])}" fill="none" stroke="${C.rimLit}" stroke-width="2.4"/>`

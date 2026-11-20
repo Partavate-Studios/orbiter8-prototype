@@ -66,7 +66,13 @@ export default {
       }
     },
     ...mapState(useStarMapStore, ['gameTime', 'systemObjects', 'sprites', 'spriteIds', 'myShipId']),
-    ...mapState(useConfigStore, ['tickDelay'])
+    ...mapState(useConfigStore, ['tickDelay']),
+    /** The star you're at, when it's your first visit and its scan is pending (its stars and planets are about to be revealed). */
+    newStarHere() {
+      const scan = this.player.scan
+      const cell = this.player.pilot?.ship.cell
+      return scan && cell != null && scan.cell === cell ? cell : null
+    }
   },
   watch: {
     jumpAnimationState: {
@@ -75,10 +81,20 @@ export default {
           if (newval) {
             this.o8audio.playMusic('jump')
           } else {
-            this.o8audio.playMusic('map')
+            this.playHereMusic()
           }
         }
       }
+    },
+    // The scan is often scheduled a moment after the jump's animation ends (when the jump is mined):
+    // the new-star track starts then, over the map's music.
+    newStarHere(cell) {
+      if (cell != null && !this.jumpAnimationState && this.o8audio.currentMusic === 'map') this.playHereMusic()
+    },
+    // A scan seen while jumping counts too: with a short scan delay (a local chain's 4 s) it can be
+    // scheduled and recorded before the jump's animation ends.
+    'player.scan.cell'(cell) {
+      if (cell != null) this.scanSeenAt = cell
     }
   },
   beforeCreate() {},
@@ -95,7 +111,7 @@ export default {
     this.startBlockPolling()
   },
   mounted() {
-    this.o8audio.playMusic('map')
+    this.playHereMusic()
   },
   unmounted() {
     window.removeEventListener('keyup', this.handleKeyPress)
@@ -104,6 +120,19 @@ export default {
     this.stopFrames()
   },
   methods: {
+    /**
+     * The music for where you are: Reflections in the Wind at a star you're visiting first while its scan
+     * is pending, once for that visit (it plays out, then the map's comes back: 08audio.js THEN), else
+     * the map's (docs/briefs/music.md).
+     */
+    playHereMusic() {
+      const here = this.player.pilot?.ship.cell
+      const cell = this.newStarHere ?? (this.scanSeenAt === here ? here : null)
+      if (cell != null && this.discoveryPlayedAt !== cell) {
+        this.discoveryPlayedAt = cell
+        this.o8audio.playMusic('discovery')
+      } else this.o8audio.playMusic('map')
+    },
     screenshot() {
       let svgRoot = document.getElementById('gameSVG')
       let svgSource = svgRoot.outerHTML

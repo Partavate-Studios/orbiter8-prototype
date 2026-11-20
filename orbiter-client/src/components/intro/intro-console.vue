@@ -171,6 +171,70 @@
           </div>
         </template>
 
+        <!-- Music: the apartment's radio, at its own volume (08audio.js) -->
+        <template v-else-if="tab === 'Music'">
+          <h2>Music</h2>
+          <div class="radio" role="radiogroup" aria-label="What the radio plays">
+            <button
+              v-for="t in RADIO_TRACKS"
+              :key="t.key"
+              type="button"
+              role="radio"
+              class="o8-pill track"
+              :class="{ on: radio.track === t.key }"
+              :aria-checked="radio.track === t.key ? 'true' : 'false'"
+              @click="tune(t.key)"
+            >
+              <span class="o8-well" :class="{ playing: radio.track === t.key }" aria-hidden="true">
+                <svg viewBox="-12 -12 24 24"><path :d="radio.track === t.key ? BARS : NOTE" /></svg>
+              </span>
+              <span class="track-words">
+                <span class="track-title">{{ t.title }}</span>
+                <span class="track-by">{{ t.composer }}</span>
+              </span>
+              <span v-if="radio.track === t.key" class="now">Playing</span>
+            </button>
+            <button
+              type="button"
+              role="radio"
+              class="o8-pill track"
+              :class="{ on: radio.track === 'off' }"
+              :aria-checked="radio.track === 'off' ? 'true' : 'false'"
+              @click="tune('off')"
+            >
+              <span class="o8-well" aria-hidden="true">
+                <svg viewBox="-12 -12 24 24"><path d="M-7 -7 L7 7 M7 -7 L-7 7" /></svg>
+              </span>
+              <span class="track-words"><span class="track-title">Off</span></span>
+            </button>
+          </div>
+          <div class="volume">
+            <label for="intro-radio-volume" class="label">Volume</label>
+            <div class="volume-row">
+              <button type="button" class="o8-pill step" aria-label="Quieter" @click="setVolume(radio.volume - 0.1)">
+                −
+              </button>
+              <input
+                id="intro-radio-volume"
+                type="range"
+                min="0"
+                max="100"
+                step="5"
+                :value="Math.round(radio.volume * 100)"
+                :style="{ '--fill': Math.round(radio.volume * 100) + '%' }"
+                @input="setVolume($event.target.value / 100)"
+              />
+              <button type="button" class="o8-pill step" aria-label="Louder" @click="setVolume(radio.volume + 0.1)">
+                +
+              </button>
+              <output for="intro-radio-volume" class="volume-value">{{ Math.round(radio.volume * 100) }}%</output>
+            </div>
+            <p class="label">
+              The radio has its own volume: the music level in Settings doesn’t change it. The tracks play in turn.
+            </p>
+          </div>
+        </template>
+
         <!-- Jobs: the board and the opening -->
         <template v-else-if="tab === 'Jobs' && (jobStep === 'board' || jobStep === 'job')">
           <div class="jobs">
@@ -281,18 +345,23 @@ import { useOnboardingStore } from '@/stores/onboarding'
 import MinervaFace from '@/components/minerva/minerva-face.vue'
 import Ship from '@/components/star-map/sprites/ship.svg.vue'
 import { BALANCE, CYCLE, MAIL, OTHER_JOBS, SAY, corporation, jobTerms } from '@/libs/intro'
+import { RADIO_TRACKS } from '@/libs/08audio'
 import { corpLogo } from '@/libs/intro-art'
 import { cleanName, nameProblem, NAME_MAX_LENGTH, PILOT_NAME_MIN_LENGTH } from '@/libs/onboarding'
 
-const TABS = ['Account', 'Health', 'Mail', 'Jobs']
+const TABS = ['Account', 'Health', 'Mail', 'Jobs', 'Music']
 /** The tabs' pictures, in their wells (24 units, centered). */
 const TAB_GLYPHS = {
   Account:
     'M-8 -5 h16 a2 2 0 0 1 2 2 v8 a2 2 0 0 1 -2 2 h-16 a2 2 0 0 1 -2 -2 v-8 a2 2 0 0 1 2 -2z M-10 -1 h20 M-6 4 h5',
   Health: 'M0 8 C-9 2 -10 -3 -7 -6 C-4 -9 -1 -7 0 -4 C1 -7 4 -9 7 -6 C10 -3 9 2 0 8z',
   Mail: 'M-9 -6 h18 v12 h-18z M-9 -6 L0 2 L9 -6',
-  Jobs: 'M-9 -3 h18 v10 h-18z M-4 -3 v-3 h8 v3 M-9 2 h18'
+  Jobs: 'M-9 -3 h18 v10 h-18z M-4 -3 v-3 h8 v3 M-9 2 h18',
+  Music: 'M-3 6 a3 3 0 1 1 -6 0 a3 3 0 1 1 6 0 M-3 6 V-8 L8 -10 V4 M8 4 a3 3 0 1 1 -6 0 a3 3 0 1 1 6 0'
 }
+/** A track's picture: a note, or bars when it's the one playing. */
+const NOTE = 'M2 5 a3 3 0 1 1 -6 0 a3 3 0 1 1 6 0 M2 5 V-8 l5 2'
+const BARS = 'M-6 7 V1 M-2 7 V-6 M2 7 V-2 M6 7 V-8'
 
 export default {
   name: 'IntroConsole',
@@ -317,6 +386,11 @@ export default {
     return {
       TABS,
       TAB_GLYPHS,
+      RADIO_TRACKS,
+      NOTE,
+      BARS,
+      // the apartment's radio (08audio.js): reactive, so the playing track is marked as it changes
+      radio: this.o8audio?.radio ?? { track: 'off', volume: 0.5 },
       BALANCE,
       CYCLE,
       MAIL,
@@ -365,6 +439,8 @@ export default {
           return { state: 'skeptical', say: SAY.health(this.health) }
         case 'Mail':
           return { state: 'talking', say: SAY.mail }
+        case 'Music':
+          return { state: this.radio.track === 'off' ? 'idle' : 'talking', say: SAY.music }
       }
       if (this.jobStep === 'ship') return { state: 'listening', say: SAY.shipName }
       if (this.jobStep === 'escort') {
@@ -406,7 +482,7 @@ export default {
     this.fit()
     window.addEventListener('resize', this.fit)
     this.onKey = (event) => {
-      // 1–4 pick the tabs
+      // 1–5 pick the tabs
       if (this.tab === 'boot' || this.locked || event.target.tagName === 'INPUT') return
       const index = Number(event.key) - 1
       if (TABS[index]) this.$emit('tab', TABS[index])
@@ -429,7 +505,7 @@ export default {
       this.$nextTick(() => {
         if (this.jobStep === 'ship' && this.tab === 'Jobs') this.$refs.shipInput?.focus()
         else if (this.jobStep === 'job' && this.tab === 'Jobs') this.$refs.accept?.focus()
-        else this.$el.querySelector?.('.content button, .tabs .primary')?.focus()
+        else this.$el.querySelector?.('.content button, .tabs .on')?.focus()
       })
     },
     subscribeTo(id) {
@@ -437,6 +513,14 @@ export default {
       this.$refs.face?.play('nod')
       this.$emit('subscribe', id)
       if (this.tab === 'boot') this.$emit('tab', 'Account')
+    },
+    /** The radio: a track from its start, or off. */
+    tune(key) {
+      this.o8audio?.playEffect('click')
+      this.o8audio?.tuneRadio(key)
+    },
+    setVolume(volume) {
+      this.o8audio?.setRadioVolume(volume)
     },
     submitShip() {
       if (this.shipProblem) return
@@ -785,6 +869,120 @@ button.job-row:focus-visible {
   line-height: 1.45;
 }
 
+/* Music: the radio's tracks as big pills, the playing one marked; its own volume */
+.radio {
+  display: grid;
+  gap: 0.6em;
+  max-width: 34em;
+}
+.track {
+  justify-content: flex-start;
+  min-height: 3.4em;
+  padding: 0 1.2em 0 0.35em;
+  border-radius: 1.7em;
+  text-align: left;
+}
+.track .o8-well {
+  width: 2.6em;
+  height: 2.6em;
+}
+.track-words {
+  display: grid;
+  min-width: 0;
+}
+.track-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.track-by {
+  font-weight: 400;
+  font-size: 0.85em;
+  color: #bdb5d4;
+}
+.now {
+  margin-left: auto;
+  font-size: 0.8em;
+  font-weight: 600;
+  color: #c3b3da;
+}
+.o8-well.playing path {
+  animation: bars 1s ease-in-out infinite alternate;
+  transform-origin: 0 7px;
+}
+@keyframes bars {
+  to {
+    transform: scaleY(0.6);
+  }
+}
+.volume {
+  margin-top: 1.4em;
+  max-width: 34em;
+  display: grid;
+  gap: 0.4em;
+}
+.volume-row {
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+}
+.step {
+  flex: none;
+  width: 2.8em;
+  min-height: 2.8em;
+  padding: 0;
+  font-size: 1.2em;
+}
+.volume input[type='range'] {
+  flex: 1;
+  min-width: 0;
+  height: 2.8em;
+  margin: 0;
+  background: none;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  border-radius: 1.4em;
+}
+.volume input[type='range']:focus-visible {
+  outline: 2.5px solid var(--o8-brand-300, #b9a0ff);
+  outline-offset: 3px;
+}
+.volume input[type='range']::-webkit-slider-runnable-track {
+  height: 10px;
+  border-radius: 5px;
+  border: 1.5px solid #4a3d7a;
+  background: linear-gradient(90deg, #b9a0ff var(--fill), #211839 var(--fill));
+}
+.volume input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 28px;
+  height: 28px;
+  margin-top: -11px;
+  border-radius: 50%;
+  border: 2px solid #b9a0ff;
+  background: #efe7ff;
+}
+.volume input[type='range']::-moz-range-track {
+  height: 10px;
+  border-radius: 5px;
+  border: 1.5px solid #4a3d7a;
+  background: linear-gradient(90deg, #b9a0ff var(--fill), #211839 var(--fill));
+}
+.volume input[type='range']::-moz-range-thumb {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid #b9a0ff;
+  background: #efe7ff;
+}
+.volume-value {
+  flex: none;
+  width: 3.2em;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: #bdb5d4;
+}
+
 /* jobs */
 .jobs {
   display: grid;
@@ -1046,7 +1244,7 @@ button.job-row:focus-visible {
   }
   .tabs {
     grid-row: 3;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 0.4em;
     padding: 0.5em 0.4em 0.8em;
     border-top: 1px solid #3f3566;

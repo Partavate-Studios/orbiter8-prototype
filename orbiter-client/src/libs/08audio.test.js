@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import Cookies from 'js-cookie'
-import Sound from './08audio'
+import Sound, { RADIO_TRACKS } from './08audio'
 
 describe('volume settings', () => {
   afterEach(() => {
@@ -43,5 +43,45 @@ describe("Minerva's voice", () => {
     sound.setVoiceLevel(0)
     sound.speak('transmission')
     expect(play).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe("the apartment's radio", () => {
+  afterEach(() => {
+    localStorage.removeItem('o8.radio')
+    Cookies.remove('musicVolume')
+    vi.restoreAllMocks()
+  })
+
+  it('starts off at half volume, and keeps its own level whatever Settings says', () => {
+    vi.spyOn(window.HTMLMediaElement.prototype, 'play').mockResolvedValue()
+    const sound = new Sound()
+    expect(sound.radio).toMatchObject({ track: 'off', volume: 0.5 })
+    sound.startRadio()
+    sound.tuneRadio(RADIO_TRACKS[0].key)
+    sound.setMusicLevel(0)
+    expect(sound.radioElement().volume).toBe(0.5)
+    expect(sound.radio.playing).toBe(true)
+  })
+
+  it('remembers the volume for the next visit, but is off again when you come back', () => {
+    const sound = new Sound()
+    sound.tuneRadio(RADIO_TRACKS[1].key)
+    sound.setRadioVolume(0.8)
+    expect(new Sound().radio).toMatchObject({ track: 'off', volume: 0.8 })
+  })
+})
+
+describe('the new-star track', () => {
+  afterEach(() => vi.restoreAllMocks())
+
+  it('plays once, then hands back to the map music', () => {
+    vi.spyOn(window.HTMLMediaElement.prototype, 'play').mockResolvedValue()
+    vi.spyOn(window.HTMLMediaElement.prototype, 'pause').mockImplementation(() => {})
+    const sound = new Sound()
+    sound.playMusic('discovery')
+    expect(sound.music['discovery'].loop).toBe(false)
+    sound.music['discovery'].dispatchEvent(new Event('ended'))
+    expect(sound.currentMusic).toBe('map')
   })
 })
