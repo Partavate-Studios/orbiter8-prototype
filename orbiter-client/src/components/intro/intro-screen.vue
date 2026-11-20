@@ -404,10 +404,13 @@ export default {
     // In the dark, the unit's system speaks first: what this is, what to do, and what comes after
     if (this.phase === 'dark')
       this.later(900, () => {
-        if (this.phase === 'dark') this.say('Minerva', SAY.opening, { hold: true })
+        if (this.phase !== 'dark') return
+        this.say('Minerva', SAY.opening, { hold: true })
+        this.o8audio?.speak('introWelcome')
       })
   },
   beforeUnmount() {
+    this.o8audio?.speaking?.pause() // her intro lines end with the room
     window.removeEventListener('resize', this.onResize)
     clearTimeout(this.noticeTimer)
     clearTimeout(this.ringTimer)
@@ -511,7 +514,8 @@ export default {
       this.later(1000, () => (this.terminalOn = true))
       this.later(1400, () => {
         this.animating = false
-        this.say('Name on file: ' + this.pilotName, SAY.lightsOn, { oneOff: 'nod' })
+        this.say('Name on file: ' + this.pilotName, SAY.lightsOn, { oneOff: 'nod', hold: true })
+        this.o8audio?.speak('introSignedIn')
         this.hintRings = true
         this.ringTimer = setTimeout(() => (this.hintRings = false), RING_HINT_MS)
       })

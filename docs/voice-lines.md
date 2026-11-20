@@ -28,6 +28,15 @@ lines are older and more "starship computer". Rewording them to fit her is the l
 | 11 | Welcome to the frontier. | `welcome-to-the-frontier` | `launched` | **Not played since the intro.** Fits waking in the ship |
 | 12 | LIDAR scan complete. | `lidar-scan-complete` | none | **Never wired.** Fits a scan finishing (about 30 s after a first visit) |
 
+## Recorded with Piper (prudence voice)
+
+| Line | File | Key | When it plays |
+|---|---|---|---|
+| Welcome home… and sign in. | `intro-welcome` | `introWelcome` | The dark unit, before the ID scan |
+| You're signed in… Statistically, you'll need it. | `intro-signed-in` | `introSignedIn` | The lights come on after the name goes through |
+
+The text of each is in `orbiter-client/speech/`.
+
 ## Obvious additions (drafts)
 
 The wording is a placeholder, in her voice. Rows 13–20 go with moves already in the game; rows 21–27 are

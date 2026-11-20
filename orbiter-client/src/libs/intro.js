@@ -185,12 +185,14 @@ export function jobTerms(corpName) {
 /** What Minerva says, by moment. */
 export const SAY = {
   scan: 'Scan your ID card.',
+  // opening and lightsOn are what she says aloud (speech/intro-welcome.txt, speech/intro-signed-in.txt)
   opening:
-    'Unit 7-2216. Corporate affordable housing. It stays dark until it has a registered occupant. Scan your ID card at the reader by the door, then tell me your name. After that, choose a corporate sponsor at the terminal: the rest of the unit opens when you do. Curfew is on. You’re not going anywhere tonight.',
+    'Welcome home. This is Minerva, your building’s network. The unit stays dark until it has a registered occupant. Hold your ID card to the reader by the door, and sign in.',
   locked: 'Locked until the unit has a corporate sponsor. Choose one at the terminal on the desk.',
   askName: 'Card read. No name on file for this card. What’s your name?',
   filing: 'Filing your name.',
-  lightsOn: 'Power’s on. So are the bills. The rest of the unit opens when you choose a corporate sponsor at the terminal on the desk.',
+  lightsOn:
+    'You’re signed in. Power is on. A few things before you get comfortable. Curfew runs from ten at night until five in the morning. The door stays locked until then, and after hours, security response is not guaranteed. The rest of the unit opens once you choose a corporate sponsor, at the terminal on the desk. You can switch sponsors later. On Earth, it’s free. Your account is on the terminal too. I wouldn’t look at it before bed. Good luck. Statistically, you’ll need it.',
   firstBoot: 'This unit runs through a corporate sponsor. Pick one, and the balcony and the door open. You can switch later; on Earth it’s free.',
   switching: 'Switching is free while you’re on Earth. Out there it costs, and what you own moves with you.',
   account: 'You owe 45. The stipend comes in 6 days. The bills come first.',

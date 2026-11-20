@@ -20,7 +20,10 @@ export const VOICE_LINES = {
   upgraded: 'upgrade-complete',
   failed: 'priority-alert',
   reconnected: 'all-systems-nominal',
-  console: 'minerva-console-online'
+  console: 'minerva-console-online',
+  // the intro (speech/ has the text each was made from)
+  introWelcome: 'intro-welcome',
+  introSignedIn: 'intro-signed-in'
 }
 /** A line isn't repeated sooner than this (ms), so a burst of chat or failures speaks once. */
 const VOICE_REPEAT_MS = 30000
