@@ -756,6 +756,16 @@ more states and six more one-offs were added (listed in the brief). Every state 
 Measured: three faces animating in the lab hold 60 fps with the CPU slowed four times. The face isn't used
 in the game yet; per the brief, it goes to her console, the intro's terminals and the HUD later.
 
+## 12. The intro mockup (2026-11-19, `docs/briefs/intro-mockup.md`)
+
+A mockup only, for Koda's approval: [`mockups/intro/`](mockups/intro/README.md), the eight moments plus the
+door's curfew warning, at desktop and phone size (16 screens each, as SVG, with overview sheets). No game
+code changed. The calls made on my own are I1–I12 in that README: the corporations' letters, colors and
+draft logos (X shareholder blue, Y family jade, Z upstart cyan); Minerva staying white with corporation
+skins on her console's header only; Corp Y as the subscription shown; draft names (Rhea Okafor, the Second
+Chance); both name prompts as things in the room; where yellow and pink first appear; the waits as the
+scanner reading your card and the escort's car crossing the block; waking as a fade through white.
+
 ## For Koda to decide
 
 Answered above, bar these:
@@ -767,3 +777,5 @@ Answered above, bar these:
   everything else shows every good.
 - Minerva's face (section 11): the look of her eyes and expressions (`mockups/minerva-face.png`, or
   the lab in a dev build), M2 (split part 7 or not) and M8 (more motion at HUD size).
+- The intro mockup (section 12, `mockups/intro/README.md`, "Open, for you"): the look, the corporations'
+  colors and logos, Minerva without an identity color, and the phone's pan-and-strip room.
