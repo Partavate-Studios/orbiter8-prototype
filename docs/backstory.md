@@ -699,8 +699,9 @@ art; the words are this file's, shortened to captions. The panels and the text t
 | 7 | A charging orbit around the sun, the flash, the streak to a star | the jump; the Orbiter 6 and the Orbiter 8's return |
 | 8 | The galaxy map, routes, claim flags, a pirate band | the new land rush; the pirates; "Liberta Galactica!" |
 
-The captions are in `orbiter-client/src/components/title/story-scene.vue` (`PANELS`); the scenes are
-the components under `orbiter-client/src/components/title/story/`. The Federation, the minds on
+The captions are in `orbiter-client/src/components/archive/story-scene.vue` (`PANELS`); the scenes are
+the components under `orbiter-client/src/components/archive/story/`. (Since 2026-11-19 the scene is
+archived, out of the title and the build; its panels are candidates for Minerva's library.) The Federation, the minds on
 Minerva and the slow sieges aren't in the panels. The 2026-11-18 merge didn't change the captions:
 nothing in them contradicts it.
 

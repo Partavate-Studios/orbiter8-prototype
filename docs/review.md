@@ -798,8 +798,8 @@ debt. Calls made on my own:
   `launch-pad`) and the Story scene with its eight panels are in `components/archive/` with a README;
   nothing imports them, so they're out of the build. The to-do for Minerva's library (reusing the panels)
   is in `demo4-plan.md`.
-- **N10. `backstory.md` is yours:** its "How it lines up with the title's Story scene" section still
-  points at `components/title/story-scene.vue`; the files are now in `components/archive/`. Left for you.
+- **N10. `backstory.md`**: its Story-scene section pointed at `components/title/`; the paths now point at
+  `components/archive/` (fixed 2026-11-19; only the paths changed, not the story).
 - **N11. `dev/harness/capture.sh`** now plays the intro for its new-player shots (same steps as my manual
   run); not run itself, since it resets the chain on the default port.
 
