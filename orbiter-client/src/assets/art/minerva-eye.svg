@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -60 120 120">
+<!-- Minerva's eye: a glow that sits behind her owl's parts and shows through the gap between them (Orbiter 8 art, 120 units square, centered; drawn for her face, components/minerva/minerva-face.vue, at a third of this size) -->
+<defs><radialGradient id="minerva-eye-halo"><stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/><stop offset="35%" stop-color="#ffffff" stop-opacity="0.45"/><stop offset="100%" stop-color="#ffffff" stop-opacity="0"/></radialGradient><radialGradient id="minerva-eye-core"><stop offset="0%" stop-color="#ffffff"/><stop offset="55%" stop-color="#ffffff" stop-opacity="0.85"/><stop offset="100%" stop-color="#ffffff" stop-opacity="0"/></radialGradient></defs>
+<g transform="scale(2.7)"><g transform="translate(0 0) rotate(0)"><ellipse rx="20" ry="9" fill="url(#minerva-eye-halo)" opacity="0.6"/><ellipse rx="6" ry="2.34" fill="url(#minerva-eye-core)" opacity="0.75"/></g></g>
+</svg>

@@ -721,6 +721,41 @@ Results in `polkadot-direction.md` (steps 4, 5, 6). Calls made on my own:
   Demo 3 build at `partavate-studios.github.io/orbiter8-demo3-client` with a testnet build; a phone
   session to see the Pocket, the signing prompt, and his personhood status in the App.
 
+## 11. Minerva's face (2026-11-19, `docs/briefs/minerva-face.md`)
+
+Built from the brief, with Koda's answers before starting: eyes are just a glow in the gap, the face stays
+plain white like the emblem, the lab opens from both a title-screen button and `#/minerva-lab`, and six
+more states and six more one-offs were added (listed in the brief). Every state and one-off is pictured in
+[`mockups/minerva-face.png`](mockups/minerva-face.png). Calls made on my own:
+
+- **M1. The eyes sit behind the parts.** Each eye is a soft white glow (two radial gradients, no filters)
+  drawn under the eight parts, so it shows only through the gaps and leaks a little along them. A blink
+  squeezes it flat, a glance moves it across the gap, wide eyes make it bigger and brighter. Also saved as
+  art: `assets/art/minerva-eye.svg` and `minerva-face.svg` (the owl at rest with her eyes).
+- **M2. Part 7 stays one piece.** Talking and Annoyed stretch or squash it about its middle (tufts and beak
+  move together) rather than splitting the art into tufts and beak. Splitting it would allow more, but it
+  changes your art.
+- **M3. One-offs overlap by layer, and restart rather than queue.** Body moves (Boom, No, Nod, Glitch,
+  Assemble, Disassemble, "ha"), the eye flash, and blinks are three layers that play together. A new one-off
+  on a busy layer fades the old one out in 0.16 s and starts at once, so typing fast keeps her eyes lit
+  without stutter. Disassemble holds: she stays apart, and no body move plays until Assemble.
+- **M4. A Slow blink one-off** came with Waiting on you (it blinks that way); it's in the lab with the others.
+- **M5. The emblem now reads its paths from `components/minerva/minerva-parts.js`**, shared with the
+  face. Its drawing is unchanged (same paths, same order).
+- **M6. In the lab, the text box puts her in Listening while it has focus** (a checkbox turns that off),
+  and she returns to her earlier state when it loses focus. On phones the faces stick to the top while the
+  console scrolls under them.
+- **M7. Reduced motion:** drift and waves at about a third, no glances that turn the head, Boom and Glitch
+  don't play, Assemble and Disassemble only fade. The lab can force it on or off.
+- **M8. At 48 px the drift is under a pixel,** so a HUD-sized face reads by its eyes (blinks, glances,
+  flashes) more than its parts. If the HUD wants more life, scale the motion up with size (not done).
+- **M9. A commit mix-up:** a parallel session's commit (`7d7d12f`, "Joining in two moves") swept up the
+  face's first draft with its own work, because both sessions share one working tree. I left that commit
+  as it is (not mine to rewrite) and committed the rest on top. Nothing was lost.
+
+Measured: three faces animating in the lab hold 60 fps with the CPU slowed four times. The face isn't used
+in the game yet; per the brief, it goes to her console, the intro's terminals and the HUD later.
+
 ## For Koda to decide
 
 Answered above, bar these:
@@ -730,3 +765,5 @@ Answered above, bar these:
 - T7's other half: a real phone's keyboard over the dialogs wasn't checked.
 - The HUD profile card on a portrait phone keeps to three rows of goods ("+N more" past five);
   everything else shows every good.
+- Minerva's face (section 11): the look of her eyes and expressions (`mockups/minerva-face.png`, or
+  the lab in a dev build), M2 (split part 7 or not) and M8 (more motion at HUD size).

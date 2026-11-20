@@ -14,7 +14,7 @@
         <minerva-face
           :ref="(el) => (faces[0] = el)"
           :state="state"
-          size="min(320px, 82vw)"
+          size="var(--large-face)"
           :speed="speed"
           :motion="motion"
           @done="lastDone = $event"
@@ -138,13 +138,17 @@ export default {
       listenOnFocus: true,
       stateBeforeTyping: null,
       lastDone: null,
-      skipped: null
+      skipped: null,
+      apart: false
     }
   },
   computed: {
     note() {
+      if (this.skipped === 'apart') return 'She’s apart: Assemble brings her back.'
       if (this.skipped) return `${this.oneOffs[this.skipped].label} doesn't play with reduced motion.`
-      return this.lastDone ? `Last finished: ${this.oneOffs[this.lastDone]?.label ?? this.lastDone}.` : 'Each plays once over the state.'
+      return this.lastDone
+        ? `Last finished: ${this.oneOffs[this.lastDone]?.label ?? this.lastDone}.`
+        : 'Each plays once over the state.'
     }
   },
   methods: {
@@ -160,7 +164,11 @@ export default {
     },
     play(name, quietly = false) {
       const played = this.faces.map((face) => face?.play(name)).some(Boolean)
-      if (!quietly) this.skipped = played ? null : name
+      if (quietly) return
+      const apart = this.apart && !this.oneOffs[name].releases && this.oneOffs[name].layer === 'body'
+      this.skipped = played ? null : apart ? 'apart' : name
+      if (name === 'disassemble' && played) this.apart = true
+      if (this.oneOffs[name].releases && played) this.apart = false
     }
   }
 }
@@ -181,6 +189,7 @@ export default {
   color: #f1eefa;
   font-family: 'Ubuntu', system-ui, sans-serif;
   text-align: left;
+  --large-face: min(320px, 82vw);
 }
 .top {
   grid-column: 1 / -1;
@@ -289,11 +298,29 @@ input[type='range'] {
     padding: 0.8em 1em 2em;
     gap: 1em;
   }
-  .large {
-    padding: 0.5em 0;
+  /* The faces stay in view while the console scrolls under them. */
+  .minerva-lab {
+    --large-face: min(230px, 62vw);
   }
   .faces {
-    gap: 1.2em;
+    position: sticky;
+    top: -0.8em;
+    z-index: 1;
+    gap: 0.6em;
+    margin: 0 -1em;
+    padding: 0.6em 1em 0.8em;
+    background: #130e24;
+    border-bottom: 1px solid #3f3566;
+  }
+  .large {
+    padding: 0.3em 0 0;
+  }
+  .smaller {
+    gap: 1.5em;
+  }
+  .now {
+    min-height: 0;
+    font-size: 0.85em;
   }
 }
 </style>

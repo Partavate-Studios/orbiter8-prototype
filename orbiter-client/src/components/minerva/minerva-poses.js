@@ -29,7 +29,7 @@
 // starts and ends with {} returns exactly to the state. One-offs on different layers play together;
 // firing one on a layer that's busy fades the old one out quickly and starts the new one (restart, never
 // queue: she reacts to the latest thing). hold: true keeps the last key's pose after it ends, until a
-// one-off that names it in `releases` plays. reduced: 'skip' doesn't play with reduced motion; 'fade'
+// one-off that names it in `releases` plays; until then, other one-offs on its layer don't play. reduced: 'skip' doesn't play with reduced motion; 'fade'
 // keeps only its fading and brightness.
 
 export const BLEND_MS = 450
@@ -280,11 +280,12 @@ export const STATES = {
     breathe: 0.7,
     float: 0.7,
     pose: {
-      face: { r: 2.5 },
-      1: { y: -3.5, r: -6 },
-      4: { y: 1, r: -5 },
-      eyeL: { open: 0.15, s: 0.08 },
-      eyeR: { open: -0.45 }
+      face: { r: 3.5 },
+      1: { y: -5, r: -8 },
+      2: { y: -1 },
+      4: { y: 1.8, r: -7 },
+      eyeL: { open: 0.3, s: 0.15, y: -1 },
+      eyeR: { open: -0.6, b: -0.15 }
     },
     blink: [3000, 6000]
   },
@@ -432,7 +433,9 @@ export const ONE_OFFS = {
 
 /** A blank pose: every target's channels at 0. */
 export function emptyPose() {
-  return Object.fromEntries(Object.entries(TARGETS).map(([target, channels]) => [target, Object.fromEntries(channels.map((c) => [c, 0]))]))
+  return Object.fromEntries(
+    Object.entries(TARGETS).map(([target, channels]) => [target, Object.fromEntries(channels.map((c) => [c, 0]))])
+  )
 }
 
 /** Adds a compiled pose (list of [target, channel, value]) into `acc`, times `weight`. */
@@ -448,7 +451,10 @@ const smooth = (p) => p * p * (3 - 2 * p)
  */
 export function compileOneOff(name, reduced = false) {
   const def = ONE_OFFS[name]
-  const keep = reduced && def.reduced === 'fade' ? (channel) => channel === 'o' || channel === 'b' || channel === 'open' : () => true
+  const keep =
+    reduced && def.reduced === 'fade'
+      ? (channel) => channel === 'o' || channel === 'b' || channel === 'open'
+      : () => true
   const keys = def.keys.map(([at, pose]) => [at, compilePose(pose).filter(([, channel]) => keep(channel))])
   return { name, def, keys }
 }

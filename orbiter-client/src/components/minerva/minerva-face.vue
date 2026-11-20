@@ -31,14 +31,7 @@
     Drawing: one transform per part per frame on the shared frame loop (libs/frame-loop.js), set on the
     elements directly, not through Vue; glows are gradients, no SVG filters.
   -->
-  <svg
-    class="minerva-face"
-    :viewBox="viewBox"
-    :style="sizeStyle"
-    role="img"
-    aria-label="Minerva"
-    overflow="visible"
-  >
+  <svg class="minerva-face" :viewBox="viewBox" :style="sizeStyle" role="img" aria-label="Minerva" overflow="visible">
     <defs>
       <radialGradient :id="ids.halo">
         <stop offset="0%" :stop-color="color" stop-opacity="0.95" />
@@ -54,7 +47,7 @@
     <g ref="face">
       <g v-for="eye in eyes" :key="eye.id" :ref="(el) => (eyeEls[eye.id] = el)">
         <ellipse class="halo" :rx="eye.rx" :ry="eye.ry" :fill="`url(#${ids.halo})`" />
-        <ellipse class="core" :rx="eye.rx * 0.42" :ry="eye.ry * 0.36" :fill="`url(#${ids.core})`" />
+        <ellipse class="core" :rx="eye.rx * 0.3" :ry="eye.ry * 0.26" :fill="`url(#${ids.core})`" />
       </g>
       <g :fill="color">
         <g v-for="part in parts" :key="part.id" :ref="(el) => (partEls[part.id] = el)">
@@ -82,8 +75,8 @@ import {
 
 /** The eyes' glows: where they sit in the gaps (centered units), their tilt, and their size. */
 const EYES = [
-  { id: 'eyeL', cx: -27, cy: 4, angle: 10, rx: 14, ry: 6.5, mirror: false },
-  { id: 'eyeR', cx: 27, cy: 4, angle: -10, rx: 14, ry: 6.5, mirror: true }
+  { id: 'eyeL', cx: -27, cy: 4, angle: 10, rx: 20, ry: 9, mirror: false },
+  { id: 'eyeR', cx: 27, cy: 4, angle: -10, rx: 20, ry: 9, mirror: true }
 ]
 
 // Each part drifts on two slow waves of its own (ms), so the gaps never line up into one rhythm.
@@ -178,6 +171,11 @@ export default {
     play(name) {
       const def = ONE_OFFS[name]
       if (!def || (this.reduced && def.reduced === 'skip')) return false
+      // Apart (or coming apart): only the one-off that brings her back plays on that layer.
+      const holding = [this.held, ...this.active.map((playing) => playing.compiled)].find(
+        (compiled) => compiled?.def.hold && compiled.def.layer === def.layer
+      )
+      if (holding && !def.releases?.includes(holding.name)) return false
       for (const playing of this.active) {
         if (playing.compiled.def.layer === def.layer && playing.fadeFrom === null) playing.fadeFrom = this.clock
       }

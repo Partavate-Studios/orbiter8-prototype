@@ -1,5 +1,10 @@
 # Brief: Minerva's animated face
 
+> **Built 2026-11-19.** The face is `orbiter-client/src/components/minerva/minerva-face.vue` (its header
+> says how to use it), its expressions are data in `minerva-poses.js`, and the dev-only lab opens from the
+> title screen's "Minerva lab" button or `#/minerva-lab`. Every state and one-off is pictured in
+> `docs/mockups/minerva-face.png`; the calls made while building are M1–M9 in `docs/review.md`.
+
 **For:** a Claude session (Fable) working in this repo, `/home/koda/dev/orbiter8-prototype`, branch
 `polkadot`. Written 2026-11-19 from Koda's direction. This file is everything you need: read it, then the
 files it points to.
@@ -56,6 +61,14 @@ pieces, never as one flat image.
 | **Surprised** | Parts spread, eyes wide |
 | **Annoyed** | Brow (1, 4, and 7's tufts) pressed down, a tighter face |
 | **Nervous** | Looking around: the eyes and face dart side to side |
+| **Listening** | An input box has focus: she leans in and holds still, eyes on you |
+| **Waiting on you** | The wallet is waiting for the player to sign: patient, a little pointed (slow blinks, a head tilt) |
+| **Scanning** | A scan is running (about 30 s): a steady sweep across the eyes, unlike Thinking |
+| **Alert** | A siege or another urgent warning: parts drawn tight, eyes bright and steady |
+| **Skeptical** | The player is about to do something unwise: one brow raised |
+| **Offline** | No connection to the chain, or the terminal is idle: parts drift loose, the glow dims |
+
+(Listening through Offline were added with Koda on 2026-11-19, before building.)
 
 More will be added later: make adding a state a small, data-driven change (e.g. a table of poses per
 part: offset, rotation, scale), not new code paths.
@@ -67,6 +80,15 @@ part: offset, rotation, scale), not new code paths.
 | **Boom** | Every part expands outward from the center, then contracts back |
 | **No** | She shakes her head |
 | **Eye flash** | A subtle flash in the eyes. Fired every time the player presses a key while an input box has focus (so it feels like she's reading as you type) |
+| **Nod** | A transaction went through: one small, deadpan nod (No's counterpart) |
+| **Assemble** | Her console or an intro terminal opens: the parts fly in and lock into place |
+| **Disassemble** | The console closes: she comes apart (and stays apart until Assemble) |
+| **Glitch** | A move failed or the network hiccuped: parts jitter out of place and snap back |
+| **Blink** | A blink on demand, for timing with dialogue (states also blink on their own) |
+| **Deadpan "ha"** | After one of her jokes: a single tiny bounce of the beak |
+
+(Nod through Deadpan "ha" were added with Koda on 2026-11-19. A Slow blink one-off came along for
+Waiting on you.)
 
 One-offs layer on top of the state: firing "boom" while "thinking" plays the boom, then thinking
 continues. Firing one while another plays should behave sensibly (queue or restart: your call; say
