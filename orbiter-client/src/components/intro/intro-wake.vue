@@ -45,7 +45,7 @@
       <minerva-face class="face" state="talking" :size="faceSize" />
       <div class="words">
         <p id="wake-say">{{ text }}</p>
-        <button ref="ok" type="button" class="o8-button primary" @click="$emit('done')">Understood</button>
+        <button ref="ok" type="button" class="o8-pill main big" @click="$emit('done')">Understood</button>
       </div>
     </div>
   </section>
@@ -146,9 +146,8 @@ export default {
   font-size: 1.15em;
   line-height: 1.45;
 }
-.words .o8-button {
+.words .o8-pill {
   font-size: 1.2em;
-  padding: 0.5em 1.6em;
 }
 @keyframes fade {
   from {
@@ -177,7 +176,7 @@ export default {
   .words p {
     font-size: 1em;
   }
-  .words .o8-button {
+  .words .o8-pill {
     width: 100%;
   }
 }

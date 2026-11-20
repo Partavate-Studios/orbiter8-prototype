@@ -1,5 +1,8 @@
 # The intro as one zoomable diorama
 
+> **Built 2026-11-20:** `orbiter-client/src/components/intro/` and `libs/intro-world.js` (calls in
+> `docs/review.md`, section 14).
+
 From Koda's notes on [`../intro-alternatives`](../intro-alternatives/README.md) (2026-11-20): the
 isometric diorama (A) is the direction; no menus in the world (you click the thing itself, the vape
 included; menus belong in Minerva's console); being zoomed out until you see your character, outlined,

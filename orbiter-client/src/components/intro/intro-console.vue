@@ -21,12 +21,12 @@
       <button
         v-if="corp && tab !== 'boot' && !locked"
         type="button"
-        class="o8-button quiet small"
+        class="o8-pill small"
         @click="$emit('tab', 'corp')"
       >
         Corporation
       </button>
-      <button ref="close" type="button" class="o8-button quiet small close" aria-label="Close" @click="$emit('close')">
+      <button ref="close" type="button" class="o8-pill small close" aria-label="Close" @click="$emit('close')">
         ✕
       </button>
     </header>
@@ -41,13 +41,16 @@
             v-for="(name, i) in TABS"
             :key="name"
             type="button"
-            class="o8-button tab"
-            :class="{ primary: tab === name }"
+            class="o8-pill tab"
+            :class="{ on: tab === name }"
             :aria-current="tab === name ? 'page' : null"
             :disabled="locked && name !== 'Jobs'"
             :title="`${name} (${i + 1})`"
             @click="$emit('tab', name)"
           >
+            <span class="o8-well" aria-hidden="true">
+              <svg viewBox="-12 -12 24 24"><path :d="TAB_GLYPHS[name]" /></svg>
+            </span>
             {{ name }}
             <span v-if="name === 'Mail'" class="badge" aria-label="2 overdue">2</span>
           </button>
@@ -66,7 +69,7 @@
               <p class="kind">{{ c.kind }}</p>
               <p class="character">{{ c.character }}</p>
               <p class="feels">{{ c.feels }}</p>
-              <button type="button" class="o8-button" @click="subscribeTo(c.id)">Subscribe</button>
+              <button type="button" class="o8-pill wide" @click="subscribeTo(c.id)">Subscribe</button>
             </article>
           </div>
           <p class="note">
@@ -92,7 +95,7 @@
                 <span :style="{ fontFamily: c.font }">{{ c.name }} housing</span>
               </div>
               <p :style="{ fontFamily: c.font }">{{ c.greeting }}</p>
-              <button v-if="c.id !== subscription" type="button" class="o8-button small" @click="subscribeTo(c.id)">
+              <button v-if="c.id !== subscription" type="button" class="o8-pill small" @click="subscribeTo(c.id)">
                 Switch to {{ c.name }}
               </button>
               <p v-else class="subscribed">Subscribed</p>
@@ -202,10 +205,10 @@
                 </template>
               </dl>
               <div class="actions">
-                <button ref="accept" type="button" class="o8-button primary big" @click="$emit('job-step', 'ship')">
+                <button ref="accept" type="button" class="o8-pill main big" @click="$emit('job-step', 'ship')">
                   Accept the job
                 </button>
-                <button type="button" class="o8-button quiet" @click="$emit('job-step', 'board')">Not yet</button>
+                <button type="button" class="o8-pill quiet" @click="$emit('job-step', 'board')">Not yet</button>
               </div>
               <p class="label">Accepting is the only way out (or back to the title).</p>
             </article>
@@ -233,9 +236,7 @@
             <p id="intro-ship-hint" class="label" :class="{ problem: shipProblem && shipProblem !== 'empty' }">
               {{ shipHint }}
             </p>
-            <button type="submit" class="o8-button primary big" :disabled="Boolean(shipProblem)">
-              Sign and name her
-            </button>
+            <button type="submit" class="o8-pill main big" :disabled="Boolean(shipProblem)">Sign and name her</button>
             <p class="label">Your wallet signs: the ship is made, and you join {{ corp?.name }}.</p>
           </form>
         </template>
@@ -253,7 +254,7 @@
           <p v-if="status === 'confirm'" class="wallet-wait" role="status">Confirm it in your wallet</p>
           <template v-else-if="status === 'failed'">
             <p class="problem" role="alert">{{ failureText }}</p>
-            <button ref="retry" type="button" class="o8-button primary" @click="$emit('retry')">Try again</button>
+            <button ref="retry" type="button" class="o8-pill main" @click="$emit('retry')">Try again</button>
           </template>
           <div class="pickup">
             <div class="map" :class="status" aria-hidden="true">
@@ -284,6 +285,14 @@ import { corpLogo } from '@/libs/intro-art'
 import { cleanName, nameProblem, NAME_MAX_LENGTH, PILOT_NAME_MIN_LENGTH } from '@/libs/onboarding'
 
 const TABS = ['Account', 'Health', 'Mail', 'Jobs']
+/** The tabs' pictures, in their wells (24 units, centered). */
+const TAB_GLYPHS = {
+  Account:
+    'M-8 -5 h16 a2 2 0 0 1 2 2 v8 a2 2 0 0 1 -2 2 h-16 a2 2 0 0 1 -2 -2 v-8 a2 2 0 0 1 2 -2z M-10 -1 h20 M-6 4 h5',
+  Health: 'M0 8 C-9 2 -10 -3 -7 -6 C-4 -9 -1 -7 0 -4 C1 -7 4 -9 7 -6 C10 -3 9 2 0 8z',
+  Mail: 'M-9 -6 h18 v12 h-18z M-9 -6 L0 2 L9 -6',
+  Jobs: 'M-9 -3 h18 v10 h-18z M-4 -3 v-3 h8 v3 M-9 2 h18'
+}
 
 export default {
   name: 'IntroConsole',
@@ -307,6 +316,7 @@ export default {
   data() {
     return {
       TABS,
+      TAB_GLYPHS,
       BALANCE,
       CYCLE,
       MAIL,
@@ -509,15 +519,13 @@ export default {
   gap: 0.6em;
 }
 .tab {
-  position: relative;
-  font-size: 1.15em;
-  padding: 0.55em 1em;
-  border-radius: 14px;
+  justify-content: flex-start;
+  min-height: 2.75em;
+  padding: 0 1em 0 0.3em;
+  font-size: 1.1em;
 }
 .badge {
-  position: absolute;
-  top: -0.5em;
-  right: -0.4em;
+  margin-left: auto;
   min-width: 1.5em;
   height: 1.5em;
   border-radius: 999px;
@@ -594,10 +602,9 @@ h3 {
   font-style: italic;
   flex: 1;
 }
-.corp-card .o8-button {
+.corp-card .o8-pill {
   margin-top: 0.6em;
-  width: 100%;
-  font-size: 1.15em;
+  font-size: 1.1em;
 }
 .skin {
   background: #120f1c;
@@ -622,7 +629,7 @@ h3 {
 .skin p {
   margin: 0.8em 0.9em;
 }
-.skin .o8-button {
+.skin .o8-pill {
   margin: 0 0.9em 0.9em;
   justify-self: start;
 }
@@ -721,10 +728,10 @@ h3 {
   gap: 0.2em 0.6em;
   text-align: left;
   font: inherit;
-  color: #f1eefa;
-  background: #17141f;
-  border: 1.5px solid transparent;
-  border-radius: 10px;
+  color: #efe7ff;
+  background: linear-gradient(180deg, #2e2354 0%, #211839 100%);
+  border: 1.5px solid #4a3d7a;
+  border-radius: 14px;
   padding: 0.65em 0.9em;
   box-sizing: border-box;
 }
@@ -732,10 +739,17 @@ button.mail-row,
 button.job-row {
   cursor: pointer;
 }
+button.mail-row:hover,
+button.job-row:hover,
 .mail-row.open,
 .job-row.open {
-  background: #221d30;
-  border-color: #c3b3da;
+  background: linear-gradient(180deg, #3a2c69 0%, #2a1f4c 100%);
+  border-color: #b9a0ff;
+}
+button.mail-row:focus-visible,
+button.job-row:focus-visible {
+  outline: 2.5px solid var(--o8-brand-300, #b9a0ff);
+  outline-offset: 3px;
 }
 .from {
   font-weight: 600;
@@ -824,10 +838,6 @@ button.job-row {
   display: flex;
   gap: 1em;
   flex-wrap: wrap;
-}
-.o8-button.big {
-  font-size: 1.3em;
-  padding: 0.55em 1.4em;
 }
 /* your ship to be: the game's ship, drawn as a yellow outline (yellow: yours) */
 .ship-outline {
@@ -1042,9 +1052,21 @@ button.job-row {
     border-top: 1px solid #3f3566;
     background: #0d0b15;
   }
+  /* on a phone, each tab stacks its picture over its name: a rounded tile, same plum and edge */
   .tab {
-    font-size: 0.95em;
-    padding: 0.7em 0.2em;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.25em;
+    min-height: 0;
+    padding: 0.45em 0.2em 0.5em;
+    border-radius: 16px;
+    font-size: 0.85em;
+  }
+  .tab .badge {
+    position: absolute;
+    top: 0.2em;
+    right: 0.3em;
+    margin: 0;
   }
   .content {
     grid-row: 2;
@@ -1072,7 +1094,7 @@ button.job-row {
   .corp-card .character {
     display: none;
   }
-  .corp-card .o8-button {
+  .corp-card .o8-pill {
     grid-column: 1 / -1;
     margin-top: 0.4em;
   }

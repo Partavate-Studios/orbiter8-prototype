@@ -29,7 +29,7 @@
             >
               {{ hint }}
             </p>
-            <button type="submit" class="o8-button primary register" :disabled="Boolean(problem)">
+            <button type="submit" class="o8-pill main big register" :disabled="Boolean(problem)">
               Register with Minerva
             </button>
             <p class="hint small">Your wallet signs this: your first move on chain.</p>
@@ -50,13 +50,13 @@
           </p>
           <template v-else-if="failed">
             <p class="problem" role="alert">{{ failureText }}</p>
-            <button ref="retry" type="button" class="o8-button primary" @click="$emit('retry')">Try again</button>
+            <button ref="retry" type="button" class="o8-pill main" @click="$emit('retry')">Try again</button>
           </template>
         </template>
       </div>
       <p class="device-name" aria-hidden="true">MINERVA · ID</p>
     </div>
-    <button v-if="phase === 'name'" type="button" class="o8-button quiet back" @click="$emit('close')">Back</button>
+    <button v-if="phase === 'name'" type="button" class="o8-pill quiet back" @click="$emit('close')">Back</button>
   </section>
 </template>
 

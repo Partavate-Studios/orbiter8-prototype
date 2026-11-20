@@ -7,7 +7,7 @@
       <p class="title">{{ title }}</p>
       <p class="body">{{ body }}</p>
     </div>
-    <button type="button" class="o8-button quiet small close" aria-label="Dismiss" @click="$emit('close')">✕</button>
+    <button type="button" class="o8-pill small close" aria-label="Dismiss" @click="$emit('close')">✕</button>
   </aside>
 </template>
 

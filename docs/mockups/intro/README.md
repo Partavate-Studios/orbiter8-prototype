@@ -1,7 +1,8 @@
 # The intro, in the apartment: a mockup
 
 > **Built 2026-11-19:** `orbiter-client/src/components/intro/` (calls in `docs/review.md`, section 13).
-> This folder stays as the approved design.
+> This folder stays as the approved design. **Replaced 2026-11-20** by the isometric diorama
+> ([`../intro-zoom/`](../intro-zoom/README.md)).
 
 For Koda to approve before anything is built (brief: [`docs/briefs/intro-mockup.md`](../../briefs/intro-mockup.md)).
 Nothing in the game changed. Every copy line marked **draft** is a placeholder in the right voice: the

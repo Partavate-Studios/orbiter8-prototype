@@ -824,6 +824,69 @@ debt. Calls made on my own:
   first boot's line now point at the sponsor. All copy is draft. On a phone the long opening covers the
   top of the scanner (the "Scan your ID card" button stays clear).
 
+## 14. The intro as a zoomable diorama (2026-11-20, `mockups/intro-zoom/`)
+
+Koda approved the isometric diorama ("build this from end to end") after two rounds of mockups
+(`mockups/intro-alternatives/`, then `mockups/intro-zoom/`), with these rules: no menus in the world (you
+click the thing itself, the vape included; menus only in Minerva's console); you, outlined in yellow, and
+the camera able to pull back as far as the block; using a thing is a zoom, not a change of scene; things
+simple far away and full up close; through the glass door the view fills the screen; a window shows the
+city too; a busier city; no road under the balcony; and Minerva's buttons in the style of the card
+drawer's (the buttons that slide out from behind the selection card).
+
+What changed in `orbiter-client/`:
+- `libs/intro-world.js` (new): the world in isometric, in one plane (WS px at 60 px per world unit): the
+  seeded city, Block 7's tower, the unit cut open (the floors above as a ghost), the room's live SVG,
+  hotspot outlines, where you stand for each view. `libs/intro-vista.js` (new): the view straight on.
+  `libs/raster.js` (new): an SVG drawn once into a canvas.
+- `components/intro/intro-screen.vue`, rewritten around one camera (a CSS translate and scale of the
+  plane). Views: the block (the opening, falling into the dark unit), the dark, the room, and zooms into
+  the scanner, TV, terminal, door, vape, glass and window. Scroll, pinch, + and −, or the gamepad's
+  triggers pull back to the block; Esc, B or a click elsewhere steps back. The flow (both transactions,
+  the corporation, the console, notices, resuming on reload, Skip intro) is the same code as before.
+- `intro-balcony.vue`, rewritten: the view fills the screen; you at the rail from behind; the vape in
+  your hand and the rail's terminal are clicked, no button row; the glass's frame takes you back in.
+  The same view with a window frame is what the window shows.
+- `intro-tv.vue` is gone: the TV is zoomed into in the room (click it again for the next channel).
+- The phone's strip of four room buttons and the dark's "Scan your ID card" button are gone (they were
+  menus in the world); the room fits a phone's width, and every hotspot is at least 44 px on screen.
+- Minerva's buttons: `.o8-pill` and `.o8-well` in `App.vue` (the card drawer's look, from
+  `hud/selection-panel.vue`), used by her console (tabs with pictures, Subscribe, Accept, Sign, Try again,
+  the letters and the job board as plum rows), the ID scanner, her notices, the door's card and waking.
+  On a phone the console's tabs stack picture over name.
+- `libs/intro-art.js` keeps only the corporations' ads and logos; the flat room's art is retired.
+- `gamepad-overlay.vue` forwards its commands to the intro on `/intro` (triggers and B).
+
+**Performance** (the trick, as promised): the city and the tower's outside never change, so they're drawn
+once, at load, into three bitmaps (far 2560×2048 at 4.5 px a unit, middle and near 2048² at 14 and 48;
+1536–2048 on phones; `intro-world.test.js` keeps them inside phone canvas limits). The camera only slides
+and scales them; the room is the only live SVG, sharpened when the camera stops (`will-change` only while
+moving). The city's SVG builds in about 25 ms; drawing it takes a moment at load, during the opening's
+hold on the block. Measured in the harness (software rendering, so pessimistic) while pulling from the
+room to the block and back and zooming the TV: median 16.7 ms a frame, p95 50 ms; with the CPU slowed 4×,
+median 33 ms, p95 50 ms, about the star map's own numbers (25–50 fps at 4×, `mockups/color-direction.md`).
+
+Checked by playing it in one session at 1440×900 and at 390×844 (dark, name, lights, TV and channels, the
+first boot, Account and Mail, the door, the vape, the balcony and its vape, the window, pulling back to the
+block and in, the job, the ship's name, the escort, waking), and a reload landing in the lit room. `npm
+test`, `npm run lint` and a scratch build pass.
+
+Calls I made:
+- **Z1. The tower is a slender slab** so the unit's outside wall can hold the glass door and the window.
+- **Z2. The floors above are a ghost** (in true isometric a ceiling would hide the whole back wall).
+- **Z3. The view through the glass is a straight-on picture**, not more isometric city (isometric has no
+  vista); the panes show the same picture, small, on the wall's slant.
+- **Z4. The TV stays on the room's slant when zoomed; the console squares up**, as in the mockup.
+- **Z5. The city's colors:** the game's purples and blues with cyan, violet and amber signs; no pink, no
+  yellow. Its text uses the system font (an SVG drawn as an image can't use web fonts).
+- **Z6. The opening starts on the block** (the city lit, your unit dark), holds while the bitmaps draw, then
+  falls into the dark unit (2.6 s); reduced motion cuts it.
+- **Z7. You walk to what you use** (a glide to a spot in front of it); you sit on the mattress for the vape.
+- **Z8. The window is clickable:** the same view in a window frame; a click anywhere steps back.
+- **Z9. The hand is gone:** the focused thing gets its outline and its name; you are the figure.
+- **Z10. The balcony keeps one way back** you can touch (the glass's frame at the left edge), as well as
+  Esc and B; the bottom line says how, in words, not buttons.
+
 ## For Koda to decide
 
 Answered above, bar these:
@@ -839,3 +902,5 @@ Answered above, bar these:
   Minerva's face in the console, the corporations' colors and logos, and the phone's pan-and-strip room.
 - The built intro (section 13): N8, waking literally over Earth (a camera move, or starting docked at
   the I.S.S.); N10, the Story-scene paths in `backstory.md`.
+- The diorama intro (section 14): Z1–Z10; whether `.o8-pill` should spread beyond Minerva's screens; and
+  the city's motion (signs flickering, traffic drifting) left still for now.

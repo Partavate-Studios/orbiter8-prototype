@@ -195,7 +195,9 @@ hard to add later because it shapes the data, low-hanging, or the battle minimum
   `Claims.lawAt`.* ***The intro itself built 2026-11-19*** *from the approved mockup
   (`mockups/intro/`): `orbiter-client/src/components/intro/`, replacing the title's call-sign and ship
   wizard end to end; the title's Story button and scene are retired to `components/archive/` (calls in
-  `review.md` section 13).*
+  `review.md` section 13).* ***Rebuilt 2026-11-20 as a zoomable isometric diorama*** *(Koda's go-ahead on
+  `mockups/intro-zoom/`): one world through one camera, no menus in the world, Minerva's buttons in the
+  card drawer's style (`review.md` section 14).*
 - **Minerva's library (to do, Koda 2026-11-19):** the world's history, read in Minerva's console (in the
   game and the intro), in her voice and spun by your corporation (`backstory.md`, "Her library"). The
   retired Story scene's eight animated panels (`orbiter-client/src/components/archive/story-scene.vue`

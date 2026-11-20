@@ -1,91 +1,165 @@
 <template>
   <!--
-    The intro: a new pilot's last night on Earth, and the way into the game (it replaced the title's
-    call-sign and ship wizard, 2026-11-19; the approved mockup is docs/mockups/intro/). The power is off
-    until you scan your ID card and file your name (the first transaction); then the room is yours: the
-    TV's ads, the door's curfew, the balcony and its vape, and Minerva's terminals. The housing computer
-    subscribes you to a corporation; its job board has one opening you qualify for; naming your ship
-    accepts it (the second transaction), an escort comes for you, and you wake in orbit.
+    The intro: a new pilot's last night on Earth, and the way into the game. The power is off until you
+    scan your ID card and file your name (the first transaction); then the room is yours. The housing
+    computer subscribes you to a corporation, its job board has one opening you qualify for, naming your
+    ship accepts it (the second transaction), an escort comes for you, and you wake in orbit.
 
-    Layers, back to front: the room (still art, libs/intro-art.js) and what lives in it (the lights,
-    Minerva's faces on the scanner and the terminal, the TV's picture, the things you can use, your hand),
-    moved by one camera; the balcony's view; then the overlays (the scanner's prompt, the TV, the door,
-    Minerva's console, her notices), the status line, and the white of processing.
+    One isometric world through one camera (Koda, 2026-11-20; docs/mockups/intro-zoom/): the city,
+    Block 7's tower, and unit 7-2216 cut open in it, you in it with a yellow outline. There are no menus in
+    the world: you click the thing itself (the TV, the terminal, the vape, the glass, the window, the
+    door, the ID scanner), and using it is the camera zooming in, never a change of scene. Scroll, pinch,
+    the + and − keys or the gamepad's triggers pull back as far as the whole block. Menus live only in
+    Minerva's console. Through the glass the view fills the screen: the balcony.
+
+    How it stays fast (libs/intro-world.js): the city and the tower's outside never change, so they're
+    drawn once into three bitmaps (far, middle, near) that the camera slides and scales; only the room is
+    live SVG. The camera is one CSS transform of the plane all of it sits in.
   -->
   <div
     class="intro-screen"
-    :class="{ portrait, instant, reduced }"
+    :class="{ instant, reduced, moving }"
     @pointerdown.capture="skipTransition"
     @keydown.capture="skipTransition"
+    @wheel.prevent="onWheel"
+    @pointerdown="onPointerDown"
+    @pointermove="onPointerMove"
+    @pointerup="onPointerUp"
+    @pointercancel="onPointerUp"
   >
-    <!-- the room, through the camera -->
+    <!-- the world, through the camera -->
     <div
       class="world"
-      :class="{ away: view === 'balcony' }"
+      :class="['ease-' + ease, { ready: farReady }]"
       :style="cameraStyle"
-      :aria-hidden="view !== 'room' || overlayOpen"
+      :aria-hidden="Boolean(vista) || overlayOpen"
+      @click="worldClick"
+      @transitionend.self="moving = false"
     >
-      <!-- eslint-disable-next-line vue/no-v-html -- the game's own SVG art (libs/intro-art.js), not user content -->
-      <svg class="room-art" viewBox="-400 0 2400 1400" aria-hidden="true" v-html="roomSvg"></svg>
-      <!-- the ceiling strip: it flickers on with the power -->
-      <div class="strip" :class="{ on: lightsOn }"></div>
+      <!-- the city and the tower's outside: bitmaps, far to near -->
+      <div ref="tiers" class="tiers"></div>
+      <!-- the unit's light, seen from far away -->
+      <div class="unit-glow" :class="{ on: lightsOn }" :style="unitGlowStyle"></div>
+
+      <!-- the room, live -->
+      <!-- eslint-disable vue/no-v-html -- the game's own SVG art (libs/intro-world.js), not user content -->
+      <svg
+        class="room"
+        :class="{ lit: lightsOn }"
+        :viewBox="ROOM_REGION.join(' ')"
+        :style="regionStyle(ROOM_REGION)"
+        aria-hidden="true"
+        v-html="roomSvg"
+      ></svg>
+      <!-- eslint-enable vue/no-v-html -->
       <!-- the TV's picture -->
       <!-- eslint-disable-next-line vue/no-v-html -- the game's own SVG art (libs/intro-art.js), not user content -->
-      <div class="tv-screen" :class="{ on: tvOn }" :style="placeAt(SCREENS.tv)" v-html="tvSvg"></div>
-      <!-- Minerva on the housing computer -->
-      <div class="screen-face" :style="placeAt(SCREENS.terminal)">
-        <minerva-face v-if="terminalOn" :state="terminalState" :size="120" assemble-on-mount />
+      <div class="tv-screen" :class="{ on: tvOn }" :style="tvStyle" v-html="tvSvg"></div>
+      <!-- Minerva on the housing computer and on the ID scanner -->
+      <div class="screen-face" :style="planeStyle(TERMINAL_SCREEN)">
+        <minerva-face v-if="terminalOn" :state="terminalState" :size="44" assemble-on-mount />
       </div>
-      <!-- the dark: everything but the scanner, until the power comes on -->
-      <div class="blackout" :class="{ off: lightsOn }"></div>
-      <!-- Minerva on the ID scanner: in the dark, the only light there is -->
-      <div class="scanner-glow" :class="{ off: lightsOn }"></div>
-      <div class="screen-face scanner" :style="placeAt(SCREENS.scanner)">
-        <minerva-face :state="scannerState" :size="54" />
+      <div class="screen-face" :style="planeStyle(SCANNER_SCREEN)">
+        <minerva-face :state="scannerState" :size="22" />
       </div>
-      <div class="lock-light" :class="{ open: escortHere }"></div>
+      <!-- the dark: everything in the unit but the scanner, until the power comes on -->
+      <svg
+        class="blackout"
+        :class="{ off: lightsOn }"
+        :viewBox="ROOM_REGION.join(' ')"
+        :style="regionStyle(ROOM_REGION)"
+        aria-hidden="true"
+      >
+        <defs>
+          <radialGradient id="intro-dark" gradientUnits="userSpaceOnUse" :cx="scannerAt[0]" :cy="scannerAt[1]" r="260">
+            <stop offset="0" stop-color="#000" stop-opacity="0" />
+            <stop offset="0.25" stop-color="#000" stop-opacity="0.55" />
+            <stop offset="1" stop-color="#000" stop-opacity="0.94" />
+          </radialGradient>
+          <radialGradient id="intro-scanglow">
+            <stop offset="0" stop-color="#e6dcf5" stop-opacity="0.45" />
+            <stop offset="1" stop-color="#e6dcf5" stop-opacity="0" />
+          </radialGradient>
+        </defs>
+        <polygon :points="UNIT_OUTLINE.map((p) => p.join(',')).join(' ')" fill="url(#intro-dark)" />
+        <circle :cx="scannerAt[0]" :cy="scannerAt[1]" r="90" fill="url(#intro-scanglow)" />
+      </svg>
 
-      <!-- the things you can use: real buttons, so mouse, touch, keys and the gamepad all reach them -->
+      <!-- you: a silhouette with a yellow outline (yellow is you); ringed when the camera is far out -->
+      <div class="you" :class="{ gone: Boolean(vista) }" :style="youStyle">
+        <svg :viewBox="'-60 -130 120 150'" width="120" height="150" overflow="visible" aria-hidden="true">
+          <circle
+            class="you-ring"
+            :class="{ on: camera.k < 12 }"
+            cx="0"
+            cy="-45"
+            :r="ringR"
+            :stroke-width="ringR / 20"
+          />
+          <ellipse rx="22" ry="7" fill="#000" opacity="0.5" />
+          <template v-if="sitting">
+            <path
+              class="you-body"
+              d="M-12 -4 L-9 -40 Q0 -48 9 -40 L11 -12 L26 -22 L34 -18 L42 2 L33 5 L27 -8 L12 2 Z"
+            />
+            <circle class="you-body" cy="-56" r="9" />
+            <path d="M6 -36 L18 -26 L9 -50" fill="none" stroke="#030306" stroke-width="7" stroke-linecap="round" />
+            <circle cx="9" cy="-52" r="2.6" fill="#e6dcf5" />
+          </template>
+          <template v-else>
+            <path
+              class="you-body"
+              d="M-9 0 l2 -34 q-6 -2 -6 -16 l2 -14 q2 -8 11 -8 q9 0 11 8 l2 14 q0 14 -6 16 l2 34 l-6 0 l-3 -26 l-3 26z"
+            />
+            <circle class="you-body" cy="-80" r="8" />
+          </template>
+        </svg>
+        <span v-if="puffs" :key="puffs" class="vapor" aria-hidden="true"><i></i><i></i><i></i></span>
+      </div>
+
+      <!-- what you can use: the focused one's outline, and real buttons so mouse, touch, keys and the gamepad all reach them -->
+      <svg class="outlines" :viewBox="ROOM_REGION.join(' ')" :style="regionStyle(ROOM_REGION)" aria-hidden="true">
+        <polygon
+          v-if="outlineKey"
+          :points="OUTLINES[outlineKey].map((p) => p.join(',')).join(' ')"
+          class="outline"
+          :class="{ hinted: hintRings && !focusKey }"
+        />
+      </svg>
       <button
         v-for="spot in spots"
         :key="spot.key"
         type="button"
         class="hotspot"
-        :class="{ hinted: hintRings, focused: focusKey === spot.key, locked: isLocked(spot.key) }"
-        :style="placeAt(spot)"
-        :aria-label="spot.label"
-        :tabindex="view === 'room' && !overlayOpen ? 0 : -1"
-        @click="use(spot.key)"
+        :class="{ locked: isLocked(spot.key) }"
+        :style="spot.style"
+        :aria-label="spot.label + (isLocked(spot.key) ? ' (locked)' : '')"
+        :tabindex="spotsReachable ? 0 : -1"
+        @click.stop="use(spot.key)"
         @focus="focusKey = spot.key"
-        @mouseenter="$event.target.focus({ preventScroll: true })"
+        @mouseenter="focusKey = spot.key"
+        @mouseleave="focusKey = focusKey === spot.key && !spotFocused() ? null : focusKey"
       >
-        <span class="spot-label">{{ spot.label }}</span>
+        <span class="spot-name">{{ spot.label }}</span>
       </button>
-
-      <!-- your hand: pointing at what has focus; in the dark, holding your card to the scanner -->
-      <!-- eslint-disable vue/no-v-html -- the game's own SVG art (libs/intro-art.js), not user content -->
-      <svg
-        class="hand"
-        :style="handStyle"
-        width="1"
-        height="1"
-        overflow="visible"
-        aria-hidden="true"
-        v-html="handSvg"
-      ></svg>
-      <!-- eslint-enable vue/no-v-html -->
     </div>
 
-    <!-- the balcony -->
-    <intro-balcony
-      v-if="view === 'balcony' || leavingBalcony"
-      :class="{ near: view === 'balcony' }"
-      :health="health"
-      :hits="hits"
-      @hit="takeHit"
-      @terminal="openConsole()"
-      @inside="goInside"
-    />
+    <!-- the focused thing's name, at its top, the size of the screen's words -->
+    <span v-if="nameTag" class="name-tag" :style="nameTag.style">{{ nameTag.text }}</span>
+
+    <!-- through the glass, or the window: the view fills the screen -->
+    <transition name="intro-fade">
+      <intro-balcony
+        v-if="vista"
+        :mode="vista"
+        :vista-url="vistaUrl"
+        :health="health"
+        :hits="hits"
+        @hit="takeHit"
+        @terminal="openConsole()"
+        @inside="back"
+      />
+    </transition>
 
     <!-- the status line -->
     <header class="status">
@@ -96,28 +170,8 @@
       </span>
     </header>
 
-    <!-- phones: the room's things along the bottom, in the room's order -->
-    <nav
-      v-if="portrait && phase === 'lit' && view === 'room' && !overlayOpen"
-      class="strip-nav"
-      aria-label="In the room"
-    >
-      <button
-        v-for="item in stripItems"
-        :key="item.key"
-        type="button"
-        class="strip-button"
-        :class="{ current: focusKey === item.key, locked: isLocked(item.key) }"
-        @click="stripPress(item.key)"
-      >
-        <!-- eslint-disable-next-line vue/no-v-html -- the game's own SVG art (libs/intro-art.js), not user content -->
-        <span class="strip-icon" aria-hidden="true" v-html="item.icon"></span>
-        <span>{{ item.label }}</span>
-      </button>
-    </nav>
-    <div v-if="portrait && phase === 'dark' && !overlayOpen" class="dark-action">
-      <button type="button" class="o8-button primary big" @click="use('scanner')">Scan your ID card</button>
-    </div>
+    <!-- what to do here, in a line (words, not buttons) -->
+    <p v-if="hint" class="hint-line" aria-live="polite">{{ hint }}</p>
 
     <!-- the overlays -->
     <transition name="intro-pop">
@@ -127,21 +181,25 @@
         :registration="callsignRegistration"
         @submit="fileName"
         @retry="retryName"
-        @close="phase = 'dark'"
+        @close="closeScanner"
       />
     </transition>
-    <transition name="intro-pop">
-      <intro-tv v-if="overlay === 'tv'" :corp-names="corporationNames" @close="closeOverlay" />
-    </transition>
-    <transition name="intro-pop">
-      <section v-if="overlay === 'door'" class="door-panel" role="dialog" aria-labelledby="door-heading">
-        <div class="door-card" :style="{ '--corp': corp ? corp.color : '#9088aa' }">
-          <h2 id="door-heading" :style="{ fontFamily: corp?.font }">
-            {{ corp ? corp.name + ' · Curfew' : 'Minerva · Public notice' }}
-          </h2>
-          <p :style="{ fontFamily: corp?.font }">{{ corp ? corp.curfew : curfewNotice }}</p>
-          <button ref="doorOk" type="button" class="o8-button primary" @click="closeOverlay">OK</button>
-        </div>
+    <transition name="intro-slide-up">
+      <section
+        v-if="view === 'door' && !overlay"
+        class="door-card"
+        role="dialog"
+        aria-labelledby="door-heading"
+        :style="{ '--corp': corp ? corp.color : '#9088aa' }"
+        @click.stop
+      >
+        <h2 id="door-heading" :style="{ fontFamily: corp?.font }">
+          {{ corp ? corp.name + ' · Curfew' : 'Minerva · Public notice' }}
+        </h2>
+        <p :style="{ fontFamily: corp?.font }">{{ corp ? corp.curfew : curfewNotice }}</p>
+        <button ref="doorClose" type="button" class="o8-pill small close" aria-label="Step back" @click="back">
+          ✕
+        </button>
       </section>
     </transition>
     <transition name="intro-grow">
@@ -162,7 +220,7 @@
         @subscribe="subscribe"
         @submit-ship="nameShip"
         @retry="retryShip"
-        @close="closeOverlay"
+        @close="closeConsole"
       />
     </transition>
     <transition name="intro-slide">
@@ -193,61 +251,94 @@ import {
   loadSubscription,
   saveSubscription
 } from '@/libs/intro'
-import { HOTSPOTS, ROOM, SCREENS, adArt, artDefs, handArt, roomArt, CARD_ART } from '@/libs/intro-art'
+import { adArt, artDefs } from '@/libs/intro-art'
+import {
+  K0,
+  OUTLINES,
+  ROOM_BOX,
+  ROOM_REGION,
+  SPOTS,
+  STANDS,
+  T,
+  UNIT_OUTLINE,
+  VIEW_AT,
+  bounds,
+  cityLayers,
+  cssOnY,
+  outsideSvg,
+  roomSvg,
+  tvPicture,
+  ws
+} from '@/libs/intro-world'
+import { vistaSvg } from '@/libs/intro-vista'
+import { svgToCanvas, svgToImageUrl } from '@/libs/raster'
 import IntroScanner from './intro-scanner.vue'
 import IntroConsole from './intro-console.vue'
-import IntroTv from './intro-tv.vue'
 import IntroBalcony from './intro-balcony.vue'
 import IntroNotice from './intro-notice.vue'
 import IntroWake from './intro-wake.vue'
 
-const STRIP = [
-  {
-    key: 'balcony',
-    label: 'Balcony',
-    icon: '<svg viewBox="-16 -16 32 32"><path d="M-15 -4h30M-15 -4v18M-5 -4v18M5 -4v18M15 -4v18" stroke="currentColor" stroke-width="2.5" fill="none"/></svg>'
-  },
-  {
-    key: 'tv',
-    label: 'TV',
-    icon: '<svg viewBox="-16 -16 32 32"><rect x="-15" y="-11" width="30" height="20" rx="3" stroke="currentColor" stroke-width="2.5" fill="none"/><path d="M-7 15h14" stroke="currentColor" stroke-width="2.5"/></svg>'
-  },
-  {
-    key: 'terminal',
-    label: 'Terminal',
-    icon: '<svg viewBox="-16 -16 32 32"><rect x="-14" y="-11" width="28" height="19" rx="3" stroke="currentColor" stroke-width="2.5" fill="none"/><path d="M-4 14h8M0 8v6" stroke="currentColor" stroke-width="2.5"/></svg>'
-  },
-  {
-    key: 'door',
-    label: 'Door',
-    icon: '<svg viewBox="-16 -16 32 32"><rect x="-9" y="-15" width="18" height="30" rx="2" stroke="currentColor" stroke-width="2.5" fill="none"/><circle cx="-4" cy="2" r="2" fill="currentColor"/></svg>'
-  }
-]
 const NOTICE_MS = 7000
 const RING_HINT_MS = 7000
+const AD_MS = 8000
+const LABELS = {
+  glass: 'Balcony',
+  window: 'Window',
+  tv: 'TV',
+  terminal: 'Terminal',
+  scanner: 'ID scanner',
+  door: 'Door',
+  vape: 'Vape'
+}
+/** Screens where HTML sits on the room's walls: [x0, y, zTop, w, h] in world units. */
+const TV_SCREEN = [2.9, 16.98, T.zu + 2.48, 2, 1.28]
+const TERMINAL_SCREEN = [6.17, 16.88, T.zu + 2.52, 1.36, 0.84]
+const SCANNER_SCREEN = [8.17, 16.4, T.zu + 5.6 - 2.28, 0.41, 0.38]
+/** Views the camera zooms into from the room, and how much of the screen the thing fills. */
+const ZOOMS = { tv: 0.84, terminal: 0.5, door: 0.62, scanner: 0.22, glass: 1.4, window: 1.5 }
+const VAPE_BOX = bounds([ws(0.4, 17, T.zu), ws(2.9, 17, T.zu + 2.6), ws(2.9, 20.8, T.zu), ws(0.4, 20.8, T.zu + 2.6)])
+const DARK_BOX = bounds([
+  ws(5.2, 16.4, T.zu),
+  ws(5.2, 16.4, T.zu + 5.6),
+  ws(10.4, 16.4, T.zu + 5.6),
+  ws(10.4, 21, T.zu)
+])
 
 export default {
   name: 'IntroScreen',
-  components: { MinervaFace, IntroScanner, IntroConsole, IntroTv, IntroBalcony, IntroNotice, IntroWake },
+  components: { MinervaFace, IntroScanner, IntroConsole, IntroBalcony, IntroNotice, IntroWake },
   data() {
     return {
-      SCREENS,
       BALANCE,
+      ROOM_REGION,
+      OUTLINES,
+      UNIT_OUTLINE,
+      TERMINAL_SCREEN,
+      SCANNER_SCREEN,
+      scannerAt: ws(SCANNER_SCREEN[0] + 0.2, 16.4, SCANNER_SCREEN[2] - 0.2),
       phase: 'dark',
-      view: 'room',
-      leavingBalcony: false,
+      /** Where the camera is: block, dark, room, or a thing zoomed into (tv, terminal, door, scanner, vape, glass, window). */
+      view: 'block',
+      /** In the room, how far you've pulled back: 0 the room, 1 the whole block. */
+      pull: 0,
+      ease: 'move',
+      moving: false,
+      vista: null,
       overlay: null,
       consoleTab: 'Account',
       jobStep: 'board',
-      consoleFrom: null,
-      focusKey: 'scanner',
+      focusKey: null,
       lightsOn: false,
       tvOn: false,
       terminalOn: false,
       hintRings: false,
+      channel: 0,
       subscription: null,
       health: HEALTH,
       hits: VAPE_HITS_BEFORE,
+      sitting: false,
+      vapeInHand: false,
+      puffs: 0,
       notice: null,
       noticeCount: 0,
       whiteout: false,
@@ -257,11 +348,12 @@ export default {
       vh: window.innerHeight,
       instant: false,
       reduced: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false,
-      roomSvg: artDefs('intro-') + roomArt('intro-')
+      farReady: false,
+      vistaUrl: ''
     }
   },
   computed: {
-    ...mapState(useChainStore, ['chainId', 'account', 'walletStatus', 'contractsLoaded']),
+    ...mapState(useChainStore, ['chainId', 'account']),
     ...mapState(useGameStateStore, ['haveAvatar', 'haveShip', 'gameDataLoaded', 'avatar']),
     ...mapState(useOnboardingStore, ['registration', 'callsigns', 'corporationNames']),
     portrait() {
@@ -282,73 +374,141 @@ export default {
     overlayOpen() {
       return Boolean(this.overlay) || this.phase === 'name' || this.phase === 'filing'
     },
-    spots() {
-      if (this.phase === 'dark' || this.phase === 'name' || this.phase === 'filing')
-        return [{ key: 'scanner', ...HOTSPOTS.scanner }]
-      return ['balcony', 'tv', 'terminal', 'scanner', 'door'].map((key) => ({ key, ...HOTSPOTS[key] }))
+    /** The things you can use now; in the dark, only the scanner. */
+    spotKeys() {
+      if (this.phase === 'dark' || this.phase === 'name' || this.phase === 'filing') return ['scanner']
+      if (this.phase !== 'lit') return []
+      if (this.view === 'vape') return ['vape']
+      if (this.view === 'tv') return ['tv']
+      return ['glass', 'window', 'tv', 'terminal', 'scanner', 'door', 'vape']
     },
-    stripItems() {
-      return STRIP
+    spotsReachable() {
+      return !this.overlayOpen && !this.vista && this.view !== 'door'
+    },
+    /** Hotspots: each thing's outline's box, at least a thumb wide on screen. */
+    spots() {
+      const min = (44 * K0) / this.camera.k
+      return this.spotKeys.map((key) => {
+        const b = key === 'vape' && this.view === 'vape' ? VAPE_BOX : bounds(OUTLINES[key])
+        const w = Math.max(b.w, min)
+        const h = Math.max(b.h, min)
+        return {
+          key,
+          label: LABELS[key],
+          style: {
+            left: `${b.x + b.w / 2 - w / 2}px`,
+            top: `${b.y + b.h / 2 - h / 2}px`,
+            width: `${w}px`,
+            height: `${h}px`
+          }
+        }
+      })
+    },
+    outlineKey() {
+      if (this.view !== 'room' && this.view !== 'dark') return null
+      if (this.overlayOpen || this.vista || this.moving) return null
+      return this.focusKey && this.spotKeys.includes(this.focusKey) ? this.focusKey : null
+    },
+    nameTag() {
+      const key = this.outlineKey
+      if (!key || this.pull > 0.25) return null
+      const b = bounds(OUTLINES[key])
+      const [x, y] = this.toScreen(b.x + b.w / 2, b.y)
+      return {
+        text: LABELS[key] + (this.isLocked(key) ? ' · locked' : ''),
+        style: { left: `${x}px`, top: `${Math.max(56, y - 12)}px` }
+      }
     },
     scannerState() {
       if (this.phase === 'name') return 'listening'
       if (this.phase === 'filing') return this.callsignRegistration?.status === 'confirm' ? 'waiting' : 'thinking'
-      return this.lightsOn ? 'idle' : 'idle'
+      return 'idle'
     },
     terminalState() {
       return this.subscription ? 'idle' : 'talking'
     },
     tvSvg() {
       if (!this.lightsOn) return ''
-      const look = corporation(this.subscription ?? 1, this.corporationNames)
-      return `<svg viewBox="0 0 468 300" preserveAspectRatio="xMidYMid slice">${artDefs('tv-')}${adArt('tv-', look.key, look)}</svg>`
+      const look = corporation(this.channel + 1, this.corporationNames)
+      return tvPicture(artDefs('tv-') + adArt('tv-', look.key, look))
     },
-    handSvg() {
-      const dark = this.phase === 'dark'
-      return `<g transform="scale(0.75)">${handArt(dark ? 'hold' : 'point', dark ? CARD_ART : '')}</g>`
+    roomSvg() {
+      return roomSvg({ vista: this.vistaUrl, vapeInHand: this.vapeInHand, escort: this.escortHere })
     },
-    /** The hand's place: the focused thing's lower middle, or the card held up to the scanner. */
-    handStyle() {
-      const spot = HOTSPOTS[this.focusKey] ?? HOTSPOTS.scanner
-      const x = this.phase === 'dark' ? spot.x - 70 : spot.x + spot.w * 0.55
-      const y = this.phase === 'dark' ? spot.y + spot.h + 120 : spot.y + Math.min(spot.h * 0.75, 160)
-      const hidden = this.overlayOpen || this.view !== 'room'
-      return { transform: `translate(${x}px, ${y}px)`, opacity: hidden ? 0 : 1 }
-    },
-    /** The camera over the room: covering the screen, panning on phones, leaning in on the scanner, through the glass to the balcony. */
-    camera() {
-      const { vw, vh } = this
-      let k = this.portrait ? vh / ROOM.h : Math.max(vw / ROOM.w, vh / ROOM.h)
-      let tx
-      if (this.portrait) {
-        const spot = HOTSPOTS[this.focusKey] ?? HOTSPOTS.scanner
-        const cx = spot.x + spot.w / 2
-        tx = Math.min(80 * k, Math.max(vw - (ROOM.w + 80) * k, vw / 2 - cx * k))
-      } else tx = (vw - ROOM.w * k) / 2
-      let ty = (vh - ROOM.h * k) / 2
-      // lean in on a point: it stays where it is on screen while everything grows around it
-      const lean = (px, py, z) => {
-        const sx = tx + px * k
-        const sy = ty + py * k
-        k *= z
-        tx = sx - px * k
-        ty = sy - py * k
+
+    // ---- the camera
+    /** Fits a box (WS px) in the screen below the status line: its scale (k, px per world unit) and center. */
+    fitter() {
+      const top = 48
+      const bottom = this.hint ? 40 : 12
+      return (box, fill = 0.9) => {
+        const k = K0 * Math.min((this.vw * fill) / box.w, ((this.vh - top - bottom) * fill) / box.h)
+        const cx = box.x + box.w / 2
+        const cy = box.y + box.h / 2 - ((top - bottom) / 2) * (K0 / k)
+        return { k, cx, cy }
       }
-      if (this.phase === 'name' || this.phase === 'filing') lean(1275, 480, 1.3)
-      if (this.view === 'balcony') lean(170, 520, 2.6)
-      return { k, tx, ty }
+    },
+    blockCamera() {
+      // far enough out to see the block, never past the far bitmap's edges
+      const far = cityLayers(this.small)[0]
+      const k = Math.max(this.portrait ? 2.6 : 3.3, (far.k * this.vw) / far.pxW, (far.k * this.vh) / far.pxH)
+      const [cx, cy] = ws(...VIEW_AT.block)
+      return { k, cx, cy }
+    },
+    roomCamera() {
+      return this.fitter(ROOM_BOX, this.portrait ? 0.98 : 0.88)
+    },
+    camera() {
+      const v = this.view
+      if (v === 'block') return this.blockCamera
+      if (v === 'dark') return this.fitter(DARK_BOX, this.portrait ? 0.95 : 0.7)
+      if (v === 'vape') return this.fitter(VAPE_BOX, 0.7)
+      if (ZOOMS[v]) return this.fitter(bounds(OUTLINES[v]), ZOOMS[v])
+      // the room, pulled back toward the block by scrolling or pinching: scale in steps of its log
+      const a = this.roomCamera
+      const b = this.blockCamera
+      const t = this.pull
+      if (t <= 0) return a
+      const k = Math.exp(Math.log(a.k) * (1 - t) + Math.log(b.k) * t)
+      // the center moves so that you stay in view
+      const u = (Math.log(a.k) - Math.log(k)) / (Math.log(a.k) - Math.log(b.k))
+      return { k, cx: a.cx + (b.cx - a.cx) * u, cy: a.cy + (b.cy - a.cy) * u }
     },
     cameraStyle() {
-      const { k, tx, ty } = this.camera
-      return { transform: `translate(${tx}px, ${ty}px) scale(${k})` }
+      const { k, cx, cy } = this.camera
+      const s = k / K0
+      return { transform: `translate(${this.vw / 2 - cx * s}px, ${this.vh / 2 - cy * s}px) scale(${s})` }
+    },
+    small() {
+      return Math.min(this.vw, this.vh) < 600
+    },
+    ringR() {
+      return (40 * K0) / this.camera.k
+    },
+    youStyle() {
+      const key = this.view === 'block' ? (this.phase === 'dark' ? 'dark' : 'room') : this.view
+      const [x, y] = STANDS[key] ?? STANDS.room
+      const [sx, sy] = ws(x, y, T.zu + (this.sitting ? 0.45 : 0))
+      return { transform: `translate(${sx}px, ${sy}px)` }
+    },
+    unitGlowStyle() {
+      const [x, y] = ws(5, 20, T.zu + 2.5)
+      const r = 22 * K0
+      return {
+        left: `${x - r}px`,
+        top: `${y - r}px`,
+        width: `${2 * r}px`,
+        height: `${2 * r}px`,
+        opacity: this.lightsOn && this.camera.k < 14 ? 1 : 0
+      }
+    },
+    tvStyle() {
+      return this.planeStyle(TV_SCREEN)
     },
     /** The console grows out of the terminal it was opened from. */
     consoleOrigin() {
-      const { k, tx, ty } = this.camera
-      if (this.consoleFrom === 'balcony') return { '--grow-x': '78%', '--grow-y': '72%' }
-      const s = SCREENS.terminal
-      const x = tx + (s.x + s.w / 2) * k
-      const y = ty + (s.y + s.h / 2) * k
+      if (this.vista) return { '--grow-x': '78%', '--grow-y': '72%' }
+      const [x, y] = this.toScreen(...ws(SPOTS.terminal[0], SPOTS.terminal[1], SPOTS.terminal[2]))
       return { '--grow-x': `${(x / this.vw) * 100}%`, '--grow-y': `${(y / this.vh) * 100}%` }
     },
     statusText() {
@@ -357,6 +517,25 @@ export default {
     },
     curfewNotice() {
       return TICKER.replace('MINERVA PUBLIC NOTICE · ', '').replaceAll(' · ', '. ') + '.'
+    },
+    hint() {
+      if (this.vista || this.overlayOpen || this.phase === 'wake' || this.whiteout) return ''
+      const touch = this.portrait
+      const back = touch ? 'tap anywhere else to step back' : 'Esc, B or a click elsewhere steps back'
+      if (this.phase === 'dark')
+        return this.view === 'block'
+          ? ''
+          : touch
+            ? 'Tap the ID scanner by the door'
+            : 'Click the ID scanner by the door'
+      if (this.view === 'tv') return `${touch ? 'Tap' : 'Click'} the TV to change channel · ${back}`
+      if (this.view === 'vape') return `${touch ? 'Tap' : 'Click'} the vape for another hit · ${back}`
+      if (this.view === 'door') return back[0].toUpperCase() + back.slice(1)
+      if (this.view === 'room' && this.phase === 'lit')
+        return touch
+          ? 'Tap a thing to use it · pinch to pull back'
+          : 'Click a thing to use it · scroll or + − to pull back, as far as the block'
+      return ''
     },
     /** Skipping jumps to the next thing that needs you; nothing skips a move on its way. */
     canSkip() {
@@ -371,9 +550,12 @@ export default {
       if (reg.kind === 'callsign' && status === 'done') this.powerOn()
       if (reg.kind === 'ship' && status === 'done') this.escortArrives()
     },
-    phase(phase) {
-      // the room's things take focus again when an overlay closes
-      if (phase === 'lit') this.$nextTick(() => this.focusSpot(this.focusKey))
+    camera(next, prev) {
+      if (!prev || (next.k === prev.k && next.cx === prev.cx && next.cy === prev.cy)) return
+      this.moving = !this.instant
+      // (if the transition never ends, as when it's skipped, the room is still drawn sharp soon)
+      clearTimeout(this.movingTimer)
+      this.movingTimer = setTimeout(() => (this.moving = false), 3000)
     }
   },
   created() {
@@ -385,7 +567,10 @@ export default {
     this.subscription = loadSubscription(this.chainId, this.account)
     const pending = this.registration?.status === 'sent' ? this.registration.kind : null
     const start = introStart({ haveAvatar: this.haveAvatar, haveShip: this.haveShip, pending })
-    if (start === 'filing') this.phase = 'filing'
+    if (start === 'filing') {
+      this.phase = 'filing'
+      this.view = 'scanner'
+    }
     if (start === 'lit' || start === 'escort') this.powerOn({ quietly: true })
     if (start === 'escort') {
       this.shipName = this.registration.name
@@ -394,32 +579,88 @@ export default {
     this.loadCallsigns()
     this.loadCorporations()
   },
-  mounted() {
+  async mounted() {
     this.onResize = () => {
       this.vw = window.innerWidth
       this.vh = window.innerHeight
     }
     window.addEventListener('resize', this.onResize)
-    this.$nextTick(() => this.focusSpot(this.focusKey))
-    // In the dark, the unit's system speaks first: what this is, what to do, and what comes after
-    if (this.phase === 'dark')
-      this.later(900, () => {
+    // keys on the window, so Esc works wherever focus has gone (clicking the view drops it on the page)
+    this.onKeyDown = (event) => this.onKey(event)
+    window.addEventListener('keydown', this.onKeyDown)
+    this.onIntroCommand = (event) => this.gamepad(event.detail)
+    window.addEventListener('o8-intro', this.onIntroCommand)
+    this.adTimer = setInterval(() => {
+      if (this.view !== 'tv') this.channel = (this.channel + 1) % 3
+    }, AD_MS)
+    await this.drawWorld()
+  },
+  beforeUnmount() {
+    this.gone = true
+    this.o8audio?.speaking?.pause() // her intro lines end with the room
+    window.removeEventListener('resize', this.onResize)
+    window.removeEventListener('o8-intro', this.onIntroCommand)
+    window.removeEventListener('keydown', this.onKeyDown)
+    clearTimeout(this.noticeTimer)
+    clearTimeout(this.ringTimer)
+    clearTimeout(this.movingTimer)
+    clearInterval(this.adTimer)
+    this.timers?.forEach(clearTimeout)
+    if (this.vistaUrl) URL.revokeObjectURL(this.vistaUrl)
+  },
+  methods: {
+    ...mapActions(useOnboardingStore, ['register', 'clearRegistration', 'loadCallsigns', 'loadCorporations']),
+
+    // ---- drawing the world once
+    /** The city's bitmaps, far first (the opening shows it), then the view through the glass, then the nearer ones. */
+    async drawWorld() {
+      const layers = cityLayers(this.small)
+      const add = async (layer) => {
+        const canvas = await svgToCanvas(outsideSvg(layer.region, layer.pxW, layer.pxH), layer.pxW, layer.pxH)
+        if (this.gone) return
+        Object.assign(canvas.style, this.regionStyle(layer.region))
+        this.$refs.tiers?.appendChild(canvas)
+      }
+      try {
+        await add(layers[0])
+        this.farReady = true
+        if (this.phase === 'dark' && this.view === 'block') this.later(this.reduced ? 0 : 1200, () => this.fallIn())
+        this.vistaUrl = await svgToImageUrl(vistaSvg(), 1440, 900)
+        await add(layers[1])
+        await add(layers[2])
+      } catch (error) {
+        // Without the bitmaps the room still works, over the dark: say so in the console, carry on.
+        console.warn('The intro’s city could not be drawn:', error)
+        this.farReady = true
+        if (this.phase === 'dark' && this.view === 'block') this.fallIn()
+      }
+    },
+    /** The opening: from the whole block, the camera falls into your dark unit; then Minerva speaks. */
+    fallIn() {
+      if (this.phase !== 'dark' || this.view !== 'block') return
+      this.ease = 'fall'
+      this.view = 'dark'
+      this.later(this.reduced ? 200 : 2600, () => {
+        this.ease = 'move'
         if (this.phase !== 'dark') return
         this.say('Minerva', SAY.opening, { hold: true })
         this.o8audio?.speak('introWelcome')
       })
-  },
-  beforeUnmount() {
-    this.o8audio?.speaking?.pause() // her intro lines end with the room
-    window.removeEventListener('resize', this.onResize)
-    clearTimeout(this.noticeTimer)
-    clearTimeout(this.ringTimer)
-    this.timers?.forEach(clearTimeout)
-  },
-  methods: {
-    ...mapActions(useOnboardingStore, ['register', 'clearRegistration', 'loadCallsigns', 'loadCorporations']),
-    placeAt(r) {
-      return { left: `${r.x}px`, top: `${r.y}px`, width: `${r.w}px`, height: `${r.h}px` }
+    },
+
+    // ---- placing things in the plane
+    regionStyle([x, y, w, h]) {
+      return { left: `${x}px`, top: `${y}px`, width: `${w}px`, height: `${h}px` }
+    },
+    /** An HTML screen on the plane y = const: [x0, y, zTop, w, h] in world units. */
+    planeStyle([x0, y1, zTop, w, h]) {
+      return { width: `${w * K0}px`, height: `${h * K0}px`, transform: cssOnY(x0, y1, zTop) }
+    },
+    /** A point of the plane (WS px) on the screen, through the camera. */
+    toScreen(x, y) {
+      const { k, cx, cy } = this.camera
+      const s = k / K0
+      return [this.vw / 2 + (x - cx) * s, this.vh / 2 + (y - cy) * s]
     },
     later(ms, run) {
       this.timers = this.timers ?? []
@@ -428,8 +669,8 @@ export default {
     click() {
       this.o8audio?.playEffect('click')
     },
-    focusSpot(key) {
-      this.$el?.querySelector?.(`.hotspot[aria-label="${HOTSPOTS[key]?.label}"]`)?.focus({ preventScroll: true })
+    spotFocused() {
+      return document.activeElement?.classList?.contains('hotspot')
     },
     /** Any press while something animates skips it to its end. */
     skipTransition() {
@@ -437,7 +678,8 @@ export default {
       this.instant = true
       requestAnimationFrame(() => requestAnimationFrame(() => (this.instant = false)))
     },
-    /** Uses a thing in the room. */
+
+    // ---- using things
     use(key) {
       this.click()
       this.focusKey = key
@@ -445,49 +687,104 @@ export default {
         if (key === 'scanner') {
           this.notice = null
           this.phase = 'name'
+          this.view = 'scanner'
         }
         return
       }
-      if (this.isLocked(key)) this.say('No corporate sponsor', SAY.locked, { state: 'skeptical' })
-      else if (key === 'scanner')
-        this.say('Name on file: ' + this.pilotName, 'Your card’s registered with me. There’s nothing else on it.')
-      else if (key === 'tv' || key === 'door') {
-        this.notice = null
-        this.overlay = key
-        if (key === 'door') this.$nextTick(() => this.$refs.doorOk?.focus())
-      } else if (key === 'terminal') this.openConsole()
-      else if (key === 'balcony') this.goOutside()
-    },
-    stripPress(key) {
-      if (this.focusKey !== key) {
-        this.click()
-        this.focusKey = key
-        this.$nextTick(() => this.focusSpot(key))
-      } else this.use(key)
-    },
-    /** Minerva's console, opened from a terminal: the first boot until you've subscribed. */
-    openConsole(tab, jobStep) {
+      if (this.phase !== 'lit') return
+      if (this.view === 'tv' && key === 'tv') return (this.channel = (this.channel + 1) % 3)
+      if (this.view === 'vape' && key === 'vape') return this.hit()
+      if (this.isLocked(key)) return this.say('No corporate sponsor', SAY.locked, { state: 'skeptical' })
+      this.pull = 0
       this.notice = null
-      this.consoleFrom = this.view === 'balcony' ? 'balcony' : 'terminal'
-      this.consoleTab = this.subscription ? (tab ?? this.consoleTab ?? 'Account') : 'boot'
-      if (jobStep) this.jobStep = jobStep
-      this.overlay = 'console'
+      if (key === 'scanner') {
+        this.view = 'scanner'
+        this.say('Name on file: ' + this.pilotName, 'Your card’s registered with me. There’s nothing else on it.')
+      } else if (key === 'tv') this.view = 'tv'
+      else if (key === 'door') {
+        this.view = 'door'
+        this.$nextTick(() => this.$refs.doorClose?.focus({ preventScroll: true }))
+      } else if (key === 'terminal') this.openConsole()
+      else if (key === 'vape') this.sitDown()
+      else if (key === 'glass' || key === 'window') this.lookOut(key)
     },
-    closeOverlay() {
-      this.click()
-      this.overlay = null
-      this.$nextTick(() => this.focusSpot(this.focusKey))
+    /** A click in the plane that isn't on a thing steps back out of a zoom. */
+    worldClick(event) {
+      if (event.target.closest('.hotspot')) return
+      if (['tv', 'door', 'vape', 'scanner'].includes(this.view) && this.phase === 'lit') this.back()
     },
-    /** The balcony and the door stay locked until the unit has a corporate sponsor (Koda, 2026-11-20).
-     *  The TV doesn't: its ads are how you choose. */
-    isLocked(key) {
-      return this.phase === 'lit' && !this.subscription && (key === 'balcony' || key === 'door')
+    /** Back out one step: the view, the console, a zoom. */
+    back() {
+      if (this.phase === 'name') return this.closeScanner()
+      if (this.overlay === 'console') return this.closeConsole()
+      if (this.vista) {
+        this.click()
+        this.vista = null
+        this.view = 'room'
+        return
+      }
+      if (this.view !== 'room' && this.phase === 'lit') {
+        this.click()
+        this.sitting = false
+        this.vapeInHand = false
+        this.view = 'room'
+        this.$nextTick(
+          () =>
+            this.focusKey &&
+            this.$el.querySelector(`.hotspot[aria-label^="${LABELS[this.focusKey]}"]`)?.focus({ preventScroll: true })
+        )
+      }
     },
-    /** A notice from Minerva; `hold` keeps it up until it's dismissed or replaced. */
-    say(title, body, { hold = false, ...more } = {}) {
-      clearTimeout(this.noticeTimer)
-      this.notice = { key: ++this.noticeCount, title, body, state: 'talking', ...more }
-      if (!hold) this.noticeTimer = setTimeout(() => (this.notice = null), NOTICE_MS)
+    onKey(event) {
+      if (event.target.closest?.('input, textarea')) return
+      // (inside the console, its own Esc closes it and stops there)
+      if (event.key === 'Escape') this.back()
+      else if ((event.key === '-' || event.key === '_') && this.canPull()) this.pullBy(0.12)
+      else if ((event.key === '+' || event.key === '=') && this.canPull()) this.pullBy(-0.12)
+    },
+
+    // ---- pulling back: scroll, pinch, keys, triggers
+    canPull() {
+      return this.view === 'room' && this.phase === 'lit' && !this.overlayOpen && !this.vista
+    },
+    pullBy(amount) {
+      this.ease = 'pull'
+      this.pull = Math.min(1, Math.max(0, this.pull + amount))
+      clearTimeout(this.easeTimer)
+      this.easeTimer = setTimeout(() => (this.ease = 'move'), 300)
+    },
+    onWheel(event) {
+      if (!this.canPull()) return
+      this.pullBy(Math.max(-0.2, Math.min(0.2, event.deltaY * 0.0012)))
+    },
+    onPointerDown(event) {
+      if (event.pointerType !== 'touch') return
+      this.touches = this.touches ?? new Map()
+      this.touches.set(event.pointerId, [event.clientX, event.clientY])
+      this.pinchFrom = this.touches.size === 2 ? this.pinchDistance() : null
+    },
+    onPointerMove(event) {
+      if (!this.touches?.has(event.pointerId)) return
+      this.touches.set(event.pointerId, [event.clientX, event.clientY])
+      if (this.touches.size === 2 && this.pinchFrom && this.canPull()) {
+        const d = this.pinchDistance()
+        this.pullBy(Math.log(this.pinchFrom / d) * 0.6)
+        this.pinchFrom = d
+      }
+    },
+    onPointerUp(event) {
+      this.touches?.delete(event.pointerId)
+      if ((this.touches?.size ?? 0) < 2) this.pinchFrom = null
+    },
+    pinchDistance() {
+      const [a, b] = [...this.touches.values()]
+      return Math.hypot(a[0] - b[0], a[1] - b[1]) || 1
+    },
+    /** The gamepad (gamepad-overlay.vue forwards its commands here): triggers pull back, B steps back. */
+    gamepad({ command, ...detail }) {
+      if (command === 'back') this.back()
+      else if (command === 'zoom' && this.canPull())
+        this.pullBy(((detail.out ?? 0) - (detail.in ?? 0)) * (detail.seconds ?? 0.016) * 1.4)
     },
 
     // ---- your name: the first transaction
@@ -499,10 +796,14 @@ export default {
       this.clearRegistration()
       this.phase = 'name'
     },
+    closeScanner() {
+      this.phase = 'dark'
+      this.view = 'dark'
+    },
     /** The power comes on: the strip flickers, the room fades up, the TV and then the terminal start. */
     powerOn({ quietly = false } = {}) {
       this.phase = 'lit'
-      this.focusKey = 'terminal'
+      this.view = 'room'
       this.lightsOn = true
       this.animating = !quietly
       if (quietly) {
@@ -510,6 +811,7 @@ export default {
         this.terminalOn = true
         return
       }
+      this.focusKey = 'terminal'
       this.later(700, () => (this.tvOn = true))
       this.later(1000, () => (this.terminalOn = true))
       this.later(1400, () => {
@@ -522,27 +824,66 @@ export default {
       this.clearRegistration()
     },
 
-    // ---- the balcony
-    goOutside() {
-      this.view = 'balcony'
+    // ---- the console
+    openConsole(tab, jobStep) {
+      this.notice = null
+      if (!this.vista) this.view = 'terminal'
+      this.consoleTab = this.subscription ? (tab ?? this.consoleTab ?? 'Account') : 'boot'
+      if (jobStep) this.jobStep = jobStep
+      this.overlay = 'console'
     },
-    goInside() {
+    closeConsole() {
       this.click()
-      this.view = 'room'
-      this.leavingBalcony = true
-      this.later(900, () => (this.leavingBalcony = false))
-      this.$nextTick(() => this.focusSpot('balcony'))
+      this.overlay = null
+      if (!this.vista) this.view = 'room'
+      this.$nextTick(() => this.$el.querySelector('.hotspot[aria-label="Terminal"]')?.focus({ preventScroll: true }))
+    },
+    /** The balcony and the door stay locked until the unit has a corporate sponsor (Koda, 2026-11-20). */
+    isLocked(key) {
+      return this.phase === 'lit' && !this.subscription && (key === 'glass' || key === 'door')
+    },
+    /** A notice from Minerva; `hold` keeps it up until it's dismissed or replaced. */
+    say(title, body, { hold = false, ...more } = {}) {
+      clearTimeout(this.noticeTimer)
+      this.notice = { key: ++this.noticeCount, title, body, state: 'talking', ...more }
+      if (!hold) this.noticeTimer = setTimeout(() => (this.notice = null), NOTICE_MS)
+    },
+
+    // ---- the vape: you sit on the mattress and take a hit; Minerva counts
+    sitDown() {
+      this.view = 'vape'
+      this.later(650, () => {
+        if (this.view !== 'vape') return
+        this.sitting = true
+        this.vapeInHand = true
+        this.later(400, () => this.hit())
+      })
+    },
+    hit() {
+      if (this.hitting) return
+      this.hitting = true
+      this.later(2200, () => (this.hitting = false))
+      this.puffs++
+      this.takeHit()
     },
     takeHit() {
       this.hits++
       this.health = Math.max(1, this.health - 1)
-      // Minerva notices once the vapor clears, unless you've gone in or opened a terminal by then
+      // Minerva notices once the vapor clears, unless a terminal is open by then
       this.later(1600, () => {
-        if (this.view !== 'balcony' || this.overlay) return
+        if (this.overlay) return
         this.say(`Health score ${this.health} (−1)`, SAY.vape(this.hits, this.health), {
           attention: true,
           state: 'skeptical'
         })
+      })
+    },
+
+    // ---- through the glass or the window: the camera pushes through and the view fills the screen
+    lookOut(key) {
+      this.view = key
+      this.later(this.reduced ? 0 : 700, () => {
+        if (this.view === key) this.vista = key === 'glass' ? 'balcony' : 'window'
       })
     },
 
@@ -568,6 +909,7 @@ export default {
       this.animating = true
       this.later(1400, () => {
         this.overlay = null
+        this.vista = null
         this.whiteout = true
       })
       this.later(2900, () => {
@@ -594,8 +936,12 @@ export default {
       if (this.phase === 'dark') {
         this.notice = null
         this.phase = 'name'
+        this.view = 'scanner'
       } else if (this.phase === 'lit') {
-        this.view = 'room'
+        this.vista = null
+        this.sitting = false
+        this.vapeInHand = false
+        this.pull = 0
         this.openConsole('Jobs', 'job')
       }
     }
@@ -613,43 +959,84 @@ export default {
   font-family: 'Ubuntu', system-ui, sans-serif;
   text-align: left;
   user-select: none;
+  touch-action: none;
 }
 
-/* ---- the room, through the camera */
+/* ---- the world, through the camera: one transform of one plane */
 .world {
   position: absolute;
   left: 0;
   top: 0;
-  width: 1600px;
-  height: 1000px;
+  width: 0;
+  height: 0;
   transform-origin: 0 0;
+  opacity: 0;
   transition:
-    transform 0.8s cubic-bezier(0.5, 0, 0.2, 1),
+    transform 0.9s cubic-bezier(0.5, 0, 0.2, 1),
     opacity 0.8s;
 }
-.world.away {
-  opacity: 0;
+.world.ready {
+  opacity: 1;
 }
-.room-art {
+.world.ease-fall {
+  transition:
+    transform 2.6s cubic-bezier(0.6, 0, 0.15, 1),
+    opacity 0.8s;
+}
+.world.ease-pull {
+  transition:
+    transform 0.25s ease-out,
+    opacity 0.8s;
+}
+/* while the camera moves, the live layers are scaled as pictures; still, they're drawn sharp again */
+.moving .world .room,
+.moving .world .tv-screen,
+.moving .world .screen-face {
+  will-change: transform;
+}
+.world > * {
   position: absolute;
-  left: -400px;
+}
+.tiers {
+  left: 0;
   top: 0;
-  width: 2400px;
-  height: 1400px;
 }
-.strip {
+.tiers :deep(canvas) {
   position: absolute;
-  left: 560px;
-  top: 76px;
-  width: 260px;
-  height: 6px;
-  border-radius: 3px;
-  background: #d8d4e4;
-  opacity: 0;
-  box-shadow: 0 0 0 #0000;
+  display: block;
 }
-.strip.on {
+.unit-glow {
+  border-radius: 50%;
+  background: radial-gradient(closest-side, #e6dcf573, #e6dcf500);
+  pointer-events: none;
+  transition: opacity 0.9s;
+}
+.room,
+.blackout,
+.outlines {
+  overflow: visible;
+  pointer-events: none;
+}
+/* the lights: off until the name is filed; the strip flickers on */
+.room :deep(.light-strip) {
+  opacity: 0;
+}
+.room.lit :deep(.light-strip) {
   animation: strip-flicker 0.9s steps(1, end) forwards;
+}
+.room :deep(.room-glow) {
+  opacity: 0;
+  transition: opacity 0.9s 0.25s;
+}
+.room.lit :deep(.room-glow) {
+  opacity: 1;
+}
+.room :deep(.lock-light) {
+  fill: #b9a0ff;
+  transition: fill 0.4s;
+}
+.room :deep(.lock-light.open) {
+  fill: #ebff99;
 }
 @keyframes strip-flicker {
   0% {
@@ -664,144 +1051,163 @@ export default {
   36% {
     opacity: 0.1;
   }
-  52% {
-    opacity: 0.85;
-  }
+  52%,
   100% {
     opacity: 0.85;
   }
 }
+.blackout {
+  transition: opacity 0.9s 0.25s;
+}
+.blackout.off {
+  opacity: 0;
+}
 .tv-screen {
-  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
   overflow: hidden;
+  pointer-events: none;
+}
+.tv-screen :deep(svg) {
+  display: block;
+  width: 100%;
+  height: 100%;
   transform: scaleY(0.01);
   opacity: 0;
   transition:
     transform 0.3s ease-out,
     opacity 0.15s;
 }
-.tv-screen.on {
+.tv-screen.on :deep(svg) {
   transform: none;
   opacity: 1;
 }
-.tv-screen :deep(svg) {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
 .screen-face {
-  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
   display: grid;
   place-items: center;
   pointer-events: none;
 }
-.blackout {
-  position: absolute;
-  left: -400px;
-  top: -100px;
-  width: 2400px;
-  height: 1500px;
+
+/* you */
+.you {
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
   pointer-events: none;
-  background: radial-gradient(circle 340px at 1675px 580px, #0000 0, #0000008c 30%, #000000f7 75%, #000 100%);
-  transition: opacity 0.9s 0.25s;
+  transition:
+    transform 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.4s;
 }
-.blackout.off,
-.scanner-glow.off {
+.you.gone {
   opacity: 0;
 }
-.scanner-glow {
+.you svg {
   position: absolute;
-  left: 1125px;
-  top: 330px;
-  width: 300px;
-  height: 300px;
-  pointer-events: none;
-  background: radial-gradient(closest-side, #e6dcf573, #e6dcf500);
-  transition: opacity 0.9s 0.25s;
+  left: -72px;
+  top: -156px;
+  width: 144px;
+  height: 180px;
 }
-.lock-light {
+.you-body {
+  fill: #030306;
+  stroke: #ccff00;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+}
+.you-ring {
+  fill: none;
+  stroke: #ccff00;
+  opacity: 0;
+  transition: opacity 0.6s;
+}
+.you-ring.on {
+  opacity: 0.85;
+}
+.vapor {
   position: absolute;
-  left: 1387px;
-  top: 515px;
-  width: 10px;
-  height: 10px;
+  left: 4px;
+  top: -70px;
+}
+.vapor i {
+  position: absolute;
+  width: 46px;
+  height: 34px;
+  margin: -17px 0 0 -23px;
   border-radius: 50%;
-  background: #b9a0ff;
-  transition: background 0.4s;
+  background: radial-gradient(closest-side, #d8d4e480, #d8d4e400);
+  opacity: 0;
+  animation: puff 2.4s ease-out forwards;
 }
-.lock-light.open {
-  background: #ebff99;
+.vapor i:nth-child(2) {
+  animation-delay: 0.25s;
+}
+.vapor i:nth-child(3) {
+  animation-delay: 0.5s;
+}
+@keyframes puff {
+  0% {
+    opacity: 0.9;
+    transform: translate(0, 0) scale(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-14px, -110px) scale(2.6);
+  }
 }
 
 /* the things you can use */
+.outline {
+  fill: #b9a0ff10;
+  stroke: #b9a0ff;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.outline.hinted {
+  stroke-dasharray: 8 6;
+}
 .hotspot {
-  position: absolute;
   padding: 0;
   margin: 0;
   background: none;
-  border: 3px solid transparent;
-  border-radius: 14px;
+  border: 0;
+  border-radius: 8px;
   cursor: pointer;
-  transition: border-color 0.2s;
+  -webkit-tap-highlight-color: transparent;
 }
-.hotspot.hinted {
-  border: 3px dashed #b9a0ffaa;
-}
-.hotspot:hover,
-.hotspot:focus-visible,
-.hotspot.focused:focus {
-  border: 3px solid #b9a0ff;
+.hotspot:focus-visible {
   outline: none;
 }
-.spot-label {
+/* its name, there for screen readers and the harness, not seen */
+.spot-name {
   position: absolute;
-  left: 50%;
-  bottom: calc(100% + 10px);
-  transform: translateX(-50%);
+  inset: 0;
+  overflow: hidden;
+  color: transparent;
+  font-size: 1px;
+}
+.name-tag {
+  position: absolute;
+  transform: translate(-50%, -100%);
   white-space: nowrap;
   font:
-    500 17px 'Ubuntu',
+    500 15px 'Ubuntu',
     system-ui,
     sans-serif;
   color: #1c0838;
   background: #c3b3da;
   border-radius: 999px;
-  padding: 4px 14px;
-  opacity: 0;
-  transition: opacity 0.2s;
+  padding: 3px 13px;
   pointer-events: none;
-}
-.hotspot.hinted .spot-label {
-  opacity: 0.85;
-  background: #0b0916e6;
-  color: #f1eefa;
-  border: 1px solid #b9a0ff;
-}
-.hotspot:hover .spot-label,
-.hotspot:focus-visible .spot-label,
-.hotspot.focused:focus .spot-label {
-  opacity: 1;
-  background: #c3b3da;
-  color: #1c0838;
-}
-/* the balcony and the door, until the unit has a corporate sponsor */
-.strip-button.locked {
-  opacity: 0.5;
-}
-.hotspot.locked .spot-label::after {
-  content: ' · locked';
-}
-.hand {
-  position: absolute;
-  left: 0;
-  top: 0;
-  pointer-events: none;
-  transition:
-    transform 0.25s ease-out,
-    opacity 0.2s;
+  z-index: 3;
 }
 
-/* ---- the status line */
+/* ---- the status line and the hint */
 .status {
   position: absolute;
   inset: 0 0 auto;
@@ -828,86 +1234,35 @@ export default {
   gap: 0.5em;
   font-family: 'Ubuntu', system-ui, sans-serif;
 }
-
-/* ---- phones: the room's things along the bottom */
-.strip-nav {
+.hint-line {
   position: absolute;
   inset: auto 0 0;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  padding: 0.6em 0.3em 1em;
-  background: #030306e6;
-  border-top: 1px solid #3f3566;
-  z-index: 4;
-}
-.strip-button {
-  display: grid;
-  justify-items: center;
-  gap: 0.35em;
-  background: none;
-  border: 0;
+  margin: 0;
+  padding: 0.6em 1em 0.75em;
+  text-align: center;
+  background: linear-gradient(#03030600, #030306cc);
   color: #bdb5d4;
-  font:
-    13px 'Ubuntu',
-    system-ui,
-    sans-serif;
-  cursor: pointer;
-  padding: 0.3em 0;
-}
-.strip-icon {
-  width: 58px;
-  height: 58px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: #3a1a66;
-  border: 1px solid #ffffff55;
-  color: #ffffff;
-}
-.strip-icon :deep(svg) {
-  width: 32px;
-  height: 32px;
-}
-.strip-button.current {
-  color: #f1eefa;
-}
-.strip-button.current .strip-icon {
-  background: #c3b3da;
-  color: #1c0838;
-  outline: 2.5px solid #b9a0ff;
-  outline-offset: 3px;
-}
-.dark-action {
-  position: absolute;
-  inset: auto 1em 2em;
-  display: grid;
+  font-size: 14px;
+  pointer-events: none;
   z-index: 4;
-}
-.o8-button.big {
-  font-size: 1.2em;
-  padding: 0.7em 1em;
 }
 
-/* ---- the door's warning */
-.door-panel {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  background: #030306a6;
-  z-index: 6;
-}
+/* ---- the door's curfew, in your corporation's voice: it slides up from the bottom, the door above it */
 .door-card {
+  position: absolute;
+  left: 50%;
+  bottom: 3.2em;
+  transform: translateX(-50%);
   width: min(34em, 100% - 2em);
   box-sizing: border-box;
   background: #0b0912f2;
-  border: 1.5px solid #c3b3da;
+  border: 1.5px solid #5a4c8c;
   border-top: 3px solid var(--corp);
   border-radius: 14px;
-  padding: 1.4em 1.6em;
+  padding: 1.2em 3em 1.3em 1.5em;
   display: grid;
-  gap: 0.9em;
-  justify-items: start;
+  gap: 0.7em;
+  z-index: 6;
 }
 .door-card h2 {
   margin: 0;
@@ -916,8 +1271,13 @@ export default {
 }
 .door-card p {
   margin: 0;
-  font-size: 1.2em;
+  font-size: 1.15em;
   line-height: 1.4;
+}
+.door-card .close {
+  position: absolute;
+  top: 0.7em;
+  right: 0.7em;
 }
 
 /* ---- processing */
@@ -934,7 +1294,7 @@ export default {
   opacity: 1;
 }
 
-/* ---- the overlays' motion: popping from the scanner, growing from a terminal, notices sliding in */
+/* ---- the overlays' motion */
 .intro-pop-enter-active,
 .intro-pop-leave-active {
   transition:
@@ -969,42 +1329,24 @@ export default {
   opacity: 0;
   transform: translateY(-1.5em);
 }
-
-/* the city lives: billboards flicker, traffic drifts (classes from libs/intro-art.js) */
-.intro-screen :deep(.intro-flicker) {
-  animation: billboard-flicker 7s infinite steps(1, end);
+.intro-slide-up-enter-active,
+.intro-slide-up-leave-active {
+  transition:
+    opacity 0.25s,
+    transform 0.25s ease-out;
 }
-@keyframes billboard-flicker {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  91% {
-    opacity: 1;
-  }
-  92% {
-    opacity: 0.45;
-  }
-  93% {
-    opacity: 1;
-  }
-  95% {
-    opacity: 0.6;
-  }
-  96% {
-    opacity: 1;
-  }
+.intro-slide-up-enter-from,
+.intro-slide-up-leave-to {
+  opacity: 0;
+  transform: translate(-50%, 1.5em);
 }
-.intro-screen :deep(.intro-traffic) {
-  animation: traffic 50s linear infinite;
+.intro-fade-enter-active,
+.intro-fade-leave-active {
+  transition: opacity 0.5s;
 }
-@keyframes traffic {
-  from {
-    transform: translateX(-60px);
-  }
-  to {
-    transform: translateX(60px);
-  }
+.intro-fade-enter-from,
+.intro-fade-leave-to {
+  opacity: 0;
 }
 
 /* any press skips a transition to its end */
@@ -1015,15 +1357,11 @@ export default {
 }
 /* reduced motion: fades in place of camera moves, no flicker */
 .reduced .world {
-  transition: opacity 0.4s;
+  transition: opacity 0.4s !important;
 }
-.reduced .strip.on {
+.reduced .room.lit :deep(.light-strip) {
   animation: none;
   opacity: 0.85;
-}
-.reduced :deep(.intro-flicker),
-.reduced :deep(.intro-traffic) {
-  animation: none;
 }
 .reduced .intro-grow-enter-from,
 .reduced .intro-grow-leave-to,

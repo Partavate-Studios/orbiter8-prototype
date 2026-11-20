@@ -103,6 +103,9 @@ export default {
       'stepPlanet'
     ]),
     run(command, detail) {
+      // the intro has its own camera and its own way back (intro-screen.vue)
+      if (this.$route?.path === '/intro')
+        return window.dispatchEvent(new CustomEvent('o8-intro', { detail: { command, ...detail } }))
       if (command === 'back') return this.back()
       if (!this.onStarMap) return
       switch (command) {
@@ -122,7 +125,8 @@ export default {
           return this.toggleScope()
         case 'zoomOutPressed':
           // Already as far out as the camera goes: leave the system for its neighbors.
-          if (!this.neighborView && this.viewport.scale >= useUIStore().neighborSwitchScale * 0.97) this.enterNeighborView()
+          if (!this.neighborView && this.viewport.scale >= useUIStore().neighborSwitchScale * 0.97)
+            this.enterNeighborView()
           return
         case 'zoomInPressed':
           if (this.neighborView) useUIStore().zoomInToStar()
