@@ -690,6 +690,17 @@ Calls made building it, for Koda's review:
   replaces it, in the Fable session). Pilots is 22.9 KB (the defaults moved out of its initializer to
   fit). The trade and explore bots now start with a full hold and no cash: they'll need to sell first.
   Played locally: register, choose Corp X, name the ship, wake at Sol with −45¢ and the hold full.
+- **X41. Testnet redeployed** (2026-11-19, Koda: "do the deed work… star density is good for now… then
+  deploy"): a fresh deployment on Polkadot Hub TestNet with everything since 11-17 (joining in two moves,
+  corporations and the starter kit, deeds drawn on chain, free discovery claims, the cheat). Before it,
+  the deed collection was renamed **"Orbiter 8 Deeds" (O8D)**, since deeds cover asteroids too (names are
+  fixed at deployment). Spike key, 64 transactions, all successful, about 18.7 PAS; first transaction in
+  block 15,977,178. Addresses in `sdk/src/chain/networks.js`; the commit is tagged
+  `testnet-2026-11-19` (local tag, for Koda to push), so the planned storage-layout check can compare
+  later upgrades against exactly what's live. Checked on chain: a fresh pilot registered, accepted the
+  job with Corp Z (debt 45, hold full) and its ship's picture came back from `tokenURI`; the explore bot
+  jumped and scanned with drand proofs. Earlier testnet pilots and deeds are gone (a new galaxy).
+  Not done: a play-through of the intro in the browser on the testnet.
 
 ## 10. The Polkadot App spikes (2026-11-18, milestone 7 steps 4–6)
 

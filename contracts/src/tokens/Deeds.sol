@@ -153,7 +153,7 @@ contract Deeds is ERC721Upgradeable, ModuleBase {
     }
 
     function initialize(address admin) external initializer {
-        __ERC721_init("Orbiter 8 Planets", "O8P");
+        __ERC721_init("Orbiter 8 Deeds", "O8D");
         __ModuleBase_init(admin);
     }
 
