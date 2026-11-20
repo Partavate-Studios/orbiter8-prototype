@@ -8,11 +8,14 @@ OUT=$2
 NEW_PLAYER=0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0
 ./chain-reset.sh
 
-# New player: the title, Minerva's welcome, the callsign, the ship, launch.
+# New player: the title, then the intro (components/intro/): the dark room and the ID scanner's name
+# prompt, the lights on, the first boot and the job, the ship's name, waking in orbit.
+B() { echo "eval:[...document.querySelectorAll('button')].find(b=>b.textContent.trim().startsWith('$1'))?.click()"; }
 ACCOUNT=$NEW_PLAYER node explore.mjs "$URL" "$OUT" wait:5000 shot:01-title \
-  click:Begin wait:1500 shot:02-register "click:Register My Call Sign" wait:1500 shot:03-callsign \
-  'type:#register-callsign=Tester' "click:File My Registration" wait:8000 "click:Find a Ship" wait:1500 shot:04-ship-create \
-  'type:#register-ship=Rocinante' "click:Take Off" wait:10000 shot:05-launch
+  click:Begin wait:2500 shot:02-dark "click:ID scanner" wait:1200 \
+  'type:#intro-name=Tester' shot:03-callsign "$(B Register)" wait:9000 shot:04-lights-on \
+  "click:Terminal" wait:1200 "$(B Subscribe)" wait:800 "$(B Jobs)" wait:500 "$(B Pilot)" wait:600 "$(B Accept)" wait:800 \
+  'type:#intro-ship=Rocinante' "$(B Sign)" wait:14000 shot:05-launch "$(B Understood)" wait:3000
 
 # Same player in the star map.
 ACCOUNT=$NEW_PLAYER node explore.mjs "$URL" "$OUT" wait:5000 click:Continue wait:12000 \

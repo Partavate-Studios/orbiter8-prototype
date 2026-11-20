@@ -1,6 +1,7 @@
 <template>
   <!-- The first screen: the title scene, a status pill, and either the title menu on its dark band or
-       the onboarding wizard. Its watchers drive connecting: wallet → contracts → the player's data. -->
+       the connect panel. Its watchers drive connecting: wallet → contracts → the player's data. A new
+       pilot then goes into the intro (/intro), which is also the game's story. -->
   <div class="title-screen" @pointerdown.capture="unlockAudio" @keydown.capture="unlockAudio">
     <title-scene />
 
@@ -36,7 +37,6 @@
         <div class="secondary">
           <button type="button" class="o8-button" @click="openPanel('settings')">Settings</button>
           <button type="button" class="o8-button" @click="openPanel('network')">Network</button>
-          <button type="button" class="o8-button" @click="openStory">Story</button>
         </div>
       </section>
     </div>
@@ -44,8 +44,6 @@
     <p class="version">Version {{ version }}</p>
     <!-- Dev builds only: Minerva's face and its test console. -->
     <router-link v-if="isDev" to="/minerva-lab" class="o8-button small quiet dev-lab">Minerva lab</router-link>
-
-    <story-scene v-if="storyOpen" @close="closeStory" />
   </div>
 </template>
 
@@ -59,7 +57,6 @@ import TitleScene from './title-scene.vue'
 import OnboardingWizard from './onboarding-wizard.vue'
 import NetworkPanel from './network-panel.vue'
 import SettingsPanel from './settings-panel.vue'
-import StoryScene from './story-scene.vue'
 
 // The main button's label waits this long before following a change (ms), so a state that only
 // lasts a moment (a quick reconnect) never flashes on it.
@@ -67,14 +64,13 @@ const SETTLE_MS = 400
 
 export default {
   name: 'TitleScreen',
-  components: { TitleScene, OnboardingWizard, NetworkPanel, SettingsPanel, StoryScene, Orbiter8Logo },
+  components: { TitleScene, OnboardingWizard, NetworkPanel, SettingsPanel, Orbiter8Logo },
   data() {
     return {
       version: __APP_VERSION__,
       isDev: import.meta.env.DEV,
       // What the main button shows: titleAction, once it has held for SETTLE_MS.
-      shownAction: null,
-      storyOpen: false
+      shownAction: null
     }
   },
   computed: {
@@ -143,12 +139,16 @@ export default {
     unlockAudio() {
       this.o8audio.unlock()
     },
-    /** The main button: straight into the game when ready, otherwise the wizard at the current step. */
+    /** The main button: into the game when ready, into the intro for a new pilot, otherwise connecting. */
     start() {
       this.o8audio.playEffect('click')
       if (this.step === 'ready') {
         this.o8audio.speak('welcomeBack')
         this.$router.push('/play')
+        return
+      }
+      if (this.step === 'callsign' || this.step === 'ship') {
+        this.$router.push('/intro')
         return
       }
       // With one wallet (or the one used last time), connecting is the obvious next move: the click
@@ -158,14 +158,6 @@ export default {
         if (wallet) this.chooseWallet(wallet)
       }
       this.openWizard()
-    },
-    openStory() {
-      this.o8audio.playEffect('click')
-      this.storyOpen = true
-    },
-    closeStory() {
-      this.o8audio.playEffect('click')
-      this.storyOpen = false
     },
     openPanel(panel) {
       this.o8audio.playEffect('click')

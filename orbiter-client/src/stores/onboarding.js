@@ -1,5 +1,6 @@
-// The title screen and its onboarding wizard: which step the player is on (libs/onboarding.js, from the
-// chain and game stores), whether the wizard or a panel is open, and the registration in progress.
+// The title screen, its connect panel and the intro: which step the player is on (libs/onboarding.js, from
+// the chain and game stores), whether the connect panel or a side panel is open, and the registration in
+// progress (the intro's two transactions: the name at the ID scanner, the ship with the job).
 import { defineStore } from 'pinia'
 import { useChainStore } from '@/stores/chain'
 import { useGameStateStore } from '@/stores/gamestate'
@@ -82,7 +83,6 @@ export const useOnboardingStore = defineStore('Onboarding', {
         })
       }
     },
-    /** Reads every callsign once, for the "taken" hint. Failing just leaves the hint off. */
     /** The corporations a new pilot may join (Pilots.corporations). */
     async loadCorporations() {
       try {
@@ -91,6 +91,7 @@ export const useOnboardingStore = defineStore('Onboarding', {
         console.error('Reading the corporations failed:', error.shortMessage ?? error.message)
       }
     },
+    /** Reads every callsign once, for the "taken" hint. Failing just leaves the hint off. */
     async loadCallsigns() {
       try {
         this.callsigns = await game.listCallsigns()
@@ -125,13 +126,11 @@ export const useOnboardingStore = defineStore('Onboarding', {
         }
       }
     },
-    /** After a reload: picks up a registration that was still waiting to be mined. */
+    /** After a reload: picks up a registration that was still waiting to be mined (the intro shows it). */
     async resumeRegistration() {
       const pending = game.pendingRegistration()
       if (!pending) return
       this.registration = { ...pending, status: 'sent', reason: null, failure: null }
-      // Back where the player left off: watching the registration go through.
-      this.openWizard()
       try {
         await game.resumeRegistration()
         this.registration = { ...this.registration, status: 'done' }

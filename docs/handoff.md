@@ -52,8 +52,10 @@ modules (Galaxy, Pilots, Market, Planets, Factory, Battle, Armory, tokens). The 
 rebuilt onto the new contracts, plus the new features in the same style.
 
 A pilot's path:
-1. **Title screen**, then the onboarding wizard: wallet (locally, the dev wallet), network, call sign,
-   ship name (both register in one transaction), Take Command.
+1. **Title screen**: connect (wallet, locally the dev wallet; network; gas), then **the intro**
+   (`orbiter-client/src/components/intro/`, since 2026-11-19): a dark apartment where the ID scanner files
+   your name (the first transaction), the housing computer's corporation, the job board, naming the ship
+   (the second transaction, which accepts the job), and waking in orbit.
 2. **Sol**, star 0, with nine planets and Federation stations. Select anything for its card and menu.
    - Earth's I.S.S.: trade (eight goods on Buy and Sell pages), the shipyard (holds get dearer as you
      add them; engine range), the armory (weapons and armor, fitted to the ship).

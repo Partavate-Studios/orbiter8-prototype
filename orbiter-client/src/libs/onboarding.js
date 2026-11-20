@@ -1,11 +1,13 @@
 // Where a player is in getting started, worked out from the wallet and game state alone, so the title
-// screen and the onboarding wizard always agree and a reload lands on the right step.
+// screen, its connect panel and the intro always agree and a reload lands on the right step. Connecting
+// (wallet, network, funds) happens in the title's panel; the name and the ship, in the intro
+// (components/intro/, libs/intro.js).
 
 /**
- * The wizard's steps, in order. Funds and loading are shown as part of the network step.
- * @type {readonly ['wallet', 'network', 'callsign', 'ship', 'command']}
+ * The connect panel's steps, in order. Funds and loading are shown as part of the network step.
+ * @type {readonly ['wallet', 'network']}
  */
-export const WIZARD_STEPS = ['wallet', 'network', 'callsign', 'ship', 'command']
+export const WIZARD_STEPS = ['wallet', 'network']
 
 /**
  * @typedef {object} OnboardingInput
@@ -27,7 +29,8 @@ export const WIZARD_STEPS = ['wallet', 'network', 'callsign', 'ship', 'command']
  * - 'network': connected to a network the game isn't on;
  * - 'loading': reading the game (or failed to: see contractsFailed);
  * - 'funds': nothing to pay gas with, before a registration;
- * - 'callsign' / 'ship': registering (or a registration in flight);
+ * - 'callsign' / 'ship': in the intro: filing a name, or taking the job and naming the ship (or a
+ *   registration in flight);
  * - 'ready': has a ship, can take command.
  * @param {OnboardingInput} input
  */
@@ -44,12 +47,10 @@ export function onboardingStep(input) {
   return input.haveAvatar ? 'ship' : 'callsign'
 }
 
-/** Which wizard dot a step belongs to. */
+/** Which connect-panel dot a step belongs to. */
 export function wizardStepOf(step) {
   if (step === 'searching' || step === 'wallet') return 'wallet'
-  if (step === 'network' || step === 'loading' || step === 'funds') return 'network'
-  if (step === 'ready') return 'command'
-  return step
+  return 'network'
 }
 
 /**
@@ -69,8 +70,8 @@ export function titleAction(step, input) {
     case 'ready':
       return { label: 'Continue', enabled: true }
     default:
-      // funds, callsign, ship: Begin until there's a callsign, then Launch
-      return { label: input.haveAvatar ? 'Launch' : 'Begin', enabled: true }
+      // funds, callsign, ship: Begin the intro, or Continue it once a name is on file
+      return { label: input.haveAvatar ? 'Continue' : 'Begin', enabled: true }
   }
 }
 

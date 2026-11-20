@@ -765,6 +765,44 @@ notes: lights off until the name is filed; the curfew is for violence and thin s
 noir silhouette look with muted colors; the balcony door left, the door out right. The calls made on my
 own are I1–I8 in that README.
 
+## 13. The intro, built (2026-11-19)
+
+Koda: "this will fully replace the current signup process … end to end", keep the old graphics somewhere
+to reference, remove the title's Story and its animation (perhaps reused for history in Minerva later: a
+to-do). Built from the approved mockup into `orbiter-client/src/components/intro/` (with `libs/intro.js`
+for where it starts and its words, and `libs/intro-art.js` for the still art). Played end to end on the
+local chain at desktop and phone size, landing in the game with the name, ship, corporation and the −45¢
+debt. Calls made on my own:
+
+- **N1. Connecting stays on the title.** The wallet, network and gas steps keep their panel (now two dots,
+  Wallet and Network); the moment a new pilot is connected and funded, the intro takes over. The title's
+  button reads Begin (no name yet) or Continue (name on file, or a ship).
+- **N2. The corporation lives in the browser until the job.** The chain records it only with
+  `acceptJob`, so the first boot's choice is kept per network and account in local storage and survives a
+  reload; a new browser asks again at the terminal.
+- **N3. Resuming:** a reload goes to the title as always (App.vue); Begin or Continue lands where the
+  chain says: the dark room, the scanner waiting on a name already sent, the lit room, or the escort
+  waiting on a ship already sent.
+- **N4. Skip intro jumps to the next thing that needs you:** the name prompt in the dark; the job's page
+  once the lights are on (or the first boot, if no corporation yet). Nothing skips a move on its way.
+- **N5. Hovering a thing focuses it,** so the hand, the focus ring and the label always agree; the
+  gamepad's spatial navigation reaches the room's things because they're real buttons.
+- **N6. The face is the widget everywhere** (scanner, terminal, console, notices, balcony terminal,
+  waking), in states that fit: listening while you type, waiting on the wallet, thinking while it's mined,
+  annoyed with a glitch when it fails, skeptical at the vape and the balance.
+- **N7. Failures keep what you typed:** a declined or failed move says why in pink with Try again.
+- **N8. Waking is part of the intro,** then "Understood" enters the game. The game starts the ship at
+  Sol as before (the contract places it); a camera move to Earth, or starting docked at the I.S.S., would
+  make "in orbit over Earth" literal: for Koda.
+- **N9. Archived, not deleted:** the wizard's call-sign and ship steps (`wizard-register`, `pilot-card`,
+  `launch-pad`) and the Story scene with its eight panels are in `components/archive/` with a README;
+  nothing imports them, so they're out of the build. The to-do for Minerva's library (reusing the panels)
+  is in `demo4-plan.md`.
+- **N10. `backstory.md` is yours:** its "How it lines up with the title's Story scene" section still
+  points at `components/title/story-scene.vue`; the files are now in `components/archive/`. Left for you.
+- **N11. `dev/harness/capture.sh`** now plays the intro for its new-player shots (same steps as my manual
+  run); not run itself, since it resets the chain on the default port.
+
 ## For Koda to decide
 
 Answered above, bar these:
@@ -778,3 +816,5 @@ Answered above, bar these:
   the lab in a dev build), M2 (split part 7 or not) and M8 (more motion at HUD size).
 - The intro mockup (section 12, `mockups/intro/README.md`, "Open, for you"): the noir look, the size of
   Minerva's face in the console, the corporations' colors and logos, and the phone's pan-and-strip room.
+- The built intro (section 13): N8, waking literally over Earth (a camera move, or starting docked at
+  the I.S.S.); N10, the Story-scene paths in `backstory.md`.

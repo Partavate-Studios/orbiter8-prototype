@@ -49,7 +49,7 @@ describe('onboarding step', () => {
   it('maps steps onto the wizard dots', () => {
     expect(
       ['searching', 'wallet', 'network', 'loading', 'funds', 'callsign', 'ship', 'ready'].map(wizardStepOf)
-    ).toEqual(['wallet', 'wallet', 'network', 'network', 'network', 'callsign', 'ship', 'command'])
+    ).toEqual(['wallet', 'wallet', 'network', 'network', 'network', 'network', 'network', 'network'])
   })
 
   it('labels the title button by progress', () => {
@@ -60,7 +60,7 @@ describe('onboarding step', () => {
     expect(label({ walletStatus: 'idle' })).toBe('Connect')
     expect(label({ haveAvatar: false, haveShip: false })).toBe('Begin')
     expect(label({ haveAvatar: false, haveShip: false, balance: 0 })).toBe('Begin')
-    expect(label({ haveShip: false })).toBe('Launch')
+    expect(label({ haveShip: false })).toBe('Continue')
     expect(label({})).toBe('Continue')
     expect(titleAction('loading', ready).enabled).toBe(false)
     expect(titleAction('loading', { ...ready, contractsFailed: true }).enabled).toBe(true)

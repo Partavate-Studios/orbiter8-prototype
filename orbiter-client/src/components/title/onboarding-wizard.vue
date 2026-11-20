@@ -1,20 +1,12 @@
 <template>
-  <!-- The onboarding wizard: whatever step the player is on (stores/onboarding.js), in Minerva's panel. -->
+  <!-- The connect panel: the wallet, the network, and gas, in Minerva's panel. Once a new pilot is
+       connected and funded, the intro takes over (components/intro/): the name, the corporation, the job
+       and the ship are all asked there. -->
   <minerva-panel :title="title" :steps="dots" :current="wizardStep" @close="closeWizard">
-    <wizard-register
-      v-if="registerKind"
-      ref="register"
-      :key="registerKind"
-      :kind="registerKind"
-      :intro-done="introDone"
-      @blocked="formBlocked = $event"
-    />
-    <wizard-connect v-else />
+    <wizard-connect />
 
     <template #actions>
-      <button v-if="action" type="button" class="o8-button primary" :disabled="!action.enabled" @click="action.run">
-        {{ action.label }}
-      </button>
+      <button v-if="step === 'ready'" type="button" class="o8-button primary" @click="takeCommand">Take Command</button>
     </template>
   </minerva-panel>
 </template>
@@ -22,17 +14,12 @@
 <script>
 import { mapActions, mapState } from 'pinia'
 import { useOnboardingStore } from '@/stores/onboarding'
-import { useGameStateStore } from '@/stores/gamestate'
 import MinervaPanel from './minerva-panel.vue'
 import WizardConnect from './wizard-connect.vue'
-import WizardRegister from './wizard-register.vue'
 
 const DOTS = [
   { id: 'wallet', label: 'Wallet' },
-  { id: 'network', label: 'Network' },
-  { id: 'callsign', label: 'Call sign' },
-  { id: 'ship', label: 'Ship' },
-  { id: 'command', label: 'Command' }
+  { id: 'network', label: 'Network' }
 ]
 
 const TITLES = {
@@ -41,65 +28,37 @@ const TITLES = {
   network: 'Choose Where to Play',
   loading: 'Reading the Galaxy',
   funds: 'Funds for Gas',
-  callsign: 'Call Sign Registration',
-  ship: 'Starship Registration',
-  ready: 'Ready for Launch'
+  ready: 'Ready'
 }
 
 export default {
   name: 'OnboardingWizard',
-  components: { MinervaPanel, WizardConnect, WizardRegister },
+  components: { MinervaPanel, WizardConnect },
   data() {
-    return { introDone: false, formBlocked: false, dots: DOTS }
+    return { dots: DOTS }
   },
   computed: {
-    ...mapState(useOnboardingStore, ['step', 'wizardStep', 'registration']),
-    ...mapState(useGameStateStore, ['avatar']),
-    /** A registration on screen keeps its own step until the player moves on from it. */
-    registerKind() {
-      if (this.registration) return this.registration.kind
-      return this.step === 'callsign' || this.step === 'ship' ? this.step : null
-    },
+    ...mapState(useOnboardingStore, ['step', 'wizardStep']),
     title() {
-      return TITLES[this.registerKind ?? this.step] ?? TITLES.wallet
-    },
-    /** The panel's main button, if this step has one. */
-    action() {
-      const registration = this.registration
-      if (registration) {
-        if (registration.status === 'failed') return { label: 'Try Again', enabled: true, run: this.clearRegistration }
-        if (registration.status !== 'done') return null
-        if (registration.kind === 'callsign')
-          return { label: 'Find a Ship', enabled: true, run: this.clearRegistration }
-        return { label: 'Take Command of ' + registration.name, enabled: true, run: this.takeCommand }
-      }
-      if (this.registerKind === 'callsign' && !this.introDone) {
-        return { label: 'Register My Call Sign', enabled: true, run: this.readIntro }
-      }
-      if (this.registerKind) {
-        return {
-          label: this.registerKind === 'callsign' ? 'File My Registration' : 'Take Off',
-          enabled: !this.formBlocked,
-          run: () => this.$refs.register.submit()
-        }
-      }
-      if (this.step === 'ready') return { label: 'Take Command', enabled: true, run: this.takeCommand }
-      return null
+      return TITLES[this.step] ?? TITLES.wallet
     }
   },
-  mounted() {
-    if (this.step === 'callsign') this.loadCallsigns()
+  watch: {
+    // Connected, read and funded: a new pilot goes on into the intro.
+    step: {
+      immediate: true,
+      handler(step) {
+        if (step === 'callsign' || step === 'ship') {
+          this.closeWizard()
+          this.$router.push('/intro')
+        }
+      }
+    }
   },
   methods: {
-    ...mapActions(useOnboardingStore, ['closeWizard', 'clearRegistration', 'loadCallsigns']),
-    readIntro() {
-      this.o8audio.playEffect('click')
-      this.introDone = true
-      this.loadCallsigns()
-    },
+    ...mapActions(useOnboardingStore, ['closeWizard']),
     takeCommand() {
       this.o8audio.playEffect('click')
-      this.clearRegistration()
       this.closeWizard()
       this.$router.push('/play')
     }

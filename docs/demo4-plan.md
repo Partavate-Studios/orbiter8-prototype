@@ -192,7 +192,15 @@ hard to add later because it shapes the data, low-hanging, or the battle minimum
   title and story art; the title's Story button now that history lives in the library.
   *Built 2026-11-19 (X40): the two joining moves (register at the ID scanner; accept the job and name
   the ship), Corp X, Y and Z on chain with switching, the starting debt and hold of goods, and
-  `Claims.lawAt`. The intro scene itself waits for the Fable session.*
+  `Claims.lawAt`.* ***The intro itself built 2026-11-19*** *from the approved mockup
+  (`mockups/intro/`): `orbiter-client/src/components/intro/`, replacing the title's call-sign and ship
+  wizard end to end; the title's Story button and scene are retired to `components/archive/` (calls in
+  `review.md` section 13).*
+- **Minerva's library (to do, Koda 2026-11-19):** the world's history, read in Minerva's console (in the
+  game and the intro), in her voice and spun by your corporation (`backstory.md`, "Her library"). The
+  retired Story scene's eight animated panels (`orbiter-client/src/components/archive/story-scene.vue`
+  and `archive/story/`) can illustrate it when you look up history. To flesh out: what's in it, how it's
+  organized, how each corporation tells it.
 - **Upgrade safety before mainnet (to do, Koda 2026-11-19):** the contracts already upgrade without losing
   data (UUPS proxies, ERC-7201 namespaced storage; Deeds, Credits and Claims were upgraded in place on the
   testnet, 2026-11-18). The diamond pattern isn't needed. Missing: an automatic check that a new version
