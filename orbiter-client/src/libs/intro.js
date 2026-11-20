@@ -185,10 +185,13 @@ export function jobTerms(corpName) {
 /** What Minerva says, by moment. */
 export const SAY = {
   scan: 'Scan your ID card.',
+  opening:
+    'Unit 7-2216. Corporate affordable housing. It stays dark until it has a registered occupant. Scan your ID card at the reader by the door, then tell me your name. After that, choose a corporate sponsor at the terminal: the rest of the unit opens when you do. Curfew is on. You’re not going anywhere tonight.',
+  locked: 'Locked until the unit has a corporate sponsor. Choose one at the terminal on the desk.',
   askName: 'Card read. No name on file for this card. What’s your name?',
   filing: 'Filing your name.',
-  lightsOn: 'Power’s on. So are the bills. The terminal on the desk has your account.',
-  firstBoot: 'This unit runs through a corporation. Pick one. You can switch later; on Earth it’s free.',
+  lightsOn: 'Power’s on. So are the bills. The rest of the unit opens when you choose a corporate sponsor at the terminal on the desk.',
+  firstBoot: 'This unit runs through a corporate sponsor. Pick one, and the balcony and the door open. You can switch later; on Earth it’s free.',
   switching: 'Switching is free while you’re on Earth. Out there it costs, and what you own moves with you.',
   account: 'You owe 45. The stipend comes in 6 days. The bills come first.',
   health: (score) => `Your health score is ${score}. Your insurer would worry. You don’t have an insurer.`,

@@ -814,6 +814,16 @@ debt. Calls made on my own:
 - **N11. `dev/harness/capture.sh`** now plays the intro for its new-player shots (same steps as my manual
   run); not run itself, since it resets the chain on the default port.
 
+- **N12. A corporate sponsor before the unit opens** (Koda, 2026-11-20: Minerva tells you that you'll
+  have to choose a corporate sponsor at the terminal before you get full access to the unit). In the
+  dark, before the scan, Minerva now speaks first (`SAY.opening`, held until you scan): the unit, the
+  scan, your name, then the sponsor at the terminal, and the curfew. Once the lights are on, the
+  **balcony and the door are locked** until you've chosen (their labels say "locked", the phone's strip
+  dims them, and using one gets Minerva's "No corporate sponsor"). **The TV isn't locked**: its ads are
+  the clues for choosing, and ads that run without a sponsor fit the world. The lights-on line and the
+  first boot's line now point at the sponsor. All copy is draft. On a phone the long opening covers the
+  top of the scanner (the "Scan your ID card" button stays clear).
+
 ## For Koda to decide
 
 Answered above, bar these:

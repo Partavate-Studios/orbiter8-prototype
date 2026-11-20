@@ -246,7 +246,8 @@ listings and what citizenship means in play: Later):**
 - This replaces the earlier safety, wealth and freedom axes.
 
 **Choosing a corporation (Decided, 2026-11-19).** Booting your housing computer for the first time, you
-subscribe to one of the three; a note says you can change it at any time, and switching is easy. Parts
+subscribe to one of the three as your **corporate sponsor**, and only then is the unit fully yours
+(Koda, 2026-11-20); a note says you can change it at any time, and switching is easy. Parts
 of Minerva's interface change with it: its look, its voice, possibly the history and news. All three
 have job boards listing similar pilot jobs, and **you join whichever corporation you're subscribed to
 when you apply.** It's a simple game choice given context.
@@ -404,7 +405,10 @@ across thousands of nodes.
 2. **An ID-card scanner turns on your new corporate affordable housing unit.** Scanning your card prompts
    for your name: that's your name in the game, and **the first transaction** (registration with
    Minerva). (Koda, 2026-11-19; this replaces entering the call sign on the job screen.)
-3. First boot of the housing computer: subscribe to a corporation (switchable any time).
+3. First boot of the housing computer: choose a **corporate sponsor** (switchable any time). The unit
+   isn't fully yours until you do: Minerva says so in the dark before you scan, and the balcony and the
+   door stay locked until you've chosen (the TV's ads still play: they're how you choose). (Koda,
+   2026-11-20.)
 4. Explore: the TV's ads (clues to the three corporations), the balcony, the mail, the door (after
    curfew, a warning in your corporation's voice).
 5. The job board of your current subscription: one eligible opening, the pilot program. The job screen

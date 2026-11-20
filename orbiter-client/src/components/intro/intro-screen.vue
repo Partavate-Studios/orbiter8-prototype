@@ -51,7 +51,7 @@
         :key="spot.key"
         type="button"
         class="hotspot"
-        :class="{ hinted: hintRings, focused: focusKey === spot.key }"
+        :class="{ hinted: hintRings, focused: focusKey === spot.key, locked: isLocked(spot.key) }"
         :style="placeAt(spot)"
         :aria-label="spot.label"
         :tabindex="view === 'room' && !overlayOpen ? 0 : -1"
@@ -107,7 +107,7 @@
         :key="item.key"
         type="button"
         class="strip-button"
-        :class="{ current: focusKey === item.key }"
+        :class="{ current: focusKey === item.key, locked: isLocked(item.key) }"
         @click="stripPress(item.key)"
       >
         <!-- eslint-disable-next-line vue/no-v-html -- the game's own SVG art (libs/intro-art.js), not user content -->
@@ -401,6 +401,11 @@ export default {
     }
     window.addEventListener('resize', this.onResize)
     this.$nextTick(() => this.focusSpot(this.focusKey))
+    // In the dark, the unit's system speaks first: what this is, what to do, and what comes after
+    if (this.phase === 'dark')
+      this.later(900, () => {
+        if (this.phase === 'dark') this.say('Minerva', SAY.opening, { hold: true })
+      })
   },
   beforeUnmount() {
     window.removeEventListener('resize', this.onResize)
@@ -434,10 +439,14 @@ export default {
       this.click()
       this.focusKey = key
       if (this.phase === 'dark') {
-        if (key === 'scanner') this.phase = 'name'
+        if (key === 'scanner') {
+          this.notice = null
+          this.phase = 'name'
+        }
         return
       }
-      if (key === 'scanner')
+      if (this.isLocked(key)) this.say('No corporate sponsor', SAY.locked, { state: 'skeptical' })
+      else if (key === 'scanner')
         this.say('Name on file: ' + this.pilotName, 'Your card’s registered with me. There’s nothing else on it.')
       else if (key === 'tv' || key === 'door') {
         this.notice = null
@@ -466,10 +475,16 @@ export default {
       this.overlay = null
       this.$nextTick(() => this.focusSpot(this.focusKey))
     },
-    say(title, body, more = {}) {
+    /** The balcony and the door stay locked until the unit has a corporate sponsor (Koda, 2026-11-20).
+     *  The TV doesn't: its ads are how you choose. */
+    isLocked(key) {
+      return this.phase === 'lit' && !this.subscription && (key === 'balcony' || key === 'door')
+    },
+    /** A notice from Minerva; `hold` keeps it up until it's dismissed or replaced. */
+    say(title, body, { hold = false, ...more } = {}) {
       clearTimeout(this.noticeTimer)
       this.notice = { key: ++this.noticeCount, title, body, state: 'talking', ...more }
-      this.noticeTimer = setTimeout(() => (this.notice = null), NOTICE_MS)
+      if (!hold) this.noticeTimer = setTimeout(() => (this.notice = null), NOTICE_MS)
     },
 
     // ---- your name: the first transaction
@@ -572,8 +587,10 @@ export default {
     },
     skipIntro() {
       this.click()
-      if (this.phase === 'dark') this.phase = 'name'
-      else if (this.phase === 'lit') {
+      if (this.phase === 'dark') {
+        this.notice = null
+        this.phase = 'name'
+      } else if (this.phase === 'lit') {
         this.view = 'room'
         this.openConsole('Jobs', 'job')
       }
@@ -762,6 +779,13 @@ export default {
   opacity: 1;
   background: #c3b3da;
   color: #1c0838;
+}
+/* the balcony and the door, until the unit has a corporate sponsor */
+.strip-button.locked {
+  opacity: 0.5;
+}
+.hotspot.locked .spot-label::after {
+  content: ' · locked';
 }
 .hand {
   position: absolute;
