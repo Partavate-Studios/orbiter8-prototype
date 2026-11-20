@@ -60,7 +60,6 @@ export function vista(o = {}) {
   for (let i = 0; i < 26; i++) {
     const w = 50 + r() * 90
     const x = r() * (W + 100) - 50
-    if (Math.abs(x + w / 2 - VP[0]) < 70) continue
     const top = VP[1] - (90 + r() * 330)
     s += tower(x, top, w, H, { fill: '#130f45', win: Math.floor(r() * 4), k: 2.6 })
     if (r() < 0.75) {
@@ -70,49 +69,19 @@ export function vista(o = {}) {
     }
   }
   s += rect(0, VP[1] - 120, W, 200, { fill: 'url(#v-haze)', opacity: 0.6 })
-  // the street canyon: the road falling to the vanishing point, its light trails
-  s += `<path d="M${VP[0] - 30} ${VP[1]} L${VP[0] + 30} ${VP[1]} L${W * 0.86} ${H} L${W * 0.14} ${H}z" fill="#0d0a30"/>`
-  s += `<ellipse cx="${VP[0]}" cy="${H}" rx="${W * 0.5}" ry="${H * 0.45}" fill="url(#v-glow)"/>`
-  for (let i = 0; i < 18; i++) {
-    const a = -0.42 + (i / 17) * 0.84
-    const col = i % 3 === 0 ? '#e6dcf5' : i < 13 ? '#ffb36b' : '#ff8a5c'
-    s += `<path d="M${r2(VP[0] + a * 50)} ${VP[1]} L${r2(VP[0] + a * W * 0.8)} ${H}" stroke="${col}" stroke-width="${r2(1 + r() * 2.5)}" opacity="${r2(0.35 + r() * 0.5)}" stroke-dasharray="${r2(20 + r() * 60)} ${r2(6 + r() * 20)}"/>`
+  // no streets: you're high up, looking out level; the towers fall away below the rail into the glow
+  // of the streets you can't see
+  s += `<ellipse cx="${W / 2}" cy="${H}" rx="${W * 0.7}" ry="${H * 0.3}" fill="url(#v-glow)"/>`
+  // a few near towers, straight on, at the sides: big screens, vertical signs
+  for (const [x, w, top, c, words] of [[-40, 260, 150, 3, WORDS[1]], [W - 230, 270, 90, 2, WORDS[2]], [250, 120, 330, 6, null], [W - 380, 110, 380, 5, null]]) {
+    s += tower(x, top, w, H, { fill: '#0c0a2e', win: 2, k: 3.4 })
+    s += sign(x + w * 0.12, top + 40, w * 0.76, w * 0.5, c, words, { glow: 1 })
+    const vx = x + (x < W / 2 ? w - 22 : 22)
+    const c2 = (c + 2) % BB.length
+    const word = (words ? words[0] : 'VITA').replace(/ /g, '')
+    s += `<ellipse cx="${vx}" cy="${top + 380}" rx="40" ry="140" fill="url(#bb-glow-${c2})"/>` + rect(vx - 16, top + 260, 32, 230, { fill: `url(#bb-fill-${c2})`, stroke: '#05041a', sw: 1 })
+    ;[...word.slice(0, 7)].forEach((ch, i) => (s += text(vx, top + 290 + i * 30, ch, { size: 20, anchor: 'middle', weight: 700, fill: '#f6f2ff' })))
   }
-  // the near towers framing the canyon, faces receding to the vanishing point, signs hung off them
-  const near = (side) => {
-    const sx = side < 0 ? 0 : W
-    const inner = side < 0 ? VP[0] - 330 : VP[0] + 330
-    const wall = `M${sx} -20 L${inner} ${VP[1] - 200} L${inner} ${VP[1] + 60} L${sx} ${H + 20}z`
-    const cid = `v-near${side}`
-    let t = `<clipPath id="${cid}"><path d="${wall}"/></clipPath><path d="${wall}" fill="#0e0b36"/>`
-    t += `<g clip-path="url(#${cid})"><g transform="scale(3.2)">${rect(0, 0, W / 3.2, H / 3.2, { fill: `url(#win${side < 0 ? 2 : 1})`, opacity: 0.8 })}</g></g>`
-    t += `<path d="M${inner} ${VP[1] - 200} L${inner} ${VP[1] + 60}" stroke="#8f7cff" stroke-width="2" opacity="0.7"/>`
-    // floors receding
-    for (let f = 0; f < 18; f++) {
-      const yy = -20 + f * 52
-      const iy = VP[1] - 200 + f * (260 / 18)
-      t += `<path d="M${sx} ${yy} L${inner} ${r2(iy)}" stroke="#2a2270" stroke-width="1" opacity="0.7"/>`
-    }
-    // vertical signs and screens on the face, in perspective (scaled toward the inner edge)
-    for (let n = 0; n < 7; n++) {
-      const tt = 0.1 + n * 0.12
-      const x = sx + (inner - sx) * tt
-      const scale = 1 - tt * 0.85
-      const y = 120 + r() * 360 * (1 - tt * 0.4)
-      const c = Math.floor(r() * BB.length)
-      const vw = 34 * scale
-      const vh = 180 * scale
-      t += `<ellipse cx="${r2(x)}" cy="${r2(y + vh / 2)}" rx="${r2(vw * 2)}" ry="${r2(vh * 0.8)}" fill="url(#bb-glow-${c})"/>`
-      t += rect(r2(x - vw / 2), r2(y), r2(vw), r2(vh), { fill: `url(#bb-fill-${c})`, stroke: '#05041a', sw: 1 })
-      const word = WORDS[Math.floor(r() * WORDS.length)][0].replace(/ /g, '')
-      ;[...word.slice(0, 6)].forEach((ch, i) => (t += text(r2(x), r2(y + (i + 1) * (vh / 7)), ch, { size: r2(vw * 0.6), anchor: 'middle', weight: 700, fill: '#f6f2ff', opacity: 0.9 })))
-    }
-    // one big screen high on each side
-    const bx = side < 0 ? 90 : W - 90 - 300
-    t += sign(bx, 70, 300, 170, side < 0 ? 3 : 2, side < 0 ? WORDS[1] : WORDS[2], { glow: 1 })
-    return t
-  }
-  s += near(-1) + near(1)
   // air traffic
   for (let i = 0; i < 40; i++) {
     const x = r() * W

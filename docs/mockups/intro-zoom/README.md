@@ -26,8 +26,8 @@ glass door and the window show, and what fills the screen once the camera goes t
 | [1](1-block.svg) | All the way out | The city, the tower, your lit notch, and you as a speck with a yellow outline (ringed). The intro can open here and fall in. |
 | [2](2-room.svg) | The room (where you play) | The cutaway in its tower. No labels or menus: things are clickable; the hovered one gets an outline and its name (the vape here). The glass door and the window show the city. |
 | [3](3-tv.svg) | Into the TV | The set fills the screen with the full ad and Minerva's ticker; the room is still round the edges. It keeps the room's slant (an option: square up as it lands). |
-| [4](4-terminal.svg) | Into the terminal | Her console lifts off the screen and squares up to you, the room still behind. Menus live here. |
-| [5](5-balcony.svg) | Through the glass | The camera passes the glass into the view: the busy city straight on, you at the rail from behind, the terminal on the rail. |
+| [4](4-terminal.svg) | Into the terminal | Her console lifts off the screen and squares up to you, the room still behind. Menus live here, as the card drawer's buttons (below). |
+| [5](5-balcony.svg) | Through the glass | The camera passes the glass into the view: the busy city straight on, you at the rail from behind, the terminal on the rail. You're high up looking out level: no streets, the towers fall away below the rail into their glow. |
 | [6](6-vape.svg) | The vape, clicked | No "Take a hit" button: click the vape on the mattress; you sit and take a hit, the vapor rises, Minerva notes the cost (pink). |
 
 ## Calls I made
@@ -43,3 +43,13 @@ glass door and the window show, and what fills the screen once the camera goes t
 - **Z5. The city's colors** are the game's purples and blues with cyan, violet and amber signs; no pink
   (it means "needs you") and no yellow (it means you) in the city.
 - Desktop only so far; on a phone the room panel needs no panning (the box fits the width).
+
+## Second pass (2026-11-20)
+
+- **No road under you** (Koda): the balcony looks out level from high up, so the streets are out of
+  sight below the rail; the canyon walls and light trails are gone.
+- **Minerva's buttons are the card drawer's** (Koda: the buttons that slide out from behind the selection
+  card, `hud/selection-panel.vue` `.action`, are the ones he likes best): a plum gradient pill with a thin
+  violet edge, its picture in a round well, bold pale text. The tab you're on gets the hover look (the
+  edge lit lavender, a lighter plum) and the focus ring, not a lavender fill. Her letters are the same
+  pills, as rows.

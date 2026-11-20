@@ -4,6 +4,34 @@ import { C, MONO, CORPS, rect, text, notice, note, statusLine, consoleFrame, par
 import { camera, world, worldDefs, SPOTS, T } from './world.mjs'
 import { vista, railing } from './vista.mjs'
 
+
+// ---------------------------------------------------------------- the card drawer's buttons (hud/selection-panel.vue .action)
+// Koda (2026-11-20): the buttons that slide out from behind the selection card are the ones to use for
+// Minerva: a plum gradient pill, a thin violet edge, its picture in a round well, bold pale text; hover
+// lights the edge lavender. The one you're on gets the hover look and the focus ring, never a lavender fill.
+const DRAWER_DEFS = `<defs><linearGradient id="dr-pill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2e2354"/><stop offset="1" stop-color="#211839"/></linearGradient><linearGradient id="dr-pill-on" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a2c69"/><stop offset="1" stop-color="#2a1f4c"/></linearGradient><radialGradient id="dr-well" cx="50%" cy="40%" r="60%"><stop offset="0" stop-color="#3d2a6e"/><stop offset="1" stop-color="#1a1331"/></radialGradient></defs>`
+const GLYPHS = {
+  Account: 'M-8 -5 h16 a2 2 0 0 1 2 2 v8 a2 2 0 0 1 -2 2 h-16 a2 2 0 0 1 -2 -2 v-8 a2 2 0 0 1 2 -2z M-10 -1 h20 M-6 4 h5',
+  Health: 'M0 8 C-9 2 -10 -3 -7 -6 C-4 -9 -1 -7 0 -4 C1 -7 4 -9 7 -6 C10 -3 9 2 0 8z',
+  Mail: 'M-9 -6 h18 v12 h-18z M-9 -6 L0 2 L9 -6',
+  Jobs: 'M-9 -3 h18 v10 h-18z M-4 -3 v-3 h8 v3 M-9 2 h18'
+}
+function pill(x, y, w, h, label, o = {}) {
+  let s = ''
+  if (o.on) s += rect(x - 5, y - 5, w + 10, h + 10, { r: (h + 10) / 2, stroke: C.brand300, sw: 2.5 })
+  s += rect(x, y, w, h, { r: h / 2, fill: o.on ? 'url(#dr-pill-on)' : 'url(#dr-pill)', stroke: o.on ? '#b9a0ff' : '#4a3d7a', sw: 1.5 })
+  const wr = h / 2 - 5
+  const wx = x + 5 + wr
+  const wy = y + h / 2
+  if (o.glyph) {
+    s += `<circle cx="${wx}" cy="${wy}" r="${wr}" fill="url(#dr-well)" stroke="#5a4c8c" stroke-width="1"/>`
+    s += `<g transform="translate(${wx} ${wy}) scale(${(wr * 0.62) / 10})"><path d="${o.glyph}" fill="none" stroke="#d9ccf5" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></g>`
+  }
+  s += text(o.glyph ? x + 10 + wr * 2 + 8 : x + 18, y + h / 2 + (o.size ?? 17) * 0.36, label, { size: o.size ?? 17, weight: 700, fill: '#efe7ff' })
+  if (o.badge) s += `<circle cx="${x + w - 18}" cy="${y + h / 2}" r="11" fill="${C.pink}"/>` + text(x + w - 18, y + h / 2 + 4.5, String(o.badge), { size: 12, anchor: 'middle', weight: 700 })
+  return s
+}
+
 const hint = (W, H, s) => rect(0, H - 40, W, 40, { fill: C.black, opacity: 0.8 }) + text(24, H - 15, s, { size: 14, fill: C.text2 })
 const memo = (x, y, w, name, lines) => note(x, y, w, [`${name}.`, ...lines], { size: 12.5 })
 const vignette = (W, H) => rect(0, 0, W, H, { fill: 'url(#w-farhaze)' }) + rect(0, 0, W, H, { fill: 'url(#w-vignette)' })
@@ -73,8 +101,12 @@ export const PANELS = [
       const box = [[x, y], [x + w, y], [x + w, y + h], [x, y + h]]
       s += corners.map((c, i) => `<path d="M${c[0]} ${c[1]} L${box[i][0]} ${box[i][1]}" stroke="${C.brand300}" stroke-width="1" opacity="0.35"/>`).join('')
       s += `<polygon points="${corners.map((c) => c.join(',')).join(' ')}" fill="${C.lavenderLight}" opacity="0.08"/>`
-      const f = consoleFrame(x, y, w, h, { corp: 'X', tab: 'Mail', badges: { Mail: 2 }, state: 'talking', say: 'Two bills are overdue. One company said no, politely. Another didn’t read it.' })
-      s += f.svg
+      const f = consoleFrame(x, y, w, h, { corp: 'X', tabs: false, state: 'talking', say: 'Two bills are overdue. One company said no, politely. Another didn’t read it.' })
+      s += DRAWER_DEFS + f.svg
+      // her tabs, as the card drawer's buttons
+      ;['Account', 'Health', 'Mail', 'Jobs'].forEach((tab, i) => {
+        s += pill(x + 24, y + h - 24 - 4 * 62 + i * 62, 272, 50, tab, { glyph: GLYPHS[tab], on: tab === 'Mail', badge: tab === 'Mail' ? 2 : 0 })
+      })
       const c = f.content
       s += text(c.x, c.y + 18, 'Mail', { size: 24, weight: 500, family: CORPS.X.headFont }) + text(c.x + 70, c.y + 18, '7 · 2 overdue', { size: 14, fill: C.text3 })
       const MAIL = [
@@ -84,20 +116,22 @@ export const PANELS = [
         ['Talent Intake', 'Your application was not reviewed', 'Rejection'],
         ['Block 7 Security', 'Incident report: 3 assaults, 0 arrests', '']
       ]
+      // the letters, in the drawer's plum: the rows are buttons too
       MAIL.forEach(([from, subj, tag], i) => {
         const ry = c.y + 40 + i * 70
         const open = i === 2
-        s += rect(c.x, ry, c.w, 62, { r: 10, fill: open ? '#221d30' : '#17141f', stroke: open ? C.lavender : 'none', sw: 1.5 })
-        s += text(c.x + 16, ry + 26, from, { size: 15, weight: 600 }) + text(c.x + 16, ry + 48, subj, { size: 14, fill: C.text2 })
+        s += rect(c.x, ry, c.w, 60, { r: 14, fill: open ? 'url(#dr-pill-on)' : 'url(#dr-pill)', stroke: open ? '#b9a0ff' : '#4a3d7a', sw: 1.5 })
+        s += `<circle cx="${c.x + 30}" cy="${ry + 30}" r="20" fill="url(#dr-well)" stroke="#5a4c8c" stroke-width="1"/><g transform="translate(${c.x + 30} ${ry + 30}) scale(1.1)"><path d="${GLYPHS.Mail}" fill="none" stroke="#d9ccf5" stroke-width="1.5" stroke-linejoin="round"/></g>`
+        s += text(c.x + 62, ry + 25, from, { size: 15, weight: 700, fill: '#efe7ff' }) + text(c.x + 62, ry + 46, subj, { size: 14, fill: C.text2 })
         if (tag) {
           const tw = tag.length * 7.5 + 18
           const od = tag === 'Overdue'
-          s += rect(c.x + c.w - tw - 12, ry + 12, tw, 22, { r: 11, stroke: od ? C.pink : C.text3, sw: 1.5 }) + text(c.x + c.w - tw / 2 - 12, ry + 27, tag, { size: 12, anchor: 'middle', fill: od ? C.pinkLight : C.text2, weight: 600 })
+          s += rect(c.x + c.w - tw - 14, ry + 19, tw, 22, { r: 11, stroke: od ? C.pink : C.text3, sw: 1.5 }) + text(c.x + c.w - tw / 2 - 14, ry + 34, tag, { size: 12, anchor: 'middle', fill: od ? C.pinkLight : C.text2, weight: 600 })
         }
       })
       s += statusLine(W) + hint(W, H, 'Here a menu belongs: tabs 1–4, shoulder buttons · ✕, Esc or B shrinks it back into the screen')
-      s += memo(W - 430, H - 230, 410, '4 · The terminal, zoomed in', [
-        'From far away her screen is just her emblem. Click it and the camera pushes in; the console lifts off the screen and squares up to you, the room still behind it. Menus live here, not in the world.'
+      s += memo(W - 450, H - 300, 430, '4 · The terminal, zoomed in', [
+        'From far away her screen is just her emblem. Click it and the camera pushes in; the console lifts off the screen and squares up to you, the room still behind it. Menus live here, not in the world.', 'Her buttons are the card drawer’s (the ones that slide out from behind the selection card): plum pills with their picture in a round well. The one you’re on lights its edge and gets the focus ring.'
       ])
       return s
     }
