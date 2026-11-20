@@ -112,7 +112,7 @@ console.log('signer address', await signer.getAddress(), 'Pilots', PILOTS)
 let view = await pilots.pilotOf(signer.address)
 if (!view.registered) {
   const t0 = Date.now()
-  const tx = await pilots.register('AppSpike' + product.h160Address.slice(2, 6), 'Pocket ' + product.h160Address.slice(6, 10))
+  const tx = await pilots.register('AppSpike' + product.h160Address.slice(2, 6)) // then acceptJob(1, ship name) for a ship
   const receipt = await tx.wait()
   console.log('register: status', receipt.status, 'logs', receipt.logs.length, 'in', ms(t0), 'tx', tx.hash)
   view = await pilots.pilotOf(signer.address)

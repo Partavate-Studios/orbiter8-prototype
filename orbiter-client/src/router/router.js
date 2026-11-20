@@ -20,6 +20,10 @@ export default createRouter({
         const gameState = useGameStateStore()
         return gameState.gameDataLoaded && gameState.haveShip ? true : '/'
       }
-    }
+    },
+    // Dev builds only: Minerva's face and its test console. Production builds drop it, file and all.
+    ...(import.meta.env.DEV
+      ? [{ path: '/minerva-lab', name: 'Minerva Lab', component: () => import('@/components/minerva/minerva-lab.vue') }]
+      : [])
   ]
 })

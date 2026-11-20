@@ -183,19 +183,6 @@
   },
   {
     "type": "function",
-    "name": "START_CREDITS",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
     "name": "START_RANGE",
     "inputs": [],
     "outputs": [
@@ -232,6 +219,24 @@
       }
     ],
     "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "acceptJob",
+    "inputs": [
+      {
+        "name": "corporation",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "shipName",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
   },
   {
     "type": "function",
@@ -397,6 +402,70 @@
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "corporationOf",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "corporations",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "names",
+        "type": "string[]",
+        "internalType": "string[]"
+      },
+      {
+        "name": "switchFee",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "kit",
+        "type": "tuple",
+        "internalType": "struct Pilots.StarterKit",
+        "components": [
+          {
+            "name": "credits",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "debt",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "goods",
+            "type": "uint8[]",
+            "internalType": "uint8[]"
+          },
+          {
+            "name": "units",
+            "type": "uint16[]",
+            "internalType": "uint16[]"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -646,6 +715,11 @@
             "internalType": "uint256"
           },
           {
+            "name": "corporation",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
             "name": "ship",
             "type": "tuple",
             "internalType": "struct Pilots.Ship",
@@ -780,11 +854,6 @@
         "name": "callsign",
         "type": "string",
         "internalType": "string"
-      },
-      {
-        "name": "shipName",
-        "type": "string",
-        "internalType": "string"
       }
     ],
     "outputs": [],
@@ -913,6 +982,24 @@
         "name": "battle_",
         "type": "address",
         "internalType": "contract IMoveHook"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setCorporations",
+    "inputs": [
+      {
+        "name": "names",
+        "type": "string[]",
+        "internalType": "string[]"
+      },
+      {
+        "name": "switchFee",
+        "type": "uint256",
+        "internalType": "uint256"
       }
     ],
     "outputs": [],
@@ -1058,6 +1145,41 @@
         "name": "range",
         "type": "uint8",
         "internalType": "uint8"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setStarterKit",
+    "inputs": [
+      {
+        "name": "kit",
+        "type": "tuple",
+        "internalType": "struct Pilots.StarterKit",
+        "components": [
+          {
+            "name": "credits",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "debt",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "goods",
+            "type": "uint8[]",
+            "internalType": "uint8[]"
+          },
+          {
+            "name": "units",
+            "type": "uint16[]",
+            "internalType": "uint16[]"
+          }
+        ]
       }
     ],
     "outputs": [],
@@ -1228,6 +1350,19 @@
   },
   {
     "type": "function",
+    "name": "switchCorporation",
+    "inputs": [
+      {
+        "name": "corporation",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "traverse",
     "inputs": [
       {
@@ -1368,6 +1503,31 @@
         "internalType": "uint256"
       }
     ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "CorporationChanged",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "corporation",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "uint8"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "CorporationsSet",
+    "inputs": [],
     "anonymous": false
   },
   {
@@ -1703,6 +1863,37 @@
   },
   {
     "type": "event",
+    "name": "ShipAccepted",
+    "inputs": [
+      {
+        "name": "pilot",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "shipId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "corporation",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "uint8"
+      },
+      {
+        "name": "shipName",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
     "name": "ShipRenamed",
     "inputs": [
       {
@@ -1724,6 +1915,12 @@
         "internalType": "string"
       }
     ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "StarterKitSet",
+    "inputs": [],
     "anonymous": false
   },
   {
@@ -1873,6 +2070,11 @@
   },
   {
     "type": "error",
+    "name": "HasShip",
+    "inputs": []
+  },
+  {
+    "type": "error",
     "name": "InvalidInitialization",
     "inputs": []
   },
@@ -1895,6 +2097,22 @@
         "name": "free",
         "type": "uint256",
         "internalType": "uint256"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "NoShip",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "NoSuchCorporation",
+    "inputs": [
+      {
+        "name": "corporation",
+        "type": "uint8",
+        "internalType": "uint8"
       }
     ]
   },

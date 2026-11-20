@@ -32,7 +32,8 @@ for (const b of [1, 2, 3, 4, 5, 6, 7, 9, 10, 12, 14]) await send(planets.setCost
 const P = (n) => at(n, pilot)
 const [pilots, market, armory, drones] = [P('pilots'), P('market'), P('armory'), P('drones')]
 const mine = { planets: P('planets'), claims: P('claims') }
-if (!(await pilots.pilotOf(me)).registered) await send(pilots.register(`Builder${account}`, 'Hammer'))
+if (!(await pilots.pilotOf(me)).registered) await send(pilots.register(`Builder${account}`))
+if (Number((await pilots.pilotOf(me)).shipId) === 0) await send(pilots.acceptJob(1, 'Hammer'))
 // The belt's asteroids: the sections whose id has a view (an empty section's doesn't).
 const rocks = []
 for (let i = 0; i < 8; i++) {

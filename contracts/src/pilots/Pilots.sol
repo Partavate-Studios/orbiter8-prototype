@@ -35,7 +35,6 @@ contract Pilots is ModuleBase {
     uint8 public constant MAX_RANGE = 4;
     uint16 public constant START_BAYS = 5;
     uint16 public constant MAX_BAYS = 250; // cargo bays and drone bays together
-    uint256 public constant START_CREDITS = 1_000;
     uint256 public constant CALLSIGN_FEE = 2_000;
     uint256 public constant SHIP_NAME_FEE = 500;
     uint256 public constant MAX_SESSION = 12 hours;
@@ -74,7 +73,18 @@ contract Pilots is ModuleBase {
     struct Pilot {
         string callsign;
         bool registered;
-        uint256 shipId; // the active ship (one per pilot in this run, D26)
+        uint256 shipId; // the active ship (one per pilot in this run, D26); 0 until the job is accepted
+        uint8 corporation; // 1-based (`corporations`); 0: a non-citizen
+        uint40 corporationSince; // when the pilot joined it (for waiting periods, later)
+    }
+
+    /// What the pilot program advances a new pilot (Koda, 2026-11-19): credits, the debt carried over from
+    /// Earth, and a hold of goods. Admin-set, so it can be retuned.
+    struct StarterKit {
+        uint256 credits;
+        uint256 debt;
+        uint8[] goods;
+        uint16[] units;
     }
 
     struct Session {
@@ -87,6 +97,7 @@ contract Pilots is ModuleBase {
         string callsign;
         bool registered;
         uint256 shipId;
+        uint8 corporation;
         Ship ship;
         address sessionKey;
         uint64 sessionExpiry;
@@ -114,6 +125,9 @@ contract Pilots is ModuleBase {
         uint8 dronesPerBay; // a tunable (D91): one for now
         IMiningHook mining; // ships mining a belt's empty sections (D78, D93)
         mapping(address => bool) isMining;
+        string[] corporations; // their names, by id - 1 (Koda, 2026-11-19: Corp X, Y and Z for now)
+        uint256 switchFee; // what changing corporation costs (burned)
+        StarterKit kit;
     }
 
     // keccak256(abi.encode(uint256(keccak256("orbiter8.pilots")) - 1)) & ~bytes32(uint256(0xff))
@@ -121,6 +135,10 @@ contract Pilots is ModuleBase {
 
     event Registered(address indexed pilot, uint256 indexed shipId, string callsign, string shipName);
     event CallsignChanged(address indexed pilot, string callsign);
+    event ShipAccepted(address indexed pilot, uint256 indexed shipId, uint8 corporation, string shipName);
+    event CorporationChanged(address indexed pilot, uint8 corporation);
+    event CorporationsSet(); // read them with corporations()
+    event StarterKitSet();
     event ShipRenamed(address indexed pilot, uint256 indexed shipId, string name);
     event Jumped(address indexed pilot, uint256 from, uint256 to, bool discovered);
     event Traversed(address indexed pilot, uint256 blackHole, uint256 exit, bool discovered);
@@ -149,6 +167,9 @@ contract Pilots is ModuleBase {
     error SendFailed();
     error BadLoadout();
     error NoDroneRoom(uint256 room);
+    error NoShip();
+    error HasShip();
+    error NoSuchCorporation(uint8 corporation);
 
     function _p() internal pure returns (PilotsStorage storage p) {
         assembly {
@@ -163,6 +184,37 @@ contract Pilots is ModuleBase {
         p.credits = credits_;
         p.shipTokens = ships_;
         p.dronesPerBay = 1;
+        // The corporations and the starter kit are set by the deployment (Deployment.wireJoining).
+    }
+
+    /// The corporations' names (by id - 1) and what switching costs. Admin only.
+    function setCorporations(string[] calldata names, uint256 switchFee) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        PilotsStorage storage p = _p();
+        delete p.corporations;
+        for (uint256 i = 0; i < names.length; i++) p.corporations.push(names[i]);
+        p.switchFee = switchFee;
+        emit CorporationsSet();
+    }
+
+    /// What a new pilot starts with. Admin only.
+    function setStarterKit(StarterKit calldata kit) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        if (kit.goods.length != kit.units.length) revert BadLoadout();
+        uint256 total;
+        for (uint256 i = 0; i < kit.units.length; i++) total += kit.units[i];
+        if (total > START_BAYS) revert NoRoom(START_BAYS);
+        _p().kit = kit;
+        emit StarterKitSet();
+    }
+
+    /// The corporations' names (id = index + 1), what switching costs, and what a new pilot starts with.
+    function corporations() external view returns (string[] memory names, uint256 switchFee, StarterKit memory kit) {
+        PilotsStorage storage p = _p();
+        return (p.corporations, p.switchFee, p.kit);
+    }
+
+    /// A pilot's corporation (0: a non-citizen).
+    function corporationOf(address pilot) external view returns (uint8) {
+        return _p().pilots[pilot].corporation;
     }
 
     /// How many drones a drone bay holds (D91).
@@ -194,6 +246,7 @@ contract Pilots is ModuleBase {
         PilotsStorage storage p = _p();
         Pilot storage record = p.pilots[pilot];
         if (!record.registered) revert NotRegistered();
+        if (record.shipId == 0) revert NoShip();
         return p.ships[record.shipId];
     }
 
@@ -228,26 +281,63 @@ contract Pilots is ModuleBase {
 
     // ── registering and names ───────────────────────────────────────────────────────────────────
 
-    /// Registers a call sign and launches the pilot's ship at Sol, with starting credits. Wallets
+    /// Registers a call sign with Minerva (Koda, 2026-11-19: scanning your ID card in your new housing
+    /// unit). The pilot is a non-citizen with no ship until the job is accepted (`acceptJob`). Wallets
     /// only: a session key can't register.
-    function register(string calldata callsign, string calldata shipName) external {
+    function register(string calldata callsign) external {
         address who = msg.sender;
         PilotsStorage storage p = _p();
         if (p.pilots[who].registered || p.sessions[who].pilot != address(0)) revert AlreadyRegistered();
         bytes32 key = _nameKey(callsign);
         if (p.byCallsign[key] != address(0)) revert CallsignTaken(callsign);
-        _nameKey(shipName);
         p.byCallsign[key] = who;
-        uint256 shipId = ++p.count;
         Pilot storage pilot = p.pilots[who];
         pilot.callsign = callsign;
         pilot.registered = true;
+        emit Registered(who, 0, callsign, "");
+    }
+
+    /// Accepts the pilot job (Koda, 2026-11-19): names the ship, which mints it in Earth's orbit (Sol),
+    /// joins `corporation` (the one the player is subscribed to), and loads the pilot program's advance
+    /// (StarterKit: a hold of goods and the debt carried over from Earth). Wallets only.
+    function acceptJob(uint8 corporation, string calldata shipName) external {
+        address who = msg.sender;
+        PilotsStorage storage p = _p();
+        Pilot storage pilot = p.pilots[who];
+        if (!pilot.registered) revert NotRegistered();
+        if (pilot.shipId != 0) revert HasShip();
+        if (corporation == 0 || corporation > p.corporations.length) revert NoSuchCorporation(corporation);
+        _nameKey(shipName);
+        uint256 shipId = ++p.count;
         pilot.shipId = shipId;
+        (pilot.corporation, pilot.corporationSince) = (corporation, uint40(block.timestamp));
         Ship storage ship = p.ships[shipId];
         (ship.name, ship.range, ship.bays) = (shipName, START_RANGE, START_BAYS);
         p.shipTokens.mint(who, shipId);
-        p.credits.mint(who, START_CREDITS);
-        emit Registered(who, shipId, callsign, shipName);
+        StarterKit storage kit = p.kit;
+        if (kit.credits > 0) p.credits.mint(who, kit.credits);
+        if (kit.debt > 0) p.credits.addDebt(who, kit.debt);
+        for (uint256 i = 0; i < kit.goods.length; i++) {
+            p.cargo[shipId][kit.goods[i]] += kit.units[i];
+            ship.cargo += kit.units[i];
+            emit CargoChanged(who, kit.goods[i], p.cargo[shipId][kit.goods[i]]);
+        }
+        emit ShipAccepted(who, shipId, corporation, shipName);
+    }
+
+    /// Changes the pilot's corporation, for a fee (burned): the taxes at their ports and the law over what
+    /// they own follow it (Koda, 2026-11-19). Wallets only.
+    function switchCorporation(uint8 corporation) external {
+        address who = msg.sender;
+        PilotsStorage storage p = _p();
+        Pilot storage pilot = p.pilots[who];
+        if (pilot.shipId == 0) revert NoShip();
+        if (corporation == 0 || corporation > p.corporations.length || corporation == pilot.corporation) {
+            revert NoSuchCorporation(corporation);
+        }
+        if (p.switchFee > 0) p.credits.burn(who, p.switchFee);
+        (pilot.corporation, pilot.corporationSince) = (corporation, uint40(block.timestamp));
+        emit CorporationChanged(who, corporation);
     }
 
     /// A new call sign, for a fee (burned). Wallets only.
@@ -487,6 +577,7 @@ contract Pilots is ModuleBase {
         v.callsign = record.callsign;
         v.registered = record.registered;
         v.shipId = record.shipId;
+        v.corporation = record.corporation;
         v.ship = p.ships[record.shipId];
         address key = p.sessionKeyOf[who];
         v.sessionKey = key;

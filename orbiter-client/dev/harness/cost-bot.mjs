@@ -48,8 +48,10 @@ if (!(await adminC.credits.hasRole(role, await admin.getAddress()))) await (awai
 for (const who of [addrA, addrB]) await (await adminC.credits.mint(who, 1_000_000)).wait()
 
 // A: trades in Sol's belt, fits out at its yard and armory, mines, buys what a Citadel needs.
-if (!(await A.pilots.pilotOf(addrA)).registered) await record('A', a, 'register', () => A.pilots.register(`Cost${accountA}`, 'Ledger'))
-if (!(await B.pilots.pilotOf(addrB)).registered) await record('B', b, 'register', () => B.pilots.register(`Cost${accountB}`, 'Lance'))
+if (!(await A.pilots.pilotOf(addrA)).registered) await record('A', a, 'register', () => A.pilots.register(`Cost${accountA}`))
+if (Number((await A.pilots.pilotOf(addrA)).shipId) === 0) await record('A', a, 'accept job', () => A.pilots.acceptJob(1, 'Ledger'))
+if (!(await B.pilots.pilotOf(addrB)).registered) await record('B', b, 'register', () => B.pilots.register(`Cost${accountB}`))
+if (Number((await B.pilots.pilotOf(addrB)).shipId) === 0) await record('B', b, 'accept job', () => B.pilots.acceptJob(1, 'Lance'))
 await record('A', a, 'buy 100 cargo bays (Earth)', () => A.market.buyBays(EARTH, 100, MAX))
 await record('A', a, 'buy a drone bay (Psyche Station)', () => A.market.buyDroneBays(PSYCHE, 1, MAX))
 await record('A', a, 'buy a mining drone (Psyche armory)', () => A.armory.buy(PSYCHE, MINING_DRONE, 1, MAX))

@@ -110,6 +110,17 @@ contract PlanetsTest is PlanetsFixture {
 
     /// The discoverer's claims are free in the star's first-claim window, every planet and asteroid
     /// (Koda, 2026-11-18); after it, or for anyone else, the claim fee.
+    /// Whose law applies (Koda, 2026-11-19): the star owner's corporation, else the body owner's; Sol's
+    /// and nobody's bodies only Minerva's (0).
+    function test_lawFollowsOwnership() public {
+        assertEq(claims.lawAt(EARTH), 0, "Sol is Minerva's");
+        assertEq(claims.lawAt(home), 0, "nobody owns it");
+        _go(ada, star);
+        vm.prank(ada);
+        claims.claim(home);
+        assertEq(claims.lawAt(home), pilots.corporationOf(ada), "the owner's corporation");
+    }
+
     function test_theDiscovererClaimsFree() public {
         _go(ada, star); // Ada arrives first: the discoverer
         assertEq(galaxy.star(star).discoverer, ada);
@@ -169,8 +180,7 @@ contract PlanetsTest is PlanetsFixture {
     }
 
     function test_theDiscovererClaimsFirstUnlessTheyFlyOn() public {
-        vm.prank(bo);
-        pilots.register("Bodo", "Barge");
+        _join(bo, "Bodo", "Barge");
         _go(ada, star); // Ada discovers it
         _go(bo, star);
         _pay(bo, 5_000);
@@ -183,8 +193,7 @@ contract PlanetsTest is PlanetsFixture {
     }
 
     function test_theWindowEndsAfterTenMinutes() public {
-        vm.prank(bo);
-        pilots.register("Bodo", "Barge");
+        _join(bo, "Bodo", "Barge");
         _go(ada, star);
         _go(bo, star);
         skip(10 minutes);
@@ -345,8 +354,7 @@ contract PlanetsTest is PlanetsFixture {
         assertEq(claims.namesOf(home)[0], "Haven");
         assertEq(claims.namesOf(home)[1], "Haven Dock");
 
-        vm.prank(bo);
-        pilots.register("Bodo", "Raider");
+        _join(bo, "Bodo", "Raider");
         vm.prank(bo);
         vm.expectRevert(abi.encodeWithSelector(Claims.NotYours.selector, home));
         claims.rename(home, 0, "Mine Now");
@@ -360,8 +368,7 @@ contract PlanetsTest is PlanetsFixture {
     function test_whoNamesAStar() public {
         uint256 fee = planets.costOf(planets.STATION()).credits;
         uint256 n = SystemGen.planetCount(keccak256("test universe"), star);
-        vm.prank(bo);
-        pilots.register("Bodo", "Raider");
+        _join(bo, "Bodo", "Raider");
         _go(ada, star); // Ada arrives first: the discoverer
         _go(bo, star);
         assertEq(galaxy.star(star).discoverer, ada);
@@ -602,8 +609,7 @@ contract AsteroidClaimsTest is PlanetsFixture {
         skip(10 minutes);
         uint256 stored = _supply(asteroid, good);
         assertGt(stored, 0);
-        vm.prank(bo);
-        pilots.register("Bodo", "Barge");
+        _join(bo, "Bodo", "Barge");
         _pay(bo, 100_000);
         vm.prank(bo);
         market.buyBays(EARTH, 20, type(uint256).max);
@@ -640,8 +646,7 @@ contract AsteroidClaimsTest is PlanetsFixture {
         vm.prank(ada);
         drones.startMining(dust, 0);
         assertTrue(pilots.isMining(ada));
-        vm.prank(bo);
-        pilots.register("Bodo", "Barge");
+        _join(bo, "Bodo", "Barge");
         vm.prank(bo);
         vm.expectRevert(abi.encodeWithSelector(Drones.SlotTaken.selector, 0));
         drones.startMining(dust, 0);

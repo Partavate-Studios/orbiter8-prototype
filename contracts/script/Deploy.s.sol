@@ -147,6 +147,20 @@ library Deployment {
         game.ships.setPilots(game.pilots);
     }
 
+    /// Joining the game (Koda, 2026-11-19): the three corporations (names for now) and what the pilot
+    /// program advances a new pilot: 3 Helium-3 (Earth buys it) and 2 Electronics (Ceres and others buy
+    /// them), about 800 credits of goods, against the 45 carried over from Earth; no cash. Its own step
+    /// after `wire`, as `wireDeeds` is.
+    function wireJoining(Game memory game) internal {
+        string[] memory names = new string[](3);
+        (names[0], names[1], names[2]) = ("Corp X", "Corp Y", "Corp Z");
+        game.pilots.setCorporations(names, 5_000);
+        uint8[] memory goods = new uint8[](2);
+        uint16[] memory units = new uint16[](2);
+        (goods[0], units[0], goods[1], units[1]) = (3, 3, 7, 2);
+        game.pilots.setStarterKit(Pilots.StarterKit(0, 45, goods, units));
+    }
+
     /// Deeds draw themselves (D107): their sources, and the drawing. Its own step after `wire` (inside
     /// it, the tests' fixture runs out of stack).
     function wireDeeds(Game memory game) internal {
@@ -164,6 +178,7 @@ contract Deploy is Script {
         Deployment.Game memory game = Deployment.deploy(admin, seed, scanDelay);
         Deployment.wire(game);
         Deployment.wireDeeds(game);
+        Deployment.wireJoining(game);
         vm.stopBroadcast();
         console.log("Galaxy", address(game.galaxy));
         console.log("Pilots", address(game.pilots));

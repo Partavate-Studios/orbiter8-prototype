@@ -139,6 +139,20 @@ contract Claims is ModuleBase {
         emit Claimed(id, pilot);
     }
 
+    /// Whose law applies at a body (Koda, 2026-11-19: ownership decides): the corporation of its star's
+    /// owner, for the whole system; where nobody owns the star, the corporation of the body's owner. 0:
+    /// only Minerva's own rules (nobody owns either, or the owner is a non-citizen; Sol is Minerva's).
+    function lawAt(uint256 id) external view returns (uint8) {
+        ClaimsStorage storage c = _c();
+        address keeper = c.galaxy.keeperOf(BodyId.cellOf(id));
+        if (keeper != address(0)) {
+            uint8 corporation = c.pilots.corporationOf(keeper);
+            if (corporation != 0) return corporation;
+        }
+        address owner = c.owners[id];
+        return owner == address(0) ? 0 : c.pilots.corporationOf(owner);
+    }
+
     /// What `pilot` pays to claim a body at `cell` now: free (`discoveryFee`) for the star's discoverer in
     /// its first-claim window, the claim fee otherwise.
     function claimFeeOf(address pilot, uint256 cell) external view returns (uint256) {

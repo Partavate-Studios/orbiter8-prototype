@@ -30,8 +30,7 @@ contract BattleFixture is PlanetsFixture {
         vm.startPrank(admin);
         battle.grantRole(battle.GAME_MODULE(), admin); // the tests set planet defenses directly
         vm.stopPrank();
-        vm.prank(bo);
-        pilots.register("Bodo", "Raider");
+        _join(bo, "Bodo", "Raider");
     }
 
     /// Bo armed at Sol's armory: two railguns, a missile rack and armor, `plates` of it.

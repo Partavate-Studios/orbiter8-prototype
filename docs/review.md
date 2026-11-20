@@ -675,6 +675,21 @@ Calls made building it, for Koda's review:
   Credits for the cheat button (implementation `0x1e30C6D4645cb2f63689483DEB6d57b192b114C2`), Claims for
   the discoverer's free claims (`0x8Ce494050a66b1a669C1aa263E1E0069B5A7eA40`; its tuning reads 2,000 /
   50,000 / 0), as Deeds before (X38). The full redeploy before the next push brings everything fresh.
+- **X40. Joining is two moves, with a corporation, a debt and a hold of goods** (2026-11-19, Koda: the ID
+  card scanner registers the name; accepting the job names the ship, the second move, and you wake in
+  it). `Pilots.register(callsign)` makes a non-citizen with no ship (ship moves refuse with `NoShip`);
+  `Pilots.acceptJob(corporation, shipName)` mints the ship at Sol, joins the corporation and loads the
+  starter kit; `switchCorporation` changes it for a fee (5,000, burned). Guesses, all admin-settable
+  (`setCorporations`, `setStarterKit`, set by the deploy's `wireJoining`): the names **Corp X, Corp Y,
+  Corp Z**; the kit **3 Helium-3 and 2 Electronics** (about 800 credits; Earth buys Helium-3, Ceres and
+  others Electronics), **no cash**, a **debt of 45** (the −45 from Earth). Credits keeps the debt beside
+  the balance (`debtOf`; what the game pays clears it first); the game shows balance minus debt (−45¢
+  at the start). `Claims.lawAt(id)`: the star owner's corporation, else the body owner's, else 0
+  (Minerva's rules); nothing uses it yet. Until the intro exists, the wizard's ship step has a small
+  "You'll fly for" choice of the three; its wording still says "Take Off" and the launch pad (the intro
+  replaces it, in the Fable session). Pilots is 22.9 KB (the defaults moved out of its initializer to
+  fit). The trade and explore bots now start with a full hold and no cash: they'll need to sell first.
+  Played locally: register, choose Corp X, name the ship, wake at Sol with −45¢ and the hold full.
 
 ## 10. The Polkadot App spikes (2026-11-18, milestone 7 steps 4–6)
 

@@ -40,7 +40,8 @@ async function record(action, send, extra = {}, value = 0n) {
 // Register and start a session from the wallet; everything after goes through the key.
 const pilotsByWallet = new Contract(P, abi('Pilots'), wallet)
 if (!(await pilotsByWallet.pilotOf(me)).registered) {
-  await record('register', () => pilotsByWallet.register(process.env.NAME ?? `Trader${account}`, process.env.SHIP ?? 'Hauler'))
+  await record('register', () => pilotsByWallet.register(process.env.NAME ?? `Trader${account}`))
+  await record('accept job', () => pilotsByWallet.acceptJob(1, process.env.SHIP ?? 'Hauler'))
 }
 const key = withGasMargin(Wallet.createRandom().connect(provider))
 const expiry = Math.floor(Date.now() / 1000) + 3600

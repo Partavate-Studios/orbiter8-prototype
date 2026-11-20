@@ -7,11 +7,8 @@
       <pilot-card v-else :pilot-name="registration.name" />
 
       <template v-if="registration.status === 'confirm'">
-        <p v-if="kind === 'callsign'">Checking with Minerva that the call sign is free…</p>
-        <template v-else>
-          <p>Confirm the registration in your wallet.</p>
-          <p class="hint">Don't see it? Click your wallet's icon in your browser's toolbar.</p>
-        </template>
+        <p>Confirm the registration in your wallet.</p>
+        <p class="hint">Don't see it? Click your wallet's icon in your browser's toolbar.</p>
       </template>
 
       <template v-else-if="registration.status === 'sent'">
@@ -69,6 +66,14 @@
           >, this is your new starship.
         </p>
       </template>
+      <!-- The corporation you join (Koda, 2026-11-19); the intro's housing computer will ask this later -->
+      <fieldset v-if="kind === 'ship' && corporationNames.length" class="corporations">
+        <legend>You'll fly for</legend>
+        <label v-for="(corp, i) in corporationNames" :key="corp" class="corporation">
+          <input v-model="corporation" type="radio" name="corporation" :value="i + 1" />
+          {{ corp }}
+        </label>
+      </fieldset>
       <label :for="inputId">{{
         kind === 'callsign' ? 'Your call sign' : 'What will you name your new Orbiter 8?'
       }}</label>
@@ -122,7 +127,16 @@ export default {
     return { name: '', slow: false, NAME_MAX_LENGTH, inputId: 'register-' + this.kind }
   },
   computed: {
-    ...mapState(useOnboardingStore, ['registration', 'callsigns']),
+    ...mapState(useOnboardingStore, ['registration', 'callsigns', 'corporationNames']),
+    /** Which corporation the ship step joins (1-based). */
+    corporation: {
+      get() {
+        return useOnboardingStore().corporation
+      },
+      set(value) {
+        useOnboardingStore().corporation = value
+      }
+    },
     ...mapState(useChainStore, ['networkData', 'chainId', 'balance']),
     ...mapState(useGameStateStore, ['avatar']),
     pilotName() {
@@ -191,6 +205,7 @@ export default {
   },
   mounted() {
     this.$refs.input?.focus()
+    if (this.kind === 'ship') useOnboardingStore().loadCorporations()
     // Minerva introduces herself as the new pilot's introduction opens.
     if (this.kind === 'callsign' && !this.introDone && !this.registration) this.o8audio.speak('greetings')
   },
@@ -212,6 +227,24 @@ export default {
 </script>
 
 <style scoped>
+.corporations {
+  border: none;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.corporations legend {
+  margin-bottom: 0.25rem;
+}
+.corporation {
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+}
 .wizard-register {
   display: grid;
   gap: 0.9em;

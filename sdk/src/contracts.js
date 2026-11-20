@@ -254,6 +254,7 @@ export function createGame(runner, addresses, { startBlock = 0 } = {}) {
       return {
         callsign: p.callsign,
         shipId: Number(p.shipId),
+        corporation: Number(p.corporation),
         ship: {
           name: p.ship.name,
           cell: Number(p.ship.cell),
@@ -279,9 +280,16 @@ export function createGame(runner, addresses, { startBlock = 0 } = {}) {
       }
     },
 
-    /** Credits in a wallet. */
+    /** Credits in a wallet, less any debt (a new pilot starts owing; Credits.debtOf): can be negative. */
     async balance(address) {
-      return Number(await credits.balanceOf(address))
+      const [balance, debt] = await Promise.all([credits.balanceOf(address), credits.debtOf(address)])
+      return Number(balance) - Number(debt)
+    },
+
+    /** The corporations' names (id = index + 1) and what switching costs (Pilots.corporations). */
+    async corporations() {
+      const [names, switchFee] = await pilots.corporations()
+      return { names: [...names], switchFee: Number(switchFee) }
     },
 
     /** Units of each good aboard the pilot's ship. */
@@ -628,8 +636,16 @@ export function createGame(runner, addresses, { startBlock = 0 } = {}) {
 
     // Moves resolve after they're mined, with the receipt. Each takes `options` last: `{ onSent(hash) }`
     // hears the moment the wallet has sent it, before it's mined (the jump animation and the tray use it).
-    async register(callsign, shipName, options) {
-      return sent(pilots.register(callsign, shipName), options)
+    /** Registers the call sign (Koda, 2026-11-19: the ID card scanner); no ship yet. */
+    async register(callsign, options) {
+      return sent(pilots.register(callsign), options)
+    },
+    /** Accepts the pilot job: names the ship (minting it in Earth's orbit) and joins `corporation` (1-based). */
+    async acceptJob(corporation, shipName, options) {
+      return sent(pilots.acceptJob(corporation, shipName), options)
+    },
+    async switchCorporation(corporation, options) {
+      return sent(pilots.switchCorporation(corporation), options)
     },
     async jump(to, proofs = [], options) {
       return sent(pilots.jump(to, proofs), options)

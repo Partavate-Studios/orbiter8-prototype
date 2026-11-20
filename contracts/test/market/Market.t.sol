@@ -41,13 +41,30 @@ contract GameFixture is Test {
         game = Deployment.deploy(admin, _universe(), 30);
         Deployment.wire(game);
         Deployment.wireDeeds(game);
+        Deployment.wireJoining(game);
         // The tests pay pilots directly.
         game.credits.grantRole(game.credits.GAME_MODULE(), admin);
         game.market.grantRole(game.market.GAME_MODULE(), admin);
         vm.stopPrank();
         (galaxy, pilots, market, credits, ships) = (game.galaxy, game.pilots, game.market, game.credits, game.ships);
-        vm.prank(ada);
-        pilots.register("Ada", "Ledger");
+        _plainStart();
+        _join(ada, "Ada", "Ledger");
+    }
+
+    /// Joins the game as the intro does (Koda, 2026-11-19): register the call sign, then accept the job
+    /// with a named ship (corporation 1).
+    function _join(address who, string memory callsign, string memory shipName) internal {
+        vm.startPrank(who);
+        pilots.register(callsign);
+        pilots.acceptJob(1, shipName);
+        vm.stopPrank();
+    }
+
+    /// The old start (1,000 credits, no debt, an empty hold), so these tests keep their arithmetic; the
+    /// story's starter kit has its own tests.
+    function _plainStart() internal {
+        vm.prank(admin);
+        pilots.setStarterKit(Pilots.StarterKit(1_000, 0, new uint8[](0), new uint16[](0)));
     }
 
     function _pay(address who, uint256 amount) internal {
@@ -77,6 +94,18 @@ contract GameFixture is Test {
 }
 
 contract MarketTest is GameFixture {
+    /// Debt is kept beside the balance, which can't go negative; what the game pays clears it first.
+    function test_incomePaysDebtFirst() public {
+        vm.prank(admin);
+        credits.addDebt(bo, 45);
+        _pay(bo, 30);
+        assertEq(credits.balanceOf(bo), 0);
+        assertEq(credits.debtOf(bo), 15);
+        _pay(bo, 100);
+        assertEq(credits.balanceOf(bo), 85);
+        assertEq(credits.debtOf(bo), 0);
+    }
+
     function test_onlyTheAdminCheats() public {
         vm.prank(admin);
         credits.cheat(ada, 10_000_000);
@@ -386,8 +415,7 @@ contract MarketTest is GameFixture {
     function test_portsGrowWithThePopulation() public {
         assertEq(market.capacity(), 300);
         for (uint256 i = 0; i < 4; i++) {
-            vm.prank(makeAddr(string.concat("pilot", vm.toString(i))));
-            pilots.register(string.concat("Pilot", vm.toString(i)), "Hull");
+            _join(makeAddr(string.concat("pilot", vm.toString(i))), string.concat("Pilot", vm.toString(i)), "Hull");
         }
         assertEq(market.capacity(), 5 * 220);
     }
@@ -436,7 +464,7 @@ contract SessionTest is GameFixture {
         vm.expectRevert(Pilots.NotRegistered.selector);
         pilots.startSession(makeAddr("another"), uint64(block.timestamp + 1 hours));
         vm.expectRevert(Pilots.AlreadyRegistered.selector);
-        pilots.register("Eve", "Stolen");
+        pilots.register("Eve");
         vm.stopPrank();
     }
 
@@ -465,8 +493,7 @@ contract SessionTest is GameFixture {
     }
 
     function test_badSessions() public {
-        vm.prank(bo);
-        pilots.register("Bodo", "Barge");
+        _join(bo, "Bodo", "Barge");
         vm.startPrank(ada);
         vm.expectRevert(Pilots.BadSession.selector);
         pilots.startSession(key, uint64(block.timestamp + 13 hours));
@@ -491,8 +518,7 @@ contract NamesAndShipsTest is GameFixture {
         assertEq(credits.totalSupply(), supply - pilots.CALLSIGN_FEE());
         assertEq(pilots.byCallsign("countess"), ada);
         assertEq(pilots.byCallsign("ada"), address(0));
-        vm.prank(bo);
-        pilots.register("Ada", "Barge");
+        _join(bo, "Ada", "Barge");
         assertEq(pilots.byCallsign("ADA"), bo);
     }
 

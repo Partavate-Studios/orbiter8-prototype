@@ -238,29 +238,10 @@ export function createGameClient() {
   }
   const ship = () => state.pilot?.ship
 
-  // ── the call sign, held until the ship is named (the wizard asks for them one at a time; they register in one move)
-
-  const callsignKey = () => `o8.callsign.${state.chainId}.${state.account}`
-  const heldCallsign = () => {
-    try {
-      return localStorage.getItem(callsignKey())
-    } catch {
-      return null
-    }
-  }
-  let callsignInMemory = null
-  const holdCallsign = (name) => {
-    callsignInMemory = name
-    try {
-      localStorage.setItem(callsignKey(), name)
-    } catch {
-      // kept in memory for this visit
-    }
-  }
+  // ── an old call sign held in the browser (before 2026-11-19 both names registered in one move)
   const releaseCallsign = () => {
-    callsignInMemory = null
     try {
-      localStorage.removeItem(callsignKey())
+      localStorage.removeItem(`o8.callsign.${state.chainId}.${state.account}`)
     } catch {
       // nothing kept
     }
@@ -271,10 +252,9 @@ export function createGameClient() {
   /** The player as the screens read it, from the pilot. */
   function playerShape() {
     const p = state.pilot
-    const held = callsignInMemory ?? heldCallsign()
     const avatar = {
-      registered: Boolean(p) || Boolean(held),
-      name: p ? p.callsign : (held ?? ''),
+      registered: Boolean(p),
+      name: p ? p.callsign : '',
       shipId: p ? p.shipId : 0,
       credits: state.credits,
       ship: { name: null, location: null, orbit: null, holds: null, cargo: [], usedHolds: 0, owner: null }
@@ -316,7 +296,8 @@ export function createGameClient() {
 
   async function loadPilot() {
     state.pilot = (await game.pilot(state.account)) ?? false
-    if (!state.pilot) {
+    // Not registered, or registered with no ship yet (the job not accepted): nothing aboard to read
+    if (!state.pilot || !state.pilot.shipId) {
       Object.assign(state, { credits: 0, cargo: [], condition: null, deeds: 0, session: null, ownedAt: new Map() })
       ownedFor = null
       keyGame = keyWallet = null
@@ -720,17 +701,20 @@ export function createGameClient() {
   const partPrice = (port, part, count) => partPriceFor(state.rules, port, part, count)
 
   const actions = {
-    /** Holds the call sign (checked free) until the ship is named: both register in one move. */
-    async createAvatar(name) {
+    /** Registers the call sign with Minerva: the first of joining's two moves (Koda, 2026-11-19). */
+    async createAvatar(name, options) {
       if (await game.callsignOwner(name)) throw new Error('That call sign is taken.')
-      holdCallsign(name)
-      notifyPlayer()
+      const receipt = await game.register(name, options)
+      releaseCallsign()
+      await client.refresh()
+      return receipt
     },
-    /** Registers the pilot and their ship together. */
-    async launchShip(name, options) {
-      const callsign = callsignInMemory ?? heldCallsign()
-      if (!callsign) throw new Error('Choose a call sign first.')
-      const receipt = await game.register(callsign, name, options)
+    /**
+     * Accepts the pilot job: names the ship, which mints it, and joins a corporation (`options.corporation`,
+     * 1-based; the first if not given). The second move; when it lands the pilot wakes in Earth's orbit.
+     */
+    async launchShip(name, options = {}) {
+      const receipt = await game.acceptJob(options.corporation ?? 1, name, options)
       await client.refresh()
       return receipt
     },
@@ -926,20 +910,14 @@ export function createGameClient() {
     }
   }
 
-  function notifyPlayer() {
-    state.player = playerShape()
-    notify('player')
-  }
-
-  /** Registration (launchShip) is remembered while in flight, so a reload can pick up the wait. */
-  const launch = actions.launchShip
-  actions.launchShip = async (name, options = {}) => {
+  /** Both joining moves are remembered while in flight, so a reload can pick up the wait. */
+  const remembered = (kind, send) => async (name, options = {}) => {
     const { chainId, account } = state
     try {
-      return await launch(name, {
+      return await send(name, {
         ...options,
         onSent: (hash) => {
-          rememberPending(chainId, account, { kind: 'ship', hash, name, sentAt: Date.now() })
+          rememberPending(chainId, account, { kind, hash, name, sentAt: Date.now() })
           options.onSent?.(hash)
         }
       })
@@ -947,6 +925,8 @@ export function createGameClient() {
       forgetPending(chainId, account)
     }
   }
+  actions.createAvatar = remembered('callsign', actions.createAvatar)
+  actions.launchShip = remembered('ship', actions.launchShip)
 
   const client = {
     state,
@@ -1038,6 +1018,11 @@ export function createGameClient() {
         forgetPending(state.chainId, state.account)
         await client.refreshPlayer()
       }
+    },
+
+    /** The corporations a pilot may join: { names (id = index + 1), switchFee } (Pilots.corporations). */
+    async corporations() {
+      return game ? game.corporations() : { names: [], switchFee: 0 }
     },
 
     /** Every call sign in use, lowercased. */

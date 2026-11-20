@@ -22,7 +22,8 @@ export default {
     // resolves the URL asynchronously, so wait for it; checking right away always saw '/'.
     router.isReady().then(() => {
       const path = router.currentRoute.value.path
-      if (path != '/') {
+      // Except the dev builds' Minerva lab, which needs no game loaded.
+      if (path != '/' && !(import.meta.env.DEV && path == '/minerva-lab')) {
         router.push('/')
       }
     })

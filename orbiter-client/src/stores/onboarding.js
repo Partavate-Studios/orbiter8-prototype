@@ -28,6 +28,9 @@ export const useOnboardingStore = defineStore('Onboarding', {
     registration: null,
     /** Callsigns in use, lowercased; null until read, or when there are too many to read. */
     callsigns: null,
+    /** The corporations' names (id = index + 1), and the one the new pilot joins (Koda, 2026-11-19) */
+    corporationNames: [],
+    corporation: 1,
     /** chainId → { pilots, starSystems }, null (no RPC answered) or 'loading' (sdk/network-stats.js) */
     networkStats: {}
   }),
@@ -80,6 +83,14 @@ export const useOnboardingStore = defineStore('Onboarding', {
       }
     },
     /** Reads every callsign once, for the "taken" hint. Failing just leaves the hint off. */
+    /** The corporations a new pilot may join (Pilots.corporations). */
+    async loadCorporations() {
+      try {
+        this.corporationNames = (await game.corporations()).names
+      } catch (error) {
+        console.error('Reading the corporations failed:', error.shortMessage ?? error.message)
+      }
+    },
     async loadCallsigns() {
       try {
         this.callsigns = await game.listCallsigns()
@@ -100,7 +111,7 @@ export const useOnboardingStore = defineStore('Onboarding', {
       }
       try {
         if (kind === 'callsign') await game.actions.createAvatar(name, { onSent })
-        else await game.actions.launchShip(name, { onSent })
+        else await game.actions.launchShip(name, { onSent, corporation: this.corporation })
         await game.refreshPlayer()
         this.registration = { ...this.registration, status: 'done' }
         if (kind === 'callsign') this.callsigns?.add(name.toLowerCase())

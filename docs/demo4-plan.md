@@ -190,6 +190,9 @@ hard to add later because it shapes the data, low-hanging, or the battle minimum
   last bitcoin). Design first: the animated Minerva face (Koda will brief it), then mockups for Minerva in
   the HUD, fleet interfaces, a widget design system and every planned feature's new UI together; the
   title and story art; the title's Story button now that history lives in the library.
+  *Built 2026-11-19 (X40): the two joining moves (register at the ID scanner; accept the job and name
+  the ship), Corp X, Y and Z on chain with switching, the starting debt and hold of goods, and
+  `Claims.lawAt`. The intro scene itself waits for the Fable session.*
 - **Upgrade safety before mainnet (to do, Koda 2026-11-19):** the contracts already upgrade without losing
   data (UUPS proxies, ERC-7201 namespaced storage; Deeds, Credits and Claims were upgraded in place on the
   testnet, 2026-11-18). The diamond pattern isn't needed. Missing: an automatic check that a new version

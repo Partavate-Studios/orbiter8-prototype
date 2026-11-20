@@ -56,7 +56,8 @@ async function proofs(cells) {
 
 const me = await signer.getAddress()
 if (!(await pilots.pilotOf(me)).registered) {
-  await record('register', () => pilots.register(process.env.NAME ?? `Bot${account}`, process.env.SHIP ?? 'Surveyor'))
+  await record('register', () => pilots.register(process.env.NAME ?? `Bot${account}`))
+  await record('accept job', () => pilots.acceptJob(1, process.env.SHIP ?? 'Surveyor'))
 }
 
 for (let i = 0; i < Number(moves); i++) {

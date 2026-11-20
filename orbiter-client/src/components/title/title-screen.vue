@@ -42,6 +42,8 @@
     </div>
 
     <p class="version">Version {{ version }}</p>
+    <!-- Dev builds only: Minerva's face and its test console. -->
+    <router-link v-if="isDev" to="/minerva-lab" class="o8-button small quiet dev-lab">Minerva lab</router-link>
 
     <story-scene v-if="storyOpen" @close="closeStory" />
   </div>
@@ -69,6 +71,7 @@ export default {
   data() {
     return {
       version: __APP_VERSION__,
+      isDev: import.meta.env.DEV,
       // What the main button shows: titleAction, once it has held for SETTLE_MS.
       shownAction: null,
       storyOpen: false
@@ -291,6 +294,14 @@ export default {
   margin: 0;
   font-size: 0.8em;
   color: #c3b3da99;
+}
+.dev-lab {
+  position: absolute;
+  right: 1em;
+  bottom: 0.5em;
+  font-size: 0.75em;
+  color: #c3b3da;
+  border-color: #ffffff26;
 }
 @media (max-width: 600px) {
   .status-block {
