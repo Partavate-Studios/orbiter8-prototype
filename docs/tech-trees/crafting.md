@@ -67,6 +67,8 @@ where a finished part can go.
 
 ## Autofactory kinds (planned, to design)
 
+**Superseded (2026-11-21):** three sizes (ship, planet, orbital) in [`../industry-plan.md`](../industry-plan.md).
+
 Koda, 2026-11-07: there should be **ground (terrestrial) autofactories and orbital autofactories**,
 building slightly different things with a lot of overlap. The details wait for a design pass. The
 first guesses below are only a starting point:
