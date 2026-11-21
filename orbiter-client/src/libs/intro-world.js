@@ -660,3 +660,25 @@ export function tvPicture(adSvg) {
 }
 
 export { CORP_LOOKS }
+
+/**
+ * The drawing helpers, for other isometric scenes built the same way (libs/intro-pod.js): boxes, flat art on
+ * the three planes, and the SVG shapes in world units. `matrix` gives a plane's transform for live elements.
+ */
+export const iso = {
+  box: (x, y, z, w, d, h, o) => box(null, x, y, z, w, d, h, o),
+  onX,
+  onY,
+  onZ,
+  rect,
+  text,
+  poly,
+  pts,
+  rng,
+  C,
+  matrix: {
+    y: (x0, y1, zTop) => mat(CS * K0, SN * K0, 0, K0, ws(x0, y1, zTop)),
+    x: (x1, yMax, zTop) => mat(CS * K0, -SN * K0, 0, K0, ws(x1, yMax, zTop)),
+    z: (x0, y0, z) => mat(CS * K0, SN * K0, -CS * K0, SN * K0, ws(x0, y0, z))
+  }
+}

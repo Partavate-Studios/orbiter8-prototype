@@ -33,7 +33,7 @@
 
     <div class="body">
       <aside class="minerva">
-        <minerva-face ref="face" class="face" :state="face.state" :size="faceSize" />
+        <minerva-face ref="face" class="face" :state="face.state" :size="faceSize" pokeable />
         <p class="name" aria-hidden="true">MINERVA</p>
         <p class="say" aria-live="polite">{{ face.say }}</p>
         <nav v-if="tab !== 'boot'" class="tabs" aria-label="Console">

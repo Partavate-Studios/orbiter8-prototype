@@ -2,7 +2,7 @@
   <!-- A notice from Minerva while her console is closed: her face, small (as in a HUD corner), and a line.
        Pink when it needs you (the vape's toll). -->
   <aside class="intro-notice" :class="{ attention }" role="status">
-    <minerva-face ref="face" class="face" :state="state" :size="84" />
+    <minerva-face ref="face" class="face" :state="state" :size="84" pokeable />
     <div class="words">
       <p class="title">{{ title }}</p>
       <p class="body">{{ body }}</p>

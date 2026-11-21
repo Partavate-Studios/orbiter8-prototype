@@ -18,6 +18,9 @@
       motion  'auto' follows the system's reduced-motion setting; 'full' or 'reduced' forces one.
               Reduced: calmer drift and waves, no Boom or Glitch, Assemble and Disassemble fade.
       assemble-on-mount  plays Assemble when it appears.
+      pokeable  she reacts when clicked or tapped: a flash, a shake of the head, a glitch; poked POKES_TO_BURST
+              times in quick succession, she bursts apart and puts herself back together (Koda). Emits
+              'poke' with the count in the streak and whether she burst.
 
     One-offs: play(name) plays one of ONE_OFFS (boom, no, nod, flash, blink, slowBlink, assemble,
     disassemble, glitch, ha) over the current state and returns whether it played. Emits 'done' with the
@@ -31,7 +34,16 @@
     Drawing: one transform per part per frame on the shared frame loop (libs/frame-loop.js), set on the
     elements directly, not through Vue; glows are gradients, no SVG filters.
   -->
-  <svg class="minerva-face" :viewBox="viewBox" :style="sizeStyle" role="img" aria-label="Minerva" overflow="visible">
+  <svg
+    class="minerva-face"
+    :class="{ pokeable }"
+    :viewBox="viewBox"
+    :style="sizeStyle"
+    role="img"
+    aria-label="Minerva"
+    overflow="visible"
+    @click="pokeable && poke($event)"
+  >
     <defs>
       <radialGradient :id="ids.halo">
         <stop offset="0%" :stop-color="color" stop-opacity="0.95" />
@@ -97,6 +109,11 @@ const random = (min, max) => min + Math.random() * (max - min)
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
 const fixed = (value) => Math.round(value * 1000) / 1000
 
+/** Pokes closer together than this (ms) count as one streak. */
+const POKE_GAP_MS = 900
+const POKES_TO_BURST = 6
+const POKE_REACTIONS = ['flash', 'no', 'glitch', 'no', 'glitch']
+
 export default {
   name: 'MinervaFace',
   props: {
@@ -105,9 +122,10 @@ export default {
     color: { type: String, default: '#ffffff' },
     speed: { type: Number, default: 1 },
     motion: { type: String, default: 'auto', validator: (value) => ['auto', 'full', 'reduced'].includes(value) },
-    assembleOnMount: { type: Boolean, default: false }
+    assembleOnMount: { type: Boolean, default: false },
+    pokeable: { type: Boolean, default: false }
   },
-  emits: ['done'],
+  emits: ['done', 'poke'],
   data() {
     const id = ++instances
     return {
@@ -159,10 +177,32 @@ export default {
     this.stopFrames = onFrame((now) => this.frame(now))
   },
   beforeUnmount() {
+    clearTimeout(this.pokeTimer)
     this.stopFrames?.()
     this.motionQuery?.removeEventListener?.('change', this.onMotionChange)
   },
   methods: {
+    /** A click on her: each poke in a streak gets a sharper reaction, and enough of them in a row burst her apart. */
+    poke(event) {
+      event.stopPropagation()
+      const now = performance.now()
+      if (this.bursting) return
+      this.pokes = now - (this.lastPoke ?? -Infinity) < POKE_GAP_MS ? (this.pokes ?? 0) + 1 : 1
+      this.lastPoke = now
+      if (this.pokes >= POKES_TO_BURST) {
+        this.pokes = 0
+        this.bursting = true
+        this.play('disassemble')
+        this.pokeTimer = setTimeout(() => {
+          this.play('assemble')
+          this.pokeTimer = setTimeout(() => (this.bursting = false), 1100)
+        }, 1400)
+        return this.$emit('poke', POKES_TO_BURST, true)
+      }
+      this.play(POKE_REACTIONS[(this.pokes - 1) % POKE_REACTIONS.length])
+      this.$emit('poke', this.pokes, false)
+    },
+
     /**
      * Plays a one-off over the current state.
      * @param {string} name a key of ONE_OFFS
@@ -359,5 +399,9 @@ function smoothstep(p) {
 .minerva-face {
   display: block;
   overflow: visible;
+}
+.minerva-face.pokeable {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 </style>

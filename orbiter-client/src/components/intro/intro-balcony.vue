@@ -13,46 +13,64 @@
     <div v-else class="view placeholder"></div>
 
     <template v-if="mode === 'balcony'">
-      <!-- you, from behind, leaning on the rail -->
-      <svg class="you" viewBox="-130 -330 320 330" aria-hidden="true">
-        <path
-          d="M-120 0 L-110 -150 Q-100 -210 -40 -224 L-26 -250 Q-30 -300 0 -312 Q30 -300 26 -250 L40 -224 Q100 -210 110 -150 L120 0z"
-          class="body"
-        />
-        <circle cx="0" cy="-290" r="40" class="body" />
-        <path d="M110 -150 L170 -205 L150 -232" fill="none" stroke="#030306" stroke-width="22" stroke-linecap="round" />
-        <path
-          d="M110 -150 L170 -205 L150 -232"
-          fill="none"
-          stroke="#ccff00"
-          stroke-width="2"
-          stroke-linecap="round"
-          opacity="0.6"
-        />
-        <circle cx="150" cy="-236" r="5" fill="#e6dcf5" :class="{ lit: hitting }" />
-      </svg>
-      <span v-if="puffs" :key="puffs" class="vapor" aria-hidden="true"><i></i><i></i><i></i></span>
-      <!-- the rail and its posts -->
+      <!-- the rail and its posts, beyond you: you stand on the balcony, on this side of it (Koda) -->
       <div class="rail" aria-hidden="true"></div>
+      <!-- you, from behind, an elbow on the rail and the vape up in that hand: click it for a hit, and the hand
+           goes to your mouth (behind your head, from here). The arm is drawn first, so the body covers its top. -->
+      <div class="you-wrap">
+        <svg class="you" viewBox="-130 -330 320 330" overflow="visible" aria-hidden="true">
+          <g class="arm" :class="{ up: hitting }" transform="translate(95 -195)">
+            <g class="upper">
+              <line class="limb-edge" x2="71" />
+              <line class="limb" x2="71" />
+              <g class="fore">
+                <line class="limb-edge" x2="80" />
+                <line class="limb" x2="80" />
+                <rect x="72" y="-5" width="36" height="10" rx="5" class="vape-pen" />
+                <circle cx="76" r="3.5" class="vape-led" />
+                <circle cx="80" r="13" class="body" />
+              </g>
+            </g>
+          </g>
+          <path
+            d="M-120 0 L-110 -150 Q-100 -210 -40 -224 L-26 -250 Q-30 -300 0 -312 Q30 -300 26 -250 L40 -224 Q100 -210 110 -150 L120 0z"
+            class="body"
+          />
+          <circle cx="0" cy="-290" r="40" class="body" />
+        </svg>
+        <span v-if="puffs" :key="puffs" class="vapor" aria-hidden="true"><i></i><i></i><i></i></span>
+        <button ref="vape" type="button" class="thing vape" aria-label="Vape" @click.stop="hit">
+          <span class="tag">Vape</span>
+        </button>
+      </div>
       <!-- the vape in your hand, and the terminal on the rail: things to click -->
-      <button ref="vape" type="button" class="thing vape" aria-label="Vape" @click.stop="hit">
-        <span class="tag">Vape</span>
-      </button>
       <button type="button" class="thing terminal" aria-label="Terminal on the rail" @click.stop="$emit('terminal')">
         <span class="screen"><minerva-face :state="hitAgo ? 'skeptical' : 'idle'" size="70%" /></span>
         <span class="tag">Terminal</span>
       </button>
     </template>
 
-    <!-- the glass's frame, just passed: back in -->
-    <button type="button" class="frame left" aria-label="Back inside" @click.stop="$emit('inside')">
-      <span aria-hidden="true">‹</span>
-    </button>
+    <!-- the glass's frame, just passed (it takes you back in too) -->
+    <div class="frame left" aria-hidden="true" @click.stop="$emit('inside')"><span>‹</span></div>
     <div class="frame right" aria-hidden="true"></div>
+    <!-- back in: a pill like the card drawer's, at the bottom left of center, where you look for it (Koda) -->
+    <button type="button" class="o8-pill back" @click.stop="$emit('inside')">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <path
+          d="M14.5 5.5 L8 12 L14.5 18.5"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+      {{ mode === 'balcony' ? 'Inside' : 'Step back' }}
+    </button>
     <p class="hint-line">
       {{
         mode === 'balcony'
-          ? 'The vape, the terminal on the rail · the glass behind you, Esc or B to go back in'
+          ? 'The vape, the terminal on the rail · Inside, Esc or B to go back in'
           : 'Click anywhere, Esc or B to step back'
       }}
     </p>
@@ -137,13 +155,58 @@ export default {
   pointer-events: none;
 }
 
-/* you, at the rail */
-.you {
+/* you, at the rail: the figure, its vape and its vapor share one box, placed in the figure's units */
+.you-wrap {
   position: absolute;
   left: 50%;
   bottom: 0;
   height: min(46vh, 70vw);
+  aspect-ratio: 320 / 330;
   transform: translateX(-62%);
+}
+.you {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.arm .limb-edge {
+  stroke: #ccff00;
+  stroke-width: 35;
+  stroke-linecap: round;
+}
+.arm .limb {
+  stroke: #030306;
+  stroke-width: 30;
+  stroke-linecap: round;
+}
+.arm .upper,
+.arm .fore {
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.arm .upper {
+  transform: rotate(39deg);
+}
+.arm .fore {
+  transform: translate(71px, 0) rotate(-114deg);
+}
+.arm.up .upper {
+  transform: rotate(-39deg);
+}
+.arm.up .fore {
+  transform: translate(71px, 0) rotate(-127deg);
+}
+.vape-pen {
+  fill: #2a2440;
+  stroke: #b9a0ff;
+  stroke-width: 2;
+}
+.vape-led {
+  fill: #e6dcf5;
+  transition: fill 0.3s;
+}
+.arm.up .vape-led {
+  fill: #ffffff;
 }
 .body {
   fill: #030306;
@@ -151,13 +214,11 @@ export default {
   stroke-width: 2.5;
   stroke-linejoin: round;
 }
-.you .lit {
-  fill: #ffffff;
-}
+/* at your mouth: your head's front, from behind */
 .vapor {
   position: absolute;
-  left: 50%;
-  bottom: min(30vh, 46vw);
+  left: 44%;
+  top: 14%;
 }
 .vapor i {
   position: absolute;
@@ -167,13 +228,14 @@ export default {
   border-radius: 50%;
   background: radial-gradient(closest-side, #d8d4e488, #d8d4e400);
   opacity: 0;
-  animation: puff 2.6s ease-out forwards;
+  animation: puff 2.6s ease-out 0.9s forwards;
 }
+/* (the exhale, once the hand is down from your mouth) */
 .vapor i:nth-child(2) {
-  animation-delay: 0.3s;
+  animation-delay: 1.2s;
 }
 .vapor i:nth-child(3) {
-  animation-delay: 0.6s;
+  animation-delay: 1.5s;
 }
 @keyframes puff {
   0% {
@@ -232,11 +294,13 @@ export default {
 .thing:focus-visible .tag {
   opacity: 1;
 }
+/* the hand's place at rest, in the figure's box */
 .vape {
-  left: calc(50% - 30px);
-  bottom: calc(min(46vh, 70vw) * 0.55);
-  width: max(60px, 9vw);
-  height: max(60px, 9vw);
+  left: 94%;
+  top: 31%;
+  width: max(64px, 8vw);
+  height: max(64px, 8vw);
+  transform: translate(-50%, -50%);
 }
 .terminal {
   right: 14%;
@@ -246,6 +310,13 @@ export default {
   background: #0c0a14;
   border: 2px solid #6a6188;
   border-radius: 10px;
+}
+/* narrow screens: your vape hand is at the right edge, so the terminal sits on the rail to your left */
+@media (max-aspect-ratio: 4/5) {
+  .terminal {
+    right: auto;
+    left: 9%;
+  }
 }
 .terminal .screen {
   position: absolute;
@@ -273,11 +344,29 @@ export default {
   cursor: pointer;
   box-shadow: inset -3px 0 0 #2a2540;
 }
-.frame.left:hover,
-.frame.left:focus-visible {
+.frame.left:hover {
   color: #f1eefa;
   box-shadow: inset -3px 0 0 #b9a0ff;
-  outline: none;
+}
+.frame span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+/* back inside: at the bottom, left of center, over the rail */
+.back {
+  position: absolute;
+  left: max(16px, calc(50% - min(46vh, 70vw) * 0.35 - 120px));
+  bottom: calc(2.6em + 14px);
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 12px;
+}
+.window .back {
+  bottom: calc(clamp(18px, 5vw, 60px) + 2.6em);
 }
 .frame.right {
   right: 0;

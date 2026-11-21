@@ -944,6 +944,46 @@ star playing Reflections in the Wind while its scan was pending and on after it 
 map's; a second new star, Reflections again; the track's end handing back to the map's (sought to its
 last seconds). The Music page at 390×844. `npm test`, `npm run lint` and a scratch build pass.
 
+## 16. The intro, Koda's play-through notes (2026-11-20)
+
+Koda's notes after playing it, built:
+- **Back in from the balcony:** the frame at the left edge went unnoticed; he looked for a symbol at the
+  bottom, left of center. Now an "Inside" pill (the card drawer's) sits there, over the rail; the frame
+  still works. Wheeling out on the balcony or at the window also takes you back in.
+- **On this side of the rail:** you stood beyond it; the rail is now drawn behind you.
+- **The vaping arm:** redrawn in both views as an outlined limb (yellow under black, like your body) in two
+  parts that turn at the shoulder and the elbow, so the hand swings up to your mouth and back; the vape is
+  in the hand, its light brighter on the hit, and the exhale comes after it. On the bed the hand rests on
+  your knee; on the balcony your elbow is on the rail and the vape up in that hand (from behind, the hit
+  goes behind your head).
+- **The TV from the bed:** the TV is a thing you can click from the bed; you stay sitting, and stepping
+  back from it returns you to the bed.
+- **Poking Minerva:** her face in the console, in her notices and on waking reacts to a click (a flash, a
+  shake of the head, a glitch); six in quick succession and she bursts apart and puts herself back
+  together (`pokeable` on `minerva-face.vue`).
+- **Her vape lines fall with your score:** above 12, the count as before; 12–9 "You should consider not";
+  8–5 "You're not helping yourself by helping yourself"; 4–2 "I've stopped doing the arithmetic. I'd like
+  you to stop too" (mine); at 1, every time, "This isn't funny anymore", and the title stops saying −1.
+- **Body storage:** signing now goes white, then into a new isometric scene, then black, then waking
+  (`intro-freeze.vue`, `libs/intro-pod.js`): a cryo pod on a round plinth in the middle of a cold room,
+  wires to it from server racks, LN₂ tanks and a medical cart, cables hanging into it from above, a
+  cabinet, a body-storage map, and a vitals screen counting down to −196 °C with your name and a slowing
+  heartbeat. You lie under the lid's window from the chest up, yellow-outlined; the glass is mid-dark blue
+  and frosts from its edges to white while the vents puff and a cold fog settles. About ten seconds; a
+  click hurries it.
+
+Calls:
+- **F1:** waking (Minerva's first message over Earth) stays after the pod, coming out of the black; "into
+  the game" read as into waking, since waking carries the job and the debt.
+- **F2:** no words in the pod scene beyond its screens (no Minerva line): the readouts say it.
+- **F3:** on a narrow screen the balcony's terminal sits on the rail to your left (on the right it covered
+  your vape hand).
+- **F4:** the 4–2 vape line is mine; Koda's lines are the other two and the last.
+
+Checked at 1440×900 and 390×844: the bed, the TV from the bed and back, the arm's two poses, the balcony
+(Inside, wheel out), six pokes bursting her and her coming back, the vape lines down to 1, and the whole
+sign → white → pod → black → waking. `npm test` and `npm run lint` pass.
+
 ## For Koda to decide
 
 Answered above, bar these:
@@ -962,3 +1002,4 @@ Answered above, bar these:
 - The diorama intro (section 14): Z1–Z10; whether `.o8-pill` should spread beyond Minerva's screens; and
   the city's motion (signs flickering, traffic drifting) left still for now.
 - Music (section 15): M1–M8, and Minerva's draft line on the Music page.
+- Body storage (section 16): F1–F4, and the scene itself.

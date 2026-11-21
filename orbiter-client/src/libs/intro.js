@@ -193,7 +193,8 @@ export const SAY = {
   filing: 'Filing your name.',
   lightsOn:
     'You’re signed in. Power is on. A few things before you get comfortable. Curfew runs from ten at night until five in the morning. The door stays locked until then, and after hours, security response is not guaranteed. The rest of the unit opens once you choose a corporate sponsor, at the terminal on the desk. You can switch sponsors later. On Earth, it’s free. Your account is on the terminal too. I wouldn’t look at it before bed. Good luck. Statistically, you’ll need it.',
-  firstBoot: 'This unit runs through a corporate sponsor. Pick one, and the balcony and the door open. You can switch later; on Earth it’s free.',
+  firstBoot:
+    'This unit runs through a corporate sponsor. Pick one, and the balcony and the door open. You can switch later; on Earth it’s free.',
   switching: 'Switching is free while you’re on Earth. Out there it costs, and what you own moves with you.',
   account: 'You owe 45. The stipend comes in 6 days. The bills come first.',
   health: (score) => `Your health score is ${score}. Your insurer would worry. You don’t have an insurer.`,
@@ -202,11 +203,33 @@ export const SAY = {
   music: 'The building’s radio. It came with the unit, like the damp. Pick something, or give me some quiet.',
   shipName: 'Name your ship. It’s registered with me before pickup.',
   escort: 'Application filed. An escort will arrive shortly to take you to processing.',
-  vape: (hits, score) =>
-    `Vape. That’s ${ordinal(hits)} today. At this rate your score reaches zero in ${Math.max(1, Math.round(score / Math.max(1, hits)))} days. I’m only counting.`,
+  // Her line after a hit, as your health score falls (it starts at HEALTH and stops at 1; Koda's lines below 13)
+  vape: (hits, score) => {
+    if (score <= 1) return 'This isn’t funny anymore.'
+    if (score <= 4) return `Score ${score}. I’ve stopped doing the arithmetic. I’d like you to stop too.`
+    if (score <= 8) return 'You’re not helping yourself by helping yourself.'
+    if (score <= 12) return `That’s ${ordinal(hits)} today. You should consider not.`
+    return `Vape. That’s ${ordinal(hits)} today. At this rate your score reaches zero in ${Math.max(1, Math.round(score / Math.max(1, hits)))} days. I’m only counting.`
+  },
   wake: (ship, debt) =>
     `You’re awake. This is your ship, the ${ship}, in orbit over Earth. Your body is in storage. Your mind is here, with me. You owe the pilot program ${debt} credits. The hold carries the program’s advance. Sell it at the I.S.S., clear the debt, then go find a star nobody has. That’s the job.`
 }
 function ordinal(n) {
-  return ['none', 'one', 'two', 'three', 'the fourth', 'the fifth', 'the sixth', 'the seventh'][n] ?? `number ${n}`
+  return (
+    [
+      'none',
+      'one',
+      'two',
+      'three',
+      'the fourth',
+      'the fifth',
+      'the sixth',
+      'the seventh',
+      'the eighth',
+      'the ninth',
+      'the tenth',
+      'the eleventh',
+      'the twelfth'
+    ][n] ?? `number ${n}`
+  )
 }

@@ -103,8 +103,20 @@
               d="M-12 -4 L-9 -40 Q0 -48 9 -40 L11 -12 L26 -22 L34 -18 L42 2 L33 5 L27 -8 L12 2 Z"
             />
             <circle class="you-body" cy="-56" r="9" />
-            <path d="M6 -36 L18 -26 L9 -50" fill="none" stroke="#030306" stroke-width="7" stroke-linecap="round" />
-            <circle cx="9" cy="-52" r="2.6" fill="#e6dcf5" />
+            <!-- the near arm, over the body: the hand rests on your knee, and comes up to your mouth for a hit -->
+            <g class="arm" :class="{ up: hitting }" transform="translate(5 -38)">
+              <g class="upper">
+                <line class="limb-edge" x2="15.8" />
+                <line class="limb" x2="15.8" />
+                <g class="fore">
+                  <line class="limb-edge" x2="13" />
+                  <line class="limb" x2="13" />
+                  <rect x="11" y="-1.2" width="8" height="2.4" rx="1.2" class="vape-pen" />
+                  <circle cx="11.6" r="0.9" class="vape-led" />
+                  <circle cx="13" r="2.4" class="you-body" />
+                </g>
+              </g>
+            </g>
           </template>
           <template v-else>
             <path
@@ -228,7 +240,10 @@
     </transition>
 
     <!-- processing, left unsaid: white, then the ship -->
+    <!-- body storage: out of the white, the pod freezing; then black, and waking -->
+    <intro-freeze v-if="phase === 'freeze'" :pilot-name="pilotName" @done="frozen" />
     <div class="whiteout" :class="{ on: whiteout }"></div>
+    <div class="blackout-fade" :class="{ on: blackFade }"></div>
     <intro-wake v-if="phase === 'wake'" :ship-name="shipName" :corp="corp" :debt="-BALANCE" @done="enterGame" />
   </div>
 </template>
@@ -277,6 +292,7 @@ import IntroConsole from './intro-console.vue'
 import IntroBalcony from './intro-balcony.vue'
 import IntroNotice from './intro-notice.vue'
 import IntroWake from './intro-wake.vue'
+import IntroFreeze from './intro-freeze.vue'
 
 const NOTICE_MS = 7000
 const RING_HINT_MS = 7000
@@ -306,7 +322,7 @@ const DARK_BOX = bounds([
 
 export default {
   name: 'IntroScreen',
-  components: { MinervaFace, IntroScanner, IntroConsole, IntroBalcony, IntroNotice, IntroWake },
+  components: { MinervaFace, IntroScanner, IntroConsole, IntroBalcony, IntroNotice, IntroWake, IntroFreeze },
   data() {
     return {
       BALANCE,
@@ -343,6 +359,7 @@ export default {
       notice: null,
       noticeCount: 0,
       whiteout: false,
+      blackFade: false,
       escortHere: false,
       shipName: '',
       vw: window.innerWidth,
@@ -379,7 +396,8 @@ export default {
     spotKeys() {
       if (this.phase === 'dark' || this.phase === 'name' || this.phase === 'filing') return ['scanner']
       if (this.phase !== 'lit') return []
-      if (this.view === 'vape') return ['vape']
+      // on the bed you can still reach the TV: watching it from there, you stay sitting
+      if (this.view === 'vape') return ['vape', 'tv']
       if (this.view === 'tv') return ['tv']
       return ['glass', 'window', 'tv', 'terminal', 'scanner', 'door', 'vape']
     },
@@ -487,7 +505,7 @@ export default {
       return (40 * K0) / this.camera.k
     },
     youStyle() {
-      const key = this.view === 'block' ? (this.phase === 'dark' ? 'dark' : 'room') : this.view
+      const key = this.sitting ? 'vape' : this.view === 'block' ? (this.phase === 'dark' ? 'dark' : 'room') : this.view
       const [x, y] = STANDS[key] ?? STANDS.room
       const [sx, sy] = ws(x, y, T.zu + (this.sitting ? 0.45 : 0))
       return { transform: `translate(${sx}px, ${sy}px)` }
@@ -520,7 +538,7 @@ export default {
       return TICKER.replace('MINERVA PUBLIC NOTICE · ', '').replaceAll(' · ', '. ') + '.'
     },
     hint() {
-      if (this.vista || this.overlayOpen || this.phase === 'wake' || this.whiteout) return ''
+      if (this.vista || this.overlayOpen || this.phase === 'wake' || this.phase === 'freeze' || this.whiteout) return ''
       const touch = this.portrait
       const back = touch ? 'tap anywhere else to step back' : 'Esc, B or a click elsewhere steps back'
       if (this.phase === 'dark')
@@ -530,7 +548,7 @@ export default {
             ? 'Tap the ID scanner by the door'
             : 'Click the ID scanner by the door'
       if (this.view === 'tv') return `${touch ? 'Tap' : 'Click'} the TV to change channel · ${back}`
-      if (this.view === 'vape') return `${touch ? 'Tap' : 'Click'} the vape for another hit · ${back}`
+      if (this.view === 'vape') return `${touch ? 'Tap' : 'Click'} the vape for another hit, or the TV · ${back}`
       if (this.view === 'door') return back[0].toUpperCase() + back.slice(1)
       if (this.view === 'room' && this.phase === 'lit')
         return touch
@@ -540,7 +558,7 @@ export default {
     },
     /** Skipping jumps to the next thing that needs you; nothing skips a move on its way. */
     canSkip() {
-      if (this.phase === 'filing' || this.phase === 'wake' || this.whiteout) return false
+      if (['filing', 'freeze', 'wake'].includes(this.phase) || this.whiteout) return false
       return !(this.overlay === 'console' && this.jobStep === 'escort')
     }
   },
@@ -730,6 +748,11 @@ export default {
         this.view = 'room'
         return
       }
+      if (this.view === 'tv' && this.sitting && this.phase === 'lit') {
+        this.click()
+        this.view = 'vape'
+        return
+      }
       if (this.view !== 'room' && this.phase === 'lit') {
         this.click()
         this.sitting = false
@@ -770,10 +793,11 @@ export default {
       const zoomIn = event.deltaY < 0
       if (
         !zoomIn &&
-        ['tv', 'door', 'vape', 'scanner'].includes(this.view) &&
+        ['tv', 'door', 'vape', 'scanner', 'glass', 'window'].includes(this.view) &&
         this.phase === 'lit' &&
         !this.overlayOpen
       ) {
+        // (out on the balcony or at the window, wheeling out takes you back inside)
         this.wheelQuietUntil = now + 600
         return this.back()
       }
@@ -907,14 +931,19 @@ export default {
     },
     takeHit() {
       this.hits++
+      const before = this.health
       this.health = Math.max(1, this.health - 1)
       // Minerva notices once the vapor clears, unless a terminal is open by then
       this.later(1600, () => {
         if (this.overlay) return
-        this.say(`Health score ${this.health} (−1)`, SAY.vape(this.hits, this.health), {
-          attention: true,
-          state: 'skeptical'
-        })
+        this.say(
+          `Health score ${this.health}${this.health < before ? ' (−1)' : ''}`,
+          SAY.vape(this.hits, this.health),
+          {
+            attention: true,
+            state: 'skeptical'
+          }
+        )
       })
     },
 
@@ -953,13 +982,22 @@ export default {
         // the apartment's radio fades with the room; the ship's music takes over in the game
         this.o8audio?.stopRadio(1500)
       })
+      // out of the white into body storage (intro-freeze.vue), which says when it's done
       this.later(2900, () => {
-        this.phase = 'wake'
+        this.phase = 'freeze'
         this.clearRegistration()
       })
-      this.later(3300, () => {
-        this.whiteout = false
-        this.animating = false
+      this.later(3300, () => (this.whiteout = false))
+    },
+    /** The pod is frozen: black, then waking in orbit. */
+    frozen() {
+      this.blackFade = true
+      this.later(1300, () => {
+        this.phase = 'wake'
+        this.later(200, () => {
+          this.blackFade = false
+          this.animating = false
+        })
       })
     },
     enterGame() {
@@ -1160,6 +1198,47 @@ export default {
   stroke-width: 1.8;
   stroke-linejoin: round;
 }
+/* the arm: an outlined limb (a yellow line under a black one) in two parts that turn at the shoulder and the
+   elbow, so the hand swings up to the mouth rather than jumping there */
+.arm .limb-edge {
+  stroke: #ccff00;
+  stroke-width: 7.6;
+  stroke-linecap: round;
+}
+.arm .limb {
+  stroke: #030306;
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+.arm .upper,
+.arm .fore {
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.arm .upper {
+  transform: rotate(72deg);
+}
+.arm .fore {
+  transform: translate(15.8px, 0) rotate(-86deg);
+}
+.arm.up .upper {
+  transform: rotate(-11deg);
+}
+.arm.up .fore {
+  transform: translate(15.8px, 0) rotate(-126deg);
+}
+.vape-pen {
+  fill: #2a2440;
+  stroke: #b9a0ff;
+  stroke-width: 0.5;
+}
+.vape-led {
+  fill: #e6dcf5;
+  transition: fill 0.3s;
+}
+.arm.up .vape-led {
+  fill: #ffffff;
+  filter: drop-shadow(0 0 1.5px #ffffff);
+}
 .you-ring {
   fill: none;
   stroke: #ccff00;
@@ -1171,8 +1250,8 @@ export default {
 }
 .vapor {
   position: absolute;
-  left: 4px;
-  top: -70px;
+  left: 14px;
+  top: -66px;
 }
 .vapor i {
   position: absolute;
@@ -1182,13 +1261,14 @@ export default {
   border-radius: 50%;
   background: radial-gradient(closest-side, #d8d4e480, #d8d4e400);
   opacity: 0;
-  animation: puff 2.4s ease-out forwards;
+  animation: puff 2.4s ease-out 0.9s forwards;
 }
+/* (the exhale comes once the hand is down from the mouth's height: after the inhale) */
 .vapor i:nth-child(2) {
-  animation-delay: 0.25s;
+  animation-delay: 1.15s;
 }
 .vapor i:nth-child(3) {
-  animation-delay: 0.5s;
+  animation-delay: 1.4s;
 }
 @keyframes puff {
   0% {
@@ -1332,6 +1412,18 @@ export default {
   z-index: 20;
 }
 .whiteout.on {
+  opacity: 1;
+}
+.blackout-fade {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.2s ease-in-out;
+  z-index: 20;
+}
+.blackout-fade.on {
   opacity: 1;
 }
 

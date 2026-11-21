@@ -42,7 +42,7 @@
       </div>
     </div>
     <div class="message">
-      <minerva-face class="face" state="talking" :size="faceSize" />
+      <minerva-face class="face" state="talking" :size="faceSize" pokeable />
       <div class="words">
         <p id="wake-say">{{ text }}</p>
         <button ref="ok" type="button" class="o8-pill main big" @click="$emit('done')">Understood</button>
