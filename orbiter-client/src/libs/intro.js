@@ -200,6 +200,8 @@ export const SAY = {
   health: (score) => `Your health score is ${score}. Your insurer would worry. You don’t have an insurer.`,
   mail: 'Two bills are overdue. One company said no, politely. Another didn’t read it.',
   jobs: 'One opening you qualify for. Read all of it before you sign.',
+  database:
+    'Your sponsor’s files. Theirs, so they read like theirs. The history is the same in all of them; I checked.',
   music: 'The building’s radio. It came with the unit, like the damp. Pick something, or give me some quiet.',
   shipName: 'Name your ship. It’s registered with me before pickup.',
   escort: 'Application filed. An escort will arrive shortly to take you to processing.',

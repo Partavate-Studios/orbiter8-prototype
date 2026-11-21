@@ -984,6 +984,38 @@ Checked at 1440×900 and 390×844: the bed, the TV from the bed and back, the ar
 (Inside, wheel out), six pokes bursting her and her coming back, the vape lines down to 1, and the whole
 sign → white → pod → black → waking. `npm test` and `npm run lint` pass.
 
+## 17. Your corporation's database, in Minerva's console (2026-11-20, `briefs/corp-database.md`)
+
+Built as the brief has it: a sixth console tab between Jobs and Music, named as your corporation names it
+(Records, The Archive, the wiki), with four pages: the Orbiter 8 (each corporation's opening line, the
+shared text, the spec block, the ship drawn fitted out from `sdk/ship-art.js`), How it works (a small
+star → jump → star diagram, the drive, the scan and the pilot with pictures, each corporation's closing
+line), their own ship (the hull from `SHIP_DESIGNS` in the corporation's color on a grid, redaction bars
+over it, a stamp, "Concept · not flown", the spec line with drawn bars read as "classified", redacted
+lines), and History (the same for all, with pictures). The words are data in `libs/corp-database.js`,
+keyed X, Y, Z; switching sponsor switches the name, the voice and the ship page.
+
+Calls:
+- **D1:** the tab sits between Jobs and Music, and its label is the corporation's name for it; on a phone
+  the six tabs stay in one row and a long name wraps under its picture.
+- **D2:** the ship page's button reads "The Meridian" (the ship's name) rather than "Our ship".
+- **D3:** Minerva's line on the tab is mine: "Your sponsor's files. Theirs, so they read like theirs. The
+  history is the same in all of them; I checked."
+- **D4:** a closing aside on each ship page (mine): "The Orbiter 8 is still the standard every pilot
+  flies. This one is a promise." — the brief's point that their ship is a promise, not for sale.
+- **D5:** the Orbiter 8 is shown fitted with shields 1, armor 2, three railguns, two missile racks, four
+  point defense, 250 bays, drones and repair bots: what it can carry, not what you start with. Its NFT
+  colors (yellow railguns among them) are the game's own art, kept as is.
+- **D6:** pictures: the drive `engine-range.svg`, the scan `deep-scanner.svg`, the pilot Minerva's face
+  (her eye alone is only a glow at this size), the colonies `colony.svg`, the expansion `good-water.svg`,
+  the Regrettion `exchange.svg`, Minerva `minerva-face.svg`, the Orbiters `fleet.svg`, 2140 the Orbiter
+  8's hull; each in a round well like the tabs'. The Orbiter 6 has none.
+- **D7:** no engines lit on the hero drawing (the flame gradient lives in the game's map defs); a soft
+  glow under it instead.
+
+Checked at 1440×900 for Corps X and Z and at 390×844 for Corp Y: every page, scrolled to its end.
+`npm test`, `npm run lint` and a scratch build pass.
+
 ## For Koda to decide
 
 Answered above, bar these:
@@ -1003,3 +1035,4 @@ Answered above, bar these:
   the city's motion (signs flickering, traffic drifting) left still for now.
 - Music (section 15): M1–M8, and Minerva's draft line on the Music page.
 - Body storage (section 16): F1–F4, and the scene itself.
+- The corporation database (section 17): D1–D7, and the brief's own list (names, hulls, focuses, the reconciliation, "Exploded: █").

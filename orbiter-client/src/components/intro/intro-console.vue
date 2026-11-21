@@ -3,7 +3,7 @@
     Minerva's console, opened from a terminal: her face and voice are its spine (a column on wide screens,
     a band across the top on narrow ones), then what she's talking about. The subscribed corporation's
     skin is a thin band across the top: its color, logo, typeface and name; her face and words never change
-    with it. Tabs: Account, Health, Mail, Jobs; the first boot (choosing a corporation) comes before them,
+    with it. Tabs: Account, Health, Mail, Jobs, your corporation's database, Music; the first boot (choosing a corporation) comes before them,
     and the band's corporation button opens switching. The job runs on in Jobs: the opening, naming your
     ship (the second transaction), the escort's wait.
   -->
@@ -45,13 +45,13 @@
             :class="{ on: tab === name }"
             :aria-current="tab === name ? 'page' : null"
             :disabled="locked && name !== 'Jobs'"
-            :title="`${name} (${i + 1})`"
+            :title="`${tabLabel(name)} (${i + 1})`"
             @click="$emit('tab', name)"
           >
             <span class="o8-well" aria-hidden="true">
               <svg viewBox="-12 -12 24 24"><path :d="TAB_GLYPHS[name]" /></svg>
             </span>
-            {{ name }}
+            {{ tabLabel(name) }}
             <span v-if="name === 'Mail'" class="badge" aria-label="2 overdue">2</span>
           </button>
         </nav>
@@ -170,6 +170,9 @@
             </article>
           </div>
         </template>
+
+        <!-- your corporation's database: its name and voice are theirs (intro-database.vue) -->
+        <intro-database v-else-if="tab === 'Database' && corp" :corp="corp" />
 
         <!-- Music: the apartment's radio, at its own volume (08audio.js) -->
         <template v-else-if="tab === 'Music'">
@@ -344,12 +347,14 @@ import { mapState } from 'pinia'
 import { useOnboardingStore } from '@/stores/onboarding'
 import MinervaFace from '@/components/minerva/minerva-face.vue'
 import Ship from '@/components/star-map/sprites/ship.svg.vue'
+import IntroDatabase from './intro-database.vue'
+import { corpDatabase } from '@/libs/corp-database'
 import { BALANCE, CYCLE, MAIL, OTHER_JOBS, SAY, corporation, jobTerms } from '@/libs/intro'
 import { RADIO_TRACKS } from '@/libs/08audio'
 import { corpLogo } from '@/libs/intro-art'
 import { cleanName, nameProblem, NAME_MAX_LENGTH, PILOT_NAME_MIN_LENGTH } from '@/libs/onboarding'
 
-const TABS = ['Account', 'Health', 'Mail', 'Jobs', 'Music']
+const TABS = ['Account', 'Health', 'Mail', 'Jobs', 'Database', 'Music']
 /** The tabs' pictures, in their wells (24 units, centered). */
 const TAB_GLYPHS = {
   Account:
@@ -357,6 +362,7 @@ const TAB_GLYPHS = {
   Health: 'M0 8 C-9 2 -10 -3 -7 -6 C-4 -9 -1 -7 0 -4 C1 -7 4 -9 7 -6 C10 -3 9 2 0 8z',
   Mail: 'M-9 -6 h18 v12 h-18z M-9 -6 L0 2 L9 -6',
   Jobs: 'M-9 -3 h18 v10 h-18z M-4 -3 v-3 h8 v3 M-9 2 h18',
+  Database: 'M-8 -6 a8 3 0 1 0 16 0 a8 3 0 1 0 -16 0 v12 a8 3 0 0 0 16 0 v-12 M-8 0 a8 3 0 0 0 16 0',
   Music: 'M-3 6 a3 3 0 1 1 -6 0 a3 3 0 1 1 6 0 M-3 6 V-8 L8 -10 V4 M8 4 a3 3 0 1 1 -6 0 a3 3 0 1 1 6 0'
 }
 /** A track's picture: a note, or bars when it's the one playing. */
@@ -365,7 +371,7 @@ const BARS = 'M-6 7 V1 M-2 7 V-6 M2 7 V-2 M6 7 V-8'
 
 export default {
   name: 'IntroConsole',
-  components: { MinervaFace, Ship },
+  components: { MinervaFace, Ship, IntroDatabase },
   props: {
     /** 'boot' | 'corp' | 'Account' | 'Health' | 'Mail' | 'Jobs' */
     tab: { type: String, required: true },
@@ -439,6 +445,8 @@ export default {
           return { state: 'skeptical', say: SAY.health(this.health) }
         case 'Mail':
           return { state: 'talking', say: SAY.mail }
+        case 'Database':
+          return { state: 'talking', say: SAY.database }
         case 'Music':
           return { state: this.radio.track === 'off' ? 'idle' : 'talking', say: SAY.music }
       }
@@ -482,7 +490,7 @@ export default {
     this.fit()
     window.addEventListener('resize', this.fit)
     this.onKey = (event) => {
-      // 1–5 pick the tabs
+      // 1–6 pick the tabs
       if (this.tab === 'boot' || this.locked || event.target.tagName === 'INPUT') return
       const index = Number(event.key) - 1
       if (TABS[index]) this.$emit('tab', TABS[index])
@@ -495,6 +503,10 @@ export default {
     window.removeEventListener('keydown', this.onKey)
   },
   methods: {
+    /** A tab's name: the database goes by your corporation's name for it. */
+    tabLabel(name) {
+      return name === 'Database' && this.corp ? corpDatabase(this.corp.key).name : name
+    },
     logo(key, size) {
       return `<svg viewBox="${-size / 2 - 2} ${-size / 2 - 2} ${size + 4} ${size + 4}" width="${size + 4}" height="${size + 4}">${corpLogo(key, 0, 0, size)}</svg>`
     },
@@ -1244,7 +1256,7 @@ button.job-row:focus-visible {
   }
   .tabs {
     grid-row: 3;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: 0.4em;
     padding: 0.5em 0.4em 0.8em;
     border-top: 1px solid #3f3566;
@@ -1258,7 +1270,11 @@ button.job-row:focus-visible {
     min-height: 0;
     padding: 0.45em 0.2em 0.5em;
     border-radius: 16px;
-    font-size: 0.85em;
+    font-size: 0.8em;
+    /* six across: a longer name (your corporation's database) wraps under its picture */
+    white-space: normal;
+    text-align: center;
+    line-height: 1.1;
   }
   .tab .badge {
     position: absolute;
