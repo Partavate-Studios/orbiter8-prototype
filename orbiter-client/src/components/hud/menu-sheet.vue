@@ -33,8 +33,6 @@ import { useUIStore } from '@/stores/ui'
 import { CARD_THEMES, menuTheme, mixHex } from '@/libs/card-theme'
 import { CARD_GRAY } from '@/libs/palette'
 import { openMenuName } from '@/components/star-map/hud/menus/menu-container/_menu-container.svg.vue'
-import ColonyMenu from '@/components/star-map/hud/menus/colony-menu.svg'
-import LoadoutMenu from '@/components/star-map/hud/menus/loadout-menu.svg'
 import TradePanel from './trade/trade-panel.vue'
 import ObjectsPanel from './objects/objects-panel.vue'
 import YardsPanel from './yards/yards-panel.vue'
@@ -47,6 +45,8 @@ import RanksPanel from './panels/ranks-panel.vue'
 import SettingsPanel from './panels/settings-panel.vue'
 import SiegePanel from './panels/siege-panel.vue'
 import AsteroidPanel from './panels/asteroid-panel.vue'
+import ColonyPanel from './panels/colony-panel.vue'
+import ShipPanel from './panels/ship-panel.vue'
 
 /**
  * Every menu's inside: the quiet blue-gray the station's menus had (Koda, 2026-11-21: "I love the color
@@ -67,13 +67,13 @@ const HTML_MENUS = {
   leaderboard: RanksPanel,
   settings: SettingsPanel,
   siege: SiegePanel,
-  asteroid: AsteroidPanel
+  asteroid: AsteroidPanel,
+  colony: ColonyPanel,
+  loadout: ShipPanel
 }
 
-const MENUS = {
-  colony: ColonyMenu,
-  loadout: LoadoutMenu
-}
+/** (Every menu is HTML now; this is kept for a menu still drawn in the map's units, should one return.) */
+const MENUS = {}
 // The menus were drawn for a panel this wide at most, a screen (960 units) tall, centered on 0.
 const MAX_WIDTH = 800
 const HALF_HEIGHT = 480

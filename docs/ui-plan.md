@@ -861,4 +861,26 @@ Log:
   - Screenshot: `built/help-chat-ranks-settings.png`, `built/sieges-feed.png`. 251 tests, lint pass.
   - **Menus done:** Yards, Armory, Help, Chat, Sieges, Ranks, Settings, the list, the pilot's card.
     **Left:** Loadout (the ship's Details), Siege, Asteroid Works, Colony, Trade's layout.
+- 2026-11-22: **Menu work, batch 2 built.** Every menu is HTML on `hud/kit.css` now; the old SVG
+  menus are deleted (`menu-sheet.vue`'s SVG path is left empty for one that might return).
+  - **Siege:** the two sides beside each other, layers as bars in the order hits land, what each has
+    left to fire, the state in a line, one main action; the attacker's name opens their info card.
+    *Not seen running:* no siege on any chain at hand.
+  - **Asteroid Works:** the line (built, next, later); the next step's needs, each with how short you
+    are; people, drones and the store with their limits in their headings.
+  - **Colony:** pages as icon tabs; People (a bar, sliders to land and take aboard); Storage (eight
+    goods with their icons and colors, one opens in place with Deliver and Collect sliders, and says
+    why when neither can move); Build (the whole line in pictures, the next building's cost and what
+    it still needs, How planets grow); Factory (orders of 5, finished parts with Install / To moons /
+    To ship, and ordering in place, no separate page); Defenses (with the moons' mounts).
+  - **Your ship** (was Loadout): both pictures, its room with each limit (mounts, holds, drone room,
+    range in the capacitors' yellow, a damaged step pink), what's fitted with Unload, damage, and the
+    built-in drones.
+  - **Seen running:** Colony and Asteroid Works on a system built out with
+    `LOCAL_FILE=-8546 node dev/harness/build-out.mjs 1 4` on a private copy (stopped afterwards);
+    Your ship on Koda's copy. Screenshots: `built/colony-and-asteroid.png`, `built/ship.png`.
+    No moves were made on these screens: land, deliver, build, order, fit and unload are untested.
+  - **Left:** Trade's layout (its controls nearest the card); the SVG menu helpers that nothing uses
+    now (`star-map/hud/menus/`: menu-button, menu-container, widgets) can be removed once checked;
+    the phone layouts of Colony, Asteroid Works, Siege and Your ship weren't looked at.
 

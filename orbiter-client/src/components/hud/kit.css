@@ -246,3 +246,40 @@ button.k-row:hover:not(:disabled) {
   color: #efe7ff88;
   font-size: 13px;
 }
+/* a slider: how many (the trade menu's sliders are the model: choosing an amount is part of the fun) */
+.k-range {
+  flex: 1;
+  min-width: 80px;
+  height: 28px;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.k-range:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+/* an amount to move: its words, its slider, its number, its button, in one line */
+.k-move {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  margin: 4px 0;
+  color: #bdb5d4;
+  font-size: 14px;
+}
+.k-move > span:first-child {
+  flex: none;
+  width: 96px;
+}
+.k-move output {
+  flex: none;
+  min-width: 52px;
+  color: #ffffff;
+  font-size: 17px;
+  text-align: right;
+}
+.k-panel.narrow .k-move {
+  flex-wrap: wrap;
+}
