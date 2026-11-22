@@ -792,4 +792,25 @@ Log:
   we're close enough."** The ship's art goes into the game and the contract. Also from Koda: selecting
   **another pilot's ship** shows no UI; flesh that out, and make the ship's owner's info card
   reachable from it.
+- 2026-11-22: **Built: the ship's new art, in the game and on chain** (commit "The Orbiter 8's
+  upgrades, redrawn"). `sdk/src/ship-art.js` and `contracts/src/art/ShipArt.sol` draw the same string
+  (hashes pinned in `sdk/src/ship-art.test.js`; `forge test` prints them). Claude's own additions to
+  round 8: railguns moved off the pods to beside the fuselage's shoulders (the pods are engines); the
+  missile ports three across and two down a rack, so three racks don't run the fuselage's length;
+  point-defense dots all on the fuselage's edge; the shield follows the longer pods. The opened-up
+  view is `shipInsideParts` (the game's only); the Loadout shows both. Ships.sol is 17,822 bytes.
+  **The contract change shows on a chain only after a redeploy** (a fresh `npm run local` does it;
+  the testnet needs a deploy). The interface didn't change, so no ABI update.
+- 2026-11-22: **Built: another pilot's ship, and the pilot's info card.** Another pilot's ship now has
+  one action, Pilot (its pill); anything someone else owns has an Owner well; a leaderboard row
+  opens the same card. `hud/profile/profile-panel.vue` (menu `profile`, `ui.openProfile(address)`):
+  call sign, corporation, their ship drawn from what's fitted to it and where it is, credits,
+  planets, ports, rank by planets, what they own in this system (each a way to it), their address
+  with Copy, and sockets for achievements and corporate rank. New client method `game.pilotOf`.
+  Screenshots: `mockups/together/built/other-ship-and-pilot.png`, `phone-pilot.png`,
+  `loadout-two-views.png`. 248 client tests, 124 contract tests, lint pass. Checked by screenshots on
+  Koda's running copy (reads only).
+  - **Left:** your own info card isn't reachable yet (the pilot plate's avatar still selects your
+    ship); the other ship's card face is thin (Pilot, At); owner names in the card's readouts and in
+    chat and the siege feed aren't links yet.
 

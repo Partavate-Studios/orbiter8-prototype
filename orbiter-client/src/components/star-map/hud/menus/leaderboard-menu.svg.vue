@@ -38,7 +38,8 @@
             :transform="'translate(0 ' + (-300 + 65 * index) + ')'"
           >
             <text v-if="row.gapBefore" x="0" y="-2" fill="#ffffff66">⋯</text>
-            <menu-slot-container :highlight="row.isMe">
+            <!-- a pilot's row opens their info card (hud/profile/profile-panel.vue) -->
+            <menu-slot-container :highlight="row.isMe" class="can-click" @click="openProfile(row.player.address)">
               <g :font-size="rowFontSize" :fill="row.isMe ? '#ffffff' : '#ffffffcc'">
                 <text :x="columns.rank" y="36">{{ row.rank }}</text>
                 <text :x="columns.name" y="36" text-anchor="start" :font-size="nameFit(row.player).size / (rowEm * 16) + 'em'">{{ nameFit(row.player).text }}</text>
@@ -143,6 +144,10 @@ export default {
     clearInterval(this.clock)
   },
   methods: {
+    openProfile(address) {
+      this.o8audio.playEffect('click')
+      useUIStore().openProfile(address)
+    },
     async load(refresh = false) {
       if (refresh) this.o8audio.playEffect('click')
       this.status = 'loading'

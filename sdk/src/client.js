@@ -1116,6 +1116,10 @@ export function createGameClient() {
     starName,
     traitsOf,
     derivedPlanetName,
+    /** Any pilot as the chain has them (call sign, corporation, ship with its loadout), or null if they haven't registered. */
+    async pilotOf(address) {
+      return game ? game.pilot(address) : null
+    },
     /** A pilot's call sign, if the client has met them, else null. */
     callsignOf(address) {
       return state.callsigns[address] || null

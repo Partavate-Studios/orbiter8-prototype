@@ -116,6 +116,11 @@ function pilotMenu(object, d, marketName) {
       break
     }
   }
+  // Someone else's: the way to their info card (a ship's is its pilot). Not Sol's, which are Minerva's.
+  const others = object.owner && !object.isMine && !object.federation && object.type !== 'star' && object.type !== 'section'
+  if (others && (object.type === 'ship' || cellOf(object.objectId ?? 1) !== 0)) {
+    add((object.type === 'ship' ? 'Pilot' : 'Owner') + (object.ownerName ? ': ' + object.ownerName : ''), 'owner')
+  }
   // Planets, stations, moons and the ship: the owner names them (stars above).
   if (object.isMine && object.type !== 'star')
     add('Rename ' + object.type.charAt(0).toUpperCase() + object.type.slice(1), 'rename')

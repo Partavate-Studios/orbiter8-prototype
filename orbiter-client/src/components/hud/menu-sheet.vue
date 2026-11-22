@@ -46,6 +46,7 @@ import HelpMenu from '@/components/star-map/hud/menus/help-menu.svg'
 import TradePanel from './trade/trade-panel.vue'
 import ObjectsPanel from './objects/objects-panel.vue'
 import YardsPanel from './yards/yards-panel.vue'
+import ProfilePanel from './profile/profile-panel.vue'
 
 /**
  * Every menu's inside: the quiet blue-gray the station's menus had (Koda, 2026-11-21: "I love the color
@@ -57,7 +58,8 @@ const MENU_INSIDE = mixHex(CARD_THEMES.station.deep, CARD_GRAY, 0.6)
 const HTML_MENUS = {
   trade: TradePanel,
   objects: ObjectsPanel,
-  shipyard: YardsPanel
+  shipyard: YardsPanel,
+  profile: ProfilePanel
 }
 
 const MENUS = {

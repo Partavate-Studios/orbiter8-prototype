@@ -181,6 +181,14 @@ describe('HUD', () => {
     expect(problems).toEqual([])
   })
 
+  it("opens a pilot's info card, with their record still to come", async () => {
+    ui.openProfile('0xabc')
+    await settle()
+    expect(ui.menuState.profileMenu).toBe(true)
+    expect(root.querySelector('.profile-panel')).not.toBe(null)
+    expect(problems).toEqual([])
+  })
+
   it('always holds a card: with nothing selected, your ship', async () => {
     ui.selectSprite(null)
     await settle()

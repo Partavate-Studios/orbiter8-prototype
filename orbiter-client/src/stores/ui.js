@@ -37,7 +37,7 @@ function readActionsOpen() {
 /** The free space right of an open menu that's worth moving the selection into (CSS pixels). */
 const MIN_ROOM_BESIDE_MENU_PX = 180
 /** (`objects` is the list of what's in the system: it took in the old planets, ports and ships menus.) */
-const MENUS = ['objects', 'settings', 'trade', 'shipyard', 'chat', 'leaderboard', 'colony', 'armory', 'loadout', 'siege', 'feed', 'help', 'asteroid']
+const MENUS = ['objects', 'profile', 'settings', 'trade', 'shipyard', 'chat', 'leaderboard', 'colony', 'armory', 'loadout', 'siege', 'feed', 'help', 'asteroid']
 
 /** The old list menus' names still open the list, on that kind (the P key, older callers). */
 const LIST_KINDS = { planets: 'planet', ports: 'station', ships: 'ship' }
@@ -119,6 +119,8 @@ export const useUIStore = defineStore('UI', {
     /** The list of what's here (hud/objects/objects-panel.vue): which kind it shows, and for stations which of them. */
     listKind: readHudPrefs().listKind ?? 'all',
     listWant: readHudPrefs().listWant ?? null,
+    /** Whose info card the profile menu shows (an address), or null (hud/profile/profile-panel.vue). */
+    profileOf: null,
     /** The minimap and zoom are folded away under the system's name (hud/system-block.vue). */
     mapFolded: Boolean(readHudPrefs().mapFolded),
     // Whether the Minerva panel (backtick) is open.
@@ -619,6 +621,12 @@ export const useUIStore = defineStore('UI', {
         menu = 'objects'
       }
       if (MENUS.includes(menu)) this.hud.menuState[menu + 'Menu'] = true
+    },
+    /** Opens a pilot's info card: any owner's name leads here (docs/ui-plan.md 4.5). */
+    openProfile(address) {
+      if (!address) return
+      this.profileOf = String(address)
+      this.openMenu('profile')
     },
     /** The list's filter: a kind ('all', 'planet', 'station', 'moon', 'asteroid', 'ship', 'yours'), and for stations which ('buying', 'yards', 'armory' or null). */
     setList(kind, want = null) {

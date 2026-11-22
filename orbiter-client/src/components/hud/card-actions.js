@@ -21,12 +21,13 @@ const credits = (n) => n.toLocaleString('en-US')
  * isn't a slot: those are the big icons at the top of the menu, so nothing is offered twice.
  */
 export const SLOTS = {
-  planet: [['claim', 'colony', 'attack'], ['siege'], ['recruit'], ['market'], ['rename']],
-  station: [['trade'], ['shipyards'], ['armory'], ['rename']],
-  ship: [['jump'], ['loadout'], ['session'], ['market'], ['rename']],
+  planet: [['claim', 'colony', 'attack'], ['siege'], ['recruit'], ['market'], ['rename', 'owner']],
+  station: [['trade'], ['shipyards'], ['armory'], ['rename', 'owner']],
+  // (another pilot's ship has one thing to do: see its pilot)
+  ship: [['jump', 'owner'], ['loadout'], ['session'], ['market'], ['rename']],
   star: [['jump'], ['traverse'], ['nameStar']],
-  moon: [['rename']],
-  asteroid: [['claim', 'asteroid', 'attack'], ['siege'], ['rename']],
+  moon: [['rename', 'owner']],
+  asteroid: [['claim', 'asteroid', 'attack'], ['siege'], ['rename', 'owner']],
   section: [['mine', 'stopMining']]
 }
 /** The commands the menu's top icons carry instead. */
@@ -71,10 +72,11 @@ export const ACTION_LOOK = {
   loadout: { icon: 'ship', word: 'Loadout' },
   session: { icon: 'session', word: 'Session' },
   mine: { icon: 'mine', word: 'Mine' },
-  stopMining: { icon: 'stop', word: 'Stop' }
+  stopMining: { icon: 'stop', word: 'Stop' },
+  owner: { icon: 'you', word: 'Owner' }
 }
 /** The actions that can be a card's main one (its pill); the first of them in slot order is. */
-const MAIN_COMMANDS = new Set(['trade', 'jump', 'colony', 'claim', 'attack', 'asteroid', 'mine', 'stopMining', 'recruit'])
+const MAIN_COMMANDS = new Set(['trade', 'jump', 'colony', 'claim', 'attack', 'asteroid', 'mine', 'stopMining', 'recruit', 'owner'])
 /** Why an action can't be used now, in a word or two. */
 const WHY_NOT = { claim: "Can't afford", attack: 'Not armed', mine: 'All taken' }
 
@@ -93,7 +95,9 @@ export function cardButtons(object, actions) {
       const look = ACTION_LOOK[option.command] ?? { icon: 'details', word: option.text.split(' ')[0] }
       const price = option.command === 'claim' ? option.text.match(/\((.+)\)/)?.[1] : undefined
       const note = option.enabled ? (option.command === 'session' && /^End/.test(option.text) ? 'On' : price) : (WHY_NOT[option.command] ?? 'Not now')
-      return { option, key: index + 1, ...look, note, needsYou: !option.enabled && option.command === 'claim' }
+      // ("Pilot: Ada" on a ship, "Owner: Ada" on a planet: the word before the name)
+      const word = option.command === 'owner' ? option.text.split(':')[0] : look.word
+      return { option, key: index + 1, ...look, word, note, needsYou: !option.enabled && option.command === 'claim' }
     })
     .filter(Boolean)
   const main = buttons.find((button) => MAIN_COMMANDS.has(button.option.command)) ?? null
@@ -159,6 +163,8 @@ export async function runAction(option, object, { showMoons }) {
     }
     case 'stopMining':
       return player.stopMining()
+    case 'owner':
+      return ui.openProfile(object.owner)
     case 'colony':
     case 'armory':
     case 'loadout':
