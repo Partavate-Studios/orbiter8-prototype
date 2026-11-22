@@ -586,3 +586,19 @@ So the measure for a loop is **travel and stability, not the number of clicks**:
 - **Never preset a trade slider (Koda, 2026-11-21).** Sliding and choosing what to buy and sell is one
   of the few fun interactions the player has. And they may have come to buy for a build: something
   else already selected would feel wrong. The trade screen always opens with every slider at rest.
+
+## 13. An option: the card less than double wide (Koda, 2026-11-21)
+
+Koda: when something secondary is selected, the card needn't be double width; it could be some amount
+less, with the emphasis on the selected thing. An option, not a requirement.
+
+Claude's suggestion, not yet drawn: **a spine and one face.** The planet's side narrows to a spine
+about 90 px wide (its sphere, then its station and moons as a column of tabs), and the selected thing
+takes the full face beside it. About 1.4 times a card's width, not 2. The heading stays joined.
+- The tabs sit in the spine in every state, the plain planet card included, so they never move under
+  the pointer when the face changes.
+- It answers two open problems: whose actions the row holds (the one face), and telling ways (tabs
+  down the spine) from actions (wells along the bottom).
+- It's close to what a phone needs.
+- The cost: the planet's readouts aren't shown while its station or moon is in front; its name and
+  sphere are.
