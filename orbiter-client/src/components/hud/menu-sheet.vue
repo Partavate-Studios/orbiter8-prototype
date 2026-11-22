@@ -34,9 +34,7 @@ import { CARD_THEMES, menuTheme, mixHex } from '@/libs/card-theme'
 import { CARD_GRAY } from '@/libs/palette'
 import { openMenuName } from '@/components/star-map/hud/menus/menu-container/_menu-container.svg.vue'
 import ColonyMenu from '@/components/star-map/hud/menus/colony-menu.svg'
-import AsteroidMenu from '@/components/star-map/hud/menus/asteroid-menu.svg'
 import LoadoutMenu from '@/components/star-map/hud/menus/loadout-menu.svg'
-import SiegeMenu from '@/components/star-map/hud/menus/siege-menu.svg'
 import TradePanel from './trade/trade-panel.vue'
 import ObjectsPanel from './objects/objects-panel.vue'
 import YardsPanel from './yards/yards-panel.vue'
@@ -47,6 +45,8 @@ import ChatPanel from './panels/chat-panel.vue'
 import FeedPanel from './panels/feed-panel.vue'
 import RanksPanel from './panels/ranks-panel.vue'
 import SettingsPanel from './panels/settings-panel.vue'
+import SiegePanel from './panels/siege-panel.vue'
+import AsteroidPanel from './panels/asteroid-panel.vue'
 
 /**
  * Every menu's inside: the quiet blue-gray the station's menus had (Koda, 2026-11-21: "I love the color
@@ -65,14 +65,14 @@ const HTML_MENUS = {
   chat: ChatPanel,
   feed: FeedPanel,
   leaderboard: RanksPanel,
-  settings: SettingsPanel
+  settings: SettingsPanel,
+  siege: SiegePanel,
+  asteroid: AsteroidPanel
 }
 
 const MENUS = {
   colony: ColonyMenu,
-  asteroid: AsteroidMenu,
-  loadout: LoadoutMenu,
-  siege: SiegeMenu
+  loadout: LoadoutMenu
 }
 // The menus were drawn for a panel this wide at most, a screen (960 units) tall, centered on 0.
 const MAX_WIDTH = 800
