@@ -718,4 +718,13 @@ Log:
   Jump as its pill); Mars and its station the same way; `O` opened the list, Stations then Buying
   listed the 8 ports that buy the cargo. No errors in the page. Not covered: claim, jump, siege,
   colony, the gamepad, a phone-size session with moves.
+- 2026-11-21: **Koda on the Yards menu (cargo holds and drone bays):**
+  - He loves the background color of those menus (the station's menus) "as a default color".
+  - He does not like the purple buttons on them: purple clashes with that background.
+  - They have little iconography, give no feedback on what you can afford, and have minor issues.
+  - Done in answer: every menu's inside is now that color; the Yards menu is rebuilt in HTML to the
+    standard (`hud/yards/yards-panel.vue`), its buttons in the menu's own color, with icons, prices,
+    what you can afford and what's left after. The first menu of the walk-through (Koda's note 3).
+  - **Changes the kit:** on a menu about a thing, the main button takes that thing's color (dark text
+    on it, as headings do), not the brand purple. The card's own pill is still purple; ask Koda.
 

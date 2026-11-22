@@ -30,10 +30,9 @@
 import { mapActions, mapState } from 'pinia'
 import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
-import { menuTheme, mixHex } from '@/libs/card-theme'
+import { CARD_THEMES, menuTheme, mixHex } from '@/libs/card-theme'
 import { CARD_GRAY } from '@/libs/palette'
 import { openMenuName } from '@/components/star-map/hud/menus/menu-container/_menu-container.svg.vue'
-import ShipyardMenu from '@/components/star-map/hud/menus/shipyard-menu.svg'
 import ChatMenu from '@/components/star-map/hud/menus/chat-menu.svg'
 import LeaderboardMenu from '@/components/star-map/hud/menus/leaderboard-menu.svg'
 import SettingsMenu from '@/components/star-map/hud/menus/settings-menu.svg'
@@ -46,15 +45,22 @@ import FeedMenu from '@/components/star-map/hud/menus/feed-menu.svg'
 import HelpMenu from '@/components/star-map/hud/menus/help-menu.svg'
 import TradePanel from './trade/trade-panel.vue'
 import ObjectsPanel from './objects/objects-panel.vue'
+import YardsPanel from './yards/yards-panel.vue'
+
+/**
+ * Every menu's inside: the quiet blue-gray the station's menus had (Koda, 2026-11-21: "I love the color
+ * of the background on those menus as a default color"). The frame still takes each menu's own colors.
+ */
+const MENU_INSIDE = mixHex(CARD_THEMES.station.deep, CARD_GRAY, 0.6)
 
 /** Menus built in HTML rather than the map's SVG units (round 2): they size themselves. */
 const HTML_MENUS = {
   trade: TradePanel,
-  objects: ObjectsPanel
+  objects: ObjectsPanel,
+  shipyard: YardsPanel
 }
 
 const MENUS = {
-  shipyard: ShipyardMenu,
   chat: ChatMenu,
   leaderboard: LeaderboardMenu,
   settings: SettingsMenu,
@@ -114,7 +120,10 @@ export default {
       return {
         '--mid': t.mid,
         '--deep': t.deep,
-        '--inside': mixHex(t.deep, CARD_GRAY, 0.6)
+        // (for a menu's own buttons and marks: the thing's color, and a light step of it)
+        '--base': t.base,
+        '--accent': t.accent,
+        '--inside': MENU_INSIDE
       }
     }
   },
