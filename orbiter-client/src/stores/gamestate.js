@@ -90,7 +90,7 @@ export const useGameStateStore = defineStore('GameState', {
     },
     /**
      * Through the black hole the ship is at, to its partner: once the move is sent, the ship stretches
-     * into the hole (black-hole-entry.vue), then the jump animation plays until the far side loads.
+     * into the hole (black-hole-entry.vue), then the passage (libs/hole-passage.js) plays until the far side loads.
      * Resolves true if it went through.
      */
     async traverseBlackHole() {
@@ -100,10 +100,13 @@ export const useGameStateStore = defineStore('GameState', {
         await game.actions.traverse({
           onSent: () => {
             gameAudio().speak('jumpStarting')
+            ui.jumpThroughHole = true
             ui.blackHoleEntry = Date.now()
+            // The passage starts under the entry's last moments, so the entry fades out onto it (and
+            // not at all if the move has already failed).
             setTimeout(() => {
-              if (!ui.hud.jumpAnimationState) ui.jumpAnimationOn()
-            }, BLACK_HOLE_ENTRY_MS)
+              if (ui.jumpThroughHole && !ui.hud.jumpAnimationState) ui.jumpAnimationOn()
+            }, BLACK_HOLE_ENTRY_MS * 0.9)
           }
         })
       } catch (error) {
@@ -111,6 +114,7 @@ export const useGameStateStore = defineStore('GameState', {
         ui.blackHoleEntry = null
         console.error('Going through failed:', error.shortMessage ?? error.message)
         if (ui.jumpAnimationState) ui.jumpStalled(error.shortMessage ?? error.message)
+        else ui.jumpThroughHole = false
         return false
       }
       return true

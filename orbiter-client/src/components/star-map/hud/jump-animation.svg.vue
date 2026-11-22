@@ -2,11 +2,12 @@
   <g>
     <!-- The background and star streaks are drawn on canvas (background-canvas.vue). -->
     <g :transform="`translate(${shipSlideX} -100)`">
-      <g v-if="(!stall || stall.visible) && slide.ship !== null" :transform="stall ? stall.transform : shipTransform">
+      <!-- (through a black hole the ship has echoes of itself behind it: libs/hole-passage.js) -->
+      <g v-for="(layer, index) in shipLayers" :key="index" :transform="layer.transform" :opacity="layer.opacity">
         <g transform="scale(15) rotate(90)">
           <ship />
         </g>
-        <g transform="rotate(180)" :opacity="stall ? stall.flames : 1">
+        <g transform="rotate(180)" :opacity="layer.flames">
           <rect x="35" y="-40" width="1000" height="80" ry="80" rx="80" stroke-width="0" fill="url(#starStreak)" />
           <rect x="25" y="-89" width="1000" height="40" ry="80" rx="80" stroke-width="0" fill="url(#starStreak)" />
           <rect x="25" y="49" width="1000" height="40" ry="80" rx="80" stroke-width="0" fill="url(#starStreak)" />
@@ -28,7 +29,7 @@
       </g>
     </g>
 
-    <g :opacity="slide.words">
+    <g :opacity="slide.words" :transform="wordsTransform">
     <text
       v-if="!stall"
       x="0"
@@ -38,7 +39,7 @@
       stroke-width="0"
       text-anchor="middle"
       alignment-baseline="central"
-      >Traveling to a new star system... brb
+      >{{ throughHole ? 'Falling through a black hole... brb' : 'Traveling to a new star system... brb' }}
     </text>
 
     <text
@@ -74,7 +75,8 @@ import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
 import Ship from '../sprites/ship.svg'
 import MenuButton from './menus/menu-button.svg'
-import { jumpSlide } from '@/libs/jump-slide'
+import { jumpSlide, slidesWanted } from '@/libs/jump-slide'
+import { holeShip, HOLE_ECHOES } from '@/libs/hole-passage'
 
 // A stalled ship slides off the left of the screen over STALL_SLIDE_MS, spinning faster and faster
 // (STALL_SPIN turns in all) and shrinking to STALL_SCALE.
@@ -82,6 +84,11 @@ const STALL_SLIDE_MS = 3000
 const STALL_SPIN = 3
 const STALL_SCALE = 0.3
 const STALL_FLAMES_MS = 450
+/** The ship is 345 units long here; through a black hole it's pulled to as much as HOLE_ROOM, and shrinks to fit a narrow screen. */
+const HOLE_ROOM = 900
+/** What the travel words say inside a black hole (the same line as among the jump's tips). */
+const HOLE_TIP =
+  'Black holes come in pairs. Fly into one and you come out of its partner, somewhere in the dark between the arms. Probably. It has always been fine so far.'
 
 export default {
   name: 'JumpAnimation',
@@ -97,7 +104,7 @@ export default {
   },
   computed: {
     ...mapState(useStarMapStore, ['gameTime', 'currentStarSystemName']),
-    ...mapState(useUIStore, ['jumpStall', 'leftMostX', 'jumpPhase', 'jumpPhaseAt', 'jumpShipGone', 'screenSize', 'viewport', 'baseScale']),
+    ...mapState(useUIStore, ['jumpStall', 'leftMostX', 'jumpPhase', 'jumpPhaseAt', 'jumpShipGone', 'jumpThroughHole', 'screenSize', 'viewport', 'baseScale']),
     /** Where the slides stand (libs/jump-slide.js); gameTime makes it re-evaluate every frame. */
     slide() {
       void this.gameTime
@@ -105,8 +112,37 @@ export default {
     },
     /** The ship's slide, from screen widths to this layer's units (the layer is 1200 units tall, scaled by baseScale). */
     shipSlideX() {
-      const widthUnits = (this.viewport.resolution * this.screenSize.width) / this.screenSize.height / this.baseScale
-      return ((this.slide.ship ?? 0) * widthUnits).toFixed(1)
+      return ((this.slide.ship ?? 0) * this.widthUnits).toFixed(1)
+    },
+    /** The screen's width in this layer's units. */
+    widthUnits() {
+      return (this.viewport.resolution * this.screenSize.width) / this.screenSize.height / this.baseScale
+    },
+    /** Going through a black hole, not jumping (the stalled ship falls behind as any does). */
+    throughHole() {
+      return this.jumpThroughHole
+    },
+    /** The ship as it's drawn: once; through a black hole, with its echoes under it; stalled, until it's off screen. */
+    shipLayers() {
+      if (this.slide.ship === null) return []
+      if (this.stall) return this.stall.visible ? [{ transform: this.stall.transform, opacity: 1, flames: this.stall.flames }] : []
+      if (!this.throughHole) return [{ transform: this.shipTransform, opacity: 1, flames: 1 }]
+      const wild = slidesWanted() ? 1 : 0
+      const fit = Math.min(1, this.widthUnits / HOLE_ROOM)
+      return HOLE_ECHOES.map(([behind, opacity]) => {
+        const ship = holeShip((this.gameTime - behind) / 1000, wild)
+        return {
+          transform: `translate(${(ship.x * fit).toFixed(1)} ${(ship.y * fit).toFixed(1)}) rotate(${ship.turn.toFixed(2)}) scale(${(2 * fit * ship.stretch).toFixed(3)} ${(2 * fit * ship.squeeze).toFixed(3)})`,
+          opacity,
+          flames: ship.flames
+        }
+      })
+    },
+    /** Through a black hole the words lean and stretch a little with the ship. */
+    wordsTransform() {
+      if (!this.throughHole || this.stall || !slidesWanted()) return null
+      const ship = holeShip(this.gameTime / 1000)
+      return `skewX(${(ship.turn * 0.6).toFixed(2)}) scale(${(1 + (ship.stretch - 1.45) * 0.08).toFixed(3)} 1)`
     },
     /** The stalled ship's extra motion, `null` while the jump is going fine (re-evaluated every frame via gameTime). */
     stall() {
@@ -146,7 +182,7 @@ export default {
     }
   },
   mounted: function () {
-    this.loreTip = this.randomLoreTip()
+    this.loreTip = this.throughHole ? HOLE_TIP : this.randomLoreTip()
   },
   methods: {
     ...mapActions(useUIStore, ['jumpRecover']),

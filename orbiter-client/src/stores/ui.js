@@ -87,6 +87,11 @@ export const useUIStore = defineStore('UI', {
     techTreeOpen: false,
     /** When the ship began stretching into a black hole (Date.now()), or null (black-hole-entry.vue). */
     blackHoleEntry: null,
+    /**
+     * This jump goes through a black hole, from the moment the move is sent until you're out the far
+     * side: it has its own passage (libs/hole-passage.js) and music, not the jump's streaks.
+     */
+    jumpThroughHole: false,
     minerva: {
       terminal: {
         history: []
@@ -625,6 +630,7 @@ export const useUIStore = defineStore('UI', {
       clearTimeout(jumpPhaseTimer)
       this.jumpPhase = null
       this.jumpFromMap = false
+      this.jumpThroughHole = false
       this.hud.jumpAnimationState = false
     },
     /** A jump that was already under way failed: stall the jump animation and say why. */
@@ -653,7 +659,9 @@ export const useUIStore = defineStore('UI', {
       this.jumpDepartScale = this.viewport.scaleTween?.target ?? this.viewport.scale
       this.neighborView = false
       this.hud.jumpAnimationState = true
-      if (!slidesWanted()) return this.jumpCruise()
+      // Through a black hole there's no sliding away: the hole has already swallowed the ship
+      // (black-hole-entry.vue), and the passage is what's behind it.
+      if (!slidesWanted() || this.jumpThroughHole) return this.jumpCruise()
       // The system (or the galaxy map) slides away first; the camera stays put under it.
       this.jumpPhase = 'depart'
       this.jumpPhaseAt = Date.now()

@@ -90,6 +90,15 @@ export default class Sound {
     // played once, then the map's music comes back
     this.music['discovery'] = new Audio('./audio/music/discovery/ReflectionsInTheWind.mp3')
     this.music['discovery'].preload = 'none'
+    // Black holes (Koda, 2026-11-21): Entering the Tomb in a system with a black hole at its core, The
+    // Tribal Ordeal while going through one (playgame.vue). Both are large, so loaded on first use.
+    this.music['holeSystem'] = new Audio('./audio/music/blackhole/EnteringTheTomb.mp3')
+    this.music['holeSystem'].loop = true
+    this.music['holeSystem'].preload = 'none'
+    this.music['hole'] = new Audio('./audio/music/blackhole/TheTribalOrdeal.mp3')
+    this.music['hole'].loop = true
+    this.music['hole'].preload = 'none'
+
     for (const [song, next] of Object.entries(THEN))
       this.music[song].addEventListener('ended', () => {
         if (this.currentMusic === song) this.playMusic(next)

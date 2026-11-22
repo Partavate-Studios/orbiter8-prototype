@@ -19,7 +19,9 @@ import { useConfigStore } from '@/stores/config'
 import { onFrame, FRAME_ORDER } from '@/libs/frame-loop'
 import { CompositedLayer } from '@/libs/composited-layer'
 import { paintBackdrop, BACKDROP_SIZE } from './assets/backdrop-art'
-import { jumpSlide } from '@/libs/jump-slide'
+import { jumpSlide, slidesWanted, JUMP_ARRIVE_MS } from '@/libs/jump-slide'
+import { holeSurge, holeThroat } from '@/libs/hole-passage'
+import { MAP } from '@/libs/palette'
 
 // Pixels drawn beyond each screen edge, so the layers can pan or shrink a little before a redraw.
 const MARGIN = 256
@@ -31,6 +33,12 @@ const JUMP_STREAK_COUNT = 50
 const JUMP_STAR_SPEED = 25
 // A stalled jump's streaks coast to a stop over this long (the ship falls behind faster: jump-animation.svg.vue).
 const JUMP_STALL_STOP_MS = 3000
+// Through a black hole (libs/hole-passage.js): the dark over the backdrop, the rings that pour out of
+// the throat, and the smeared stars between them.
+const HOLE_DARK = '#05010df4'
+const HOLE_RINGS = 11
+const HOLE_SMEARS = 80
+const HOLE_SMEAR_COLOR = '#e6dcf5'
 
 // How far the camera's zoom (viewport.scale) changes the size of each background layer.
 // These are the original formulas from map.vue.
@@ -80,7 +88,7 @@ export default {
     screenDimensions() {
       return this.screenSize.width + 'x' + this.screenSize.height + '@' + this.screenSize.dpr
     },
-    ...mapState(useUIStore, ['viewport', 'screenSize', 'jumpAnimationState', 'jumpStall', 'galaxyPan', 'jumpPhase', 'jumpPhaseAt', 'jumpShipGone']),
+    ...mapState(useUIStore, ['viewport', 'screenSize', 'jumpAnimationState', 'jumpStall', 'galaxyPan', 'jumpPhase', 'jumpPhaseAt', 'jumpShipGone', 'jumpThroughHole']),
     ...mapState(useConfigStore, ['graphicsQuality']),
     showStars() {
       return this.graphicsQuality > 1
@@ -115,6 +123,12 @@ export default {
     this.jumpStreaks = Array.from({ length: JUMP_STREAK_COUNT }, () => ({
       x: Math.random() * 5000,
       y: Math.random() * 3000 - 1500
+    }))
+    this.holeSmears = Array.from({ length: HOLE_SMEARS }, () => ({
+      angle: Math.random() * Math.PI * 2,
+      phase: Math.random(),
+      rate: 0.6 + Math.random() * 0.9,
+      length: 0.04 + Math.random() * 0.1
     }))
     // The backdrop is opaque and the stars thin out at the edges, so neither may show its edge:
     // they redraw whenever shrinking them would uncover part of the screen.
@@ -234,6 +248,9 @@ export default {
         const stalled = this.jumpStall ? Math.min(1, (Date.now() - this.jumpStall.at) / JUMP_STALL_STOP_MS) : 0
         const speed = (1 - stalled) * (1 - stalled)
         this.jumpDistance = ((this.jumpDistance ?? 0) + speed * JUMP_STAR_SPEED * 100 * seconds) % 10000
+        // (the black hole's passage falls in surges: libs/hole-passage.js)
+        this.holeDepth = (this.holeDepth ?? 0) + speed * seconds * holeSurge(now / 1000)
+        this.holeNow = now / 1000
         this.drawJump()
         // The backdrop stays put while the system slides away and the ship cruises (Koda, round 2);
         // arriving, it follows the camera again as the new system slides in.
@@ -282,6 +299,7 @@ export default {
     drawJump() {
       const canvas = this.$refs.jump
       const ctx = this.centeredContext(canvas, 0)
+      if (this.jumpThroughHole) return this.drawHole(ctx)
       const { from, to } = jumpSlide(this.jumpPhase, Date.now() - this.jumpPhaseAt, { shipGone: this.jumpShipGone }).streaks
       if (to - from <= 0) return
 
@@ -306,6 +324,77 @@ export default {
         }
       }
       this.hideStreaksOutside(ctx, canvas, from, to)
+    },
+    /**
+     * The passage through a black hole, in place of the streaks (libs/hole-passage.js): dark, with a
+     * throat of light ahead that wanders, and rings and smeared stars pouring out of it past you,
+     * stretched wide and twisting. It thins away as the far side's system slides in.
+     */
+    drawHole(ctx) {
+      const { width, height } = this.screenSize
+      const fade = this.jumpPhase === 'arrive' ? 1 - Math.min(1, (Date.now() - this.jumpPhaseAt) / (JUMP_ARRIVE_MS * 0.55)) : 1
+      if (fade <= 0) return
+      const throat = holeThroat(this.holeNow, slidesWanted() ? 1 : 0)
+      const depth = this.holeDepth
+      const reach = Math.hypot(width, height) * 0.75
+      const wide = throat.stretch
+      const tall = 0.85 / Math.sqrt(throat.stretch)
+
+      ctx.globalAlpha = fade
+      ctx.fillStyle = HOLE_DARK
+      ctx.fillRect(-width / 2, -height / 2, width, height)
+      ctx.rotate(throat.tilt)
+      const cx = throat.x * width
+      const cy = throat.y * height
+      // What's far away sits on the throat; what's near is still where the throat was a moment ago,
+      // so the passage bends as the throat wanders.
+      const bend = (d) => 1 - d * 1.35
+
+      const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, reach * 0.55)
+      glow.addColorStop(0, MAP.partnerLink + '38')
+      glow.addColorStop(0.35, MAP.partnerLink + '10')
+      glow.addColorStop(1, MAP.partnerLink + '00')
+      ctx.fillStyle = glow
+      ctx.fillRect(-reach * 1.5, -reach * 1.5, reach * 3, reach * 3)
+
+      ctx.strokeStyle = MAP.partnerLink
+      for (let i = 0; i < HOLE_RINGS; i++) {
+        const d = (i / HOLE_RINGS + depth * 0.16) % 1
+        const r = reach * d ** 2.6
+        ctx.globalAlpha = fade * Math.sin(Math.PI * d) * 0.5
+        ctx.lineWidth = 1 + d * d * 12
+        ctx.beginPath()
+        // each ring leans its own way, and the lean rolls along the passage
+        ctx.ellipse(cx * bend(d), cy * bend(d), r * wide, r * tall, throat.swirl * 0.4 * Math.sin(this.holeNow * 0.5 + d * 3), 0, Math.PI * 2)
+        ctx.stroke()
+      }
+
+      ctx.strokeStyle = HOLE_SMEAR_COLOR
+      ctx.lineCap = 'round'
+      for (const smear of this.holeSmears) {
+        const d = (smear.phase + depth * 0.3 * smear.rate) % 1
+        const end = Math.min(1.15, d + smear.length * (0.4 + d * 2))
+        ctx.globalAlpha = fade * Math.min(1, d * 1.6) * 0.75
+        ctx.lineWidth = 0.6 + d * 2.6
+        ctx.beginPath()
+        // twisted hardest near the throat, so each smear curls as it comes
+        for (const [at, move] of [
+          [d, 'moveTo'],
+          [end, 'lineTo']
+        ]) {
+          const angle = smear.angle + throat.swirl * (1 - at) * 2.5
+          const r = reach * at ** 2.2
+          ctx[move](cx * bend(at) + Math.cos(angle) * r * wide, cy * bend(at) + Math.sin(angle) * r * tall)
+        }
+        ctx.stroke()
+      }
+
+      // the throat itself: the dark you're falling toward and never reach
+      ctx.globalAlpha = fade
+      ctx.fillStyle = MAP.hole
+      ctx.beginPath()
+      ctx.ellipse(cx, cy, reach * 0.03 * wide, reach * 0.03 * tall, 0, 0, Math.PI * 2)
+      ctx.fill()
     },
     /**
      * Wipes the streaks outside the stretch they show in (`from` to `to`, in screen widths), with a soft

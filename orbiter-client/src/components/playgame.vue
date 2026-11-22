@@ -56,7 +56,7 @@ export default {
   },
   computed: {
     ...mapState(useGameStateStore, ['haveAvatar', 'haveShip']),
-    ...mapState(useUIStore, ['selected', 'jumpAnimationState', 'viewport', 'neighborView', 'neighborSwitchScale', 'menuState', 'jumpFromMap']),
+    ...mapState(useUIStore, ['selected', 'jumpAnimationState', 'jumpThroughHole', 'viewport', 'neighborView', 'neighborSwitchScale', 'menuState', 'jumpFromMap']),
     techTreeOpen: {
       get() {
         return useUIStore().techTreeOpen
@@ -72,24 +72,29 @@ export default {
       const scan = this.player.scan
       const cell = this.player.pilot?.ship.cell
       return scan && cell != null && scan.cell === cell ? cell : null
+    },
+    /** The system you're in has a black hole at its core. */
+    atBlackHole() {
+      return Object.values(this.systemObjects).some((object) => object.type === 'star' && object.blackHole)
     }
   },
   watch: {
-    jumpAnimationState: {
-      handler: function (newval, oldval) {
-        if (newval != oldval) {
-          if (newval) {
-            this.o8audio.playMusic('jump')
-          } else {
-            this.playHereMusic()
-          }
-        }
-      }
+    jumpAnimationState() {
+      this.playTravelMusic()
+    },
+    // (set when the move is sent, before the ship has stretched into the hole: the music starts there)
+    jumpThroughHole() {
+      this.playTravelMusic()
+    },
+    // The system often loads after this screen does, and changes under a jump.
+    atBlackHole(hole) {
+      if (this.jumpAnimationState || this.jumpThroughHole) return
+      if (hole !== (this.o8audio.currentMusic === 'holeSystem')) this.playHereMusic()
     },
     // The scan is often scheduled a moment after the jump's animation ends (when the jump is mined):
     // the new-star track starts then, over the map's music.
     newStarHere(cell) {
-      if (cell != null && !this.jumpAnimationState && this.o8audio.currentMusic === 'map') this.playHereMusic()
+      if (cell != null && !this.jumpAnimationState && !this.jumpThroughHole && this.o8audio.currentMusic === 'map') this.playHereMusic()
     },
     // A scan seen while jumping counts too: with a short scan delay (a local chain's 4 s) it can be
     // scheduled and recorded before the jump's animation ends.
@@ -121,11 +126,24 @@ export default {
   },
   methods: {
     /**
-     * The music for where you are: Reflections in the Wind at a star you're visiting first while its scan
-     * is pending, once for that visit (it plays out, then the map's comes back: 08audio.js THEN), else
-     * the map's (docs/briefs/music.md).
+     * The music for traveling: the jump's, or the black hole's from the moment you go in; and back to
+     * the music for where you are once you've arrived. Safe to call again: it never restarts a song.
+     */
+    playTravelMusic() {
+      const playing = this.o8audio.currentMusic
+      if (this.jumpAnimationState || this.jumpThroughHole) {
+        const song = this.jumpThroughHole ? 'hole' : 'jump'
+        if (playing !== song) this.o8audio.playMusic(song)
+      } else if (playing === 'jump' || playing === 'hole') this.playHereMusic()
+    },
+    /**
+     * The music for where you are: Entering the Tomb in a system with a black hole at its core; else
+     * Reflections in the Wind at a star you're visiting first while its scan is pending, once for that
+     * visit (it plays out, then the map's comes back: 08audio.js THEN); else the map's
+     * (docs/briefs/music.md).
      */
     playHereMusic() {
+      if (this.atBlackHole) return this.o8audio.playMusic('holeSystem')
       const here = this.player.pilot?.ship.cell
       const cell = this.newStarHere ?? (this.scanSeenAt === here ? here : null)
       if (cell != null && this.discoveryPlayedAt !== cell) {
