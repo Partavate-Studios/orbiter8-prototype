@@ -753,4 +753,17 @@ Log:
   - A ship with every upgrade "should look really cool" but this one looks cluttered: "everything
     should fit together nicely".
   - Round 2 is drawn to these: `docs/mockups/ship-upgrades/sheet.png` (round 1 kept as `round-1.png`).
+- 2026-11-21: **Koda on round 2: "mostly improvements".**
+  - Keep the old shields' **blue glow**, in the ship's shape: the same shape, larger, behind the ship.
+  - He loves the missile racks as little round ports.
+  - **Two kinds of thing:** what's outside affects the ship's shape (guns); what's inside you wouldn't
+    see on a ship flying around (cargo bays, drones).
+  - He doesn't like the range change: it looked like another cone layer added on.
+  - Round 3 (`docs/mockups/ship-upgrades/sheet.png`; rounds 1 and 2 kept beside it): two pictures of
+    every ship. **As it flies:** railguns, missile ports, point defense, armor, the blue ship-shaped
+    shield, and for range the pods themselves longer. **Opened up** (for a yard or the ship's Details):
+    the bay with cargo holds and drone bays (darts for battle drones, rings for mining drones), repair
+    bots, and the capacitor bank in the pods, a cell a step of range. Waiting for Koda.
+  - Open: whether the NFT's picture is the outside or the opened-up one; whether battle drones show as
+    an escort while fighting.
 

@@ -7,7 +7,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { shipArtParts, SHIP_ART_VIEWBOX } from '../../../sdk/src/ship-art.js'
+import { SHIP_ART_VIEWBOX } from '../../../sdk/src/ship-art.js'
 import { SHIP_DESIGNS } from '../../../sdk/src/ship-designs.js'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
@@ -17,7 +17,7 @@ const HULL_D = SHIP_DESIGNS.orbiter8.d
 // ── the new concept, round 2 (Koda's notes on round 1, 2026-11-21) ───────────
 // The Orbiter 8 is a frame you build out, like a flatbed truck: a big empty bay in the fuselage, and
 // what you fit goes inside it. So:
-// - the fuselage always shows its bay; cargo holds and drone bays fill it, cell by cell;
+// - what's inside (holds, drone bays, bots, capacitors) shows only when the ship is opened up (round 3);
 // - the pods carry the weapons: rails along their sides, missile tubes set into them;
 // - armor is plating that grows back from the nose and the pods' fronts, cut to the hull's own shape;
 // - a shield wraps the hull's outline, a band a level;
@@ -29,43 +29,31 @@ const HULL = '#e6dcf5'
 const PART = '#b9a6d6'
 const LINE = '#8f7fb0'
 const DARK = '#2a1a4a'
-const WELL = '#d3c7ea'
 const GLOW = '#ffd2a1'
-const COLD = '#cfd9ff'
 const PINK = '#ff6fb0'
 // The hull, nose up, centered: the fuselage is ±847 wide from its nose at -2300 to its skirt at about
 // 1270; a pod each side is centered ±1820, ±475 wide, from about -640 to 950.
 const hullPath = (attrs) => `<path transform="translate(-2300,-2300)" d="${HULL_D}" ${attrs}/>`
 
-/** A shield wraps the hull: its outline again, wider and fainter, a band a level. */
-const shield = (levels) => {
-  let out = ''
-  for (let i = levels; i > 0; i--) out += hullPath(`fill="none" stroke="${COLD}" stroke-width="${150 + i * 150}" stroke-opacity="0.13" stroke-linejoin="round"`)
-  if (levels) out += hullPath(`fill="none" stroke="${COLD}" stroke-width="130" stroke-opacity="0.75" stroke-linejoin="round"`)
-  return out
-}
-/** Longer range: longer thrusters under the fuselage and each pod, a warm tip on them. */
-const thrusters = (range) => {
-  const len = Math.min(3, range - 1) * 190
-  if (len <= 0) return ''
-  const bell = (x, y, top, bottom) => `<path d="M${x - top} ${y}h${top * 2}l${bottom - top} ${len}h${-bottom * 2}z" fill="${HULL}" stroke="${LINE}" stroke-width="40" stroke-linejoin="round"/><rect x="${x - bottom + 50}" y="${y + len - 75}" width="${bottom * 2 - 100}" height="50" rx="25" fill="${GLOW}"/>`
-  return bell(-1820, 900, 250, 330) + bell(1820, 900, 250, 330) + bell(0, 1210, 400, 500)
-}
+/** The shield: the old blue glow, in the ship's own shape: the hull again, larger, behind it. A step a level. */
+const BLUE = '#7fd4ff'
+const shield = (levels) =>
+  levels
+    ? `<g transform="translate(0 -520) scale(${1.08 + levels * 0.04}) translate(0 520)">` + hullPath(`fill="${BLUE}" fill-opacity="0.${levels * 6}" stroke="${BLUE}" stroke-width="${levels * 28}" stroke-linejoin="round"`) + '</g>'
+    : ''
 /**
- * The bay: the fuselage's open inside, always there. Cargo holds fill it from the back, then drone
- * bays (each with a dart in it), a cell for every ten.
+ * Longer range: the pods themselves are longer (they hold the capacitor bank), a step a level. Drawn
+ * over the hull's own pods so the ship's outline simply grows; no cone is added.
  */
-const bay = (holds, droneBays) => {
-  let out = `<rect x="-540" y="-460" width="1080" height="1280" rx="90" fill="${WELL}" stroke="${LINE}" stroke-width="36"/>`
-  const cargoCells = Math.min(25, Math.ceil(holds / 10))
-  const droneCells = Math.min(25 - cargoCells, Math.ceil(droneBays / 10))
-  for (let i = 0; i < cargoCells + droneCells; i++) {
-    const x = -485 + (i % 5) * 200
-    const y = 560 - Math.floor(i / 5) * 240
-    if (i < cargoCells) out += `<rect x="${x}" y="${y}" width="170" height="200" rx="34" fill="${LINE}"/>`
-    else out += `<rect x="${x}" y="${y}" width="170" height="200" rx="34" fill="${DARK}"/><path d="M${x + 85} ${y + 45}l55 115l-55 -32l-55 32z" fill="${HULL}"/>`
+const pods = (range) => {
+  const len = Math.min(3, range - 1) * 170
+  if (len <= 0) return ''
+  const one = (cx) => {
+    const side = (k) => `M${cx + k * 478} 330V${640 + len}L${cx + k * 310} ${700 + len}V${800 + len}L${cx + k * 380} ${950 + len}`
+    return `<path d="M${cx - 478} 330V${640 + len}L${cx - 310} ${700 + len}V${800 + len}L${cx - 380} ${950 + len}H${cx + 380}L${cx + 310} ${800 + len}V${700 + len}L${cx + 478} ${640 + len}V330z" fill="${HULL}"/>` +
+      `<path d="${side(-1)}H${cx + 380}M${cx + 478} 330V${640 + len}L${cx + 310} ${700 + len}V${800 + len}L${cx + 380} ${950 + len}" fill="none" stroke="${LINE}" stroke-width="40" stroke-linejoin="round"/>`
   }
-  return out
+  return one(-1820) + one(1820)
 }
 /** Armor: plating that grows back from the nose and the pods' fronts, cut to the hull's shape, further each level. */
 const armor = (levels, clip) => {
@@ -110,56 +98,62 @@ const turrets = (count) => {
   for (let i = 0; i < count && i < 6; i++) out += `<rect x="${xs[i] - 30}" y="${ys[i] - 300}" width="60" height="230" fill="${DARK}"/><circle cx="${xs[i]}" cy="${ys[i]}" r="125" fill="${HULL}" stroke="${DARK}" stroke-width="56"/>`
   return out
 }
-/** Battle drones: darts flying escort off the tail, one for every ten. */
-const drones = (count, below) => {
-  let out = ''
-  for (let i = 0; i < Math.min(8, Math.ceil(count / 10)); i++) {
-    const x = (i % 2 === 0 ? -1 : 1) * (760 + Math.floor(i / 2) * 430)
-    const y = 1900 + below + Math.floor(i / 2) * 150
-    out += `<path d="M${x} ${y - 170}l125 330l-125 -80l-125 80z" fill="${HULL}"/>`
-  }
-  return out
-}
-/** Mining drones: rings in a line astern, one for every ten. */
-const miners = (count, below) => {
-  let out = ''
-  const n = Math.min(4, Math.ceil(count / 10))
-  for (let i = 0; i < n; i++) out += `<circle cx="${(i - (n - 1) / 2) * 300}" cy="${1560 + below}" r="80" fill="none" stroke="${HULL}" stroke-width="54"/>`
-  return out
-}
-/** Repair bots: small crawlers in a column each side of the bay. */
-const bots = (count) => {
-  let out = ''
-  for (let i = 0; i < count && i < 6; i++) {
-    const x = i % 2 === 0 ? -690 : 690
-    const y = -250 + Math.floor(i / 2) * 330
-    out += `<path d="M${x - 105} ${y - 45}h210M${x - 105} ${y + 45}h210" stroke="${DARK}" stroke-width="30" stroke-linecap="round"/><rect x="${x - 60}" y="${y - 80}" width="120" height="160" rx="46" fill="${DARK}"/>`
-  }
-  return out
-}
 /** Damage: cracks in pink (it needs you), not dark holes. */
 const SCARS = `<g fill="none" stroke="${PINK}" stroke-width="56" stroke-linecap="round" stroke-linejoin="round"><path d="M-1050 620l190 150l-130 170l250 130"/><path d="M180 -1020l-150 140l170 120"/><path d="M1620 550l150 170l-190 120"/></g>`
 
 let clips = 0
+/** The ship from outside, as it flies: only what changes its shape. Holds, bays and bots don't show. */
 function newShip(ship, scarred = false) {
   const l = ship.loadout
   const clip = 'hull' + ++clips
-  const below = Math.min(3, (ship.range ?? 1) - 1) * 190
   return (
     `<clipPath id="${clip}">${hullPath('')}</clipPath>` +
     shield(l.shields) +
-    drones(l.drones, below) +
-    miners(l.miningDrones ?? 0, below) +
     railguns(l.railguns) +
-    thrusters(ship.range ?? 1) +
     hullPath(`fill="${HULL}" stroke="${LINE}" stroke-width="40"`) +
+    pods(ship.range ?? 1) +
     armor(l.armor, clip) +
-    bay(ship.bays, ship.droneBays ?? 0) +
     missiles(l.missiles) +
     turrets(l.pointDefense) +
-    bots(l.repairBots) +
     (scarred ? SCARS : '')
   )
+}
+/**
+ * The ship opened up, as a yard or its Details would show it: the hull as a drawing, and what's fitted
+ * inside. The bay with its cargo holds and drone bays (darts for battle drones, rings for mining
+ * drones), the repair bots beside it, the capacitor bank in the pods (a cell a step of range).
+ */
+function insideShip(ship) {
+  const l = ship.loadout
+  let out = hullPath(`fill="#1d1436" stroke="${LINE}" stroke-width="50"`) + pods(ship.range ?? 1).replaceAll(HULL, '#1d1436')
+  out += `<rect x="-540" y="-460" width="1080" height="1280" rx="90" fill="#150f28" stroke="${LINE}" stroke-width="36" stroke-dasharray="90 60"/>`
+  const cargoCells = Math.min(25, Math.ceil(ship.bays / 10))
+  const battle = Math.ceil(l.drones / 10)
+  const mining = Math.ceil((l.miningDrones ?? 0) / 10)
+  const droneCells = Math.min(25 - cargoCells, Math.max(Math.ceil((ship.droneBays ?? 0) / 10), battle + mining))
+  for (let i = 0; i < cargoCells + droneCells; i++) {
+    const x = -485 + (i % 5) * 200
+    const y = 560 - Math.floor(i / 5) * 240
+    const k = i - cargoCells
+    if (k < 0) out += `<rect x="${x}" y="${y}" width="170" height="200" rx="34" fill="${PART}"/>`
+    else {
+      out += `<rect x="${x}" y="${y}" width="170" height="200" rx="34" fill="none" stroke="${PART}" stroke-width="30"/>`
+      if (k < battle) out += `<path d="M${x + 85} ${y + 45}l55 115l-55 -32l-55 32z" fill="${HULL}"/>`
+      else if (k < battle + mining) out += `<circle cx="${x + 85}" cy="${y + 100}" r="42" fill="none" stroke="${HULL}" stroke-width="30"/>`
+    }
+  }
+  // the capacitor bank: a cell a step of range, in each pod
+  for (let i = 0; i < 4; i++) {
+    const on = i < (ship.range ?? 1)
+    for (const cx of [-1820, 1820]) out += `<rect x="${cx - 260}" y="${420 - i * 250}" width="520" height="190" rx="50" fill="${on ? GLOW : 'none'}" stroke="${on ? GLOW : LINE}" stroke-width="30" ${on ? '' : 'stroke-dasharray="60 50"'}/>`
+  }
+  // repair bots, racked each side of the bay
+  for (let i = 0; i < l.repairBots && i < 6; i++) {
+    const x = i % 2 === 0 ? -690 : 690
+    const y = -250 + Math.floor(i / 2) * 330
+    out += `<path d="M${x - 105} ${y - 45}h210M${x - 105} ${y + 45}h210" stroke="${PART}" stroke-width="30" stroke-linecap="round"/><rect x="${x - 60}" y="${y - 80}" width="120" height="160" rx="46" fill="${PART}"/>`
+  }
+  return out
 }
 
 // ── the sheet ────────────────────────────────────────────────────────────────
@@ -169,18 +163,13 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
 const T = (x, y, s, { size = 13, fill = '#f1eefa', weight = 400, anchor = 'start' } = {}) => `<text x="${x}" y="${y}" font-size="${size}" fill="${fill}" font-weight="${weight}" text-anchor="${anchor}">${esc(s)}</text>`
 const frame = (x, y, size, inner) => `<rect x="${x}" y="${y}" width="${size}" height="${size}" rx="12" fill="#160f2c" stroke="#3f3566"/><svg x="${x}" y="${y}" width="${size}" height="${size}" viewBox="${SHIP_ART_VIEWBOX}">${inner}</svg>`
 
-const PARTS = [
-  ['The bay', 'The fuselage is a big empty bay. Cargo holds fill it from the back, then drone bays, a cell for every ten.', shipWith({}, { bays: 120, droneBays: 40 })],
-  ['Railguns', 'Twin white rails with a breech along each pod; the third down the spine.', shipWith({ railguns: 3 })],
-  ['Missile racks', 'Six tubes set into each pod; the third in the nose.', shipWith({ missiles: 3 })],
-  ['Point defense', 'A ring and a stub of a barrel, in pairs.', shipWith({ pointDefense: 6 })],
-  ['Armor', 'Plating that grows back from the nose and the pods, cut to the hull\'s shape: further each level.', shipWith({ armor: 3 })],
-  ['Shields', 'The hull\'s own outline, wider and fainter: it wraps the ship. A band a level.', shipWith({ shields: 3 })],
-  ['Battle drones', 'Darts flying escort off the tail, one for every ten. (Kept from round 1.)', shipWith({ drones: 60 })],
-  ['Mining drones', 'Rings in a line astern. Not drawn today.', shipWith({ miningDrones: 30 })],
-  ['Repair bots', 'Small crawlers in a column each side of the bay.', shipWith({ repairBots: 6 })],
-  ['Jump range', 'Longer thrusters, a step a level. Not drawn today.', shipWith({}, { range: 4 })],
-  ['Damage', 'Cracks in pink (it needs you), not dark holes.', shipWith({}, { rangeLost: 1 }), true]
+const OUTSIDE = [
+  ['Railguns', 'Twin white rails with a breech.', [1, 2, 3].map((n) => shipWith({ railguns: n }))],
+  ['Missile racks', 'Round ports set into the pods; the third in the nose.', [1, 2, 3].map((n) => shipWith({ missiles: n }))],
+  ['Point defense', 'A ring and a stub of a barrel, in pairs.', [2, 4, 6].map((n) => shipWith({ pointDefense: n }))],
+  ['Shields', 'The old blue glow, in the ship\'s shape: the hull again, larger, behind it.', [1, 2, 3].map((n) => shipWith({ shields: n }))],
+  ['Armor', 'Plating cut to the hull\'s shape, further back each level.', [1, 3, 5].map((n) => shipWith({ armor: n }))],
+  ['Jump range', 'The pods themselves grow longer: they hold the capacitors. No cone added.', [2, 3, 4].map((n) => shipWith({}, { range: n }))]
 ]
 const LOADOUTS = [
   ['A new pilot', shipWith()],
@@ -190,43 +179,40 @@ const LOADOUTS = [
 ]
 
 const W = 1440
-const CELL = 150
-let body = T(30, 40, 'The Orbiter 8\'s upgrades, re-drawn: round 2', { size: 18, weight: 700, fill: '#fff' })
-body += T(30, 62, 'A frame you build out: the fuselage is a big empty bay and what you fit goes inside it. The pods carry the weapons. Armor and the shield follow the hull\'s own shape. Longer range is longer thrusters.', { size: 12.5, fill: '#c3b3da' })
-let y = 96
-PARTS.forEach(([name, text, ship, scarred], i) => {
-  const col = i % 3
-  const row = Math.floor(i / 3)
-  const x = 30 + col * 470
-  const cy = y + row * (CELL + 62)
-  body += frame(x, cy, CELL, shipArtParts(ship, scarred)) + T(x + CELL / 2, cy + CELL + 16, 'today', { size: 11, fill: '#9088aa', anchor: 'middle' })
-  body += frame(x + CELL + 12, cy, CELL, newShip(ship, scarred)) + T(x + CELL + 12 + CELL / 2, cy + CELL + 16, 'proposed', { size: 11, fill: '#c9b6ff', anchor: 'middle' })
-  body += T(x + CELL * 2 + 26, cy + 22, name, { size: 14.5, weight: 700, fill: '#fff' })
+const CELL = 132
+let body = T(30, 40, 'The Orbiter 8\'s upgrades, re-drawn: round 3', { size: 18, weight: 700, fill: '#fff' })
+body += T(30, 62, 'Two kinds of thing (Koda): what\'s on the outside changes the ship\'s shape; what\'s inside you wouldn\'t see on a ship flying by. So two pictures: the ship as it flies, and the ship opened up.', { size: 12.5, fill: '#c3b3da' })
+let y = 92
+body += T(30, y + 12, 'ON THE OUTSIDE: THREE STEPS OF EACH', { size: 11, weight: 700, fill: '#c9b6ff' })
+y += 26
+OUTSIDE.forEach(([name, text, ships], i) => {
+  const x = 30 + (i % 2) * 700
+  const cy = y + Math.floor(i / 2) * (CELL + 28)
+  ships.forEach((ship, k) => (body += frame(x + k * (CELL + 8), cy, CELL, newShip(ship))))
+  body += T(x + 3 * (CELL + 8) + 10, cy + 24, name, { size: 14.5, weight: 700, fill: '#fff' })
   const words = text.split(' ')
   let line = ''
   let n = 0
   for (const word of words) {
-    if ((line + ' ' + word).length > 22) {
-      body += T(x + CELL * 2 + 26, cy + 44 + n * 16, line.trim(), { size: 11.5, fill: '#c3b3da' })
+    if ((line + ' ' + word).length > 34) {
+      body += T(x + 3 * (CELL + 8) + 10, cy + 46 + n * 16, line.trim(), { size: 11.5, fill: '#c3b3da' })
       n++
       line = word
     } else line += ' ' + word
   }
-  body += T(x + CELL * 2 + 26, cy + 44 + n * 16, line.trim(), { size: 11.5, fill: '#c3b3da' })
+  body += T(x + 3 * (CELL + 8) + 10, cy + 46 + n * 16, line.trim(), { size: 11.5, fill: '#c3b3da' })
 })
-y += Math.ceil(PARTS.length / 3) * (CELL + 62) + 16
-body += `<rect x="30" y="${y}" width="${W - 60}" height="1" fill="#ffffff" opacity="0.12"/>` + T(30, y + 28, 'WHOLE SHIPS', { size: 11, weight: 700, fill: '#c9b6ff' })
+y += Math.ceil(OUTSIDE.length / 2) * (CELL + 28) + 8
+body += `<rect x="30" y="${y}" width="${W - 60}" height="1" fill="#ffffff" opacity="0.12"/>` + T(30, y + 28, 'WHOLE SHIPS: AS THEY FLY, AND OPENED UP', { size: 11, weight: 700, fill: '#c9b6ff' })
 y += 44
 const BIG = 300
 LOADOUTS.forEach(([name, ship], i) => {
   const x = 30 + i * 348
-  body += frame(x, y, BIG, newShip(ship)) + T(x, y + BIG + 22, name, { size: 14.5, weight: 700, fill: '#fff' })
-  // today's, and both at the size the card and the pilot plate show them
-  body += frame(x, y + BIG + 36, 92, shipArtParts(ship)) + T(x + 46, y + BIG + 144, 'today', { size: 11, fill: '#9088aa', anchor: 'middle' })
-  body += frame(x + 104, y + BIG + 36, 92, newShip(ship)) + T(x + 150, y + BIG + 144, 'proposed', { size: 11, fill: '#c9b6ff', anchor: 'middle' })
-  body += frame(x + 208, y + BIG + 36, 44, newShip(ship)) + T(x + 230, y + BIG + 96, '44 px', { size: 10, fill: '#9088aa', anchor: 'middle' })
+  body += frame(x, y, BIG, newShip(ship)) + T(x, y + BIG + 22, name, { size: 14.5, weight: 700, fill: '#fff' }) + T(x + BIG, y + BIG + 22, 'as it flies', { size: 11, fill: '#9088aa', anchor: 'end' })
+  body += frame(x, y + BIG + 36, BIG, insideShip(ship)) + T(x + BIG, y + BIG * 2 + 56, 'opened up: holds, drone bays, bots, capacitors', { size: 11, fill: '#9088aa', anchor: 'end' })
+  body += frame(x, y + BIG * 2 + 70, 64, newShip(ship)) + frame(x + 74, y + BIG * 2 + 70, 44, newShip(ship)) + T(x + 130, y + BIG * 2 + 100, 'at 64 and 44 px', { size: 10.5, fill: '#9088aa' })
 })
-const H = y + BIG + 170
+const H = y + BIG * 2 + 154
 const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family="Ubuntu, 'Segoe UI', sans-serif">\n<rect width="${W}" height="${H}" fill="#130e24"/>\n${body}\n</svg>\n`
 fs.mkdirSync(OUT, { recursive: true })
 fs.writeFileSync(path.join(OUT, 'sheet.svg'), svg)
