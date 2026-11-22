@@ -804,7 +804,7 @@ function phoneStrip(x, y, line, { lineFill = YELLOW_LIGHT, on = '' } = {}) {
   const g = id('ps')
   defs.push(`<linearGradient id="${g}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7c39cd"/><stop offset="0.2" stop-color="#280b4b"/><stop offset="0.5" stop-color="#5c1aae"/><stop offset="0.8" stop-color="#280b4b"/><stop offset="1" stop-color="#7c39cd"/></linearGradient>`)
   let out = R(x + 8, y + 8, PW - 16, 60, { rx: 12, fill: `url(#${g})` }) + R(x + 11, y + 11, PW - 22, 54, { rx: 9, fill: '#0d0719' })
-  out += C(x + 38, y + 38, 20, { fill: '#1a1331', stroke: on === 'minerva' ? '#fff' : BRAND_300, sw: on === 'minerva' ? 2.2 : 1.2 }) + art('minerva-face', x + 38, y + 38, 36) + C(x + 54, y + 52, 4, { fill: GREEN, stroke: '#0d0719', sw: 1.5 })
+  out += C(x + 38, y + 38, 20, { fill: '#1a1331', stroke: on === 'minerva' ? '#fff' : BRAND_300, sw: on === 'minerva' ? 2.2 : 1.2 }) + art('minerva-face', x + 38, y + 38, 36)
   out += T(x + 66, y + 34, 'Tester', { size: 15, fill: '#fff' }) + T(x + 66, y + 51, '743¢', { size: 13, fill: '#fff' })
   out += L(x + 150, y + 18, x + 150, y + 58, { stroke: BORDER_STRONG })
   out += ship(x + 172, y + 34, 22, 45) + T(x + 190, y + 33, 'Taconator', { size: 13, fill: '#fff' }) + R(x + 262, y + 23, 22, 12, { rx: 6, fill: YELLOW }) + T(x + 273, y + 32, 'IN', { size: 8, weight: 700, fill: S1, anchor: 'middle' })
@@ -1402,12 +1402,273 @@ function mock8() {
   doc(W, Hh, out, '8-card-states')
 }
 
+
+// ═════════════════════════════════════════════════════════════════════════════
+// 7. The kit (ui-guide.md section 11): every part a screen is made of, in each of its states.
+// ═════════════════════════════════════════════════════════════════════════════
+function mock7() {
+  const W = 1440
+  const Hh = 900
+  let out = R(0, 0, W, Hh, { fill: '#130e24' })
+  out += T(30, 38, 'Mockup 7 · the kit', { size: 16, weight: 700, fill: '#fff' }) + T(210, 38, 'Every screen is made of these parts and nothing else (ui-guide.md, section 11).', { size: 12.5, fill: LAV })
+  const head = (x, y, title, rule) => section(x, y, title.toUpperCase(), 420) + T(x, y + 24, rule, { size: 11.5, fill: '#ffffffaa' })
+  const cap = (x, y, text) => T(x, y, text, { size: 11, fill: TEXT_3, anchor: 'middle' })
+  // column 1
+  let x = 30
+  let y = 78
+  out += head(x, y, 'Main pill', 'A screen\'s one main action. One per screen. Its picture and one or two words.')
+  out += mainPill(x, y + 40, 150, 'trade', 'Trade') + cap(x + 75, y + 104, 'ready') + mainPill(x + 170, y + 40, 150, 'trade', 'Trade', { dim: true, reason: 'One in flight' }) + mainPill(x + 340, y + 40, 100, 'go', 'Go')
+  y += 138
+  out += head(x, y, 'Well', 'Any other action: round, a small icon, one word under it.')
+  out += iconWell(x + 26, y + 66, 'yards', 'Yards') + iconWell(x + 96, y + 66, 'armory', 'Armory') + iconWell(x + 166, y + 66, 'claim', 'Claim', { sub: '2,000¢' }) + iconWell(x + 236, y + 66, 'claim', 'Claim', { dim: true, sub: 'Can\'t afford', subFill: PINK_LIGHT }) + iconWell(x + 320, y + 66, 'attack', 'Attack', { dim: true, sub: 'Not armed', subFill: LAV }) + iconWell(x + 396, y + 66, 'details', 'Details')
+  y += 150
+  out += head(x, y, 'Tab', 'A way to somewhere: a rounded square, never round. The current one is lit.')
+  out += tab(x, y + 40, { pic: (cx, cy) => sphere(cx, cy, 13, PLANET.Desert) }) + tab(x + 56, y + 40, { pic: (cx, cy) => station(cx, cy, 26), on: true, color: THEME.station.base }) + tab(x + 112, y + 40, { pic: (cx, cy) => sphere(cx, cy, 11, PLANET.Moon), badge: '3' })
+  ;['all', 'planet', 'station', 'moon', 'asteroid', 'ship', 'yours'].forEach((name, i) => (out += tab(x + 190 + i * 36, y + 46, { pic: (cx, cy) => si(cx, cy, name, 18, name === 'yours' ? YELLOW_LIGHT : '#fff'), on: i === 2, size: 32 })))
+  out += cap(x + 78, y + 104, 'a planet\'s family') + cap(x + 316, y + 104, 'a list\'s filters')
+  y += 138
+  out += head(x, y, 'Row', 'One thing in a list. The selected row is lit and carries Go.')
+  out += objRow(x, y + 38, 440, { pic: (cx, cy) => sphere(cx, cy, 12, PLANET.Ice), name: 'Halcyon', sub: 'Ice · Ada Vance', fold: false, siege: true })
+  out += objRow(x, y + 86, 440, { pic: (cx, cy) => sphere(cx, cy, 13, PLANET.Desert), name: 'Tessera', sub: 'Desert · size 9', fold: true, selected: true, mine: true }) + mainPill(x + 330, y + 86, 100, 'go', 'Go')
+  y += 152
+  out += head(x, y, 'Heading', 'The frame\'s title in the thing\'s color. Two meet when one belongs to the other.')
+  out += heading3(x - 10, y + 40, 240, TESSERA) + heading3(x + 220, y + 40, 240, TESSERA, { theme: THEME.station, name: 'Port Tessera' })
+  // column 2
+  x = 510
+  y = 78
+  out += head(x, y, 'Tile', 'One fact with a number. A label of ten letters at most.')
+  ;[['4', 'planets', 'planet'], ['3', 'ports', 'port'], ['1', 'asteroid', 'asteroid'], ['2', 'named', 'nameStar']].forEach(([n, label, ic], i) => {
+    const bx = x + i * 106
+    out += R(bx, y + 40, 98, 56, { rx: 10, fill: S2 }) + si(bx + 22, y + 68, ic, 20, '#c9b6ff') + T(bx + 44, y + 66, n, { size: 20, fill: '#fff' }) + T(bx + 44, y + 84, label, { size: 11, fill: TEXT_3 })
+  })
+  y += 138
+  out += head(x, y, 'Bar and ring', 'A bar for an amount, a ring for time. Lavender; pink only when it needs you.')
+  out += T(x, y + 56, 'People', { size: 11.5, fill: '#a99fc6' }) + bar(x + 60, y + 49, 180, 0.76) + T(x + 250, y + 56, '8,400 of 11,000', { size: 12, fill: '#fff' })
+  out += T(x, y + 80, 'Shield', { size: 11.5, fill: '#a99fc6' }) + bar(x + 60, y + 73, 180, 0.4, { fill: PINK_LIGHT }) + T(x + 250, y + 80, 'level 3 of 5', { size: 12, fill: PINK_LIGHT })
+  out += ring(x + 380, y + 62, 17, 0.35, BRAND_300) + si(x + 380, y + 62, 'build', 17, '#d9ccf5') + T(x + 380, y + 100, '2h 10m', { size: 11, fill: LAV, anchor: 'middle' })
+  y += 150
+  out += head(x, y, 'Status mark, link, socket', 'True things are flat. Names go somewhere. Dashes mean "not there yet".')
+  out += builtMarks(x + 50, y + 62, ['citadel', 'colonyBuilt', 'port', 'yardsBuilt'], DESERT.accent, 3) + cap(x + 50, y + 100, 'built, and being built')
+  out += T(x + 150, y + 58, 'Owner', { size: 11, fill: '#a99fc6' }) + T(x + 150, y + 76, 'Ada Vance', { size: 14.5, weight: 700, fill: '#c9b6ff' }) + L(x + 150, y + 80, x + 224, y + 80, { stroke: '#c9b6ff', opacity: 0.7 }) + cap(x + 188, y + 100, 'a link')
+  out += notYet(x + 260, y + 40, 180, 46, 'Terraforming', null) + cap(x + 350, y + 100, 'a socket')
+  y += 138
+  out += head(x, y, 'Section heading', 'Small capitals and a rule. Five to a screen at most.')
+  out += section(x, y + 56, 'PEOPLE AND WHAT THEY MAKE', 420)
+  y += 100
+  out += head(x, y, 'Type', 'Nothing under 11 px (12 on a phone). Four sizes to a screen.')
+  out += T(x, y + 66, 'Tessera', { size: 24, fill: '#fff' }) + T(x + 110, y + 66, 'Port Tessera', { size: 15.5, weight: 700, fill: '#fff' }) + T(x + 230, y + 66, 'Desert · size 9', { size: 12.5, fill: '#e6dcf5' }) + T(x + 340, y + 66, 'Orbit 2', { size: 11, fill: TEXT_3 })
+  out += cap(x + 44, y + 86, '24 title') + cap(x + 160, y + 86, '15.5 name, pill') + cap(x + 276, y + 86, '12.5 value') + cap(x + 360, y + 86, '11 label')
+  // column 3: meanings
+  x = 990
+  y = 78
+  out += head(x, y, 'One meaning each', 'A color or a line style means one thing, everywhere.')
+  const mean = (my, swatch, title, text) => swatch + T(x + 56, my + 4, title, { size: 13.5, weight: 700, fill: '#fff' }) + T(x + 56, my + 21, text, { size: 11.5, fill: '#ffffffaa' })
+  out += mean(y + 62, C(x + 22, y + 68, 14, { fill: YELLOW }), 'Yellow', 'Yours, and what you gain.')
+  out += mean(y + 110, C(x + 22, y + 116, 14, { fill: PINK_LIGHT }), 'Pink', 'Needs you: a signature, a failure, a siege.')
+  out += mean(y + 158, C(x + 22, y + 164, 14, { fill: LAV }), 'Lavender', 'Waiting, time, how far along.')
+  out += mean(y + 206, C(x + 22, y + 212, 14, { fill: BRAND_500, stroke: BRAND_300, sw: 2 }), 'Purple', 'Something to press.')
+  out += mean(y + 254, C(x + 22, y + 260, 14, { stroke: BORDER_STRONG, dash: '4 4', sw: 1.5 }), 'Dashes', 'Not there yet. (A siege keeps its pink dashes.)')
+  out += mean(y + 302, R(x + 8, y + 294, 28, 28, { rx: 8, fill: S3, stroke: BRAND_300, sw: 2 }), 'A square', 'A way to somewhere.')
+  out += mean(y + 350, C(x + 22, y + 356, 14, { fill: '#241a45', stroke: BORDER_STRONG, sw: 1.5 }), 'A circle', 'Something to do.')
+  out += mean(y + 398, si(x + 22, y + 404, 'citadel', 20, DESERT.accent), 'No outline', 'Simply true. Can\'t be pressed.')
+  y += 470
+  out += head(x, y, 'A screen', 'A card, big: the thing\'s frame and color, its picture, then sections.')
+  out += frame(x, y + 40, 420, 250, DESERT) + heading3(x, y + 50, 420, TESSERA) + sphere(x + 80, y + 150, 46, PLANET.Desert)
+  ;[0, 1, 2].forEach((i) => (out += section(x + 160, y + 106 + i * 50, ['WHAT IT IS', 'BUILT', 'DEFENSES'][i], 236) + R(x + 160, y + 120 + i * 50, 150 - i * 30, 8, { rx: 4, fill: S3 })))
+  out += mainPill(x + 20, y + 232, 118, 'colony', 'Colony') + cap(x + 79, y + 300, 'the main action: bottom left, nearest your hand')
+  doc(W, Hh, out, '7-kit')
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// 9. The activity window in every state, its Waiting page, and the top right two ways.
+// ═════════════════════════════════════════════════════════════════════════════
+/**
+ * Minerva's plate. items: { icon, frac, kind: 'busy' | 'wait' | 'needs' | 'failed', count }.
+ * Busy is filled (nothing else can start); waiting is outlined; pink needs the player.
+ */
+function activity(x, y, { items = [], session = '3h 12m', tip = null, more = 0 } = {}) {
+  const busy = items.filter((i) => i.kind !== 'wait')
+  const waiting = items.filter((i) => i.kind === 'wait')
+  const w = 62 + busy.length * 44 + (busy.length && waiting.length ? 14 : 0) + waiting.length * 44 + (more ? 40 : 0) + (session ? 92 : 8)
+  let out = R(x, y, w, 52, { rx: 26, fill: '#12052a', stroke: items.some((i) => i.kind === 'needs' || i.kind === 'failed') ? PINK_LIGHT : BORDER_STRONG, sw: 1.5 })
+  out += C(x + 27, y + 26, 21, { fill: '#1a1331', stroke: BRAND_300, sw: 1.2 }) + art('minerva-face', x + 27, y + 26, 38)
+  let ix = x + 80
+  const spots = {}
+  const one = (item) => {
+    const pink = item.kind === 'needs' || item.kind === 'failed'
+    let o = C(ix, y + 26, 15, { fill: item.kind === 'failed' ? PINK_LIGHT : item.kind === 'busy' ? BRAND_500 : '#1a1331' })
+    o += pink ? C(ix, y + 26, 18.5, { stroke: PINK_LIGHT, sw: 2.4 }) : ring(ix, y + 26, 18.5, item.frac, item.kind === 'busy' ? '#ffffff' : BRAND_300)
+    o += si(ix, y + 26, item.icon, 17, item.kind === 'failed' ? S1 : item.kind === 'wait' ? '#d9ccf5' : '#fff')
+    if (item.count) o += C(ix + 14, y + 12, 8, { fill: '#230b41', stroke: '#ffffff88' }) + T(ix + 14, y + 15.5, item.count, { size: 10, fill: '#fff', anchor: 'middle' })
+    spots[item.icon] = ix
+    ix += 44
+    return o
+  }
+  busy.forEach((item) => (out += one(item)))
+  if (busy.length && waiting.length) {
+    out += L(ix - 15, y + 12, ix - 15, y + 40, { stroke: BORDER_STRONG })
+    ix += 14
+  }
+  waiting.forEach((item) => (out += one(item)))
+  if (more) {
+    out += T(ix - 4, y + 31, '+' + more, { size: 13, fill: LAV })
+    ix += 40
+  }
+  if (session) out += L(ix - 16, y + 12, ix - 16, y + 40, { stroke: BORDER_STRONG }) + si(ix + 2, y + 26, 'session', 16, LAV) + T(ix + 18, y + 30.5, session, { size: 12, fill: LAV })
+  if (tip) {
+    const tx = spots[tip.at] ?? x + 27
+    const tw = tip.text.length * 6.5 + 28 + (tip.retry ? 86 : 0)
+    out += `<path d="M${tx - 6} ${y + 58}L${tx} ${y + 51}L${tx + 6} ${y + 58}" fill="#1b1531" stroke="${tip.pink ? PINK_LIGHT : BORDER_STRONG}"/>` + R(tx - 34, y + 58, tw, 32, { rx: 10, fill: S1, stroke: tip.pink ? PINK_LIGHT : BORDER_STRONG }) + T(tx - 20, y + 78.5, tip.text, { size: 12.5, fill: tip.pink ? PINK_LIGHT : '#e6dcf5' })
+    if (tip.retry) out += R(tx - 34 + tw - 84, y + 62, 78, 24, { rx: 12, fill: '#2a1f4c', stroke: PINK_LIGHT }) + T(tx - 34 + tw - 45, y + 78.5, 'Try again', { size: 12, fill: '#efe7ff', anchor: 'middle' })
+  }
+  return out
+}
+function mock9() {
+  const W = 1440
+  const Hh = 1010
+  let out = R(0, 0, W, Hh, { fill: '#0b0916' })
+  out += T(30, 38, 'Mockup 9 · the activity window, and the top right', { size: 16, weight: 700, fill: '#fff' })
+  const label = (x, y, n, title, text) => pin(x + 9, y - 4, n) + T(x + 26, y, title, { size: 13.5, weight: 700, fill: '#c9b6ff' }) + T(x + 26, y + 17, text, { size: 11.5, fill: '#ffffffaa' })
+  let y = 78
+  out += label(30, y, '1', 'Nothing going on', 'Her face, and your session in lavender.') + activity(56, y + 32, {})
+  y += 128
+  out += label(30, y, '2', 'Busy, and waiting', 'Filled: nothing else can start until it\'s through. Outlined: only waiting. Point at one for its line.')
+  out += activity(56, y + 32, { items: [{ icon: 'trade', frac: 0.6, kind: 'busy' }, { icon: 'mine', frac: 0.5, kind: 'busy' }, { icon: 'claim', frac: 0.3, kind: 'wait' }, { icon: 'scan', frac: 0.75, kind: 'wait' }, { icon: 'build', frac: 0.2, kind: 'wait', count: '2' }], tip: { at: 'trade', text: 'Selling 3 Helium-3 at Port Tessera' } })
+  y += 164
+  out += label(30, y, '3', 'It needs you', 'Pink, first in line: a signature is waiting in your wallet.')
+  out += activity(56, y + 32, { items: [{ icon: 'wallet', kind: 'needs' }, { icon: 'mine', frac: 0.5, kind: 'busy' }, { icon: 'scan', frac: 0.75, kind: 'wait' }], session: '', tip: { at: 'wallet', text: 'Sign the claim in your wallet', pink: true } })
+  y += 164
+  out += label(30, y, '4', 'It failed', 'Pink fill, and a way to try again. It stays until you\'ve seen it.')
+  out += activity(56, y + 32, { items: [{ icon: 'trade', kind: 'failed' }, { icon: 'mine', frac: 0.5, kind: 'busy' }], tip: { at: 'trade', text: 'The trade failed: the price moved', pink: true, retry: true } })
+  y += 164
+  out += label(30, y, '5', 'A lot going on', 'Six fit; the rest are a count. Like kinds stack with a number.')
+  out += activity(56, y + 32, { items: [{ icon: 'trade', frac: 0.6, kind: 'busy' }, { icon: 'mine', frac: 0.5, kind: 'busy' }, { icon: 'claim', frac: 0.3, kind: 'wait', count: '3' }, { icon: 'scan', frac: 0.75, kind: 'wait' }, { icon: 'build', frac: 0.2, kind: 'wait', count: '4' }, { icon: 'siege', frac: 0.4, kind: 'wait' }], more: 3 })
+  y += 120
+  out += label(30, y, '6', 'On a phone', 'Her face in the top strip; the icons in a line under it.')
+  out += R(56, y + 30, 390, 96, { rx: 14, fill: '#130e24', stroke: '#ffffff22' }) + G(phoneStrip(0, 0, ''), { transform: `translate(56 ${y + 26})` })
+  ;[['trade', 'busy', 0.6], ['mine', 'busy', 0.5], ['claim', 'wait', 0.3], ['scan', 'wait', 0.75]].forEach(([icon, kind, frac], i) => {
+    const cx = 84 + i * 36 + (i > 1 ? 10 : 0)
+    out += C(cx, y + 110, 11, { fill: kind === 'busy' ? BRAND_500 : '#1a1331' }) + ring(cx, y + 110, 13.5, frac, kind === 'busy' ? '#fff' : BRAND_300, 2) + si(cx, y + 110, icon, 13, '#fff')
+  })
+  out += si(376, y + 110, 'session', 14, LAV) + T(390, y + 114, '3h 12m', { size: 12, fill: LAV })
+  // pressed: everything waiting, in one list
+  const sx = 560
+  out += label(sx, 78, '7', 'Pressed: everything, in one list', 'Each line names its thing (a link) and how long. Busy first.')
+  out += sheet(sx, 112, 400, 520, THEME.ship, '', '')
+  out += C(sx + 50, 158, 26, { fill: '#1a1331', stroke: BRAND_300, sw: 1.5 }) + art('minerva-face', sx + 50, 158, 48) + T(sx + 88, 156, 'Minerva', { size: 20, fill: '#fff' }) + T(sx + 88, 174, 'What\'s going on', { size: 12, fill: LAV })
+  ;[['link', false, 'session'], ['waiting', true, 'scan'], ['library', false, 'details']].forEach(([, on, icon], i) => (out += tab(sx + 26 + i * 44, 198, { pic: (cx, cy) => si(cx, cy, icon, 18), on, size: 34 })))
+  const rows = [
+    ['trade', 'busy', 0.6, 'Selling 3 Helium-3', 'Port Tessera', 'in flight'],
+    ['mine', 'busy', 0.5, 'Mining, 4 drones', 'The belt', 'full in 44 s'],
+    ['claim', 'wait', 0.3, 'Claim filed', 'Star 412 b', 'next block'],
+    ['scan', 'wait', 0.75, 'Scanning', 'Wolf 359', '8 s'],
+    ['build', 'wait', 0.2, 'Building Yards', 'Tessera', '2h 10m'],
+    ['order', 'wait', 0.5, '2 railguns', 'Tessera', '40m']
+  ]
+  out += section(sx + 26, 254, 'KEEPING YOU BUSY', 348) + section(sx + 26, 374, 'WAITING', 348)
+  rows.forEach(([icon, kind, frac, what, where, when], i) => {
+    const ry = (kind === 'busy' ? 268 : 388) + (kind === 'busy' ? i : i - 2) * 50
+    out += C(sx + 46, ry + 22, 14, { fill: kind === 'busy' ? BRAND_500 : '#1a1331' }) + ring(sx + 46, ry + 22, 17.5, frac, kind === 'busy' ? '#fff' : BRAND_300) + si(sx + 46, ry + 22, icon, 16, '#fff')
+    out += T(sx + 76, ry + 19, what, { size: 13.5, fill: '#fff' }) + T(sx + 76, ry + 36, where, { size: 12, fill: '#c9b6ff' }) + L(sx + 76, ry + 39, sx + 76 + where.length * 6.2, ry + 39, { stroke: '#c9b6ff', opacity: 0.6 }) + T(sx + 374, ry + 27, when, { size: 12.5, fill: LAV, anchor: 'end' })
+  })
+  // the top right, two ways
+  const tx = 1010
+  out += label(tx, 78, '8', 'Top right, way A: two pieces', 'Where you are up top; how you\'re looking over the dock.')
+  out += G(space(400, 300, 3), { transform: `translate(${tx} 112)` }) + R(tx, 112, 400, 300, { stroke: '#ffffff22' })
+  out += G(wherePlate(392, 8) + viewUnit(392, 212) + dock(392, 292), { transform: `translate(${tx} 112)` })
+  out += label(tx, 448, '9', 'Top right, way B: one panel', 'The name leads; the map and zoom fold out under it (and fold away).')
+  out += G(space(400, 300, 4), { transform: `translate(${tx} 482)` }) + R(tx, 482, 400, 300, { stroke: '#ffffff22' })
+  const bx = tx + 74
+  const by = 490
+  out += R(bx, by, 318, 196, { rx: 28, ry: 28, fill: '#12052a', stroke: BORDER_STRONG, sw: 1.5 }) + G(wherePlate(318, 0), { transform: `translate(${bx} ${by})` })
+  out += G(viewUnit(292, 126).replace(/stroke="#3f3566"/, 'stroke="none"'), { transform: `translate(${bx + 13} ${by + 60})` }) + glyph(bx + 159, by + 190, 'M-5 2L0 -3L5 2', { size: 14 })
+  out += G(dock(392, 292), { transform: `translate(${tx} 482)` })
+  out += label(tx, 818, '10', 'The center can be anything', 'A star, a black hole, or a pair: one button, one name.')
+  out += G(wherePlate(318, 0, { name: 'The Maw', number: 'Black hole 77', count: '2', color: '#d98a2b' }), { transform: `translate(${tx} 850) scale(0.6)` })
+  out += G(wherePlate(318, 0, { name: 'Castor', number: 'Star System 88', count: '9', color: '#cad7ff' }) + C(318 - 318 + 40, 28, 9, { fill: '#fffdf2', stroke: '#ffd2a1', sw: 2 }), { transform: `translate(${tx + 204} 850) scale(0.6)` })
+  doc(W, Hh, out, '9-activity-and-top-right')
+}
+
 mock1()
 mock2()
 mock3()
 mock4()
 mock5()
 mock8()
+
+// ═════════════════════════════════════════════════════════════════════════════
+// 10. The trade loop, with the pointer's travel measured (ui-plan.md section 12): the steps stay
+//     (planet, station, trade, choose, Make Trade); what changes is how far apart they are.
+// ═════════════════════════════════════════════════════════════════════════════
+/** The trade menu, simplified: `near` puts the sliders and Make Trade on the side nearest the card. */
+function tradeSheet(near) {
+  const x = 350
+  const y = 150
+  const w = 760
+  const h = 730
+  let out = sheet(x, y, w, h, THEME.station, 'Port Tessera', 'Port of Trade · SB-B-BS-')
+  out += R(x + 30, y + 90, w - 60, 130, { rx: 10, fill: '#150f28', stroke: BORDER }) + station(x + 110, y + 155, 90) + ship(x + w - 110, y + 155, 70, 90, '#8f86a8')
+  out += holds(x + 300, y + 120, ['HE3', 'HE3', 'HE3', null, null, null, null, null, null, null], 20, 6) + holds(x + 300, y + 152, Array(10).fill(null), 20, 6)
+  const goods = [['MET', 'Metals', 'Buys', '119¢'], ['RAR', 'Rare elements', 'Buys', '259¢'], ['HE3', 'Helium-3', 'Buys', '197¢'], ['ORG', 'Organics', 'Sells', '56¢'], ['SIL', 'Silicon', 'Buys', '88¢'], ['EQP', 'Equipment', 'Sells', '190¢'], ['ELC', 'Electronics', 'Sells', '247¢']]
+  const sx = near ? x + 40 : x + 345
+  const gx = near ? x + 270 : x + 40
+  const px = near ? x + 480 : x + 220
+  goods.forEach(([code, name, does, price], i) => {
+    const ry = y + 250 + i * 48
+    if (code === 'HE3') out += R(x + 24, ry, w - 48, 44, { rx: 8, fill: S2 })
+    out += T(gx, ry + 27, code, { size: 12, weight: 700, fill: GOODS[code] }) + T(gx + 40, ry + 27, name, { size: 14, fill: '#fff' })
+    out += T(px, ry + 21, does + ' 300', { size: 13, fill: code === 'HE3' ? YELLOW_LIGHT : '#fff' }) + T(px, ry + 37, price + ' each', { size: 11, fill: TEXT_3 })
+    out += R(sx, ry + 20, 190, 4, { rx: 2, fill: '#0f0a1e', stroke: BORDER }) + (code === 'HE3' ? R(sx + 40, ry + 20, 55, 4, { rx: 2, fill: BRAND_300 }) + R(sx + 36, ry + 12, 8, 20, { rx: 3, fill: '#fff' }) : R(sx + 91, ry + 12, 8, 20, { rx: 3, fill: '#8f86a8' }))
+    if (code === 'HE3') out += T(x + w - 40, ry + 27, '+591¢', { size: 14, weight: 700, fill: YELLOW_LIGHT, anchor: 'end' })
+  })
+  const mx = near ? x + 40 : x + w / 2 - 130
+  out += G(mainPill(0, 0, 118, 'trade', 'Make Trade'), { transform: `translate(${mx} ${y + h - 92}) scale(2.2 1.2)` })
+  out += T(near ? x + 330 : x + 40, y + h - 60, 'Balance 743¢ · Get 591¢ · After 1,334¢', { size: 13, fill: '#e6dcf5' })
+  return { svg: out, slider: [sx + 40, y + 250 + 2 * 48 + 22], make: [mx + 130, y + h - 66] }
+}
+function loopScreen(near) {
+  let out = space(1440, 900, 31, 0.3)
+  out += pilotPlate(18, 16) + activity(580, 14, { items: [{ icon: 'mine', frac: 0.5, kind: 'busy' }] }) + wherePlate(1422, 14) + dock(1422, 882)
+  out += strip(18, 394, 2, { marks: [['star'], ['Rocky', 8, 'port'], ['Desert', 10, 'port', 'mine'], ['Ice', 10, 'port'], ['Gaseous', 12], ['belt'], ['Volcanic', 9]], dot: YELLOW, starColor: '#ffb08a' }).svg
+  out += card3Station(18, 448)
+  const sheetNow = tradeSheet(near)
+  out += sheetNow.svg
+  const pts = [[139, 414], [51, 576], [91, 840], sheetNow.slider, sheetNow.make, [173, 414]]
+  let total = 0
+  const legs = []
+  for (let i = 1; i < pts.length; i++) {
+    const d = Math.round(Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]))
+    total += d
+    legs.push(d)
+    out += L(pts[i - 1][0], pts[i - 1][1], pts[i][0], pts[i][1], { stroke: '#ffffff', sw: 3, opacity: 0.85 })
+    const mx = (pts[i][0] + pts[i - 1][0]) / 2
+    const my = (pts[i][1] + pts[i - 1][1]) / 2
+    out += R(mx - 34, my - 15, 68, 30, { rx: 15, fill: '#fff' }) + T(mx, my + 7, d + ' px', { size: 19, weight: 700, fill: '#130e24', anchor: 'middle' })
+  }
+  pts.forEach(([px, py], i) => (out += C(px, py, 17, { fill: '#fff' }) + T(px, py + 7, i === 5 ? '1' : String(i + 1), { size: 19, weight: 700, fill: '#130e24', anchor: 'middle' })))
+  return { svg: out, total, legs }
+}
+function mock10() {
+  const W = 1440
+  const Hh = 640
+  let out = R(0, 0, W, Hh, { fill: '#0b0916' })
+  out += T(30, 38, 'Mockup 10 · the trade loop, measured', { size: 16, weight: 700, fill: '#fff' }) + T(330, 38, '1 a planet\'s mark · 2 its Station tab · 3 Trade · 4 choose what to sell · 5 Make Trade · back to 1 for the next planet', { size: 12.5, fill: LAV })
+  const a = loopScreen(false)
+  const b = loopScreen(true)
+  out += G(a.svg, { transform: 'translate(30 96) scale(0.47)' }) + R(30, 96, 677, 423, { stroke: '#ffffff33' })
+  out += G(b.svg, { transform: 'translate(733 96) scale(0.47)' }) + R(733, 96, 677, 423, { stroke: '#ffffff33' })
+  out += T(30, 82, 'A · the new card, the trade menu laid out as it is today', { size: 13.5, weight: 700, fill: '#c9b6ff' }) + T(733, 82, 'B · the same, with the sliders and Make Trade on the side nearest the card', { size: 13.5, weight: 700, fill: '#c9b6ff' })
+  out += T(30, 552, `${a.total.toLocaleString('en-US')} px a loop`, { size: 22, weight: 700, fill: '#fff' }) + T(30, 574, `Legs: ${a.legs.join(', ')}. The three steps on the card are close; the long legs are into and out of the menu.`, { size: 12, fill: '#ffffffaa' })
+  out += T(733, 552, `${b.total.toLocaleString('en-US')} px a loop`, { size: 22, weight: 700, fill: '#fff' }) + T(733, 574, `Legs: ${b.legs.join(', ')}. ${Math.round((1 - b.total / a.total) * 100)}% less travel, the same five steps, nothing preset, nothing skipped.`, { size: 12, fill: '#ffffffaa' })
+  out += T(30, 606, 'Today\'s game, by the Ports menu: about 2,400 px. Mockup 5 by the list: about 3,000 px. Measured at 1440 × 900, in straight lines.', { size: 12, fill: TEXT_3 })
+  doc(W, Hh, out, '10-trade-loop')
+  return { a, b }
+}
+
+mock7()
+mock9()
+const loop = mock10()
+console.log('trade loop:', loop.a.total, loop.a.legs, loop.b.total, loop.b.legs)
 
 // ── PNGs, with Chrome ────────────────────────────────────────────────────────
 if (process.argv.includes('--png')) {

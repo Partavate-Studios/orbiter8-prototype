@@ -634,10 +634,10 @@ and 7 on) and `node dev/mockups/icons.mjs --png` (mockup 6). The icon paths are 
 | Prep item | State |
 |---|---|
 | Small-icon set (mockup 6) | Done, approved by Koda as drawn |
-| The kit and screen standard (`ui-guide.md` section 11, mockup 7) | See below |
+| The kit and screen standard (`ui-guide.md` section 11, mockup 7) | Drawn: `mockups/together/7-kit.png`. Waiting for Koda |
 | The card in every state, desktop and phone (mockup 8) | Drawn: `mockups/together/8-card-states.png` (ship, planet, moons' list, station, a blocked action, one moon, three phone sheets). Waiting for Koda |
-| The activity window in every state; the top right two ways (mockup 9) | See below |
-| The trade loop, travel measured (mockup 10) | See below |
+| The activity window in every state; the top right two ways (mockup 9) | Drawn: `mockups/together/9-activity-and-top-right.png`. Koda to choose way A (two pieces) or B (one panel that folds) |
+| The trade loop, travel measured (mockup 10) | Drawn: `mockups/together/10-trade-loop.png`. 2,153 px a loop with today's trade menu; 1,758 px (18% less) with its sliders and Make Trade on the side nearest the card. Koda to say whether the trade menu may be laid out that way |
 
 **The card, as now designed (after Koda's "milder take"):**
 - A card with a family is a **spine** (a column of tabs: the planet, its station, its moon or Moons)
@@ -657,3 +657,12 @@ Log:
 - 2026-11-21: `ui-guide.md` section 11 (kit and standard, proposed). Mockup 8 drawn. Tabs are rounded
   squares and actions are round, so the two can't be confused. Widths: ship 250, planet/station/moon
   312, moons' list 512.
+- 2026-11-21: mockups 7 (kit), 9 (activity window: quiet, busy and waiting, needs you, failed, a lot,
+  phone, and the list it opens; the top right two ways; a black hole or a pair at the center) and 10
+  (trade loop) drawn. **All the prep is drawn. Next: Koda reviews mockups 7 to 10.** After that the
+  build starts with the card (Part 7's order), on branch `polkadot`, each step checked at phone size
+  and in one long play session.
+- Still to carry further, not yet drawn: the walk through each menu against the standard (Help first:
+  lead with How Planets Grow, not First Steps, per Koda's note 3); the pilot plate; a ship's Details;
+  the profile with more life (avatars are on the to-do list in `demo4-plan.md`); the list (Objects) on
+  a phone.
