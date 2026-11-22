@@ -431,3 +431,118 @@ slots are empty; mockup 3 shows a player's planet with everything on it.
    rival's credits and holdings on their profile what you want?
 10. **The Ships switcher, switched off, visible today?** Or hidden until a pilot can have two ships?
 11. **The Map button's name.** Map, Galaxy, or keep Jump?
+
+---
+
+## 10. Koda's feedback on the mockups (2026-11-21, being collected)
+
+Notes as Koda gives them. Nothing here is designed yet; the next move is decided once he's done.
+
+1. **An activity window, in place of the mining chip.** The mining message "looks like an
+   afterthought". Koda wants one small window of icons for what you have going on:
+   - **Things that block you:** an icon per activity that means you can't do anything else until it's
+     through. A trade just submitted (you can't submit another elsewhere until it lands); active mining.
+   - **Things that are only waiting:** shown in the same window though they don't block you. A claim
+     filed and not yet through (you can still file more) gets a little claim icon.
+   - All in the same place, as icons, one per activity.
+   - *Touches:* the mining chip under the pilot plate (4.4 kept it there), the tray's rows under
+     Minerva's plate, and Minerva's Waiting page (4.4). Whether blocking moves should also dim the
+     actions they block is not yet said.
+2. **The top right still doesn't hold together.** Sol's name and button, and the Objects and Map
+   buttons, still read as separate pieces. It is "this is where you are", but **the minimap feels
+   awkward there**. (Mockup 1, section 4.7.)
+3. **The menus need a walk-through, and a standard.** "The sub menus are a bit of a mess."
+   - Example: Help leads with First Steps ("do these things"), while the information on planets (How
+     Planets Grow, the tech tree) is buried, though it's the far more useful page.
+   - Koda wants to go through these screens one by one and improve them all, probably against **a
+     standard for how a screen like that is built**.
+   - *Touches:* 4.8 and Part 5 left every menu's inside unchanged; this plan has no menu standard yet.
+4. **The wing is "almost good": join the two headings.** The planet's title and the wing's title
+   should be combined somehow. Koda's idea: the two title pills keep their own colors and names, but
+   their inner ends meet in the center, touching, so they make **one big heading across the top** of
+   the whole card. Otherwise the wing stays as drawn. (Mockup 1, section 4.2.)
+5. **The Objects menu is good, with three changes.** (Mockup 2, section 4.1.)
+   - **Icons for the filter tabs, not words** (All, Planets, Stations, Moons, Asteroids, Ships, Mine).
+     And as a rule for the whole UI: **icons in place of words when and where we can.**
+   - **No "Objects of Sol" title** at the top.
+   - **Don't say "things"; say "celestial bodies".** (The mockup's line reads "27 things here".)
+     *Claude's reading, to confirm:* the word replaces "things" in that line. Whether "Objects" as the
+     menu's and button's name should become "Celestial bodies" too, and what ships are called in it
+     (a ship isn't a celestial body), is not yet said.
+6. **Planet Details: "look fantastic... great work."** Keep as drawn. (Mockup 3, section 4.3.)
+7. **The pilot card is boring.** Players will want to make an **avatar of some kind**. That's for
+   later; it's on the to-do list in `demo4-plan.md` ("Consider next", Pilot avatars). Until then the
+   profile needs more life than the plain figure in mockup 3. (Section 4.5.)
+8. **Keep the data, tighten the labels.** Koda loves how much data the mockups show, but labels must
+   not be verbose: "we have to keep the final UI clean and tight". His example: "stars named" runs out
+   of its tile on the profile (mockup 3). A rule for every screen: short labels, and nothing ever
+   spills out of its container (`ui-guide.md`, "Room for the longest name", applies to labels too).
+
+## 11. Claude's own review of the mockups (2026-11-21, at Koda's request)
+
+Three passes over the four mockups (how it's used, how it's built, how it looks), then what to change.
+Recommendations only; Koda decides.
+
+**Use**
+- The wing has two action rows on screen (the planet's, dimmed, and the station's), both showing keys
+  1–5. Only one can be live.
+- "Back to Earth" is offered three ways: the wing's first well, the lit Station well, Earth's own side.
+  The well spends the best action slot on navigation.
+- What's going on is told in four places: Minerva's line, the tray rows, the mining chip, the Waiting
+  page (Koda's note 1).
+- Objects asks for a hidden double press ("press one to select it, again to go").
+- Earth shows three empty sockets out of five: the first card a new player sees looks hollow.
+- Link makes End Session the biggest button on the page, though it's rarely wanted.
+- Details repeats the owner as a link and as an Owner well.
+
+**Build**
+- Type is too small in places: 9–10 px labels on the card, the wing's goods table, key hints.
+- The action wells are 38 px, under the 44 px the plan promised; five don't fit the card's width at 44.
+- The game's art turns to blobs under about 24 px (citadel, colony and claim look alike). Replacing
+  words with icons (Koda's note 5) needs icons that read small.
+- Too many one-off parts: filter chips, state chips, rank pills, the IN tag, "You're here", tiles,
+  sockets. No shared kit.
+- Text runs out of its box in more places than "stars named" (the Weapons line in Details).
+- The phone's top strip holds eight things in 60 px.
+
+**Look**
+- Planet Details works because it has big art, one identity color and room. The profile and the
+  sheets (Objects, Minerva, Ships) have none of the three: all the same purple.
+- Dashes mean five things: selected, empty slot, not yet, being built, under siege.
+- Circles mean three things: an action, a way to somewhere, a status (the works icons can't be pressed).
+- Yellow is on the session line and bars, the IN tag, "You're here", gains and wanted goods. Too much
+  for it to keep its force; a session's time isn't "yours" or a gain.
+- Green means both "the network is in contact" and "this port buys your cargo". The color guide has
+  no green.
+- The wing's goods table is the densest spot in the UI, in its smallest type.
+
+**Recommended**
+1. **One card, one heading, one action row.** With Koda's joined heading on top, put a single action
+   row across the bottom of the whole card, belonging to whichever leaf is in front. Drop the back
+   well. Move Details to the title (press the title or the art), so four slots fit at 44 px.
+2. **Minerva's plate is the activity window** (Koda's note 1): her face, then an icon per activity
+   with a progress ring, blocking ones marked. Mining, trades in flight, claims, scans, builds. The
+   tray rows and the mining chip fold into it. Blocked actions dim and say why.
+3. **A small-icon set before swapping words for icons:** one grid, one line weight, tested at 20 px,
+   with a caption or tooltip always available.
+4. **A kit and a screen standard** (Koda's notes 3 and 8): well, pill, chip, tile, row, section
+   heading, bar, socket; smallest type 11 px (12 on phones); label length limits; nothing overflows;
+   every sheet built as Details is (art, identity color, sections).
+5. **One meaning each:** dashes only for "not there yet" (siege keeps its pink dashes); "buys your
+   cargo" in yellow, as the color guide says, and no green; session time in lavender.
+6. **Tell actions, ways and statuses apart:** filled wells with captions for actions; statuses lose
+   their rings.
+7. **Top right in two parts** (Koda's note 2): where you are (the name, which opens the list, and Map)
+   apart from how you're looking (minimap and zoom together). Needs its own mockup.
+8. **Trims:** the wing shows its code and the one line that matters, the goods table stays in Trade
+   and Details; no sockets for actions a body can never have; a Go button on Objects' selected row;
+   End Session as a quiet button; no Owner well in Details.
+
+**Koda's answer (2026-11-21):** "I like all of that." All eight recommendations stand. He added:
+
+9. **Moons: with more than one, open a list of moons first.** The moon menus "were awkward before":
+   they defaulted to the first moon. With several moons the wing should show a list of them, by name.
+   It's "one of the few places we have words".
+
+Mockup 5 (`mockups/together/5-revised`) draws the recommendations and notes 1, 2, 4, 5, 8 and 9 together,
+before building starts.

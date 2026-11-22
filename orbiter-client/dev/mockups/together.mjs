@@ -347,18 +347,18 @@ function dock(right, bottom) {
   return out
 }
 /** The system strip: the center, each planet and the belt as marks, ‹ › to step, and a list button that opens Objects. */
-function strip(x, y, sel = 3, { compact = false } = {}) {
-  const marks = [['star'], ['Rocky', 8], ['Volcanic', 9, 'port'], ['Terrestrial', 10, 'port'], ['Ferrous', 9, 'port'], ['belt'], ['Gaseous', 12, 'port'], ['Gaseous', 11], ['Ice', 10, 'port'], ['Ice', 10], ['Rocky', 7]]
+function strip(x, y, sel = 3, { compact = false, marks: given = null, dot = GREEN, starColor = '#fff1c4' } = {}) {
+  const marks = given ?? [['star'], ['Rocky', 8], ['Volcanic', 9, 'port'], ['Terrestrial', 10, 'port'], ['Ferrous', 9, 'port'], ['belt'], ['Gaseous', 12, 'port'], ['Gaseous', 11], ['Ice', 10, 'port'], ['Ice', 10], ['Rocky', 7]]
   const step = compact ? 29 : 34
   const w = 36 + marks.length * step + 30 + 44
   let out = R(x, y, w, 40, { rx: 20, fill: '#12052a', stroke: BORDER }) + glyph(x + 18, y + 20, 'M3 -6L-3 0L3 6', { size: 16 })
   marks.forEach(([cls, r, port, mine], i) => {
     const cx = x + 36 + step * (i + 0.5)
     if (i === sel) out += C(cx, y + 20, 15, { stroke: BRAND_300, sw: 2 })
-    if (cls === 'star') out += starBody(cx, y + 20, 8)
+    if (cls === 'star') out += starBody(cx, y + 20, 8, starColor)
     else if (cls === 'belt') out += C(cx, y + 20, 9, { stroke: '#cdbb9c', sw: 2.5, dash: '2 3' })
     else out += sphere(cx, y + 20, r * 0.92, PLANET[cls], { earth: cls === 'Terrestrial' })
-    if (port && i % 2) out += C(cx, y + 4.5, 2.2, { fill: GREEN })
+    if (port && i % 2) out += C(cx, y + 4.5, 2.2, { fill: dot })
     if (mine) out += C(cx + 9, y + 32, 3, { fill: YELLOW, stroke: '#12052a' })
   })
   const end = x + 36 + marks.length * step
@@ -965,10 +965,270 @@ function mock4() {
   doc(W, H, out, '4-phone')
 }
 
+
+// ═════════════════════════════════════════════════════════════════════════════
+// 5. Revised, after Koda's notes and the review (ui-plan.md sections 10 and 11): one card with one
+//    heading and one action row; a list of moons; Minerva's plate as the activity window; the top
+//    right in two parts; icons for the list's filters. No green; dashes only for "not there yet".
+// ═════════════════════════════════════════════════════════════════════════════
+const DESERT = shades(PLANET.Desert[1])
+/** Small line icons: one 24-unit grid, one line weight, drawn to read at 20 px. */
+const SMALL = {
+  trade: 'M-8 -3H7M3 -7L7 -3L3 1M8 4H-7M-3 0L-7 4L-3 8',
+  mining: 'M-7 8L4 -3M-1 -8Q7 -8 8 1M2 -5L5 -2',
+  claim: 'M-5 9V-8M-5 -8H7L3.5 -4L7 0H-5',
+  scan: 'M0 1L6 -5M-8 1A8 8 0 0 1 0 -7M-4 1A4 4 0 0 1 0 -3M0 1V1.2',
+  build: 'M-8 8H8M-5 8V-2L0 -7L5 -2V8M-1.5 8V3H1.5V8',
+  planet: 'M-6 0A6 6 0 1 0 6 0A6 6 0 1 0 -6 0M-9.5 3Q0 6 9.5 -3',
+  moon: 'M3 -7.5A7.5 7.5 0 1 0 3 7.5A6 6 0 1 1 3 -7.5Z',
+  asteroid: 'M-6 -3L-1 -7.5L6 -4.5L7.5 2L2 7.5L-5.5 5Z',
+  yours: 'M0 -8L2.3 -2.6L8 -2.4L3.6 1.4L5 7L0 3.8L-5 7L-3.6 1.4L-8 -2.4L-2.3 -2.6Z',
+  go: 'M-7 0H6M2 -4.5L6.5 0L2 4.5'
+}
+/** A progress ring: the part of a circle done so far, from the top, clockwise. */
+function ring(cx, cy, r, frac, stroke, sw = 2.4) {
+  const a = Math.min(0.999, frac) * Math.PI * 2
+  const x2 = cx + r * Math.sin(a)
+  const y2 = cy - r * Math.cos(a)
+  return C(cx, cy, r, { stroke: '#ffffff22', sw }) + `<path d="M${cx} ${cy - r}A${r} ${r} 0 ${frac > 0.5 ? 1 : 0} 1 ${x2.toFixed(1)} ${y2.toFixed(1)}" fill="none" stroke="${stroke}" stroke-width="${sw}" stroke-linecap="round"/>`
+}
+/**
+ * Minerva's plate as the activity window: her face, what's keeping you busy (filled: nothing else can
+ * start until it's through), then what's only waiting (outlined), each with a ring for how far along.
+ */
+function activityPlate(cx, y, { tip = null } = {}) {
+  const busy = [['trade', 0.6], ['mining', 0.5]]
+  const waiting = [['claim', 0.3], ['scan', 0.75], ['build', 0.2]]
+  const w = 64 + busy.length * 44 + 18 + waiting.length * 44 + 92
+  const x = cx - w / 2
+  let out = R(x, y, w, 52, { rx: 26, fill: '#12052a', stroke: BORDER_STRONG, sw: 1.5 })
+  out += C(x + 27, y + 26, 21, { fill: '#1a1331', stroke: BRAND_300, sw: 1.2 }) + art('minerva-face', x + 27, y + 26, 38)
+  let ix = x + 80
+  const spots = {}
+  for (const [name, frac] of busy) {
+    out += C(ix, y + 26, 15, { fill: BRAND_500 }) + ring(ix, y + 26, 18.5, frac, '#ffffff') + glyph(ix, y + 26, SMALL[name], { size: 17, stroke: '#fff' })
+    spots[name] = ix
+    ix += 44
+  }
+  out += L(ix - 13, y + 12, ix - 13, y + 40, { stroke: BORDER_STRONG })
+  ix += 18
+  for (const [name, frac] of waiting) {
+    out += C(ix, y + 26, 15, { fill: '#1a1331' }) + ring(ix, y + 26, 18.5, frac, BRAND_300) + glyph(ix, y + 26, SMALL[name], { size: 17, stroke: '#d9ccf5' })
+    spots[name] = ix
+    ix += 44
+  }
+  // the session: a state, not an activity, in lavender
+  out += L(ix - 16, y + 12, ix - 16, y + 40, { stroke: BORDER_STRONG }) + glyph(ix + 2, y + 26, GLYPH.key, { size: 16, stroke: LAV }) + T(ix + 18, y + 30.5, '3h 12m', { size: 12, fill: LAV })
+  if (tip) {
+    const tx = spots[tip.at]
+    const tw = tip.text.length * 6.6 + 28
+    out += `<path d="M${tx - 6} ${y + 58}L${tx} ${y + 51}L${tx + 6} ${y + 58}" fill="#1b1531" stroke="${BORDER_STRONG}"/>` + R(tx - 34, y + 58, tw, 30, { rx: 10, fill: S1, stroke: BORDER_STRONG }) + T(tx - 20, y + 77.5, tip.text, { size: 12.5, fill: '#e6dcf5' })
+  }
+  return { svg: out, spots, x, w }
+}
+/** Where you are, as one piece: the center's button, the name (press: the list), and Map. */
+function wherePlate(right, y, { name = 'Wolf 359', number = 'Star System 412', count = '14', color = '#ffb08a' } = {}) {
+  const w = 318
+  const x = right - w
+  let out = R(x, y, w, 56, { rx: 28, fill: '#12052a', stroke: BORDER_STRONG, sw: 1.5 })
+  out += C(x + 28, y + 28, 21, { fill: mix('#230b41', color, 0.18), stroke: color + 'aa', sw: 1.5 }) + starBody(x + 28, y + 28, 5, color)
+  out += T(x + 60, y + 22, number, { size: 11, fill: '#ffffffaa' }) + T(x + 60, y + 43, name, { size: 20, fill: '#fff' })
+  out += L(x + 186, y + 12, x + 186, y + 44, { stroke: BORDER_STRONG })
+  out += glyph(x + 208, y + 28, GLYPH.tree, { size: 18, stroke: '#fff' }) + T(x + 224, y + 33, count, { size: 14, fill: '#fff' })
+  out += L(x + 256, y + 12, x + 256, y + 44, { stroke: BORDER_STRONG }) + mapIcon(x + 286, y + 28, 1.2)
+  return out
+}
+/** How you're looking, as one piece: the minimap and its zoom rail in one frame, over the dock. */
+function viewUnit(right, bottom) {
+  const w = 292
+  const h = 126
+  const x = right - w
+  const y = bottom - h
+  let out = R(x, y, w, h, { rx: 16, fill: '#12052a', stroke: BORDER, opacity: 0.92 })
+  const mx = x + 12
+  out += R(mx, y + 10, 226, h - 20, { rx: 8, fill: '#0d0719', stroke: '#ffffff22' })
+  const ccx = mx + 113
+  const ccy = y + h / 2
+  ;[[30, 12], [58, 22], [86, 34], [108, 44]].forEach(([rx, ry]) => (out += `<ellipse cx="${ccx}" cy="${ccy}" rx="${rx}" ry="${ry}" fill="none" stroke="#ffffff22"/>`))
+  out += C(ccx, ccy, 3.2, { fill: '#ffb08a' }) + C(ccx + 56, ccy + 6, 2.6, { fill: YELLOW }) + C(ccx - 28, ccy - 5, 2, { fill: '#fff' }) + C(ccx - 70, ccy + 20, 2, { fill: '#fff' }) + C(ccx + 100, ccy - 16, 2, { fill: '#fff' })
+  out += R(ccx + 36, ccy - 10, 40, 30, { rx: 2, stroke: '#ffffffaa' })
+  const zx = x + w - 27
+  out += T(zx, y + 26, '+', { size: 19, fill: '#fff', anchor: 'middle' }) + T(zx, y + h - 12, '−', { size: 19, fill: '#fff', anchor: 'middle' }) + L(zx, y + 36, zx, y + h - 32, { stroke: '#ffffff55' }) + R(zx - 10, y + 50, 20, 10, { rx: 5, fill: '#e6dcf5' })
+  return out
+}
+/** The joined heading: each side's own color and name, their inner ends meeting at the hinge. */
+function heading(x, y, w, split, left, right, front = 'left') {
+  const h = 26
+  const half = (hx, hw, theme, name, sub, side, lit) => {
+    const body = R(hx, y, hw, h, { rx: 13, fill: theme.base }) + (side === 'left' ? R(hx + hw - 16, y, 16, h, { fill: theme.base }) : R(hx, y, 16, h, { fill: theme.base }))
+    const dx = side === 'left' ? hx + 18 : hx + hw - 18
+    return G(body + T(hx + hw / 2, y + 18, name, { size: 13.5, weight: 700, anchor: 'middle', fill: S1 }) + (sub ? T(hx + hw / 2 + name.length * 4 + 10, y + 18, sub, { size: 11, fill: S1, opacity: 0.7 }) : '') + glyph(dx, y + 13, GLYPH.details, { size: 13, stroke: S1 }), { opacity: lit ? 1 : 0.72 })
+  }
+  return half(x + 10, split - 10, left.theme, left.name, left.sub, 'left', front === 'left') + half(x + split, w - split - 10, right.theme, right.name, right.sub, 'right', front === 'right')
+}
+/** One action row across the whole card, for whichever side is in front. */
+function actionRow(x, y, w, actions) {
+  let out = L(x + 16, y, x + w - 16, y, { stroke: '#ffffff', sw: 1, opacity: 0.12 })
+  actions.forEach((a, i) => {
+    const cx = x + 46 + i * 78
+    out += well(cx, y + 31, 22, { ...a, pic: a.pic(cx, y + 31) })
+  })
+  return out
+}
+/** The planet's side of the revised card: art, what's built (flat, not pressable), the family row, readouts. */
+function tesseraSide(x, y, on) {
+  let out = sphere(x + 125, y + 96, 38, PLANET.Desert)
+  ;[['citadel', 1], ['colony', 1], ['port', 1], ['yards', 0.45]].forEach(([a, o], i) => {
+    const cx = x + 125 + (i - 1.5) * 34
+    out += art(a, cx, y + 154, 24, o)
+    if (o < 1) out += ring(cx, y + 154, 14, 0.35, BRAND_300, 1.8)
+  })
+  ;[[P.station, 'Station', 0], [P.moon, 'Moons', 1, '3']].forEach(([pic, caption, i, badge]) => {
+    const cx = x + 125 + (i - 0.5) * 70
+    out += well(cx, y + 200, 21, { pic: pic(cx, y + 200), caption, on: on === i, badge })
+  })
+  const py = y + 244
+  out += R(x + 10, py, 230, 86, { rx: 12, fill: '#150f28', stroke: '#00000066' })
+  out += T(x + 20, py + 18, 'PLANET', { size: 10, weight: 700, fill: DESERT.accent, spacing: 1.2 }) + T(x + 230, py + 18, 'Orbit 2', { size: 11, fill: TEXT_3, anchor: 'end' })
+  out += R(x + 18, py + 24, 214, 1, { fill: '#ffffff', opacity: 0.14 })
+  ;[['Owner', 'You', YELLOW_LIGHT], ['World', 'Desert · size 9'], ['Building', 'Yards · 2h 10m']].forEach(([label, value, fill = '#fff'], i) => {
+    out += T(x + 20, py + 42 + i * 17, label, { size: 11, fill: '#a99fc6' }) + T(x + 230, py + 42 + i * 17, value, { size: 12, weight: 700, fill, anchor: 'end' })
+  })
+  return out
+}
+const WING_X = 250
+const CARD2_W = 486
+const CARD2_H = 434
+function cardShell(x, y, front, right) {
+  let out = frame(x, y, CARD2_W, CARD2_H, DESERT)
+  out += R(x + WING_X, y + 40, CARD2_W - WING_X - 8, 294, { rx: 14, fill: '#221a3d' })
+  out += heading(x, y + 10, CARD2_W, WING_X, { theme: DESERT, name: 'Tessera' }, right, front)
+  out += L(x + WING_X, y + 44, x + WING_X, y + 334, { stroke: right.theme.base, sw: 2, opacity: 0.8 })
+  out += yoursBadge5(x + CARD2_W - 4, y + 4)
+  return out
+}
+const yoursBadge5 = (cx, cy, r = 11) =>
+  C(cx, cy, r, { fill: YELLOW, stroke: S1, sw: 2 }) + `<polygon transform="translate(${cx} ${cy})" points="0,-6.5 1.9,-2 6.6,-2 2.8,1 4.2,5.6 0,2.9 -4.2,5.6 -2.8,1 -6.6,-2 -1.9,-2" fill="${S1}"/>`
+/** The card with the list of moons in its wing: Tessera is still in front, so the actions are Tessera's. */
+function cardMoons(x, y) {
+  let out = cardShell(x, y, 'left', { theme: THEME.moon, name: 'Moons', sub: '3' })
+  out += tesseraSide(x, y, 1)
+  const moons = [['Arden', '6 mounts · 4 fitted', 13], ['Bly', '6 mounts · 6 fitted', 11], ['Coro', '6 mounts · empty', 9]]
+  moons.forEach(([name, sub, r], i) => {
+    const ry = y + 52 + i * 62
+    out += R(x + WING_X + 12, ry, CARD2_W - WING_X - 32, 54, { rx: 12, fill: i === 0 ? S3 : '#150f28', stroke: i === 0 ? BRAND_300 : BORDER, sw: i === 0 ? 1.5 : 1 })
+    out += sphere(x + WING_X + 42, ry + 27, r, PLANET.Moon) + T(x + WING_X + 68, ry + 24, name, { size: 15, fill: '#fff', weight: 500 }) + T(x + WING_X + 68, ry + 41, sub, { size: 11, fill: TEXT_3 }) + glyph(x + CARD2_W - 36, ry + 27, GLYPH.chev, { size: 13 })
+  })
+  out += T(x + WING_X + 16, y + 262, 'No siege can take a moon\'s guns.', { size: 11, fill: TEXT_3 })
+  out += actionRow(x, y + 340, CARD2_W, [
+    { pic: P.art('colony', 1.9), caption: 'Colony', main: true },
+    { pic: P.glyph(GLYPH.market), caption: 'Market' }
+  ])
+  return out
+}
+/** The same card with the station in front: its code, the one line that matters, and its actions below. */
+function cardStation(x, y) {
+  let out = cardShell(x, y, 'right', { theme: THEME.station, name: 'Port Tessera' })
+  out += tesseraSide(x, y, 0)
+  const wx = x + WING_X
+  const ww = CARD2_W - WING_X - 8
+  out += station(wx + ww / 2, y + 118, 84) + ship(wx + ww / 2 - 56, y + 94, 22, 110)
+  const py = y + 244
+  out += R(wx + 10, py, ww - 20, 86, { rx: 12, fill: '#150f28', stroke: '#00000066' })
+  out += T(wx + 20, py + 18, 'STATION', { size: 10, weight: 700, fill: THEME.station.accent, spacing: 1.2 }) + portCode(wx + ww - 20, py + 19, 'SB-B-BS-', 'end', 13, [3])
+  out += R(wx + 18, py + 24, ww - 36, 1, { fill: '#ffffff', opacity: 0.14 })
+  out += art('good-he3', wx + 30, py + 44, 20) + T(wx + 46, py + 48, 'Buys your Helium-3', { size: 12, fill: YELLOW_LIGHT }) + T(wx + ww - 20, py + 48, '+591¢', { size: 13, weight: 700, fill: YELLOW_LIGHT, anchor: 'end' })
+  out += T(wx + 20, py + 70, 'Has', { size: 11, fill: '#a99fc6' }) + T(wx + ww - 20, py + 70, 'Port · Yards', { size: 12, weight: 700, fill: '#fff', anchor: 'end' })
+  out += actionRow(x, y + 340, CARD2_W, [
+    { pic: P.art('port', 1.9), caption: 'Trade', dim: true, sub: 'in flight', subFill: LAV },
+    { pic: P.art('yards', 1.9), caption: 'Yards', main: true },
+    { pic: P.glyph(GLYPH.market), caption: 'Market' }
+  ])
+  return out
+}
+/** The list of what's here, with icons for its filters and no title. */
+function listSheet(x, y, w, h) {
+  let out = sheet(x, y, w, h, shades('#ffb08a'), '', '')
+  const tabs = [['tree', GLYPH.tree, true], ['planet', SMALL.planet], ['station', null], ['moon', SMALL.moon], ['asteroid', SMALL.asteroid], ['ship', null], ['yours', SMALL.yours]]
+  tabs.forEach(([name, d, on], i) => {
+    const cx = x + 50 + i * 54
+    out += C(cx, y + 46, 21, { fill: on ? S3 : '#1f173a', stroke: on ? BRAND_300 : '#4a3d7a', sw: on ? 2 : 1.2 })
+    if (name === 'station') out += station(cx, y + 46, 22)
+    else if (name === 'ship') out += ship(cx, y + 46, 22, 45)
+    else out += glyph(cx, y + 46, d, { size: 20, stroke: name === 'yours' ? YELLOW_LIGHT : '#fff' })
+  })
+  out += T(x + 28, y + 90, '14 celestial bodies · 2 ships', { size: 12, fill: LAV })
+  const cy = y + 102
+  out += R(x + 24, cy, w - 48, 50, { rx: 12, fill: '#150f28', stroke: '#ffb08a55' }) + starBody(x + 60, cy + 25, 10, '#ffb08a') + T(x + 90, cy + 23, 'Wolf 359', { size: 16, fill: '#fff', weight: 500 }) + T(x + 90, cy + 39, 'Class M star', { size: 11.5, fill: TEXT_3 })
+  const rows = [
+    { pic: (cx, cy2) => sphere(cx, cy2, 11, PLANET.Rocky), name: 'Star 412 b', sub: 'Rocky · unclaimed', fold: false },
+    { pic: (cx, cy2) => sphere(cx, cy2, 13, PLANET.Desert), name: 'Tessera', sub: 'Desert · size 9', fold: true, selected: true, mine: true },
+    { depth: 1, pic: (cx, cy2) => station(cx, cy2, 26), name: 'Port Tessera', sub: 'Buys your Helium-3', code: 'SB-B-BS-', wanted: [3] },
+    { depth: 1, pic: (cx, cy2) => sphere(cx, cy2, 9, PLANET.Moon), name: 'Arden, Bly, Coro', sub: '3 moons' },
+    { pic: (cx, cy2) => sphere(cx, cy2, 14, PLANET.Ice), name: 'Halcyon', sub: 'Ice · Ada Vance', fold: false, siege: true }
+  ]
+  let ry = cy + 58
+  for (const row of rows) {
+    out += objRow(x + 24, ry, w - 48, row)
+    if (row.selected) out += R(x + w - 104, ry + 8, 64, 28, { rx: 14, fill: BRAND_500, stroke: BRAND_300 }) + T(x + w - 84, ry + 27, 'Go', { size: 13, weight: 700, fill: '#fff', anchor: 'middle' }) + glyph(x + w - 58, ry + 22, SMALL.go, { size: 13, stroke: '#fff' })
+    ry += 46
+  }
+  return out
+}
+function mock5() {
+  let out = space(1440, 900, 31)
+  // Wolf 359's system: solid orbits; Tessera with its station and three moons
+  out += `<path d="M-40 250Q760 470 1480 640" fill="none" stroke="#4a3f75" stroke-width="1.2"/>`
+  out += C(930, 380, 120, { stroke: '#4a3f75' }) + C(930, 380, 190, { stroke: '#4a3f75' }) + C(930, 380, 270, { stroke: '#4a3f75' })
+  out += sphere(930, 380, 54, PLANET.Desert) + T(930, 460, 'Tessera', { size: 17, fill: '#ffffff77', anchor: 'middle' })
+  out += station(826, 320, 40) + sphere(1096, 288, 13, PLANET.Moon) + sphere(800, 520, 11, PLANET.Moon) + sphere(1180, 482, 9, PLANET.Moon) + ship(1010, 300, 24, 60)
+  out += C(930, 380, 76, { stroke: DESERT.accent, opacity: 0.55 }) + `<path d="M866 422L560 484H520" fill="none" stroke="${DESERT.accent}" opacity="0.4"/>`
+  out += pilotPlate(18, 16, { cargo: 'Cargo 3/5' })
+  const plate = activityPlate(720, 14, { tip: { at: 'trade', text: 'Selling 3 Helium-3 at Port Tessera' } })
+  out += plate.svg
+  out += wherePlate(1422, 14)
+  out += viewUnit(1422, 792) + dock(1422, 882)
+  out += strip(18, 394, 2, { marks: [['star'], ['Rocky', 8, 'port'], ['Desert', 10, 'port', 'mine'], ['Ice', 10, 'port'], ['Gaseous', 12], ['belt'], ['Volcanic', 9]], dot: YELLOW, starColor: '#ffb08a' }).svg
+  out += cardMoons(18, 448)
+  out += pin(8, 652, '1') + pin(268, 446, '2') + pin(522, 544, '3') + pin(522, 820, '4') + pin(plate.x - 16, 40, '5') + pin(1090, 42, '6') + pin(1116, 730, '7') + pin(46, 602, '8')
+  // below: the same card with the station in front, and the list
+  out += R(0, 900, 1440, 580, { fill: '#0b0916' }) + L(0, 900, 1440, 900, { stroke: '#ffffff22' })
+  const by = 936
+  out += T(30, by, 'The same card, the station in front', { size: 14, weight: 700, fill: '#c9b6ff' })
+  out += cardStation(30, by + 18)
+  out += pin(540, by + 290, '9') + pin(20, by + 390, '10')
+  out += T(580, by, 'The list of what\'s here', { size: 14, weight: 700, fill: '#c9b6ff' })
+  out += listSheet(580, by + 18, 470, 420)
+  out += pin(570, by + 64, '11') + pin(1060, by + 250, '12')
+  const nx = 1092
+  out += T(nx, by, 'Mockup 5 · revised', { size: 15, weight: 700, fill: '#fff' })
+  const notes = [
+    ['1', 'More than one moon: the Moons well opens a list, by name. One of the few places with words.'],
+    ['2', 'One heading: the two titles keep their colors and meet at the hinge. The corner mark on each opens its Details.'],
+    ['3', 'The wing is the moons\' list here. Pressing a moon shows it in the wing.'],
+    ['4', 'One action row for the whole card, for whichever side is in front. Wells are 44 px. No back well, no empty sockets.'],
+    ['5', 'Minerva\'s plate is the activity window. Filled icons keep you busy; outlined ones only wait. Rings show how far along. Point at one for its line. The session sits at the end, in lavender.'],
+    ['6', 'Where you are, one piece: the center, the name (opens the list) and Map.'],
+    ['7', 'How you\'re looking, one piece: minimap and zoom, over the dock.'],
+    ['8', 'What\'s built is flat, not ringed: it\'s a status, not a button. The ring on Yards is its progress.'],
+    ['9', 'The wing keeps the code and the one line that matters. Prices live in Trade and Details.'],
+    ['10', 'Trade is dimmed and says why: one is in flight.'],
+    ['11', 'Icons for filters, no title, "celestial bodies".'],
+    ['12', 'A Go button on the selected row.']
+  ]
+  let yy = by + 28
+  for (const [n, text] of notes) {
+    out += note(nx, yy, n, text, 310)
+    yy += Math.ceil(text.length / 50) * 15 + 9
+  }
+  doc(1440, 1480, out, '5-revised')
+}
+
 mock1()
 mock2()
 mock3()
 mock4()
+mock5()
 
 // ── PNGs, with Chrome ────────────────────────────────────────────────────────
 if (process.argv.includes('--png')) {
