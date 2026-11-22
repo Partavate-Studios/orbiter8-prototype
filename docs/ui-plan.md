@@ -813,4 +813,16 @@ Log:
   - **Left:** your own info card isn't reachable yet (the pilot plate's avatar still selects your
     ship); the other ship's card face is thin (Pilot, At); owner names in the card's readouts and in
     chat and the siege feed aren't links yet.
+- 2026-11-22: **Koda: the armory menu hadn't been updated** ("I think that's where we started").
+  Rebuilt as the Yards were: `hud/armory/armory-panel.vue` (HTML), the old SVG menu deleted. Your ship
+  as it flies and opened up, updating with what you're about to fit; mounts as six pips, free holds,
+  drone room; each part with its own small picture (as drawn on the ship), what it takes, how many
+  are fitted, its price, and when you can't have one, why ("No mounts free", "No drone bay free", "No
+  free holds", "At its limit", or how many credits short, in light pink); a stepper that stops at
+  what both fits and can be paid for (the old dial went to 20 whatever the room: `review.md` X33);
+  cost and what's left; one main button in the station's color. It stays open after a purchase. New
+  rule in `sdk/src/parts.js`: `partRoom`, with a test. Screenshots: `built/armory.png`,
+  `built/phone-armory.png`. Checked by screenshots, no purchase made.
+- **Menus walked through so far:** Yards, Armory. **Still to do:** Colony, Asteroid Works, Loadout
+  (into the ship's Details), Siege, Feed, Chat, Ranks, Help, Settings, Trade (controls nearest the card).
 

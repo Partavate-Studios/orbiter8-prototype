@@ -37,7 +37,6 @@ import ChatMenu from '@/components/star-map/hud/menus/chat-menu.svg'
 import LeaderboardMenu from '@/components/star-map/hud/menus/leaderboard-menu.svg'
 import SettingsMenu from '@/components/star-map/hud/menus/settings-menu.svg'
 import ColonyMenu from '@/components/star-map/hud/menus/colony-menu.svg'
-import ArmoryMenu from '@/components/star-map/hud/menus/armory-menu.svg'
 import AsteroidMenu from '@/components/star-map/hud/menus/asteroid-menu.svg'
 import LoadoutMenu from '@/components/star-map/hud/menus/loadout-menu.svg'
 import SiegeMenu from '@/components/star-map/hud/menus/siege-menu.svg'
@@ -47,6 +46,7 @@ import TradePanel from './trade/trade-panel.vue'
 import ObjectsPanel from './objects/objects-panel.vue'
 import YardsPanel from './yards/yards-panel.vue'
 import ProfilePanel from './profile/profile-panel.vue'
+import ArmoryPanel from './armory/armory-panel.vue'
 
 /**
  * Every menu's inside: the quiet blue-gray the station's menus had (Koda, 2026-11-21: "I love the color
@@ -59,7 +59,8 @@ const HTML_MENUS = {
   trade: TradePanel,
   objects: ObjectsPanel,
   shipyard: YardsPanel,
-  profile: ProfilePanel
+  profile: ProfilePanel,
+  armory: ArmoryPanel
 }
 
 const MENUS = {
@@ -67,7 +68,6 @@ const MENUS = {
   leaderboard: LeaderboardMenu,
   settings: SettingsMenu,
   colony: ColonyMenu,
-  armory: ArmoryMenu,
   asteroid: AsteroidMenu,
   loadout: LoadoutMenu,
   siege: SiegeMenu,
