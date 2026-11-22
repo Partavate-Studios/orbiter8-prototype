@@ -546,3 +546,41 @@ Recommendations only; Koda decides.
 
 Mockup 5 (`mockups/together/5-revised`) draws the recommendations and notes 1, 2, 4, 5, 8 and 9 together,
 before building starts.
+
+## 12. Pointer travel on the trade loop (Koda, 2026-11-21)
+
+Koda's measure: for a loop players repeat (find a port that buys what you carry, go there, trade,
+again), how far does the mouse travel between clicks? It should be comfortable. Measured on the
+mockups at 1440 × 900, in straight lines, with the trade menu where it is today (Make Trade at the
+bottom center).
+
+| Route, one loop | Clicks | Travel |
+|---|---|---|
+| Today: Ports button, a row's Trade shortcut, a slider, Make Trade | 3 and a drag | about 2,400 px |
+| Mockup 5, the list: open it (top right), Stations, Buying, the row's Trade, a slider, Make Trade | 5 and a drag | about 3,000 px |
+| Mockup 5, the list, if it remembered its filters | 3 and a drag | about 2,700 px |
+| Mockup 5, strip and card: a planet's mark, Station, Trade, a slider, Make Trade | 4 and a drag | about 2,200 px |
+
+**The new design is no better than today on this loop, and through the list it's worse.** Why: the
+openers are in corners and the work is in the center, so every loop crosses the screen twice; the list
+adds two filter clicks; nothing at Make Trade leads to the next port; selling needs a slider drag per good.
+
+**To fix (not yet drawn):** a budget for repeated loops (say 3 clicks and 600 px); "Next buyer" offered
+where Make Trade was, once the trade is through; arriving from Buying presets the sliders to sell what
+the port buys; the list remembers its filters; a best-buyer shortcut on the ship's card or the cargo
+cells.
+
+**Koda's correction (2026-11-21): steps are good, work is bad.** The player should feel they went
+somewhere: a few clicks to reach a new planet is right, and clicking a planet and then its station is
+good when it tells you where you are. What's bad is the work around those clicks: moving the mouse far,
+or menus shifting in an unsettling way.
+
+So the measure for a loop is **travel and stability, not the number of clicks**:
+- Keep the steps that carry a sense of place (planet, then station, then trade).
+- Each next step appears close to the last click.
+- Nothing moves under the pointer: a control keeps its place from one step to the next and from one
+  planet to the next.
+- This drops two of the fixes above as written: a "Next buyer" button that skips the trip, and a
+  best-buyer shortcut. Kept: the list remembers its filters; sliders preset to what the port buys (to
+  be confirmed); and the strip-and-card route (planet's mark, Station, Trade) becomes the one to make
+  short, since it's the one that shows where you are.
