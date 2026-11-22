@@ -29,10 +29,9 @@
 <script>
 import { mapActions, mapState } from 'pinia'
 import { useStarMapStore } from '@/stores/starmap'
-import { useUIStore } from '@/stores/ui'
+import { useUIStore, openMenuName } from '@/stores/ui'
 import { CARD_THEMES, menuTheme, mixHex } from '@/libs/card-theme'
 import { CARD_GRAY } from '@/libs/palette'
-import { openMenuName } from '@/components/star-map/hud/menus/menu-container/_menu-container.svg.vue'
 import TradePanel from './trade/trade-panel.vue'
 import ObjectsPanel from './objects/objects-panel.vue'
 import YardsPanel from './yards/yards-panel.vue'

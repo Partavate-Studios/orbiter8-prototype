@@ -96,7 +96,7 @@ import { shipHolds } from '@/libs/goods'
 import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
 import { usePlayerStore } from '@/stores/player'
-import ShipUpgrade from '@/components/star-map/hud/menus/_trade-menu/ship-upgrade.svg'
+import ShipUpgrade from './ship-in-yard.svg.vue'
 import engineArt from '@/assets/art/engine-range.svg'
 import SmallIcon from '../small-icon.vue'
 

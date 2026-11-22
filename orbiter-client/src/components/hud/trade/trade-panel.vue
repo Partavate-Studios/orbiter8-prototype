@@ -421,27 +421,41 @@ h2 {
   justify-content: center;
   margin-top: 6px;
 }
-/* the menu's main action: the strongest purple (BRAND_500, BRAND_300 border; row C1) */
+/* the menu's main action, in the port's own color with dark words, as the other menus' are (Koda,
+   2026-11-21: the brand purple clashed with the menus' background) */
 .make {
   min-width: 260px;
-  height: 44px;
-  border: 1px solid #b9a0ff;
-  border-radius: 8px;
-  background: #7b4fe6;
-  color: #ffffff;
+  height: 46px;
+  border: 2px solid var(--accent);
+  border-radius: 23px;
+  background: var(--base);
+  color: #1b1531;
   font: inherit;
   font-size: 18px;
   font-weight: bold;
   cursor: pointer;
 }
 .make:hover:not(:disabled) {
-  background: #8b5cf6;
+  background: var(--accent);
 }
 .make:disabled {
-  border-color: #b9a0ff55;
-  background: #7b4fe655;
-  color: #ffffff66;
+  border-color: color-mix(in srgb, var(--base) 45%, transparent);
+  background: color-mix(in srgb, var(--base) 22%, transparent);
+  color: #ffffff77;
   cursor: default;
+}
+/* On wide screens the sliders and Make Trade sit on the side nearest the card in your hand, so the
+   trade loop's long legs are shorter (docs/ui-plan.md section 12 and mockup 10: 18% less travel; the
+   same steps, nothing preset). */
+.trade-panel:not(.narrow) .row {
+  grid-template-columns: minmax(0, 1fr) 172px 104px 64px 76px;
+}
+.trade-panel:not(.narrow) .flow {
+  order: -1;
+}
+.trade-panel:not(.narrow) .readouts,
+.trade-panel:not(.narrow) .go {
+  justify-content: flex-start;
 }
 .make:focus-visible,
 .clear:focus-visible {

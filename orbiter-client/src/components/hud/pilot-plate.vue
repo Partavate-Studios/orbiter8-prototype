@@ -1,24 +1,25 @@
 <template>
-  <!-- You: call sign, ship, credits and cargo, in the pilot card's striped purple frame. The round
-       button selects your ship (Space). Under the names, every cargo hold, one cell each, filled in its
-       good's color; it opens the full list. -->
+  <!-- You: call sign, ship, credits and cargo, in the pilot card's striped purple frame. Two things to
+       press (Koda, 2026-11-21: you as an identity, not only your ship): you (the round button and your
+       call sign) open your info card; your ship's name selects your ship (Space). Under the names,
+       every cargo hold, one cell each, filled in its good's color; it opens the full list. -->
   <div class="pilot-plate" :class="{ strip }">
     <div class="frame">
       <rim-button
         v-if="!strip"
         class="me"
-        label="My ship"
-        title="My ship (Space)"
+        label="You"
+        title="You: your info card"
         bare
         :tint="HUD_TINT.you"
         :rest="HUD_REST.you"
-        @press="$emit('my-ship')"
+        @press="$emit('me')"
       >
         <avatar-icon />
       </rim-button>
       <div class="who">
-        <b :style="{ fontSize: callsign.size + 'px' }">{{ callsign.text }}</b>
-        <span :style="{ fontSize: shipName.size + 'px' }">{{ shipName.text }}</span>
+        <button type="button" class="name" title="You: your info card" :style="{ fontSize: callsign.size + 'px' }" @click="$emit('me')">{{ callsign.text }}</button>
+        <button type="button" class="ship" title="Your ship (Space)" :style="{ fontSize: shipName.size + 'px' }" @click="$emit('my-ship')">{{ shipName.text }}</button>
       </div>
       <b class="credits">{{ avatar.credits.toLocaleString('en-US') }}&cent;</b>
       <!-- every hold, one cell each, in its good's color (round 2, item 6) -->
@@ -69,7 +70,7 @@ export default {
     /** A phone's full-width strip: no my-ship button (it's a tab). */
     strip: { type: Boolean, default: false }
   },
-  emits: ['my-ship'],
+  emits: ['my-ship', 'me'],
   data() {
     return { open: false, HUD_TINT, HUD_REST, HOLDS_H, TEXT_3 }
   },
@@ -175,14 +176,31 @@ export default {
     'cargo cargo';
   grid-template-columns: minmax(0, 1fr) auto;
 }
-.who b {
-  color: #ffffff;
-  font-weight: normal;
+.who button {
+  align-self: flex-start;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
   white-space: nowrap;
+  cursor: pointer;
 }
-.who span {
+.who button:hover {
+  text-decoration: underline;
+  text-decoration-color: #b9a0ff;
+  text-underline-offset: 3px;
+}
+.who button:focus-visible {
+  outline: 2.5px solid var(--o8-brand-300);
+  outline-offset: 2px;
+}
+.who .name {
+  color: #ffffff;
+}
+.who .ship {
   color: #c3b3da;
-  white-space: nowrap;
 }
 .credits {
   grid-area: credits;

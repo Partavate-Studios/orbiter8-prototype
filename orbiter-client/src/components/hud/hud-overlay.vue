@@ -6,7 +6,7 @@
   <div class="hud" :class="{ phone, map: neighborView }" :style="{ zoom: hudScale }" @click="releaseFocus">
     <!-- you -->
     <div class="you">
-      <pilot-plate :strip="phone" @my-ship="myShip" />
+      <pilot-plate :strip="phone" @my-ship="myShip" @me="me" />
     </div>
 
     <!-- Minerva: your link to the network, and what's under way (it took in the session, scan and mining chips) -->
@@ -48,11 +48,10 @@ import { mapActions, mapState } from 'pinia'
 import { STAR_KEY } from '@orbiter8/sdk/system'
 import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
-import { useUIStore } from '@/stores/ui'
+import { useUIStore, openMenuName } from '@/stores/ui'
 import { usePlayerStore } from '@/stores/player'
 import { firstSteps } from '@/libs/first-steps'
 import { HUD_TINT, HUD_REST } from '@/libs/palette'
-import { openMenuName } from '@/components/star-map/hud/menus/menu-container/_menu-container.svg.vue'
 import AvatarIcon from '@/components/star-map/hud/icons/avatar-icon.svg'
 import StarIcon from '@/components/star-map/hud/icons/star-icon.svg'
 import HelpIcon from '@/components/star-map/hud/icons/help-icon.svg'
@@ -186,6 +185,10 @@ export default {
     toggleMenu(menu) {
       if (this.menuState[menu + 'Menu']) this.closeMenu()
       else this.openMenu(menu)
+    },
+    /** Your own info card (hud/profile/profile-panel.vue). */
+    me() {
+      useUIStore().openProfile(this.player.account)
     },
     myShip() {
       this.closeMenu()

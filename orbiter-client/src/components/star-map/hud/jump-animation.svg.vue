@@ -74,7 +74,7 @@ import { mapActions, mapState } from 'pinia'
 import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
 import Ship from '../sprites/ship.svg'
-import MenuButton from './menus/menu-button.svg'
+import MenuButton from './menu-button.svg'
 import { jumpSlide, slidesWanted } from '@/libs/jump-slide'
 import { holeShip, HOLE_ECHOES } from '@/libs/hole-passage'
 

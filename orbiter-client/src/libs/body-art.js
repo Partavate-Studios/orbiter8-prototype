@@ -77,17 +77,3 @@ export function homeOf(key, objects) {
   if (object.type === 'moon') return object.orbiting
   return null
 }
-
-/**
- * Line glyphs (24 units, centered) for the actions with no art of their own, drawn in the menu's
- * lavender: jump (a star with a course), session (a key), rename (a pen), market (out to a page),
- * the black hole (a spiral) and naming a star (a star).
- */
-export const ACTION_GLYPH = {
-  jump: 'M-8 6L4 -6M4 -6H-2M4 -6V0M6 -9L7 -7L9 -6.5L7 -6L6 -4L5 -6L3 -6.5L5 -7Z',
-  session: 'M-3 0A4.5 4.5 0 1 1 -3 0.01M1.5 0H9M6 0V3.5M9 0V3',
-  rename: 'M-7 7L-6 3L4 -7L7 -4L-3 6ZM2 -5L5 -2',
-  market: 'M-6 -3H-8V8H3V6M-1 -8H8V1M8 -8L-2 2',
-  traverse: 'M0 0A2 2 0 0 1 2 2A4 4 0 0 1 -2 6A6 6 0 0 1 -8 0A8 8 0 0 1 0 -8A9 9 0 0 1 9 1',
-  nameStar: 'M0 -8L2.4 -2.6L8 -2.4L3.6 1.2L5 7L0 3.8L-5 7L-3.6 1.2L-8 -2.4L-2.4 -2.6Z'
-}

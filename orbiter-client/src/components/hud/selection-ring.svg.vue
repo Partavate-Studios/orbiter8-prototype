@@ -11,10 +11,9 @@
 <script>
 import { mapState } from 'pinia'
 import { useStarMapStore } from '@/stores/starmap'
-import { useUIStore } from '@/stores/ui'
+import { useUIStore, openMenuName } from '@/stores/ui'
 import { WORLD_OFFSET_Y } from '@/constants'
 import { CARD_THEMES, cardThemeKey } from '@/libs/card-theme'
-import { openMenuName } from '@/components/star-map/hud/menus/menu-container/_menu-container.svg.vue'
 import { EDGE, CARD_WIDTH, CARD_HEIGHT } from './layout'
 
 const RADIUS = 95

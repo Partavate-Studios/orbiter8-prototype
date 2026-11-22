@@ -24,16 +24,6 @@ let onCruise = []
  * The HUD's full-screen menus (hud.svg.vue), each shown by `menuState[name + 'Menu']`, including
  * colony (a planet's people, storage, buildings and transfers), armory, loadout, siege and the siege feed.
  */
-/** Where the selection menu's open or closed state is remembered. */
-const ACTIONS_OPEN_KEY = 'o8.hud.actionsOpen'
-function readActionsOpen() {
-  try {
-    return typeof localStorage === 'undefined' || localStorage.getItem(ACTIONS_OPEN_KEY) !== '0'
-  } catch {
-    return true
-  }
-}
-
 /** The free space right of an open menu that's worth moving the selection into (CSS pixels). */
 const MIN_ROOM_BESIDE_MENU_PX = 180
 /** (`objects` is the list of what's in the system: it took in the old planets, ports and ships menus.) */
@@ -49,6 +39,11 @@ function readHudPrefs() {
   } catch {
     return {}
   }
+}
+
+/** The open menu's name ('trade', 'chat'…), or null. */
+export function openMenuName(ui) {
+  return Object.entries(ui.hud.menuState).find(([key, on]) => on === true && key !== 'menuShowing')?.[0]?.replace(/Menu$/, '') ?? null
 }
 
 export const useUIStore = defineStore('UI', {
@@ -113,9 +108,6 @@ export const useUIStore = defineStore('UI', {
     // Whether the selected sprite's info card (or, with nothing selected, the scope) is shown.
     // Clicking the selected sprite toggles it.
     showScope: true,
-    // Whether the selection's menu is slid out from behind its card (the tab on its edge, A, pad R3 with
-    // the card shown). Remembered for every selection, and across visits.
-    actionsOpen: readActionsOpen(),
     /** The list of what's here (hud/objects/objects-panel.vue): which kind it shows, and for stations which of them. */
     listKind: readHudPrefs().listKind ?? 'all',
     listWant: readHudPrefs().listWant ?? null,
@@ -277,15 +269,6 @@ export const useUIStore = defineStore('UI', {
      */
     toggleScope() {
       this.showScope = true
-    },
-    /** Slides the selection's menu out from behind its card, or back behind it. */
-    toggleActions(open = !this.actionsOpen) {
-      this.actionsOpen = open
-      try {
-        localStorage.setItem(ACTIONS_OPEN_KEY, open ? '1' : '0')
-      } catch {
-        // (private browsing: remembered for this visit only)
-      }
     },
     toggleMinerva() {
       this.showMinerva = !this.showMinerva

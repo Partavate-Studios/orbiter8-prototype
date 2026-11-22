@@ -40,10 +40,10 @@
 </template>
 
 <script>
-import Ship from '../../../sprites/ship.svg'
-import Station from '../../../sprites/station.svg'
-import ShipOutline from '../../../sprites/ship-outline.svg'
-import StationOutline from '../../../sprites/station-outline.svg'
+import Ship from '@/components/star-map/sprites/ship.svg'
+import Station from '@/components/star-map/sprites/station.svg'
+import ShipOutline from '@/components/star-map/sprites/ship-outline.svg'
+import StationOutline from '@/components/star-map/sprites/station-outline.svg'
 import HoldGrid from '@/components/hud/hold-grid.svg.vue'
 
 export default {
