@@ -1027,7 +1027,13 @@ counts them, up to the bays free when mining started; nothing new is read from t
 
 Calls:
 - **M1:** on a phone it's shorter ("4 mining · 2/5 · 23m"), so it stays clear of the star's name.
-- **M2:** the drone count is the ship's mining drones plus the built-in drones set to mine.
+- **M2:** the drone count is the drones that are mining: the count the contract fixed in the mining
+  rate when mining started (Koda: "only count mining drones that mine"), not the ship's setup now.
+
+Found in the contracts: **reassigning the built-in drones doesn't stop mining.** `Repairs.assignDrones`
+doesn't end a mining run, so a pilot can start mining with 4 drones, then set them all to repair: the
+run keeps mining at 4 drones' rate while they repair too. A fix for the next contract release: assigning
+drones ends mining (as other moves do), or mining reads the split when it's stopped.
 
 Found while testing: **a new pilot can't mine until they sell.** The starter cargo fills all 5 holds,
 so Start mining fails with "Nothing to mine with, or no room in the holds." Fine if selling first is the

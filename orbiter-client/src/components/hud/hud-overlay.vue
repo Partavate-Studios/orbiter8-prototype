@@ -197,8 +197,7 @@ export default {
     mining() {
       const progress = miningProgress(this.player.mining, this.now)
       if (!progress) return null
-      const ship = this.player.ship
-      const drones = (ship?.loadout?.miningDrones ?? 0) + (this.player.condition?.mining ?? 0)
+      const { drones } = progress
       const count = `${progress.mined}/${progress.room}`
       // a phone's is shorter, clear of the star's name beside it
       if (this.phone) {

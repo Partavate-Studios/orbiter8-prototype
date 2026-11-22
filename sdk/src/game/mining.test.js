@@ -17,6 +17,11 @@ describe('miningProgress', () => {
     expect(miningProgress(mining, at(480))).toMatchObject({ mined: 1, fraction: 0.2, secondsLeft: 1920 })
   })
 
+  it('counts the drones the contract counted when mining started', () => {
+    expect(miningProgress(mining, at(0)).drones).toBe(4)
+    expect(miningProgress({ ...mining, rate: 1_875 }, at(0)).drones).toBe(1)
+  })
+
   it('stops at the room it started with', () => {
     expect(miningProgress(mining, at(2400))).toMatchObject({ mined: 5, fraction: 1, full: true, secondsLeft: 0 })
     expect(miningProgress(mining, at(9999))).toMatchObject({ mined: 5, fraction: 1, full: true })
