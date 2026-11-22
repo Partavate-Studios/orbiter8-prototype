@@ -727,4 +727,18 @@ Log:
     what you can afford and what's left after. The first menu of the walk-through (Koda's note 3).
   - **Changes the kit:** on a menu about a thing, the main button takes that thing's color (dark text
     on it, as headings do), not the brand purple. The card's own pill is still purple; ask Koda.
+- 2026-11-21: **Koda on the Orbiter 8's upgrades:** they "all look pretty bad... the color is bad, the
+  shapes don't cut it... you can re-conceptualize them completely". The art is `sdk/src/ship-art.js`,
+  which mirrors `contracts/src/art/ShipArt.sol` character for character (the NFT's picture), so new
+  art means a contract change too. New art is drawn as a mockup first:
+  `docs/mockups/ship-upgrades/` (script `orbiter-client/dev/mockups/ship-upgrades.mjs`).
+  - Drawn: `docs/mockups/ship-upgrades/sheet.png`, each part today and proposed, and four whole ships
+    at 300, 92 and 44 px. One family of colors (the white hull, two lavenders, a dark inset); only the
+    capacitors, the shield and damage keep a color. It also draws jump range and mining drones, which
+    have no picture today. **Waiting for Koda.** If he agrees: port to `sdk/src/ship-art.js` and
+    `ShipArt.sol` together, update the pinned hashes in `sdk/src/ship-art.test.js`, check the
+    contract's size (`forge build --sizes`), and redeploy on the test chains.
+- **Where things stand:** steps 1 (card) and 2 (list, top right) built and play-tested; Yards rebuilt;
+  step 3 (Minerva's plate and Link) is next; the other menus still to walk through (Armory, Colony,
+  Loadout into the ship's Details, Help).
 
