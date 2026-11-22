@@ -710,4 +710,12 @@ Log:
     the old `jump-icon`, `planets-icon`, `ports-icon` and `ships-icon` components are unused now.
   - **Next: step 3,** Minerva's plate as the activity window, and her Link page (the session moves
     there from the ship's card).
+- 2026-11-21: **Play-tested steps 1 and 2 with real moves,** on a private copy (`CHAIN_PORT=8546
+  UI_PORT=8092 npm run local`, stopped afterwards; Koda's own copy on 8080 wasn't touched). One page,
+  one session: registered a new pilot through the intro; Earth from the strip; its station from the
+  spine's tab (heading "Earth | I.S.S.", Trade as the pill, Yards and Armory as wells); key `1` opened
+  Trade; sold 3 Helium-3 (credits -45 to 533); Esc back to nothing selected (the card showed the ship,
+  Jump as its pill); Mars and its station the same way; `O` opened the list, Stations then Buying
+  listed the 8 ports that buy the cargo. No errors in the page. Not covered: claim, jump, siege,
+  colony, the gamepad, a phone-size session with moves.
 
