@@ -621,3 +621,36 @@ is a good plan. Prep first, shown to Koda before any game code changes:
 Assumed unless Koda says otherwise (his answers to Part 9 so far cover 1, 2, 4, 7 and 8 only):
 with nothing selected the card shows your ship; the nearby strip goes; Loadout folds into the ship's
 Details; Rename moves into Details; the minimap's new place is still open and gets drawn two ways.
+
+## 15. Progress notes (kept as the work goes, so another session can pick it up)
+
+**State on 2026-11-21:** Koda approved the direction and the icon sheet ("the icons are all great, you
+can begin"). Prep comes first; no game code is changed until Koda has seen the prep (section 14).
+
+How to redraw the mockups, from `orbiter-client/`: `node dev/mockups/together.mjs --png` (mockups 1–5
+and 7 on) and `node dev/mockups/icons.mjs --png` (mockup 6). The icon paths are in
+`dev/mockups/small-icons.mjs`.
+
+| Prep item | State |
+|---|---|
+| Small-icon set (mockup 6) | Done, approved by Koda as drawn |
+| The kit and screen standard (`ui-guide.md` section 11, mockup 7) | See below |
+| The card in every state, desktop and phone (mockup 8) | See below |
+| The activity window in every state; the top right two ways (mockup 9) | See below |
+| The trade loop, travel measured (mockup 10) | See below |
+
+**The card, as now designed (after Koda's "milder take"):**
+- A card with a family is a **spine** (a column of tabs: the planet, its station, its moon or Moons)
+  and one **face**. The tabs are in the spine in every state, so they never move.
+- Plain planet: the planet is the face. Station or a single moon: it becomes the face; same width.
+- Several moons: the Moons tab opens a **list** panel beside the face (the only wider state). Picking
+  a moon makes it the face and closes the list.
+- **One heading** across the top: the planet's name alone, or the planet's and the face's, each in
+  its color, meeting.
+- **One action row** across the bottom, the face's: the main action as a wide pill with its picture
+  and word, the others as 44 px wells, Details always last.
+- A ship or a star has no family, so no spine.
+
+Log:
+- 2026-11-21: plan, mockups 1–4, Koda's feedback (section 10), review (11), mockup 5, the trade-loop
+  measure (12), the narrower card (13), go-ahead (14), icon sheet (mockup 6).

@@ -214,3 +214,47 @@ Session moves here from the ship's menu), the block number, and anything else ab
 
 **Your ships.** When pilots can have several ships, a menu to switch which ship you control, which
 always makes clear which ship you're in.
+
+## 11. Proposed: the kit and the screen standard (2026-11-21; for Koda's review, not built)
+
+From Koda's notes on the mockups ("some standard on how we build screens", "clean and tight", icons
+over words) and the review in [`ui-plan.md`](ui-plan.md) section 11. Drawn in
+[`mockups/together/7-kit`](mockups/together/7-kit.png). Once Koda agrees, this becomes the rule for
+every screen, and each menu is walked through against it.
+
+### The parts
+
+Every screen is made of these and nothing else. A new part needs a reason and goes in this list.
+
+| Part | For | Rules |
+|---|---|---|
+| **Main pill** | A screen's or card's one main action | One per screen. Its picture in a well at its left, one or two words. Brand purple. At least 44 px tall. |
+| **Well** | Any other action | A 44 px circle with a small icon and a one-word caption under it. Dimmed when it can't be used now, with the reason in the caption's place. |
+| **Tab** | A way to somewhere (a planet's station, a list's filter, a menu's page) | A rounded square, never a circle, so it can't be taken for an action. The current one is lit. A count badge if it stands for several. |
+| **Row** | One thing in a list | Its mark, name, one line under it, one value at the right. The selected row is lit and carries Go. |
+| **Tile** | One fact with a number | A label of at most 10 letters, a value. Never wider than its text allows. |
+| **Bar and ring** | How much, how far along | A bar for an amount, a ring for time. Lavender; pink only when it needs the player. |
+| **Section heading** | Groups a screen | Small capitals and a rule. At most five to a screen. |
+| **Link** | A name that goes somewhere | Underlined, in the color of what it names. |
+| **Socket** | Something that isn't there yet | Dashed outline, dimmed picture, "Not yet". Dashes mean this and nothing else (a siege keeps its pink dashes). |
+| **Status mark** | Something that's simply true (built, yours, besieged) | Flat, no ring, can't be pressed. |
+
+### The standard for a screen
+
+1. **A screen is a card, big.** The frame and heading of the thing it's about, in that thing's color;
+   its picture on the left (on top, on a phone); sections on the right. Planet Details is the model.
+2. **One main action,** a main pill, in the same place on every screen: the bottom left of the
+   content, nearest the card in your hand.
+3. **Icons before words.** A word only where an icon can't carry it: names, numbers, the main
+   action, a well's one-word caption, a list of moons.
+4. **Type:** nothing under 11 px (12 on a phone). Four sizes to a screen at most.
+5. **Labels are short** and never leave their box: shrink to fit, then cut with an ellipsis, as
+   names do (`libs/fit-text.js`).
+6. **One meaning each.** Yellow: yours, and gains. Pink: needs you. Lavender: waiting, time, progress.
+   Dashes: not there yet. No green.
+7. **Steps are fine, work isn't** (`ui-plan.md` section 12). The next thing to press appears near the
+   last one. Nothing moves under the pointer: a control keeps its place from step to step and from
+   one planet to the next.
+8. **Sliders start at rest.** Nothing is chosen for the player.
+9. **Every screen has its phone layout,** drawn with it.
+
