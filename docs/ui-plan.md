@@ -912,4 +912,12 @@ Log:
     armories' stock should be checked against the testnet's read budget (`dev/harness/read-costs.mjs`);
     the "Mine" holdings and Transfer in the list, and the Details screens for planets, stations,
     moons and stars from mockup 3, are not built (the ship's and the pilot's are).
+- 2026-11-22: **Koda: ships in the world should show their exterior fittings; they were always the
+  plain Orbiter 8.** Built: each ship here carries what shows from outside (`fitted`: range, damage,
+  railguns, missiles, point defense, armor, shields), taken from the `pilotOf` read `shipsAt` already
+  makes (no extra read). `sprites/ship.svg.vue` draws the ship as it flies (`shipArtParts`, hull in
+  the world's white) on the map and on the card; a ship with nothing to show, and the lowest graphics
+  level, keep the plain hull. Seen on Koda's copy: `built/fitted-ship-in-world.png`. A ship's look
+  follows the system's own reload, so it updates when the star's data next refreshes. Not drawn
+  fitted: the jump and black hole passages, the trade and yards scenes.
 

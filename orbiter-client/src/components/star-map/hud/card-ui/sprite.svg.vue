@@ -7,7 +7,7 @@
       :black-hole="Boolean(systemObjects[objectId].blackHole)"
       :spectral="systemObjects[objectId].spectral"
     ></star>
-    <ship v-if="systemObjects[objectId].type == 'ship'" transform="rotate(180) scale(4)" :should-show-engines="false" />
+    <ship v-if="systemObjects[objectId].type == 'ship'" transform="rotate(180) scale(4)" :should-show-engines="false" :fitted="systemObjects[objectId].fitted" />
     <station v-if="systemObjects[objectId].type == 'station' && !systemObjects[objectId].onAsteroid" transform="scale(2.2)" :station="systemObjects[objectId]" />
     <moon v-if="systemObjects[objectId].type == 'moon'" transform="scale(4)"></moon>
     <asteroid

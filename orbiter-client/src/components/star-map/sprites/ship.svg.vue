@@ -5,7 +5,11 @@
       <g v-if="shouldShowEngines && graphicsQuality > 1">
         <ship-engines />
       </g>
-      <g transform="translate(-2300,-2300)">
+      <!-- Fitted out (Koda, 2026-11-22: ships in the world show what's on their outside): the ship as
+           it flies, drawn from what's fitted (sdk/ship-art.js; our own string), its hull the world's white -->
+      <!-- eslint-disable-next-line vue/no-v-html, vue/no-v-text-v-html-on-component -->
+      <g v-if="art" v-html="art" />
+      <g v-else transform="translate(-2300,-2300)">
         <path
           fill="white"
           class="fil0"
@@ -20,6 +24,9 @@
 import { mapState } from 'pinia'
 import { useConfigStore } from '@/stores/config'
 import ShipEngines from './animations/ship-engines.svg'
+import { shipArtParts, showsFittings } from '@orbiter8/sdk/ship-art'
+
+let drawn = 0
 
 export default {
   name: 'Ship',
@@ -27,10 +34,21 @@ export default {
     ShipEngines
   },
   props: {
-    shouldShowEngines: { type: Boolean, default: false }
+    shouldShowEngines: { type: Boolean, default: false },
+    /** What's fitted to this ship that shows from outside ({ range, rangeLost, baysLost, loadout }), or null for the plain hull. */
+    fitted: { type: Object, default: null }
+  },
+  data() {
+    // (each drawing's ids are its own: many ships share the page)
+    return { artId: 'ship' + ++drawn + '-' }
   },
   computed: {
-    ...mapState(useConfigStore, ['graphicsQuality'])
+    ...mapState(useConfigStore, ['graphicsQuality']),
+    /** The fitted ship's drawing, or null: the plain hull is cheaper, and it's all the lowest graphics level draws. */
+    art() {
+      if (this.graphicsQuality < 2 || !showsFittings(this.fitted)) return null
+      return shipArtParts(this.fitted, false, this.artId).replaceAll('#e6dcf5', '#ffffff')
+    }
   }
 }
 </script>

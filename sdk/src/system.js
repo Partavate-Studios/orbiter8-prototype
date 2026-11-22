@@ -283,6 +283,8 @@ export function buildSystem(system, playerAccount) {
       location: ship.location,
       owner: ship.owner,
       ownerName: ownerName(ship.owner, 'Unknown'),
+      // what's fitted that shows from outside: guns, ports, armor, shields, range (sdk/ship-art.js)
+      fitted: ship.fitted ?? null,
       isMine: String(ship.owner) == String(playerAccount),
       orbiting: mining ? mining.section : orbiting,
       // the slots turn with the section's sprite (its rotation is its angle round the star), so the

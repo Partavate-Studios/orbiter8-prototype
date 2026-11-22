@@ -551,7 +551,8 @@ export function createGameClient() {
         name: s.name,
         location: cell,
         orbit: dockedAt(s.address, cell),
-        owner: s.address
+        owner: s.address,
+        fitted: s.fitted ?? null
       }
     }
     return data

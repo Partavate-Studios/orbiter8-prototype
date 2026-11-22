@@ -28,7 +28,7 @@
             <line :x1="sprite.dock.tube.from" y1="-1.6" :x2="sprite.dock.tube.to" y2="-1.6" />
             <line :x1="sprite.dock.tube.from" y1="1.6" :x2="sprite.dock.tube.to" y2="1.6" />
           </g>
-          <g transform="rotate(180)"><ship v-if="type === 'ship'" :should-show-engines="!sprite.object.dock" /></g>
+          <g transform="rotate(180)"><ship v-if="type === 'ship'" :should-show-engines="!sprite.object.dock" :fitted="sprite.object.fitted" /></g>
           <star v-if="type === 'star'" :black-hole="Boolean(sprite.object.blackHole)" :spectral="sprite.object.spectral" />
         </template>
         <a v-if="type !== 'shell'" cursor="pointer" @mouseover="pointerOn(true)" @mouseleave="pointerOn(false)" @click.prevent="spriteAction()">

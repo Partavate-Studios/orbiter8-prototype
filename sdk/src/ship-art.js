@@ -118,6 +118,13 @@ export function shipArtParts(ship, scarred = false, id = '') {
   )
 }
 
+/** Whether anything shows on the ship from outside: a ship with nothing fitted at range 1 is the plain hull. */
+export function showsFittings(ship) {
+  if (!ship?.loadout) return false
+  const l = ship.loadout
+  return Boolean(l.railguns || l.missiles || l.pointDefense || l.armor || l.shields || (ship.range ?? 1) > 1 || ship.rangeLost > 0 || ship.baysLost > 0)
+}
+
 export const SHIP_ART_VIEWBOX = '-2800 -2800 5600 5600'
 
 /** The NFT's picture, identical to ShipArt.sol's tokenURI image (pinned by hashes in the tests). */

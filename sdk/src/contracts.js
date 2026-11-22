@@ -474,7 +474,25 @@ export function createGame(runner, addresses, { startBlock = 0 } = {}) {
       const all = await Promise.all(addresses.map((a) => pilots.pilotOf(a).then((p) => [a, p])))
       return all
         .filter(([, p]) => p.registered && Number(p.ship.cell) === cell)
-        .map(([address, p]) => ({ address, shipId: Number(p.shipId), name: p.ship.name, callsign: p.callsign }))
+        .map(([address, p]) => ({
+          address,
+          shipId: Number(p.shipId),
+          name: p.ship.name,
+          callsign: p.callsign,
+          // what shows on the ship from outside (sdk/ship-art.js): already in this read
+          fitted: {
+            range: Number(p.ship.range),
+            rangeLost: Number(p.ship.rangeLost),
+            baysLost: Number(p.ship.baysLost),
+            loadout: {
+              railguns: Number(p.ship.loadout.railguns),
+              missiles: Number(p.ship.loadout.missiles),
+              pointDefense: Number(p.ship.loadout.pointDefense),
+              armor: Number(p.ship.loadout.armor),
+              shields: Number(p.ship.loadout.shields)
+            }
+          }
+        }))
     },
 
     /** Call signs by address (lowercase), for `addresses`. */
