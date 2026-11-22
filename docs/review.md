@@ -710,7 +710,9 @@ Calls made building it, for Koda's review:
   starter kit; `switchCorporation` changes it for a fee (5,000, burned). Guesses, all admin-settable
   (`setCorporations`, `setStarterKit`, set by the deploy's `wireJoining`): the names **Corp X, Corp Y,
   Corp Z**; the kit **3 Helium-3 and 2 Electronics** (about 800 credits; Earth buys Helium-3, Ceres and
-  others Electronics), **no cash**, a **debt of 45** (the −45 from Earth). Credits keeps the debt beside
+  others Electronics), **no cash**, a **debt of 45** (the −45 from Earth). *(Answered 2026-11-22, D111: the debt is the loan of the starter cargo, owed to the corporation and
+  repaid from 50% of each sale's margin, with a notice when it's paid in full; not the Earth balance.
+  To build: `demo4-plan.md`, "The starting loan".)* Credits keeps the debt beside
   the balance (`debtOf`; what the game pays clears it first); the game shows balance minus debt (−45¢
   at the start). `Claims.lawAt(id)`: the star owner's corporation, else the body owner's, else 0
   (Minerva's rules); nothing uses it yet. Until the intro exists, the wizard's ship step has a small
@@ -1104,7 +1106,8 @@ asked. Answered since the last list: P3–P5 and the product id (D101–D105, D1
 - X1: the Federation's other income (parts at a Sol armory, repairs at a Sol yard) still burns; send it
   to the treasury too?
 - X40: the joining guesses, all admin-settable: the names Corp X, Y and Z, the starter kit (3 Helium-3,
-  2 Electronics), no cash, a debt of 45, the 5,000 fee to switch corporation.
+  2 Electronics), no cash, the 5,000 fee to switch corporation. (The debt is answered: D111, the
+  cargo's loan, repaid from half the trading margin; to build.)
 - Section 18: a new pilot can't mine until they sell (the starter cargo fills every hold). Intended as
   the first step, or should the card say "Sell cargo to make room"?
 - Section 18's fix for reassigning the built-in drones mid-mining (see the to-dos): end mining, or

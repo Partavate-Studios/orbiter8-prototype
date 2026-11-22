@@ -37,7 +37,9 @@ Hours of play to each goal, median pilot:
 **Since these numbers:** a new pilot starts in debt with a hold of goods instead of 1,000 credits
 (Koda, 2026-11-19; `Pilots.setStarterKit`, set in `contracts/script/Deploy.s.sol` `wireJoining`; the
 debt is in `Credits.debtOf` and paid off first from what the game pays), and the Federation's fee goes
-to its treasury (D94). The simulator's runs above assume the old start (`economy.mjs` still gives pilots 1,000 credits).
+to its treasury (D94). **To change (D111, 2026-11-22):** the debt becomes the advance's value (about 800, not
+45), repaid from 50% of each sale's margin rather than from every payment in full; the 50% is Koda's
+starting number, to tune. The simulator's runs above assume the old start (`economy.mjs` still gives pilots 1,000 credits).
 
 A unit's margin, from a full selling port to a needy buying port, is 1.2 × its spread: 36 credits for water ice and
 156 for electronics. Every unit moves the price, so a big load pays less per unit than a small one.

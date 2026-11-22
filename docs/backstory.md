@@ -471,13 +471,18 @@ across thousands of nodes.
 8. Minerva's first message: what's expected of you, starting with the premise (a linked human mind
    flies this ship, and that mind is you).
 
-**You start in debt, with a hold full of goods (Decided, 2026-11-19),** not starting credits: the
-negative balance carried over from Earth, and a cargo of goods as the pilot program's advance. You don't
-make money of your own until your sales clear the debt; the cargo is worth more than that, so the first
-sale feels like a win (Suggestion). On chain the debt has its own record beside the balance, which
-can't go below zero (`Credits.sol`, built 2026-11-19): whatever the game pays you clears the debt
-first. If you ever run dry, you can go mine the asteroid belt to get
-going again.
+**You start in debt, with a hold full of goods (Decided, 2026-11-19; how the debt works, Koda
+2026-11-22, D111),** not starting credits. **The debt is the loan of that cargo:** your corporation
+advances the goods in your holds, and you owe it their value. It isn't your Earth balance; Earth's bills
+stay on Earth. You sell the cargo to earn your first money, and you pay the corporation back **from the
+profit on your trades: half of each sale's margin** goes to the debt and the other half is yours, so
+you're never left short. When the last of it is paid, a notice congratulates you: **your debts are paid
+in full, and everything you buy and sell from here is your profit to keep.** If you ever run dry, you
+can go mine the asteroid belt to get going again.
+
+(As built today, since 2026-11-19, it works differently: a debt of 45 carried from Earth, which every payment
+the game makes clears first, in full. The change is on the list for the next contract release,
+`demo4-plan.md`, "The starting loan".)
 
 **Can a new player start as a pirate? No (Decided):** pirates have renounced a citizenship, which you
 need to have had first. **Native pirates (Leaning, 2026-11-19):** an independent pirate who has stayed
@@ -614,6 +619,8 @@ revived remnants.
 - **"She is neutral, as far as anyone can tell."** Minerva is provably neutral; the story no longer hints
   at a hidden agenda (2026-11-19).
 - **Starting credits.** You start in debt with a hold full of goods (2026-11-19).
+- **The debt carried over from Earth.** The starting debt is the loan of the starter cargo, paid back
+  from half your trading margin (2026-11-22, D111).
 - **Launching your ship / the take-off.** You wake in a ship already orbiting Earth (2026-11-18).
 - **Buying an Orbiter ("now for sale").** Pilots are hired; the Orbiter 8 is the open standard everyone
   starts in (2026-11-18/19).
@@ -715,6 +722,7 @@ Koda's answers to it.
 | **The name entered at the ID-card scanner is the call sign.** | Koda, 2026-11-22 |
 | Added: the character's body isn't fit for other work and they've mostly given up; the pitch is brand new, the only option, wild and one-way; unattended ships run with Minerva at the helm. | Koda, Q1, Q11, 2026-11-18 |
 | Open: the Orbiter 8's first flight with no one aboard, and where autopilot ends (Open story questions). | The review |
+| **The starting debt is the loan of the starter cargo**, owed to your corporation and paid back from half of each trade's margin; a notice when it's paid in full. Not the Earth balance. | Koda, 2026-11-22 (D111) |
 
 ### 2026-11-19/20: the intro's two transactions
 

@@ -138,6 +138,7 @@ design doc), [`design-ideas.md`](design-ideas.md) (Koda's working doc), [`cost-e
 | D108 | **One codebase and one build** for the Polkadot App and the browser (Koda took the recommendation, 2026-11-18): at startup the client picks the App's account and signer (wrapped as an EIP-1193 wallet) or a browser wallet; the App's libraries load only inside the App; the same static bundle is published to GitHub Pages and the App. Split only if D66 makes a genuinely different interface; the shared SDK keeps that cheap. | 2026-11-18 |
 | D109 | **Personhood isn't enforced yet** (Koda, 2026-11-18): D102 (one pilot per person) waits until the game is closer to release. | 2026-11-18 |
 | D110 | **Discoverers claim free** (Koda, 2026-11-18): during a star's 10-minute first-claim window (D40) its discoverer claims every planet and asteroid there for nothing (`Claims.discoveryFee`, 0, admin-tunable; `claimFeeOf`); after the window, the claim fee like everyone. The card's button says "Claim Planet (free)". | 2026-11-18 |
+| D111 | **The starting debt is the loan of the starter cargo** (Koda, 2026-11-22). Your corporation advances the goods in your holds; the debt is their value, owed to the corporation. It's **not** your Earth balance: the apartment's −45 is Earth flavor and stays behind. You sell the cargo to earn your first money, and pay the corporation back **from the profit margin on trades: 50% of each sale's margin** (Koda's starting number, tunable) goes to the debt until it's paid, and the rest is yours, so a pilot never sells themselves short. When the debt is paid, **a notice congratulates you: your debts are paid in full, and everything you buy and sell from here is your profit to keep.** Replaces X40's guess (a debt of 45 from Earth, cleared by 100% of what the game pays first). Details, and what's still to settle, under "Consider next", "The starting loan". | 2026-11-22 |
 
 ## Features: this run and consider next
 
@@ -171,6 +172,30 @@ Each item keeps its date and Koda's words. Done items moved to "Done from this l
 Checked against the code and `git log` on 2026-11-22.
 
 **Contracts, the next release**
+- **The starting loan (D111, Koda 2026-11-22; not built).** Today (X40) the debt is a fixed 45, "the −45
+  from Earth", and `Credits.mint` takes 100% of every payment the game makes until it's cleared. To build:
+  - **The debt is the advance's value:** set with the starter kit (`Pilots.setStarterKit`), e.g. the
+    kit's goods at their base prices (3 Helium-3 and 2 Electronics: about 800). Suggestion: a fixed
+    number set with the kit, so it doesn't move with market prices.
+  - **Repayment is half the margin of each sale.** A sale's margin is what the port pays less what the
+    goods cost the pilot. That needs a **cost basis per good** on chain: the average price paid for what's
+    in the hold, updated on each purchase (Suggestion: kept by `Market` or `Pilots`, eight numbers a
+    pilot). Goods that cost nothing (the advance itself, mined goods, a planet's output) are all
+    margin (Suggestion). A sale at a loss or at cost repays nothing. 50% of the margin goes to the
+    debt, the rest to the balance; no interest.
+  - **Only trade margins repay it** (Suggestion): not the cheat, not a port owner's income, not other
+    payments. `Credits.mint`'s "debt first" goes; the Market does the split.
+  - **Where repayments go:** to the corporation. Corporations aren't accounts yet, so for now the
+    treasury, or burned (open).
+  - **Paid in full:** `DebtChanged(pilot, 0)` triggers a one-time notice from the corporation or Minerva:
+    "Debts paid in full. Everything you buy and sell from here is your profit to keep." The trade
+    screen shows, until then, how much of a sale goes to the debt.
+  - **The game's words follow:** the intro's wake line ("You owe the pilot program N credits") and the
+    job's terms ("your debt comes with you") should say the cargo is a loan from the corporation, paid
+    back from half your trading profit (`libs/intro.js`); the apartment's "You owe 45" stays as Earth's
+    bills. Story: `backstory.md`, "You start in debt"; tuning: `demo4-tuning.md`.
+  - Check what it costs: `Market` and `Pilots` sizes (Pilots has 1.7 KB left), and a trade's gas with
+    the cost-basis write.
 - **Industry (in design, Koda 2026-11-21):** three sizes of autofactory (ship, planet, orbital; ships built in orbit, corporations' ships at high rank), worker and defense drones that build (time scales with drones committed, up to 4 a job), cargo ships moving goods between your bodies in a system, a system-wide holdings screen, and an NFT exchange. Direction and open questions: [`industry-plan.md`](industry-plan.md). Not built; waits on Koda's answers there. Supersedes the two kinds of Autofactory (Koda 2026-11-07: ground and orbital, "slightly different things, with a lot of overlap"; first guesses in `docs/tech-trees/crafting.md`, "Autofactory kinds").
 - **Binary stars (to do soon, Koda 2026-11-07; "soon" 2026-11-21):** some systems have two stars orbiting each other at the center. Selecting either selects the pair as **one object**; a single star can't be selected on its own. Alpha Centauri and Sirius, among Sol's genesis neighbors, are real binaries. Not built.
 - **Dwarf planets (to do, Koda 2026-11-16; D87):** small worlds (Pluto, Ceres, Eris…) as their own kind of body. To design. Body ids already leave room for the kind (`BodyId.sol`).

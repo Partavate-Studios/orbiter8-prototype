@@ -2,7 +2,7 @@
 
 **Status: design, not built.** Koda's direction of 2026-11-21, written up with Claude's suggestions
 and the questions it leaves. Nothing here is a numbered decision yet: once Koda answers the open
-questions, the answers go into `demo4-plan.md` as decisions (from D111; D101–D110 are taken), and the
+questions, the answers go into `demo4-plan.md` as decisions (from D112; D101–D111 are taken), and the
 ones that replace earlier decisions say so. This is a large contract change, for a release after the
 current testnet.
 
