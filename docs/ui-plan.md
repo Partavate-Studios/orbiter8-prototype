@@ -825,4 +825,21 @@ Log:
   `built/phone-armory.png`. Checked by screenshots, no purchase made.
 - **Menus walked through so far:** Yards, Armory. **Still to do:** Colony, Asteroid Works, Loadout
   (into the ship's Details), Siege, Feed, Chat, Ranks, Help, Settings, Trade (controls nearest the card).
+- 2026-11-22: **Koda on the Armory: "good start"**; respect the limits on what can be fitted; don't
+  blindly follow what was made; evaluate it on UX, UI and design, then build the best menu possible.
+  - **Limits checked against the contract** (`Pilots.setLoadout`): six mounts (point defense 1, a
+    railgun or a missile rack 2), armor up to 5, shields up to 3, repair bots 5 holds, armor 10 and
+    shields 20 a level, drones by drone bays. `partRoom` matches; the art draws no more than fit.
+  - **What the first pass got wrong.** Use: most rows were dimmed dead ends with nowhere to go; the
+    stepper and button were at the far end of the sheet from the row pressed; nothing said what a part
+    is for. Build: one flat list of eight; the room block was apart from the rows it governs; armor's
+    and shields' own limits weren't shown. Look: 45% dimming washed rows out; two small ship pictures
+    with no captions.
+  - **Second pass (built):** three groups by what a part uses up (Weapons: mounts; Drones: drone
+    bays; Inside the hull: holds), each with its meter in its heading; a line on what each part is
+    for; armor and shield levels as pips; the chosen part opens in place with its stepper, cost and
+    Fit button; mounts and levels about to be taken show in yellow, and both ship pictures update;
+    a group that's out of room says where room comes from, with a Yards button.
+  - **A pattern for the other menus:** group by the limit that governs, put the meter in the group's
+    heading, open the chosen row in place, and never leave a "can't" without a way on.
 

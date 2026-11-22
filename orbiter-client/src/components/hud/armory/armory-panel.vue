@@ -1,10 +1,16 @@
 <template>
-  <!-- A station's armory (Koda, 2026-11-22: rebuilt to the screen standard as the yards were,
-       docs/ui-guide.md section 11): parts for your ship, bought and fitted in one move. A Sol station
-       sells at twice a part's cost, a pilot's Armory at one and a half (paid to its owner). Each part
-       shows its picture (as it's drawn on the ship), what it takes, how many you have, its price, and
-       when you can't have one, why: no room, or how short you are. The ship beside the list shows
-       what you're about to fit. Buttons take the station's color, not the brand purple. -->
+  <!-- A station's armory: parts for your ship, bought and fitted in one move. A Sol station sells at
+       twice a part's cost, a pilot's Armory at one and a half (paid to its owner).
+       Second pass (Koda, 2026-11-22: "look at what you build, evaluate it... then build the best menu
+       you can"). What the first pass got wrong, and what this does about it (docs/ui-plan.md):
+       - eight flat rows, most of them dimmed: now three groups by what a part uses up (mounts, drone
+         bays, holds), each with its own meter, so a limit is seen where it applies;
+       - "no room" was a dead end: the group says where room comes from (the Yards, one press away);
+       - the stepper and the button sat at the far end of the sheet from the row you pressed: the
+         chosen row now opens in place, with its stepper, its cost and its button;
+       - nothing said what a part is for: each has a line;
+       - armor and shields have a limit of their own: drawn as pips on their rows.
+       The limits are the contract's (Pilots.setLoadout), through sdk/parts.js partRoom. -->
   <div v-if="station" class="armory-panel" :class="{ narrow }">
     <header>
       <span class="title">
@@ -14,62 +20,68 @@
       <span class="balance"><small>You have</small><b>{{ credits(avatar.credits) }}¢</b></span>
     </header>
 
-    <!-- your ship as it will be: as it flies, and opened up; then the room it has left -->
+    <!-- your ship as it will be: as it flies, and opened up -->
     <div class="ship">
-      <svg ref="outside" class="art" :viewBox="SHIP_ART_VIEWBOX" aria-hidden="true" />
-      <svg ref="inside" class="art" :viewBox="SHIP_ART_VIEWBOX" aria-hidden="true" />
-      <div class="room">
-        <p>
-          <span>Mounts</span>
-          <span class="pips" :aria-label="mounts + ' of ' + SHIP_MOUNTS + ' mounts used'"><i v-for="n in SHIP_MOUNTS" :key="n" :class="{ on: n <= mounts, adding: n > mounts && n <= mountsAfter }" /></span>
-        </p>
-        <p><span>Free holds</span><b>{{ player.freeBays }}</b></p>
-        <p><span>Drone room</span><b>{{ droneFree }}</b></p>
-      </div>
+      <figure><svg ref="outside" class="art" :viewBox="SHIP_ART_VIEWBOX" aria-hidden="true" /><figcaption>As it flies</figcaption></figure>
+      <figure><svg ref="inside" class="art" :viewBox="SHIP_ART_VIEWBOX" aria-hidden="true" /><figcaption>Opened up</figcaption></figure>
     </div>
 
-    <section>
-      <h3>Parts</h3>
-      <button v-for="row in rows" :key="row.id" type="button" class="part" :class="{ on: row.id === part, off: !row.can }" :aria-pressed="row.id === part ? 'true' : 'false'" @click="choose(row)">
-        <!-- (the pictures are this file's own fixed strings) -->
-        <!-- eslint-disable-next-line vue/no-v-html -->
-        <svg class="pic" viewBox="-12 -12 24 24" aria-hidden="true" v-html="PICTURES[row.field]" />
-        <span class="text">
-          <b>{{ row.name }}</b>
-          <small>{{ row.takes }}<template v-if="row.have"> · {{ row.have }} fitted</template></small>
+    <section v-for="group in groups" :key="group.key">
+      <h3>
+        <span>{{ group.title }}</span>
+        <!-- the group's limit, where it applies -->
+        <span class="meter">
+          <span v-if="group.pips" class="pips" aria-hidden="true"><i v-for="n in group.pips.of" :key="n" :class="{ on: n <= group.pips.used, adding: n > group.pips.used && n <= group.pips.after }" /></span>
+          {{ group.meter }}
         </span>
-        <span class="price">
-          <b>{{ credits(row.price) }}¢</b>
-          <small v-if="row.why" :class="{ needs: row.short }">{{ row.why }}</small>
-        </span>
-      </button>
+      </h3>
+      <div v-for="row in group.rows" :key="row.id" class="part" :class="{ on: row.id === part, off: !row.can }">
+        <button type="button" class="summary" :disabled="!row.can" :aria-expanded="row.id === part ? 'true' : 'false'" @click="choose(row)">
+          <!-- (the pictures are this file's own fixed strings) -->
+          <!-- eslint-disable-next-line vue/no-v-html -->
+          <svg class="pic" viewBox="-12 -12 24 24" aria-hidden="true" v-html="PICTURES[row.field]" />
+          <span class="text">
+            <b>{{ row.name }}</b>
+            <small>{{ row.does }}</small>
+          </span>
+          <!-- how many you have; armor and shields as levels of their limit -->
+          <span v-if="row.max" class="have levels" :aria-label="row.have + ' of ' + row.max + ' levels'"><i v-for="n in row.max" :key="n" :class="{ on: n <= row.have, adding: row.id === part && n > row.have && n <= row.have + count }" /></span>
+          <span v-else-if="row.have" class="have">×{{ row.have }}</span>
+          <span class="price">
+            <b>{{ credits(row.price) }}¢</b>
+            <small :class="{ needs: row.short }">{{ row.why || row.takes }}</small>
+          </span>
+        </button>
+        <!-- chosen: how many, what it costs, and the button, right where you pressed -->
+        <div v-if="row.id === part" class="buy">
+          <div class="stepper">
+            <button type="button" class="step" :disabled="count <= 1" aria-label="One fewer" @click="step(-1)">−</button>
+            <output aria-live="polite">{{ count }}</output>
+            <button type="button" class="step" :disabled="count >= row.most" aria-label="One more" @click="step(1)">+</button>
+          </div>
+          <p class="sums">
+            <span><b>{{ credits(total) }}¢</b> · {{ credits(avatar.credits - total) }}¢ left</span>
+            <small>{{ row.most === 1 ? 'One is all that fits and you can pay for' : `Up to ${row.most}` }}</small>
+          </p>
+          <button type="button" class="main" :disabled="pending" @click="buy">{{ pending ? 'Fitting…' : `Fit ${count}` }}</button>
+        </div>
+      </div>
+      <!-- out of room: where room comes from, one press away -->
+      <p v-if="group.more" class="more">
+        {{ group.more }}
+        <button v-if="station.yard" type="button" class="link" @click="toYards"><small-icon name="yards" />Yards</button>
+      </p>
     </section>
-
-    <!-- the screen's one main action, for the part chosen -->
-    <footer v-if="chosen">
-      <div class="stepper">
-        <button type="button" class="step" :disabled="count <= 1" aria-label="One fewer" @click="step(-1)">−</button>
-        <output aria-live="polite">{{ count }}</output>
-        <button type="button" class="step" :disabled="count >= chosen.most" aria-label="One more" @click="step(1)">+</button>
-      </div>
-      <div class="sums">
-        <p><span>Cost</span><b>{{ credits(total) }}¢</b></p>
-        <p><span>Left after</span><b>{{ credits(avatar.credits - total) }}¢</b></p>
-      </div>
-      <button type="button" class="main" :disabled="!chosen.can || pending" @click="buy">
-        {{ pending ? 'Fitting…' : `Fit ${count} ${count === 1 ? chosen.name.toLowerCase() : partPlural(chosen.name)}` }}
-      </button>
-    </footer>
-    <p v-else class="hint">Choose a part. It's bought and fitted in one move.</p>
   </div>
 </template>
 
 <script>
-import { mapState } from 'pinia'
-import { SHIP_PARTS, SHIP_MOUNTS, mountsUsed, partPlural, partRoom } from '@orbiter8/sdk/parts'
+import { mapActions, mapState } from 'pinia'
+import { SHIP_PARTS, SHIP_MOUNTS, mountsUsed, partRoom } from '@orbiter8/sdk/parts'
 import { shipArtParts, shipInsideParts, SHIP_ART_VIEWBOX } from '@orbiter8/sdk/ship-art'
 import { useStarMapStore } from '@/stores/starmap'
 import { useGameStateStore } from '@/stores/gamestate'
+import { useUIStore } from '@/stores/ui'
 import { usePlayerStore } from '@/stores/player'
 import SmallIcon from '../small-icon.vue'
 
@@ -84,6 +96,25 @@ const PICTURES = {
   armor: '<path d="M-8 9V0A8 8 0 0 1 8 0V9Z" fill="none" stroke="#8f7fb0" stroke-width="1.4"/><path d="M-8 1V0A8 8 0 0 1 8 0V1Z" fill="#b9a6d6"/>',
   shields: '<path d="M-7 9V0A7 7 0 0 1 7 0V9" fill="none" stroke="#7fd4ff" stroke-width="4" stroke-linecap="round"/>'
 }
+// What each part is for, in a line (the battle's counters: docs/demo4-tuning.md; no numbers, they're tuned on chain).
+const DOES = {
+  railguns: 'Strong against armor',
+  missiles: 'Strong against shields',
+  pointDefense: 'Stops missiles',
+  drones: 'Strong against weapons',
+  miningDrones: 'Mines the belt. Never lost',
+  repairBots: 'Mends your armor each round',
+  armor: 'Takes the hits your shield lets through',
+  shields: 'Takes hits first, and recharges'
+}
+// Parts by what they use up: the group's meter is that limit.
+const GROUPS = [
+  { key: 'mounts', title: 'Weapons', fields: ['railguns', 'missiles', 'pointDefense'] },
+  { key: 'drones', title: 'Drones', fields: ['drones', 'miningDrones'] },
+  { key: 'holds', title: 'Inside the hull', fields: ['repairBots', 'armor', 'shields'] }
+]
+/** What a part takes, short. */
+const TAKES = { railguns: '2 mounts', missiles: '2 mounts', pointDefense: '1 mount', drones: '1 drone bay', miningDrones: '1 drone bay', repairBots: '5 holds', armor: '10 holds a level', shields: '20 holds a level' }
 
 export default {
   name: 'ArmoryPanel',
@@ -95,7 +126,7 @@ export default {
     narrow: { type: Boolean, default: false }
   },
   data() {
-    return { player: usePlayerStore(), part: null, count: 1, pending: false, PICTURES, SHIP_ART_VIEWBOX, SHIP_MOUNTS }
+    return { player: usePlayerStore(), part: null, count: 1, pending: false, PICTURES, SHIP_ART_VIEWBOX }
   },
   computed: {
     ...mapState(useStarMapStore, ['systemObjects']),
@@ -110,22 +141,15 @@ export default {
     ship() {
       return this.player.ship
     },
-    mounts() {
-      return mountsUsed(this.ship.loadout)
+    dronesPerBay() {
+      return this.player.economy?.dronesPerBay ?? 1
     },
-    mountsAfter() {
-      return mountsUsed(this.preview.loadout)
-    },
-    droneFree() {
-      const per = this.player.economy?.dronesPerBay ?? 1
-      return Math.max(0, (this.ship.droneBays ?? 0) * per - this.ship.loadout.drones - (this.ship.loadout.miningDrones ?? 0))
-    },
-    /** Every part: what it takes, how many are fitted, its price, and whether you can have one (and if not, why). */
+    /** Every part: what it's for, what it takes, how many are fitted, its price, and whether you can have one (and if not, why). */
     rows() {
       const credits = this.avatar.credits
       return SHIP_PARTS.map((p) => {
         const price = this.player.partPrice(this.port, p.id, 1)
-        const room = partRoom(p, this.ship, { freeBays: this.player.freeBays, dronesPerBay: this.player.economy?.dronesPerBay ?? 1 })
+        const room = partRoom(p, this.ship, { freeBays: this.player.freeBays, dronesPerBay: this.dronesPerBay })
         // the most that both fit and can be paid for
         let most = Math.min(room.fits, 20)
         while (most > 0 && this.player.partPrice(this.port, p.id, most) > credits) most--
@@ -134,41 +158,70 @@ export default {
           id: p.id,
           field: p.field,
           name: this.player.rules.parts[p.id].name,
-          takes: p.space,
+          does: DOES[p.field],
+          takes: TAKES[p.field],
+          max: p.max ?? 0,
           have: this.ship.loadout[p.field] ?? 0,
           price,
           most,
           can: most > 0,
           short,
+          noRoom: room.fits === 0,
           why: room.why || (short ? `${this.credits(price - credits)}¢ short` : '')
         }
       })
     },
     chosen() {
-      return this.rows.find((row) => row.id === this.part) ?? null
+      return this.rows.find((row) => row.id === this.part && row.can) ?? null
     },
     total() {
       return this.chosen ? this.player.partPrice(this.port, this.part, this.count) : 0
     },
-    /** The ship with what's chosen already fitted: the pictures show it. */
+    /** The ship with what's chosen already fitted: the pictures and the meters show it. */
     preview() {
       const loadout = { ...this.ship.loadout }
-      if (this.chosen?.can) loadout[this.chosen.field] = (loadout[this.chosen.field] ?? 0) + this.count
+      if (this.chosen) loadout[this.chosen.field] = (loadout[this.chosen.field] ?? 0) + this.count
       return { ...this.ship, loadout }
+    },
+    /** The three groups, each with its limit as a meter, and where more room comes from when it's out. */
+    groups() {
+      const l = this.ship.loadout
+      const after = this.preview.loadout
+      const droneRoom = (this.ship.droneBays ?? 0) * this.dronesPerBay
+      const dronesNow = l.drones + (l.miningDrones ?? 0)
+      const free = this.player.freeBays
+      const meters = {
+        mounts: {
+          pips: { of: SHIP_MOUNTS, used: mountsUsed(l), after: mountsUsed(after) },
+          meter: `${mountsUsed(l)} of ${SHIP_MOUNTS} mounts`,
+          more: ''
+        },
+        drones: {
+          meter: droneRoom ? `${dronesNow} of ${droneRoom} drone room` : 'No drone bays',
+          more: dronesNow >= droneRoom ? 'Drones live in drone bays.' : ''
+        },
+        holds: {
+          meter: `${free} free ${free === 1 ? 'hold' : 'holds'}`,
+          more: free < 5 ? 'These take free cargo holds: sell cargo, or fit more holds.' : ''
+        }
+      }
+      return GROUPS.map((group) => ({ ...group, ...meters[group.key], rows: group.fields.map((field) => this.rows.find((row) => row.field === field)) }))
     }
   },
   watch: {
     preview: { deep: true, handler: 'draw' },
-    // (what fits changes as parts go on: never more chosen than fit)
-    chosen(row) {
-      if (row) this.count = Math.max(1, Math.min(this.count, row.most || 1))
+    // (what fits changes as parts go on: never more chosen than fit; a part that no longer fits closes)
+    rows() {
+      const row = this.rows.find((r) => r.id === this.part)
+      if (!row?.can) this.part = null
+      else this.count = Math.max(1, Math.min(this.count, row.most))
     }
   },
   mounted() {
     this.draw()
   },
   methods: {
-    partPlural,
+    ...mapActions(useUIStore, ['openMenu']),
     credits(n) {
       return Math.round(n).toLocaleString('en-US')
     },
@@ -177,9 +230,10 @@ export default {
       if (this.$refs.outside) this.$refs.outside.innerHTML = shipArtParts(this.preview, false, 'armory-')
       if (this.$refs.inside) this.$refs.inside.innerHTML = shipInsideParts(this.preview)
     },
+    /** Opens the part in place (pressed again, closes it). */
     choose(row) {
       this.o8audio?.playEffect('click')
-      this.part = row.id
+      this.part = this.part === row.id ? null : row.id
       this.count = 1
     },
     step(by) {
@@ -190,6 +244,10 @@ export default {
       this.pending = true
       if (await this.player.buyParts(this.port, this.part, this.count)) this.count = 1
       this.pending = false
+    },
+    toYards() {
+      this.o8audio?.playEffect('click')
+      this.openMenu('shipyard')
     }
   }
 }
@@ -250,74 +308,87 @@ small {
   font-size: 19px;
   font-weight: normal;
 }
+/* the ship, twice */
 .ship {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  justify-content: center;
+  gap: 14px;
   margin-top: 12px;
 }
+figure {
+  margin: 0;
+  text-align: center;
+}
 .art {
-  flex: none;
-  width: 116px;
-  height: 116px;
+  display: block;
+  width: 128px;
+  height: 128px;
   border-radius: 12px;
   background: #150f28;
 }
 .narrow .art {
-  width: 88px;
-  height: 88px;
+  width: 112px;
+  height: 112px;
 }
-.room {
-  flex: 1;
-  min-width: 0;
-  padding-left: 8px;
-}
-.room p {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin: 0;
-  font-size: 13.5px;
-  line-height: 26px;
-}
-.room span {
-  color: #bdb5d4;
-}
-.room b {
-  color: #ffffff;
-}
-.pips {
-  display: flex;
-  gap: 4px;
-}
-.pips i {
-  width: 14px;
-  height: 14px;
-  box-sizing: border-box;
-  border: 1.5px solid color-mix(in srgb, var(--base) 70%, transparent);
-  border-radius: 50%;
-}
-.pips i.on {
-  border-color: var(--accent);
-  background: var(--accent);
-}
-/* about to be taken: yours, once you fit it */
-.pips i.adding {
-  border-color: var(--o8-yellow-light);
-  background: var(--o8-yellow-light);
+figcaption {
+  margin-top: 4px;
+  color: #9088aa;
+  font-size: 11.5px;
 }
 section {
   margin-top: 14px;
 }
 h3 {
-  margin: 0 0 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 4px;
   padding-bottom: 5px;
   border-bottom: 1px solid #ffffff1f;
   color: var(--accent);
   font-size: 11px;
   letter-spacing: 1.3px;
   text-transform: uppercase;
+}
+.meter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #e6dcf5;
+  font-size: 12.5px;
+  font-weight: normal;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.pips,
+.levels {
+  display: flex;
+  gap: 4px;
+}
+.pips i,
+.levels i {
+  width: 11px;
+  height: 11px;
+  box-sizing: border-box;
+  border: 1.5px solid color-mix(in srgb, var(--base) 75%, transparent);
+  border-radius: 50%;
+}
+.levels i {
+  width: 8px;
+  height: 14px;
+  border-radius: 3px;
+}
+.pips i.on,
+.levels i.on {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+/* about to be taken: yours, once you fit it */
+.pips i.adding,
+.levels i.adding {
+  border-color: var(--o8-yellow-light);
+  background: var(--o8-yellow-light);
 }
 button {
   font: inherit;
@@ -331,34 +402,37 @@ button:focus-visible {
   outline: 2.5px solid var(--o8-brand-300);
   outline-offset: 2px;
 }
-/* a part: its picture, its name and what it takes, its price */
+/* a part: its picture, its name and what it's for, how many you have, its price */
 .part {
+  border: 1.5px solid transparent;
+  border-radius: 12px;
+}
+.part.on {
+  border-color: var(--accent);
+  background: #ffffff14;
+}
+.summary {
   display: flex;
   align-items: center;
   gap: 12px;
   width: 100%;
-  min-height: 46px;
+  min-height: 48px;
   box-sizing: border-box;
-  padding: 3px 12px 3px 8px;
-  border: 1.5px solid transparent;
-  border-radius: 12px;
+  padding: 4px 12px 4px 8px;
+  border: 0;
+  border-radius: 11px;
   background: none;
   color: inherit;
   text-align: left;
 }
-.part:hover {
-  border-color: color-mix(in srgb, var(--accent) 60%, transparent);
-  background: #ffffff0c;
-}
-.part.on {
-  border-color: var(--accent);
-  background: #ffffff1c;
+.summary:hover:not(:disabled) {
+  background: #ffffff10;
 }
 .pic {
   flex: none;
-  width: 34px;
-  height: 34px;
-  padding: 3px;
+  width: 36px;
+  height: 36px;
+  padding: 4px;
   box-sizing: border-box;
   border-radius: 9px;
   background: #150f28;
@@ -373,8 +447,14 @@ button:focus-visible {
   font-size: 15px;
   font-weight: 500;
 }
+.have {
+  flex: none;
+  color: #e6dcf5;
+  font-size: 14px;
+}
 .price {
   flex: none;
+  min-width: 96px;
   text-align: right;
 }
 .price b {
@@ -385,32 +465,32 @@ button:focus-visible {
 .price small {
   font-size: 11.5px;
 }
-/* can't have one now: dimmed, and it says why */
+/* can't have one now: quieter, and the line under its price says why */
 .part.off .pic,
-.part.off .text,
+.part.off .text b,
 .part.off .price b {
-  opacity: 0.45;
+  opacity: 0.55;
 }
 /* short of credits: light pink, said in words (pink needs you) */
 small.needs {
   color: var(--o8-pink-light);
 }
-footer {
+/* the chosen part, opened: how many, the cost, the button */
+.buy {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-top: 16px;
-  padding-top: 14px;
-  border-top: 1px solid #ffffff1f;
+  gap: 14px;
+  padding: 4px 12px 10px 56px;
 }
-.narrow footer {
+.narrow .buy {
   flex-wrap: wrap;
+  padding-left: 12px;
 }
 .stepper {
   flex: none;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
 }
 .step {
   width: 44px;
@@ -431,57 +511,74 @@ footer {
   opacity: 0.35;
 }
 output {
-  min-width: 44px;
+  min-width: 40px;
   color: #ffffff;
-  font-size: 28px;
+  font-size: 26px;
   text-align: center;
 }
 .sums {
   flex: 1;
   min-width: 120px;
-}
-.sums p {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
   margin: 0;
-  font-size: 14px;
-  line-height: 23px;
-}
-.sums span {
   color: #bdb5d4;
+  font-size: 13.5px;
 }
 .sums b {
   color: #ffffff;
+  font-size: 15px;
+}
+.sums small {
+  font-size: 11.5px;
 }
 /* the main action: the menu's own color, dark words on it, as its heading has */
 .main {
   flex: none;
-  height: 48px;
-  min-width: 170px;
+  height: 44px;
+  min-width: 104px;
   padding: 0 22px;
   border: 2px solid var(--accent);
-  border-radius: 24px;
+  border-radius: 22px;
   background: var(--base);
   color: #1b1531;
   font-size: 16px;
   font-weight: bold;
   white-space: nowrap;
 }
-.narrow .main {
-  flex: 1 0 100%;
-}
 .main:hover:not(:disabled) {
   background: var(--accent);
 }
 .main:disabled {
-  border-color: color-mix(in srgb, var(--base) 45%, transparent);
-  background: color-mix(in srgb, var(--base) 22%, transparent);
-  color: #ffffff77;
+  opacity: 0.6;
 }
-.hint {
-  margin: 14px 0 0;
+.more {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 4px 0 0;
+  padding: 0 12px 0 8px;
   color: #9088aa;
   font-size: 12.5px;
+}
+.link {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 14px 0 10px;
+  border: 1.2px solid color-mix(in srgb, var(--accent) 60%, transparent);
+  border-radius: 16px;
+  background: #ffffff10;
+  color: #ffffff;
+  font-size: 13px;
+}
+.link:hover {
+  border-color: var(--accent);
+  background: #ffffff22;
+}
+.link .small-icon {
+  width: 18px;
+  height: 18px;
 }
 </style>
