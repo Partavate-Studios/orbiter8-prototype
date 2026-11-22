@@ -777,4 +777,7 @@ Log:
   color, wrapping the ship nicely. Round 5 drawn: the hull's outline in the old blue, fat, behind the
   ship, fatter each level, breathing in and out (`sheet.svg`). Known gap: where longer range lengthens
   the pods, the shield doesn't follow the added length yet.
+- 2026-11-22: **Koda on point defense:** a dot, not the dark gun turret; the dots can overlap the
+  ship's edge along the hull. Round 6 drawn: lavender dots sitting on the hull's outline, in pairs
+  (the nose, the fuselage's sides, the pods).
 
