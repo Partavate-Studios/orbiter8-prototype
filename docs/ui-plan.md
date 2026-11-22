@@ -741,4 +741,16 @@ Log:
 - **Where things stand:** steps 1 (card) and 2 (list, top right) built and play-tested; Yards rebuilt;
   step 3 (Minerva's plate and Link) is next; the other menus still to walk through (Armory, Colony,
   Loadout into the ship's Details, Help).
+- 2026-11-21: **Koda on the first upgrade sheet: "not a big fan of any".** His notes:
+  - Railguns are "close to good", and can be white.
+  - Shields should **wrap the ship**, not make a bubble.
+  - The armor "doesn't look good at all".
+  - **Cargo holds go inside the ship.** The Orbiter 8 is designed to be built out: "like getting a big
+    flatbed truck, you design it... it's a big empty space and the cargo holds get fitted inside... or
+    drone bays... or maybe other things later."
+  - Longer thrusters could show that the ship jumps further.
+  - He likes the battle drones most of all.
+  - A ship with every upgrade "should look really cool" but this one looks cluttered: "everything
+    should fit together nicely".
+  - Round 2 is drawn to these: `docs/mockups/ship-upgrades/sheet.png` (round 1 kept as `round-1.png`).
 
