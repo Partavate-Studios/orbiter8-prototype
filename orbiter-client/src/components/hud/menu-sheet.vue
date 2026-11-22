@@ -33,20 +33,20 @@ import { useUIStore } from '@/stores/ui'
 import { CARD_THEMES, menuTheme, mixHex } from '@/libs/card-theme'
 import { CARD_GRAY } from '@/libs/palette'
 import { openMenuName } from '@/components/star-map/hud/menus/menu-container/_menu-container.svg.vue'
-import ChatMenu from '@/components/star-map/hud/menus/chat-menu.svg'
-import LeaderboardMenu from '@/components/star-map/hud/menus/leaderboard-menu.svg'
-import SettingsMenu from '@/components/star-map/hud/menus/settings-menu.svg'
 import ColonyMenu from '@/components/star-map/hud/menus/colony-menu.svg'
 import AsteroidMenu from '@/components/star-map/hud/menus/asteroid-menu.svg'
 import LoadoutMenu from '@/components/star-map/hud/menus/loadout-menu.svg'
 import SiegeMenu from '@/components/star-map/hud/menus/siege-menu.svg'
-import FeedMenu from '@/components/star-map/hud/menus/feed-menu.svg'
-import HelpMenu from '@/components/star-map/hud/menus/help-menu.svg'
 import TradePanel from './trade/trade-panel.vue'
 import ObjectsPanel from './objects/objects-panel.vue'
 import YardsPanel from './yards/yards-panel.vue'
 import ProfilePanel from './profile/profile-panel.vue'
 import ArmoryPanel from './armory/armory-panel.vue'
+import HelpPanel from './panels/help-panel.vue'
+import ChatPanel from './panels/chat-panel.vue'
+import FeedPanel from './panels/feed-panel.vue'
+import RanksPanel from './panels/ranks-panel.vue'
+import SettingsPanel from './panels/settings-panel.vue'
 
 /**
  * Every menu's inside: the quiet blue-gray the station's menus had (Koda, 2026-11-21: "I love the color
@@ -60,19 +60,19 @@ const HTML_MENUS = {
   objects: ObjectsPanel,
   shipyard: YardsPanel,
   profile: ProfilePanel,
-  armory: ArmoryPanel
+  armory: ArmoryPanel,
+  help: HelpPanel,
+  chat: ChatPanel,
+  feed: FeedPanel,
+  leaderboard: RanksPanel,
+  settings: SettingsPanel
 }
 
 const MENUS = {
-  chat: ChatMenu,
-  leaderboard: LeaderboardMenu,
-  settings: SettingsMenu,
   colony: ColonyMenu,
   asteroid: AsteroidMenu,
   loadout: LoadoutMenu,
-  siege: SiegeMenu,
-  feed: FeedMenu,
-  help: HelpMenu
+  siege: SiegeMenu
 }
 // The menus were drawn for a panel this wide at most, a screen (960 units) tall, centered on 0.
 const MAX_WIDTH = 800

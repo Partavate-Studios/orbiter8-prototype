@@ -1,0 +1,248 @@
+/* The kit (docs/ui-guide.md section 11): the parts every menu panel is made of, written once. A panel's
+   root has class k-panel; the menu sheet gives it the menu's colors (--base, --accent, --inside). */
+.k-panel {
+  width: min(560px, calc(100vw - 60px));
+  box-sizing: border-box;
+  padding: 18px 22px 20px;
+  color: #e6dcf5;
+  text-align: left;
+}
+.k-panel.narrow {
+  width: calc(100vw - 34px);
+  padding: 14px 12px 16px;
+}
+/* the heading: its icon, its name, a line under it; clear of the sheet's close button on wide screens */
+.k-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-right: 52px;
+}
+.k-panel.narrow .k-head {
+  padding-right: 0;
+}
+.k-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  color: var(--accent);
+}
+.k-title > .small-icon {
+  flex: none;
+  width: 34px;
+  height: 34px;
+}
+.k-title b {
+  display: block;
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: normal;
+  line-height: 1.1;
+}
+.k-panel small {
+  display: block;
+  color: #bdb5d4;
+  font-size: 12.5px;
+}
+.k-panel section {
+  margin-top: 14px;
+}
+/* a section's heading: small capitals and a rule; what governs the section sits at its right */
+.k-panel h3 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 6px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #ffffff1f;
+  color: var(--accent);
+  font-size: 11px;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+}
+.k-meter {
+  color: #e6dcf5;
+  font-size: 12.5px;
+  font-weight: normal;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.k-panel button {
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.k-panel button:disabled {
+  cursor: default;
+}
+.k-panel button:focus-visible,
+.k-panel input:focus-visible {
+  outline: 2.5px solid var(--o8-brand-300);
+  outline-offset: 2px;
+}
+/* the screen's one main action: the menu's own color, dark words on it, as its heading has */
+.k-main {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 46px;
+  min-width: 120px;
+  padding: 0 22px;
+  border: 2px solid var(--accent);
+  border-radius: 23px;
+  background: var(--base);
+  color: #1b1531;
+  font-size: 16px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+.k-main:hover:not(:disabled) {
+  background: var(--accent);
+}
+.k-main:disabled {
+  border-color: color-mix(in srgb, var(--base) 45%, transparent);
+  background: color-mix(in srgb, var(--base) 22%, transparent);
+  color: #ffffff77;
+}
+.k-main .small-icon {
+  width: 22px;
+  height: 22px;
+}
+/* a second action: outlined in the menu's color */
+.k-quiet {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 16px;
+  border: 1.5px solid color-mix(in srgb, var(--accent) 70%, transparent);
+  border-radius: 20px;
+  background: #ffffff10;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+.k-quiet:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: #ffffff26;
+}
+.k-quiet:disabled {
+  border-color: color-mix(in srgb, var(--base) 45%, transparent);
+  color: #ffffff66;
+}
+.k-quiet .small-icon {
+  width: 18px;
+  height: 18px;
+}
+/* a row: one thing in a list; pressable ones light up */
+.k-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 46px;
+  box-sizing: border-box;
+  padding: 4px 12px 4px 8px;
+  border: 1.5px solid transparent;
+  border-radius: 12px;
+  background: none;
+  color: inherit;
+  text-align: left;
+}
+button.k-row:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--accent) 60%, transparent);
+  background: #ffffff10;
+}
+.k-row.on {
+  border-color: var(--accent);
+  background: #ffffff18;
+}
+.k-row .k-text {
+  flex: 1;
+  min-width: 0;
+}
+.k-row .k-text b {
+  display: block;
+  overflow: hidden;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* a name that goes somewhere */
+.k-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #c9b6ff;
+  font-weight: bold;
+  text-decoration: underline;
+  text-decoration-color: #c9b6ff88;
+  text-underline-offset: 3px;
+}
+.k-link:hover {
+  color: #ffffff;
+}
+/* yours */
+.k-you {
+  color: var(--o8-yellow-light);
+}
+/* needs you */
+.k-needs {
+  color: var(--o8-pink-light);
+}
+.k-none {
+  margin: 14px 4px;
+  color: #9088aa;
+  font-size: 13px;
+}
+/* tabs: square, a way to somewhere; the current one is lit */
+.k-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.k-tab {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 12px;
+  border: 1.2px solid color-mix(in srgb, var(--base) 55%, transparent);
+  border-radius: 12px;
+  background: #ffffff0a;
+  color: #e6dcf5;
+  font-size: 14px;
+}
+.k-tab:hover {
+  border-color: var(--accent);
+}
+.k-tab.on {
+  border: 2.2px solid var(--accent);
+  background: #ffffff1c;
+  color: #ffffff;
+}
+.k-tab .small-icon {
+  width: 20px;
+  height: 20px;
+}
+/* not there yet */
+.k-socket {
+  padding: 8px 12px;
+  border: 1px dashed #5a4c8c;
+  border-radius: 10px;
+  color: #efe7ff88;
+  font-size: 13px;
+}

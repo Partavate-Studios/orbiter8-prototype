@@ -846,4 +846,19 @@ Log:
   heading ("7 of 250 bays", counting what you're about to fit); the Fit button beside the stepper
   instead of at the foot of the sheet; engine power in the capacitors' warm yellow. Checked by
   screenshot. **Next:** Colony, then Loadout into the ship's Details, then the rest of the list above.
+- 2026-11-22: **Koda: "do all of the menu work you can."** Batch 1 built, all HTML on a shared
+  stylesheet (`hud/kit.css`: the kit's parts written once; panels in `hud/panels/`), the old SVG
+  menus deleted:
+  - **Help:** How planets grow leads, as the screen's main way on (Koda's note 3); then the first
+    steps with their ticks; then the keys.
+  - **Chat:** you write where you read (a field and Send in the panel, focused; the dialog is gone);
+    thirty broadcasts, not twelve; a pilot's name opens their info card.
+  - **Sieges (the feed):** thirty events; running ones pink; pilots' names open their info cards, a
+    planet in this system selects it.
+  - **Ranks:** Planets / Credits as tabs, Refresh, a row opens that pilot's info card; your row lit.
+  - **Settings:** each setting a row of steps with its value in its heading; Interface size is in the
+    panel (it had no control here before); Back to title; the dev cheat.
+  - Screenshot: `built/help-chat-ranks-settings.png`, `built/sieges-feed.png`. 251 tests, lint pass.
+  - **Menus done:** Yards, Armory, Help, Chat, Sieges, Ranks, Settings, the list, the pilot's card.
+    **Left:** Loadout (the ship's Details), Siege, Asteroid Works, Colony, Trade's layout.
 
