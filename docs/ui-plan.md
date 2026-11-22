@@ -602,3 +602,22 @@ takes the full face beside it. About 1.4 times a card's width, not 2. The headin
 - It's close to what a phone needs.
 - The cost: the planet's readouts aren't shown while its station or moon is in front; its name and
   sphere are.
+
+**Koda's choice (2026-11-21): the milder take.** The card stays double wide for the moons' list (the
+planet is still the subject), and narrows to a spine and one face when a station or a single moon is in
+front. Claude's worry that the card changes width between two clicks is noted; Koda prefers it. Design
+it so the tabs and the action row hold their places through the change.
+
+## 14. Going ahead (Koda, 2026-11-21)
+
+Koda: the proposal is an improvement; carry the concepts "a bit further and deeper"; the up-front prep
+is a good plan. Prep first, shown to Koda before any game code changes:
+
+1. The small-icon set (`mockups/together/6-small-icons`, drawn by `dev/mockups/icons.mjs`).
+2. The kit and the screen standard.
+3. Deeper mockups: the card in each state (plain, moons' list, spine and face) on desktop and phone;
+   the activity window; the top right; the trade loop's travel, measured.
+
+Assumed unless Koda says otherwise (his answers to Part 9 so far cover 1, 2, 4, 7 and 8 only):
+with nothing selected the card shows your ship; the nearby strip goes; Loadout folds into the ship's
+Details; Rename moves into Details; the minimap's new place is still open and gets drawn two ways.
