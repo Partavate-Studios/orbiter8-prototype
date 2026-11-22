@@ -883,4 +883,33 @@ Log:
   - **Left:** Trade's layout (its controls nearest the card); the SVG menu helpers that nothing uses
     now (`star-map/hud/menus/`: menu-button, menu-container, widgets) can be removed once checked;
     the phone layouts of Colony, Asteroid Works, Siege and Your ship weren't looked at.
+- 2026-11-22: **Koda: "keep going until you're done with all of it." Done:**
+  - **Step 3, Minerva** (`hud/minerva-plate.vue`, `hud/panels/minerva-panel.vue`, `libs/activities.js`):
+    her plate at the top is the activity window (her face shows the most pressing thing; an icon per
+    thing under way with a ring; filled = keeps you busy, outlined = waiting, pink = needs you; the
+    session at the end in lavender). The session, scan and mining chips are gone. Her menu (key `N`):
+    Link (network, block, address, balances, how you're signing, Start / End Session) and Under way
+    (everything in one list). **Start Session left the ship's card.**
+  - **You:** the pilot plate's avatar and call sign open your own info card; the ship's name selects
+    your ship.
+  - **Trade:** on wide screens the sliders and Make Trade are on the side nearest the card; its main
+    button takes the port's color.
+  - **Cleanup:** the SVG menus' helpers, four unused icons, the drawer's state and glyphs removed.
+  - **Found by playing, and fixed:** a pilot's Armory sells only what its Autofactory has finished
+    (`Armory.buy` takes from the factory's store), which the Armory screen ignored: it now reads
+    other pilots' armories' stock (`sdk/src/client.js`), shows "N in stock" and "None in stock", and
+    caps the stepper by it. Tall menus slid under Minerva's plate: the sheet stops below it, on
+    desktop and phone. "No free holds" with four free now says "Needs 5 free holds".
+  - **Play-tested with real moves** on a private copy (stopped after; Koda's untouched): a session
+    started from Minerva; at a colony, collecting 5 metals and delivering 2 back; ordering refused with
+    its reason when storage was short; 2 holds fitted at a player's yards and 1 at the I.S.S.; a trade
+    through the new layout (credits -45 to 533); a purchase at an empty player armory failing with the
+    chain's reason on Minerva's plate (before the fix above); your own info card.
+  - **Still not exercised with a real move:** fitting a part at an armory that has stock, landing and
+    boarding people, building, placing an order that goes through, installing finished parts, a
+    siege, jumping, the gamepad. **Not seen at all:** the Siege screen (no siege on any chain at hand).
+  - **Open, for Koda:** the new ship art on chain needs a redeploy; the extra read of other pilots'
+    armories' stock should be checked against the testnet's read budget (`dev/harness/read-costs.mjs`);
+    the "Mine" holdings and Transfer in the list, and the Details screens for planets, stations,
+    moons and stars from mockup 3, are not built (the ship's and the pilot's are).
 

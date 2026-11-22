@@ -23,7 +23,7 @@ describe('how many more of a part fit a ship', () => {
     const ship = { droneBays: 0, loadout: { ...none, armor: 4, shields: 3 } }
     expect(partRoom(part('repairBots'), ship, { freeBays: 12 })).toEqual({ fits: 2, why: '' })
     expect(partRoom(part('armor'), ship, { freeBays: 100 })).toEqual({ fits: 1, why: '' })
-    expect(partRoom(part('armor'), ship, { freeBays: 9 })).toEqual({ fits: 0, why: 'No free holds' })
+    expect(partRoom(part('armor'), ship, { freeBays: 9 })).toEqual({ fits: 0, why: 'Needs 10 free holds' })
     expect(partRoom(part('shields'), ship, { freeBays: 100 })).toEqual({ fits: 0, why: 'At its limit' })
   })
 })

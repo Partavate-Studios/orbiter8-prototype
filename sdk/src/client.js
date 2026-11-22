@@ -430,6 +430,10 @@ export function createGameClient() {
         if (p.autofactory || p.building === 7) state.factories[p.id] = await game.factoryAt(p.id)
       })
     )
+    // Other pilots' armories sell only what their Autofactory has finished (Armory.buy takes the
+    // parts from the factory's store), so an armory's stock is read too.
+    const armories = planets.filter((p) => p.owner && p.owner !== state.account && p.level >= 6 && p.autofactory)
+    await Promise.all(armories.map(async (p) => (state.factories[p.id] = await game.factoryAt(p.id))))
     Object.assign(state, { planets, ports, sieges })
     onProgress(80)
 

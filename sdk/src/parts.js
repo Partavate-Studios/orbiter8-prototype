@@ -35,7 +35,7 @@ export function partRoom(part, ship, { freeBays, dronesPerBay = 1 }) {
   const left = part.max ? part.max - (l[part.field] ?? 0) : Infinity
   if (left <= 0) return { fits: 0, why: 'At its limit' }
   const fits = Math.min(left, Math.floor(freeBays / part.holds))
-  return { fits: Math.max(0, fits), why: fits > 0 ? '' : 'No free holds' }
+  return { fits: Math.max(0, fits), why: fits > 0 ? '' : `Needs ${part.holds} free holds` }
 }
 
 /** Factory's mining drone (D75): ship-only for now; bodies' drone pools come with the belts. */

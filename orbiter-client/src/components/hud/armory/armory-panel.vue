@@ -15,7 +15,7 @@
     <header>
       <span class="title">
         <small-icon name="armory" />
-        <span><b>Armory</b><small>{{ station.name }}</small></span>
+        <span><b>Armory</b><small>{{ station.name }}<template v-if="!sol"> · sells what its Autofactory has made</template></small></span>
       </span>
       <span class="balance"><small>You have</small><b>{{ credits(avatar.credits) }}¢</b></span>
     </header>
@@ -78,6 +78,7 @@
 <script>
 import { mapActions, mapState } from 'pinia'
 import { SHIP_PARTS, SHIP_MOUNTS, mountsUsed, partRoom } from '@orbiter8/sdk/parts'
+import { isSolStation } from '@orbiter8/sdk/market'
 import { shipArtParts, shipInsideParts, SHIP_ART_VIEWBOX } from '@orbiter8/sdk/ship-art'
 import { useStarMapStore } from '@/stores/starmap'
 import { useGameStateStore } from '@/stores/gamestate'
@@ -141,6 +142,10 @@ export default {
     ship() {
       return this.player.ship
     },
+    /** One of Sol's stations: it sells any number. A pilot's Armory sells only what its Autofactory has finished (Armory.buy). */
+    sol() {
+      return isSolStation(this.port)
+    },
     dronesPerBay() {
       return this.player.economy?.dronesPerBay ?? 1
     },
@@ -150,16 +155,17 @@ export default {
       return SHIP_PARTS.map((p) => {
         const price = this.player.partPrice(this.port, p.id, 1)
         const room = partRoom(p, this.ship, { freeBays: this.player.freeBays, dronesPerBay: this.dronesPerBay })
-        // the most that both fit and can be paid for
-        let most = Math.min(room.fits, 20)
+        const stock = this.sol ? Infinity : (this.player.factories[this.port]?.stored?.[p.id] ?? 0)
+        // the most that fit, are in stock and can be paid for
+        let most = Math.min(room.fits, stock, 20)
         while (most > 0 && this.player.partPrice(this.port, p.id, most) > credits) most--
-        const short = room.fits > 0 && most === 0
+        const short = room.fits > 0 && stock > 0 && most === 0
         return {
           id: p.id,
           field: p.field,
           name: this.player.rules.parts[p.id].name,
           does: DOES[p.field],
-          takes: TAKES[p.field],
+          takes: TAKES[p.field] + (this.sol || !stock ? '' : ` · ${stock} in stock`),
           max: p.max ?? 0,
           have: this.ship.loadout[p.field] ?? 0,
           price,
@@ -167,7 +173,7 @@ export default {
           can: most > 0,
           short,
           noRoom: room.fits === 0,
-          why: room.why || (short ? `${this.credits(price - credits)}¢ short` : '')
+          why: (stock === 0 ? 'None in stock' : room.why) || (short ? `${this.credits(price - credits)}¢ short` : '')
         }
       })
     },

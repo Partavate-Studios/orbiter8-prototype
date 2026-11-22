@@ -218,7 +218,8 @@ export default {
   display: flex;
   flex-direction: column;
   max-width: 100%;
-  max-height: calc(100% - 28px);
+  /* (clear of Minerva's plate at the top: hud/minerva-plate.vue) */
+  max-height: calc(100% - 92px);
   box-sizing: border-box;
   transform: translateX(-50%);
   padding: 10px;
@@ -281,7 +282,8 @@ export default {
   bottom: 0;
   width: 100%;
   /* under the pilot's strip: credits and cargo stay in view */
-  max-height: calc(100% - 58px - env(safe-area-inset-top));
+  /* (under the pilot strip and Minerva's plate) */
+  max-height: calc(100% - 114px - env(safe-area-inset-top));
   padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
   border-radius: 12px 12px 0 0;
 }

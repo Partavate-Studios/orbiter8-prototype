@@ -281,5 +281,17 @@ button.k-row:hover:not(:disabled) {
   text-align: right;
 }
 .k-panel.narrow .k-move {
-  flex-wrap: wrap;
+  gap: 8px;
+}
+.k-panel.narrow .k-move > span:first-child {
+  width: 58px;
+  font-size: 13px;
+}
+.k-panel.narrow .k-move output {
+  min-width: 34px;
+}
+.k-panel.narrow .k-move .k-main,
+.k-panel.narrow .k-move .k-quiet {
+  min-width: 0;
+  padding: 0 14px;
 }

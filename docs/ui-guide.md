@@ -215,7 +215,7 @@ Session moves here from the ship's menu), the block number, and anything else ab
 **Your ships.** When pilots can have several ships, a menu to switch which ship you control, which
 always makes clear which ship you're in.
 
-## 11. Proposed: the kit and the screen standard (2026-11-21; for Koda's review, not built)
+## 11. The kit and the screen standard (2026-11-21; Koda agreed; built in `hud/kit.css` and every menu)
 
 From Koda's notes on the mockups ("some standard on how we build screens", "clean and tight", icons
 over words) and the review in [`ui-plan.md`](ui-plan.md) section 11. Drawn in
@@ -228,7 +228,7 @@ Every screen is made of these and nothing else. A new part needs a reason and go
 
 | Part | For | Rules |
 |---|---|---|
-| **Main pill** | A screen's or card's one main action | One per screen. Its picture in a well at its left, one or two words. Brand purple. At least 44 px tall. |
+| **Main pill** | A screen's or card's one main action | One per screen. Its picture in a well at its left, one or two words. On a menu it takes the menu's own color with dark words (Koda, 2026-11-21: the brand purple clashed with the menus' background); on the card it's the brand purple. At least 44 px tall. |
 | **Well** | Any other action | A 44 px circle with a small icon and a one-word caption under it. Dimmed when it can't be used now, with the reason in the caption's place. |
 | **Tab** | A way to somewhere (a planet's station, a list's filter, a menu's page) | A rounded square, never a circle, so it can't be taken for an action. The current one is lit. A count badge if it stands for several. |
 | **Row** | One thing in a list | Its mark, name, one line under it, one value at the right. The selected row is lit and carries Go. |
@@ -257,4 +257,10 @@ Every screen is made of these and nothing else. A new part needs a reason and go
    one planet to the next.
 8. **Sliders start at rest.** Nothing is chosen for the player.
 9. **Every screen has its phone layout,** drawn with it.
+10. **Group by the limit that governs,** and put that limit in the group's heading (mounts, holds,
+    drone room, orders of five).
+11. **The chosen row opens in place,** with its amount, its cost and its button: nothing to cross the
+    screen for.
+12. **Never a "can't" without a reason,** and where there is one, a way on (the Armory's way to the Yards).
+13. **Every menu's inside is the same blue-gray;** the frame and the buttons take the menu's own color.
 
