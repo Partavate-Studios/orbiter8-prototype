@@ -35,12 +35,25 @@ const PINK = '#ff6fb0'
 // 1270; a pod each side is centered ±1820, ±475 wide, from about -640 to 950.
 const hullPath = (attrs) => `<path transform="translate(-2300,-2300)" d="${HULL_D}" ${attrs}/>`
 
-/** The shield: the old blue glow, in the ship's own shape: the hull again, larger, behind it. A step a level. */
+/**
+ * The shield: the old blue glow, in the ship's own shape: the hull again, larger, behind it, a step a
+ * level. It never holds still: it breathes in and out and drifts between blue and violet (Koda, round 3).
+ */
 const BLUE = '#7fd4ff'
-const shield = (levels) =>
-  levels
-    ? `<g transform="translate(0 -520) scale(${1.08 + levels * 0.04}) translate(0 520)">` + hullPath(`fill="${BLUE}" fill-opacity="0.${levels * 6}" stroke="${BLUE}" stroke-width="${levels * 28}" stroke-linejoin="round"`) + '</g>'
-    : ''
+const VIOLET = '#b9a0ff'
+const shield = (levels) => {
+  if (!levels) return ''
+  const low = (levels * 0.04).toFixed(2)
+  const high = (levels * 0.09).toFixed(2)
+  return (
+    `<g transform="translate(0 -520) scale(${1.08 + levels * 0.04}) translate(0 520)">` +
+    `<path transform="translate(-2300,-2300)" d="${HULL_D}" fill="${BLUE}" fill-opacity="${high}" stroke="${BLUE}" stroke-width="${levels * 28}" stroke-linejoin="round">` +
+    `<animate attributeName="fill-opacity" values="${high};${low};${high}" dur="5s" repeatCount="indefinite"/>` +
+    `<animate attributeName="fill" values="${BLUE};${VIOLET};${BLUE}" dur="9s" repeatCount="indefinite"/>` +
+    `<animate attributeName="stroke" values="${BLUE};${VIOLET};${BLUE}" dur="9s" repeatCount="indefinite"/>` +
+    '</path></g>'
+  )
+}
 /**
  * Longer range: the pods themselves are longer (they hold the capacitor bank), a step a level. Drawn
  * over the hull's own pods so the ship's outline simply grows; no cone is added.
@@ -126,32 +139,35 @@ function newShip(ship, scarred = false) {
 function insideShip(ship) {
   const l = ship.loadout
   let out = hullPath(`fill="#1d1436" stroke="${LINE}" stroke-width="50"`) + pods(ship.range ?? 1).replaceAll(HULL, '#1d1436')
-  out += `<rect x="-540" y="-460" width="1080" height="1280" rx="90" fill="#150f28" stroke="${LINE}" stroke-width="36" stroke-dasharray="90 60"/>`
+  // the bay takes the whole fuselage: nothing else is drawn with it
+  out += `<rect x="-740" y="-1560" width="1480" height="2500" rx="120" fill="#150f28" stroke="${LINE}" stroke-width="36" stroke-dasharray="90 60"/>`
   const cargoCells = Math.min(25, Math.ceil(ship.bays / 10))
   const battle = Math.ceil(l.drones / 10)
   const mining = Math.ceil((l.miningDrones ?? 0) / 10)
   const droneCells = Math.min(25 - cargoCells, Math.max(Math.ceil((ship.droneBays ?? 0) / 10), battle + mining))
   for (let i = 0; i < cargoCells + droneCells; i++) {
-    const x = -485 + (i % 5) * 200
-    const y = 560 - Math.floor(i / 5) * 240
+    const x = -680 + (i % 5) * 276
+    const y = 410 - Math.floor(i / 5) * 480
+    const cx = x + 128
+    const cy = y + 220
     const k = i - cargoCells
-    if (k < 0) out += `<rect x="${x}" y="${y}" width="170" height="200" rx="34" fill="${PART}"/>`
+    if (k < 0) out += `<rect x="${x}" y="${y}" width="256" height="440" rx="50" fill="${PART}"/><path d="M${x + 50} ${y + 150}h156M${x + 50} ${y + 290}h156" stroke="${LINE}" stroke-width="30"/>`
     else {
-      out += `<rect x="${x}" y="${y}" width="170" height="200" rx="34" fill="none" stroke="${PART}" stroke-width="30"/>`
-      if (k < battle) out += `<path d="M${x + 85} ${y + 45}l55 115l-55 -32l-55 32z" fill="${HULL}"/>`
-      else if (k < battle + mining) out += `<circle cx="${x + 85}" cy="${y + 100}" r="42" fill="none" stroke="${HULL}" stroke-width="30"/>`
+      out += `<rect x="${x}" y="${y}" width="256" height="440" rx="50" fill="none" stroke="${PART}" stroke-width="34"/>`
+      if (k < battle) out += `<path d="M${cx} ${cy - 130}l90 250l-90 -62l-90 62z" fill="${HULL}"/>`
+      else if (k < battle + mining) out += `<circle cx="${cx}" cy="${cy}" r="70" fill="none" stroke="${HULL}" stroke-width="40"/>`
     }
   }
-  // the capacitor bank: a cell a step of range, in each pod
+  // the capacitor bank: a cell a step of range, in each pod, in the engines' warm yellow
   for (let i = 0; i < 4; i++) {
     const on = i < (ship.range ?? 1)
-    for (const cx of [-1820, 1820]) out += `<rect x="${cx - 260}" y="${420 - i * 250}" width="520" height="190" rx="50" fill="${on ? GLOW : 'none'}" stroke="${on ? GLOW : LINE}" stroke-width="30" ${on ? '' : 'stroke-dasharray="60 50"'}/>`
+    for (const cx of [-1820, 1820]) out += `<rect x="${cx - 300}" y="${440 - i * 250}" width="600" height="190" rx="50" fill="${on ? GLOW : 'none'}" stroke="${on ? GLOW : LINE}" stroke-width="30" ${on ? '' : 'stroke-dasharray="60 50"'}/>`
   }
-  // repair bots, racked each side of the bay
+  // repair bots, racked in the nose over the bay
   for (let i = 0; i < l.repairBots && i < 6; i++) {
-    const x = i % 2 === 0 ? -690 : 690
-    const y = -250 + Math.floor(i / 2) * 330
-    out += `<path d="M${x - 105} ${y - 45}h210M${x - 105} ${y + 45}h210" stroke="${PART}" stroke-width="30" stroke-linecap="round"/><rect x="${x - 60}" y="${y - 80}" width="120" height="160" rx="46" fill="${PART}"/>`
+    const x = -450 + i * 180
+    const y = -1830
+    out += `<path d="M${x - 62} ${y - 80}v160M${x + 62} ${y - 80}v160" stroke="${PART}" stroke-width="26" stroke-linecap="round"/><rect x="${x - 45}" y="${y - 100}" width="90" height="200" rx="40" fill="${PART}"/>`
   }
   return out
 }
@@ -167,7 +183,7 @@ const OUTSIDE = [
   ['Railguns', 'Twin white rails with a breech.', [1, 2, 3].map((n) => shipWith({ railguns: n }))],
   ['Missile racks', 'Round ports set into the pods; the third in the nose.', [1, 2, 3].map((n) => shipWith({ missiles: n }))],
   ['Point defense', 'A ring and a stub of a barrel, in pairs.', [2, 4, 6].map((n) => shipWith({ pointDefense: n }))],
-  ['Shields', 'The old blue glow, in the ship\'s shape: the hull again, larger, behind it.', [1, 2, 3].map((n) => shipWith({ shields: n }))],
+  ['Shields', 'The old blue glow in the ship\'s shape, behind it. It breathes, and drifts from blue to violet (see sheet.svg).', [1, 2, 3].map((n) => shipWith({ shields: n }))],
   ['Armor', 'Plating cut to the hull\'s shape, further back each level.', [1, 3, 5].map((n) => shipWith({ armor: n }))],
   ['Jump range', 'The pods themselves grow longer: they hold the capacitors. No cone added.', [2, 3, 4].map((n) => shipWith({}, { range: n }))]
 ]
@@ -180,7 +196,7 @@ const LOADOUTS = [
 
 const W = 1440
 const CELL = 132
-let body = T(30, 40, 'The Orbiter 8\'s upgrades, re-drawn: round 3', { size: 18, weight: 700, fill: '#fff' })
+let body = T(30, 40, 'The Orbiter 8\'s upgrades, re-drawn: round 4', { size: 18, weight: 700, fill: '#fff' })
 body += T(30, 62, 'Two kinds of thing (Koda): what\'s on the outside changes the ship\'s shape; what\'s inside you wouldn\'t see on a ship flying by. So two pictures: the ship as it flies, and the ship opened up.', { size: 12.5, fill: '#c3b3da' })
 let y = 92
 body += T(30, y + 12, 'ON THE OUTSIDE: THREE STEPS OF EACH', { size: 11, weight: 700, fill: '#c9b6ff' })
@@ -209,7 +225,7 @@ const BIG = 300
 LOADOUTS.forEach(([name, ship], i) => {
   const x = 30 + i * 348
   body += frame(x, y, BIG, newShip(ship)) + T(x, y + BIG + 22, name, { size: 14.5, weight: 700, fill: '#fff' }) + T(x + BIG, y + BIG + 22, 'as it flies', { size: 11, fill: '#9088aa', anchor: 'end' })
-  body += frame(x, y + BIG + 36, BIG, insideShip(ship)) + T(x + BIG, y + BIG * 2 + 56, 'opened up: holds, drone bays, bots, capacitors', { size: 11, fill: '#9088aa', anchor: 'end' })
+  body += frame(x, y + BIG + 36, BIG, insideShip(ship)) + T(x + BIG, y + BIG * 2 + 56, 'opened up: holds and drone bays, bots, capacitors', { size: 11, fill: '#9088aa', anchor: 'end' })
   body += frame(x, y + BIG * 2 + 70, 64, newShip(ship)) + frame(x + 74, y + BIG * 2 + 70, 44, newShip(ship)) + T(x + 130, y + BIG * 2 + 100, 'at 64 and 44 px', { size: 10.5, fill: '#9088aa' })
 })
 const H = y + BIG * 2 + 154

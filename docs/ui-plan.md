@@ -766,4 +766,11 @@ Log:
     bots, and the capacitor bank in the pods, a cell a step of range. Waiting for Koda.
   - Open: whether the NFT's picture is the outside or the opened-up one; whether battle drones show as
     an escort while fighting.
+- 2026-11-21: **Koda on round 3: "getting better".**
+  - The opened-up view's bay can use more of the space, since nothing else is drawn with it.
+  - He likes the yellow for engine power.
+  - The shield should fade in and out, or fade between two colors, all the time.
+  - The NFT's picture is the outside view, for now.
+  - Battle drones are not escorts for now; the idea is on the list in `demo4-plan.md` to consider later.
+  - Round 4 drawn to these (`sheet.svg` moves: open it in a browser to see the shield; the PNG is still).
 
