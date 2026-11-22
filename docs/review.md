@@ -1016,6 +1016,26 @@ Calls:
 Checked at 1440×900 for Corps X and Z and at 390×844 for Corp Y: every page, scrolled to its end.
 `npm test`, `npm run lint` and a scratch build pass.
 
+## 18. A mining indicator on the HUD (Koda, 2026-11-21)
+
+Koda: "some kind of on-screen indicator that shows how many drones you have out mining and a progress
+bar for how long it should take." While your ship mines an empty belt section, a yellow chip under the
+pilot plate (beside the session and scan chips) reads "Mining · 4 drones · 2/5 · full in 23m" with a bar
+that fills as the holds do, then "holds full". Pressing it selects the section, whose card has Stop
+mining. The numbers are the contract's (`sdk/game/mining.js`, tested): whole units as `Drones.sol`
+counts them, up to the bays free when mining started; nothing new is read from the chain.
+
+Calls:
+- **M1:** on a phone it's shorter ("4 mining · 2/5 · 23m"), so it stays clear of the star's name.
+- **M2:** the drone count is the ship's mining drones plus the built-in drones set to mine.
+
+Found while testing: **a new pilot can't mine until they sell.** The starter cargo fills all 5 holds,
+so Start mining fails with "Nothing to mine with, or no room in the holds." Fine if selling first is the
+intended first step; otherwise the card could say "Sell cargo to make room" instead of failing.
+
+Checked in one session (account 9: the intro, selling the starter cargo, mining, waiting) at 1440×900
+and 390×844. `npm test`, `npm run lint` and a scratch build pass.
+
 ## For Koda to decide
 
 Answered above, bar these:

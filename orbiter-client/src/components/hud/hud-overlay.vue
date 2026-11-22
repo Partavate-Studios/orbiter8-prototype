@@ -10,6 +10,21 @@
       <div class="chips">
         <span v-if="sessionLeft" class="chip" title="Your session key: moves go without wallet popups">Session · {{ sessionLeft }} left</span>
         <span v-if="scanWords && !neighborView" class="chip" role="status">{{ scanWords }}</span>
+        <!-- the ship's drones at work in an empty belt section: what stopping now would load, and when the
+             holds are full; it selects the section, where Stop mining is -->
+        <button
+          v-if="mining && !neighborView"
+          type="button"
+          class="chip mining"
+          :class="{ full: mining.full }"
+          :title="mining.full ? 'The holds are full: stop mining to load the ore' : 'Your drones are mining. Stopping loads what they have so far'"
+          @click="miningSection"
+        >
+          <span>{{ mining.words }}</span>
+          <span class="bar" role="progressbar" aria-label="Mining" :aria-valuenow="mining.mined" aria-valuemin="0" :aria-valuemax="mining.room">
+            <i :style="{ width: mining.fraction * 100 + '%' }" />
+          </span>
+        </button>
       </div>
     </div>
 
@@ -50,6 +65,7 @@ import { reactive } from 'vue'
 import { mapActions, mapState } from 'pinia'
 import { STAR_KEY } from '@orbiter8/sdk/system'
 import { game } from '@orbiter8/sdk/client'
+import { miningProgress } from '@orbiter8/sdk/game/mining'
 import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
@@ -78,6 +94,15 @@ import RimButton from './rim-button.vue'
 // How many broadcasts the chat had when it was last open. Kept outside the component: the HUD goes
 // away during a jump and comes back.
 const chat = reactive({ seen: null })
+
+/** "40s", "12m", "1h 05m": a countdown in a chip. */
+function duration(seconds) {
+  if (seconds < 60) return `${seconds}s`
+  const minutes = Math.ceil(seconds / 60)
+  const h = Math.floor(minutes / 60)
+  const m = minutes % 60
+  return h ? `${h}h ${String(m).padStart(2, '0')}m` : `${m}m`
+}
 
 export default {
   name: 'HudOverlay',
@@ -168,6 +193,22 @@ export default {
       const m = Math.floor((seconds % 3600) / 60)
       return h ? `${h}h ${m}m` : `${m}m`
     },
+    /** The ship mining (D93): its drones at work, units mined of the room, and the time until full; or null. */
+    mining() {
+      const progress = miningProgress(this.player.mining, this.now)
+      if (!progress) return null
+      const ship = this.player.ship
+      const drones = (ship?.loadout?.miningDrones ?? 0) + (this.player.condition?.mining ?? 0)
+      const count = `${progress.mined}/${progress.room}`
+      // a phone's is shorter, clear of the star's name beside it
+      if (this.phone) {
+        const left = progress.full ? 'full' : duration(progress.secondsLeft)
+        return { ...progress, words: `${drones || ''} mining · ${count} · ${left}`.trim() }
+      }
+      const crew = drones ? `${drones} drone${drones === 1 ? '' : 's'} · ` : ''
+      const left = progress.full ? 'holds full' : `full in ${duration(progress.secondsLeft)}`
+      return { ...progress, words: `Mining · ${crew}${count} · ${left}` }
+    },
     /** "Scanning Lulin-851… 23 s", then "Recording the scan…", or null. */
     scanWords() {
       const scan = this.player.scan
@@ -191,7 +232,8 @@ export default {
     // Timers (sessions, buildings, sieges) count down by this clock; the scan's by the second.
     this.clock = setInterval(() => usePlayerStore().tick(), 15_000)
     this.seconds = setInterval(() => {
-      if (usePlayerStore().scan) this.now = Date.now()
+      const player = usePlayerStore()
+      if (player.scan || player.mining) this.now = Date.now()
     }, 1000)
   },
   unmounted() {
@@ -229,6 +271,13 @@ export default {
     jump() {
       this.closeMenu()
       this.zoomOutToNeighbors()
+    },
+    /** The section the ship is mining, selected: its card has Stop mining. */
+    miningSection() {
+      const section = this.systemObjects[this.myShipId]?.mining?.section
+      if (!section) return
+      this.closeMenu()
+      this.selectSprite(section)
     }
   }
 }
@@ -290,6 +339,45 @@ export default {
   color: var(--o8-yellow-light);
   font-size: 12px;
   white-space: nowrap;
+}
+/* mining: a button (it selects the section), with a bar that fills as the holds do */
+.chip.mining {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding: 5px 11px 6px;
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.chip.mining:hover {
+  border-color: #ebff99aa;
+}
+.chip.mining:focus-visible {
+  outline: 2px solid var(--o8-yellow-light);
+  outline-offset: 2px;
+}
+.chip.mining .bar {
+  display: block;
+  height: 4px;
+  border-radius: 2px;
+  background: #ebff9926;
+  overflow: hidden;
+}
+.chip.mining .bar i {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--o8-yellow-light);
+  transition: width 1s linear;
+}
+@media (prefers-reduced-motion: reduce) {
+  .chip.mining .bar i {
+    transition: none;
+  }
 }
 .where {
   top: calc(var(--edge) + env(safe-area-inset-top));
