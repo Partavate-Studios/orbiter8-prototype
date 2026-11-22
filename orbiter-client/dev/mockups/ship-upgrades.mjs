@@ -18,7 +18,7 @@ const HULL_D = SHIP_DESIGNS.orbiter8.d
 // The Orbiter 8 is a frame you build out, like a flatbed truck: a big empty bay in the fuselage, and
 // what you fit goes inside it. So:
 // - what's inside (holds, drone bays, bots, capacitors) shows only when the ship is opened up (round 3);
-// - the pods carry the weapons: rails along their sides, missile tubes set into them;
+// - rails run along the pods' sides; missile ports are set into the fuselage (the pods are engines);
 // - armor is plating that grows back from the nose and the pods' fronts, cut to the hull's own shape;
 // - a shield wraps the hull's outline, a band a level;
 // - longer range is longer thrusters;
@@ -85,25 +85,23 @@ const railguns = (count) => {
   }
   return out
 }
-/** Missile racks: six tubes set into each pod, the third in the nose. */
+/** Missile racks: six round ports each, set into the hull itself, one rack below the other down the fuselage. Never on the pods: those are engines. */
 const missiles = (count) => {
-  const xs = [-1820, 1820, 0]
-  const ys = [80, 80, -1250]
   let out = ''
   for (let i = 0; i < count && i < 3; i++) {
-    for (let k = 0; k < 6; k++) out += `<circle cx="${xs[i] - 130 + (k % 2) * 260}" cy="${ys[i] + Math.floor(k / 2) * 230}" r="78" fill="${DARK}"/>`
+    for (let k = 0; k < 6; k++) out += `<circle cx="${-130 + (k % 2) * 260}" cy="${-1250 + i * 760 + Math.floor(k / 2) * 230}" r="78" fill="${DARK}"/>`
   }
   return out
 }
 /**
- * Point defense: white dots on the hull's edge, overlapping it, in pairs: the nose, the fuselage's
+ * Point defense: dots in the hull's own color on its edge, overlapping it, in pairs: the nose, the fuselage's
  * sides, the pods' inner shoulders (clear of the railguns on their outer sides).
  */
 const turrets = (count) => {
   const xs = [-600, 600, -847, 847, -1484, 1484]
   const ys = [-2051, -2051, -1000, -1000, -626, -626]
   let out = ''
-  for (let i = 0; i < count && i < 6; i++) out += `<circle cx="${xs[i]}" cy="${ys[i]}" r="125" fill="#ffffff"/>`
+  for (let i = 0; i < count && i < 6; i++) out += `<circle cx="${xs[i]}" cy="${ys[i]}" r="125" fill="${HULL}"/>`
   return out
 }
 /** Damage: cracks in pink (it needs you), not dark holes. */
@@ -176,8 +174,8 @@ const frame = (x, y, size, inner) => `<rect x="${x}" y="${y}" width="${size}" he
 
 const OUTSIDE = [
   ['Railguns', 'Twin white rails with a breech, small against so big a ship.', [1, 2, 3].map((n) => shipWith({ railguns: n }))],
-  ['Missile racks', 'Round ports set into the pods; the third in the nose.', [1, 2, 3].map((n) => shipWith({ missiles: n }))],
-  ['Point defense', 'White dots on the hull\'s edge, overlapping it, clear of the railguns.', [2, 4, 6].map((n) => shipWith({ pointDefense: n }))],
+  ['Missile racks', 'Round ports set into the hull, a rack below a rack. Never on the engines.', [1, 2, 3].map((n) => shipWith({ missiles: n }))],
+  ['Point defense', 'Dots in the hull\'s own color on its edge, clear of the railguns.', [2, 4, 6].map((n) => shipWith({ pointDefense: n }))],
   ['Shields', 'The hull\'s own outline, fat and blue, behind the ship: it wraps it closely. Fatter each level; it breathes (see sheet.svg).', [1, 2, 3].map((n) => shipWith({ shields: n }))],
   ['Armor', 'Plating cut to the hull\'s shape, further back each level.', [1, 3, 5].map((n) => shipWith({ armor: n }))],
   ['Jump range', 'The pods themselves grow longer: they hold the capacitors. No cone added.', [2, 3, 4].map((n) => shipWith({}, { range: n }))]
@@ -192,7 +190,7 @@ const LOADOUTS = [
 
 const W = 1440
 const CELL = 132
-let body = T(30, 40, 'The Orbiter 8\'s upgrades, re-drawn: round 7', { size: 18, weight: 700, fill: '#fff' })
+let body = T(30, 40, 'The Orbiter 8\'s upgrades, re-drawn: round 8', { size: 18, weight: 700, fill: '#fff' })
 body += T(30, 62, 'Two kinds of thing (Koda): what\'s on the outside changes the ship\'s shape; what\'s inside you wouldn\'t see on a ship flying by. So two pictures: the ship as it flies, and the ship opened up.', { size: 12.5, fill: '#c3b3da' })
 let y = 92
 body += T(30, y + 12, 'ON THE OUTSIDE: THREE STEPS OF EACH', { size: 11, weight: 700, fill: '#c9b6ff' })

@@ -784,4 +784,8 @@ Log:
   railguns a bit smaller ("that's overkill... the O8 is a pretty big ship"). Round 7 drawn: white dots
   on the hull's edge (the third pair on the pods' inner shoulders, clear of the rails); railguns
   about two thirds the length and thinner.
+- 2026-11-22: **Koda:** the dots looked whiter than the ship; they should be the ship's own color.
+  And the missile silos go only on the hull (the fuselage), never the engines (the pods). Round 8
+  drawn: dots in the hull's color; the missile ports in the fuselage, a rack below a rack down its
+  middle. **Rule to keep: the pods are engines.**
 
