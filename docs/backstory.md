@@ -96,6 +96,9 @@ imminent and that maybe we were just too fragile to expand past the barrier of o
 all, provides all the energy that sustains every form of life we know. Leaving our planet was the
 tiniest of steps compared with leaving our sun.
 
+The worry came true. The Second Regrettion didn't arrive as a war or a crash; it arrived person by
+person. With nowhere new to go, people lost their sense of purpose.
+
 **The jump.** The answer turned out to be the sun itself. A star pours out more energy in a second
 than humanity has ever used. The Orbiter 8 carries a **capacitor bank** that drinks that energy in.
 It drops into a close orbit, closer than any ship had dared, and charges from the star's light and
@@ -113,13 +116,19 @@ again. It is still out there, somewhere in deep space. The Orbiter 8, however, n
 system; it came back. It arrived at a foreign star in under 36 hours, dropped into orbit, recharged
 from a sun no human had ever seen up close, and jumped home. It was the first return trip in history.
 
-**Earth.** At home it's 2140 and it is bleak: too many people, not enough work. The ads never stop, the
-streets have a curfew, and most people live on a basic income. At the very bottom are the non-citizens,
-who belong to no corporation and get by on a thin stipend paid through Minerva, in corporate housing
-for the poor. The new starships need pilots, and the corporations are desperate for volunteers. The
+**Earth.** At home it's 2140, and what hurts isn't poverty. There's enough wealth that the poor are fed
+and housed, and the corporations exploit them only so much; you can check out and still survive, and
+millions have. What hurts is having nothing to do and nowhere to go. There are too many people and not
+enough work. The ads never stop, the streets have a curfew, and most people live on a basic income. At
+the very bottom are the non-citizens, who belong to no corporation and get by on a thin stipend paid
+through Minerva, in corporate housing for the poor.
+
+Then, suddenly, humanity can leave its star. The new starships can't fly without a pilot inside them:
+each needs a human mind in its systems, uploaded into Minerva and linked to the ship. So the
+corporations are desperate for volunteers, desperate enough to take someone from the very bottom. The
 job is one way, but the terms are generous: keep most of what you earn, captain your own fleet, claim
-the worlds you find, and become a citizen. For someone with nothing left, it's the one door still
-open. (Soldiering is another.)
+the worlds you find, and become a citizen. For someone with nothing left, whose body after years of
+neglect isn't fit for much else, it's the one door still open. (Soldiering is another, for the fit.)
 
 **The new land rush.** The Orbiter 8 came out of shared science, and no corporation could patent it:
 it's the open standard, and every new pilot starts in one. Pilots are pouring out of Sol. On arrival at a star, while the banks charge, the ship's long-range scan sweeps the
@@ -130,7 +139,8 @@ until a pilot names it. The pilot who discovers a star gets the first chance to 
 names it first, keeping that right until someone owns it. Whoever holds all of its planets owns it,
 until a rival holds most of them.
 
-**The pilots.** A pilot doesn't sit in the cockpit. The new ships need more than any AMI can manage
+**The pilots.** A pilot doesn't sit in the cockpit. The new ships only work with a human mind inside
+their systems. They need more than any AMI can manage
 alone, and a human working beside one is too slow; a human mind uploaded into Minerva, flying with her
 help, is fast enough. So every pilot's mind lives on Minerva, copied across the whole network the way
 her ledger is, so there's no one place where it can be lost, and the body waits in cold storage, to be
@@ -173,12 +183,19 @@ settled it is.
   Bobiverse books: use standard, well-known sci-fi ideas (von Neumann probes, mind uploading,
   autofactories, 3D printing) and play them straight and consistently. Consistency is what makes a
   future feel real.
+- **The heart of the story is purpose (Decided, core theme, Koda 2026-11-22).** There's no expansion
+  left for humanity, and with nowhere new to go, people lose their sense of purpose. There's enough
+  wealth that the poor are fed and housed (the corporations exploit them to some degree), so you can
+  check out and still survive, and millions do. It's depressing. The player's character is one of
+  them: checked out, surviving, having mostly given up. Then, suddenly, humanity can leave its star
+  system, and that is the character's opportunity.
 - **Every game limit needs an in-world reason (Decided).** Cooldowns, lag, costs and caps come from
   logistics, physics, law or infrastructure, never "because the game says so." Examples already in the
   story: the scan runs while the banks charge; engine range is the size of the bank; Minerva destroys
   her fees.
-- **The frontier is the hope; Earth is bleak by contrast (Decided, Koda 2026-11-18).** The universe is
-  about expansion and opportunity, and the contrast is the point: you leave a dead-end life for a fleet
+- **The frontier is the hope; Earth is bleak by contrast (Decided, Koda 2026-11-18).** The bleakness has a
+  cause: **lost purpose after expansion stopped** (Koda 2026-11-22), not just scarcity; the frontier
+  gives purpose back. The universe is about expansion and opportunity, and the contrast is the point: you leave a dead-end life for a fleet
   of your own among the stars. "Liberta Galactica!" means escape. The hopeful frontier still sets it
   apart from darker games like EVE Frontier.
 - **Borrow concepts, not signatures (Decided in spirit).** Generic sci-fi concepts are fair game. Ideas
@@ -203,7 +220,10 @@ The published backstory stands (Decided), with the jump drive changed on 2026-11
   2026-11-19). It wasn't long ago.
 - **Early 2090s land rush:** gravity-assist ships called **Orbiters** open routes to the outer worlds,
   all the way to the edge of the solar system. They sling between planets only.
-- **The second plateau:** the fear that humanity can't leave its sun.
+- **The Second Regrettion (Decided, Koda 2026-11-22):** the second plateau, when humanity couldn't
+  leave its sun. The published backstory feared a second Regrettion; it came true, felt person by
+  person as lost purpose. The Orbiter 8 ends it. (Minerva's library and the corporations' versions of
+  history can name it.)
 - **Recently:** a customized Orbiter 6 charges at the sun, jumps, and is lost.
 - **2140, now:** the Orbiter 8 makes the first interstellar return trip, in under 36 hours, and the
   corporations start hiring pilots for it. The intro is set now (Decided). Among Minerva's news items:
@@ -225,6 +245,12 @@ pilots came to be (the founding minds).
 - **Non-citizens (Decided, 2026-11-19)** are the bottom of society: no corporation, a minimal stipend paid
   through Minerva, corporate housing for the poor. **Citizenship is the reward for paths like piloting**
   (and soldiering, and others), and it comes with real privileges.
+- **Membership levels (Decided, Koda 2026-11-22).** Corporations have levels: **sponsored**, then
+  **citizen** ("the big one"), then higher ranks, like ranks in a military. Being sponsored means the
+  corporation is yours but you aren't a citizen yet: the entry level, which the intro's housing
+  subscription gives you. The player starts sponsored (housing, a stipend, no citizenship); piloting
+  is the path to citizen, and play continues up the ranks. What each level grants (votes, protections,
+  benefits, tax rates) is Later.
 - **Anyone can start a corporation (Decided).** Corporations create shell corporations constantly, but
   Minerva is open, so anyone can trace who owns what.
 - **No Federation (Decided, 2026-11-19).** Sol belongs to Minerva's system (see Minerva). If anything
@@ -247,7 +273,9 @@ listings and what citizenship means in play: Later):**
 
 **Choosing a corporation (Decided, 2026-11-19).** Booting your housing computer for the first time, you
 subscribe to one of the three as your **corporate sponsor**, and only then is the unit fully yours
-(Koda, 2026-11-20); a note says you can change it at any time, and switching is easy. Parts
+(Koda, 2026-11-20). "Sponsor" is the membership level (Koda, 2026-11-22): you're sponsored by the
+corporation you subscribe to, and applying for the pilot job is your path from sponsored to citizen.
+A note says you can change it at any time, and switching is easy. Parts
 of Minerva's interface change with it: its look, its voice, possibly the history and news. All three
 have job boards listing similar pilot jobs, and **you join whichever corporation you're subscribed to
 when you apply.** It's a simple game choice given context.
@@ -324,7 +352,8 @@ reporting, but the texture is there if it's ever wanted.)
   planet as harassment, with rising fees.
 - Hiring and registering new pilots: the job application is filed with her (see The player).
 - In the design doc, the cross-universe credit bridge is the "interdimensional Minerva link."
-- Her onboard consoles fly ships: the Orbiter 8's first flight was under the sole command of one.
+- Her onboard consoles fly ships: the Orbiter 8's first flight was under the sole command of one. (How
+  that fits "a human mind must be inside": open, see Open story questions.)
 
 **The meta-layer (Suggestion):** Minerva maps neatly onto the blockchain itself: neutral, owned by no
 one, enforcing rules everyone agreed to. **In the fiction, the smart contracts are Minerva.** The name
@@ -354,9 +383,19 @@ fits too: Minerva is the Roman goddess of wisdom, and her owl is on the title's 
   Orbiter 8 that one corporation can make them, sold or built in the game somehow (Later); eventually
   alien ships. The game's name against the ship's is Parked, eased by the Orbiter 8 being everyone's
   starting ship (see Naming).
-- **Why minds pilot: speed (Decided, Koda 2026-11-18).** AMIs alone aren't good enough, and humans working
-  with AMIs are too slow for the calculation and adjustment the new ships need. An uploaded mind flying
-  with Minerva's help is fast enough. Bodies can make the trip; it's the speed of thought that can't.
+- **A human mind must be inside the system (Decided, core premise, Koda 2026-11-22).** The new ships
+  only work with a human pilot "inside" the computer system: a mind uploaded into Minerva and linked to
+  the ship. It's one of the game's key premises, and it explains why things are as they are: why the
+  corporations need volunteers at all, why someone at the very bottom gets this chance, why minds live
+  on Minerva, why bodies wait in cold storage, and why one mind focuses on one ship at a time.
+  - **It's told early,** not buried in the library: plainly on the intro's job screen (the ships can't
+    fly without a human mind inside; that's why they need *you*), in Minerva's first message on waking
+    (Suggestion, in her blunt way: "This ship requires a linked human mind to operate. You are that
+    mind."), and in the library's first entries.
+- **Why a mind must be inside: speed (Decided, Koda 2026-11-18).** AMIs alone aren't good enough, and
+  humans working with AMIs are too slow for the calculation and adjustment the new ships need. An
+  uploaded mind flying with Minerva's help is fast enough. Bodies can make the trip; it's the speed of
+  thought that can't. It's a hard requirement, not a performance boost (Koda, 2026-11-22).
 - **The pilots need a better name (Later)** than "Orbiter 8 pilots," since they won't all fly Orbiter 8s.
 
 ### The player: mind, fleet and body
@@ -375,7 +414,10 @@ fits too: Minerva is the Roman goddess of wisdom, and her owl is on the title's 
   (Decided, 2026-11-19). At first it's all ships; other machines may come later. This solves the NFT problem: selling a ship shrinks your fleet, buying one
   grows it, and there's never any doubt which ship you're flying.
 - It explains the design doc's "one avatar per account" rule: the avatar *is* the mind.
-- **Unattended ships** run on basic AMI autopilot (the design doc's Artificial Machine Intelligence).
+- **Unattended ships:** ships you aren't linked to run small autopilot jobs with Minerva at the helm
+  (Koda, Q11: the AMI is Minerva). "AMI" stays only as the general term for machine intelligence (the
+  design doc's Artificial Machine Intelligence). Where the line falls between what Minerva can run and
+  what needs a linked mind is open (Open story questions).
 
 **Why this replaced the cube:** a mind in a physical cube is the Bobiverse's signature. A mind spread
 across a neutral network is Orbiter 8's own idea. It's also different from EVE Frontier's "Self + Shell
@@ -398,9 +440,11 @@ across thousands of nodes.
 **Joining the game: employment (Decided, 2026-11-18).** A corporation hires you through its job board
 (see Society, Choosing a corporation). The intro, as decided:
 
-1. You wake in a tiny apartment in a dense city, newly assigned to it: alone, on a stipend, −45 credits
-   after the last payment went to bills, a very low health score (flavor only: it shows in the intro and
-   never again), an inbox of junk, overdue bills and job rejections. Your vape costs health points, and
+1. You wake in a tiny apartment in a dense city, newly assigned to it: alone, on a stipend, having
+   mostly given up on life (Koda, 2026-11-18), your body in no shape for any other work after years of
+   not looking after it (Koda, Q1). You're at −45 credits after the last payment went to bills, with a
+   very low health score (flavor only: it shows in the intro and never again) and an inbox of junk,
+   overdue bills and job rejections. Your vape costs health points, and
    Minerva reports each one.
 2. **An ID-card scanner turns on your new corporate affordable housing unit.** Scanning your card prompts
    for your name: that's your name in the game, and **the first transaction** (registration with
@@ -411,44 +455,53 @@ across thousands of nodes.
    2026-11-20.)
 4. Explore: the TV's ads (clues to the three corporations), the balcony, the mail, the door (after
    curfew, a warning in your corporation's voice).
-5. The job board of your current subscription: one eligible opening, the pilot program. The job screen
-   says plainly what happens: your body is frozen and your consciousness put into a machine; you'll
-   have a call sign there; the industry is space shipping. It sells it as a new life.
+5. The job board of your current subscription: one eligible opening, the pilot program. The listing is
+   **brand new, the only option you're eligible for, a wild proposition and a one-way trip** (Koda,
+   2026-11-18). The job screen says plainly what happens: the new ships can't fly without a human mind
+   inside them, which is why they need you; your body is frozen and your consciousness put into the
+   machine; the name you registered will be your call sign (Koda, 2026-11-22: the name entered at the
+   ID-card scanner *is* the call sign); the industry is space shipping. It sells it as a new life. Not
+   everything (cold storage, earnings) needs to be in the promotional material, but the gist must be.
 6. **Accepting the job is the only way out of the intro** (other than back to the title screen). You're
    asked to **name your ship before you're picked up: the second transaction**, which mints the ship
    and joins the corporation you're subscribed to. "An escort will arrive shortly to take you to
    processing."
 7. **Processing is left unsaid (Decided):** when the transaction goes through, you wake, in control of
    your ship orbiting Earth.
-8. Minerva's first message: what's expected of you.
+8. Minerva's first message: what's expected of you, starting with the premise (a linked human mind
+   flies this ship, and that mind is you).
 
 **You start in debt, with a hold full of goods (Decided, 2026-11-19),** not starting credits: the
 negative balance carried over from Earth, and a cargo of goods as the pilot program's advance. You don't
 make money of your own until your sales clear the debt; the cargo is worth more than that, so the first
-sale feels like a win (Suggestion). If you ever run dry, you can go mine the asteroid belt to get
+sale feels like a win (Suggestion). On chain the debt has its own record beside the balance, which
+can't go below zero (`Credits.sol`, built 2026-11-19): whatever the game pays you clears the debt
+first. If you ever run dry, you can go mine the asteroid belt to get
 going again.
 
 **Can a new player start as a pirate? No (Decided):** pirates have renounced a citizenship, which you
 need to have had first. **Native pirates (Leaning, 2026-11-19):** an independent pirate who has stayed
 independent long enough can build a machine that onboards people outside the corporate menus, bringing
 in friends as native pirates: registered with Minerva like everyone, but never subscribed to a
-corporation (Suggestion for how it fits). Pirates become the sponsors.
+corporation (Suggestion for how it fits). Native pirates **vouch for** their friends (Suggestion for the
+wording, 2026-11-22: "sponsor" now names the membership level).
 
-**Sponsorship (Later).** Superseded as the way in by employment. If it returns, the suggested shape is a
+**Referral (Later; called "Sponsorship" until 2026-11-22, renamed because "sponsored" is now the first
+membership level).** Superseded as the way in by employment. If it returns, the suggested shape is a
 referral perk recorded by Minerva, layered on employment, not a gate on entry. Koda's earlier thinking:
 
 - Koda's original idea: you can join only if an existing player creates your consciousness and gives it
   to you (invite-only).
 - Under the Minerva model, a new mind can't simply appear. **An existing citizen or corporation must
-  sponsor its registration with Minerva** (Suggestion for how the idea carries over).
+  vouch for its registration with Minerva** (Suggestion for how the idea carries over).
 - What it does: bots and fake accounts get expensive, players become recruiters, there's an in-world
-  family tree of who sponsored whom, and joining is an in-world event.
+  family tree of who vouched for whom, and joining is an in-world event.
 - To solve: founding minds to start the chain; a way in for newcomers with no friends in the game
-  (corporations as recruiting offices); sponsorship farming (sponsorship binds permanently and costs
+  (corporations as recruiting offices); referral farming (a referral binds permanently and costs
   real time or resources).
-- **Each new mind is a new person**, never a copy of its sponsor. Copies are the Bobiverse's signature.
+- **Each new mind is a new person**, never a copy of whoever vouched for it. Copies are the Bobiverse's signature.
 - In the game today, anyone can register. One pilot per person (D102) isn't enforced yet; it waits
-  until the game is closer to release (D109, Koda 2026-11-18). Sponsorship would be one way to do it.
+  until the game is closer to release (D109, Koda 2026-11-18). Referral would be one way to do it.
 
 ### Pirates (Decided core)
 
@@ -564,7 +617,13 @@ revived remnants.
 - **Launching your ship / the take-off.** You wake in a ship already orbiting Earth (2026-11-18).
 - **Buying an Orbiter ("now for sale").** Pilots are hired; the Orbiter 8 is the open standard everyone
   starts in (2026-11-18/19).
-- **Sponsorship as the way in.** Employment replaced it; sponsorship may return as a referral perk (Later).
+- **Sponsorship as the way in.** Employment replaced it; it may return as a referral perk (Later).
+- **"Sponsorship" as the name of the referral idea.** Renamed "Referral" (2026-11-22): "sponsored" is the
+  first membership level.
+- **Entering the call sign on the job screen.** Replaced by the ID-card scanner: the name you enter
+  there is your call sign (2026-11-19, confirmed 2026-11-22).
+- **Naming and minting the ship on waking.** Replaced by naming it before pickup, the second
+  transaction (2026-11-20).
 - **The government check.** The character is a non-citizen on a Minerva-administered stipend.
 - **Safety, wealth and freedom** as the corporations' axes. Replaced by the three-corporation structure.
 
@@ -603,18 +662,32 @@ revived remnants.
 **Story and world**
 
 - [ ] **The three corporations:** names, logos, histories, natures, ad voices, job listings, what
-      citizenship means in play (laws, protections, taxes, benefits), and how each one's history casts
-      heroes and villains (the structure in Society).
+      citizenship means in play (laws, protections, taxes, benefits), what each membership level grants
+      (sponsored, citizen, the ranks above), and how each one's history casts heroes and villains (the
+      structure in Society).
 - [ ] **The founding minds:** how the first pilots came to be. Koda wants to come back to this soon.
+      (One answer is on offer in the Orbiter 8's first flight, below.)
+- [ ] **The Orbiter 8's first flight** (2026-11-22, raised by "a mind must be inside"): the story says it
+      flew under the sole command of a Minerva console, with no one aboard. Options: (a) it carried the
+      first uploaded mind, a volunteer whose name is now history, which would also answer the founding
+      minds (Suggestion); (b) the console alone barely managed one test flight and can't run the ship
+      reliably or commercially, so real service needs minds (the corporation database's "How it
+      works" page leans this way today: her whole network's attention for 36 hours); (c) rewrite the
+      first flight's command line.
+- [ ] **Autopilot against "a mind must be inside"** (2026-11-22): ships you aren't linked to still run
+      small jobs (holding a siege, mining). Suggestion: Minerva can keep a ship *running* on simple
+      tasks, but jumping, trading, claiming and anything complex need a linked mind, which is also why
+      your focus moves from ship to ship. Confirm the line?
 - [ ] **Minerva's origin story:** born of the decentralized-systems spirit, found her place by accident,
       couldn't be replaced, came to run Sol and its defense network.
 - [ ] **A better name for the pilots,** since they won't all fly Orbiter 8s.
 - [ ] **Other paths to citizenship** (soldiers, and others), as world detail.
-- [ ] **Sponsorship and referrals,** including the native-pirate onboarding machine.
+- [ ] **Referrals** (formerly "Sponsorship"), including the native-pirate onboarding machine.
 - [ ] **Getting your body back** from cold storage: a real goal, or flavor?
 - [ ] **Corporate ship lines:** patented models, how they're sold or built, and the game's name against
       the ship's.
-- [ ] **Switching corporations:** fees, waiting periods, delayed benefits.
+- [ ] **Switching corporations:** fees, waiting periods, delayed benefits, and whether your rank carries
+      over, resets or partly transfers.
 - [ ] **Minerva's news items:** the last bitcoin mined, and others that fit the world.
 - [ ] **The fake company registry** for ads, bills and mail (`STORY_UPDATE_INTRO.md`).
 - [ ] Minerva's hidden agenda (Parked).
@@ -627,6 +700,29 @@ library; the pilot card's "United Federation of Planets".
 ---
 
 ## History
+
+### 2026-11-22: purpose, the mind inside, membership levels
+
+From a review of this file against Koda's design chats (`BACKSTORY_REVIEW.md`, another session), and
+Koda's answers to it.
+
+| Change | Source |
+|---|---|
+| **The heart of the story is purpose:** no expansion left, people fed and housed but checked out by the millions; the character is one of them, until humanity can suddenly leave its star. | Koda, 2026-11-22 |
+| **The feared second Regrettion came true**, felt person by person as lost purpose; the Orbiter 8 ends it. The timeline's "second plateau" is now the Second Regrettion. | Koda, 2026-11-22 |
+| **A human mind must be inside the system** (core premise), told early: the job screen, Minerva's first message, the library. Speed stays the reason why; it's a hard requirement. | Koda, 2026-11-22 |
+| **Membership levels:** sponsored, citizen, then ranks; "sponsor" names the entry level. The referral idea is renamed "Referral"; native pirates vouch for friends. | Koda, 2026-11-22 |
+| **The name entered at the ID-card scanner is the call sign.** | Koda, 2026-11-22 |
+| Added: the character's body isn't fit for other work and they've mostly given up; the pitch is brand new, the only option, wild and one-way; unattended ships run with Minerva at the helm. | Koda, Q1, Q11, 2026-11-18 |
+| Open: the Orbiter 8's first flight with no one aboard, and where autopilot ends (Open story questions). | The review |
+
+### 2026-11-19/20: the intro's two transactions
+
+| Change | Source |
+|---|---|
+| **An ID-card scanner** turns on the housing unit; the name entered is your name and call sign, and **the first transaction** (registration with Minerva). | Koda, 2026-11-19 |
+| **The balcony and the door stay locked** until you choose a corporate sponsor; Minerva says so in the dark. | Koda, 2026-11-20 |
+| **You name the ship before pickup: the second transaction**, which mints the ship and joins your corporation. Accepting the job is the only way out of the intro. | Koda, 2026-11-19/20 |
 
 ### 2026-11-19: Koda's answers to the story questions
 
@@ -645,7 +741,7 @@ library; the pilot card's "United Federation of Planets".
 | **Ships are crippled, not destroyed;** unattended ships run small autopilot jobs. | Koda, Q13, Q25 |
 | The intro is set in 2140; the last bitcoin mined is a Minerva news item. | Koda, Q9 |
 | No pirate fork: pirates use Minerva and encrypt. Native pirates, onboarded by veteran pirates (Leaning). | Koda, Q6, Q27 |
-| The call sign is entered on the job screen, and the pickup request is the contract; the ship is minted when you name it, on waking. | Koda, Q15, Q16 |
+| ~~The call sign is entered on the job screen, and the pickup request is the contract; the ship is minted when you name it, on waking.~~ Superseded 2026-11-19/20 (see above). | Koda, Q15, Q16 |
 
 ### 2026-11-18: the new intro
 
