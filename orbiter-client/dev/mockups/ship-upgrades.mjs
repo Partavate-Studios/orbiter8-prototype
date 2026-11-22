@@ -72,16 +72,16 @@ const armor = (levels, clip) => {
   out += `<path d="M-900 ${fy(n)}h1800M-2400 ${py(n)}h1160M1240 ${py(n)}h1160" stroke="${LINE}" stroke-width="50"/>`
   return out + '</g>'
 }
-/** Railguns: twin white rails with a breech, one along each pod, the third down the spine. */
+/** Railguns: twin white rails with a breech, small against so big a ship: one along each pod, the third down the spine. */
 const railguns = (count) => {
-  const xs = [-2420, 2420, 0]
-  const tops = [-1900, -1900, -2770]
-  const lengths = [2100, 2100, 1050]
+  const xs = [-2390, 2390, 0]
+  const tops = [-1300, -1300, -2600]
+  const lengths = [1250, 1250, 760]
   let out = ''
   for (let i = 0; i < count && i < 3; i++) {
     const x = xs[i]
     const t = tops[i]
-    out += `<g fill="${HULL}" stroke="${LINE}" stroke-width="30"><rect x="${x - 110}" y="${t}" width="80" height="${lengths[i]}"/><rect x="${x + 30}" y="${t}" width="80" height="${lengths[i]}"/><rect x="${x - 150}" y="${t + lengths[i] - 560}" width="300" height="500" rx="60"/><rect x="${x - 130}" y="${t + 300}" width="260" height="90"/></g>`
+    out += `<g fill="${HULL}" stroke="${LINE}" stroke-width="26"><rect x="${x - 78}" y="${t}" width="52" height="${lengths[i]}"/><rect x="${x + 26}" y="${t}" width="52" height="${lengths[i]}"/><rect x="${x - 105}" y="${t + lengths[i] - 360}" width="210" height="320" rx="44"/><rect x="${x - 92}" y="${t + 220}" width="184" height="64"/></g>`
   }
   return out
 }
@@ -95,12 +95,15 @@ const missiles = (count) => {
   }
   return out
 }
-/** Point defense: dots that sit on the hull's edge, overlapping it, in pairs: the nose, the fuselage's sides, the pods. */
+/**
+ * Point defense: white dots on the hull's edge, overlapping it, in pairs: the nose, the fuselage's
+ * sides, the pods' inner shoulders (clear of the railguns on their outer sides).
+ */
 const turrets = (count) => {
-  const xs = [-600, 600, -847, 847, -2156, 2156]
+  const xs = [-600, 600, -847, 847, -1484, 1484]
   const ys = [-2051, -2051, -1000, -1000, -626, -626]
   let out = ''
-  for (let i = 0; i < count && i < 6; i++) out += `<circle cx="${xs[i]}" cy="${ys[i]}" r="125" fill="${PART}" stroke="${LINE}" stroke-width="44"/>`
+  for (let i = 0; i < count && i < 6; i++) out += `<circle cx="${xs[i]}" cy="${ys[i]}" r="125" fill="#ffffff"/>`
   return out
 }
 /** Damage: cracks in pink (it needs you), not dark holes. */
@@ -172,9 +175,9 @@ const T = (x, y, s, { size = 13, fill = '#f1eefa', weight = 400, anchor = 'start
 const frame = (x, y, size, inner) => `<rect x="${x}" y="${y}" width="${size}" height="${size}" rx="12" fill="#160f2c" stroke="#3f3566"/><svg x="${x}" y="${y}" width="${size}" height="${size}" viewBox="${SHIP_ART_VIEWBOX}">${inner}</svg>`
 
 const OUTSIDE = [
-  ['Railguns', 'Twin white rails with a breech.', [1, 2, 3].map((n) => shipWith({ railguns: n }))],
+  ['Railguns', 'Twin white rails with a breech, small against so big a ship.', [1, 2, 3].map((n) => shipWith({ railguns: n }))],
   ['Missile racks', 'Round ports set into the pods; the third in the nose.', [1, 2, 3].map((n) => shipWith({ missiles: n }))],
-  ['Point defense', 'Dots that sit on the hull\'s edge, overlapping it, in pairs.', [2, 4, 6].map((n) => shipWith({ pointDefense: n }))],
+  ['Point defense', 'White dots on the hull\'s edge, overlapping it, clear of the railguns.', [2, 4, 6].map((n) => shipWith({ pointDefense: n }))],
   ['Shields', 'The hull\'s own outline, fat and blue, behind the ship: it wraps it closely. Fatter each level; it breathes (see sheet.svg).', [1, 2, 3].map((n) => shipWith({ shields: n }))],
   ['Armor', 'Plating cut to the hull\'s shape, further back each level.', [1, 3, 5].map((n) => shipWith({ armor: n }))],
   ['Jump range', 'The pods themselves grow longer: they hold the capacitors. No cone added.', [2, 3, 4].map((n) => shipWith({}, { range: n }))]
@@ -182,13 +185,14 @@ const OUTSIDE = [
 const LOADOUTS = [
   ['A new pilot', shipWith()],
   ['A trader', shipWith({ pointDefense: 2, miningDrones: 20 }, { bays: 150, droneBays: 20, range: 3 })],
-  ['A raider', shipWith({ railguns: 2, missiles: 1, armor: 2, shields: 1, drones: 30 }, { bays: 60, droneBays: 30, range: 2 })],
-  ['Everything', shipWith({ railguns: 2, missiles: 1, armor: 5, shields: 3, drones: 80, miningDrones: 40, repairBots: 6 }, { bays: 130, droneBays: 120, range: 4 })]
+  ['A raider', shipWith({ railguns: 2, pointDefense: 2, armor: 2, shields: 1, drones: 30 }, { bays: 60, droneBays: 30, range: 2 })],
+  // (six mounts: a railgun and a missile rack take two each, a point-defense dot one)
+  ['Everything', shipWith({ railguns: 1, missiles: 1, pointDefense: 2, armor: 5, shields: 3, drones: 80, miningDrones: 40, repairBots: 6 }, { bays: 130, droneBays: 120, range: 4 })]
 ]
 
 const W = 1440
 const CELL = 132
-let body = T(30, 40, 'The Orbiter 8\'s upgrades, re-drawn: round 6', { size: 18, weight: 700, fill: '#fff' })
+let body = T(30, 40, 'The Orbiter 8\'s upgrades, re-drawn: round 7', { size: 18, weight: 700, fill: '#fff' })
 body += T(30, 62, 'Two kinds of thing (Koda): what\'s on the outside changes the ship\'s shape; what\'s inside you wouldn\'t see on a ship flying by. So two pictures: the ship as it flies, and the ship opened up.', { size: 12.5, fill: '#c3b3da' })
 let y = 92
 body += T(30, y + 12, 'ON THE OUTSIDE: THREE STEPS OF EACH', { size: 11, weight: 700, fill: '#c9b6ff' })

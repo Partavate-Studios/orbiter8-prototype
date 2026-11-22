@@ -780,4 +780,8 @@ Log:
 - 2026-11-22: **Koda on point defense:** a dot, not the dark gun turret; the dots can overlap the
   ship's edge along the hull. Round 6 drawn: lavender dots sitting on the hull's outline, in pairs
   (the nose, the fuselage's sides, the pods).
+- 2026-11-22: **Koda:** the point-defense dots entirely white, never overlapping the railguns; the
+  railguns a bit smaller ("that's overkill... the O8 is a pretty big ship"). Round 7 drawn: white dots
+  on the hull's edge (the third pair on the pods' inner shoulders, clear of the rails); railguns
+  about two thirds the length and thinner.
 
