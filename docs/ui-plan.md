@@ -773,4 +773,8 @@ Log:
   - The NFT's picture is the outside view, for now.
   - Battle drones are not escorts for now; the idea is on the list in `demo4-plan.md` to consider later.
   - Round 4 drawn to these (`sheet.svg` moves: open it in a browser to see the shield; the PNG is still).
+- 2026-11-22: **Koda on round 4's shield:** don't make that layer so big; give it fatter lines, one
+  color, wrapping the ship nicely. Round 5 drawn: the hull's outline in the old blue, fat, behind the
+  ship, fatter each level, breathing in and out (`sheet.svg`). Known gap: where longer range lengthens
+  the pods, the shield doesn't follow the added length yet.
 

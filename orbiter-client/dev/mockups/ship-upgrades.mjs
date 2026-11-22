@@ -36,24 +36,16 @@ const PINK = '#ff6fb0'
 const hullPath = (attrs) => `<path transform="translate(-2300,-2300)" d="${HULL_D}" ${attrs}/>`
 
 /**
- * The shield: the old blue glow, in the ship's own shape: the hull again, larger, behind it, a step a
- * level. It never holds still: it breathes in and out and drifts between blue and violet (Koda, round 3).
+ * The shield: the hull's own outline in the old shield's blue, drawn fat behind the ship so it wraps
+ * it closely (Koda, round 4: not a bigger copy of the ship). Fatter each level. One color; it breathes
+ * in and out all the time.
  */
 const BLUE = '#7fd4ff'
-const VIOLET = '#b9a0ff'
-const shield = (levels) => {
-  if (!levels) return ''
-  const low = (levels * 0.04).toFixed(2)
-  const high = (levels * 0.09).toFixed(2)
-  return (
-    `<g transform="translate(0 -520) scale(${1.08 + levels * 0.04}) translate(0 520)">` +
-    `<path transform="translate(-2300,-2300)" d="${HULL_D}" fill="${BLUE}" fill-opacity="${high}" stroke="${BLUE}" stroke-width="${levels * 28}" stroke-linejoin="round">` +
-    `<animate attributeName="fill-opacity" values="${high};${low};${high}" dur="5s" repeatCount="indefinite"/>` +
-    `<animate attributeName="fill" values="${BLUE};${VIOLET};${BLUE}" dur="9s" repeatCount="indefinite"/>` +
-    `<animate attributeName="stroke" values="${BLUE};${VIOLET};${BLUE}" dur="9s" repeatCount="indefinite"/>` +
-    '</path></g>'
-  )
-}
+const shield = (levels) =>
+  levels
+    ? `<path transform="translate(-2300,-2300)" d="${HULL_D}" fill="none" stroke="${BLUE}" stroke-width="${180 + levels * 130}" stroke-linejoin="round" stroke-opacity="0.9">` +
+      '<animate attributeName="stroke-opacity" values="0.9;0.45;0.9" dur="5s" repeatCount="indefinite"/></path>'
+    : ''
 /**
  * Longer range: the pods themselves are longer (they hold the capacitor bank), a step a level. Drawn
  * over the hull's own pods so the ship's outline simply grows; no cone is added.
@@ -183,7 +175,7 @@ const OUTSIDE = [
   ['Railguns', 'Twin white rails with a breech.', [1, 2, 3].map((n) => shipWith({ railguns: n }))],
   ['Missile racks', 'Round ports set into the pods; the third in the nose.', [1, 2, 3].map((n) => shipWith({ missiles: n }))],
   ['Point defense', 'A ring and a stub of a barrel, in pairs.', [2, 4, 6].map((n) => shipWith({ pointDefense: n }))],
-  ['Shields', 'The old blue glow in the ship\'s shape, behind it. It breathes, and drifts from blue to violet (see sheet.svg).', [1, 2, 3].map((n) => shipWith({ shields: n }))],
+  ['Shields', 'The hull\'s own outline, fat and blue, behind the ship: it wraps it closely. Fatter each level; it breathes (see sheet.svg).', [1, 2, 3].map((n) => shipWith({ shields: n }))],
   ['Armor', 'Plating cut to the hull\'s shape, further back each level.', [1, 3, 5].map((n) => shipWith({ armor: n }))],
   ['Jump range', 'The pods themselves grow longer: they hold the capacitors. No cone added.', [2, 3, 4].map((n) => shipWith({}, { range: n }))]
 ]
@@ -196,7 +188,7 @@ const LOADOUTS = [
 
 const W = 1440
 const CELL = 132
-let body = T(30, 40, 'The Orbiter 8\'s upgrades, re-drawn: round 4', { size: 18, weight: 700, fill: '#fff' })
+let body = T(30, 40, 'The Orbiter 8\'s upgrades, re-drawn: round 5', { size: 18, weight: 700, fill: '#fff' })
 body += T(30, 62, 'Two kinds of thing (Koda): what\'s on the outside changes the ship\'s shape; what\'s inside you wouldn\'t see on a ship flying by. So two pictures: the ship as it flies, and the ship opened up.', { size: 12.5, fill: '#c3b3da' })
 let y = 92
 body += T(30, y + 12, 'ON THE OUTSIDE: THREE STEPS OF EACH', { size: 11, weight: 700, fill: '#c9b6ff' })
