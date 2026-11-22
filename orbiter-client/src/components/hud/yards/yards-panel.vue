@@ -19,7 +19,8 @@
     </svg>
 
     <section>
-      <h3>Room aboard</h3>
+      <!-- the limit on the group it governs (as the armory's meters): every bay, cargo or drone, counts toward one total -->
+      <h3><span>Room aboard</span><span class="meter">{{ ship.holds + droneBays + count }} of {{ MAX_CARGO_HOLDS }} bays</span></h3>
       <div class="kinds" role="tablist" aria-label="What to fit">
         <button v-for="kind in KINDS" :key="kind.key" type="button" role="tab" class="kind" :class="{ on: kind.key === bayKind }" :aria-selected="kind.key === bayKind ? 'true' : 'false'" @click="chooseKind(kind.key)">
           <small-icon :name="kind.icon" />
@@ -54,7 +55,14 @@
             </p>
           </div>
         </div>
-        <p class="hint">Each one costs more than the last.</p>
+        <!-- the button is where the stepper is: nothing to cross the sheet for (second pass) -->
+        <div class="go">
+          <p class="hint">Each one costs more than the last.</p>
+          <button type="button" class="main" :disabled="!count || pending" @click="fit">
+            <span class="main-well"><small-icon :name="bayKind === 'drone' ? 'drones' : 'port'" /></span>
+            {{ pending ? 'Fitting…' : count ? `Fit ${count} ${noun(count)}` : 'Fit ' + noun(2) }}
+          </button>
+        </div>
       </template>
     </section>
 
@@ -77,14 +85,6 @@
       </div>
     </section>
 
-    <!-- the screen's one main action -->
-    <footer>
-      <button type="button" class="main" :disabled="!count || pending" @click="fit">
-        <span class="main-well"><small-icon :name="bayKind === 'drone' ? 'drones' : 'port'" /></span>
-        {{ pending ? 'Fitting…' : count ? `Fit ${count} ${noun(count)}` : 'Fit ' + noun(2) }}
-      </button>
-      <span v-if="count" class="total">{{ credits(totalCost) }}¢</span>
-    </footer>
   </div>
 </template>
 
@@ -123,7 +123,8 @@ export default {
       pending: false,
       player: usePlayerStore(),
       engineArt,
-      MAX_RANGE
+      MAX_RANGE,
+      MAX_CARGO_HOLDS
     }
   },
   computed: {
@@ -280,6 +281,10 @@ section {
   margin-top: 14px;
 }
 h3 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
   margin: 0 0 10px;
   padding-bottom: 5px;
   border-bottom: 1px solid #ffffff1f;
@@ -434,9 +439,10 @@ small.needs {
   border: 1px solid color-mix(in srgb, var(--base) 70%, transparent);
   border-radius: 4px;
 }
+/* engine power is the capacitors' warm yellow, as on the ship's own picture */
 .pips i.on {
-  border-color: var(--accent);
-  background: var(--accent);
+  border-color: #ffd2a1;
+  background: #ffd2a1;
 }
 /* the next step: not there yet */
 .pips i.next {
@@ -469,11 +475,22 @@ small.needs {
   width: 20px;
   height: 20px;
 }
-footer {
+.meter {
+  color: #e6dcf5;
+  font-size: 12.5px;
+  font-weight: normal;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.go {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-top: 20px;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 10px;
+}
+.go .hint {
+  margin: 0;
 }
 /* the main action: the menu's own color, dark words on it, as its heading has */
 .main {
@@ -506,14 +523,11 @@ footer {
   border-radius: 50%;
   background: #1b153133;
 }
-.total {
-  color: #ffffff;
-  font-size: 19px;
-}
 .narrow .buy {
   gap: 14px;
 }
-.narrow .main {
-  flex: 1;
+.narrow .go {
+  flex-direction: column;
+  align-items: stretch;
 }
 </style>

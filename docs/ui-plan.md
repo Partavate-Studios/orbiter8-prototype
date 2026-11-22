@@ -842,4 +842,8 @@ Log:
     a group that's out of room says where room comes from, with a Yards button.
   - **A pattern for the other menus:** group by the limit that governs, put the meter in the group's
     heading, open the chosen row in place, and never leave a "can't" without a way on.
+- 2026-11-22: **Yards, second pass** (the Armory's pattern): the bays' limit as a meter in the group's
+  heading ("7 of 250 bays", counting what you're about to fit); the Fit button beside the stepper
+  instead of at the foot of the sheet; engine power in the capacitors' warm yellow. Checked by
+  screenshot. **Next:** Colony, then Loadout into the ship's Details, then the rest of the list above.
 
