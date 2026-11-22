@@ -3,3 +3,6 @@ dist
 #orbiter-client/src/contract-artifacts/*.json
 .editorconfig
 .env
+
+# Media we may use later but no longer ship (kept locally, not tracked)
+media-archive/

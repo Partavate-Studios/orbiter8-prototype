@@ -14,7 +14,6 @@ export const VOICE_LINES = {
   registered: 'registration-complete',
   launched: 'welcome-to-the-frontier',
   welcomeBack: 'welcome-back',
-  jumpStarting: 'fusion-engines-primed-initiating-interstellar-jump',
   jumpComplete: 'interstellar-jump-complete',
   transmission: 'incoming-transmission',
   upgraded: 'upgrade-complete',

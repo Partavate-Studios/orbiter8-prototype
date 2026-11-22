@@ -11,12 +11,11 @@ The game plays `public/audio/voice/<file>.mp3`, looked up by key in `VOICE_LINES
 Her voice is blunt and dry: literal, direct, deadpan (`docs/backstory.md`, "Minerva"). The existing
 lines are older and more "starship computer". Rewording them to fit her is the later voice pass.
 
-## What we have (12 files)
+## What we have (11 files)
 
 | # | Line | File | Key | When it plays |
 |---|---|---|---|---|
 | 1 | Priority alert. | `priority-alert` | `failed` | A move failed (not when you declined it) |
-| 2 | Fusion engines primed. Initiating interstellar jump. | `fusion-engines-primed-initiating-interstellar-jump` | `jumpStarting` | A jump starts |
 | 3 | Interstellar jump complete. | `interstellar-jump-complete` | `jumpComplete` | A jump lands |
 | 4 | Welcome back. | `welcome-back` | `welcomeBack` | A returning pilot enters from the title |
 | 5 | Incoming transmission. | `incoming-transmission` | `transmission` | New chat messages |
@@ -59,6 +58,11 @@ for the intro.
 | 25 | Name your ship. | `name-your-ship` | Intro, after accepting the job |
 | 26 | An escort will arrive shortly. | `an-escort-will-arrive-shortly` | Intro, while the second transaction goes through |
 | 27 | You're awake. | `youre-awake` | Intro, waking in the ship |
+
+## Removed
+
+- **"Fusion engines primed. Initiating interstellar jump."** (`jumpStarting`, played as a jump started):
+  removed 2026-11-21, Koda: "just kind of annoying". The file is in `media-archive/voice/` (ignored by git).
 
 ## Not voice
 

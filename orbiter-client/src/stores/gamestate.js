@@ -73,7 +73,6 @@ export const useGameStateStore = defineStore('GameState', {
       try {
         await game.actions.moveTo(system, {
           onSent: () => {
-            gameAudio().speak('jumpStarting')
             ui.jumpAnimationOn()
           }
         })
@@ -99,7 +98,6 @@ export const useGameStateStore = defineStore('GameState', {
       try {
         await game.actions.traverse({
           onSent: () => {
-            gameAudio().speak('jumpStarting')
             ui.jumpThroughHole = true
             ui.blackHoleEntry = Date.now()
             // The passage starts under the entry's last moments, so the entry fades out onto it (and
