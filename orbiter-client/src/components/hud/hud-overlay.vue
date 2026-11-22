@@ -7,26 +7,10 @@
     <!-- you -->
     <div class="you">
       <pilot-plate :strip="phone" @my-ship="myShip" />
-      <div class="chips">
-        <span v-if="sessionLeft" class="chip" title="Your session key: moves go without wallet popups">Session · {{ sessionLeft }} left</span>
-        <span v-if="scanWords && !neighborView" class="chip" role="status">{{ scanWords }}</span>
-        <!-- the ship's drones at work in an empty belt section: what stopping now would load, and when the
-             holds are full; it selects the section, where Stop mining is -->
-        <button
-          v-if="mining && !neighborView"
-          type="button"
-          class="chip mining"
-          :class="{ full: mining.full }"
-          :title="mining.full ? 'The holds are full: stop mining to load the ore' : 'Your drones are mining. Stopping loads what they have so far'"
-          @click="miningSection"
-        >
-          <span>{{ mining.words }}</span>
-          <span class="bar" role="progressbar" aria-label="Mining" :aria-valuenow="mining.mined" aria-valuemin="0" :aria-valuemax="mining.room">
-            <i :style="{ width: mining.fraction * 100 + '%' }" />
-          </span>
-        </button>
-      </div>
     </div>
+
+    <!-- Minerva: your link to the network, and what's under way (it took in the session, scan and mining chips) -->
+    <minerva-plate class="minerva" :compact="phone" :now="now" @open="toggleMenu('minerva')" />
 
     <template v-if="!neighborView">
       <!-- where you are -->
@@ -62,8 +46,6 @@
 import { reactive } from 'vue'
 import { mapActions, mapState } from 'pinia'
 import { STAR_KEY } from '@orbiter8/sdk/system'
-import { game } from '@orbiter8/sdk/client'
-import { miningProgress } from '@orbiter8/sdk/game/mining'
 import { useGameStateStore } from '@/stores/gamestate'
 import { useStarMapStore } from '@/stores/starmap'
 import { useUIStore } from '@/stores/ui'
@@ -81,6 +63,7 @@ import GearIcon from '@/components/star-map/hud/icons/gear-icon.svg'
 import MoreIcon from './more-icon.svg.vue'
 import ListIcon from './list-icon.svg.vue'
 import MapRimIcon from './map-rim-icon.svg.vue'
+import MinervaPlate from './minerva-plate.vue'
 import PilotPlate from './pilot-plate.vue'
 import SystemBlock, { starTint } from './system-block.vue'
 import SelectionPanel from './selection-panel.vue'
@@ -90,15 +73,6 @@ import RimButton from './rim-button.vue'
 // How many broadcasts the chat had when it was last open. Kept outside the component: the HUD goes
 // away during a jump and comes back.
 const chat = reactive({ seen: null })
-
-/** "40s", "12m", "1h 05m": a countdown in a chip. */
-function duration(seconds) {
-  if (seconds < 60) return `${seconds}s`
-  const minutes = Math.ceil(seconds / 60)
-  const h = Math.floor(minutes / 60)
-  const m = minutes % 60
-  return h ? `${h}h ${String(m).padStart(2, '0')}m` : `${m}m`
-}
 
 export default {
   name: 'HudOverlay',
@@ -113,6 +87,7 @@ export default {
     MoreIcon,
     ListIcon,
     MapRimIcon,
+    MinervaPlate,
     PilotPlate,
     SystemBlock,
     SelectionPanel,
@@ -175,40 +150,6 @@ export default {
         this.chatButton,
         { menu: 'settings', icon: 'gear-icon', bind: { label: 'Settings', tint: HUD_TINT.settings, rest: HUD_REST.settings, on: on.settingsMenu } }
       ]
-    },
-    /** The session key's time left, or null when there's no live session. */
-    sessionLeft() {
-      const d = this.player
-      if (!d.sessionLive) return null
-      const seconds = Math.max(0, d.session.expiry - d.now / 1000)
-      const h = Math.floor(seconds / 3600)
-      const m = Math.floor((seconds % 3600) / 60)
-      return h ? `${h}h ${m}m` : `${m}m`
-    },
-    /** The ship mining (D93): its drones at work, units mined of the room, and the time until full; or null. */
-    mining() {
-      const progress = miningProgress(this.player.mining, this.now)
-      if (!progress) return null
-      const { drones } = progress
-      const count = `${progress.mined}/${progress.room}`
-      // a phone's is shorter, clear of the star's name beside it
-      if (this.phone) {
-        const left = progress.full ? 'full' : duration(progress.secondsLeft)
-        return { ...progress, words: `${drones || ''} mining · ${count} · ${left}`.trim() }
-      }
-      const crew = drones ? `${drones} drone${drones === 1 ? '' : 's'} · ` : ''
-      const left = progress.full ? 'holds full' : `full in ${duration(progress.secondsLeft)}`
-      return { ...progress, words: `Mining · ${crew}${count} · ${left}` }
-    },
-    /** "Scanning Lulin-851… 23 s", then "Recording the scan…", or null. */
-    scanWords() {
-      const scan = this.player.scan
-      if (!scan) return null
-      const here = scan.cell === this.player.ship?.cell
-      const where = here ? 'this star' : game.starName(scan.cell)
-      if (scan.status === 'due') return `Recording the scan of ${where}…`
-      const seconds = Math.max(0, Math.ceil((scan.readyAt - this.now) / 1000))
-      return seconds > 0 ? `Scanning ${where}… ${seconds} s` : `Scanning ${where}…`
     }
   },
   watch: {
@@ -222,10 +163,8 @@ export default {
   mounted() {
     // Timers (sessions, buildings, sieges) count down by this clock; the scan's by the second.
     this.clock = setInterval(() => usePlayerStore().tick(), 15_000)
-    this.seconds = setInterval(() => {
-      const player = usePlayerStore()
-      if (player.scan || player.mining) this.now = Date.now()
-    }, 1000)
+    // (Minerva's plate counts down by the second)
+    this.seconds = setInterval(() => (this.now = Date.now()), 1000)
   },
   unmounted() {
     clearInterval(this.clock)
@@ -262,13 +201,6 @@ export default {
     jump() {
       this.closeMenu()
       this.zoomOutToNeighbors()
-    },
-    /** The section the ship is mining, selected: its card has Stop mining. */
-    miningSection() {
-      const section = this.systemObjects[this.myShipId]?.mining?.section
-      if (!section) return
-      this.closeMenu()
-      this.selectSprite(section)
     }
   }
 }
@@ -313,62 +245,11 @@ export default {
 .you > * {
   pointer-events: auto;
 }
-.chips {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 5px;
-  margin-top: 7px;
-  pointer-events: none;
-}
-/* things of yours that are counting down: yellow (libs/palette.js) */
-.chip {
-  padding: 4px 11px;
-  border: 1px solid #ebff9955;
-  border-radius: 12px;
-  background: #12052ae6;
-  color: var(--o8-yellow-light);
-  font-size: 12px;
-  white-space: nowrap;
-}
-/* mining: a button (it selects the section), with a bar that fills as the holds do */
-.chip.mining {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 4px;
-  padding: 5px 11px 6px;
-  font: inherit;
-  font-size: 12px;
-  text-align: left;
-  cursor: pointer;
-  pointer-events: auto;
-}
-.chip.mining:hover {
-  border-color: #ebff99aa;
-}
-.chip.mining:focus-visible {
-  outline: 2px solid var(--o8-yellow-light);
-  outline-offset: 2px;
-}
-.chip.mining .bar {
-  display: block;
-  height: 4px;
-  border-radius: 2px;
-  background: #ebff9926;
-  overflow: hidden;
-}
-.chip.mining .bar i {
-  display: block;
-  height: 100%;
-  border-radius: 2px;
-  background: var(--o8-yellow-light);
-  transition: width 1s linear;
-}
-@media (prefers-reduced-motion: reduce) {
-  .chip.mining .bar i {
-    transition: none;
-  }
+.minerva {
+  top: calc(var(--edge) - 4px + env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 22;
 }
 .where {
   top: calc(var(--edge) + env(safe-area-inset-top));
@@ -404,6 +285,11 @@ export default {
 }
 .phone .you {
   right: calc(var(--edge) + env(safe-area-inset-right));
+}
+.phone .minerva {
+  top: calc(var(--edge) + 58px + env(safe-area-inset-top));
+  left: calc(var(--edge) + env(safe-area-inset-left));
+  transform: none;
 }
 .phone .where {
   top: calc(var(--edge) + 58px + env(safe-area-inset-top));

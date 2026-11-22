@@ -32,7 +32,7 @@ import router from '@/router/router'
 import { onFrame } from '@/libs/frame-loop'
 
 /** Keys for the HUD's menus (their buttons' tooltips name them). */
-const MENU_KEYS = { m: 'map', o: 'objects', p: 'planets', h: 'help', c: 'chat', l: 'leaderboard', f: 'feed' }
+const MENU_KEYS = { m: 'map', o: 'objects', n: 'minerva', p: 'planets', h: 'help', c: 'chat', l: 'leaderboard', f: 'feed' }
 
 /** Whether a key went to a text field (chat, names), not the map. */
 function isTyping(event) {

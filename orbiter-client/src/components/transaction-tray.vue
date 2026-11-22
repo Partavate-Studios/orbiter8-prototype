@@ -90,7 +90,8 @@ export default {
 <style scoped>
 .transaction-tray {
   position: fixed;
-  top: 12px;
+  /* under Minerva's plate (hud/minerva-plate.vue): a move on its way is her talking */
+  top: 74px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1100;
@@ -188,7 +189,7 @@ export default {
 /* A portrait phone: under the pilot's strip (components/hud/hud-overlay.vue). */
 @media (orientation: portrait) {
   .transaction-tray {
-    top: calc(68px + env(safe-area-inset-top));
+    top: calc(126px + env(safe-area-inset-top));
   }
 }
 @keyframes turn {

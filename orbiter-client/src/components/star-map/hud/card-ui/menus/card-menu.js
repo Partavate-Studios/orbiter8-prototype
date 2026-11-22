@@ -80,7 +80,7 @@ function pilotMenu(object, d, marketName) {
       if (object.isMine) {
         add('Jump To Neighbor Star', 'jump')
         add('Ship Loadout', 'loadout')
-        add(d.sessionLive ? 'End Session' : 'Start Session', 'session')
+        // (the session is Minerva's now: hud/panels/minerva-panel.vue)
       }
       if (marketName) menu.push(marketItem(marketName))
       break

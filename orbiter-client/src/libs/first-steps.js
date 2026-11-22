@@ -11,7 +11,7 @@ export function firstSteps(player) {
   return [
     {
       title: 'Start a session',
-      lines: ['From your ship’s menu: one approval, then', 'no wallet popups for 4 hours.'],
+      lines: ['Press Minerva, at the top: one approval, then', 'no wallet popups for 4 hours.'],
       done: player.sessionLive
     },
     {

@@ -47,6 +47,7 @@ import SiegePanel from './panels/siege-panel.vue'
 import AsteroidPanel from './panels/asteroid-panel.vue'
 import ColonyPanel from './panels/colony-panel.vue'
 import ShipPanel from './panels/ship-panel.vue'
+import MinervaPanel from './panels/minerva-panel.vue'
 
 /**
  * Every menu's inside: the quiet blue-gray the station's menus had (Koda, 2026-11-21: "I love the color
@@ -69,7 +70,8 @@ const HTML_MENUS = {
   siege: SiegePanel,
   asteroid: AsteroidPanel,
   colony: ColonyPanel,
-  loadout: ShipPanel
+  loadout: ShipPanel,
+  minerva: MinervaPanel
 }
 
 /** (Every menu is HTML now; this is kept for a menu still drawn in the map's units, should one return.) */

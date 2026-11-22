@@ -37,7 +37,7 @@ function readActionsOpen() {
 /** The free space right of an open menu that's worth moving the selection into (CSS pixels). */
 const MIN_ROOM_BESIDE_MENU_PX = 180
 /** (`objects` is the list of what's in the system: it took in the old planets, ports and ships menus.) */
-const MENUS = ['objects', 'profile', 'settings', 'trade', 'shipyard', 'chat', 'leaderboard', 'colony', 'armory', 'loadout', 'siege', 'feed', 'help', 'asteroid']
+const MENUS = ['objects', 'profile', 'minerva', 'settings', 'trade', 'shipyard', 'chat', 'leaderboard', 'colony', 'armory', 'loadout', 'siege', 'feed', 'help', 'asteroid']
 
 /** The old list menus' names still open the list, on that kind (the P key, older callers). */
 const LIST_KINDS = { planets: 'planet', ports: 'station', ships: 'ship' }

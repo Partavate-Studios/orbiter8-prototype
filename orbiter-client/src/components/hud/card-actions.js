@@ -24,7 +24,7 @@ export const SLOTS = {
   planet: [['claim', 'colony', 'attack'], ['siege'], ['recruit'], ['market'], ['rename', 'owner']],
   station: [['trade'], ['shipyards'], ['armory'], ['rename', 'owner']],
   // (another pilot's ship has one thing to do: see its pilot)
-  ship: [['jump', 'owner'], ['loadout'], ['session'], ['market'], ['rename']],
+  ship: [['jump', 'owner'], ['loadout'], ['market'], ['rename']],
   star: [['jump'], ['traverse'], ['nameStar']],
   moon: [['rename', 'owner']],
   asteroid: [['claim', 'asteroid', 'attack'], ['siege'], ['rename', 'owner']],

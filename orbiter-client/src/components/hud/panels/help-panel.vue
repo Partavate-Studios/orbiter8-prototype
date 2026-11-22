@@ -45,6 +45,7 @@ const KEYS = [
   ['1–9', 'the card’s actions'],
   ['O', 'everything here'],
   ['M', 'the galaxy map'],
+  ['N', 'Minerva'],
   ['Space', 'your ship'],
   ['Tab', 'the next planet'],
   ['C', 'chat'],
