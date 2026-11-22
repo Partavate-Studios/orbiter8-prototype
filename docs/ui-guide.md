@@ -6,7 +6,8 @@ its own guide, [`color-guide.md`](color-guide.md). The game itself (rules, econo
 [`design.md`](design.md), [`demo4-plan.md`](demo4-plan.md) and [`backstory.md`](backstory.md).
 
 A working document: rules here come from Koda's decisions and reactions, each with its reason. Open
-questions are at the end; when Koda settles one, it moves up into the guide.
+questions and unbuilt UI work are in section 9, the one list for them; when Koda settles one, it moves
+up into the guide.
 
 ## 1. What the game feels like
 
@@ -27,22 +28,29 @@ mockup and log it in `docs/review.md`.
 
 ## 2. Layout
 
-- **Two cards in the star system:** the selection card (left: what you selected, as a playing card)
-  and the action card (right: what you can do with it). Card frames and titles take the selection's
-  color; insides are the same purple-gray everywhere; menu buttons one purple (`color-guide.md`).
-- **Over the selection card, two selectors** (Koda, 2026-11-17): the system strip (the star, the
-  planets and the asteroid belt, in orbit order) and under it the nearby strip, round icons (no names;
-  names are tooltips) for what's around the selection: its planet, port and moons, or the belt's eight
-  places (asteroids, their ports, the empty dust). A planet's port and moons are buttons on its
-  card's bottom edge: choosing one deals that card out beside the planet's, which waits behind it
-  (X27); the menu slides out from behind the front card. The menu's actions wear their pictures from
-  `assets/art/` (`libs/body-art.js`); the 1–9 keys still press them, named in each button's tooltip.
+- **The selection card** (bottom left: what you selected, as a playing card). Its frame and title take
+  the selection's color; its inside is the same purple-gray everywhere (`color-guide.md`). Until
+  2026-11-21 its actions were a second card beside it, as a list of purple buttons; now they're the
+  card's own action row (below). Menus' insides are a blue-gray (section 11, rule 13).
+- **Over the selection card, the system strip** (Koda, 2026-11-17): the star, the planets and the
+  asteroid belt, in orbit order, with a list button at its end that opens the list of everything here.
+- **The card itself** (built 2026-11-21, `ui-plan.md`; replaces the 2026-11-17 nearby strip, the card
+  dealt out beside the planet's (X27) and the menu that slid out from behind the card): a planet's
+  station and moons, or the belt's places, are tabs down the card's **spine**; the chosen one takes the
+  card's **face**; one heading across the top; **one action row** of pictured wells across the bottom,
+  the main action as a pill (section 11). The 1–9 keys press the actions, named in each one's tooltip.
+  With nothing selected the card shows your ship; it's never put away.
 - **Menus slide up in the middle**, in the shared menu container, opened from a HUD button or a card's
   menu (`stores/ui.js` `MENUS`). **No panels parked in a corner of the game view:** Koda rejected a
   corner first-steps card ("keep popups consistent, so have it slide up like all of the other menus
   do"). A new info panel is a menu with a HUD icon, and a count badge if it needs attention.
-- **The HUD:** round buttons down the side, tinted by what they open, white icons; the pilot's card at
-  the top left; the star and minimap at the top right; zoom at the bottom.
+- **The HUD** (as rebuilt 2026-11-21/22): the four corners of `hud-redesign.md` (P2). You at the top
+  left (the pilot plate: your call sign opens your info card, your ship's name selects your ship);
+  Minerva's plate at the top center (the activity window and your link to the network); where you are
+  at the top right (one panel: the center's button, the system's name, which opens the list, Map, and
+  the minimap and zoom folding out under it); the card at the bottom left; the dock at the bottom right
+  (Help, Sieges, Ranks, Chat, Settings), round buttons tinted by what they open, white icons, each
+  with its word. A phone has a tab bar: My ship, Objects, Map, Chat, More.
 - **Phones matter.** The game was built for phones from the start. Portrait layouts (`viewRatio <= 1`)
   put the selection card at the bottom. Design every wide-screen change with its phone counterpart, and
   check it at `VW=390 VH=844` in the harness (`TOUCH=1` for a touch screen).
@@ -105,7 +113,7 @@ mockup and log it in `docs/review.md`.
 - Tests only where they earn their keep (game math, chain conversions, critical flows, the HUD's
   render smoke tests).
 
-## 8. Proposed: the galaxy map, further (Koda agreed, 2026-11-14; not built)
+## 8. Proposed: the galaxy map, further (Koda agreed, 2026-11-14; item 5 built, the rest not)
 
 From a ChatGPT galaxy-map mockup, recorded with the color-system proposal. Colors follow
 `color-guide.md`.
@@ -125,7 +133,8 @@ From a ChatGPT galaxy-map mockup, recorded with the color-system proposal. Color
    (they may appear in on-chain SVGs).
 5. **A strong selection marker:** a thick glowing outline and a small pointer, readable on handhelds.
    Selection (purple, outer glow), yours (yellow, the hex outline) and attention (pink, an inner frame or
-   pulse) each have their own place, so all three can show on one hex.
+   pulse) each have their own place, so all three can show on one hex. *Built (`color-guide.md` row
+   G1 · 1, `star-map/galaxy-map.vue`).*
 6. **Plotted routes:** dashed lines for a course across several stars, once ranges allow multi-star
    jumps; lavender (the player's plan), pink where a leg is blocked or dangerous.
 
@@ -134,28 +143,93 @@ backgrounds, glow on everything and big decorative planets (against "the interfa
 cyan buttons (buttons stay purple); a decorative color per hex (a hex's color means its star's class,
 yours or attention).
 
-## 9. Open questions
+## 9. Open questions and what's left
+
+The one list of open UI questions and unbuilt UI work. Other UI docs (`ui-plan.md`, `hud-redesign.md`,
+the mockups' notes) point here; color-only questions stay in `color-guide.md` section 10.
+
+### For Koda to decide
 
 - [ ] **The UI inside the Polkadot App (D66):** keep this client's layout, or rethink for the App? What
-      does the App put around a Product (its own bars, safe areas, light or dark mode), and how should the
-      game fit on a phone inside it?
+      does the App put around a Product (its own bars, safe areas, a theme, light or dark mode, colors of
+      its own), and how should the game fit on a phone inside it?
 - [ ] **The title screen and story:** Koda found them still very purple; the story's art has been
-      updated once (4e38a01); what more?
+      updated once (4e38a01); what more? (The planet and star palettes could bring more color; the
+      Earth by the port is a start: `color-guide.md`.)
 - [ ] **Binary stars:** two stars at a system's center, selected as one object. How does the card show
-      a pair?
-- [ ] **Asteroid fields and mining drones:** how they look in the system view, and how drones bring
-      goods back to a parked ship.
-- [ ] **Drone swarms in battle:** a first drawing is `assets/art/drone-swarm.svg`.
-- [ ] **Publishing builds quickly** for play-tests (waits for Koda's branch strategy).
+      a pair? (The top right is drawn to hold a pair: `mockups/together/9-activity-and-top-right`.)
+- [ ] **Mining drones:** how drones bring goods back to a parked ship, drawn in the system view. (The
+      belt itself is drawn, 5737c8b; mining shows on Minerva's plate.)
+- [ ] **Drone swarms in battle:** a first drawing is `assets/art/drone-swarm.svg` (used on the cards'
+      works icons).
+- [ ] **Publishing builds quickly** for play-tests: where builds go is decided (D106, GitHub Pages); a
+      fast page per build is still to do (`demo4-plan.md`).
+- [ ] **The card's main pill:** on a menu the main button takes the menu's own color; on the card it's
+      still the brand purple. Should the card follow? (`ui-plan.md` section 15, the Yards.)
+- [ ] **"Celestial bodies":** the list's count line says it; whether the list's and button's name
+      ("Objects") should change too, and what ships are called in it (`ui-plan.md` section 10, note 5).
+- [ ] **Holds in the pilot plate** at 250 are about 2 px cells: exact, but a texture at that size
+      (`hud-redesign.md`, round 2).
+- [ ] **The pilot's info card needs more life:** avatars are for later (`demo4-plan.md`, "Consider
+      next"); until then, what?
 
-## 10. Direction: bringing the system together (Koda, 2026-11-21; not built)
+### Designed, not built yet (section 10 and `ui-plan.md`)
 
-Koda's notes on where the HUD should go next. Not designed or built yet: each part needs a mockup that
-Koda approves before it's built (CLAUDE.md, "Keep the card and menu art"). The card's art and the big
-menus stay; what changes is how the pieces connect.
+- [ ] **Details** for a planet, station, moon, asteroid and star (mockup 3; Koda: "look fantastic").
+      With it, a Details well on every card; Rename moves into Details, by the name. The ship's own
+      screen (Your ship) and the pilot's info card are built.
+- [ ] **Your ships:** the switcher for when a pilot has several ships (D26), always saying which ship
+      you're in. Whether to show it switched off before then is open (`ui-plan.md` Part 9, question 10).
+- [ ] **The list's "Yours" holdings:** your bodies' goods, drones and builds (the industry plan's "one
+      screen of everything you own in the system"); Transfer and cargo ships, switched off until the
+      contracts exist.
+- [ ] **The list's keys:** arrows to move, right and left to unfold and fold, typing to filter by name.
+- [ ] **Blocked actions dim and say why** while an activity in flight blocks them (`ui-plan.md`
+      section 11, recommendation 2; the activity window is built, the dimming isn't).
+- [ ] **Names as links everywhere:** owners' names in the card's readouts aren't links yet (chat, the
+      siege feed, ranks and the Owner well are). Another pilot's ship's card face is thin (Pilot, At).
+- [ ] **The block lamps** still sit at the bottom center (`star-map/hud/connection-status.svg.vue`);
+      the plan moved them into Minerva's plate (the block number is on her Link page).
+- [ ] **Minerva's Library, News and Mail** pages: switched off until their content is in the game.
+- [ ] **Fitted ships in the passages:** the jump and black-hole passages, the trade and yards scenes
+      still draw the plain Orbiter 8.
+- [ ] **The galaxy map, further:** section 8, items 1–4 and 6.
 
-**The plan and first mockups** (2026-11-21, for Koda's review): [`ui-plan.md`](ui-plan.md) and
-[`mockups/together/`](mockups/together/).
+### Not yet checked in play
+
+- [ ] With a real move: fitting a part at an armory that has stock, landing and boarding people,
+      building, an Autofactory order that goes through, installing finished parts, a siege, jumping
+      through the new card, the gamepad on the new HUD.
+- [ ] Not seen at all: the Siege screen (no siege on any chain at hand), on desktop or phone.
+- [ ] Read costs: the extra read of other pilots' armories' stock against the testnet's read budget
+      (`dev/harness/read-costs.mjs`).
+- [ ] The belt's spine scrolls when it has many places; check it shows there's more.
+- [ ] The ships' new art (c939272) is on a chain only after a redeploy: a fresh `npm run local` has it;
+      the testnet needs a deploy.
+
+## 10. Direction: bringing the system together (Koda, 2026-11-21; mostly built 2026-11-21/22)
+
+Koda's notes on where the HUD should go next. Each part needed a mockup that Koda approved before it
+was built (CLAUDE.md, "Keep the card and menu art"). The card's art and the big menus stay; what
+changes is how the pieces connect.
+
+**The plan and mockups:** [`ui-plan.md`](ui-plan.md) and [`mockups/together/`](mockups/together/);
+screenshots of what was built in [`mockups/together/built/`](mockups/together/built/).
+
+**Where it stands (2026-11-22).** Koda's notes below are kept as he gave them. Against them:
+
+| Part | State |
+|---|---|
+| One list for the system | Built (`hud/objects/objects-panel.vue`, key `O`): the center pinned, the tree with a planet's station and moons folded in, icon tabs for the kinds, Buying under stations. It replaced the Planets, Ports and Ships buttons. Left: its keys, the "Yours" holdings (section 9). |
+| The card never collapsed | Built: never put away; with nothing selected it shows your ship. |
+| Station and moons as part of the planet's card | Built as a spine of tabs and one face, one heading (Koda's "milder take", `ui-plan.md` section 13). |
+| Icons rather than text menus, in the card | Built: one action row of pictured wells (`hud/action-row.vue`, `libs/small-icons.js`). |
+| Details | The ship's (Your ship, `hud/panels/ship-panel.vue`) is built. A planet's, station's, moon's, asteroid's and star's are not (section 9). |
+| Minerva, your network connection | Built: her plate at the top center is the activity window; her menu's Link page has the network, block, address, balances, how you're signing and Start / End Session (`hud/minerva-plate.vue`, `hud/panels/minerva-panel.vue`). Start Session left the ship's card. |
+| You, as a player | Built: your own info card from the pilot plate (`hud/profile/profile-panel.vue`). Achievements and rankings on it: later. |
+| Other players' profiles | Built, simple: from another pilot's ship, an Owner well, ranks, chat and the siege feed. Not yet from owners' names on the card's readouts. |
+| Your ships (a switcher) | Not built: waits for several ships per pilot (D26). |
+| The galaxy map's icon | Redrawn: hexes and a straight jump (`hud/map-icon.svg.vue`, `map-rim-icon.svg.vue`); the button is named Map. |
 
 ### What's wrong now
 
@@ -219,8 +293,8 @@ always makes clear which ship you're in.
 
 From Koda's notes on the mockups ("some standard on how we build screens", "clean and tight", icons
 over words) and the review in [`ui-plan.md`](ui-plan.md) section 11. Drawn in
-[`mockups/together/7-kit`](mockups/together/7-kit.png). Once Koda agrees, this becomes the rule for
-every screen, and each menu is walked through against it.
+[`mockups/together/7-kit`](mockups/together/7-kit.png). Koda agreed (2026-11-21: "everything looks
+good"); it's the rule for every screen, and every menu was rebuilt against it on 2026-11-21/22.
 
 ### The parts
 

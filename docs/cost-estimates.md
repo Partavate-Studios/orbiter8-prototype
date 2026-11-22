@@ -2,7 +2,7 @@
 
 Measured 2026-11-01 in a real play session on the local chain (Hardhat), with the Demo 3 contracts as
 deployed. A fresh pilot played through the game's own client and wallet (the harness's play bot,
-`orbiter-client/dev/harness/play-bot.js`) with two goals from Koda: **max out the cargo holds** and
+`orbiter-client/dev/harness/play-bot.js`, removed with Demo 3's client path in 9fe3ceb) with two goals from Koda: **max out the cargo holds** and
 **build a station**. Both were reached.
 
 **How to use these numbers.** Gas is what a move costs in work; it's the same on any EVM network
@@ -81,15 +81,16 @@ Assumptions: ETH $2,300 and DOT $0.955.
 | **Sign-up to 250 holds** | **$0.15 ($0.09–$1.86)** | **$0.37 ($0.19–$1.86)** | **$0.54 ($0.27–$2.70)** |
 | **Then a station** | **$0.05 ($0.03–$0.65)** | **$0.13 ($0.07–$0.65)** | **$0.19 ($0.10–$0.95)** |
 
-**To firm up Polkadot Hub,** deploy a copy of the contracts to Polkadot Hub's testnet and run the play bot there: it would give the real fees, deposits included.
+**To firm up Polkadot Hub,** deploy a copy of the contracts to Polkadot Hub's testnet and run the play bot there: it would give the real fees, deposits included. *(Done 2026-11-18: "Polkadot Hub TestNet, measured", below.)*
 
-**Moonbeam, Moonriver and Moonbase Alpha have shut down** (maintenance mode from 2026-08-01; transactions are rejected). The client still lists Moonriver and Moonbase Alpha.
+**Moonbeam, Moonriver and Moonbase Alpha have shut down** (maintenance mode from 2026-08-01; transactions are rejected). The client then still listed Moonriver and Moonbase Alpha; Demo 3's networks left the client in milestone 5c.
 
 ## Demo 4, measured locally (added 2026-11-07)
 
 Gas from Demo 4's contracts on Foundry's local chain: the exploring and trading bots
-(`orbiter-client/dev/harness/explore-bot4.mjs`, `trade-bot4.mjs`) and Foundry's gas reports. Polkadot
-Hub's storage deposits aren't in these: they wait for the local Polkadot node (`docs/demo4-plan.md`, B3).
+(`orbiter-client/dev/harness/explore-bot4.mjs`, `trade-bot4.mjs`, now `explore-bot.mjs` and `trade-bot.mjs`) and
+Foundry's gas reports. Polkadot Hub's storage deposits aren't in these: they waited for the local Polkadot node
+(`docs/demo4-plan.md`, B3), and were measured on the testnet instead (below).
 Typical prices, as above (Base 0.008 gwei, Arbitrum One 0.02 gwei, Polkadot Hub scaled from a transfer).
 
 | Move | Demo 4 gas | Demo 3 gas | Base | Arbitrum One | Polkadot Hub |
@@ -164,10 +165,15 @@ endpoint), and with MetaMask they go through the wallet's provider.
 - **Every reload of the game reads about 125–140 times from the chain** (mostly `eth_call`: the player, the system, each planet, station and moon, each ship, and owner names), plus a few `eth_getLogs` for recent events.
 - **The client reloads** after each of the player's moves, whenever a new block changes the game, and every 2 minutes regardless.
 - **So an idle player makes about 3,900 reads an hour,** plus about 130 per move. A thousand idle players would be about 4 million reads an hour.
-- **Ideas for later:** batching the reads through Multicall3, already used for the leaderboard; reloading only what changed; and the contract wish list's events for every move.
+- **Ideas for later:** batching the reads through Multicall3, already used for the leaderboard (Polkadot Hub has no Multicall3, D34: the new contracts batch reads in their own view functions instead); reloading only what changed; and the contract wish list's events for every move.
 - **A client-only detail:** with the local test wallet, ethers asked the node for the chain ID before nearly every call (1,340 `eth_chainId` calls for 1,450 `eth_call`s). MetaMask answers that itself, so real players aren't affected. Passing the network to ethers would remove these calls entirely.
 
 ## What playing showed (for the design)
+
+From Demo 3's play session (2026-11-01). The rewritten contracts answer most of these: margins differ
+by good and every unit moves the price (B20), restocking was retuned and fixed (B22, `demo4-tuning.md`),
+a new pilot starts with more to trade (B16, now a hold of goods), and the ship must be at the port's
+star (B18).
 
 - **Every good has the same margin,** about 60 credits a unit, so route choice hardly matters. Any port that sells something, then any port that buys it.
 - **Ports restock very slowly:** one unit every 2 minutes, about 30 an hour. One pilot with 250 holds drained Sol's ports in about 70 trades: margins fell from 60 to 39, then 16, 6 and 0, and the bot ran out of profitable trades. With many players, Sol's ports would be empty most of the time.
@@ -199,4 +205,7 @@ spent. An upgrade uploads one module's new code: a fraction of this.
 Player moves pay deposits too, at 0.002 DOT a storage slot: a first arrival at a new star writes a
 handful of slots, so about 0.01 to 0.02 DOT more. That's far less than feared above.
 
-Testnet first: Polkadot Hub's testnet would give the real numbers for both (milestone 6).
+Testnet first: Polkadot Hub's testnet would give the real numbers for both (milestone 6). *Measured since: a
+full deploy to Polkadot Hub TestNet took 60 transactions and 17.96 PAS as EVM bytecode (2026-11-18,
+`expansion-plan.md`), and 25.3 PAS as PolkaVM (2026-11-13, `polkadot-direction.md`); moves are in "Polkadot
+Hub TestNet, measured" above.*

@@ -24,7 +24,7 @@ Koda: "lets color the stars", with purple as the game's color and deep space's, 
 star's color reaching its system "to a degree… just the glow", some gray in UI components, and costly
 detail on high graphics only. Built:
 
-- **Stars by spectral class** (`sdk/traits.js`, colors in `libs/palette.js` `STAR_CLASSES`): in the
+- **Stars by spectral class** (`sdk/src/traits.js`, colors in `libs/palette.js` `STAR_CLASSES`): in the
   system view, on cards, the galaxy map, the minimap and the star button. The glow takes the class's
   color, and the system's dim glow is warmed or cooled toward it (only 22%, so space stays purple).
 - **Planets by class** (`PLANET_COLORS`), surfaces in the class's colors, **tilted rings**, **solid
@@ -74,6 +74,10 @@ now Ferrous, rust red as people know it, and its station Tiangong trades as a Fe
 equipment where it sold silicon; metals and what it buys are unchanged).
 
 ## To do, later
+
+*Status 2026-11-22: these are tracked in [`../color-guide.md`](../color-guide.md) section 10 (a star's
+class in play) and [`../ui-guide.md`](../ui-guide.md) section 9 (mining drones, binary stars). The belt
+is drawn (5737c8b).*
 
 - **Star colors by class:** done (above). Still open: tie a star's class to play. Real stars run from blue (hottest, heaviest) through white, yellow and orange to red (coolest, lightest).
   - Most are red dwarfs; the game may soften that.

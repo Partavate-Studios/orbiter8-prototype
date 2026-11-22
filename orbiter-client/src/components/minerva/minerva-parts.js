@@ -1,4 +1,4 @@
-// Minerva's owl emblem, in its eight parts (docs/briefs/minerva-face-parts.svg numbers them). The emblem
+// Minerva's owl emblem, in its eight parts (docs/archive/briefs/minerva-face-parts.svg numbers them). The emblem
 // (components/assets/minerva-emblem.svg.vue) draws them as one shape; her face
 // (minerva-face.vue) moves each one. Paths are in the art's own units, offset by (-108, -108) so the
 // owl is centered on the origin: about 178 wide and 96 tall.

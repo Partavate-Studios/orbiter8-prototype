@@ -1,5 +1,9 @@
 # Planet station proposals (2026-11-18)
 
+> **Built 2026-11-18 (0ceea51): Koda picked system E.** Stations show what they have; docking moved to
+> the three alternate faces (`PADS = [0, 120, 240]` in `sdk/src/game/docking.js`). Logged as X36 in
+> `docs/review.md`. The other systems stay here as the record.
+
 Three systems for a planet's station, where its look shows what it has (Koda: "the space port should
 look different depending on if it has an armory, a port of trade, etc."). Drawn by
 `../gen-stations.py`; every system uses the same module shapes, so a port reads as a port everywhere:
@@ -38,4 +42,4 @@ the ship (thick, smooth, solid; few small details) instead of round 1's finer dr
   with ships. E keeps **three alternate faces for docking** (0°, 120°, 240°: the Port's collars, with
   small cargo pods beside them) and puts the yards (180°), guns (300°) and factory (60°) on the other
   three. `../overview-3.svg` shows one, two and three ships docked. Building it means `PADS` in
-  `docking.js` becomes those three faces (MAX_DOCKED is already 3).
+  `docking.js` becomes those three faces (MAX_DOCKED is already 3). *Done (0ceea51).*

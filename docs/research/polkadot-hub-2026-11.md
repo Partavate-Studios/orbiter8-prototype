@@ -2,6 +2,13 @@
 
 This page is for the Demo 4 network decision: an Ethereum L2 (Base, Arbitrum) or Polkadot Hub. It is written for a Solidity developer who doesn't know Polkadot internals.
 
+> **A snapshot of 2026-11-06, kept as written.** Since then (2026-11-22): Koda chose Polkadot Hub, launched
+> in the Polkadot App (D62–D66, 2026-11-08), and the spike answered most of the open questions below
+> (results in [`../polkadot-direction.md`](../polkadot-direction.md)). On Polkadot Hub TestNet, a plain
+> OpenZeppelin UUPS upgrade works, on REVM and on PolkaVM; the drand check (the BN254 pairing) works on
+> both; the game deploys and plays as EVM bytecode. Reads have a compute budget of about 39,000 units a
+> call there, and the client's reads were reshaped to fit. Each item of "What to test" is marked below.
+
 ## Summary (as of 2026-11-06)
 
 - **Smart contracts have been live on Polkadot Hub mainnet since 2026-01-27.** Polkadot Hub is the chain that used to be called Asset Hub. Contracts run in `pallet-revive`, which has two engines: **REVM**, which runs normal EVM bytecode, and **PVM**, a RISC-V engine. Parity tells most developers to use REVM. The docs call PVM's Ethereum-compatible mode "early-stage". ([launch post](https://forum.polkadot.network/t/release-of-smart-contracts-on-polkadot/16848), [Dual VM docs](https://docs.polkadot.com/smart-contracts/for-eth-devs/dual-vm-stack/))
@@ -362,28 +369,30 @@ Reading: the Hub is technically live and improving, but there are very few users
 
 ### What to test on testnet before deciding
 
-1. **UUPS end to end on Polkadot Hub TestNet (REVM).** Deploy `ERC1967Proxy` with an OZ v5 `UUPSUpgradeable` implementation that uses ERC-7201 storage, call `upgradeToAndCall` to a V2 that adds a namespaced field, and check that storage is preserved. Record the deposits and fees for deploy and upgrade.
-2. **The play bot with real contracts.** As `cost-estimates.md` already proposes, measure fees and storage deposits per move, especially sign-up and the jump into an unexplored star.
+1. *(Done 2026-11-13: a Credits upgrade through the proxy kept its state, on REVM and on PolkaVM; `polkadot-direction.md` steps 2 and 3.)* **UUPS end to end on Polkadot Hub TestNet (REVM).** Deploy `ERC1967Proxy` with an OZ v5 `UUPSUpgradeable` implementation that uses ERC-7201 storage, call `upgradeToAndCall` to a V2 that adds a namespaced field, and check that storage is preserved. Record the deposits and fees for deploy and upgrade.
+2. *(Done 2026-11-18: the trade, explore and cost bots played the testnet; `cost-estimates.md`, "Polkadot Hub TestNet, measured".)* **The play bot with real contracts.** As `cost-estimates.md` already proposes, measure fees and storage deposits per move, especially sign-up and the jump into an unexplored star.
 3. **Randomness.**
    - (a) Confirm the block-hash prediction: from a script, predict `hash(N)` for a lone transaction and compare it with the result.
-   - (b) Prototype drand `evmnet` verification and measure the BN254 pairing cost.
-   - (c) Check that the 24 s timestamp steps don't break round selection or cooldowns.
+   - (b) Prototype drand `evmnet` verification and measure the BN254 pairing cost. *(Done: the game scans with drand; on the testnet the scan costs about 0.006 PAS on REVM, 0.011 on PolkaVM.)*
+   - (c) Check that the 24 s timestamp steps don't break round selection or cooldowns. *(The scan's round is 30 s after arrival for this reason, B5; scans work on the testnet.)*
 4. **The read path.** Load a map region through
    - (a) the official eth-rpc and a community endpoint,
    - (b) PAPI + smoldot in a browser Web Worker calling `ReviveApi`, and
    - (c) Pine-RPC.
 
    Measure the startup time and latency for 130 batched reads. Deploy your own Multicall3 or batch view.
+
+   *(Partly done: the game reads through the official eth-rpc, with batch views shaped for the per-read budget, and event reads in 2,000-block chunks. Inside the App, reads go through the host as `ReviveApi.call` dry runs (`polkadot-direction.md`, step 4). smoldot and Pine-RPC weren't tried.)*
 5. **The caller checks.** Confirm that `utility.batch_all` and a proxied Substrate account pass `tx.origin == msg.sender`, and decide whether that matters once randomness doesn't depend on the same transaction.
-6. **Wallet onboarding.** Go from a fresh MetaMask to a first move with DOT on the Hub. Note the existential deposit and the gas-buffer advice.
+6. *(Superseded: inside the Polkadot App players use its per-Product account, not MetaMask; the browser build still uses a wallet, D108.)* **Wallet onboarding.** Go from a fresh MetaMask to a first move with DOT on the Hub. Note the existential deposit and the gas-buffer advice.
 7. **Re-check before committing.** Look at the live `specVersion` and changelog for EIP-7702, the 500 ms block status, and `pallet-revive` breaking changes since this note.
 
 ---
 
 ## Couldn't confirm / sources disagree
 
-- **No plain OpenZeppelin `UUPSUpgradeable.upgradeToAndCall` upgrade found on mainnet.** UUPS proxies are deployed and used, and a custom ERC-1967 `upgradeToAndCall` upgrade happened five times. Test 1 above closes this gap.
-- **No evidence either way for proxies on PVM.** Parity (2025) and a hackathon project disagree on whether OZ v5 compiles with `resolc`.
+- **No plain OpenZeppelin `UUPSUpgradeable.upgradeToAndCall` upgrade found on mainnet.** UUPS proxies are deployed and used, and a custom ERC-1967 `upgradeToAndCall` upgrade happened five times. Test 1 above closes this gap. *(Closed on the testnet, 2026-11-13.)*
+- **No evidence either way for proxies on PVM.** Parity (2025) and a hackathon project disagree on whether OZ v5 compiles with `resolc`. *(Closed 2026-11-13: our OZ v5 contracts compile with `resolc` and upgrade on PolkaVM on the testnet.)*
 - **Transparent proxies and Diamonds:** no verified mainnet example. Diamond facets appear only on testnet.
 - **The docs are older than the code** on account mapping (the docs say `map_account` is required; auto-mapping has been on since June 2026) and on PVM limits (call depth 5 vs 25, code ~100 KB vs 1 MiB, events 416 B vs 64 KiB). I trusted the code in both cases.
 - **`PREVRANDAO`:** one blog says it maps to a VRF; the code, docs and mainnet show a constant.

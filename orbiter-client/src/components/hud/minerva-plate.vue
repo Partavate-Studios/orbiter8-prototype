@@ -69,7 +69,7 @@ export default {
     session() {
       return sessionLeft(this.player)
     },
-    /** Her face says the most pressing thing (briefs/minerva-face.md). */
+    /** Her face says the most pressing thing (docs/archive/briefs/minerva-face.md). */
     mood() {
       if (this.connectionLost) return 'offline'
       const kinds = this.all.map((item) => item.kind + ':' + item.icon)

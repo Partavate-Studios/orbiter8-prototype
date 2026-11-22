@@ -3,7 +3,9 @@
 Reference pictures of Orbiter 8's progression, in the style of strategy-game tech trees.
 
 **The Markdown files are the source of truth; the pictures are drawn from them.** To change a tech
-tree, edit its Markdown file, then redraw the pictures from time to time:
+tree, edit its Markdown file, then redraw the pictures from time to time. **The pictures were last drawn
+on 2026-11-07,** before the belt (asteroid buildings, drone bays, mining drones, built-in drones) and the
+ship's redraw of 2026-11-22: they need a redraw.
 
 ```bash
 cd orbiter-client && node dev/tech-trees/build.mjs     # writes the .svg and .png files here (needs Chrome)
@@ -12,7 +14,7 @@ cd orbiter-client && node dev/tech-trees/build.mjs     # writes the .svg and .pn
 | Source | Picture | What it holds |
 |---|---|---|
 | [upgrades.md](upgrades.md) | [upgrades.png](upgrades.png) | Planet buildings (Claim → Citadel → Colony → Station → Port → Yards → Armory, and branches such as the Autofactory); where a siege's hits land on a planet; the Orbiter 8's upgrades and parts |
-| [crafting.md](crafting.md) | [crafting.png](crafting.png) | The goods; manufactured goods and proposed recipes; the Autofactory's parts by tier, and its two planned kinds (ground and orbital); where parts are fitted |
+| [crafting.md](crafting.md) | [crafting.png](crafting.png) | The goods; manufactured goods and proposed recipes; the Autofactory's parts by tier, and its two planned kinds (ground and orbital, superseded by the three sizes in `industry-plan.md`); where parts are fitted |
 | [planet-classes.md](planet-classes.md) | [planet-classes.png](planet-classes.png) | The ten planet classes: what each mines and sells, what its ports buy, people per unit of size. Also where each good comes from in the crafting picture |
 
 ## How the pictures are made
@@ -20,7 +22,7 @@ cd orbiter-client && node dev/tech-trees/build.mjs     # writes the .svg and .pn
 - **Text, numbers and order:** from the Markdown tables. Each file starts with how its tables are
   read. Only the layout lives in `orbiter-client/dev/tech-trees/build.mjs`.
 - **The game's own art:** read live from the game's components. That covers the planet surfaces by
-  class, Koda's station, ship and moon, and the ship NFT's drawn parts (`sdk/ship-art.js`). A
+  class, Koda's station, ship and moon, and the ship NFT's drawn parts (`sdk/src/ship-art.js`). A
   Markdown cell names it as `planet:<class>`, `ship:<part>=<count>`, `station` or `moon`.
 - **Invented art:** saved as standalone SVG drawings in
   [`orbiter-client/src/assets/art/`](../../orbiter-client/src/assets/art/). There are drawings for
@@ -35,7 +37,7 @@ cd orbiter-client && node dev/tech-trees/build.mjs     # writes the .svg and .pn
 Each item is marked with one of three borders:
 
 - **Solid card edge:** in the game now.
-- **Dashed:** planned, decided but not built (fleets and Relays, the two kinds of Autofactory).
+- **Dashed:** planned, decided but not built (fleets and Relays, the two kinds of Autofactory, now superseded by `industry-plan.md`).
 - **Dotted:** an idea proposed in these files. Each one is a call for Koda.
 
 ## The ideas, for Koda to weigh

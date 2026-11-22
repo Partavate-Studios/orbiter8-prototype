@@ -26,7 +26,7 @@ the HUD. So design it as a component, not a page.
 ## The art: Minerva's owl, in parts
 
 `orbiter-client/src/components/assets/minerva-emblem.svg.vue` is her emblem: an owl's face (a mask), about
-180 × 100 units, drawn as **8 separate paths**. `docs/briefs/minerva-face-parts.svg` (and `.png`) shows them
+180 × 100 units, drawn as **8 separate paths**. `docs/archive/briefs/minerva-face-parts.svg` (and `.png`) shows them
 numbered and colored:
 
 | Part | What it is |

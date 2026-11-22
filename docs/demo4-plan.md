@@ -7,7 +7,10 @@ superseded where they conflict (D37's anvil, D41's session keys, D43's RPC path,
 
 **Status: confirmed by Koda (2026-11-06); building.** Followed to the end, each step ticked off as it
 lands. Calls made while building, where the plan didn't say, are logged under "Built: calls for Koda to
-review" at the end.
+review" at the end. **Where it stands (2026-11-22):** milestones 0–5c and 8 are built, bar a few
+steps left open below; milestones 6 and 7 (testnets, the Polkadot spike) are partly done; the testnet
+runs the build tagged `testnet-2026-11-19`. What's left, grouped by area, is under "Consider next:
+what's left".
 
 Branch `demo4`, off `modernize` (2026-11-06). Background: [`design.md`](design.md) (post-Demo 3
 design doc), [`design-ideas.md`](design-ideas.md) (Koda's working doc), [`cost-estimates.md`](cost-estimates.md)
@@ -27,7 +30,7 @@ design doc), [`design-ideas.md`](design-ideas.md) (Koda's working doc), [`cost-e
 |---|---|---|
 | D1 | **Jump range is a ship upgrade.** The prototype's range setting (how many stars away you can jump) becomes an upgrade that lets a ship jump further. It gets a sci-fi name and in-world reason later. It's the design doc's "Engine Upgrade". | 2026-11-06 |
 | D2 | **A fresh universe.** Demo 4 starts a new galaxy on new contracts; nothing migrates from Demo 3, which stays where it is. | 2026-11-06 |
-| D3 | **Rewrite the contracts from scratch in the latest Solidity.** Demo 3's contracts were written while learning and have bugs; reuse their rules, not their code. **They must be upgradeable,** so future releases don't need a new universe. (Koda once planned the Diamond pattern; the approach is chosen in the next round.) | 2026-11-06 |
+| D3 | **Rewrite the contracts from scratch in the latest Solidity.** Demo 3's contracts were written while learning and have bugs; reuse their rules, not their code. **They must be upgradeable,** so future releases don't need a new universe. (Koda once planned the Diamond pattern; the approach is chosen in the next round: UUPS, D14.) | 2026-11-06 |
 | D4 | **Network-neutral until decided otherwise.** Fable researches Polkadot's very latest features and whether to consider moving; the findings are documented in `docs/research/` and inform the choice. | 2026-11-06 |
 | D5 | **Internal milestones, no public release until critical mass.** The dev cycle has milestones; the public release waits until enough of the game is in (what counts is decided below). | 2026-11-06 |
 | D6 | **Generation mixes several aspects of the player and the world**, and resists manipulation, including by whoever controls the order transactions are recorded in. | 2026-11-06 |
@@ -38,7 +41,7 @@ design doc), [`design-ideas.md`](design-ideas.md) (Koda's working doc), [`cost-e
 | D11 | **Range starts at 1, and each upgrade adds 1, up to 4.** Each level costs progressively more **in time to earn**, not just in credits: getting from 1 to 2 should take far less play than 3 to 4. The prices must account for a pilot's profit rate rising as they add holds (in the play session, profit per trade grew from about 300 credits at 5 holds to about 15,000 at 250). | 2026-11-06 |
 | D12 | **Range never reveals stars.** It only reaches stars already charted. New stars appear only around a star someone arrives at for the first time: its 6 neighbors, never more. | 2026-11-06 |
 | D13 | **Research runs on Opus** (Koda's account has few Fable credits). Fable can check it later. | 2026-11-06 |
-| D14 | **UUPS proxies** (ERC-1967) with namespaced storage (ERC-7201), one per module, upgraded by an admin multisig. **Pending:** confirmation that this works on Polkadot Hub (the research). | 2026-11-06 |
+| D14 | **UUPS proxies** (ERC-1967) with namespaced storage (ERC-7201), one per module, upgraded by an admin multisig. **Pending:** confirmation that this works on Polkadot Hub (the research). *Confirmed: D34, and a UUPS upgrade with state kept on Paseo, 2026-11-13 (milestone 7).* | 2026-11-06 |
 | D15 | **No wallet-only check.** Since EIP-7702 it can't be enforced, and it would block the smart wallets session keys need. Exploration's own design must prevent re-rolls. | 2026-11-06 |
 | D16 | **The spiral can be revised by an upgrade, for uncharted space only.** Decided stars never change. | 2026-11-06 |
 | D17 | **Black holes are portals** to another part of space where there's another black hole. A ship can travel to a black hole and orbit it, then choose to leave or to go through. (Details in the next round.) | 2026-11-06 |
@@ -85,12 +88,12 @@ design doc), [`design-ideas.md`](design-ideas.md) (Koda's working doc), [`cost-e
 | D58 | **The Autofactory** is a planet building after Colony: a Bobiverse-style build queue of up to 5 orders. Each order's goods are paid when queued; orders are built one after another, lazily by timestamp; finished items go to the planet's storage, to fit to the planet or load onto the ship. In this run it builds drones, weapons, defenses, platforms and repair bots; crafting adds recipes later. **The Armory** stays a shop at the station, selling finished weapons to any visiting pilot, with the owner's cut. | 2026-11-06 |
 | D59 | **The Orbiter 8's slots:** 6 weapon mounts (point defense 1, railgun 2, missile rack 2); and up to 250 bays of internal space, bought as holds are today, each given to one thing: cargo (1 unit, or 100 colonists) 1 bay, a drone 2, a repair bot 5, a shield level (up to 3) 20, an armor level (up to 5) 10. Range upgrades are engines and take no space. Planets' capacities are much larger. Numbers tuned by simulation, then "find the fun". | 2026-11-06 |
 | D60 | **A tech tree reference screen:** pithy and straightforward, showing what each building, part and upgrade takes and what it unlocks, so players aren't left to trial and error. | 2026-11-06 |
+| D61 | **Moons are free weapons platforms** (Koda, 2026-11-07): **six mounts a moon**, for a planet's owner. Built platforms can be destroyed; moons can't, but every weapon on a moon can be. In a siege the weapons on moons are **exposed, outside the planet's shield**. | 2026-11-07 |
 | D62 | **Polkadot only** (Koda, 2026-11-08): give up other EVM networks; explore and use what Polkadot uniquely offers. Focus on **Polkadot Hub**; our own chain only if the game succeeds. ([polkadot-direction.md](polkadot-direction.md)) | 2026-11-08 |
 | D63 | **Launch strictly in the Polkadot App** as a Product, aiming to release alongside the App's launch. Non-App play can be considered later. | 2026-11-08 |
 | D64 | **No clunky wallets:** the App's per-Product account, signer and allowances (AutoSigning, sponsored contract calls) in place of MetaMask, the network step and, if they do the job, session keys. | 2026-11-08 |
 | D65 | **Things become tradable:** ships (pilots will have several, so ships are collectibles), planets, and possibly port goods. B15 and B30 hold only for now. | 2026-11-08 |
 | D66 | **The UI may be rethought for the App,** choosing the best-performing approach; explored after the spike. | 2026-11-08 |
-| D61 | **Moons are free weapons platforms** (Koda, 2026-11-07): **six mounts a moon**, for a planet's owner. Built platforms can be destroyed; moons can't, but every weapon on a moon can be. In a siege the weapons on moons are **exposed, outside the planet's shield**. | 2026-11-07 |
 | D67 | Asteroid belts in Sol (between Mars and Jupiter) and about 1 system in 4; at most one belt a system. ([expansion-plan.md](expansion-plan.md), decision 1) | 2026-11-16 |
 | D68 | A belt is a ring of 8 sections. ([expansion-plan.md](expansion-plan.md), decision 2) | 2026-11-16 |
 | D69 | A section usually holds one large asteroid; about 1 in 6 is empty. ([expansion-plan.md](expansion-plan.md), decision 3) | 2026-11-16 |
@@ -136,14 +139,14 @@ design doc), [`design-ideas.md`](design-ideas.md) (Koda's working doc), [`cost-e
 | D109 | **Personhood isn't enforced yet** (Koda, 2026-11-18): D102 (one pilot per person) waits until the game is closer to release. | 2026-11-18 |
 | D110 | **Discoverers claim free** (Koda, 2026-11-18): during a star's 10-minute first-claim window (D40) its discoverer claims every planet and asteroid there for nothing (`Claims.discoveryFee`, 0, admin-tunable; `claimFeeOf`); after the window, the claim fee like everyone. The card's button says "Claim Planet (free)". | 2026-11-18 |
 
-## Features: this run and consider next (proposed, for Koda to choose)
+## Features: this run and consider next
 
 Every idea from [`design.md`](design.md), [`design-ideas.md`](design-ideas.md), the contract wish
 list in `UPGRADE_NOTES.md` and the play session in [`cost-estimates.md`](cost-estimates.md).
-**Proposed, not decided.** The test for "this run": decided already, needed by other features,
-hard to add later because it shapes the data, low-hanging, or the battle minimum.
+The test for "this run": decided already, needed by other features, hard to add later because it
+shapes the data, low-hanging, or the battle minimum.
 
-### This run (proposed)
+### This run (accepted as proposed, D23; built, milestones 0–5c)
 
 | Feature | Why now |
 |---|---|
@@ -161,79 +164,71 @@ hard to add later because it shapes the data, low-hanging, or the battle minimum
 | Planets, linear tech tree: Citadel, Colony, Station, Port, Yards, Armory; colonists and production | Battle needs planets worth taking and defending |
 | **Battle minimum:** planet defenses; a few ship weapons that counter each other; armor; slow, public sieges; damage to ship systems instead of a reset; repairs before attacking again; claims with a waiting period | Required |
 
-### Consider next (proposed)
+### Consider next: what's left
 
-- **Battle, more:** the Federation punishing attacks on its planets (D49), overheating, experience, booby traps, ship-to-ship combat, asteroid attacks
-- **Battle you can watch (to do, Koda 2026-11-07):** drones fight as swarms of small triangles or dots moving in groups: very simple SVG, so many draw fast, like the shuttles going back and forth between the big ships and the ports. A first drawing is `orbiter-client/src/assets/art/drone-swarm.svg`.
-- **Social:** corporations, corporate law, protected zones, pirates and bands, bounties
-- **Economy and building:** supply routes, crafting, builders (probes, autofactories), negotiated prices, branching tech tree
-- **Two kinds of Autofactory (to do, Koda 2026-11-07):** ground (terrestrial) and orbital autofactories build slightly different things, with a lot of overlap. Details to design later; first guesses in `docs/tech-trees/crafting.md`, "Autofactory kinds".
-- **Industry (in design, Koda 2026-11-21):** three sizes of autofactory (ship, planet, orbital; ships built in orbit, corporations' ships at high rank), worker and defense drones that build (time scales with drones committed, up to 4 a job), cargo ships moving goods between your bodies in a system, a system-wide holdings screen, and an NFT exchange. Direction and open questions: [`industry-plan.md`](industry-plan.md). Supersedes the two-kinds note above.
-- **Fleets:** several ships per pilot, with remote control (signal lag, relays); refine first (D26)
-- **Bigger systems:** terraforming (designed together), digital pilots (cubes, lag, relays, escape pods, cube hunting), tractor beams
-- **Star density (to revisit, Koda 2026-11-09):** after a test run, the galaxy feels **too dense**. Koda found it hard to tune in the hex prototype; the optimum is lower than now, but space must never **dead-end** (a scan that leaves a pilot with no way on). The rules are in `contracts/src/galaxy/ScanRules.sol` `newStars`: every open neighbor fills 3% of the time off the spiral arms and 58% on them; none fill 1–42% of the time (more in the void, with fewer open slots); otherwise about 4 stars around the star, more on an arm. The levers are those odds and the "about 4" (plus black holes, which open other routes). Tune with the simulator (`orbiter-client/dev/sim/`) or the play bot, measuring stars per scan, dead ends, and how far a pilot can travel, before changing the contract (the client mirrors it in `sdk/` with cross-check tests).
-- **Binary stars (to do soon, Koda 2026-11-07; "soon" 2026-11-21):** some systems have two stars orbiting each other at the center. Selecting either selects the pair as **one object**; a single star can't be selected on its own. Alpha Centauri and Sirius, among Sol's genesis neighbors, are real binaries.
-- **The HUD brought together (to design, Koda 2026-11-21):** one Objects menu for the system with filters, a card that's never collapsed and grows to show a planet's station and moons, icons on the card, a Details view, a Minerva network panel (wallet, session, block), a player view and other players' profiles, a ship switcher, and a new galaxy-map icon. Notes: `ui-guide.md` section 10.
-- **Achievements and leaderboard rankings on your profile (much later, Koda 2026-11-21).**
+Everything still open from this list, the milestones below and `expansion-plan.md`, grouped by area.
+Each item keeps its date and Koda's words. Done items moved to "Done from this list", after it.
+Checked against the code and `git log` on 2026-11-22.
+
+**Contracts, the next release**
+- **Industry (in design, Koda 2026-11-21):** three sizes of autofactory (ship, planet, orbital; ships built in orbit, corporations' ships at high rank), worker and defense drones that build (time scales with drones committed, up to 4 a job), cargo ships moving goods between your bodies in a system, a system-wide holdings screen, and an NFT exchange. Direction and open questions: [`industry-plan.md`](industry-plan.md). Not built; waits on Koda's answers there. Supersedes the two kinds of Autofactory (Koda 2026-11-07: ground and orbital, "slightly different things, with a lot of overlap"; first guesses in `docs/tech-trees/crafting.md`, "Autofactory kinds").
+- **Binary stars (to do soon, Koda 2026-11-07; "soon" 2026-11-21):** some systems have two stars orbiting each other at the center. Selecting either selects the pair as **one object**; a single star can't be selected on its own. Alpha Centauri and Sirius, among Sol's genesis neighbors, are real binaries. Not built.
+- **Dwarf planets (to do, Koda 2026-11-16; D87):** small worlds (Pluto, Ceres, Eris…) as their own kind of body. To design. Body ids already leave room for the kind (`BodyId.sol`).
+- **Upgrade safety before mainnet (to do, Koda 2026-11-19):** the contracts already upgrade without losing data (UUPS proxies, ERC-7201 namespaced storage; Deeds, Credits and Claims were upgraded in place on the testnet, 2026-11-18). The diamond pattern isn't needed. Missing: an automatic check that a new version keeps every storage layout (e.g. OpenZeppelin's upgrades validation, or a storage-layout diff in CI) before any upgrade of a live deployment. Not built yet.
+- **Contract size room:** Battle has 1.9 KB left, Pilots 1.7 KB, Planets 2.3 KB (`forge build --sizes`, 2026-11-22). If Battle needs more, `Combat` can become a linked library (check that `resolc` links libraries first; `expansion-plan.md`).
+- **Star density (to revisit, Koda 2026-11-09):** after a test run, the galaxy feels **too dense**. Koda found it hard to tune in the hex prototype; the optimum is lower than now, but space must never **dead-end** (a scan that leaves a pilot with no way on). The rules are in `contracts/src/galaxy/ScanRules.sol` `newStars`: every open neighbor fills 3% of the time off the spiral arms and 58% on them; none fill 1–42% of the time (more in the void, with fewer open slots); otherwise about 4 stars around the star, more on an arm. The levers are those odds and the "about 4" (plus black holes, which open other routes). Tune with the simulator (`orbiter-client/dev/sim/`) or the play bot, measuring stars per scan, dead ends, and how far a pilot can travel, before changing the contract (the client mirrors it in `sdk/` with cross-check tests). *2026-11-19 (66c4c70): a density map for Koda to decide from: `contracts/test/sim/DensityMap.t.sol` (`DENSITY_MAP=1`) explores 60 rings from Sol with the real scan, drawn by `orbiter-client/dev/sim/density-map.mjs` into `docs/mockups/density/today-60-rings.svg` (7,246 stars and 212 black holes in 10,981 cells, 70% of charted cells holding a star). The rules are unchanged.*
+- **Revisit the scan's randomness (Koda 2026-11-18):** the drand scan (D35) feels less than smooth: a jump, a wait for the drand round, then another wallet popup to write it. Not happy with drand's use; revisit later, guided by the Polkadot App (what randomness Polkadot Hub or the App offers, and moves without popups).
+- **Star classes in play (idea):** a star's spectral class (now drawn, B56) could set how fast it charges the jump drive (the story): blue and white stars fast, red dwarfs slow.
+- **Fleets:** several ships per pilot, with remote control (signal lag, relays); refine first (D26). D105 (ships as Scarcity NFTs, a pilot record) is shaped for them.
+- **Battle, more:** the Federation punishing attacks on its planets (D49), overheating, experience, booby traps, ship-to-ship combat, asteroid attacks (asteroid sieges are built, D95). Several attackers in one siege (B32, `demo4-tuning.md` "To decide").
+- **Corporations, the rest of the intro's contract side** (decided in story 2026-11-18/19): port taxes and legal control of what you own moving with the pilot's corporation, and a waiting period on switching (`Pilots` keeps `corporationSince` for it). Built so far: Corp X, Y and Z, switching for a fee (5,000), the starting debt, `Claims.lawAt` (see "Done from this list").
+
+**Economy and tuning**
+- **Koda's approval of the numbers** in [`demo4-tuning.md`](demo4-tuning.md): trade, holds and range (milestone 2), battle (milestone 4), the belt (applied 2026-11-17).
+- **Building costs and times** (milestone 3): still starting values (B29), not simulated.
+- **The simulator learns miners and asteroid owners** (`expansion-plan.md`, left for later), if the belt's numbers are to be tuned for real.
+
+**Client and UI**
+- **The HUD brought together (Koda 2026-11-21):** one Objects menu for the system with filters, a card that's never collapsed and grows to show a planet's station and moons, icons on the card, a Details view, a Minerva network panel (wallet, session, block), a player view and other players' profiles, a ship switcher, and a new galaxy-map icon. Notes: `ui-guide.md` section 10; the plan, its build order and progress notes: [`ui-plan.md`](ui-plan.md) (sections 7 and 15). *Built 2026-11-21/22:* the card (b926b52), the Objects list and the top right with the new Map icon (ec77f53), Minerva's plate and her Link page (576386a), another pilot's info card and your own (19c5b30, fab4489), every menu rebuilt as HTML to the screen standard (e7be724 to 3ad11b0). *Left:* Details beyond the ship's own screen (step 4), the Ships switcher and the "waiting" list (step 6), a play session covering claim, jump, siege, colony, the gamepad and a phone with moves (`ui-plan.md` section 15).
+- **The HUD's planet picker (revisit, Koda 2026-11-16):** the strip of the system's bodies on the selection card (from the HUD redesign, `docs/hud-redesign.md`). Keep it as is; later, give it much more to do. *2026-11-21: the strip stays, with a list button at its end; the Objects list now does the browsing (ec77f53).*
+- **Battle you can watch (to do, Koda 2026-11-07):** drones fight as swarms of small triangles or dots moving in groups: very simple SVG, so many draw fast, like the shuttles going back and forth between the big ships and the ports. A first drawing is `orbiter-client/src/assets/art/drone-swarm.svg`. Not built.
 - **Battle drones as an escort (to consider again later, Koda 2026-11-21):** drawn flying in formation off the ship's tail, perhaps only while it fights. Koda liked them best of the first upgrade drawings, but for now drones stay inside, in their bays (`docs/mockups/ship-upgrades/round-1.png` shows the escort).
 - **Pilot avatars (later, Koda 2026-11-21):** let players make an avatar of some kind for their pilot. It goes on the pilot's card and profile, which Koda found boring as mocked up (`ui-plan.md` section 10, mockup 3). How avatars are made (parts to pick from, an upload, an NFT) is open; `design.md` (Avatars) mentions an avatar image with an off switch.
-- **Analyze the clean-room client's ideas (to do, Koda 2026-11-16):** `client-rnd/fresh/` (its GAME.md and DESIGN.md: one market board per star, planned trade routes and courses, one list of every timer, every move's visible life) "has some great ideas"; study them for the main client after the planned work.
-- **A cheat code for debugging (done 2026-11-18: Settings' cheat button in dev builds, +10,000,000¢ through the admin's `Credits.cheat`, `dev/cheat.js`; on the testnet too, Credits upgraded in place):** a way to give the pilot credits, goods, parts or time while testing a deployment (an admin-only contract function, or a debug panel calling the admin's moves). Not in the 2026-11-17 testnet deploy.
-- **The HUD's planet picker (revisit, Koda 2026-11-16):** the strip of the system's bodies on the selection card (from `client-rnd/hud/`). Keep it as is when the HUD comes into the main client; later, give it much more to do.
-- **Deeds draw themselves (done 2026-11-18, D107; samples in `mockups/deeds/`):** `Deeds.tokenURI` with an on-chain SVG of the planet, moon or asteroid (class colors, size, rings, its station and owner's mark), in the selection card's NFT-card look; mirrors the client's drawing like `ShipArt` ↔ `sdk/src/ship-art.js`. Watch Deeds' size (24,576 bytes): the art may need its own library contract.
-- **The new intro and onboarding (decided in story 2026-11-18/19; to design, then build; `backstory.md`,
-  "Joining the game", and `story-sources/PROJECTS_INTRO.md`):** the apartment intro and Minerva's console;
-  subscribing to a corporation on the housing computer (switchable; Minerva's interface re-skins per
-  corporation); the call sign entered on the job screen, with the pickup request as the contract
-  transaction (registration and corporation together); waking in Earth orbit with no launch; **naming the
-  ship accepts and mints it**; Minerva's first message. Contracts (check each with Koda before building):
-  the pilot's corporation on chain, switchable (port taxes and legal control of what you own move with
-  it; a fee, perhaps a waiting period); **starting in debt with a hold full of goods** instead of 1,000
-  credits (Credits is an ERC-20 and can't go negative: the debt needs its own balance, paid down first by
-  sales); ownership-based law (a star's owner's corporation rules its system). Client: Minerva's library
-  (client-side content, history varying by corporation), her blunt and dry voice guide, news items (the
-  last bitcoin). Design first: the animated Minerva face (Koda will brief it), then mockups for Minerva in
-  the HUD, fleet interfaces, a widget design system and every planned feature's new UI together; the
-  title and story art; the title's Story button now that history lives in the library.
-  *Built 2026-11-19 (X40): the two joining moves (register at the ID scanner; accept the job and name
-  the ship), Corp X, Y and Z on chain with switching, the starting debt and hold of goods, and
-  `Claims.lawAt`.* ***The intro itself built 2026-11-19*** *from the approved mockup
-  (`mockups/intro/`): `orbiter-client/src/components/intro/`, replacing the title's call-sign and ship
-  wizard end to end; the title's Story button and scene are retired to `components/archive/` (calls in
-  `review.md` section 13).* ***Rebuilt 2026-11-20 as a zoomable isometric diorama*** *(Koda's go-ahead on
-  `mockups/intro-zoom/`): one world through one camera, no menus in the world, Minerva's buttons in the
-  card drawer's style (`review.md` section 14).*
-- **Minerva's library (to do, Koda 2026-11-19):** the world's history, read in Minerva's console (in the
-  game and the intro), in her voice and spun by your corporation (`backstory.md`, "Her library"). The
-  retired Story scene's eight animated panels (`orbiter-client/src/components/archive/story-scene.vue`
-  and `archive/story/`) can illustrate it when you look up history. To flesh out: what's in it, how it's
-  organized, how each corporation tells it.
-- **Upgrade safety before mainnet (to do, Koda 2026-11-19):** the contracts already upgrade without losing
-  data (UUPS proxies, ERC-7201 namespaced storage; Deeds, Credits and Claims were upgraded in place on the
-  testnet, 2026-11-18). The diamond pattern isn't needed. Missing: an automatic check that a new version
-  keeps every storage layout (e.g. OpenZeppelin's upgrades validation, or a storage-layout diff in CI)
-  before any upgrade of a live deployment.
-- **The GUI redesign goes to a Fable session (Koda 2026-11-19):** Minerva in the HUD, the intro scene,
-  fleet interfaces and the widget system wait for it. First up there: Minerva's animated face, briefed in
-  [`briefs/minerva-face.md`](briefs/minerva-face.md).
-- **Revisit the scan's randomness (Koda 2026-11-18):** the drand scan (D35) feels less than smooth: a
-  jump, a wait for the drand round, then another wallet popup to write it. Not happy with drand's use;
-  revisit later, guided by the Polkadot App (what randomness Polkadot Hub or the App offers, and moves
-  without popups).
-- **Dwarf planets (to do, Koda 2026-11-16):** small worlds (Pluto, Ceres, Eris…) as their own kind of body. To design.
-- **Asteroid belts (in design, Koda 2026-11-16):** a ring divided into sections; each section usually has one large asteroid (sizes and compositions vary; some sections are empty). On the asteroid, a pilot builds a platform, brings people, builds or buys drones, and builds a port that the mining supplies: one infrastructure on the big asteroid. Nothing is built in empty space, but a ship with drones can harvest in an empty section. Sol gets its belt. The plan, with Koda's decisions of 2026-11-16 and what's still open: [`expansion-plan.md`](expansion-plan.md) (with bay types, built-in drones, mining, a fully built Sol and a contract refactor). Supersedes the asteroid-fields note below.
-- **Asteroid fields (to do, Koda 2026-11-07):** fields that can be mined; whether they can be owned is open. Perhaps special **mining drones** that slowly collect resources and bring them to the ship while it's parked there.
-- **Star classes in play (idea):** a star's spectral class (now drawn, B56) could set how fast it charges the jump drive (the story): blue and white stars fast, red dwarfs slow.
-- **Discoverers claim cheap (done 2026-11-18, D110: free, every planet and asteroid, in the first-claim window):** the first pilot to visit a new star claims its planets free or for very little; anyone else pays the normal fee. Builds on D40 (today the discoverer gets a 10-minute window to themselves, at the normal fee, in `Planets.claim`). To settle: free or a discount; every planet there or a few; only within the window or for good; and how it holds up against pilots farming discoveries with spare accounts (the personhood check, spike step 5, would help).
-- **Publishing builds quickly (to do, Koda 2026-11-14):** a way to put a build up fast, maybe a page per subdirectory where builds land before they're pushed. Waits for Koda's branch strategy.
-- **3D rendering** (Koda has a ship model and a prototype project to reference) (D33)
+- **Achievements and leaderboard rankings on your profile (much later, Koda 2026-11-21).** The info card has places for achievements and corporate rank, switched off (19c5b30).
+- **Analyze the clean-room client's ideas (to do, Koda 2026-11-16):** `client-rnd/fresh/` (its GAME.md and DESIGN.md: one market board per star, planned trade routes and courses, one list of every timer, every move's visible life) "has some great ideas"; study them for the main client after the planned work. It also has yet to learn the belt (D97, expansion decision 31).
+- **3D rendering** (Koda has a ship model and a prototype project to reference) (D33).
+
+**Story and Minerva**
+- **Minerva's library (to do, Koda 2026-11-19):** the world's history, read in Minerva's console (in the game and the intro), in her voice and spun by your corporation (`backstory.md`, "Her library"). The retired Story scene's eight animated panels (`orbiter-client/src/components/archive/story-scene.vue` and `archive/story/`) can illustrate it when you look up history. To flesh out: what's in it, how it's organized, how each corporation tells it. *A start, 2026-11-20 (7889b7a): your corporation's database in Minerva's console, with a shared History page; the words in `orbiter-client/src/libs/corp-database.js`, calls in `review.md` section 17.*
+- **The intro's client leftovers** (decided in story 2026-11-18/19): Minerva's blunt and dry voice guide, and news items (the last bitcoin). Not built.
+
+**The Polkadot launch** (details in [`polkadot-direction.md`](polkadot-direction.md))
+- Milestone 7's open steps (below): the client in the phone App and on `dot.li`; AutoSigning in the App itself; seeing a ship in the Pocket; planning the migration with Koda.
+- Milestone 0's local Polkadot Hub node (B3) and milestone 6's remaining tests (smoldot reads, the App's wallets).
+- **Publishing builds quickly (to do, Koda 2026-11-14):** a way to put a build up fast, maybe a page per subdirectory where builds land before they're pushed. Waits for Koda's branch strategy. *Partly: since 2026-11-17 (7f23ef9) a GitHub Pages workflow publishes the client on every push to `polkadot` (D106); a page per subdirectory isn't built.*
+
+**Much later, or parked**
+- **Social:** corporations, corporate law, protected zones, pirates and bands, bounties
+- **Economy and building:** supply routes, crafting, builders (probes, autofactories), negotiated prices, branching tech tree
+- **Bigger systems:** terraforming (designed together), digital pilots (cubes, lag, relays, escape pods, cube hunting), tractor beams
 - **Parked:** portals between networks, new ship types and aliens, tokenized goods, hidden information with ZK proofs, invite-only cubes, star-system weapons, Minerva's hidden agenda, planet maintenance, vanity upgrades, alignment, corporate taxes; client extras (soundtrack folders, re-skinning, ENS names)
+
+### Done from this list
+
+- **A cheat code for debugging (done 2026-11-18, 6ec309b):** Settings' cheat button in dev builds, +10,000,000¢ through the admin's `Credits.cheat`, `dev/cheat.js`; on the testnet too, Credits upgraded in place. Asked for as a way to give the pilot credits, goods, parts or time while testing a deployment (an admin-only contract function, or a debug panel calling the admin's moves). Not in the 2026-11-17 testnet deploy.
+- **Deeds draw themselves (done 2026-11-18, D107; 8c03d41, testnet 5d30688; samples in `mockups/deeds/`):** `Deeds.tokenURI` with an on-chain SVG of the planet, moon or asteroid (class colors, size, rings, its station and owner's mark), in the selection card's NFT-card look; mirrors the client's drawing like `ShipArt` ↔ `sdk/src/ship-art.js`. The art is its own contract, `DeedArt` (Deeds is 14.7 KB).
+- **Discoverers claim cheap (done 2026-11-18, D110, 825223e: free, every planet and asteroid, in the first-claim window):** the first pilot to visit a new star claims its planets free or for very little; anyone else pays the normal fee. Builds on D40 (the discoverer's 10-minute window, now in `Claims`). The questions it raised (free or a discount; every planet or a few; within the window or for good) were settled by D110; farming discoveries with spare accounts waits on personhood (D102, D109).
+- **The new intro and onboarding (decided in story 2026-11-18/19; `backstory.md`, "Joining the game", and `story-sources/PROJECTS_INTRO.md`):** the apartment intro and Minerva's console; subscribing to a corporation on the housing computer (switchable; Minerva's interface re-skins per corporation); the call sign entered on the job screen, with the pickup request as the contract transaction (registration and corporation together); waking in Earth orbit with no launch; **naming the ship accepts and mints it**; Minerva's first message. Contracts (each checked with Koda before building): the pilot's corporation on chain, switchable (port taxes and legal control of what you own move with it; a fee, perhaps a waiting period); **starting in debt with a hold full of goods** instead of 1,000 credits (Credits is an ERC-20 and can't go negative: the debt has its own balance, paid down first by sales); ownership-based law (a star's owner's corporation rules its system). Client: Minerva's library (client-side content, history varying by corporation), her blunt and dry voice guide, news items (the last bitcoin). Design first: the animated Minerva face, then mockups for Minerva in the HUD, fleet interfaces, a widget design system and every planned feature's new UI together; the title and story art; the title's Story button now that history lives in the library.
+  *Built 2026-11-19 (X40, 7d7d12f): the two joining moves (register at the ID scanner; accept the job and name the ship), Corp X, Y and Z on chain with switching, the starting debt and hold of goods (45 credits of debt, 3 Helium-3 and 2 Electronics, `Deploy.s.sol` `wireJoining`), and `Claims.lawAt`.* ***The intro itself built 2026-11-19*** *(daff848) from the approved mockup (`mockups/intro/`): `orbiter-client/src/components/intro/`, replacing the title's call-sign and ship wizard end to end; the title's Story button and scene are retired to `components/archive/` (calls in `review.md` section 13).* ***Rebuilt 2026-11-20 as a zoomable isometric diorama*** *(b415f8c; Koda's go-ahead on `mockups/intro-zoom/`): one world through one camera, no menus in the world, Minerva's buttons in the card drawer's style (`review.md` section 14).* What's still open from it is under "Story and Minerva" and "Corporations" above.
+- **The GUI redesign goes to a Fable session (Koda 2026-11-19):** Minerva in the HUD, the intro scene, fleet interfaces and the widget system wait for it. First up there: Minerva's animated face, briefed in [`archive/briefs/minerva-face.md`](archive/briefs/minerva-face.md). *Done: the face (4f2018c, 2026-11-19), the intro (above), and the HUD work with its kit and screen standard (`ui-plan.md`, `ui-guide.md` section 11). Fleet interfaces wait for fleets.*
+- **Asteroid belts (Koda 2026-11-16; built 2026-11-16, milestone 8):** a ring divided into sections; each section usually has one large asteroid (sizes and compositions vary; some sections are empty). On the asteroid, a pilot builds a platform, brings people, builds or buys drones, and builds a port that the mining supplies: one infrastructure on the big asteroid. Nothing is built in empty space, but a ship with drones can harvest in an empty section. Sol gets its belt. The plan, with Koda's decisions of 2026-11-16: [`expansion-plan.md`](expansion-plan.md) (with bay types, built-in drones, mining, a fully built Sol and a contract refactor; D67–D100).
+- **Asteroid fields (Koda 2026-11-07; superseded by the belts):** fields that can be mined; whether they can be owned was open. Perhaps special **mining drones** that slowly collect resources and bring them to the ship while it's parked there. The belts answered both: asteroids are owned (D72), and mining drones are a part (D75) that mines empty sections from a parked ship (D93).
 
 ## Open questions
 
-Rounds 1–5 answered, except Q25 (contract tooling), which waits for the research. Next: the research's findings (the engine question is settled by D33).
-
-**Research done (D34).** All rounds answered (D1–D60). D53's balance table is a proposal to confirm with the finished plan.
+All rounds answered (D1–D60), with the research done (D34). Q25 (contract tooling) was settled by D36
+(Foundry). D53's balance table was confirmed with the plan (section 12). Questions raised since live in
+`review.md` ("For Koda to decide"), `industry-plan.md` and `ui-plan.md`.
 
 ## Plan (confirmed 2026-11-06)
 
@@ -393,29 +388,29 @@ impossible or needs a design call goes back to Koda; everything else is decided 
 
 **Milestone 0: setup**
 - [x] A `contracts/` Foundry project with OpenZeppelin upgradeable contracts.
-- [ ] The local Polkadot Hub node built and scripted (start, deploy, reset), next to the existing Hardhat setup. *Scripted (`contracts/polkadot-node.sh`); waiting for Koda to run it (B3).*
-- [ ] A smoke test: a UUPS module deployed, upgraded and its storage checked on both chains (the research's test 1). *Passes on Foundry's chain; Polkadot waits on B3.*
+- [ ] The local Polkadot Hub node built and scripted (start, deploy, reset), next to the existing Hardhat setup. *Scripted (`contracts/polkadot-node.sh`); waiting for Koda to run it (B3). Still not run (2026-11-22): contract work uses Foundry's chain and Polkadot Hub TestNet.*
+- [x] A smoke test: a UUPS module deployed, upgraded and its storage checked on both chains (the research's test 1). *Passes on Foundry's chain; on Polkadot, done on Paseo Asset Hub instead of the local node (Credits upgraded with its state kept, EVM bytecode and PolkaVM, 2026-11-13; `polkadot-direction.md`).*
 
 **Milestone 1: foundation and galaxy**
 - [x] Roles, the module registry, and the event conventions. *Registry deferred to milestone 2 (B11).*
 - [x] Hex math, the spiral, and derived star and planet traits, in Solidity and JS, cross-checked against each other. *Star traits are client-only (D8, D9); planet traits arrive with planets in milestone 3.*
 - [x] drand verification (`Randomness`), with fuzz tests and gas measured.
 - [x] `Galaxy`: cells, jumps, arrivals, scans, black hole pairs, discoverers, renames, region and system views. *System views arrive with planets.*
-- [x] The client SDK's new chain layer (RPC transport first), and the galaxy map view with regions loading as you pan. *`npm run local4`. Now the game's galaxy map (milestone 5b).*
-- [x] The play bot explores; gas and deposits per arrival measured. *`dev/harness/explore-bot4.mjs`; gas in B13; Polkadot deposits wait on B3.*
+- [x] The client SDK's new chain layer (RPC transport first), and the galaxy map view with regions loading as you pan. *Was `npm run local4` (now `npm run local`). Now the game's galaxy map (milestone 5b).*
+- [x] The play bot explores; gas and deposits per arrival measured. *`dev/harness/explore-bot.mjs` (was `explore-bot4.mjs`); gas in B13; Polkadot deposits measured on the testnet instead (`cost-estimates.md`, 2026-11-18).*
 
 **Milestone 2: pilots and trade**
-- [ ] `Pilots`: call signs, the ship NFT, location, the bays and weapon mounts (D59), range, damage fields. *Done except mounts and damage, which come with battle (milestone 4).*
+- [x] `Pilots`: call signs, the ship NFT, location, the bays and weapon mounts (D59), range, damage fields. *Mounts and damage came with battle (milestone 4): `Pilots.MOUNTS` and the loadout, damage in `Repairs`.*
 - [x] Session keys, and the client's session flow.
 - [x] `Market`: the goods registry, ports, trade with price limits and a location check, sales of holds and range.
 - [x] Credits and fees as sinks.
-- [x] The client's trading, upgrade and pilot screens, on the new SDK. *The docks panel; `dev/harness/trade-bot4.mjs` plays it (B24).*
+- [x] The client's trading, upgrade and pilot screens, on the new SDK. *The docks panel; `dev/harness/trade-bot.mjs` (was `trade-bot4.mjs`) plays it (B24).*
 - [x] The simulator's first version, with the economy tuned to D29's targets (for Koda's approval). *[`demo4-tuning.md`](demo4-tuning.md).*
 
 **Milestone 3: planets**
 - [x] `Planets`: claims with the discoverer's window, the tech tree, populations (D57), production, the Autofactory queue and planet storage (D58), moving drones and weapons between ship and planet (D55, D56). *Moving parts comes with ship mounts in milestone 4.*
 - [x] The client's planet screens, building, the Autofactory queue, and the **tech tree reference screen** (D60).
-- [ ] Tuning of building costs and times. *Starting values in place (B29); simulated with battle.*
+- [ ] Tuning of building costs and times. *Starting values in place (B29); not simulated yet (2026-11-22). The asteroid line's costs are analysed in `demo4-tuning.md`, "The belt".*
 
 **Milestone 4: battle**
 - [x] Weapons, armor, shields, repair bots and platforms as parts and buildings.
@@ -438,7 +433,7 @@ Milestones 1–5 built the new rules on a separate `/galaxy` screen with plain p
 - [x] Names for planets, moons and stations, set by the planet's owner (Demo 3's renames); derived names otherwise. *`Planets.rename`/`namesOf` (B43).*
 
 *The client: Demo 3's SDK shape on Demo 4*
-- [x] `sdk/v4/client.js`: the same interface as `sdk/client.js` (state, subscribe, refresh, actions), so Demo 3's stores and screens draw Demo 4 unchanged where the rules are the same.
+- [x] `sdk/v4/client.js`: the same interface as `sdk/client.js` (state, subscribe, refresh, actions), so Demo 3's stores and screens draw Demo 4 unchanged where the rules are the same. *Since 5c the only client: `sdk/src/client.js`.*
 - [x] The network list knows Demo 4 deployments (the local chain first); the app picks the client by deployment. *Demo 3's networks still play Demo 3 (B54).*
 
 *Demo 3's screens, each working on Demo 4*
@@ -452,7 +447,7 @@ Milestones 1–5 built the new rules on a separate `/galaxy` screen with plain p
 - [x] Jumping: the galaxy hex map takes the neighbor view's place (D: "the galaxy map replaces the neighbor view"), with the jump animation, warp effects and scans. *(B47)*
 - [x] Minimap, zoom slider, connection status, loading bar, scope toggle.
 - [x] Minerva's layer (terminal, profile, sprites, debug), the transaction tray, game dialogs.
-- [ ] Audio (music and Minerva's voice), keyboard controls, gamepad overlay, phone layouts (the bottom card). *Unchanged from Demo 3 and shared by both demos; keyboard checked (Tab steps planets), audio and the gamepad not tried in this pass (the harness mutes audio and has no gamepad).*
+- [ ] Audio (music and Minerva's voice), keyboard controls, gamepad overlay, phone layouts (the bottom card). *Unchanged from Demo 3 and shared by both demos; keyboard checked (Tab steps planets), audio and the gamepad not tried in this pass (the harness mutes audio and has no gamepad).* *Since: music and Minerva's voice reworked in the game (13a96fd, 94f6f7c, 9e76984); phone layouts checked with every UI change. Still not tried on the current client: the gamepad (parked since 2026-10-25, 19004b8).*
 
 *Demo 4's features, in Demo 3's screens and art* (the card menu's own placeholders: "Port Upgrades", "Transfers", "Attacking … until demo 4")
 - [x] Session keys: start, end, and the status in the HUD.
@@ -489,7 +484,7 @@ Milestones 1–5 built the new rules on a separate `/galaxy` screen with plain p
 
 **Milestone 6: testnets and the decision** *(the decision is made: D62–D66, Polkadot Hub. The L2 is dropped.)*
 - [ ] ~~Deploy to Polkadot Hub's testnet and an L2 testnet.~~ Polkadot Hub's testnet only: milestone 7.
-- [ ] The research's test list on Polkadot (UUPS, drand cost, the read path through smoldot and through RPC, wallets).
+- [ ] The research's test list on Polkadot (UUPS, drand cost, the read path through smoldot and through RPC, wallets). *UUPS, drand cost and the RPC read path done on the testnet (milestone 7); smoldot and the App's wallets still open.*
 - [x] The play bot and simulator on both testnets; `cost-estimates.md` updated. *Local gas and money added to `cost-estimates.md` (2026-11-07). Polkadot Hub TestNet only (the L2 was dropped): the trade, explore and cost bots played it on 2026-11-18, every kind of move measured in gas and PAS (`cost-estimates.md`, "Polkadot Hub TestNet, measured"). The economy simulator works offline from the contracts' numbers, so it has no testnet run.*
 - [x] The network decision with Koda: **Polkadot Hub, launched in the Polkadot App** (2026-11-08).
 
@@ -499,14 +494,19 @@ Milestones 1–5 built the new rules on a separate `/galaxy` screen with plain p
 - [ ] Load the client as a Product in Polkadot Desktop and on `dot.li`; measure how it runs. *Desktop done (2026-11-14): runs about as in Chrome, once the chain and drand go through the game's own port (the sandbox blocks other addresses). Phone App and `dot.li` to try.*
 - [x] Play the testnet from the dev client, switching with the local chain in the Network panel. *(2026-11-14; on the EVM-bytecode deployment: on PolkaVM, reads returning long lists fail, to fix before moving there; `polkadot-direction.md`.)*
 - [ ] AutoSigning and sponsored contract calls: play without popups or player fees. *Koda's question (2026-11-14): how AutoSigning works in the App, and whether our session keys (D41) should stay or give way to it.* *Researched and prototyped (2026-11-18): AutoSigning returns `NotAvailable` on both phone wallets today; fees are paid in PGAS, which only proven persons can claim. The product-account signer worked as an EIP-1193 provider for ethers on the testnet (register, broadcast, start a session through the real `Pilots`), and a session key's move went through as `Revive.eth_transact` with no eth-rpc. Recommendation: keep session keys as the fallback, use AutoSigning when allocated (`polkadot-direction.md` step 4). Still to see in the App itself.*
-- [x] The personhood precompile from our contracts. *(2026-11-18) `0x…0a010000`, live on the testnet and mainnet. `contracts/spikes/PersonhoodGate.sol` reads it on the testnet (status 1 and an alias for the testnet's one bound account) and keys "one pilot per person" by alias. Where the game uses it is for Koda (`review.md` P3).*
-- [ ] Mint a ship into Asset Hub's NFT system; see it in the Pocket. *Mint done (2026-11-18): the App's NFTs are `pallet-scarcity`, which has ERC-721 precompiles; `contracts/spikes/ShipCollection.sol` created a collection and minted and transferred a ship on the testnet (not on mainnet yet). Seeing it in the Pocket needs the App: still open.*
+- [x] The personhood precompile from our contracts. *(2026-11-18) `0x…0a010000`, live on the testnet and mainnet. `contracts/spikes/src/PersonhoodGate.sol` reads it on the testnet (status 1 and an alias for the testnet's one bound account) and keys "one pilot per person" by alias. Where the game uses it is for Koda (`review.md` P3).*
+- [ ] Mint a ship into Asset Hub's NFT system; see it in the Pocket. *Mint done (2026-11-18): the App's NFTs are `pallet-scarcity`, which has ERC-721 precompiles; `contracts/spikes/src/ShipCollection.sol` created a collection and minted and transferred a ship on the testnet (not on mainnet yet). Seeing it in the Pocket needs the App: still open.*
 - [ ] Plan the migration with Koda.
 
 **Milestone 8: the expansion** (asteroid belts, drones, ship bays, a fully built Sol, a contract refactor; D67–D100).
 The steps, with their checkboxes, are in [`expansion-plan.md`](expansion-plan.md) under "Phases", and its progress log.
 - [x] Phase 0: the HUD redesign imported into the main client, the docking bug fixed, `client-rnd/hud/` removed (2026-11-16).
-- [x] Phase 1: the contract refactor (body ids with kinds, Claims and Repairs split out, a treasury, Sol fully built; 2026-11-16). - [x] Phase 2: ships (drone bays, the four built-in drones, mining drones; 2026-11-16). - [x] Phase 3: belts, in the contracts and SDK (generation, claims, the asteroid line, drone pools, supplied ports, ship mining, asteroid sieges; 2026-11-16). - [x] Phase 4: drawing the belt (band, rocks, asteroids, stations, slots; cards, menus, mining; 2026-11-16). - [x] Phase 5: tuning, analysed (`demo4-tuning.md` "The belt"; numbers left to Koda).
+- [x] Phase 1: the contract refactor (body ids with kinds, Claims and Repairs split out, a treasury, Sol fully built; 2026-11-16).
+- [x] Phase 2: ships (drone bays, the four built-in drones, mining drones; 2026-11-16).
+- [x] Phase 3: belts, in the contracts and SDK (generation, claims, the asteroid line, drone pools, supplied ports, ship mining, asteroid sieges; 2026-11-16).
+- [x] Phase 4: drawing the belt (band, rocks, asteroids, stations, slots; cards, menus, mining; 2026-11-16).
+- [x] Phase 5: tuning, analysed (`demo4-tuning.md` "The belt"; numbers left to Koda; two suggestions applied 2026-11-17).
+- [x] Sol's asteroids fully built: Federation stations with port, yard and armory (2026-11-18; X30–X31).
 
 ### 12. Confirm with Koda before building
 
@@ -528,7 +528,7 @@ when you're done, let me know about any of those decisions I should review").
 | B6 | Milestone 1 | **Black-hole partners:** 4 candidate cells sampled 8–24 steps away, each undecided with no star or black hole within 2 steps; the lowest spiral density wins. If none qualifies, the new star stays an ordinary star. | Checking the band cell by cell is too costly on chain; a rare fallback keeps scans from failing. |
 | B7 | Milestone 1 | **A scan's outcome depends on which neighbors are already decided when it's resolved,** as in the prototype. Two neighboring scans resolved in a different order can come out differently. | Fixing every input at arrival time would cost a lot more storage. Nobody can steer it usefully, since the drand value is unknown until the round is published. |
 | B8 | Milestone 1 | **Name rules (call signs, ships, stars):** 3–24 characters (stars 1–24); letters, digits, spaces, `-`, `_`, `.`; no leading, trailing or double spaces; call signs unique regardless of case. | The plan said "length, characters"; this is the common-sense set. |
-| B9 | Milestone 1 | **Measured: a first arrival plus its scan is about 540,000 gas** (142,559 for the jump, 397,074 for the scan, of which drand verification is 163,000), against 2,494,254 in Demo 3: about 4.6 times cheaper, not the 15–20 times estimated before drand was chosen. | For the record; deposits on Polkadot still to be measured (B3). |
+| B9 | Milestone 1 | **Measured: a first arrival plus its scan is about 540,000 gas** (142,559 for the jump, 397,074 for the scan, of which drand verification is 163,000), against 2,494,254 in Demo 3: about 4.6 times cheaper, not the 15–20 times estimated before drand was chosen. | For the record; deposits on Polkadot still to be measured (B3). *Measured on Polkadot Hub TestNet instead, 2026-11-18 (`cost-estimates.md`).* |
 | B10 | Milestone 1 | **Drand, Spiral and ScanRules are deployed as separate, linked libraries.** | Galaxy came to 35.7 KB, over the 24.6 KB contract limit. Now Galaxy is 14.4 KB, Drand 18.9 KB, Pilots 8.0 KB. Calls into them cost a little extra gas. `forge build --sizes` checks the limit. |
 | B11 | Milestone 1 | **No module registry contract yet.** Each module stores the addresses of the modules it calls, set when it's deployed. A registry comes in milestone 2, when `Market` makes three modules. | With two modules, a registry would only add a lookup to every call. |
 | B12 | Milestone 1 | **`forge lint` runs on demand, not on every build.** | Its notes on type conversions (each checked by hand) buried the compiler's own messages. |
@@ -557,11 +557,11 @@ when you're done, let me know about any of those decisions I should review").
 | B35 | Milestone 4 | **Repair bots restore armor only.** A ship's shields are full again after each battle. Destroyed weapons stay out of action until a shipyard repair (3,000 credits, then 3 hours in the yard). A planet's losses carry over: destroyed parts are gone. | D45 and D46 without a parts-repair system. |
 | B36 | Milestone 4 | **Sol's I.S.S. sells ship parts at twice their cost,** so pilots can arm before anyone has an Autofactory. A player's Armory sells from its store at 1.5 times, to its owner. | D58 named the Armory as the shop; Sol needed one to start battle at all. |
 | B37 | Milestone 4 | **Ships can't change their loadout while attacking,** and planets can't take parts off during a siege; planets can add defenses mid-siege (D45). | Keeps a siege's sides from shifting except in the ways D45 allows. |
-| B38 | Milestone 4 | **Measured (Foundry gas report):** laying siege about 280,000 gas; recording rounds 180,000–575,000 (up to 64 rounds); completing a claim 380,000–550,000; buying and fitting parts about 220,000; a repair 175,000. Every jump pays about 10,000 for the move hook, more when a siege at the star needs its rounds recorded. | For the record; deposits on Polkadot still wait on B3. |
+| B38 | Milestone 4 | **Measured (Foundry gas report):** laying siege about 280,000 gas; recording rounds 180,000–575,000 (up to 64 rounds); completing a claim 380,000–550,000; buying and fitting parts about 220,000; a repair 175,000. Every jump pays about 10,000 for the move hook, more when a siege at the star needs its rounds recorded. | For the record; deposits on Polkadot still wait on B3. *Measured on Polkadot Hub TestNet instead, 2026-11-18 (`cost-estimates.md`).* |
 | B39 | Milestone 4 | **The ship panel, siege box and siege feed are plain UI** like the docks (B25). Besieged stars get a pink ring on the map, and the Sieges button turns pink while any siege runs. The feed reads the Battle contract's events from the last 50,000 blocks. | Milestone 5 brings over the old look; a long-lived feed may want an indexer later. |
-| B40 | Milestone 5 | **The ship's picture is Koda's Orbiter 8 hull with its parts drawn over it**, in the hull's own coordinates: railgun barrels, missile racks, point-defense turrets, drone chevrons, repair-bot pods, cargo pods (one per 50 bays), armor as a heavier outline, a shield shimmer, and scorch marks after damage. `ShipArt.sol` draws it for the NFT's `tokenURI`; `sdk/v4/ship-art.js` draws the identical string for the client (pinned by hashes). The map keeps the plain ship icon. | D25's "simpler than before, fancier later". |
+| B40 | Milestone 5 | **The ship's picture is Koda's Orbiter 8 hull with its parts drawn over it**, in the hull's own coordinates: railgun barrels, missile racks, point-defense turrets, drone chevrons, repair-bot pods, cargo pods (one per 50 bays), armor as a heavier outline, a shield shimmer, and scorch marks after damage. `ShipArt.sol` draws it for the NFT's `tokenURI`; `sdk/src/ship-art.js` (was `sdk/v4/`) draws the identical string for the client (pinned by hashes). The map keeps the plain ship icon. *Redrawn 2026-11-22 (c939272, Koda's rounds in `mockups/ship-upgrades/`): railguns and missile ports set into the hull, the shield as the ship's outline, cargo, drones and repair bots no longer drawn outside; an opened-up view in the game only; ships in the world show what's fitted outside (0371e9d).* | D25's "simpler than before, fancier later". |
 | B41 | Milestone 5b | **Registration keeps Demo 3's two wizard steps:** the call sign is checked free and held in the browser, then sent with the ship's name in Demo 4's one `register` move. | Demo 3's screens and Minerva's lines stay; one wallet approval. |
-| B42 | Milestone 5b | **Moons are derived, never stored:** `SystemGen.moonSlots` places Sol's real moons (Demo 3's preset) and elsewhere gives each of eight orbits a moon with Demo 3's odds, (3 + body / 4) in 25. Rings, orbit speeds and moons' sizes and classes are drawn by the client only (`sdk/v4/system.js looks`), Sol's from Demo 3's preset. | D9: only what players change is stored; the contract needs moons only to accept their names. |
+| B42 | Milestone 5b | **Moons are derived, never stored:** `SystemGen.moonSlots` places Sol's real moons (Demo 3's preset) and elsewhere gives each of eight orbits a moon with Demo 3's odds, (3 + body / 4) in 25. Rings, orbit speeds and moons' sizes and classes are drawn by the client only (`sdk/src/system-gen.js` `looks`), Sol's from Demo 3's preset. | D9: only what players change is stored; the contract needs moons only to accept their names. |
 | B43 | Milestone 5b | **An owner names their planet, its station and its moons, for free;** unnamed ones read "Kara-412 b", "Kara-412 b Station", "Kara-412 b II". Sol's keep Demo 3's names and belong to "The Federation" (B52). | Demo 3's renames; a ship's new name still costs 500 (B16). |
 | B44 | Milestone 5b | **Chat is `Pilots.broadcast`:** up to 280 bytes, registered pilots or their session key, an event only. | Demo 3's `ChatLog`, stored nowhere. |
 | B45 | Milestone 5b | **The trade menu shows a Demo 4 port in two pages:** Buy (what it sells, at most 3) and Sell (what it buys, at most 4), each in Demo 3's three-dial layout; one trade can mix both. The HUD and the ship's card list the goods aboard (Demo 3's always shows its three), with short names in narrow columns ("Rares", "He-3"). Port codes have one letter per good: eight on Demo 4. | Demo 4 ports trade 4–7 of 8 goods; Demo 3's layout fits three. |
@@ -573,7 +573,7 @@ when you're done, let me know about any of those decisions I should review").
 | B51 | Milestone 5b | **The separate `/galaxy` screen is retired;** its route goes to the title screen. | Everything it did is in the game. |
 | B52 | Milestone 5b | **Sol's planets show "The Federation" as owner** and can't be claimed (D49). | Demo 3 gave them to a house account of that name. |
 | B53 | Milestone 5b | **A black hole's system draws a dark disk with its ring,** and its card says Black Hole. | Demo 3 had no black holes; D17. |
-| B56 | After milestone 5c | **Color (Koda's direction, docs/mockups/color-direction.md), the details:** stars get a spectral class O–M derived in the client (sdk/traits.js), with nothing on chain; the class shares are softened from the real ones (red 30%, orange 25%, yellow 18%, yellow-white 12%, white 8%, blue-white 5%, blue 2%); a star's size follows its class; Sol's genesis neighbors keep their real classes, found by their place around Sol. Purple stays deep space: the system's glow is tinted only 22% toward the star. Tints for the HUD buttons by function: sieges orange (pink stays for a running siege), settings gray. The cards' insides are purple-gray; their edges, titles and buttons stay purple. High graphics only: planet light and shadow, fine ring lines, the star's close light. | Koda asked for star colors with a yellow Sol, a little of the star's light across its system, gray in UI components, and costly detail on high graphics only. Measured: no cost on low and normal. |
-| B55 | After milestone 5c | **Moons (D61), the details:** the owner chooses where each weapon goes ("To moons" beside "Install" on the Colony menu's Factory page); moons take only mounted weapons (point defense 1 mount, railguns and missile racks 2), not drones, armor, shields or the BFG; hits land on platforms, then the weapons on moons, then the shield, armor, the planet's own weapons and the hull; moon weapons fire and stop missiles with the planet's; moon mounts don't count against the 3-platform cap. Weapons come off moons only outside a siege (`unfitMoons`; no button yet, as with the planet's own). Battle is 23,922 bytes now: 654 under the limit. | D51 keeps platforms as the first layer; "exposed" read as outside the shield. |
 | B54 | Milestone 5b | ~~**The client plays both demos.**~~ **Replaced (Koda, 2026-11-07):** one project, one set of contracts. The client works only with the current contracts; the old contracts and networks left the repo (milestone 5c). | Demo 3 is a past release, not a second game. |
+| B55 | After milestone 5c | **Moons (D61), the details:** the owner chooses where each weapon goes ("To moons" beside "Install" on the Colony menu's Factory page); moons take only mounted weapons (point defense 1 mount, railguns and missile racks 2), not drones, armor, shields or the BFG; hits land on platforms, then the weapons on moons, then the shield, armor, the planet's own weapons and the hull; moon weapons fire and stop missiles with the planet's; moon mounts don't count against the 3-platform cap. Weapons come off moons only outside a siege (`unfitMoons`; no button yet, as with the planet's own). Battle is 23,922 bytes now: 654 under the limit. | D51 keeps platforms as the first layer; "exposed" read as outside the shield. |
+| B56 | After milestone 5c | **Color (Koda's direction, docs/mockups/color-direction.md), the details:** stars get a spectral class O–M derived in the client (`sdk/src/traits.js`), with nothing on chain; the class shares are softened from the real ones (red 30%, orange 25%, yellow 18%, yellow-white 12%, white 8%, blue-white 5%, blue 2%); a star's size follows its class; Sol's genesis neighbors keep their real classes, found by their place around Sol. Purple stays deep space: the system's glow is tinted only 22% toward the star. Tints for the HUD buttons by function: sieges orange (pink stays for a running siege), settings gray. The cards' insides are purple-gray; their edges, titles and buttons stay purple. High graphics only: planet light and shadow, fine ring lines, the star's close light. | Koda asked for star colors with a yellow Sol, a little of the star's light across its system, gray in UI components, and costly detail on high graphics only. Measured: no cost on low and normal. |
 

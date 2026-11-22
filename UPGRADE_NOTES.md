@@ -532,7 +532,7 @@ src/sdk/
 
 - **`orbiter-client/dev/harness/`:** the Puppeteer scripts used throughout the upgrade (captures, diffs, traces, jitter, idle, zoom sets, paint flashing, Firefox). See its README.
 - **`npm run build:local`:** a production build that knows the local chain (output in `dist-local/`, ignored), to try the real bundle against `npm run local`.
-- **`docs/original-code-review.md`:** the frank review of the original client Koda asked for.
+- **`docs/archive/original-code-review.md`:** the frank review of the original client Koda asked for.
 
 ### For Koda to check by hand
 
@@ -887,7 +887,7 @@ Koda chose Rarible. Each network in `networks.js` can now name an `nftMarket`; S
 Koda wants the best parts of Enterprise Circuit (`/home/koda/dev/enterprise-circuit`, his UI rebuild) brought into this client. They're taken **one at a time, together**: for each, before/after screenshots (this client's current screen beside Enterprise Circuit's), then Koda decides what to take, then it's built.
 
 - Enterprise Circuit stays in its own repo. Bring over designs and art, adapted to this client's code (JS, Options API, `sdk/`, the frame loop), not its engine.
-- Screenshots come from a scratch copy of it run against the local chain (see `docs/enterprise-circuit-walkthrough.md`).
+- Screenshots come from a scratch copy of it run against the local chain (see `docs/archive/enterprise-circuit-walkthrough.md`).
 
 Order (from the walkthrough's list). Tick each when it lands:
 1. [x] **Onboarding:** Minerva's voice, the callsign card, the ship launch pad, and the title button that follows the player's progress.

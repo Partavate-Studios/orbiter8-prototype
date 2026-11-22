@@ -140,7 +140,7 @@ export default {
      * The music for where you are: Entering the Tomb in a system with a black hole at its core; else
      * Reflections in the Wind at a star you're visiting first while its scan is pending, once for that
      * visit (it plays out, then the map's comes back: 08audio.js THEN); else the map's
-     * (docs/briefs/music.md).
+     * (docs/archive/briefs/music.md).
      */
     playHereMusic() {
       if (this.atBlackHole) return this.o8audio.playMusic('holeSystem')

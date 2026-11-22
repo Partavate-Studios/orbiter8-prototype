@@ -1,5 +1,9 @@
 # Asteroid station proposals (2026-11-18)
 
+> **Built 2026-11-18 (0ceea51): system E,** the station at the rock's middle in the planet stations'
+> style, with the Platform's footing and the Mine's derrick and drones. The other systems stay here as
+> the record.
+
 Three systems for a station built on an asteroid, in the game's flat white station style rather than the
 illustrated base in `assets/art/asteroid-station.svg` (Koda: "it has a different style"). Drawn by
 `../gen-stations.py` over the game's own rocks, with the planet stations' module shapes (pods, turrets,

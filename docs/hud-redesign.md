@@ -2,6 +2,26 @@
 
 For Koda. Written for the experimental second client in `client-rnd/hud/` (2026-11-14/15), imported into `orbiter-client/` on 2026-11-16 and then removed. Paths below are relative to `orbiter-client/src/`.
 
+> **Partly superseded (2026-11-22).** The HUD was rebuilt again on 2026-11-21/22 from Koda's direction
+> in [`ui-guide.md`](ui-guide.md) section 10; the plan and its log are [`ui-plan.md`](ui-plan.md), the
+> rules for screens are `ui-guide.md` section 11. This document stays as the record of the first
+> redesign. The four corners (P2) and most principles still hold. What's out of date below:
+>
+> - **The card's drawer** (S3, S4, S5, R16, round 2 items 1 and 4): the menu that slid out from behind
+>   the card, its tab, the `A` key and putting the card away are gone. The card is never put away; a
+>   planet's station and moons are tabs down its spine; actions are a row of pictured wells on the card
+>   (`hud/selection-panel.vue`, `hud/action-row.vue`).
+> - **Planets, Ships and Jump buttons** (R13, R14, M7, M8, Part 4's top right): replaced by one list
+>   (`hud/objects/objects-panel.vue`, key `O`) and a Map button; the top right is one panel that folds
+>   (`hud/system-block.vue`). A phone's tabs are My ship, Objects, Map, Chat, More.
+> - **Session and scan chips** (R3, R7): replaced by Minerva's plate at the top center, the activity
+>   window (`hud/minerva-plate.vue`); Start / End Session is on her Link page, not the ship's card.
+> - **The pilot plate's round button** (R1): the avatar and call sign open your own info card; the ship's
+>   name selects your ship.
+> - **The menus' insides** (M2–M13, round 2 item 7): every menu is HTML on one kit (`hud/kit.css`,
+>   `hud/panels/`), and the SVG menus and `menu-scene.svg.vue` are deleted. Loadout is now "Your ship".
+>   Trade's sliders and Make Trade sit on the side nearest the card.
+
 - Part 1: what the current HUD does (the inventory: nothing may be lost).
 - Part 2: what's wrong with it, with screenshots.
 - Part 3: principles from good game HUDs, each tied to a decision here.
@@ -278,7 +298,7 @@ The map from Part 1's inventory to the new HUD (`orbiter-client/src/components/h
 | S7 | Camera follows | Unchanged. |
 | M1 | Trade | Rebuilt in HTML (round 2, `hud/trade/`): one row per good (code, icon and color; what the port does and at what price; the two-way slider, port left and ship right; aboard before and after; the line's credits), under the port-and-ship drawing with every hold drawn; the port's letters, readouts and Make Trade kept. |
 | M2 | Shipyard | As before, its drawing showing every hold, the ones being bought in yellow; the engines' picture by Upgrade Engines (round 2). |
-| M3–M5, M11 | Armory, colony, siege, feed | As before, each with a picture of what's happening (round 2, `widgets/menu-scene.svg.vue`): the port fitting parts to your ship; per colony page colonists, storage, the next building, the Autofactory, defenses; the attacker and the planet trading fire; the siege art over the feed. |
+| M3–M5, M11 | Armory, colony, siege, feed | As before, each with a picture of what's happening (round 2, `widgets/menu-scene.svg.vue`): the port fitting parts to your ship; per colony page colonists, storage, the next building, the Autofactory, defenses; the attacker and the planet trading fire; the siege art over the feed. (`menu-scene.svg.vue` was deleted on 2026-11-22, fab4489, when the menus were rebuilt in HTML.) |
 | M6–M13 | The other menus | The same menus, in a sheet as tall as their content; the rim stays (desktop). |
 | M14 | Close | × at the sheet's top right (desktop), chevron at the bottom (phone), click outside, Esc, pad B, or press the dock button again. |
 | O1 | Galaxy map | As above; each visited star shows its ports' count (a small station and the number), in its tooltip and in the chosen star's card (round 2, `libs/port-counts.js`). |
@@ -293,21 +313,22 @@ The map from Part 1's inventory to the new HUD (`orbiter-client/src/components/h
 tinted buttons and their icons; every menu's inside (trade's sliders and port codes, the shipyard, the
 colony's pages…); the tray; dialogs; colors and their meanings; "menus slide up in the middle".
 
-**For you to decide:**
+**For you to decide** (status 2026-11-22 in brackets; anything still open is in `ui-guide.md` section 9):
 
-1. **The card at the corner.** It's the heart of this redesign and the nearest thing to the "docked
+1. **[Settled: the card stayed at the bottom left through both rebuilds, and `ui-plan.md` keeps the four
+   corners.]** **The card at the corner.** It's the heart of this redesign and the nearest thing to the "docked
    inspector" you turned down. If it reads as generic to you, the fallback that still clears the view is
    to keep the card anchored but put card and actions *on one side* of the selection and move the
    camera's focus off-center.
-2. **Labels under the rim buttons.** They cost a little space and make the rim less minimal. They could
+2. **[Settled: kept; every rim button and tab has its word.]** **Labels under the rim buttons.** They cost a little space and make the rim less minimal. They could
    show only until the first steps are done.
-3. **The cargo bar** in place of the cargo list on the pilot card (the list is one click away).
-4. **Which five things are a phone's tabs.** I chose My ship, Star, Planets, Chat, More by how often
+3. **[Built in round 2 as every hold drawn, and kept.]** **The cargo bar** in place of the cargo list on the pilot card (the list is one click away).
+4. **[Changed 2026-11-21: My ship, Objects, Map, Chat, More (`ui-plan.md`, step 2).]** **Which five things are a phone's tabs.** I chose My ship, Star, Planets, Chat, More by how often
    they're used early on. Sieges may deserve a tab once battles are common.
-5. **Menus as tall as their content.** Short menus (Settings, Planets, Feed) no longer fill the screen.
+5. **[Built and kept; the insides were rebuilt to the kit on 2026-11-22, and Chat's Send now sits in its panel.]** **Menus as tall as their content.** Short menus (Settings, Planets, Feed) no longer fill the screen.
    The menus' insides weren't restyled; a few (Chat's Send button, far below an empty list) were drawn
    for a full-height panel and could be tightened.
-6. **The galaxy map** only had its overlay moved. The fuller redesign you agreed (`ui-guide.md`
+6. **[Still open: `ui-guide.md` section 8.]** **The galaxy map** only had its overlay moved. The fuller redesign you agreed (`ui-guide.md`
    section 8: fingerprints, detail card, routes) is separate work.
 
 ## 7. Round 2 (Koda's review, 2026-11-15)
@@ -319,15 +340,15 @@ Screenshots of the result: [`docs/mockups/hud/round2/screens/`](mockups/hud/roun
 
 | # | Koda asked | Built | Where |
 |---|---|---|---|
-| 1 | The card's menu slides out from behind the card, with a toggle; its edge shows when it's in; a little smaller than the card | The menu sits behind the card and slides out to the right (0.25 s); in, 16 px of it and its tab show past the card. Tab, the visible edge, `A`; remembered across selections and visits. 88% of the card's height. On a phone the same, beside the small card. | `hud/selection-panel.vue`, `stores/ui.js` (actionsOpen) |
+| 1 | The card's menu slides out from behind the card, with a toggle; its edge shows when it's in; a little smaller than the card | The menu sits behind the card and slides out to the right (0.25 s); in, 16 px of it and its tab show past the card. Tab, the visible edge, `A`; remembered across selections and visits. 88% of the card's height. On a phone the same, beside the small card. | `hud/selection-panel.vue`, `stores/ui.js` (actionsOpen, removed 2026-11-22) |
 | 2 | A zoom next to the map that works better, tied to the minimap | A rail beside the minimap, as tall as it: + / −, a thumb to drag (the minimap's box follows live), click anywhere on it, marks to jump to your ship / the whole system / the galaxy map, scroll over it; the minimap now drags to pan and scrolls to zoom. On phones too (the old right-edge buttons are gone). | `hud/zoom-rail.vue`, `star-map/hud/minimap.svg.vue`, `stores/ui.js` (zoomTo) |
 | 3 | Selecting the next planet means a trip to the top right | A strip of the system on the card: the star and every planet in orbit order as small spheres in their colors (yours with a yellow mark, besieged ringed pink), the selection ringed, ‹ › to step. A planet's station and moons stay the menu's icons, so nothing is listed twice. Considered and not taken: a planets list beside the card (covers the map), next/previous alone (doesn't show what's next), moving the minimap (it's "where you are"). | `hud/system-strip.vue` |
 | 4 | No duplicate buttons; keep the icons; each button has a place | "Visit Space Station / Moon / Planet" are gone; the icons stay, each in a fixed place (planet, station, moons). Actions have fixed slots by kind (a planet: Claim / Colony / Attack, Siege, Recruit, market, Rename); an empty slot keeps its place as a faint socket; keys 1–9 follow the slots. | `hud/card-actions.js` (SLOTS, slotted) |
 | 5 | One trade screen instead of goods listed twice | One row per good, in the Market's order: code and icon in the good's color, Sells/Buys and stock (yellow when the port buys what you carry), price, the two-way slider (port left, ship right: buying slides toward the ship, selling toward the port), aboard before → after, the line's credits (gains yellow). The drawing above shows each good's arrow and every hold. Readouts, the port's letters and Make Trade kept; Clear added. Phones: two lines a row, no Buy/Sell pages. | `hud/trade/` |
 | 6 | Draw every hold, not a ratio | One cell per hold up to 250, laid out to fit the box (about 2 px each in the pilot plate at 250): the pilot plate, the trade drawing (incoming lighter, leaving dashed), the shipyard (being bought in yellow). Parts and damage count as holds in use (gray). | `hud/hold-grid.svg.vue`, `libs/goods.js` |
-| 7 | Pictures in the other menus | Armory, siege, every colony page, the shipyard's engines, the siege feed: `menu-scene` (the game's art or a body's own sprite, and what passes between). New art: `assets/art/siege.svg`, `assets/art/colonists.svg` (120 units square, reusable). Loadout already had the ship. | `star-map/hud/menus/widgets/menu-scene.svg.vue` |
+| 7 | Pictures in the other menus | Armory, siege, every colony page, the shipyard's engines, the siege feed: `menu-scene` (the game's art or a body's own sprite, and what passes between). New art: `assets/art/siege.svg`, `assets/art/colonists.svg` (120 units square, reusable). Loadout already had the ship. | `star-map/hud/menus/widgets/menu-scene.svg.vue` (deleted 2026-11-22) |
 | 8 | Port counts on the galaxy map | A small station and the count beside each visited star with ports; "N ports" / "no ports" in the tooltip and the chosen star's card. Your system counts its stations as it loads; other visited stars are read from the Market's `portsAt` as they come on screen, a few at a time, remembered in the browser. | `libs/port-counts.js`, `star-map/galaxy-map.vue` |
-| 9 | A jump that keeps the background | See O4 above. The new system arrives at the zoom you left at, so the backdrop never jumps. Reduced motion: no slides. | `libs/jump-slide.js`, `stores/ui.js`, `star-map/map.vue`, `background-canvas.vue`, `hud/jump-animation.svg.vue` |
+| 9 | A jump that keeps the background | See O4 above. The new system arrives at the zoom you left at, so the backdrop never jumps. Reduced motion: no slides. | `libs/jump-slide.js`, `stores/ui.js`, `star-map/map.vue`, `star-map/background-canvas.vue`, `star-map/hud/jump-animation.svg.vue` |
 
 **The SDK lacked:** other stars' port counts (`game` doesn't expose `portsAt` for a cell other than yours),
 so `libs/port-counts.js` makes its own read-only connection (`createGame` over a `JsonRpcProvider` to the
@@ -337,14 +358,14 @@ network's first RPC). Worth adding to the SDK client.
 already run, so a system mounting while other ships were warping crashed the map (two pilots jumping at
 once showed it). The galaxy map's `startShift` warning (Part 2.4) is gone.
 
-**For Koda to decide (round 2):**
+**For Koda to decide (round 2)** (status 2026-11-22 in brackets):
 
 1. **Direction of the jump's slides.** *Decided:* the old system slides off to the left; the streaks and ship come in from the
    left; on arrival the ship leaves to the right and the new system slides in from the right (Koda, after round 2).
-2. **Empty slots as faint sockets.** They show each button's place; the trailing empty ones are left off.
+2. **[Superseded: the drawer is gone; the card's action row follows the kit, `ui-guide.md` section 11.]** **Empty slots as faint sockets.** They show each button's place; the trailing empty ones are left off.
    If the sockets read as clutter, they could go invisible (the places would stay).
-3. **The phone's menu** can be taller than the small card when a selection has five slots (your ship,
+3. **[Moot: the drawer is gone.]** **The phone's menu** can be taller than the small card when a selection has five slots (your ship,
    your planet), to keep 42 px buttons; on desktop it's always smaller than the card.
-4. **The trade menu is HTML now** (the other menus are still the map's SVG). It reads and lays out better
+4. **[Done 2026-11-22: every menu is HTML (3ad11b0).]** **The trade menu is HTML now** (the other menus are still the map's SVG). It reads and lays out better
    and the sliders are real controls; the others could follow.
-5. **Holds in the pilot plate** at 250 are about 2 px cells: exact, but a texture at that size.
+5. **[Unchanged since; listed in `ui-guide.md` section 9.]** **Holds in the pilot plate** at 250 are about 2 px cells: exact, but a texture at that size.

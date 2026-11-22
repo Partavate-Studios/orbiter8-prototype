@@ -25,7 +25,7 @@ decisions:** its accounts and signer, personhood, names, NFTs and hosting over o
 | D64 | **No clunky wallets.** Players use the App's per-Product account, its signer and its allowances; no MetaMask, no network step, no session keys if AutoSigning does the job. |
 | D65 | **Things become tradable:** ships (pilots will have several, so a ship is a collectible), planets, and possibly the goods traded at ports. Turns B15 and B30 (bound ships and deeds) into "for now". |
 | D66 | **The UI may be rethought for the App,** choosing the best-performing approach for a good UI there. Explored later, after the spike measures how the current client runs inside the App. |
-| D101 | **The Product is named `orbiter8game`** (changed the same day from `orbiter8`, which dotNS won't sell on the public path; was: (`orbiter8.paseo` on the testnet, `orbiter8.dot` on mainnet): pursue it although it's in dotNS's restricted 6–8 band (a verified person and the short-name switch on the testnet; a governance grant or a Product path on mainnet)). 9+ characters: anyone may register it, on Previewnet (`orbiter8game.testnet`) and mainnet (`orbiter8game.dot`). (Koda, 2026-11-18) |
+| D101 | **The Product is named `orbiter8game`**: `orbiter8game.testnet` on Previewnet, `orbiter8game.dot` on mainnet. At 9+ characters, anyone may register it. (Koda, 2026-11-18.) First decided the same day as `orbiter8` (`orbiter8.paseo` on the testnet, `orbiter8.dot` on mainnet), to pursue although it's in dotNS's restricted 6–8 band (a verified person and the short-name switch on the testnet; a governance grant or a Product path on mainnet); changed because dotNS won't sell it on the public path. Not registered yet. |
 | D102 | **Personhood: one pilot per person**, keyed by the person's alias in our context (`PersonhoodGate`, step 5). Nothing else gated for now. (Koda, 2026-11-18) |
 | D103 | **Signing: both.** AutoSigning when the App grants it; otherwise our session keys (D41), sent through the host. Outside the App, today's wallet and session keys. (Koda, 2026-11-18) |
 | D104 | **Players without PAS sign each move** (a phone approval per move, paid with PGAS) until they hold PAS; then session keys. The game doesn't sponsor session gas. (Koda, 2026-11-18) |
@@ -82,7 +82,9 @@ What the Polkadot App and Polkadot Hub offer that the EVM version can't (researc
 **Survives:** the contracts' game logic, drand randomness, the hex galaxy, every screen, card and
 menu (until the UI is rethought), the art, the tech trees, the story.
 
-**Becomes unnecessary** (kept on `evm-archive`):
+**Becomes unnecessary** (kept on `evm-archive`) *(2026-11-18, D103 and D108: the browser keeps its
+wallet flow and session keys, and so does the App until it grants AutoSigning; this list now describes
+play inside the App with AutoSigning)*:
 - the MetaMask/EIP-6963 wallet connect flow and the wizard's network step;
 - session keys and their gas money (if AutoSigning and sponsored calls work as documented);
 - the eth-rpc read path and the worries about it (D43's plan becomes "read through the host");
@@ -90,7 +92,10 @@ menu (until the UI is rethought), the art, the tech trees, the story.
 
 **Probably changes:** the contracts move from EVM bytecode to **PolkaVM** (Solidity compiled with
 Parity's `resolc`), because Product tooling assumes it. That raises the code size limit from 24 KB to
-1 MB (Battle is 654 bytes under today's limit). Still Solidity: no rewrite.
+1 MB (Battle is 654 bytes under today's limit). Still Solidity: no rewrite. *(2026-11-22: the game
+compiles and runs on PolkaVM (spike steps 1 and 3 below), but it still deploys as EVM bytecode, which
+Polkadot Hub runs too: on PolkaVM, reads that return long lists failed. Whether and when to move is
+open; see "Still open".)*
 
 ## Unknowns and risks
 
@@ -104,10 +109,14 @@ Parity's `resolc`), because Product tooling assumes it. That raises the code siz
   *(2026-11-18: both are right. AutoSigning is in the protocol, but the phone wallets return
   `NotAvailable` for it today; see step 4.)*
 - **Performance inside the App is unknown.** Our client is a heavy animated SVG scene; Products run in
-  a sandboxed web view on phones. The first thing to measure.
+  a sandboxed web view on phones. The first thing to measure. *(2026-11-14: Polkadot Desktop runs it
+  about as Chrome does (step 3). The phone App and `dot.li` are still to try.)*
 - **PolkaVM is young:** upgradeable proxies (UUPS) are unproven there, and Parity's `cdm` deploy tool
   treats contracts as immutable, versioned entries. Our drand check needs the BN254 pairing precompile.
+  *(Answered 2026-11-13, steps 2 and 3: UUPS upgrades work on the testnet on both engines, and the drand
+  check works on both, after a fix for PolkaVM.)*
 - **Personhood's Full tier isn't available yet;** Lite (an attested device and a username) is weak.
+  *(Still so on 2026-11-18. D109: personhood isn't enforced yet anyway.)*
 - **How collectibles reach the Pocket is undocumented** (the SDK has an `nfts` module; likely Asset
   Hub's native NFT system). *(2026-11-18: the NFTs are `pallet-scarcity`, mintable from Solidity; the
   Pocket itself is still to see. Step 6.)*
@@ -129,7 +138,56 @@ Run on the `polkadot` branch. Throwaway test keys only, never committed.
 
 The spike's results go in this file; then the migration is planned with Koda.
 
+### Where the spike stands (2026-11-22)
+
+| Step | State |
+|---|---|
+| 1. Compile with `resolc` | **Done** 2026-11-08: all 19 contracts compile, no changes. |
+| 2. Deploy to Paseo Asset Hub | **Done** 2026-11-13, as EVM bytecode and as PolkaVM: proxies upgrade, the drand check works (on PolkaVM after moving its math to `modexp`), moves cost about 0.01 PAS. |
+| 3. Load the client as a Product | **Half done:** Polkadot Desktop runs it about as Chrome does (2026-11-14, with the dev server relaying the chain and drand). The phone App and `dot.li` are still to try. |
+| 4. AutoSigning and sponsored calls | **Researched and prototyped** 2026-11-18: AutoSigning is `NotAvailable` on phones today; fees are PGAS, for proven persons. Koda decided D103 and D104. Still to see on the phone. |
+| 5. The personhood precompile | **Done** 2026-11-18: read from Solidity on the testnet and mainnet. Koda decided D102, then D109 (not enforced yet). |
+| 6. A ship in the App's NFT system | **Minted** on the testnet 2026-11-18 (`pallet-scarcity`). Koda decided D105. Seeing it in the Pocket is still to do. |
+
+The game itself plays on Polkadot Hub TestNet from the dev client and the web build (D106), as EVM
+bytecode (redeployed 2026-11-19, tagged `testnet-2026-11-19`). The current addresses are in
+`sdk/src/chain/networks.js`; addresses written below are earlier deployments, kept for the record.
+
+### Still open
+
+One list of what's unresolved, from the steps and sections below:
+
+**Needs Koda (with his phone):**
+- **The phone session** (steps 3, 4 and 6): the game in the phone App and on `dot.li`, how the signing
+  prompt reads for a `Revive.call`, how long an approval takes, whether AutoSigning is offered, the
+  Pocket (does a Scarcity NFT minted to a purse key show?), and his personhood status in the App.
+- **Plan the migration** (milestone 7's last step), from step 4's migration steps below.
+
+**To find out:**
+- Whether the host lets a Product submit a bare `Revive.eth_transact` extrinsic (the session-key path,
+  step 4).
+- Whether the App's test builds run against Previewnet or Polkadot Hub TestNet: dotNS (our product id)
+  is on Previewnet, the game's contracts on Polkadot Hub TestNet ("After the spike").
+- For D107 with D105: whether the App can show a Scarcity NFT's picture from our contract's `tokenURI`
+  (a metadata pointer it resolves). If it can't, the two decisions conflict: bring it to Koda.
+- How the event feed is read inside the App: a remote permission for eth-rpc, an indexer, or Statement
+  Store (step 4, migration step 5).
+- drand inside the App: a remote permission for `api.drand.sh`, or the relays behind an address the
+  host allows. Koda also wants the scan's randomness revisited (`demo4-plan.md`, "Consider next").
+
+**To do:**
+- Register the product id `orbiter8game` (D101) and get a Product published (`.dot` name, bundle).
+- Moving the contracts to PolkaVM, if wanted: retry the long reads there now that they're reshaped for
+  the testnet's read budget (2026-11-18), and measure memory per read. Until then the game stays on EVM
+  bytecode, which works.
+- Rename the `at` field and argument in Battle (solc warns it will become a reserved word; step 1).
+- Ship NFTs as Scarcity tokens (D105) wait for mainnet to have `pallet-scarcity`; our ERC-721 stays.
+
 ## Results
+
+Roughly newest first: steps 4–6 and what followed (2026-11-18), step 3 and playing the testnet
+(2026-11-13/14), steps 2, 3 and 1 of the contracts (2026-11-08/13), then the testnet's read limits
+(2026-11-17/18).
 
 ### Step 4: AutoSigning, sponsored calls, and our session keys (2026-11-18)
 
@@ -183,7 +241,7 @@ own answer to prompt-free signing until AutoSigning lands.
   events; `map_account` on first use; anything else (block numbers, logs) to a fallback provider.
 - `run-testnet.mjs`, with a throwaway sr25519 key standing in for the product account (the same
   creator type `getProductAccountSigner()` returns), a public WebSocket node standing in for the host's
-  client, and **the game's real testnet contracts** (`Pilots` at `0xacaa…E176`), via plain ethers:
+  client, and **the game's real testnet contracts** (`Pilots` at `0xacaa…E176`, the deployment of the day), via plain ethers:
 
   | Move | Result | Time | Fee |
   |---|---|---|---|
@@ -203,6 +261,7 @@ for a `Revive.call` (it shows a Substrate call, not our function names), and how
 takes in practice.
 
 **Answer to Koda's question: keep session keys (D41), and use AutoSigning when the App offers it: both.**
+*(Koda agreed 2026-11-18: D103. The gap below, players with no PAS, is D104: they sign each move.)*
 - **In the App, AutoSigning allocated:** moves go straight from the product account (`Revive.call`), no
   session, no gas money; fees in PGAS for players with personhood. This is D64's goal.
 - **In the App, AutoSigning `NotAvailable` (every phone today):** one approval starts a D41 session
@@ -215,7 +274,8 @@ takes in practice.
 - The contracts need nothing new: `actorOf` already maps a session key to its pilot.
 
 **Migration steps** (proposed; nothing built in the game):
-1. Get a product id (our `.dot` name); it fixes product accounts and the personhood context.
+1. Get a product id (our `.dot` name); it fixes product accounts and the personhood context. *(Chosen:
+   `orbiter8game`, D101; not registered yet.)*
 2. SDK: a `ProductAccountProvider` (this adapter, hardened) beside `discoverWallets()`, chosen when the
    page runs inside a host (`@parity/product-sdk-host` says so); `onConnect` requests
    `SmartContractAllowance` and `AutoSigning`.
@@ -270,7 +330,8 @@ account bound to an alias (`orbiter-client/dev/spikes/app-signer/probe-aliases.m
 **status 1 and its alias** through the precompile; a simulated `register()` from that account succeeds
 and from our spike key reverts `NotAPerson(0)`. The precompile read costs about 1,200 gas.
 
-**Where the game could use it (for Koda; nothing decided, see `review.md` P3):**
+**Where the game could use it** *(Koda decided 2026-11-18: D102, one pilot per person, keyed by alias;
+nothing else gated; then D109, not enforced until closer to release)*:
 1. **One pilot per person at registration** (D63's "one human, one pilot"): `Pilots.register` asks
    the gate. Keeps call signs and the leaderboard human.
 2. **The free claim and other give-aways** (starter credits, a free planet, a first ship) once per
@@ -323,7 +384,8 @@ player through purses the host derives keys for; whether the Pocket lists Scarci
 product's purse, by the player's root purse, or by any key the player controls is undocumented. So the
 open question is narrow: **mint to a purse key the host made** (`NftPurseClient.createItems`) and look.
 
-What it means for ships (D65), for Koda (`review.md` P4):
+What it means for ships (D65) *(Koda decided 2026-11-18: D105, ships become Scarcity NFTs, with the
+pilot as an on-chain record the ship keys are tied to; our ERC-721 stays until mainnet has Scarcity)*:
 - Ships can be real Scarcity NFTs, minted by the game's own contract, so they'd appear in the player's
   App with no bridge or mirror. Our `Ships` contract can own the collection and mint when a ship is
   bought; the game keeps its own ship state (bays, damage, loadout) keyed by token id.
@@ -345,6 +407,8 @@ What it means for ships (D65), for Koda (`review.md` P4):
    or the relays behind an address the host already allows.
 5. The layout inside the App on a phone (D66).
 
+*(Answered: D101 chose `orbiter8game`. The reasoning below is kept as the record of why.)*
+
 **The product id is a dotNS name, with the network's ending:** `orbiter8.paseo` on the testnet,
 `orbiter8.dot` on mainnet. It fixes the product accounts and the personhood context, so pick it once.
 dotNS ([paritytech/dotns](https://github.com/paritytech/dotns), Polkadot Hub's name contracts) sells
@@ -359,9 +423,9 @@ names by length, for one refundable deposit (10 DOT at launch; PAS on the testne
 **`orbiter8` is 8 characters:** on the testnet it needs a verified person and the switch on; on mainnet
 the public path won't sell it, leaving a governance grant (or a Product-specific path, if there is one).
 The personhood gateway's names are personal and soulbound, so not for a game. A name of 9 or more
-(`orbiter8game`, `orbitereight`) is open to anyone on both networks. **For Koda:** which name. To check
-before choosing (reads only): the testnet's short-name switch, whether the candidates are free, and
-whether Products get names some other way.
+(`orbiter8game`, `orbitereight`) is open to anyone on both networks. **For Koda:** which name *(answered: D101,
+`orbiter8game`)*. To check before choosing (reads only): the testnet's short-name switch, whether the
+candidates are free, and whether Products get names some other way *(checked below, 2026-11-18)*.
 
 **Checked 2026-11-18 (reads only, nothing registered):** dotNS is **not on Polkadot Hub TestNet**, the
 network the game runs on: the addresses in dotNS's `deployments/paseo-assethub/420420417.json` hold no
@@ -399,10 +463,11 @@ old EVM networks (Base, Moonriver, Moonbase, BSC testnet, Sepolia), not Polkadot
 current game there takes a production build pointed at the testnet with a real wallet (the dev
 wallet, its top-ups and the dev server's relays are dev-only, so the build must reach the testnet's
 RPC and drand directly; their CORS is unchecked), committed for Koda to push. It would replace Demo 3
-at that address (Koda's call). A hosted page still can't run inside Desktop's sandbox without a
+at that address (Koda's call). *(Answered: D106. Builds publish to this repo's own Pages site,
+`orbiter8-prototype`; the Demo 3 site stays as it is.)* A hosted page still can't run inside Desktop's sandbox without a
 product id: it's for browsers.
 
-### Step 3, first look: Polkadot Desktop's sandbox (2026-11-13, in progress)
+### Step 3, first look: Polkadot Desktop's sandbox (2026-11-13; Desktop done 2026-11-14, the phone still to try)
 
 Koda installed Polkadot Desktop 0.9.3 and the phone App, and opened the local game (`localhost:8092`)
 with Desktop's "Skip (Dev only)" button. The page was **blank**: Desktop's log showed
@@ -487,9 +552,9 @@ TestNet** (Paseo Asset Hub, chain 420420417, `https://eth-rpc-testnet.polkadot.i
 - **A UUPS upgrade works:** a new Credits implementation deployed, `upgradeToAndCall` through the proxy
   succeeded, the ERC-1967 slot changed and the state stayed (total supply unchanged). The research had
   found no plain OpenZeppelin UUPS upgrade on mainnet; now there's one on the testnet.
-- Addresses (testnet, throwaway): armory `0xd199576247ecDc1F0AC23A96fA6e357c94e95c0c`, battle `0xA755158746f968786E8c425BC2DA6F3296b907bF`, credits `0x6C7c8cD5c1cd85052170f0Cd3576E54eEe29971C`, deeds `0x82Fe5957866A76424959DD5402Eaf36E1bF0B6eC`, factory `0x9A50F9610d01b299D30add73278339A0eAFd1fdF`, galaxy `0x3c2041e71235eB455717BDA0CbB39D5Ee8EdA262`, market `0x23D7060da9c017960f57D78BC946374092E5Ae00`, pilots `0xC257BED2601b02cab9864aDEEec867022Cb91b48`, planets `0x81221ABe12217Aa5E0F7c15d55c38E5A943B3b6E`, ships `0x604367E54eD1ffd6fcA0F0D409b44D3CC405aFeE`.
+- Addresses (testnet, throwaway; this deployment is gone, replaced by later ones): armory `0xd199576247ecDc1F0AC23A96fA6e357c94e95c0c`, battle `0xA755158746f968786E8c425BC2DA6F3296b907bF`, credits `0x6C7c8cD5c1cd85052170f0Cd3576E54eEe29971C`, deeds `0x82Fe5957866A76424959DD5402Eaf36E1bF0B6eC`, factory `0x9A50F9610d01b299D30add73278339A0eAFd1fdF`, galaxy `0x3c2041e71235eB455717BDA0CbB39D5Ee8EdA262`, market `0x23D7060da9c017960f57D78BC946374092E5Ae00`, pilots `0xC257BED2601b02cab9864aDEEec867022Cb91b48`, planets `0x81221ABe12217Aa5E0F7c15d55c38E5A943B3b6E`, ships `0x604367E54eD1ffd6fcA0F0D409b44D3CC405aFeE`.
 
-What's left: the same on **PolkaVM** (deploying `resolc`'s bytecode, linking its libraries, proxies
+What's left *(done the same day: section 3)*: the same on **PolkaVM** (deploying `resolc`'s bytecode, linking its libraries, proxies
 there), then the App steps (3–6), which need Polkadot Desktop paired with Koda's phone.
 
 ### 3. The game runs on PolkaVM too (2026-11-13), after one fix
@@ -526,9 +591,10 @@ code, bigger deposits, mostly refundable).
 Tools in `contracts/polkavm/`: `compile.cjs`, `deploy-polkavm.mjs`, `play-paseo.mjs`, `upgrade-polkavm.mjs`,
 `probe-drand.mjs` and `probe-scan.mjs` (the gas probes that found the problem).
 
-Addresses (testnet, throwaway): armory `0x1522EE84B805000c62F578f6D85802Bdce1d19a1`, battle `0x0b13c0b2583dbc385e476E5adEE65Faad483CeAd`, credits `0xe54c7c9888ECAaFD6cAaBf839d0D8DC851a82949`, deeds `0x935fC5Fd9D675e0Dc8c773390C18b13f66c3ceCF`, factory `0x7aac150Da2c444660F9d3d8dd318F26299fA5077`, galaxy `0xD228187BAC2876B126a7D0292dA54CC2Fd542203`, market `0x5CadfD29700E3DBD36F82859D294c45515C48799`, pilots `0x34041855992c787DF895e82B497B6ACFc6Ee8008`, planets `0x2AD97462E731c1a4a4472250a78781B0E0b67634`, ships `0x80294d1937bD75B32aEb86748111FD12c35dD684`.
+Addresses (testnet, throwaway; the PolkaVM deployment, not the one the game plays): armory `0x1522EE84B805000c62F578f6D85802Bdce1d19a1`, battle `0x0b13c0b2583dbc385e476E5adEE65Faad483CeAd`, credits `0xe54c7c9888ECAaFD6cAaBf839d0D8DC851a82949`, deeds `0x935fC5Fd9D675e0Dc8c773390C18b13f66c3ceCF`, factory `0x7aac150Da2c444660F9d3d8dd318F26299fA5077`, galaxy `0xD228187BAC2876B126a7D0292dA54CC2Fd542203`, market `0x5CadfD29700E3DBD36F82859D294c45515C48799`, pilots `0x34041855992c787DF895e82B497B6ACFc6Ee8008`, planets `0x2AD97462E731c1a4a4472250a78781B0E0b67634`, ships `0x80294d1937bD75B32aEb86748111FD12c35dD684`.
 
-**Next:** the Polkadot App steps (3–6), with Polkadot Desktop paired with Koda's phone.
+**Next:** the Polkadot App steps (3–6), with Polkadot Desktop paired with Koda's phone. *(Where they
+stand: "Where the spike stands", above.)*
 
 ### 1. The contracts compile for PolkaVM (2026-11-08)
 
@@ -537,6 +603,7 @@ Compiled with Parity's `resolc` 1.5.0 (LLVM 23.1.3), size-optimized, from forge'
 
 **All 19 contracts compile, with no errors and no source changes.** Two warnings, both from solc: `at`
 will become a reserved word (an event field and an error argument in Battle). Rename them some time.
+*(Still there 2026-11-22: `WornDown(…, at)` and `NotYet(at)`.)*
 
 | Contract | PolkaVM bytes | EVM bytes (forge, 2026-11-08) |
 |---|---|---|
@@ -563,32 +630,9 @@ What it means:
 - **Code deposits grow with size.** At the research's 0.00001 DOT per byte, the code alone is about
   2.0 MB, so roughly 20 DOT locked (refundable) for a full release, up from about 2 DOT for the EVM
   code (`cost-estimates.md` has the rest of a release's deposits). Worth measuring on Paseo.
-- **Not yet known:** whether it runs as it should. Still to test on Paseo: the upgradeable proxies
+- **Not yet known** *(answered 2026-11-13, sections 2 and 3: it runs)*: whether it runs as it should. Still to test on Paseo: the upgradeable proxies
   (UUPS) on PolkaVM, linking the external libraries at deploy time, the drand signature check through
   the BN254 pairing precompile, and gas.
-
-## Sources (researched 2026-11-08)
-
-- [Polkadot docs: Apps (Polkadot Products)](https://docs.polkadot.com/apps/)
-- [Polkadot docs: Allowances and Permissions](https://docs.polkadot.com/apps/concepts/allowances/)
-- [Polkadot docs: Add a Smart Contract to Your Product](https://docs.polkadot.com/apps/build/deploy-a-smart-contract/)
-- [Polkadot docs: Individuality package](https://docs.polkadot.com/apps/product-sdk/individuality/)
-- [Polkadot docs: Proof of Personhood in the Polkadot App](https://docs.polkadot.com/reference/apps/hosts/polkadot-app/pop/)
-- [Polkadot App docs: Identity and personhood](https://docs.polkadotcommunity.foundation/architecture/identity/)
-- [Polkadot App docs: Platform services from the SDK](https://docs.polkadotcommunity.foundation/guides/platform-services-sdk/)
-- [paritytech/dotns](https://github.com/paritytech/dotns) (a contract using the personhood precompile)
-- Added 2026-11-18 (steps 4–6): [Sign and Submit](https://developers.polkadot.com/apps/build/sign-and-submit/),
-  [Signer](https://developers.polkadot.com/apps/product-sdk/signer/),
-  [Contracts](https://developers.polkadot.com/apps/product-sdk/contracts/),
-  [XCM precompile](https://developers.polkadot.com/smart-contracts/precompiles/xcm/);
-  the npm packages `@parity/product-sdk` 0.45.0 (signer 0.17.10, contracts 0.11.10, nfts 0.4.1, keys,
-  tx, individuality 0.11.7) and `@parity/truapi` 0.31.0;
-  [paritytech/individuality-community](https://github.com/paritytech/individuality-community)
-  (`precompiles/personhood`, `precompiles/scarcity`, `pallets/alias-accounts`, `runtimes/next-asset-hub-paseo`);
-  [polkadot-fellows/runtimes v2.5.0 `individuality.rs`](https://github.com/polkadot-fellows/runtimes/blob/v2.5.0/system-parachains/asset-hubs/asset-hub-polkadot/src/individuality.rs);
-  [trinity-user-agents#1218](https://github.com/paritytech/trinity-user-agents/issues/1218) (PGAS pays every fee).
-- [Polkadot App on Google Play](https://play.google.com/store/apps/details?id=io.pcf.polkadotapp&hl=en_US)
-- The earlier research: [`research/polkadot-hub-2026-11.md`](research/polkadot-hub-2026-11.md)
 
 ### Testnet: a per-call memory limit on EVM bytecode too (2026-11-17)
 
@@ -667,3 +711,25 @@ The heaviest read the client now makes is about 21,000 units, half the budget, f
 player ports; anything bigger is split by `chunked`. A body's view still grows with goods (one storage
 read each, 8 now): adding goods or per-body data should be checked with `read-costs.mjs`.
 
+## Sources (researched 2026-11-08)
+
+- [Polkadot docs: Apps (Polkadot Products)](https://docs.polkadot.com/apps/)
+- [Polkadot docs: Allowances and Permissions](https://docs.polkadot.com/apps/concepts/allowances/)
+- [Polkadot docs: Add a Smart Contract to Your Product](https://docs.polkadot.com/apps/build/deploy-a-smart-contract/)
+- [Polkadot docs: Individuality package](https://docs.polkadot.com/apps/product-sdk/individuality/)
+- [Polkadot docs: Proof of Personhood in the Polkadot App](https://docs.polkadot.com/reference/apps/hosts/polkadot-app/pop/)
+- [Polkadot App docs: Identity and personhood](https://docs.polkadotcommunity.foundation/architecture/identity/)
+- [Polkadot App docs: Platform services from the SDK](https://docs.polkadotcommunity.foundation/guides/platform-services-sdk/)
+- [paritytech/dotns](https://github.com/paritytech/dotns) (a contract using the personhood precompile)
+- Added 2026-11-18 (steps 4–6): [Sign and Submit](https://developers.polkadot.com/apps/build/sign-and-submit/),
+  [Signer](https://developers.polkadot.com/apps/product-sdk/signer/),
+  [Contracts](https://developers.polkadot.com/apps/product-sdk/contracts/),
+  [XCM precompile](https://developers.polkadot.com/smart-contracts/precompiles/xcm/);
+  the npm packages `@parity/product-sdk` 0.45.0 (signer 0.17.10, contracts 0.11.10, nfts 0.4.1, keys,
+  tx, individuality 0.11.7) and `@parity/truapi` 0.31.0;
+  [paritytech/individuality-community](https://github.com/paritytech/individuality-community)
+  (`precompiles/personhood`, `precompiles/scarcity`, `pallets/alias-accounts`, `runtimes/next-asset-hub-paseo`);
+  [polkadot-fellows/runtimes v2.5.0 `individuality.rs`](https://github.com/polkadot-fellows/runtimes/blob/v2.5.0/system-parachains/asset-hubs/asset-hub-polkadot/src/individuality.rs);
+  [trinity-user-agents#1218](https://github.com/paritytech/trinity-user-agents/issues/1218) (PGAS pays every fee).
+- [Polkadot App on Google Play](https://play.google.com/store/apps/details?id=io.pcf.polkadotapp&hl=en_US)
+- The earlier research: [`research/polkadot-hub-2026-11.md`](research/polkadot-hub-2026-11.md)

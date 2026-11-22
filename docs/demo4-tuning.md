@@ -26,13 +26,18 @@ Hours of play to each goal, median pilot:
 
 | Setting | Value | Was (Demo 3) |
 |---|---|---|
-| Starting credits and bays | 1,000 credits, 5 bays | 100 credits, 5 holds |
+| Starting credits and bays | 1,000 credits, 5 bays (since 2026-11-19: no credits, 45 of debt and a hold of 3 Helium-3 and 2 Electronics, about 800 credits of goods; below) | 100 credits, 5 holds |
 | A port's stock (each good) | 220 units per registered pilot, at least 300 | 2,000 or less, by class |
 | Restocking | empty to full in 2 hours | 1 unit every 2 minutes |
-| Federation fee on trades | 2%, burned | none (owners got 1%, newly minted) |
+| Federation fee on trades | 2%, burned (since 2026-11-16: to the Federation's treasury, D94) | none (owners got 1%, newly minted) |
 | Bays | 200 credits, plus 8 for each bay already fitted (bay 6: 240; bay 250: 2,192; all 245: about 298,000) | 250 each |
 | Range 2 / 3 / 4 | 15,000 / 150,000 / 600,000 | none |
 | Goods (base, spread) | water ice 40, 30 · metals 70, 45 · rare elements 160, 90 · helium-3 120, 70 · organics 60, 40 · silicon 50, 35 · equipment 200, 100 · electronics 260, 130 | 3 goods, about 60 margin each |
+
+**Since these numbers:** a new pilot starts in debt with a hold of goods instead of 1,000 credits
+(Koda, 2026-11-19; `Pilots.setStarterKit`, set in `contracts/script/Deploy.s.sol` `wireJoining`; the
+debt is in `Credits.debtOf` and paid off first from what the game pays), and the Federation's fee goes
+to its treasury (D94). The simulator's runs above assume the old start (`economy.mjs` still gives pilots 1,000 credits).
 
 A unit's margin, from a full selling port to a needy buying port, is 1.2 × its spread: 36 credits for water ice and
 156 for electronics. Every unit moves the price, so a big load pays less per unit than a small one.
@@ -130,7 +135,7 @@ part prices can be retuned on a live deployment. The metallic asteroid's strengt
 until it's been played. Deployed to Polkadot Hub TestNet the same day. The table above is at the old
 numbers; `node orbiter-client/dev/sim/belt.mjs` gives the new ones.
 
-Reading (for Koda; the first two applied, above):
+Reading (for Koda; the second and fourth, the drone part's price and planets' output, applied above):
 - **The floor works** (decision 13): a pilot with nothing can mine Sol's dust and afford a claim in a
   few hours, far slower than trading, as a floor should be.
 - **Mining drones aboard a ship pay back slowly** (17–29 h of mining). If ship mining should be a real

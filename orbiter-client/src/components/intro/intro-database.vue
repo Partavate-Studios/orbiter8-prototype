@@ -1,5 +1,5 @@
 <template>
-  <!-- Your corporation's database, a page of Minerva's console (docs/briefs/corp-database.md; the words are
+  <!-- Your corporation's database, a page of Minerva's console (docs/archive/briefs/corp-database.md; the words are
        libs/corp-database.js). Its name, voice and ship page are your sponsor's; the Orbiter 8, how it works
        and the history are the same for everyone. Redactions are drawn bars, heard as "classified". -->
   <div class="database" :style="{ '--corp': corp.color, '--corp-font': corp.font }">

@@ -26,7 +26,7 @@ export const VOICE_LINES = {
 }
 /**
  * The apartment's radio (the intro; Minerva's console, Music): three tracks Koda supplied
- * (docs/briefs/music.md). It's a channel of its own beside the game's music, at its own volume: the
+ * (docs/archive/briefs/music.md). It's a channel of its own beside the game's music, at its own volume: the
  * Settings music level doesn't touch it. The tracks play in turn, like a station.
  */
 export const RADIO_TRACKS = [

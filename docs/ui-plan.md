@@ -1,9 +1,14 @@
 # Orbiter 8 UI plan: one system, one card, one network, one you
 
 For Koda. Written 2026-11-21 from his direction in [`ui-guide.md`](ui-guide.md) section 10, from every
-doc that says what the UI must do, and from the HUD's code as it stands. **A plan and four mockups:
-nothing here is built.** Each part needs Koda's go-ahead on its mockup before it's built (CLAUDE.md,
-"Keep the card and menu art").
+doc that says what the UI must do, and from the HUD's code as it stands. Each part needed Koda's
+go-ahead on its mockup before it was built (CLAUDE.md, "Keep the card and menu art").
+
+> **Status (2026-11-22):** written as a plan, and mostly built since. Steps 1 to 3 of Part 7 (the card,
+> the list and the top right, Minerva), your own and other pilots' info cards, the ship's own screen and
+> every menu rebuilt to the screen standard are done; the log is section 15. What's left (Details for
+> bodies, the ships switcher, the list's holdings and keys, and the rest) is kept in one list in
+> [`ui-guide.md`](ui-guide.md) section 9. Parts 1 to 8 below are the plan as written on 2026-11-21.
 
 - Part 1: what the UI has to carry (today's features, and the ones that are coming).
 - Part 2: what's wrong now, in one page.
@@ -18,7 +23,7 @@ nothing here is built.** Each part needs Koda's go-ahead on its mockup before it
 **Sources:** `ui-guide.md` (section 10 above all), `color-guide.md`, `hud-redesign.md` (the inventory
 and round 2), `demo4-plan.md` (decisions, "consider next"), `review.md`, `industry-plan.md`,
 `expansion-plan.md`, `design.md`, `design-ideas.md`, `polkadot-direction.md`, `backstory.md`,
-`briefs/minerva-face.md`, `briefs/corp-database.md`, `tech-trees/`, and the client's
+`archive/briefs/minerva-face.md`, `archive/briefs/corp-database.md`, `tech-trees/`, and the client's
 `components/hud/`, `star-map/hud/`, `stores/` and `libs/`.
 
 ---
@@ -246,7 +251,7 @@ her talking.
 
 - The line shows the most pressing thing: `Waiting for your signature`, `Scanning Barnard's Star · 23 s`,
   `Session · 3h 12m`, or when all is quiet just the network's name and a steady dot.
-- Her face shows the same thing (`briefs/minerva-face.md`): Thinking while a move is in flight, Waiting
+- Her face shows the same thing (`archive/briefs/minerva-face.md`): Thinking while a move is in flight, Waiting
   on you for a signature, Scanning, Alert under siege, Offline with no chain.
 - The session and scan chips leave the pilot plate. The block lamps leave the bottom center. Mining
   stays under the pilot plate: it's your ship's work, not the network's.
@@ -414,31 +419,33 @@ slots are empty; mockup 3 shows a player's planet with everything on it.
 
 ## 9. Questions for Koda
 
-1. **The wing.** It makes the card wider (about twice) while a station or moon is open. On a 1440-wide
+Answers and what was built, as of 2026-11-22, in brackets. Still open ones are in `ui-guide.md` section 9.
+
+1. **[Answered: the milder take, a spine and one face (section 13); built.]** **The wing.** It makes the card wider (about twice) while a station or moon is open. On a 1440-wide
    screen that's a third of the width, at the bottom left. Too much? The fallback is a wing that covers
    the planet's readouts but leaves its art and title showing.
-2. **Captions under the action wells.** One word each. You asked for icons over text; the guide says
+2. **[Answered: captions kept, one word each (section 11, and the kit); built.]** **Captions under the action wells.** One word each. You asked for icons over text; the guide says
    never a picture alone. Keep the captions, or show them only on hover and focus?
-3. **With nothing selected, the card shows your ship.** Or should it show the system's center?
-4. **The nearby strip goes.** The belt's eight places then live on the belt's card and in Objects.
-5. **Loadout folds into the ship's Details.** One screen for the ship. Agreed?
-6. **Rename moves into Details.** It frees a slot on every card; it's one press further away.
-7. **Minerva at the top center.** Her face is on screen all through play. Right, or should she be
+3. **[Assumed (section 14) and built: your ship.]** **With nothing selected, the card shows your ship.** Or should it show the system's center?
+4. **[Built: it's gone; the belt's places are the spine's tabs.]** **The nearby strip goes.** The belt's eight places then live on the belt's card and in Objects.
+5. **[Built as the ship's own screen, Your ship, opened by the Loadout well.]** **Loadout folds into the ship's Details.** One screen for the ship. Agreed?
+6. **[Waits for Details; Rename is still a well on the card.]** **Rename moves into Details.** It frees a slot on every card; it's one press further away.
+7. **[Built there, as the activity window (section 11, recommendation 2).]** **Minerva at the top center.** Her face is on screen all through play. Right, or should she be
    smaller and in a corner until she has something to say?
-8. **Scan and session leave the pilot plate** for Minerva's line. One line shows one thing at a time;
+8. **[Built: both are on Minerva's plate.]** **Scan and session leave the pilot plate** for Minerva's line. One line shows one thing at a time;
    the rest are on her Waiting page.
-9. **Profiles of other pilots: how much to show now?** Everything here is public on chain. Is showing a
+9. **[Built showing credits, planets, ports and what they own here; Koda hasn't said.]** **Profiles of other pilots: how much to show now?** Everything here is public on chain. Is showing a
    rival's credits and holdings on their profile what you want?
-10. **The Ships switcher, switched off, visible today?** Or hidden until a pilot can have two ships?
-11. **The Map button's name.** Map, Galaxy, or keep Jump?
+10. **[Open; not built.]** **The Ships switcher, switched off, visible today?** Or hidden until a pilot can have two ships?
+11. **[Built as Map.]** **The Map button's name.** Map, Galaxy, or keep Jump?
 
 ---
 
-## 10. Koda's feedback on the mockups (2026-11-21, being collected)
+## 10. Koda's feedback on the mockups (2026-11-21)
 
-Notes as Koda gives them. Nothing here is designed yet; the next move is decided once he's done.
+Notes as Koda gave them. What came of each, as of 2026-11-22, is in brackets at its start.
 
-1. **An activity window, in place of the mining chip.** The mining message "looks like an
+1. **[Built: Minerva's plate is the activity window; the mining chip is gone. Dimming the actions a move blocks is not built.]** **An activity window, in place of the mining chip.** The mining message "looks like an
    afterthought". Koda wants one small window of icons for what you have going on:
    - **Things that block you:** an icon per activity that means you can't do anything else until it's
      through. A trade just submitted (you can't submit another elsewhere until it lands); active mining.
@@ -448,20 +455,20 @@ Notes as Koda gives them. Nothing here is designed yet; the next move is decided
    - *Touches:* the mining chip under the pilot plate (4.4 kept it there), the tray's rows under
      Minerva's plate, and Minerva's Waiting page (4.4). Whether blocking moves should also dim the
      actions they block is not yet said.
-2. **The top right still doesn't hold together.** Sol's name and button, and the Objects and Map
+2. **[Koda chose way B, one panel that folds (mockup 9); built in `hud/system-block.vue`.]** **The top right still doesn't hold together.** Sol's name and button, and the Objects and Map
    buttons, still read as separate pieces. It is "this is where you are", but **the minimap feels
    awkward there**. (Mockup 1, section 4.7.)
-3. **The menus need a walk-through, and a standard.** "The sub menus are a bit of a mess."
+3. **[Done: the kit and standard (`ui-guide.md` section 11), and every menu rebuilt to it; Help leads with How planets grow.]** **The menus need a walk-through, and a standard.** "The sub menus are a bit of a mess."
    - Example: Help leads with First Steps ("do these things"), while the information on planets (How
      Planets Grow, the tech tree) is buried, though it's the far more useful page.
    - Koda wants to go through these screens one by one and improve them all, probably against **a
      standard for how a screen like that is built**.
    - *Touches:* 4.8 and Part 5 left every menu's inside unchanged; this plan has no menu standard yet.
-4. **The wing is "almost good": join the two headings.** The planet's title and the wing's title
+4. **[Built: one heading across the card, the planet's and the face's names meeting.]** **The wing is "almost good": join the two headings.** The planet's title and the wing's title
    should be combined somehow. Koda's idea: the two title pills keep their own colors and names, but
    their inner ends meet in the center, touching, so they make **one big heading across the top** of
    the whole card. Otherwise the wing stays as drawn. (Mockup 1, section 4.2.)
-5. **The Objects menu is good, with three changes.** (Mockup 2, section 4.1.)
+5. **[Built: icon tabs, no title, "celestial bodies" in the count line. The menu's name is still open: `ui-guide.md` section 9.]** **The Objects menu is good, with three changes.** (Mockup 2, section 4.1.)
    - **Icons for the filter tabs, not words** (All, Planets, Stations, Moons, Asteroids, Ships, Mine).
      And as a rule for the whole UI: **icons in place of words when and where we can.**
    - **No "Objects of Sol" title** at the top.
@@ -469,11 +476,11 @@ Notes as Koda gives them. Nothing here is designed yet; the next move is decided
      *Claude's reading, to confirm:* the word replaces "things" in that line. Whether "Objects" as the
      menu's and button's name should become "Celestial bodies" too, and what ships are called in it
      (a ship isn't a celestial body), is not yet said.
-6. **Planet Details: "look fantastic... great work."** Keep as drawn. (Mockup 3, section 4.3.)
-7. **The pilot card is boring.** Players will want to make an **avatar of some kind**. That's for
+6. **[Not built yet: `ui-guide.md` section 9.]** **Planet Details: "look fantastic... great work."** Keep as drawn. (Mockup 3, section 4.3.)
+7. **[Open: `ui-guide.md` section 9; avatars later.]** **The pilot card is boring.** Players will want to make an **avatar of some kind**. That's for
    later; it's on the to-do list in `demo4-plan.md` ("Consider next", Pilot avatars). Until then the
    profile needs more life than the plain figure in mockup 3. (Section 4.5.)
-8. **Keep the data, tighten the labels.** Koda loves how much data the mockups show, but labels must
+8. **[A rule now: the kit's standard, items 4 and 5.]** **Keep the data, tighten the labels.** Koda loves how much data the mockups show, but labels must
    not be verbose: "we have to keep the final UI clean and tight". His example: "stars named" runs out
    of its tile on the profile (mockup 3). A rule for every screen: short labels, and nothing ever
    spills out of its container (`ui-guide.md`, "Room for the longest name", applies to labels too).
@@ -544,6 +551,11 @@ Recommendations only; Koda decides.
    they defaulted to the first moon. With several moons the wing should show a list of them, by name.
    It's "one of the few places we have words".
 
+*As of 2026-11-22:* 1 is built (the card); 2 is built except the dimming; 3 is done (`libs/small-icons.js`); 4 is
+the kit; 5 and 6 are in the kit's rules; 7 is built (way B); of 8's trims, Go on the selected row
+and End Session as a quiet button are built, and Details (with or without an Owner well) isn't built
+yet. 9 is built: several moons open a list.
+
 Mockup 5 (`mockups/together/5-revised`) draws the recommendations and notes 1, 2, 4, 5, 8 and 9 together,
 before building starts.
 
@@ -583,6 +595,8 @@ So the measure for a loop is **travel and stability, not the number of clicks**:
 - This drops two of the fixes above as written: a "Next buyer" button that skips the trip, and a
   best-buyer shortcut. Kept: the list remembers its filters; and the strip-and-card route (planet's
   mark, Station, Trade) becomes the one to make short, since it's the one that shows where you are.
+  *Both built: the filter is remembered (`ui.listKind`, `ui.listWant`); Trade's controls sit nearest
+  the card (mockup 10's measure).*
 - **Never preset a trade slider (Koda, 2026-11-21).** Sliding and choosing what to buy and sell is one
   of the few fun interactions the player has. And they may have come to buy for a build: something
   else already selected would feel wrong. The trade screen always opens with every slider at rest.
@@ -624,6 +638,9 @@ Details; Rename moves into Details; the minimap's new place is still open and ge
 
 ## 15. Progress notes (kept as the work goes, so another session can pick it up)
 
+A log, kept as written. Items it calls "left" or "waiting" were often done later in the log; where so,
+a bracket says so. **What's still left is in one list: [`ui-guide.md`](ui-guide.md) section 9.**
+
 **State on 2026-11-21:** Koda approved the direction and the icon sheet ("the icons are all great, you
 can begin"). Prep comes first; no game code is changed until Koda has seen the prep (section 14).
 
@@ -634,10 +651,10 @@ and 7 on) and `node dev/mockups/icons.mjs --png` (mockup 6). The icon paths are 
 | Prep item | State |
 |---|---|
 | Small-icon set (mockup 6) | Done, approved by Koda as drawn |
-| The kit and screen standard (`ui-guide.md` section 11, mockup 7) | Drawn: `mockups/together/7-kit.png`. Waiting for Koda |
-| The card in every state, desktop and phone (mockup 8) | Drawn: `mockups/together/8-card-states.png` (ship, planet, moons' list, station, a blocked action, one moon, three phone sheets). Waiting for Koda |
-| The activity window in every state; the top right two ways (mockup 9) | Drawn: `mockups/together/9-activity-and-top-right.png`. Koda to choose way A (two pieces) or B (one panel that folds) |
-| The trade loop, travel measured (mockup 10) | Drawn: `mockups/together/10-trade-loop.png`. 2,153 px a loop with today's trade menu; 1,758 px (18% less) with its sliders and Make Trade on the side nearest the card. Koda to say whether the trade menu may be laid out that way |
+| The kit and screen standard (`ui-guide.md` section 11, mockup 7) | Drawn: `mockups/together/7-kit.png`. Agreed by Koda (2026-11-21) |
+| The card in every state, desktop and phone (mockup 8) | Drawn: `mockups/together/8-card-states.png` (ship, planet, moons' list, station, a blocked action, one moon, three phone sheets). Agreed by Koda (2026-11-21); built |
+| The activity window in every state; the top right two ways (mockup 9) | Drawn: `mockups/together/9-activity-and-top-right.png`. Koda chose way B (one panel that folds); both built |
+| The trade loop, travel measured (mockup 10) | Drawn: `mockups/together/10-trade-loop.png`. 2,153 px a loop with today's trade menu; 1,758 px (18% less) with its sliders and Make Trade on the side nearest the card. Koda agreed; built 2026-11-22 |
 
 **The card, as now designed (after Koda's "milder take"):**
 - A card with a family is a **spine** (a column of tabs: the planet, its station, its moon or Moons)
@@ -678,13 +695,13 @@ Log:
   belt's places are the spine's tabs); the card is never put away (`ui.toggleScope` only keeps it
   shown); with nothing selected it shows your ship. Screenshots from the running game:
   `mockups/together/built/`. Lint, tests and a build pass.
-  - **Not yet play-tested with real moves:** checked by screenshots at desktop and phone size against
+  - **Not yet play-tested with real moves** [play-tested the same day, below]: checked by screenshots at desktop and phone size against
     Koda's running dev server, selecting things only. Trade, claim, jump and the number keys from the
     new row still need a real session.
   - **Left for later steps:** Details (so Rename, Loadout and Session are still wells on the card, and
     a body with no actions has an empty row); actions dimmed by an activity in flight ("One in
     flight") wait for the activity window (step 3); `ui.actionsOpen` / `toggleActions` and the `A` key
-    are unused now and can go; the belt's spine scrolls with no hint that there's more.
+    are unused now and can go [removed 2026-11-22]; the belt's spine scrolls with no hint that there's more.
   - **Next: step 2,** the list (Objects) and the top right. Koda still to choose way A or B for the
     top right (mockup 9).
 - 2026-11-21: **Koda chose way B for the top right** (mockup 9): one panel, the name leading, the map
@@ -707,7 +724,8 @@ Log:
     `phone-tabs.png`. Lint, 247 tests and a build pass. **Not play-tested with real moves.**
   - **Left:** "Yours" lists your bodies and ship here but not yet their goods, drones and builds (the
     industry plan's holdings), and Transfer isn't drawn; arrow keys and typing to filter aren't in;
-    the old `jump-icon`, `planets-icon`, `ports-icon` and `ships-icon` components are unused now.
+    the old `jump-icon`, `planets-icon`, `ports-icon` and `ships-icon` components are unused now [removed
+    2026-11-22].
   - **Next: step 3,** Minerva's plate as the activity window, and her Link page (the session moves
     there from the ship's card).
 - 2026-11-21: **Play-tested steps 1 and 2 with real moves,** on a private copy (`CHAIN_PORT=8546
@@ -735,10 +753,10 @@ Log:
   - Drawn: `docs/mockups/ship-upgrades/sheet.png`, each part today and proposed, and four whole ships
     at 300, 92 and 44 px. One family of colors (the white hull, two lavenders, a dark inset); only the
     capacitors, the shield and damage keep a color. It also draws jump range and mining drones, which
-    have no picture today. **Waiting for Koda.** If he agrees: port to `sdk/src/ship-art.js` and
+    have no picture today. **Waiting for Koda** [answered below; built after round 8]. If he agrees: port to `sdk/src/ship-art.js` and
     `ShipArt.sol` together, update the pinned hashes in `sdk/src/ship-art.test.js`, check the
     contract's size (`forge build --sizes`), and redeploy on the test chains.
-- **Where things stand:** steps 1 (card) and 2 (list, top right) built and play-tested; Yards rebuilt;
+- **Where things stood then:** steps 1 (card) and 2 (list, top right) built and play-tested; Yards rebuilt;
   step 3 (Minerva's plate and Link) is next; the other menus still to walk through (Armory, Colony,
   Loadout into the ship's Details, Help).
 - 2026-11-21: **Koda on the first upgrade sheet: "not a big fan of any".** His notes:
@@ -811,8 +829,9 @@ Log:
   `loadout-two-views.png`. 248 client tests, 124 contract tests, lint pass. Checked by screenshots on
   Koda's running copy (reads only).
   - **Left:** your own info card isn't reachable yet (the pilot plate's avatar still selects your
-    ship); the other ship's card face is thin (Pilot, At); owner names in the card's readouts and in
-    chat and the siege feed aren't links yet.
+    ship) [done 2026-11-22, below]; the other ship's card face is thin (Pilot, At); owner names in the card's readouts and in
+    chat and the siege feed aren't links yet [chat and the siege feed done in batch 1, below; the card's
+    readouts still not].
 - 2026-11-22: **Koda: the armory menu hadn't been updated** ("I think that's where we started").
   Rebuilt as the Yards were: `hud/armory/armory-panel.vue` (HTML), the old SVG menu deleted. Your ship
   as it flies and opened up, updating with what you're about to fit; mounts as six pips, free holds,
@@ -825,6 +844,7 @@ Log:
   `built/phone-armory.png`. Checked by screenshots, no purchase made.
 - **Menus walked through so far:** Yards, Armory. **Still to do:** Colony, Asteroid Works, Loadout
   (into the ship's Details), Siege, Feed, Chat, Ranks, Help, Settings, Trade (controls nearest the card).
+  [All done by the end of 2026-11-22, below.]
 - 2026-11-22: **Koda on the Armory: "good start"**; respect the limits on what can be fitted; don't
   blindly follow what was made; evaluate it on UX, UI and design, then build the best menu possible.
   - **Limits checked against the contract** (`Pilots.setLoadout`): six mounts (point defense 1, a
@@ -882,7 +902,9 @@ Log:
     No moves were made on these screens: land, deliver, build, order, fit and unload are untested.
   - **Left:** Trade's layout (its controls nearest the card); the SVG menu helpers that nothing uses
     now (`star-map/hud/menus/`: menu-button, menu-container, widgets) can be removed once checked;
-    the phone layouts of Colony, Asteroid Works, Siege and Your ship weren't looked at.
+    the phone layouts of Colony, Asteroid Works, Siege and Your ship weren't looked at. [Trade's layout
+    and the helpers done, below. Colony, Asteroid Works and Your ship were seen at phone size in
+    c5f5b10 (`built/phone-colony.png`, `built/phone-menus.png`); Siege still not.]
 - 2026-11-22: **Koda: "keep going until you're done with all of it." Done:**
   - **Step 3, Minerva** (`hud/minerva-plate.vue`, `hud/panels/minerva-panel.vue`, `libs/activities.js`):
     her plate at the top is the activity window (her face shows the most pressing thing; an icon per
@@ -908,7 +930,7 @@ Log:
   - **Still not exercised with a real move:** fitting a part at an armory that has stock, landing and
     boarding people, building, placing an order that goes through, installing finished parts, a
     siege, jumping, the gamepad. **Not seen at all:** the Siege screen (no siege on any chain at hand).
-  - **Open, for Koda:** the new ship art on chain needs a redeploy; the extra read of other pilots'
+  - **Open, for Koda** [carried into `ui-guide.md` section 9]: the new ship art on chain needs a redeploy; the extra read of other pilots'
     armories' stock should be checked against the testnet's read budget (`dev/harness/read-costs.mjs`);
     the "Mine" holdings and Transfer in the list, and the Details screens for planets, stations,
     moons and stars from mockup 3, are not built (the ship's and the pilot's are).

@@ -13,11 +13,13 @@ lines are older and more "starship computer". Rewording them to fit her is the l
 
 ## What we have (11 files)
 
+Numbered as first listed; row 2, the jump-start line, was removed (below).
+
 | # | Line | File | Key | When it plays |
 |---|---|---|---|---|
 | 1 | Priority alert. | `priority-alert` | `failed` | A move failed (not when you declined it) |
 | 3 | Interstellar jump complete. | `interstellar-jump-complete` | `jumpComplete` | A jump lands |
-| 4 | Welcome back. | `welcome-back` | `welcomeBack` | A returning pilot enters from the title |
+| 4 | Welcome back. | `welcome-back` | `welcomeBack` | A returning pilot enters from the title; entering the apartment with the lights already on |
 | 5 | Incoming transmission. | `incoming-transmission` | `transmission` | New chat messages |
 | 6 | Upgrade complete. | `upgrade-complete` | `upgraded` | A shipyard upgrade or part fitted |
 | 7 | Minerva console online. | `minerva-console-online` | `console` | Her console opens |
@@ -66,6 +68,9 @@ for the intro.
 
 ## Not voice
 
-The effects (`public/audio/effects/beep.mp3`, `click.wav`) and the three music tracks
-(`public/audio/music/`) aren't on this list. Where they came from isn't recorded here; their licenses
-are worth checking in the same pass.
+The effects (`public/audio/effects/beep.mp3`, `click.wav`) and the music (`public/audio/music/`, a
+folder a scene: `title`, `starmap`, `jumping`, `blackhole` (two tracks), `discovery` (the new-star track)
+and `apartment` (the radio's three, `RADIO_TRACKS` in `08audio.js`)) aren't on this list. The radio's
+and the new-star track came from Koda (2026-11-20, `archive/briefs/music.md`, with titles and
+composers); where the older ones came from isn't recorded here, and their licenses are worth checking
+in the same pass.

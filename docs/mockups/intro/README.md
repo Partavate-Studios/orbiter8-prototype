@@ -4,7 +4,7 @@
 > This folder stays as the approved design. **Replaced 2026-11-20** by the isometric diorama
 > ([`../intro-zoom/`](../intro-zoom/README.md)).
 
-For Koda to approve before anything is built (brief: [`docs/briefs/intro-mockup.md`](../../briefs/intro-mockup.md)).
+For Koda to approve before anything is built (brief: [`docs/archive/briefs/intro-mockup.md`](../../archive/briefs/intro-mockup.md)).
 Nothing in the game changed. Every copy line marked **draft** is a placeholder in the right voice: the
 words, company names and corporations' names are still on your list.
 
@@ -163,6 +163,9 @@ Both transactions are real waits of a few seconds:
   library isn't drawn.
 
 ## Open, for you
+
+*Moot since 2026-11-20: the intro was rebuilt as the zoomable diorama ([`../intro-zoom/`](../intro-zoom/README.md)).
+Kept as the record.*
 
 - The noir look overall: how dark, the rim light, the muted billboards against the purple console.
 - Minerva's column in the console (desktop) and band (phone): is her face big enough, or too big?

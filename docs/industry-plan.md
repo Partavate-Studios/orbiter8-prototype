@@ -2,8 +2,9 @@
 
 **Status: design, not built.** Koda's direction of 2026-11-21, written up with Claude's suggestions
 and the questions it leaves. Nothing here is a numbered decision yet: once Koda answers the open
-questions, the answers go into `demo4-plan.md` as decisions (after D100), and the ones that replace
-earlier decisions say so. This is a large contract change, for a release after the current testnet.
+questions, the answers go into `demo4-plan.md` as decisions (from D111; D101–D110 are taken), and the
+ones that replace earlier decisions say so. This is a large contract change, for a release after the
+current testnet.
 
 ## Koda's direction (2026-11-21)
 
@@ -17,7 +18,7 @@ earlier decisions say so. This is a large contract change, for a release after t
 - New ships are built at orbital autofactories.
 - If you rise high enough in a corporation **and** have an advanced enough orbital autofactory, you can
   build that corporation's specialized ship (the ships on the corporation database's "Our ship" pages:
-  `docs/briefs/corp-database.md`).
+  `docs/archive/briefs/corp-database.md`).
 - Ships and planets are bought and sold on a **neutral NFT exchange** if Polkadot has a clean one to
   integrate with. If not, the game gets a basic market of its own.
 

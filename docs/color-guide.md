@@ -47,7 +47,7 @@ you.**
 | **Interface** | cards, menus, buttons, text, focus | purples, lavenders, purple-grays |
 | **Meaning** | yours (yellow), needs you (pink) | the only loud accents in the interface |
 | **Identity** | a card's frame and title (the selected thing), a HUD button's tint (its menu) | one color per kind of thing; mid saturation |
-| **Goods** *(not built)* | goods icons, cargo, trade sliders, recipes | muted material tones |
+| **Goods** | goods icons, cargo, trade sliders, recipes | muted material tones |
 | **World** | stars, planets, moons, ships, stations, effects | illustrative, from physics and the game's art |
 
 **Why domains:** a clash matters only when two colors play the same role. A pink-banded gas giant is a
@@ -86,7 +86,7 @@ colors always come with an icon or a picture of the thing, so they don't need to
 | Layer | Today's color | Use |
 |---|---|---|
 | Space | `SPACE` `#130e24` → `SPACE_DEEP` `#0b0916`; the backdrop art deepened toward them | the universe |
-| Card and menu insides | `SURFACE_1` `#1b1531` (`CARD_GRAY`) | the same on every card and menu |
+| Card and menu insides | `SURFACE_1` `#1b1531` (`CARD_GRAY`) | the same on every card; menus since 2026-11-21: see below |
 | Readout tiles | `SURFACE_2` `#251d40` | cargo tiles; readouts that are only text have no box (C1) |
 | Hover, selected rows | `SURFACE_3` `#302651` | |
 
@@ -100,20 +100,28 @@ colors always come with an icon or a picture of the thing, so they don't need to
   Koda's purple frame and title.**
 - **Menu buttons in the right-hand card:** one purple on every card.
 - **Menus** take the color of what opened them: a menu about the selection takes its card's; a HUD
-  button's menu takes the button's tint; the ship's loadout keeps the purple.
+  button's menu takes the button's tint; the ship's own screen (was Loadout), Minerva's menu and the
+  pilot's info card keep the purple. The color is on the frame, the heading and the buttons.
+- **Every menu's inside is one quiet blue-gray** (Koda, 2026-11-21, on the station's menus: "I love the
+  color of the background on those menus as a default color"): the station's deep steel blue mixed
+  into `CARD_GRAY` (`MENU_INSIDE` in `hud/menu-sheet.vue`; `ui-guide.md` section 11, rule 13).
 - **Status:** a **pink frame** when the thing is under siege or needs you (Koda loves it). Being yours is
   a **yellow mark** (badge, dot, outline), never the frame, so a planet can be yours and under siege at once.
 
 ### Buttons
 
 - Buttons are purple and lavender; gray for quiet ones. Never pink-bodied, never in a goods color.
-- **The main action stands out** (Make Trade, Take Off, Jump): one per menu, the strongest purple.
-  Readouts (balance, gain, final total) must not outshine it.
-  *Partly built; check each menu when it's next touched.*
+- **The main action stands out** (Make Trade, Take Off, Jump): one per screen, the strongest button.
+  Readouts (balance, gain, final total) must not outshine it. *Built in every menu (the kit, 2026-11-22).*
+  **On a menu it takes the menu's own color with dark words** (Koda, 2026-11-21: the brand purple
+  clashed with the menus' inside); on the card it's still the brand purple (`BRAND_500`, `BRAND_300`
+  border). Whether the card should follow is open (`ui-guide.md` section 9).
 - **Focus** (keyboard and gamepad): a clear lavender ring on whatever has focus.
 - **HUD buttons** are tinted by what they open (`HUD_TINT`: help sky blue, sieges coral, leaderboard
   gold, chat teal, settings gray, planets blue, ships pale lavender, you yellow), with white icons. A
-  running siege rings the sieges button in pink.
+  running siege rings the sieges button in pink. (Since 2026-11-21 the planets blue is the list's
+  button, Objects; the Planets, Ports and Ships buttons are gone, so the ports and ships tints are
+  unused.)
 
 ### Text
 
@@ -134,7 +142,7 @@ Sol white; the game draws it yellow, as people know it.
 
 ### Planets (built: `PLANET_COLORS`)
 
-Ten classes, in `sdk/game/planet-types.js` order: Terrestrial, Rocky, Oceanic, Desert, Ice, Volcanic,
+Ten classes, in `sdk/src/game/planet-types.js` order: Terrestrial, Rocky, Oceanic, Desert, Ice, Volcanic,
 Gaseous, Ferrous, Lava, Swamp. Each has a light, mid and dark for the sphere, a color for its surface
 marks, and its card's color. Purple stays in the shadows. Volcanic is dark with bright vents, Lava is
 bright: lightness keeps them apart. Planets may have pink or yellow in their painting (Gaseous bands,
@@ -156,7 +164,7 @@ and gray). Its station, Tiangong, trades as a Ferrous port.
 - *Idea, later:* corporation liveries as a hull stripe and badge, never yellow or pink. Pirates fly
   unmarked hulls.
 
-## 6. Goods (built in the trade menu)
+## 6. Goods (built: trade, the list's ports, colony storage, the yards, the pilot plate's holds)
 
 Each of the eight goods gets one muted material color and its icon (`assets/art/good-*.svg` exist),
 used everywhere a good appears: port lists, cargo, sliders, production, recipes, the tech trees. **The
@@ -195,7 +203,8 @@ those are arrows, signs and yellow.
    line on why.
 
 **Never:** pink on a positive action; yellow on what isn't yours or good for you; card backgrounds
-tinted per selection; a goods color as decoration; color as the only cue; a new hex value written into
+tinted per selection; a goods color as decoration; green as an interface meaning (the kit, `ui-guide.md`
+section 11: a port that buys your cargo is yellow); color as the only cue; a new hex value written into
 a component (new colors go in `palette.js`; older ones move there as their screens are touched).
 
 ## 8. Koda's choices (2026-11-14)
@@ -210,7 +219,7 @@ possible". Built unless noted.
 | A2 | The leaderboard button soft gold `#e6cf8f`, full gold `#ffc94d` on hover. |
 | B1 · 2 | The proposal's purple surfaces: `SURFACE_1/2/3` `#1b1531` / `#251d40` / `#302651` (card insides, readout tiles, hover). |
 | B2 · 1 | Small labels on purple in lavender (`#c3b3da`, headings `#e6dcf5`). |
-| C1 · 2 | Readouts as plain text, no boxes, so buttons stand out; gains yellow, costs plain, can't-afford light pink with an outline; the main action (Make Trade) in `BRAND_500`, with a `BRAND_300` border. |
+| C1 · 2 | Readouts as plain text, no boxes, so buttons stand out; gains yellow, costs plain, can't-afford light pink with an outline; the main action (Make Trade) in `BRAND_500`, with a `BRAND_300` border (on menus, changed 2026-11-21 to the menu's own color: section 4, Buttons). |
 | D1 · 1 | The proposal's goods colors (`GOODS_COLORS`), on goods' names and codes in the trade menu ("hard to know until I see it in context"). |
 | D2 · 1 | HUD tints kept. |
 | E1 | Today's planets kept. |
@@ -225,20 +234,26 @@ possible". Built unless noted.
 
 ## 9. To do
 
-**Under review:** [`mockups/color-choices.svg`](mockups/color-choices.svg) shows each choice below as the
-game is now and its options, labeled by row (A1…G2) for Koda's answers; redraw it with
+**Reviewed:** [`mockups/color-choices.svg`](mockups/color-choices.svg) shows each choice as the game was
+and its options, labeled by row (A1…G2); Koda's answers are section 8. Redraw it with
 `npx vite-node dev/mockups/color-choices.mjs` from `orbiter-client/`.
 
 In rough order; each visible change goes past Koda first (a mockup in `docs/mockups/` when it restyles
 a screen).
 
-- [ ] Settle the readout and hover surface steps, and the main-action style; then the trade menu as the
+- [x] Settle the readout and hover surface steps, and the main-action style; then the trade menu as the
       first screen to use them (Make Trade the strongest button, readouts quieter, gains yellow, costs
-      neutral, small labels readable).
+      neutral, small labels readable). *Done: surfaces B1 · 2 and readouts C1 · 2 (section 8); the main
+      action set by the kit (`ui-guide.md` section 11); Trade rebuilt to it, then every menu
+      (2026-11-21/22).*
 - [ ] Audit every yellow and pink in the client: each must mean "yours" or "needs you".
 - [ ] Pink text uses `PINK_LIGHT` everywhere.
-- [ ] A keyboard and gamepad focus ring on everything focusable.
-- [ ] Goods colors and icons (section 6), after the open question on HUD tints.
+- [ ] A keyboard and gamepad focus ring on everything focusable. *Done in the HUD's buttons, the card's
+      action row and every menu panel (`hud/kit.css`, `rim-button.vue`, `action-row.vue`); the rest of
+      the client not checked.*
+- [x] Goods colors and icons (section 6). *Built (`GOODS_COLORS`, `libs/goods.js`, `assets/art/good-*.svg`)
+      in trade, the list's ports, colony storage, the yards and the pilot plate's holds. The question
+      on HUD tints (section 10) is still open.*
 - [ ] Measure contrast of today's text colors on their backgrounds; fix what's under 4.5:1.
 - [ ] A lint check for hex colors outside `palette.js` (once most have moved).
 
@@ -250,12 +265,14 @@ a screen).
       trophy, but it's the one yellow-ish interface color that isn't "yours". Keep?
 - [ ] **Do players misread a G star's card (yellow frame) as "yours"?** Probably not, with yours lime; check
       in play. Fallback: a neutral frame with a star-color swatch.
-- [ ] **Title screen:** Koda found it very purple. It's the brand's moment for purple, but the planet
-      and star palettes could bring more color (the Earth by the port is a good start).
-- [ ] **Gray in the interface:** how far to take it (Koda raised it; card insides are gray now).
+- **Title screen** (Koda found it very purple): kept with the other UI questions, `ui-guide.md`
+  section 9. It's the brand's moment for purple, but the planet and star palettes could bring more
+  color (the Earth by the port is a good start).
+- [ ] **Gray in the interface:** how far to take it (Koda raised it; card insides are gray now, and
+      menu insides a blue-gray since 2026-11-21).
 - [ ] **Star class in play:** should a star's class set how fast it charges the jump drive? Color would
       then hint at gameplay.
 - [ ] **Corporation liveries:** a fixed set, or player-chosen within limits (no yellow or pink)?
 - [ ] **Tech-tree branches:** colors would compete with the goods; icons and shapes instead?
-- [ ] **The Polkadot App:** does the App impose a theme, light mode, or colors of its own around a
-      Product? (Check with the spike.)
+- **The Polkadot App:** does the App impose a theme, light mode, or colors of its own around a
+  Product? (Check with the spike.) Kept with the App's layout question, `ui-guide.md` section 9.

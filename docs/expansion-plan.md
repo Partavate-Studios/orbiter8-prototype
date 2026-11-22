@@ -2,18 +2,21 @@
 
 Koda's decisions of 2026-11-16, and the plan to build them. Written so a session without the history
 of the one that wrote it can carry it out: read this whole file, then the documents it points to.
-**Status: agreed with Koda (2026-11-16): decisions 1–34 below. Built 2026-11-16, phases 0–5 (see the progress log).**
+**Status: agreed with Koda (2026-11-16): decisions 1–34 below (D67–D100 in `demo4-plan.md`). Built
+2026-11-16, phases 0–5, and Sol's asteroids on 2026-11-18 (see the progress log). Everything in this
+plan is built;** what it left open is listed in `demo4-plan.md`, "Consider next: what's left", and in
+"Left for Koda" at the end of the log.
 
-## Progress log (update after every step; newest last)
+## Progress log (newest last)
 
-A session picking this up: read this log, then `git log --oneline -20`, then carry on from the first
-unticked box under "Phases". Each step is committed on its own; an uncommitted change in the tree is
-work in progress from a session that ran out (check `git status` and `git diff` first).
+Every phase is through. The log is kept for the record: each step's commit, and the calls (X1–X34) in
+`docs/review.md` section 9, hold the details.
 
 - 2026-11-16: Phase 0 done. HUD imported (`57d63da`; analysis now `docs/hud-redesign.md`, mockups
   `docs/mockups/hud/`), `client-rnd/hud/` removed, docking bug fixed in the SDK (`tradesSinceArrival`
   in `sdk/src/game/docking.js`), decisions recorded as D67–D100 in `demo4-plan.md` (Milestone 8).
-  Seen at phone size: the zoom rail's "−" looks clipped beside the minimap (not fixed yet).
+  Seen at phone size: the zoom rail's "−" looks clipped beside the minimap (not fixed then; the
+  minimap and zoom now fold out under the system's name, ec77f53, 2026-11-21: recheck on a phone).
 - 2026-11-16: Phase 1, treasury and "Sol fully built" done (`e59dd5b`). Calls X1–X6 in `docs/review.md` §9.
 - 2026-11-16: body ids with kinds done: `cell << 16 | kind << 8 | index` (planet 0, asteroid 1); Sol's
   planets stay ids 0–8. Planet-only moves reject other kinds (`Planets._derive`). Play-tested at Sol and
@@ -24,6 +27,7 @@ work in progress from a session that ran out (check `git status` and `git diff` 
   Planets 23.3 → 19.1 KB; Claims 10.7 KB. The star-name fee is Claims' own tuning (`starNameFee`, 50,000
   as a Station cost). SDK binds `addresses.claims`. Play-tested a claim with a name at star 1.
   **The testnet (Paseo) runs the old contracts: it needs a fresh deploy before this client plays it.**
+  *(Redeployed 2026-11-17, below.)*
 - 2026-11-16: Battle split: **Repairs** (`contracts/src/battle/Repairs.sol`: each ship's condition, a
   siege's losses kept, shipyard repairs, a ship's battle side; the home for the built-in drones' repairs
   in Phase 2). Battle keeps sieges, rounds and planet defenses. Battle 23.9 → 21.8 KB; Repairs 7.4 KB.
@@ -86,30 +90,37 @@ work in progress from a session that ran out (check `git status` and `git diff` 
   `contracts/deployments/420420417.json`; about 19 PAS); a GitHub Pages workflow
   (`.github/workflows/pages.yml`) publishes the client at https://partavate-studios.github.io/orbiter8-prototype/
   on every push to `polkadot` (Settings → Pages → Source: GitHub Actions). Next release: a debug cheat code
-  (`demo4-plan.md`, Consider next).
+  (`demo4-plan.md`, Consider next). *(Done 2026-11-18, 6ec309b.)*
 - 2026-11-18: Sol's asteroids fully built (the section below): `contracts/src/planets/Sol.sol` says which
   bodies are Sol's Federation stations (its nine planets and its six asteroids) and their port classes;
   Market (ports, yards) and Armory (parts at the Federation's price) ask it. Sol now has 15 ports. Calls X30–X31.
 - 2026-11-18: reads reshaped for the testnet's per-read budget (`polkadot-direction.md`), then
   **redeployed to Polkadot Hub TestNet** (60 transactions, 17.96 PAS; addresses in `sdk/src/chain/networks.js`).
   The client plays it and reads Sol whole. Calls X32–X34.
-- **Left for Koda / a later session:** (1) review calls X1–X22 in `docs/review.md`, and the mockup
-  `docs/mockups/belt-levels.svg`; (3) tuning choices in `demo4-tuning.md` "The belt";
-  (4) extending the economy simulator with miners and asteroid owners; (5) dwarf planets (decision 21);
-  (6) the clean-room client (`client-rnd/fresh/`) learns the belt (decision 31); (7) Battle has 1.9 KB left:
-  `Combat` as a linked library if it needs more. Sizes now: Planets 21.3 KB, Battle 22.7, Market 20.3,
-  Pilots 17.5, Drones 13.9, Armory 13.2, Claims 11.3, Repairs 10.4.
+- 2026-11-19: redeployed to the testnet with everything since 11-17 (3b98d38, tag `testnet-2026-11-19`).
+- **Left for Koda / a later session** (checked 2026-11-22; all also in `demo4-plan.md`, "Consider next:
+  what's left"): (1) review calls X1–X22 in `docs/review.md`, and the mockup
+  `docs/mockups/belt-levels.svg`; (3) tuning choices in `demo4-tuning.md` "The belt" (two applied
+  2026-11-17; the rest open); (4) extending the economy simulator with miners and asteroid owners (not
+  done); (5) dwarf planets (decision 21; not done); (6) the clean-room client (`client-rnd/fresh/`)
+  learns the belt (decision 31; not done); (7) Battle has 1.9 KB left: `Combat` as a linked library if
+  it needs more. Sizes then: Planets 21.3 KB, Battle 22.7, Market 20.3, Pilots 17.5, Drones 13.9, Armory
+  13.2, Claims 11.3, Repairs 10.4. Sizes on 2026-11-22: Pilots 22.9 KB, Battle 22.7, Planets 22.3,
+  Market 20.6, Ships 17.8, Deeds 14.7, Drones 13.9, Armory 13.5, Claims 12.5, Repairs 10.4.
 
 ## Read first
 
 1. `CLAUDE.md` (commands, Koda's standing rules), `docs/handoff.md` (how to work without Koda).
-2. `docs/demo4-plan.md`: decisions D1–D66 (the game as built), "Consider next".
+2. `docs/demo4-plan.md`: decisions (D1–D66 then; D1–D110 now), "Consider next".
 3. `docs/demo4-tuning.md` (economy and battle numbers), `docs/polkadot-direction.md` (the platform:
    Polkadot Hub, launching in the Polkadot App; testnet deploys are fine with throwaway keys).
 4. `docs/ui-guide.md`, `docs/color-guide.md` (how the client is built and colored).
 5. `sdk/README.md` (the shared game SDK), `contracts/src/` (the modules named below).
 
-## Where the game stands (facts this plan builds on)
+## Where the game stood (facts this plan built on, 2026-11-16)
+
+A snapshot from before the plan was built; the refactor and the phases changed several of these (body
+ids, the module split, sizes, bays).
 
 - **Contracts** (`contracts/src/`, each a UUPS proxy, ERC-7201 storage; sizes from `forge build --sizes`,
   limit 24,576 bytes): Pilots 16.2 KB (pilots, ships, cargo, colonists, loadout), Galaxy 15.5 KB (cells,
@@ -246,9 +257,9 @@ that **Sol's asteroids are built up too**, so Phase 3 left them bare (protected 
 - [x] SDK: `portsAt(0)` lists them; the client draws a station on each and counts them on the galaxy map.
 - [x] Sol's empty section stays open to mining.
 
-## Notes for later
+## Notes for later (one fixed, one moved)
 
-- **The HUD's planet picker** (the strip of the system's bodies on top of the selection card, from
+- **The HUD's planet picker** *(moved to `demo4-plan.md`, "Consider next: what's left")* (the strip of the system's bodies on top of the selection card, from
   `client-rnd/hud/`): Koda likes the other HUD changes but not this one yet. Keep it as is when the HUD is
   imported; revisit later to add much more to it.
 - **A bug to fix** before or with the HUD import: after jumping into a system, a ship is drawn docked at
@@ -256,9 +267,14 @@ that **Sol's asteroids are built up too**, so Phase 3 left them bare (protected 
   Sol: orbiting Earth instead of the star). A trade should dock a ship only if it came after the pilot's
   latest move into the system. The SDK reads trades (`sdk/src/client.js` `dockedAt`, `sdk/src/game/
   docking.js`); it also needs the pilots' `Jumped` and `Traversed` events (Pilots.sol) to compare blocks.
-  Every new arrival orbits the star.
+  Every new arrival orbits the star. *(Fixed in Phase 0: `tradesSinceArrival` in
+  `sdk/src/game/docking.js`.)*
 
-## The contract refactor (proposal, to agree with Koda)
+## The contract refactor (agreed, D98; built in Phase 1)
+
+*As built:* body ids with kinds (`BodyId.sol`); Claims split out of Planets and Repairs out of Battle;
+Planets kept its name rather than becoming Settlements; drones and mining went into their own module
+(`Drones.sol`); belts are derived by `BeltGen.sol`; the treasury is in Market. The proposal as agreed:
 
 The game is growing new kinds of bodies (asteroids now, dwarf planets next) and new ship systems (bay
 types, drones, mining). Planets and Battle are within 1.4 KB and 0.7 KB of the size limit. Goals: room

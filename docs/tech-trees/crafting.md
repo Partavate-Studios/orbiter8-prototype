@@ -44,6 +44,7 @@ where a finished part can go.
 | Part | Tier | Status | Art | Price | Time | Recipe | Fits | Note |
 |---|---|---|---|---|---|---|---|---|
 | Drone | I · basics | now | drone-swarm | 500¢ | 5 min | 5 metals, 3 electronics | ship, planet | In battle: a swarm |
+| Mining drone | I · basics | now | drone-swarm | 400¢ | 5 min | 5 metals, 3 electronics | ship, planet | Mines; never lost in battle |
 | Repair bot | I · basics | now | ship:repairBots=6 | 2,000¢ | 15 min | 10 equipment, 10 electronics | ship, planet | |
 | Armor plating | I · basics | now | ship:armor=5 | 2,500¢ | 20 min | 50 metals | ship, planet | |
 | Point defense | I · basics | now | ship:pointDefense=6 | 3,000¢ | 20 min | 20 metals, 10 electronics | ship, planet, moons | |
@@ -67,7 +68,7 @@ where a finished part can go.
 
 ## Autofactory kinds (planned, to design)
 
-**Superseded (2026-11-21):** three sizes (ship, planet, orbital) in [`../industry-plan.md`](../industry-plan.md).
+**Superseded (2026-11-21):** three sizes (ship, planet, orbital) in [`industry-plan.md`](../industry-plan.md), in design, not built. (The heading stays as it is: the drawing script reads it by name.)
 
 Koda, 2026-11-07: there should be **ground (terrestrial) autofactories and orbital autofactories**,
 building slightly different things with a lot of overlap. The details wait for a design pass. The

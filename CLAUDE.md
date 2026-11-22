@@ -66,6 +66,11 @@ asking him); and it gives where things stand, how to run and see the game, and w
   building or changing UI. Open design questions are tracked there.
 - `docs/demo4-tuning.md` (economy and battle numbers), `docs/cost-estimates.md` (gas and money per
   move, and per release), `docs/design.md`, `docs/backstory.md` (the story; Koda's: change it only when he asks).
+- `docs/review.md`: every call made while working without Koda; its end lists what still waits on him.
+- `docs/ui-plan.md`: the UI plan from Koda's 2026-11-21 direction, with its build log.
+- `docs/expansion-plan.md` (belts, drones, bays; built) and `docs/industry-plan.md` (autofactories,
+  drones that build, cargo ships; design only, open questions).
+- `docs/archive/`: finished briefs and historical documents, kept for the record.
 - `UPGRADE_NOTES.md`: the client's modernization history (older; some of it describes the old contracts).
 - `orbiter-client/dev/harness/README.md`: the screenshot and play harness.
 - `docs/tech-trees/`: the tech trees. The Markdown files are the source of truth; the pictures are

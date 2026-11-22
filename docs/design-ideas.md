@@ -13,7 +13,7 @@ Each idea is tagged with how settled it is:
 - **Parked:** deliberately set aside for later.
 - **Suggestion:** proposed by Claude, not yet weighed in on by Koda.
 
-Scope is deliberately open right now. Demo 4 scope will be cut after more exploration.
+Scope is deliberately open right now. Demo 4 scope will be cut after more exploration. *(Cut on 2026-11-06: the decisions, and what was built, are in [`demo4-plan.md`](demo4-plan.md).)*
 
 ## Guiding principles
 
@@ -422,6 +422,12 @@ These findings come from reading [orbiter8-prototype](https://github.com/Partava
 | Trade | `tradeAtPort` and `addHoldsToShip` don't check that the ship is at that port, or even in its system. Anyone can trade at any port in the galaxy; only the client stops it. (Found in the play session, 2026-11-01.) | `StarSystemLibrary` | Medium |
 | Economy | Ports restock 1 unit per 2 minutes, and every good has the same margin (about 60 credits a unit). One pilot drained Sol's ports in about 70 trades. (Play session, 2026-11-01.) | `PlanetLibrary` | Design |
 
+*These are Demo 3's contracts, replaced by the rewrite (D3 in `demo4-plan.md`). The rewrite answers most
+findings: roles and access control (milestone 1), drand randomness (D35), the hex galaxy, a price limit on
+every trade (B23), the ship must be at the port's star (B18), margins by good and fixed restocking (B20,
+B22), and NFTs that draw themselves on chain (B40, D107). Still true in the new Market: on a sale, the
+port's fee is newly minted to its owner or the treasury.*
+
 Already a good fit with the new ideas:
 
 - Port inventory regrows lazily by timestamp, the same pattern needed for supply routes.
@@ -442,24 +448,24 @@ The biggest gaps are endgame, economy balance, and the new-player path.
 
 ### Open decisions
 
-- [ ] Whose law applies in a fight: attacker's, defender's, or system controller's?
+- [ ] Whose law applies in a fight: attacker's, defender's, or system controller's? *(Law by ownership decided 2026-11-19: a star's owner's corporation rules its system, `Claims.lawAt`. How it applies in a fight is open.)*
 - [ ] Can ships be truly destroyed, or only wrecked and salvageable?
 - [ ] What does an overheat explosion do?
 - [ ] Booby trap effect: wreck attacker assets vs. destroy the planet?
 - [ ] Can you switch ships anywhere, or only near relays or in the same system?
 - [ ] Hidden info: fully open, or hide only cube location and traps?
-- [ ] Are fees burned or sent to a Minerva treasury?
-- [ ] Lore beat for how pilots became digital.
-- [ ] Ethereum vs. Polkadot (check Polkadot Hub's current state).
-- [ ] Portals: keep, and if so, the game name vs. ship name.
-- [ ] Final goods list and count.
-- [ ] Adopt the hex galaxy model in contracts?
+- [x] Are fees burned or sent to a Minerva treasury? *Both: name, call-sign, claim and building fees are burned (B16, B27); the Federation's trade fee goes to a treasury (D94); a player's port fee to its owner.*
+- [x] Lore beat for how pilots became digital. *Decided 2026-11-18: minds pilot for speed, and live on Minerva (`backstory.md`, "Why minds pilot").*
+- [x] Ethereum vs. Polkadot (check Polkadot Hub's current state). *Polkadot Hub only, launched in the Polkadot App (D62–D66, 2026-11-08; `polkadot-direction.md`).*
+- [ ] Portals: keep, and if so, the game name vs. ship name. *(Parked with D62: Polkadot only; `demo4-plan.md`, "Much later, or parked".)*
+- [x] Final goods list and count. *Eight goods, kept in a registry so crafting can add more (D27).*
+- [x] Adopt the hex galaxy model in contracts? *Yes: the Galaxy module (`demo4-plan.md`, Goals and D8–D12, milestone 1).*
 
 ### Parked for later
 
 - Minerva hidden-agenda twist.
 - Cross-network friction for portals.
-- Demo 4 scope cut.
+- Demo 4 scope cut. *(Done: D20, D23, `demo4-plan.md` "This run".)*
 
 ## Session log
 

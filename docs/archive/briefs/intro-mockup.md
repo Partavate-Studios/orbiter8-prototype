@@ -15,10 +15,10 @@ apartment on a bleak Earth in 2140, explores it, and leaves by taking the one jo
 uploaded into Minerva, one way. Then they wake in their ship orbiting Earth. The contrast is the point:
 Earth is the dystopia, the frontier is the hope ("Liberta Galactica!" means escape).
 
-Read first: [`docs/backstory.md`](../backstory.md): "The story" (especially **Earth**, **Minerva** and
+Read first: [`docs/backstory.md`](../../backstory.md): "The story" (especially **Earth**, **Minerva** and
 **The pilots**), and in "The world": **Society** (non-citizens, the three corporations, choosing a
 corporation), **Minerva** (her voice and library), and **The player → Joining the game**, which lists the
-intro's steps as decided. The original notes are in [`docs/story-sources/`](../story-sources/)
+intro's steps as decided. The original notes are in [`docs/story-sources/`](../../story-sources/)
 (`STORY_UPDATE_INTRO.md`, `PROJECTS_INTRO.md`, `STORY_ANSWERS.md`); where they differ from `backstory.md`,
 **`backstory.md` wins** (it has Koda's latest changes, including the two transactions below).
 

@@ -1,11 +1,15 @@
-# Review log (2026-11-07)
+# Review log (from 2026-11-07)
 
-For Koda, from a session working through `docs/handoff.md` on its own. What was found, what was
+For Koda, from sessions working through `docs/handoff.md` on their own. Sections 1–8 are the first
+review (2026-11-07); later sections were added as work went on.
+
+Answered, fixed and superseded items are marked where they were asked, with the date and where it
+happened. What still waits on Koda is collected at the end, under "For Koda to decide".
+
+The first review, from a session working through `docs/handoff.md` on its own. What was found, what was
 changed and why, and every call made in your place. Screenshots are in `docs/review/`, taken with
 the harness on a fresh local chain at 1440 × 900 and 390 × 844 (two pilots, Ada and Bob, through
 the real UI: register, trade, holds, jump, scan, claim, name, session, armory, siege, black hole).
-
-A "for Koda to decide" list is at the end.
 
 ## 1. A first-time player's eyes
 
@@ -66,6 +70,8 @@ says whether it was fixed or left for you.
   and the whole HUD disappears. Fixed: a missing sprite draws nothing.
 
 ### For Koda (taste, or his art)
+
+*All answered by Koda on 2026-11-07: see "Koda's decisions" after section 6.*
 
 - **F13. On arrival the ship's card and menu are open, so the first-steps card is hidden until the
   player closes the card.** A brand-new pilot lands on a card that says "Jump To Neighbor Star / Ship
@@ -128,9 +134,11 @@ Found and left (not bugs, or Koda's):
   because you can jump from one star to another does not mean you will be able to jump back the
   same way" was true of Demo 3's one-way neighbor graph; on the hex grid every jump within range
   works both ways. And "you can rename new stars you visit first" is now "until the star has an
-  owner, for 50,000 credits". Koda's text: listed for him (F21).
+  owner, for 50,000 credits". Koda's text: listed for him (F21). *(Answered 2026-11-07: the tips
+  were replaced.)*
 - **L10. The HUD and the ship's card show at most two goods and "+N more"** (F16): Demo 3's
-  three-goods layout carried over on purpose (B45). A design call.
+  three-goods layout carried over on purpose (B45). A design call. *(Answered 2026-11-07: every
+  good on every screen; see F16.)*
 - **L11. `tradeEvents` in the events shape** is filled but no screen reads it (Demo 3's HUD did).
   Harmless; left.
 - **L12. The "avatar" name lives on in code** (`avatar`, `haveAvatar`, `avatarNames`, the avatar
@@ -210,7 +218,8 @@ Material's 48 dp as the yardstick (in the HUD's units, about 30–34 at phone sc
   rows show the part, credits and time, with the goods under the dial, so nothing overflows.
 - **T6. The tech tree** scrolls inside its card on a phone (it did before too).
 - **T7. Not checked:** a real phone's keyboard over the dialogs, and pinch-zoom on the galaxy map
-  (it has wheel zoom only; the system map pinches). Listed for Koda.
+  (it has wheel zoom only; the system map pinches). Listed for Koda. *(Pinch-zoom: answered and built
+  2026-11-07. The phone keyboard is still unchecked.)*
 
 ## 6. Code review of `sdk/client.js` and `stores/player.js`
 
@@ -256,13 +265,15 @@ Found and left (for Koda, or for the testnet milestone):
   blocks and the siege feed over 50,000 on every reload. On the local chain that's nothing; on a
   public network a provider may refuse the call, and the siege feed and docking would silently
   come back empty. Belongs with milestone 6 (the first testnet run will show it); the fix is to
-  page the range or to keep a cursor, as R6 does for registrations.
+  page the range or to keep a cursor, as R6 does for registrations. *(Answered and fixed 2026-11-07: see
+  "Koda's decisions" below.)*
 - **R10. Ships at a star are found by reading every pilot's record** (`shipsAt`, B49) on every
   reload, and the leaderboard reads every pilot's balance. Fine at demo scale; an index by star in
   the contracts, or an indexer, when pilots number in the hundreds.
 - **R11. `dockedAt` draws a ship docked wherever its pilot last traded at this star,** even after
   the pilot left and came back (B50 says "while it stays at that star", but the client can't tell).
-  Cosmetic.
+  Cosmetic. *(Fixed 2026-11-16, f3085dc: a trade docks a ship only if it came after the pilot's
+  latest arrival, `sdk/src/game/docking.js` tradesSinceArrival.)*
 - **R12. `declinedScans` is never cleared** after a declined wallet prompt, so a scan the pilot
   declined to record isn't offered again until the next reload of the page; it's still recorded
   with their next move. The comment says "until something changes"; it's "until the page reloads".
@@ -377,6 +388,10 @@ Not exercised: a real MetaMask (none in headless Chrome). `?wallet=browser` is t
 
 ## 8. The story page (Koda, 2026-11-07: "it kind of sucks")
 
+*Retired 2026-11-19: the intro replaced the title's Story button, and the Story scene with its eight
+panels is archived in `components/archive/` (section 13, N9), perhaps for Minerva's library later. The
+calls below are kept as the record.*
+
 Koda's brief: the Story page was too thin, its opening orbiting planets looked terrible (one gradient
 for every planet), its Back button was confusing and the close "×" easy to miss. Tell the story in
 summary, as before, with the game's own assets, inspired by how comics and graphic novels tell a
@@ -437,6 +452,8 @@ Calls made building it, for Koda's review:
 - **X4. The HUD redesign's analysis** moved to `docs/hud-redesign.md`, its mockups and screenshots to
   `docs/mockups/hud/`, when `client-rnd/hud/` was removed.
 - **X5. Seen, not fixed:** at phone size the zoom rail's "−" looks clipped beside the minimap.
+  *(Superseded 2026-11-21: the top right was rebuilt as one panel, the zoom folding out under the
+  star's name (`ui-plan.md` section 15, step 2). Not rechecked at phone size.)*
 - **X7. Planets keeps its name** after Claims was split out (the plan says "Settlements"). Renaming it
   touches the deploy script, the SDK, the ABIs and every client; it's cheaper to rename once asteroids
   make it settle more than planets. Planets keeps an `ownerOf` passthrough so Battle, Armory and Factory
@@ -444,11 +461,12 @@ Calls made building it, for Koda's review:
 - **X8. The star-name fee** is now Claims' own number (`starNameFee`, 50,000, what a Station cost), so
   tuning buildings no longer changes it.
 - **X9. Testnet** (done 2026-11-17: redeployed): body ids and Claims change the contracts' interface; the Paseo deployment needs a
-  fresh deploy (throwaway key, as before) before the client plays the testnet again. Not done yet.
+  fresh deploy (throwaway key, as before) before the client plays the testnet again.
 - **X10. Drone bays in the shipyard:** a two-way toggle (Cargo Holds / Drone Bays) above the existing
   stepper, drawn like the stepper's buttons; the menu's art is otherwise unchanged. It's a new control in
   one of your menus, so look at it (`docs/mockups/` has no mockup for it; screenshots in the commit's
-  play-test). The loadout's summary line adds "drones N of M".
+  play-test). The loadout's summary line adds "drones N of M". *(Superseded 2026-11-21/22: the Yards
+  were rebuilt in HTML to the screen standard, e7be724 and 4dfdf9b; `ui-plan.md` section 15.)*
 - **X11. Bay prices count both kinds:** each bay, cargo or drone, costs a little more than the last
   counting every bay the ship has (the 250 cap counts both too).
 - **X12. Ships start with no drone bays** (and 5 cargo bays, as before). The 4 built-in drones (decision
@@ -460,7 +478,8 @@ Calls made building it, for Koda's review:
   cleared it). New ships start with all four mining. Work during a siege is counted when it ends,
   before the siege's losses.
 - **X14. The loadout's drone row** ("4 × Built-in drone", − / + to move one between repairing and
-  mining) uses the Unload button's look. New control in an existing menu: for Koda's eye.
+  mining) uses the Unload button's look. New control in an existing menu: for Koda's eye. *(Superseded
+  2026-11-22: the Loadout became "Your ship", rebuilt to the screen standard, 3ad11b0.)*
 - **X15. The mining drone** is Factory part 9 ("Mining drone", 800 credits, 5 min, 5 metals and 3
   electronics; at Sol 1,600 as every part is doubled there), fitted to ships only until bodies get drone
   pools (Phase 3); a planet's store offers "To ship" for it, not "Install". It may be fitted or unloaded
@@ -516,7 +535,8 @@ Calls made building it, for Koda's review:
   art (`assets/art/asteroid-*.svg`, reference `docs/mockups/belt-levels.svg`); the asteroid card (Owner,
   Kind, Size, Yields, Built, Drones) and empty space's (Dust, Yields, Slots); the new Asteroid Works menu
   (in the loadout's row style, not a restyle of an existing screen). Mine Here takes the first free slot;
-  the slots aren't picked one by one.
+  the slots aren't picked one by one. *(The card and Asteroid Works were since rebuilt, 2026-11-21/22,
+  `ui-plan.md` section 15; the band, the rock field and the art are still for Koda's eye.)*
 - **X23. Reads go straight to the network, not through the wallet** (2026-11-17, from Koda's first
   testnet session). Claims sat on "waiting for the network" though they had landed in seconds, and second
   tries failed with "Someone claimed it first" on planets already his. Cause: after a claim the client
@@ -540,6 +560,8 @@ Calls made building it, for Koda's review:
   claim, colony, siege, colonists, holds, drones). Untouched: the card, the empty slots that hold each
   button's place, the tab. To check when playing: phones (the strips take ~95 px above the card), and
   whether the port chip should say the port's three-letter code instead of "Port".
+  *(Superseded 2026-11-21: the nearby strip was deleted and the card rebuilt with a spine of tabs (the
+  planet, its station, its moons) and one action row; `ui-plan.md` section 15, step 1.)*
   **Revised the same day (Koda):** the nearby strip is icons only (names in tooltips); "Trade at Port" on
   planets is gone; instead the menu's top holds big wordless icons, a port and a moon (with a count),
   or the planet to go back to, and the planet's actions follow below. The moon icon lists the moons in
@@ -556,7 +578,7 @@ Calls made building it, for Koda's review:
   big icons above; actions without art get a line glyph (jump, session, rename, market, black hole, name
   star; `libs/body-art.js` ACTION_GLYPH). The ✕ moved up beside the big icons, so five slots fit.
   Shots: `docs/mockups/selection-strips/buttons-*.png`. This is a restyle of the card menu's buttons
-  (Koda asked for it directly).
+  (Koda asked for it directly). *(Superseded 2026-11-21 by the card's one action row.)*
 - **X27. A port's or moon's card is dealt out beside its planet's** (2026-11-17, Koda's idea). The port
   and moon buttons left the menu for the card's bottom edge (round wells, a count on the moons). Pressing
   one deals that card out from behind the planet's, which stays, dimmed; pressing the button again or
@@ -572,8 +594,11 @@ Calls made building it, for Koda's review:
   - **Phones:** the dealt card covers its planet's but for a sliver; the edge buttons ride the front
     card. Tapping the front card still holds it up full size.
   - **The nearby strip** now partly repeats the edge buttons; worth deciding whether it stays.
+    *(Decided 2026-11-21: it went, `ui-plan.md` sections 9 and 14.)*
   - Motion: the card slides out in 0.25 s (none with reduced motion).
   Shots: `docs/mockups/selection-strips/dealt-*.png`.
+  *(Superseded 2026-11-21: the port and moons are tabs on the card's spine now, the one face showing
+  the chosen one; `ui-plan.md` section 15, step 1.)*
 - **X28. A Ports menu, and port signs on the planet strip** (2026-11-17, Koda). A fourth button beside
   Planets, Ships and Jump (under More on a phone) opens every port in the system, in orbit order: where
   it is and whose, its trade code, what your cargo would fetch there, each good it buys and sells at its
@@ -583,7 +608,9 @@ Calls made building it, for Koda's review:
   **To decide:** Koda asked for green, but the color guide makes "good for you" yellow, and the trade
   panel and this menu's code letters mark "buys what you carry" in yellow. Either the dot turns yellow,
   or green becomes the "sell here" color everywhere. In Sol every port has yards and an armory, so every
-  planet there has the gray dot. Shots: `docs/mockups/ports/`.
+  planet there has the gray dot. Shots: `docs/mockups/ports/`. *(The Ports menu became the list's
+  stations, 2026-11-21. The green dot is still green and still to decide; `ui-plan.md` section 11 raises
+  it too.)*
 - **X29. The selection card, readable** (2026-11-17, Koda: "hard to read… the data isn't as useful as
   it could be… make it clear when a planet has infrastructure"). The frame, corner brackets, title pill
   and picture are kept; the info panel is redone: the kind in the card's own color with a tag at the
@@ -623,7 +650,8 @@ Calls made building it, for Koda's review:
   all 15 in orbit order; the galaxy map counts 15. Shots in `docs/mockups/sol-belt/`. Seen, not changed:
   - **The armory's quantity dial goes to 20 for every part** (`armory-menu.svg.vue`, `:max="20"`), so with
     one drone bay it offers 20 mining drones; the contract refuses what doesn't fit. Older than this work;
-    worth capping by the part's room (drone bays, holds, mounts).
+    worth capping by the part's room (drone bays, holds, mounts). *(Fixed 2026-11-21/22: the Armory
+    caps by the part's room, `sdk/src/parts.js` partRoom, and by a player armory's stock, c5f5b10.)*
   - A Federation asteroid's menu says "Nothing to do here." beside the card (its port is the button on
     the card's edge), as a Federation planet's does.
 - **X34. Polkadot Hub TestNet redeployed** (2026-11-18, throwaway spike key, EVM bytecode as before):
@@ -687,7 +715,7 @@ Calls made building it, for Koda's review:
   at the start). `Claims.lawAt(id)`: the star owner's corporation, else the body owner's, else 0
   (Minerva's rules); nothing uses it yet. Until the intro exists, the wizard's ship step has a small
   "You'll fly for" choice of the three; its wording still says "Take Off" and the launch pad (the intro
-  replaces it, in the Fable session). Pilots is 22.9 KB (the defaults moved out of its initializer to
+  replaces it, in the Fable session). *(The intro replaced the wizard 2026-11-19, section 13.)* Pilots is 22.9 KB (the defaults moved out of its initializer to
   fit). The trade and explore bots now start with a full hold and no cash: they'll need to sell first.
   Played locally: register, choose Corp X, name the ship, wake at Sol with −45¢ and the hold full.
 - **X41. Testnet redeployed** (2026-11-19, Koda: "do the deed work… star density is good for now… then
@@ -700,7 +728,7 @@ Calls made building it, for Koda's review:
   later upgrades against exactly what's live. Checked on chain: a fresh pilot registered, accepted the
   job with Corp Z (debt 45, hold full) and its ship's picture came back from `tokenURI`; the explore bot
   jumped and scanned with drand proofs. Earlier testnet pilots and deeds are gone (a new galaxy).
-  Not done: a play-through of the intro in the browser on the testnet.
+  Not done: a play-through of the intro in the browser on the testnet. *(Still not done 2026-11-22.)*
 
 ## 10. The Polkadot App spikes (2026-11-18, milestone 7 steps 4–6)
 
@@ -713,26 +741,31 @@ Results in `polkadot-direction.md` (steps 4, 5, 6). Calls made on my own:
   `~/.config/orbiter8/app-signer-spike.json` and `app-signer-session.json` (mode 600), next to the
   spike key. The stand-in was funded from the spike key by a local XCM transfer through the XCM precompile
   (40 PAS, because a stale balance read funded it twice).
-- **P3. Personhood: where to use it is yours to decide.** Proposed in step 5: one pilot per person at
+- **P3. Personhood: where to use it is yours to decide.** *(Answered 2026-11-18: D102, one pilot per
+  person, keyed by alias; then D109, not enforced until closer to release. The product id: D101,
+  `orbiter8game`.)* Proposed in step 5: one pilot per person at
   registration, once-per-person give-aways (the free claim, starter credits), Lite to play, Full for
   anything of real value. Whatever is chosen should key on the per-context alias, not the account.
   Open: our product id (it fixes the context), and whether Lite is enough at launch.
-- **P4. Ships as Scarcity NFTs is a design change for later, not done.** The game keeps its ERC-721-style
+- **P4. Ships as Scarcity NFTs is a design change for later, not done.** *(Answered 2026-11-18: D105,
+  ships become Scarcity NFTs, with the pilot as an on-chain record; our ERC-721 until mainnet has it.)* The game keeps its ERC-721-style
   ships; the spike shows the App's NFT system is reachable from Solidity. Whether ships become Scarcity
   tokens (and how the purse-key model maps onto pilots) waits for seeing one in the Pocket, and for
   mainnet to have the pallet.
-- **P5. Session keys stay (D41), as the fallback; recommended in step 4.** AutoSigning returns
+- **P5. Session keys stay (D41), as the fallback; recommended in step 4.** *(Answered 2026-11-18: D103,
+  both; D104, players without PAS sign each move.)* AutoSigning returns
   `NotAvailable` on both phone wallets today, so dropping session keys now would mean a phone approval
   per move.
 - **P6. The collection on the testnet is called "Orbiter 8 Ships (spike)"**: it's the testnet's
   collection 0 and visible to anyone browsing Scarcity there. Throwaway, like every testnet address.
-- **P7. Open for Koda after the spikes** (*answered 2026-11-18: D101–D106; the phone session still to do*) (2026-11-18; details in `polkadot-direction.md`, "After the
+- **P7. Open for Koda after the spikes** (*answered 2026-11-18: D101 the name, D106 builds publish to
+  this repo's own Pages site and Demo 3's stays; the phone session still to do*) (2026-11-18; details in `polkadot-direction.md`, "After the
   spike"): the product name (`orbiter8` is in dotNS's restricted 6–8 band: a verified person on the
   testnet, not sold publicly on mainnet; 9+ characters are open to anyone); whether to replace the
   Demo 3 build at `partavate-studios.github.io/orbiter8-demo3-client` with a testnet build; a phone
   session to see the Pocket, the signing prompt, and his personhood status in the App.
 
-## 11. Minerva's face (2026-11-19, `docs/briefs/minerva-face.md`)
+## 11. Minerva's face (2026-11-19, `docs/archive/briefs/minerva-face.md`)
 
 Built from the brief, with Koda's answers before starting: eyes are just a glow in the gap, the face stays
 plain white like the emblem, the lab opens from both a title-screen button and `#/minerva-lab`, and six
@@ -766,8 +799,10 @@ more states and six more one-offs were added (listed in the brief). Every state 
 
 Measured: three faces animating in the lab hold 60 fps with the CPU slowed four times. The face isn't used
 in the game yet; per the brief, it goes to her console, the intro's terminals and the HUD later.
+*(Since used: in the intro, her console, notices and waking (2026-11-19/20, section 13), and on
+Minerva's plate at the top of the HUD (2026-11-22, `ui-plan.md` section 15), where M8 now matters.)*
 
-## 12. The intro mockup (2026-11-19, `docs/briefs/intro-mockup.md`)
+## 12. The intro mockup (2026-11-19, `docs/archive/briefs/intro-mockup.md`)
 
 A mockup only, for Koda's approval: [`mockups/intro/`](mockups/intro/README.md), 17 screens at desktop and
 phone size, as SVG, with overview sheets. No game code changed. Second pass the same day, from Koda's
@@ -775,6 +810,10 @@ notes: lights off until the name is filed; the curfew is for violence and thin s
 (the widget, drawn from its own poses) at the center of the UI; the balcony terminal on the railing; a
 noir silhouette look with muted colors; the balcony door left, the door out right. The calls made on my
 own are I1–I8 in that README.
+
+*Koda approved it, and it was built (section 13); the room was then redrawn as the zoomable diorama
+(section 14), which removed the phone's pan-and-strip room. What's left of the README's "Open, for
+you" list is under "For Koda to decide".*
 
 ## 13. The intro, built (2026-11-19)
 
@@ -810,7 +849,7 @@ debt. Calls made on my own:
   nothing imports them, so they're out of the build. The to-do for Minerva's library (reusing the panels)
   is in `demo4-plan.md`.
 - **N10. `backstory.md`**: its Story-scene section pointed at `components/title/`; the paths now point at
-  `components/archive/` (fixed 2026-11-19; only the paths changed, not the story).
+  `components/archive/` (fixed 2026-11-19, 60cc4e9; only the paths changed, not the story).
 - **N11. `dev/harness/capture.sh`** now plays the intro for its new-player shots (same steps as my manual
   run); not run itself, since it resets the chain on the default port.
 
@@ -887,7 +926,7 @@ Calls I made:
 - **Z10. The balcony keeps one way back** you can touch (the glass's frame at the left edge), as well as
   Esc and B; the bottom line says how, in words, not buttons.
 
-## 15. Music: the apartment's radio, and a track for a new star (2026-11-20, `briefs/music.md`)
+## 15. Music: the apartment's radio, and a track for a new star (2026-11-20, `archive/briefs/music.md`)
 
 What I built:
 - **The radio** (`libs/08audio.js`): a channel of its own beside the game's music (`radio`, reactive;
@@ -984,7 +1023,7 @@ Checked at 1440×900 and 390×844: the bed, the TV from the bed and back, the ar
 (Inside, wheel out), six pokes bursting her and her coming back, the vape lines down to 1, and the whole
 sign → white → pod → black → waking. `npm test` and `npm run lint` pass.
 
-## 17. Your corporation's database, in Minerva's console (2026-11-20, `briefs/corp-database.md`)
+## 17. Your corporation's database, in Minerva's console (2026-11-20, `archive/briefs/corp-database.md`)
 
 Built as the brief has it: a sixth console tab between Jobs and Music, named as your corporation names it
 (Records, The Archive, the wiki), with four pages: the Orbiter 8 (each corporation's opening line, the
@@ -1018,6 +1057,11 @@ Checked at 1440×900 for Corps X and Z and at 390×844 for Corp Y: every page, s
 
 ## 18. A mining indicator on the HUD (Koda, 2026-11-21)
 
+*The chip was replaced on 2026-11-22 by Minerva's plate, the activity window Koda asked for instead
+("looks like an afterthought"; `ui-plan.md` section 10, note 1, and section 15). Mining shows there
+as one of the things under way, with the same numbers (`libs/activities.js`); M2's count carried over,
+M1's short phone text went with the chip. The two findings at the end still stand.*
+
 Koda: "some kind of on-screen indicator that shows how many drones you have out mining and a progress
 bar for how long it should take." While your ship mines an empty belt section, a yellow chip under the
 pilot plate (beside the session and scan chips) reads "Mining · 4 drones · 2/5 · full in 23m" with a bar
@@ -1042,23 +1086,66 @@ intended first step; otherwise the card could say "Sell cargo to make room" inst
 Checked in one session (account 9: the intro, selling the starter cargo, mining, waiting) at 1440×900
 and 390×844. `npm test`, `npm run lint` and a scratch build pass.
 
-## For Koda to decide
+## For Koda to decide (updated 2026-11-22)
 
-Answered above, bar these:
-- P3–P5 (personhood rules, Scarcity ships, session keys versus AutoSigning) and the product id
-  (`orbiter8.dot`?), which fixes the personhood context and the product accounts.
+Everything above that isn't listed here is answered, fixed or superseded, and marked where it was
+asked. Answered since the last list: P3–P5 and the product id (D101–D105, D109), N10 (fixed
+2026-11-19), and the HUD profile card's three rows on a phone (that card went with the HUD redesign,
+2026-11-16).
+
+**The Polkadot App** (details in `polkadot-direction.md`, "Still open")
+- The phone session (P7): the game in the phone App and on `dot.li`, the signing prompt, the Pocket,
+  your personhood status. Then the migration plan (milestone 7's last step).
+- If the App can't draw a Scarcity NFT from our contract's `tokenURI`, D105 and D107 conflict.
+- The local tag `testnet-2026-11-19` (X41), to push, and when to redeploy: the testnet doesn't have the
+  new ship art yet (`ui-plan.md` section 15).
+
+**Contracts and the economy**
+- X1: the Federation's other income (parts at a Sol armory, repairs at a Sol yard) still burns; send it
+  to the treasury too?
+- X40: the joining guesses, all admin-settable: the names Corp X, Y and Z, the starter kit (3 Helium-3,
+  2 Electronics), no cash, a debt of 45, the 5,000 fee to switch corporation.
+- Section 18: a new pilot can't mine until they sell (the starter cargo fills every hold). Intended as
+  the first step, or should the card say "Sell cargo to make room"?
+- Section 18's fix for reassigning the built-in drones mid-mining (see the to-dos): end mining, or
+  have mining read the split when it stops?
 - R10: an index by star in the contracts (or an indexer) once pilots number in the hundreds.
-- T7's other half: a real phone's keyboard over the dialogs wasn't checked.
-- The HUD profile card on a portrait phone keeps to three rows of goods ("+N more" past five);
-  everything else shows every good.
-- Minerva's face (section 11): the look of her eyes and expressions (`mockups/minerva-face.png`, or
-  the lab in a dev build), M2 (split part 7 or not) and M8 (more motion at HUD size).
-- The intro mockup (section 12, `mockups/intro/README.md`, "Open, for you"): the noir look, the size of
-  Minerva's face in the console, the corporations' colors and logos, and the phone's pan-and-strip room.
-- The built intro (section 13): N8, waking literally over Earth (a camera move, or starting docked at
-  the I.S.S.); N10, the Story-scene paths in `backstory.md`.
-- The diorama intro (section 14): Z1–Z10; whether `.o8-pill` should spread beyond Minerva's screens; and
-  the city's motion (signs flickering, traffic drifting) left still for now.
-- Music (section 15): M1–M8, and Minerva's draft line on the Music page.
-- Body storage (section 16): F1–F4, and the scene itself.
-- The corporation database (section 17): D1–D7, and the brief's own list (names, hulls, focuses, the reconciliation, "Exploded: █").
+- X7: Planets keeps its name after Claims was split out (the plan says "Settlements").
+
+**The UI and the map**
+- X28: the port sign's dot is green, as you asked, but the color guide makes "good for you" yellow.
+  Turn it yellow, or make green the "sell here" color everywhere? (`ui-plan.md` section 11 too.)
+- X22: the belt's look (the far band, the close rock field, Fable's asteroid and station art).
+- X31: Sol's asteroid stations are "Ceres Station", "Vesta Station"…; invented names like the planets'
+  stations instead?
+
+**The intro** (sections 12–14 and 16)
+- From the intro mockup's "Open, for you" (`mockups/intro/README.md`): the noir look (how dark, the rim
+  light, the muted billboards), the size of Minerva's face in the console, the corporations' colors
+  and logos, and whether 2c's dashed rings show only on a first visit.
+- N8: waking literally over Earth (a camera move to Earth, or starting docked at the I.S.S.).
+- The diorama's calls Z1–Z10; whether `.o8-pill` (the card drawer's look, Minerva's screens only)
+  should spread further now that the game's menus use `hud/kit.css`; the city's motion (signs
+  flickering, traffic drifting), left still for now.
+- Body storage (section 16): F1–F4, and the scene itself; the 4–2 vape line is mine (F4).
+
+**Minerva, her voice and her music**
+- Her face (section 11): the look of her eyes and expressions (`mockups/minerva-face.png`, or the lab in
+  a dev build), M2 (split part 7 or not), and M8 (more motion at small sizes, now that she's on the
+  plate at the top of the HUD).
+- Music (section 15): M2–M8 (M1 was yours), and her draft line on the Music page.
+- The corporation database (section 17): D1–D7, and the brief's own list
+  (`archive/briefs/corp-database.md`, "For Koda to review": names, hulls, focuses, the reconciliation,
+  "Exploded: █").
+- The voice lines still to record, and their draft wording (`voice-lines.md`).
+
+## Open to-dos found while working (no decision needed)
+
+- **Reassigning the built-in drones doesn't stop mining** (section 18): `Repairs.assignDrones` leaves
+  a mining run going at the old rate. For the next contract release.
+- **Play the intro through in the browser on the testnet** (X41).
+- **A real phone's keyboard over the dialogs** (T7) hasn't been checked.
+- **The zoom at phone size** in the rebuilt top right (X5's clipped "−" was the old rail).
+- **R12:** a scan the pilot declined to record isn't offered again until the page reloads (harmless).
+- The UI plan's own open items are in `ui-plan.md` section 15; the Polkadot ones in
+  `polkadot-direction.md`, "Still open".

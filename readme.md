@@ -1,29 +1,29 @@
 # ![Orbiter 8](https://partavate.com/orbiter-8-splash.png)
 
-[Orbiter 8](https://orbiter8.com) is a decentralized space game designed for the Ethereum Virtual Machine.
+[Orbiter 8](https://orbiter8.com) is a decentralized space game: explore a hex galaxy, trade, claim and build up planets, fit weapons and lay sieges, all on chain. It's being built for **Polkadot Hub**, to launch as a mini-app in the Polkadot App; its contracts are Solidity on Polkadot Hub's EVM.
 
 **Features**
 
-- EVM Blockchain native gameplay, fully on-chain
+- Blockchain-native gameplay, fully on chain
 - Lightweight browser-based game client
 - Dynamically generated galaxy
 - _Massively_ multiplayer
 - Ownable ship and planet assets as ERC721 NFTs
-- In game current as ERC20 tokens
-- Intergalactic tading system
+- In-game currency as ERC20 tokens
+- Interstellar trading system
 - Temporal chat, uses "broadcasts"
 
 **Awards**
 
 - March 2022: Polygon Studios Grant Winner
 - April 2022: Moonriver Grants Hackathon Winner
-- Arugust 2022: Bobabeam Hackathon Winner
+- August 2022: Bobabeam Hackathon Winner
 
-**Version 0.3.0**
+**Status**
 
-This version of Orbiter 8 is the final manifestration of the original prototype. Work in this demo realizes the final alpha demo on the roadmap to a beta. There will be few (or no) updates to this repository as we focus on beta production using a refresh stack including Vue 3, EhtersJS, and Solidity 8.
+In development on the `polkadot` branch, playable on Polkadot Hub TestNet. Demo 3 (version 0.3.0) was the final release of the original prototype; this repository has since been rebuilt on Vue 3, ethers 6 and Solidity 0.8, and is where the game continues. Where things stand: [`docs/handoff.md`](docs/handoff.md).
 
-**Test Network Deployments**
+**Demo 3's test network deployments** (EVM, retired)
 - [Sepolia](https://sepolia.dev/) (Ethereum)
 - [Binance](https://www.bnbchain.org/)
 - [Mumbai](https://polygon.technology/) (Polygon)
@@ -115,7 +115,7 @@ https://cryptozombies.io/
 
 ## This is a dapp, you need a wallet
 
-Running smart contracts requires some kind of Ethereum wallet. This project assumes you use the metamask wallet available as a plugin for both Firefox and Chrome Web browsers.
+Playing on a test network takes a wallet that speaks to EVM chains, such as MetaMask. Inside the Polkadot App, the App's own signer takes that role (planned).
 
 Locally, `npm run local` gives the client a built-in dev wallet over the local chain's test accounts, so no extension is needed.
 

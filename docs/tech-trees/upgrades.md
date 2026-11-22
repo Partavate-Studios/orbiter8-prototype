@@ -42,7 +42,7 @@ Buildings off the main line. **Under** names the building each one hangs from.
 | Building | Status | Under | Art | Details |
 |---|---|---|---|---|
 | Deep Scanner | idea | Citadel | deep-scanner | Charts stars two jumps out, not only neighbors<br>_Builds on the drand scans_ |
-| Autofactory | now | Colony | autofactory | 60,000¢ · 100 equip · 100 electr · 50 silicon · 2 h<br>Builds parts, five orders at a time<br>_Ground and orbital kinds planned_ |
+| Autofactory | now | Colony | autofactory | 60,000¢ · 100 equip · 100 electr · 50 silicon · 2 h<br>Builds parts, five orders at a time<br>_Three sizes in design: industry-plan.md_ |
 | Relay | planned | Station | relay | Carries orders to ships far away, with signal lag<br>_For fleets (D26, "next")_ |
 | Exchange | idea | Port | exchange | Standing buy and sell orders at your port, filled while you're away |
 | Shipwright | planned | Yards | fleet | A second Orbiter 8: fleets, flown through Relays<br>_Ships are NFTs already_ |
@@ -61,14 +61,27 @@ the start of a round. Allies at the star fire with the planet.
 | The planet's weapons | #5cffc8 | 12 mounts plus the platforms'. Up to 60 drones, 20 repair bots and one BFG (a 300-damage shot every 6 hours). Drones do double here. |
 | Hull | #e5cfff | 60 per tech level, the defense grid its buildings support. With all six layers gone the planet is worn down, and the attacker can file a claim (a day). |
 
+## Asteroid buildings
+
+Not drawn yet: the picture predates the belt, and the drawing script doesn't read this section. An
+asteroid's own line (D88), each step after the one before; no yards or autofactory. Costs from
+`Planets` (the asteroid costs), names from the SDK (`ASTEROID_BUILDING_NAMES`).
+
+| Building | Status | Details |
+|---|---|---|
+| Platform | now | 3,000¢ · 20 equip · 20 metals · 10 min<br>**Needs 20 people landed** |
+| Mine | now | 15,000¢ · 60 equip · 30 electr · 30 min<br>Drones work: the asteroid's drones mine or defend (D90) |
+| Port | now | 60,000¢ · 80 equip · 80 electr · 2 h<br>Trades from the asteroid's store |
+| Armory | now | 200,000¢ · 120 rares · 80 electr · 6 h<br>Defense mounts: a moon's 6, a small shield, defense drones (D95) |
+
 ## Your Orbiter 8
 
 The first row is the ship itself; the rest are its upgrades.
 
 | Upgrade | Status | Art | Details |
 |---|---|---|---|
-| Orbiter 8 | now | ship: | 5 holds · range 1 · 6 weapon mounts<br>Registered with your call sign; an NFT whose picture shows what it carries |
-| Holds | now | holds | At a shipyard (the I.S.S. or a Yards). Each costs more than the last; up to 250<br>Pods show on the ship from 50 |
+| Orbiter 8 | now | ship: | 5 holds · range 1 · 6 weapon mounts · 4 built-in drones<br>Registered with your call sign; an NFT whose picture shows what it carries |
+| Holds | now | holds | Cargo bays and drone bays, at a shipyard (the I.S.S. or a Yards). Each costs more than the last; up to 250 together |
 | Engine range | now | engine-range | Range 2: 15,000¢<br>Range 3: 150,000¢<br>Range 4: 600,000¢ |
 | Repairs | now | repairs | 3,000¢ at any shipyard: everything restored<br>Then 3 hours in the yard before attacking again |
 | Fleet | planned | fleet | More ships, flown remotely through Relays, with signal lag<br>_D26: "consider next"_ |
@@ -83,7 +96,7 @@ Autofactory.
 | Railguns | ship:railguns=3 | 2 mounts · 12 damage<br>Double against armor, a quarter against shields |
 | Missile racks | ship:missiles=3 | 2 mounts · 12 damage<br>Double against shields and platforms; point defense stops them |
 | Point defense | ship:pointDefense=6 | 1 mount<br>Stops 15 missile damage a round |
-| Drones | ship:drones=60 | 2 holds each · 2 damage<br>Double against weapons; not stopped<br>_In battle: a swarm of triangles and dots_ |
+| Drones | ship:drones=60 | 1 drone bay each · 2 damage<br>Double against weapons; not stopped<br>_In battle: a swarm of triangles and dots_ |
 | Armor | ship:armor=5 | 10 holds a level, up to 5<br>50 each; takes hits after the shield |
 | Shield | ship:shields=3 | 20 holds a level, up to 3<br>60 each; regains 10% a round |
 | Repair bots | ship:repairBots=6 | 5 holds each<br>Mend 2 armor a round each |
@@ -92,4 +105,4 @@ Autofactory.
 
 | Title | Text |
 |---|---|
-| How space is shared | Mounts (6): railgun 2, missile rack 2, point defense 1.<br>Holds: drones 2 each, repair bots 5, armor 10 a level (up to 5), shields 20 a level (up to 3). Cargo uses the rest; colonists go 100 to a hold. |
+| How space is shared | Mounts (6): railgun 2, missile rack 2, point defense 1.<br>Drone bays: one drone each, battle or mining.<br>Cargo bays: repair bots 5, armor 10 a level (up to 5), shields 20 a level (up to 3). Cargo uses the rest; colonists go 100 to a bay. |

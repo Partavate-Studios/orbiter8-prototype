@@ -1,4 +1,4 @@
-// Your corporation's database, in Minerva's console (docs/briefs/corp-database.md): the pages' words as data.
+// Your corporation's database, in Minerva's console (docs/archive/briefs/corp-database.md): the pages' words as data.
 // Shared text once; each corporation's lines keyed by X, Y, Z as CORP_LOOKS is. All copy is [draft], for
 // Koda's review. Paragraphs are { lead, text } (lead in bold); a spec line mixes strings and { redact: n }
 // (a bar about n characters long, read out as "classified"). The hull keys are SHIP_DESIGNS' (old network
