@@ -687,4 +687,27 @@ Log:
     are unused now and can go; the belt's spine scrolls with no hint that there's more.
   - **Next: step 2,** the list (Objects) and the top right. Koda still to choose way A or B for the
     top right (mockup 9).
+- 2026-11-21: **Koda chose way B for the top right** (mockup 9): one panel, the name leading, the map
+  and zoom folding out under it and folding away. Step 2 starts: the list and the top right.
+- 2026-11-21: **Step 2 built: the list, and the top right (way B).**
+  - `hud/objects/objects-panel.vue` is the list (menu `objects`, key `O`): icon tabs for the kind (all,
+    planets, stations, moons, asteroids, ships, yours), the center pinned, the tree with a planet's
+    station and moons folded inside it, the belt's places, the ships. Pressing a row selects it and
+    leaves the list open; Go on the selected row closes it. Stations are the ports menu's rows
+    (`ports-panel.vue`, now with `embedded` and `want`), narrowed by Buying (best first), Yards or Armory.
+    The filter is remembered (`ui.listKind`, `ui.listWant`).
+  - The planets and ships menus are deleted; `openMenu('planets' | 'ports' | 'ships')` and the `P` key
+    open the list on that kind.
+  - `hud/system-block.vue` is one panel: the center's button, the name (press: the list, with the
+    count), Map with the new hex icon (`map-icon.svg.vue`); the minimap and zoom fold out under it and
+    fold away (`ui.mapFolded`, remembered).
+  - The system strip has a list button at its end. A phone's tabs are My ship, Objects, Map, Chat,
+    More; Star moved under More.
+  - Screenshots: `mockups/together/built/list-*.png`, `top-right-folded.png`, `phone-list.png`,
+    `phone-tabs.png`. Lint, 247 tests and a build pass. **Not play-tested with real moves.**
+  - **Left:** "Yours" lists your bodies and ship here but not yet their goods, drones and builds (the
+    industry plan's holdings), and Transfer isn't drawn; arrow keys and typing to filter aren't in;
+    the old `jump-icon`, `planets-icon`, `ports-icon` and `ships-icon` components are unused now.
+  - **Next: step 3,** Minerva's plate as the activity window, and her Link page (the session moves
+    there from the ship's card).
 

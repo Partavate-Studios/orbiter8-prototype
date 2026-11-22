@@ -36,7 +36,20 @@ function readActionsOpen() {
 
 /** The free space right of an open menu that's worth moving the selection into (CSS pixels). */
 const MIN_ROOM_BESIDE_MENU_PX = 180
-const MENUS = ['planets', 'ports', 'ships', 'settings', 'trade', 'shipyard', 'chat', 'leaderboard', 'colony', 'armory', 'loadout', 'siege', 'feed', 'help', 'asteroid']
+/** (`objects` is the list of what's in the system: it took in the old planets, ports and ships menus.) */
+const MENUS = ['objects', 'settings', 'trade', 'shipyard', 'chat', 'leaderboard', 'colony', 'armory', 'loadout', 'siege', 'feed', 'help', 'asteroid']
+
+/** The old list menus' names still open the list, on that kind (the P key, older callers). */
+const LIST_KINDS = { planets: 'planet', ports: 'station', ships: 'ship' }
+/** Small things the HUD remembers between visits: the list's filter, and whether the map is folded away. */
+const HUD_PREFS_KEY = 'o8.hud.prefs'
+function readHudPrefs() {
+  try {
+    return JSON.parse(globalThis.localStorage?.getItem(HUD_PREFS_KEY) ?? '{}') ?? {}
+  } catch {
+    return {}
+  }
+}
 
 export const useUIStore = defineStore('UI', {
   state: () => ({
@@ -103,6 +116,11 @@ export const useUIStore = defineStore('UI', {
     // Whether the selection's menu is slid out from behind its card (the tab on its edge, A, pad R3 with
     // the card shown). Remembered for every selection, and across visits.
     actionsOpen: readActionsOpen(),
+    /** The list of what's here (hud/objects/objects-panel.vue): which kind it shows, and for stations which of them. */
+    listKind: readHudPrefs().listKind ?? 'all',
+    listWant: readHudPrefs().listWant ?? null,
+    /** The minimap and zoom are folded away under the system's name (hud/system-block.vue). */
+    mapFolded: Boolean(readHudPrefs().mapFolded),
     // Whether the Minerva panel (backtick) is open.
     showMinerva: false,
     // Whether the neighbor-star view is showing (zoomed out past the heliopause; see neighbor-view.svg.vue).
@@ -596,7 +614,28 @@ export const useUIStore = defineStore('UI', {
     },
     openMenu(menu) {
       this.closeMenu()
+      if (LIST_KINDS[menu]) {
+        this.setList(LIST_KINDS[menu])
+        menu = 'objects'
+      }
       if (MENUS.includes(menu)) this.hud.menuState[menu + 'Menu'] = true
+    },
+    /** The list's filter: a kind ('all', 'planet', 'station', 'moon', 'asteroid', 'ship', 'yours'), and for stations which ('buying', 'yards', 'armory' or null). */
+    setList(kind, want = null) {
+      this.listKind = kind
+      this.listWant = kind === 'station' ? want : null
+      this.saveHudPrefs()
+    },
+    toggleMapFold() {
+      this.mapFolded = !this.mapFolded
+      this.saveHudPrefs()
+    },
+    saveHudPrefs() {
+      try {
+        localStorage.setItem(HUD_PREFS_KEY, JSON.stringify({ listKind: this.listKind, listWant: this.listWant, mapFolded: this.mapFolded }))
+      } catch {
+        // private windows may refuse storage: the choice lasts this visit
+      }
     },
     closeMenu() {
       for (const name of MENUS) this.hud.menuState[name + 'Menu'] = false

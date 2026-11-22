@@ -1,6 +1,6 @@
 <template>
-  <!-- The sheet every menu slides up in (trade, shipyard, armory, colony, siege, loadout, planets,
-       ships, chat, leaderboard, feed, help, settings). The menus are the game's own, drawn in the
+  <!-- The sheet every menu slides up in (trade, shipyard, armory, colony, siege, loadout, the list of
+       what's here, chat, leaderboard, feed, help, settings). The menus are the game's own, drawn in the
        map's units; the sheet is only as tall as what the open one draws, and scrolls when that's
        taller than the screen. Its frame takes the menu's colors (libs/card-theme.js menuTheme). -->
   <Transition name="sheet">
@@ -33,8 +33,6 @@ import { useUIStore } from '@/stores/ui'
 import { menuTheme, mixHex } from '@/libs/card-theme'
 import { CARD_GRAY } from '@/libs/palette'
 import { openMenuName } from '@/components/star-map/hud/menus/menu-container/_menu-container.svg.vue'
-import PlanetsMenu from '@/components/star-map/hud/menus/planets-menu.svg'
-import ShipsMenu from '@/components/star-map/hud/menus/ships-menu.svg'
 import ShipyardMenu from '@/components/star-map/hud/menus/shipyard-menu.svg'
 import ChatMenu from '@/components/star-map/hud/menus/chat-menu.svg'
 import LeaderboardMenu from '@/components/star-map/hud/menus/leaderboard-menu.svg'
@@ -47,17 +45,15 @@ import SiegeMenu from '@/components/star-map/hud/menus/siege-menu.svg'
 import FeedMenu from '@/components/star-map/hud/menus/feed-menu.svg'
 import HelpMenu from '@/components/star-map/hud/menus/help-menu.svg'
 import TradePanel from './trade/trade-panel.vue'
-import PortsPanel from './ports/ports-panel.vue'
+import ObjectsPanel from './objects/objects-panel.vue'
 
 /** Menus built in HTML rather than the map's SVG units (round 2): they size themselves. */
 const HTML_MENUS = {
   trade: TradePanel,
-  ports: PortsPanel
+  objects: ObjectsPanel
 }
 
 const MENUS = {
-  planets: PlanetsMenu,
-  ships: ShipsMenu,
   shipyard: ShipyardMenu,
   chat: ChatMenu,
   leaderboard: LeaderboardMenu,

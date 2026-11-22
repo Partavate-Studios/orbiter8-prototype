@@ -33,6 +33,10 @@
     <button type="button" class="step" title="Next (] or Tab)" aria-label="Next" @click="step(1)">
       <svg viewBox="-6 -8 12 16" aria-hidden="true"><path d="M-3 -6L3 0L-3 6" /></svg>
     </button>
+    <!-- the strip is the list's short form: this opens the whole of it (objects/objects-panel.vue) -->
+    <button type="button" class="list" title="Everything in this system (O)" aria-label="Everything in this system" @click="openList">
+      <small-icon name="all" />
+    </button>
   </nav>
 </template>
 
@@ -45,9 +49,11 @@ import { usePlayerStore } from '@/stores/player'
 import { PLANET_COLORS, STAR_CLASSES } from '@/libs/palette'
 import { BELT_KEY, beltKeys, homeOf, sphere } from '@/libs/body-art'
 import { portSigns } from './ports/ports'
+import SmallIcon from './small-icon.vue'
 
 export default {
   name: 'SystemStrip',
+  components: { SmallIcon },
   props: {
     /** A phone's sheet: smaller bodies. */
     compact: { type: Boolean, default: false }
@@ -137,7 +143,11 @@ export default {
     this.scrollToSelected()
   },
   methods: {
-    ...mapActions(useUIStore, ['selectSprite']),
+    ...mapActions(useUIStore, ['selectSprite', 'openMenu', 'closeMenu']),
+    openList() {
+      this.o8audio?.playEffect('click')
+      useUIStore().menuState.objectsMenu ? this.closeMenu() : this.openMenu('objects')
+    },
     setButton(key, element) {
       if (element) this.buttons.set(key, element)
       else this.buttons.delete(key)
@@ -177,6 +187,31 @@ export default {
 </script>
 
 <style scoped>
+.list {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin: 0 4px 0 6px;
+  padding: 0;
+  border: 1.2px solid #4a3d7a;
+  border-radius: 9px;
+  background: #1a1331;
+  color: #ffffff;
+  cursor: pointer;
+}
+.list:hover {
+  border-color: #b9a0ff;
+}
+.list:focus-visible {
+  outline: 2.5px solid var(--o8-brand-300);
+  outline-offset: 2px;
+}
+.list .small-icon {
+  width: 16px;
+  height: 16px;
+}
 .system-strip {
   display: flex;
   align-items: center;

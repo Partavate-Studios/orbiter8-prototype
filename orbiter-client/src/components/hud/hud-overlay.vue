@@ -41,15 +41,13 @@
       </nav>
       <template v-else>
         <div v-if="moreOpen" class="more" @click="moreOpen = false">
-          <rim-button label="Ports" :tint="HUD_TINT.ports" :rest="HUD_REST.ports" @press="toggleMenu('ports')"><ports-icon /></rim-button>
-          <rim-button label="Ships" :tint="HUD_TINT.ships" :rest="HUD_REST.ships" :badge="shipCount" @press="toggleMenu('ships')"><ships-icon /></rim-button>
-          <rim-button label="Jump" :tint="starTint" @press="jump"><jump-icon /></rim-button>
+          <rim-button label="Star" :tint="starTint" @press="star"><star-icon /></rim-button>
           <rim-button v-for="b in dockButtons.filter((d) => d.menu !== 'chat')" :key="b.menu" v-bind="b.bind" @press="toggleMenu(b.menu)"><component :is="b.icon" /></rim-button>
         </div>
         <nav class="tabs" aria-label="Menus">
           <rim-button label="My ship" :tint="HUD_TINT.you" :rest="HUD_REST.you" @press="myShip"><avatar-icon /></rim-button>
-          <rim-button label="Star" :tint="starTint" @press="star"><star-icon /></rim-button>
-          <rim-button label="Planets" :tint="HUD_TINT.planets" :rest="HUD_REST.planets" :badge="planetCount" :on="menuState.planetsMenu" @press="toggleMenu('planets')"><planets-icon /></rim-button>
+          <rim-button label="Objects" :tint="HUD_TINT.planets" :rest="HUD_REST.planets" :badge="thingCount" :on="menuState.objectsMenu" @press="toggleMenu('objects')"><list-icon /></rim-button>
+          <rim-button label="Map" :tint="starTint" @press="jump"><map-rim-icon /></rim-button>
           <rim-button v-bind="chatButton.bind" @press="toggleMenu('chat')"><broadcast-icon /></rim-button>
           <rim-button label="More" tint="#c3b3da" rest="#a59fb3" :badge="stepsLeft" :alert="besieged" :on="moreOpen" @press="moreOpen = !moreOpen"><more-icon /></rim-button>
         </nav>
@@ -75,16 +73,14 @@ import { HUD_TINT, HUD_REST } from '@/libs/palette'
 import { openMenuName } from '@/components/star-map/hud/menus/menu-container/_menu-container.svg.vue'
 import AvatarIcon from '@/components/star-map/hud/icons/avatar-icon.svg'
 import StarIcon from '@/components/star-map/hud/icons/star-icon.svg'
-import JumpIcon from '@/components/star-map/hud/icons/jump-icon.svg'
-import PlanetsIcon from '@/components/star-map/hud/icons/planets-icon.svg'
-import PortsIcon from '@/components/star-map/hud/icons/ports-icon.svg'
-import ShipsIcon from '@/components/star-map/hud/icons/ships-icon.svg'
 import HelpIcon from '@/components/star-map/hud/icons/help-icon.svg'
 import SiegesIcon from '@/components/star-map/hud/icons/sieges-icon.svg'
 import TrophyIcon from '@/components/star-map/hud/icons/trophy-icon.svg'
 import BroadcastIcon from '@/components/star-map/hud/icons/broadcast-icon.svg'
 import GearIcon from '@/components/star-map/hud/icons/gear-icon.svg'
 import MoreIcon from './more-icon.svg.vue'
+import ListIcon from './list-icon.svg.vue'
+import MapRimIcon from './map-rim-icon.svg.vue'
 import PilotPlate from './pilot-plate.vue'
 import SystemBlock, { starTint } from './system-block.vue'
 import SelectionPanel from './selection-panel.vue'
@@ -109,16 +105,14 @@ export default {
   components: {
     AvatarIcon,
     StarIcon,
-    JumpIcon,
-    PlanetsIcon,
-    ShipsIcon,
     HelpIcon,
     SiegesIcon,
     TrophyIcon,
     BroadcastIcon,
     GearIcon,
     MoreIcon,
-    PortsIcon,
+    ListIcon,
+    MapRimIcon,
     PilotPlate,
     SystemBlock,
     SelectionPanel,
@@ -145,11 +139,9 @@ export default {
     starTint() {
       return starTint(this.systemObjects[STAR_KEY])
     },
-    planetCount() {
-      return this.spriteIds.planets?.length ?? 0
-    },
-    shipCount() {
-      return this.spriteIds.ships?.length ?? 0
+    /** Everything in the list (objects/objects-panel.vue): the bodies and the ships. */
+    thingCount() {
+      return Object.values(this.systemObjects).filter((o) => o.type !== 'section').length
     },
     besieged() {
       return this.player.besiegedCells.size > 0

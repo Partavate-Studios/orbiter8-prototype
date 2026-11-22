@@ -32,7 +32,7 @@ import router from '@/router/router'
 import { onFrame } from '@/libs/frame-loop'
 
 /** Keys for the HUD's menus (their buttons' tooltips name them). */
-const MENU_KEYS = { m: 'map', p: 'planets', h: 'help', c: 'chat', l: 'leaderboard', f: 'feed' }
+const MENU_KEYS = { m: 'map', o: 'objects', p: 'planets', h: 'help', c: 'chat', l: 'leaderboard', f: 'feed' }
 
 /** Whether a key went to a text field (chat, names), not the map. */
 function isTyping(event) {
@@ -233,7 +233,8 @@ export default {
           const menu = MENU_KEYS[event.key.toLowerCase()]
           if (event.shiftKey || this.jumpAnimationState || useDialogStore().open) return
           if (menu === 'map') this.neighborView ? this.exitNeighborView() : this.zoomOutToNeighbors()
-          else if (menu && !this.neighborView) this.menuState[menu + 'Menu'] ? this.closeMenu() : this.openMenu(menu)
+          // (P is the list on its planets: the planets menu is part of the list now)
+          else if (menu && !this.neighborView) this.menuState[(menu === 'planets' ? 'objects' : menu) + 'Menu'] ? this.closeMenu() : this.openMenu(menu)
           else return
         }
       }

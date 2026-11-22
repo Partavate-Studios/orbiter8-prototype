@@ -102,7 +102,7 @@ describe('HUD', () => {
     })
   }
 
-  for (const menu of ['planets', 'ships', 'settings', 'chat', 'leaderboard']) {
+  for (const menu of ['objects', 'planets', 'ships', 'ports', 'settings', 'chat', 'leaderboard']) {
     it(`opens the ${menu} menu`, async () => {
       ui.openMenu(menu)
       await settle()
@@ -119,10 +119,34 @@ describe('HUD', () => {
     })
   }
 
-  it("lists each planet's port in the planets menu", async () => {
-    ui.openMenu('planets')
+  it("lists everything here, each planet's station folded inside it", async () => {
+    ui.selectSprite('planet:1')
+    ui.openMenu('objects')
+    ui.setList('all')
     await settle()
-    expect(root.textContent).toContain('New Station')
+    const panel = root.querySelector('.objects-panel')
+    // the selection's planet is unfolded, so its station shows
+    expect(panel.textContent).toContain('New Station')
+    // pressing a row selects it and leaves the list open; Go closes it
+    ;[...panel.querySelectorAll('.row .body')].find((row) => /New Station/.test(row.textContent)).click()
+    await settle()
+    expect(ui.selected).toBe('station:1')
+    expect(ui.menuState.objectsMenu).toBe(true)
+    panel.querySelector('.row.on .go').click()
+    await settle()
+    expect(ui.menuState.objectsMenu).toBe(false)
+    expect(problems).toEqual([])
+  })
+
+  it('the old planets, ports and ships menus open the list on that kind', async () => {
+    ui.openMenu('ports')
+    await settle()
+    expect(ui.menuState.objectsMenu).toBe(true)
+    expect(ui.listKind).toBe('station')
+    // the ports menu's rows, kept whole
+    expect(root.querySelector('.ports-panel.embedded .port')).not.toBe(null)
+    ui.setList('station', 'buying')
+    await settle()
     expect(problems).toEqual([])
   })
 
@@ -183,7 +207,7 @@ describe('HUD', () => {
     button('Settings').click()
     await settle()
     expect(ui.menuState.settingsMenu).toBe(true)
-    expect(ui.menuState.planetsMenu).toBe(false)
+    expect(ui.menuState.objectsMenu).toBe(false)
     button('Settings').click()
     await settle()
     expect(ui.menuState.settingsMenu).toBe(false)
@@ -195,11 +219,11 @@ describe('HUD', () => {
     ui.selectSprite('station:1')
     await settle()
     const labels = () => [...root.querySelectorAll('button.rim-button')].map((b) => b.getAttribute('aria-label'))
-    expect(labels()).toEqual(expect.arrayContaining(['My ship', 'Star', 'Planets', 'Chat', 'More']))
+    expect(labels()).toEqual(expect.arrayContaining(['My ship', 'Objects', 'Map', 'Chat', 'More']))
     expect(labels()).not.toContain('Settings')
     root.querySelector('button.rim-button[aria-label="More"]').click()
     await settle()
-    expect(labels()).toEqual(expect.arrayContaining(['Ships', 'Jump', 'Help', 'Sieges', 'Ranks', 'Settings']))
+    expect(labels()).toEqual(expect.arrayContaining(['Star', 'Help', 'Sieges', 'Ranks', 'Settings']))
     expect(problems).toEqual([])
   })
 

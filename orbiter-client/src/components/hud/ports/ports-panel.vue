@@ -4,14 +4,14 @@
        fetch there, every good it buys and sells at its next-unit price, and what else it has (yards,
        armory). A row's buttons go straight to trading, the yards or the armory there; its name shows
        it on the map. -->
-  <div class="ports-panel" :class="{ narrow }">
-    <header>
+  <div class="ports-panel" :class="{ narrow, embedded }">
+    <header v-if="!embedded">
       <h2>Ports of {{ starName }}</h2>
       <p v-if="ports.length">
         {{ ports.length }} {{ ports.length === 1 ? 'port' : 'ports' }} · S sells, B buys<template v-if="carrying">, <em>B</em> buys what you carry</template>
       </p>
     </header>
-    <p v-if="!ports.length" class="none">No ports in this system.</p>
+    <p v-if="!ports.length" class="none">{{ want === 'buying' ? 'No port here buys what you carry.' : want ? 'None here.' : 'No ports in this system.' }}</p>
 
     <article v-for="port in ports" :key="port.key" class="port" :class="{ here: port.key === selected }">
       <div class="top">
@@ -73,7 +73,11 @@ export default {
     /** The selection (menu-sheet passes it to every menu). */
     objectId: { type: String, default: null },
     /** A phone. */
-    narrow: { type: Boolean, default: false }
+    narrow: { type: Boolean, default: false },
+    /** Inside the list of what's here (objects-panel.vue): no heading of its own. */
+    embedded: { type: Boolean, default: false },
+    /** Only some of them: 'buying' (ports that buy what you carry, best first), 'yards' or 'armory'. */
+    want: { type: String, default: null }
   },
   data() {
     return { PORT_ART, ACTION_ART }
@@ -106,7 +110,7 @@ export default {
         stock: g.stock,
         wanted: g.mode === 'buys' && (cargo[g.id] ?? 0) > 0
       })
-      return portsOf(this.systemObjects).map(({ station, home }) => {
+      const all = portsOf(this.systemObjects).map(({ station, home }) => {
         const goods = station.goods ?? []
         const wanted = goods.filter((g) => g.mode === 'buys' && (cargo[g.id] ?? 0) > 0)
         return {
@@ -124,6 +128,10 @@ export default {
           armory: Boolean(station.armory)
         }
       })
+      if (this.want === 'buying') return all.filter((port) => port.cargoValue > 0).sort((a, b) => b.cargoValue - a.cargoValue)
+      if (this.want === 'yards') return all.filter((port) => port.yard)
+      if (this.want === 'armory') return all.filter((port) => port.armory)
+      return all
     }
   },
   methods: {
@@ -147,6 +155,13 @@ export default {
 </script>
 
 <style scoped>
+.ports-panel.embedded {
+  width: auto;
+  padding: 0;
+}
+.embedded .port:first-of-type {
+  margin-top: 0;
+}
 .ports-panel {
   width: min(720px, calc(100vw - 60px));
   text-align: left;

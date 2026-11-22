@@ -75,8 +75,7 @@ const MENU_TINTS = {
   chat: HUD_TINT.chat,
   settings: HUD_TINT.settings,
   feed: HUD_TINT.sieges,
-  planets: HUD_TINT.planets,
-  ports: HUD_TINT.ports
+  objects: HUD_TINT.planets
 }
 
 /**
