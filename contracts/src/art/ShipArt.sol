@@ -5,11 +5,13 @@ import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {Pilots} from "../pilots/Pilots.sol";
 
 /// @title The Orbiter 8, drawn from what it carries (docs/demo4-plan.md, section 7; D25)
-/// @notice Koda's Orbiter 8 hull with its parts drawn over it: railgun barrels, missile racks,
-/// point-defense turrets, drone bays, armor plating, a shield shimmer, repair-bot pods, cargo pods and
-/// damage marks. The NFT's image and the client's ship are the same drawing: orbiter-client
-/// sdk/v4/ship-art.js builds the identical string. Coordinates are the hull's own (about 4,600 across,
-/// nose up, centered on 0).
+/// @notice Koda's Orbiter 8 as it flies, with what changes its shape (redrawn 2026-11-22,
+/// docs/mockups/ship-upgrades/): railguns beside the fuselage's shoulders, missile ports set into the
+/// fuselage, point-defense dots on its edge, armor plating cut to the hull, a shield that is the ship's
+/// own outline in blue, longer pods for longer range, and damage in pink. What's fitted inside (cargo
+/// holds, drone bays, repair bots) doesn't show on a ship flying by, so it isn't drawn here. The NFT's
+/// image and the client's ship are the same drawing: sdk/src/ship-art.js builds the identical string.
+/// Coordinates are the hull's own (about 4,600 across, nose up, centered on 0).
 library ShipArt {
     using Strings for uint256;
     using Strings for int256;
@@ -19,85 +21,150 @@ library ShipArt {
 
     function svg(Pilots.Ship memory ship, bool scarred) internal pure returns (string memory) {
         Pilots.Loadout memory l = ship.loadout;
+        string memory long = _pods(ship.range);
+        bool isLong = bytes(long).length > 0;
         return string.concat(
             '<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2800 -2800 5600 5600">',
             '<rect x="-2800" y="-2800" width="5600" height="5600" fill="#160631"/>',
-            _shield(l.shields),
-            _cargo(ship.bays),
             string.concat(
-                '<path transform="translate(-2300,-2300)" d="',
+                '<defs><path id="h" transform="translate(-2300,-2300)" d="',
                 HULL,
-                '" fill="#e6dcf5" stroke="#8f7fb0" stroke-width="',
-                (40 + uint256(l.armor) * 50).toString(),
-                '"/>'
+                '"/>',
+                isLong ? string.concat('<path id="p" d="', long, '"/>') : "",
+                '<clipPath id="c"><use href="#h"/></clipPath></defs>'
             ),
+            _shield(l.shields, isLong),
             _railguns(l.railguns),
+            '<use href="#h" fill="#e6dcf5" stroke="#8f7fb0" stroke-width="40"/>',
+            isLong
+                ? '<use href="#p" fill="#e6dcf5" stroke="#8f7fb0" stroke-width="40" stroke-linejoin="round"/><rect x="-2278" y="300" width="916" height="60" fill="#e6dcf5"/><rect x="1362" y="300" width="916" height="60" fill="#e6dcf5"/>'
+                : "",
+            _armor(l.armor),
             _missiles(l.missiles),
             _turrets(l.pointDefense),
-            _drones(l.drones),
-            _bots(l.repairBots),
             scarred || ship.rangeLost > 0 || ship.baysLost > 0 ? _scars() : "",
             "</svg>"
         );
     }
 
-    function _shield(uint8 levels) private pure returns (string memory) {
-        if (levels == 0) return "";
+    /// One longer pod: the pod's lower end again, `len` further down.
+    function _pod(int256[6] memory x, uint256 len) private pure returns (string memory) {
         return string.concat(
-            '<ellipse cx="0" cy="200" rx="2700" ry="2650" fill="#7fd4ff" fill-opacity="0.',
-            (uint256(levels) * 6).toString(),
-            '" stroke="#7fd4ff" stroke-width="',
-            (uint256(levels) * 30).toString(),
-            '"/>'
+            string.concat("M", x[0].toStringSigned(), " 330V", (640 + len).toString(), "L", x[1].toStringSigned(), " "),
+            string.concat((700 + len).toString(), "V", (800 + len).toString(), "L", x[2].toStringSigned(), " "),
+            string.concat((950 + len).toString(), "H", x[3].toStringSigned(), "L", x[4].toStringSigned(), " "),
+            string.concat((800 + len).toString(), "V", (700 + len).toString(), "L", x[5].toStringSigned(), " "),
+            string.concat((640 + len).toString(), "V330z")
         );
     }
 
-    /// One pod under the body for every 50 bays.
-    function _cargo(uint16 bays) private pure returns (string memory out) {
-        uint256 pods = bays / 50;
-        for (uint256 i = 0; i < pods; i++) {
-            out = string.concat(
-                out, '<rect x="-260" y="', (1700 + i * 170).toString(), '" width="520" height="140" rx="60" fill="#b9a6d6"/>'
-            );
-        }
+    /// Longer range: the pods themselves are longer, 170 a step (they hold the capacitor bank). Empty at range 1.
+    function _pods(uint8 range) private pure returns (string memory) {
+        uint256 r = range > 4 ? 4 : range < 1 ? 1 : range;
+        uint256 len = (r - 1) * 170;
+        if (len == 0) return "";
+        return string.concat(
+            _pod([int256(-2298), -2130, -2200, -1440, -1510, -1342], len),
+            _pod([int256(1342), 1510, 1440, 2200, 2130, 2298], len)
+        );
     }
 
-    /// Barrels forward of the wing pods, then the nose.
+    /// The ship's own outline, fat and blue, behind it; fatter each level; it breathes.
+    function _shield(uint8 levels, bool isLong) private pure returns (string memory) {
+        if (levels == 0) return "";
+        return string.concat(
+            '<g fill="none" stroke="#7fd4ff" stroke-width="',
+            (180 + uint256(levels) * 130).toString(),
+            '" stroke-linejoin="round"><use href="#h"/>',
+            isLong ? '<use href="#p"/>' : "",
+            '<animate attributeName="stroke-opacity" values="0.9;0.45;0.9" dur="5s" repeatCount="indefinite"/></g>'
+        );
+    }
+
+    /// Twin rails with a breech: one beside each shoulder of the fuselage, the third down the spine.
     function _railguns(uint8 count) private pure returns (string memory out) {
-        int16[3] memory xs = [int16(-1800), 1800, 0];
-        int16[3] memory tops = [int16(-1500), -1500, -2700];
+        int16[3] memory xs = [int16(-960), 960, 0];
+        int16[3] memory tops = [int16(-1950), -1950, -2600];
+        uint16[3] memory lengths = [uint16(1250), 1250, 760];
         for (uint256 i = 0; i < count && i < 3; i++) {
+            int256 x = xs[i];
+            int256 t = tops[i];
+            string memory len = uint256(lengths[i]).toString();
             out = string.concat(
                 out,
-                '<rect x="',
-                (int256(xs[i]) - 50).toStringSigned(),
-                '" y="',
-                int256(tops[i]).toStringSigned(),
-                '" width="100" height="900" fill="#ffd65c"/>'
+                string.concat(
+                    '<g fill="#e6dcf5" stroke="#8f7fb0" stroke-width="26"><rect x="',
+                    (x - 78).toStringSigned(),
+                    '" y="',
+                    t.toStringSigned(),
+                    '" width="52" height="',
+                    len,
+                    '"/>'
+                ),
+                string.concat('<rect x="', (x + 26).toStringSigned(), '" y="', t.toStringSigned(), '" width="52" height="', len, '"/>'),
+                string.concat(
+                    '<rect x="',
+                    (x - 105).toStringSigned(),
+                    '" y="',
+                    (t + int256(uint256(lengths[i])) - 360).toStringSigned(),
+                    '" width="210" height="320" rx="44"/>'
+                ),
+                string.concat('<rect x="', (x - 92).toStringSigned(), '" y="', (t + 220).toStringSigned(), '" width="184" height="64"/></g>')
             );
         }
     }
 
-    /// Three tubes a rack, on the wings.
+    /// Plating cut to the hull's shape, growing back from the nose and the pods' fronts, further each level.
+    function _armor(uint8 levels) private pure returns (string memory) {
+        if (levels == 0) return "";
+        int256 n = levels > 5 ? int256(5) : int256(uint256(levels));
+        int256 fy = -1820 + n * 290;
+        int256 py = -430 + n * 190;
+        return string.concat(
+            string.concat(
+                '<g clip-path="url(#c)" fill="#b9a6d6"><rect x="-900" y="-2400" width="1800" height="',
+                (fy + 2400).toStringSigned(),
+                '"/>'
+            ),
+            string.concat(
+                '<rect x="-2400" y="-800" width="1160" height="',
+                (py + 800).toStringSigned(),
+                '"/><rect x="1240" y="-800" width="1160" height="',
+                (py + 800).toStringSigned(),
+                '"/>'
+            ),
+            string.concat(
+                '<path d="M-900 ',
+                fy.toStringSigned(),
+                "h1800M-2400 ",
+                py.toStringSigned(),
+                "h1160M1240 ",
+                py.toStringSigned(),
+                'h1160" stroke="#8f7fb0" stroke-width="50"/></g>'
+            )
+        );
+    }
+
+    /// Six round ports a rack, set into the fuselage, a rack below a rack. Never on the pods: those are engines.
     function _missiles(uint8 count) private pure returns (string memory out) {
-        int16[3] memory xs = [int16(-1250), 1050, -100];
         for (uint256 i = 0; i < count && i < 3; i++) {
-            out = string.concat(
-                out,
-                '<g fill="#ff8a5c"><rect x="',
-                int256(xs[i]).toStringSigned(),
-                '" y="-100" width="60" height="320"/><rect x="',
-                (int256(xs[i]) + 70).toStringSigned(),
-                '" y="-100" width="60" height="320"/><rect x="',
-                (int256(xs[i]) + 140).toStringSigned(),
-                '" y="-100" width="60" height="320"/></g>'
-            );
+            for (uint256 k = 0; k < 6; k++) {
+                out = string.concat(
+                    out,
+                    '<circle cx="',
+                    (int256(-240) + int256(k % 3) * 240).toStringSigned(),
+                    '" cy="',
+                    (int256(-1150) + int256(i) * 560 + int256(k / 3) * 240).toStringSigned(),
+                    '" r="80" fill="#2a1a4a"/>'
+                );
+            }
         }
     }
 
+    /// Dots in the hull's own color on its edge, in pairs: the nose, then down the fuselage's sides.
     function _turrets(uint8 count) private pure returns (string memory out) {
-        int16[6] memory xs = [int16(0), -700, 700, -1800, 1800, 0];
-        int16[6] memory ys = [int16(-1300), 300, 300, 500, 500, 900];
+        int16[6] memory xs = [int16(-600), 600, -847, 847, -847, 847];
+        int16[6] memory ys = [int16(-2051), -2051, -40, -40, 300, 300];
         for (uint256 i = 0; i < count && i < 6; i++) {
             out = string.concat(
                 out,
@@ -105,42 +172,13 @@ library ShipArt {
                 int256(xs[i]).toStringSigned(),
                 '" cy="',
                 int256(ys[i]).toStringSigned(),
-                '" r="110" fill="#5cffc8"/>'
+                '" r="125" fill="#e6dcf5"/>'
             );
         }
     }
 
-    /// A chevron for every ten drones (at least one), down the spine.
-    function _drones(uint16 count) private pure returns (string memory out) {
-        if (count == 0) return "";
-        uint256 marks = (uint256(count) + 9) / 10;
-        if (marks > 8) marks = 8;
-        for (uint256 i = 0; i < marks; i++) {
-            uint256 y = 400 + i * 130;
-            out = string.concat(
-                out,
-                '<path d="M-150 ',
-                y.toString(),
-                "l150 90l150 -90",
-                '" fill="none" stroke="#c38bff" stroke-width="50"/>'
-            );
-        }
-    }
-
-    function _bots(uint8 count) private pure returns (string memory out) {
-        for (uint256 i = 0; i < count && i < 6; i++) {
-            out = string.concat(
-                out,
-                '<rect x="',
-                (i % 2 == 0 ? int256(-520) : int256(400)).toStringSigned(),
-                '" y="',
-                (1000 + (i / 2) * 200).toString(),
-                '" width="120" height="140" rx="40" fill="#9effa0"/>'
-            );
-        }
-    }
-
+    /// Cracks in pink (it needs you).
     function _scars() private pure returns (string memory) {
-        return '<g fill="#1c0838" fill-opacity="0.7"><circle cx="-900" cy="900" r="160"/><circle cx="300" cy="-600" r="120"/><circle cx="1500" cy="1400" r="140"/></g>';
+        return '<g fill="none" stroke="#ff6fb0" stroke-width="56" stroke-linecap="round" stroke-linejoin="round"><path d="M-1050 620l190 150l-130 170l250 130"/><path d="M180 -1020l-150 140l170 120"/><path d="M1620 550l150 170l-190 120"/></g>';
     }
 }

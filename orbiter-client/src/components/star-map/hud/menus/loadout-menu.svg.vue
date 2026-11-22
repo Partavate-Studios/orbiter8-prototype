@@ -6,8 +6,11 @@
       <g :transform="'translate(0 -400) scale(' + scale + ')'" fill="#ffffff" dominant-baseline="middle">
         <text x="0" y="5" text-anchor="middle" fill="#ffffff88" :font-size="fitSize(ship.name, 24, 340)">{{ ship.name }}</text>
 
-        <!-- The NFT's own drawing (sdk/ship-art.js), inline so it stays sharp, without the NFT's background -->
-        <svg ref="art" x="-75" y="25" width="150" height="150" :viewBox="SHIP_ART_VIEWBOX" />
+        <!-- The ship as it flies (the NFT's own drawing, sdk/ship-art.js, inline so it stays sharp, without
+             the NFT's background), and beside it the ship opened up: what's fitted inside (Koda,
+             2026-11-22: a ship flying by doesn't show its holds and bays) -->
+        <svg ref="art" x="-165" y="25" width="150" height="150" :viewBox="SHIP_ART_VIEWBOX" />
+        <svg ref="inside" x="15" y="25" width="150" height="150" :viewBox="SHIP_ART_VIEWBOX" />
 
         <text x="0" y="185" text-anchor="middle" font-size="0.8em" fill="#ffffffaa">
           Mounts {{ mounts }} of 6 · holds {{ ship.bays - player.freeBays }} of {{ ship.bays }} used · drones
@@ -70,7 +73,7 @@ import { fitSize } from '@/libs/fit-text'
 import { mapState } from 'pinia'
 import { useUIStore } from '@/stores/ui'
 import { usePlayerStore } from '@/stores/player'
-import { shipArtParts, SHIP_ART_VIEWBOX } from '@orbiter8/sdk/ship-art'
+import { shipArtParts, shipInsideParts, SHIP_ART_VIEWBOX } from '@orbiter8/sdk/ship-art'
 import { PINK_LIGHT } from '@/libs/palette'
 import MenuContainer from './menu-container/_menu-container.svg'
 import { SHIP_PARTS, mountsUsed } from '@orbiter8/sdk/parts'
@@ -96,7 +99,11 @@ export default {
     art() {
       const off = this.condition?.off ?? []
       const scarred = Boolean(this.condition?.armorLost || off.some((n) => n > 0))
-      return shipArtParts(this.ship, scarred)
+      // (its own ids: other ships may be drawn on the same page)
+      return shipArtParts(this.ship, scarred, 'loadout-')
+    },
+    inside() {
+      return shipInsideParts(this.ship)
     },
     mounts() {
       return mountsUsed(this.ship.loadout)
@@ -138,6 +145,9 @@ export default {
     // The drawing is our own string (sdk/ship-art.js), set as the inline <svg>'s content.
     art() {
       this.drawArt()
+    },
+    inside() {
+      this.drawArt()
     }
   },
   mounted() {
@@ -147,6 +157,7 @@ export default {
     fitSize,
     drawArt() {
       if (this.$refs.art) this.$refs.art.innerHTML = this.art
+      if (this.$refs.inside) this.$refs.inside.innerHTML = this.inside
     },
     setRepairing(n) {
       if (n < 0 || n > 4 || n === this.repairing) return

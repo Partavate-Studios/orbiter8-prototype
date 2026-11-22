@@ -788,4 +788,8 @@ Log:
   And the missile silos go only on the hull (the fuselage), never the engines (the pods). Round 8
   drawn: dots in the hull's color; the missile ports in the fuselage, a rack below a rack down its
   middle. **Rule to keep: the pods are engines.**
+- 2026-11-22: **Koda: "run with any additional ideas you have and go ahead and do an implementation,
+  we're close enough."** The ship's art goes into the game and the contract. Also from Koda: selecting
+  **another pilot's ship** shows no UI; flesh that out, and make the ship's owner's info card
+  reachable from it.
 
