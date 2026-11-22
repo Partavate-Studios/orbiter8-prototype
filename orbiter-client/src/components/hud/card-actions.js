@@ -49,6 +49,57 @@ export function slotted(object, actions) {
   return out
 }
 
+/**
+ * How each action looks on the card (docs/ui-guide.md section 11): its small icon (libs/small-icons.js)
+ * and its one word.
+ */
+export const ACTION_LOOK = {
+  trade: { icon: 'trade', word: 'Trade' },
+  shipyards: { icon: 'yards', word: 'Yards' },
+  armory: { icon: 'armory', word: 'Armory' },
+  colony: { icon: 'colony', word: 'Colony' },
+  asteroid: { icon: 'platform', word: 'Works' },
+  claim: { icon: 'claim', word: 'Claim' },
+  attack: { icon: 'attack', word: 'Attack' },
+  siege: { icon: 'siege', word: 'Siege' },
+  recruit: { icon: 'recruit', word: 'Recruit' },
+  jump: { icon: 'jump', word: 'Jump' },
+  traverse: { icon: 'traverse', word: 'Enter' },
+  nameStar: { icon: 'nameStar', word: 'Name' },
+  market: { icon: 'market', word: 'Market' },
+  rename: { icon: 'rename', word: 'Rename' },
+  loadout: { icon: 'ship', word: 'Loadout' },
+  session: { icon: 'session', word: 'Session' },
+  mine: { icon: 'mine', word: 'Mine' },
+  stopMining: { icon: 'stop', word: 'Stop' }
+}
+/** The actions that can be a card's main one (its pill); the first of them in slot order is. */
+const MAIN_COMMANDS = new Set(['trade', 'jump', 'colony', 'claim', 'attack', 'asteroid', 'mine', 'stopMining', 'recruit'])
+/** Why an action can't be used now, in a word or two. */
+const WHY_NOT = { claim: "Can't afford", attack: 'Not armed', mine: 'All taken' }
+
+/**
+ * The card's action row: the main action (a pill) and the rest (wells), each with its icon, its word,
+ * its number key (its slot, so a key always means the same action) and a short note: a price, or why
+ * it can't be used now.
+ * @param {{ type: string }} object
+ * @param {{ command: string, text: string, enabled: boolean }[]} actions  actionsFor(object)
+ * @returns {{ main: object | null, wells: object[] }}
+ */
+export function cardButtons(object, actions) {
+  const buttons = slotted(object, actions)
+    .map((option, index) => {
+      if (!option) return null
+      const look = ACTION_LOOK[option.command] ?? { icon: 'details', word: option.text.split(' ')[0] }
+      const price = option.command === 'claim' ? option.text.match(/\((.+)\)/)?.[1] : undefined
+      const note = option.enabled ? (option.command === 'session' && /^End/.test(option.text) ? 'On' : price) : (WHY_NOT[option.command] ?? 'Not now')
+      return { option, key: index + 1, ...look, note, needsYou: !option.enabled && option.command === 'claim' }
+    })
+    .filter(Boolean)
+  const main = buttons.find((button) => MAIN_COMMANDS.has(button.option.command)) ?? null
+  return { main, wells: buttons.filter((button) => button !== main) }
+}
+
 /** The star's first-claim window (Claims.FIRST_CLAIM), in seconds. */
 const FIRST_CLAIM_S = 10 * 60
 

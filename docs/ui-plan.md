@@ -666,3 +666,25 @@ Log:
   lead with How Planets Grow, not First Steps, per Koda's note 3); the pilot plate; a ship's Details;
   the profile with more life (avatars are on the to-do list in `demo4-plan.md`); the list (Objects) on
   a phone.
+- 2026-11-21: **Koda on mockups 7 to 10: "everything looks good."** Taken as: the kit and standard
+  agreed; the trade menu may be laid out with its controls nearest the card; the card as in mockup 8.
+  Not answered: the top right, way A or B (asked again; it doesn't block the card). **Building starts:
+  step 1, the card** (`orbiter-client/src/components/hud/selection-panel.vue` and what it uses).
+- 2026-11-21: **Step 1 built: the card.** `hud/selection-panel.vue` rewritten (a spine of tabs, one
+  face, one heading, one action row); new `hud/action-row.vue`, `hud/small-icon.vue`,
+  `libs/small-icons.js` (the icon set, now the game's; the mockup scripts read it from there);
+  `card-actions.js` gained `ACTION_LOOK` and `cardButtons()`; the card art has a frameless `bare` mode
+  (`themed-card.vue`, `card-ui/info.svg.vue`, `card-text.svg.vue`); `nearby-strip.vue` is deleted (the
+  belt's places are the spine's tabs); the card is never put away (`ui.toggleScope` only keeps it
+  shown); with nothing selected it shows your ship. Screenshots from the running game:
+  `mockups/together/built/`. Lint, tests and a build pass.
+  - **Not yet play-tested with real moves:** checked by screenshots at desktop and phone size against
+    Koda's running dev server, selecting things only. Trade, claim, jump and the number keys from the
+    new row still need a real session.
+  - **Left for later steps:** Details (so Rename, Loadout and Session are still wells on the card, and
+    a body with no actions has an empty row); actions dimmed by an activity in flight ("One in
+    flight") wait for the activity window (step 3); `ui.actionsOpen` / `toggleActions` and the `A` key
+    are unused now and can go; the belt's spine scrolls with no hint that there's more.
+  - **Next: step 2,** the list (Objects) and the top right. Koda still to choose way A or B for the
+    top right (mockup 9).
+

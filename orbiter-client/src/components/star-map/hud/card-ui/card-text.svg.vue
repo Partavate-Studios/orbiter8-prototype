@@ -2,7 +2,7 @@
   <g transform="translate(-70 -70)">
     <!-- the name's shadow, on the ship's purple title only; others sit dark on their color (row I1) -->
     <text
-      v-if="!darkTitle"
+      v-if="titled && !darkTitle"
       fill="#000000"
       x="70"
       y="10"
@@ -17,6 +17,7 @@
       {{ systemObjects[objectId].name }}
     </text>
     <text
+      v-if="titled"
       :fill="darkTitle ? '#1b1531' : '#ffffff'"
       :font-weight="darkTitle ? 'bold' : 'normal'"
       x="70"
@@ -81,7 +82,9 @@ export default {
   inject: { cardTheme: { default: null } },
   props: {
     /** The selected object's key (see sdk/system.js objectKey). */
-    objectId: { type: String, default: null }
+    objectId: { type: String, default: null },
+    /** Draw the name in the card's title; off when the selection panel's heading carries it. */
+    titled: { type: Boolean, default: true }
   },
   data() {
     return { YELLOW_LIGHT, ROW }

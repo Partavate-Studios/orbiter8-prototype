@@ -1,5 +1,5 @@
 // Small pictures of the system's bodies and the menu's actions, for the selectors over the selection
-// card (system-strip.vue, nearby-strip.vue) and its menu (selection-panel.vue). Spheres are cheap CSS;
+// card (system-strip.vue) and the card's tabs (selection-panel.vue). Spheres are cheap CSS;
 // the rest is the game's own art (assets/art/), drawn for the tech trees and reused here.
 import port from '@/assets/art/port.svg'
 import yards from '@/assets/art/yards.svg'

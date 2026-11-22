@@ -126,48 +126,43 @@ describe('HUD', () => {
     expect(problems).toEqual([])
   })
 
-  it("deals a moon's card from the planet card's edge, and puts it back from the planet's card", async () => {
+  it("shows a moon from its planet's tab, and goes back from the lit tab", async () => {
     ui.selectSprite('planet:2')
     await settle()
-    // the moon is a chip, not a "Visit Moon" button as well (round 2, item 4)
-    expect([...root.querySelectorAll('button.action')].some((button) => /Visit/.test(button.textContent))).toBe(false)
-    root.querySelector('.edge .edge-button').click()
+    // going to the moon is a tab, not an action as well
+    expect([...root.querySelectorAll('.action-row button')].some((button) => /Visit/.test(button.title))).toBe(false)
+    const tabs = () => [...root.querySelectorAll('.spine .tab')]
+    // the planet's own tab is first and lit
+    expect(tabs()[0].classList.contains('on')).toBe(true)
+    tabs().at(-1).click()
     await settle()
     expect(ui.selected).toBe('moon:2:0')
-    // the planet's card stays, behind the moon's
-    expect(root.querySelector('.card.front')).not.toBe(null)
-    root.querySelector('.card.home.behind').click()
+    // the heading is the planet's name and the moon's, and the tabs are still there
+    expect(root.querySelector('.heading.joined .home')).not.toBe(null)
+    expect(tabs().at(-1).classList.contains('on')).toBe(true)
+    tabs().at(-1).click()
     await settle()
     expect(ui.selected).toBe('planet:2')
     expect(problems).toEqual([])
   })
 
-  it('keeps each action in its own slot', async () => {
+  it('gives a card one main action, and the rest as wells', async () => {
     ui.selectSprite('station:1')
     await settle()
-    const station = [...root.querySelectorAll('.list > .action')].map((slot) => slot.textContent.trim().replace(/^\d/, ''))
-    expect(station[0]).toBe('Trade at Port')
-    // a planet: an empty slot keeps Siege, Recruit, market and Rename in their places
+    expect(root.querySelector('.action-row .pill').textContent).toMatch(/Trade/)
+    expect(root.querySelectorAll('.action-row .pill').length).toBe(1)
     ui.selectSprite('planet:1')
     await settle()
-    const slots = [...root.querySelectorAll('.list > .action')]
-    expect(slots[0].textContent).toMatch(/Colony/)
+    expect(root.querySelector('.action-row .pill').textContent).toMatch(/Colony/)
     expect(problems).toEqual([])
   })
 
-  it('slides the menu in behind the card and out again', async () => {
-    ui.selectSprite('station:1')
-    ui.toggleActions(true)
+  it('always holds a card: with nothing selected, your ship', async () => {
+    ui.selectSprite(null)
     await settle()
-    const tab = root.querySelector('.drawer .tab')
-    expect(root.querySelector('.drawer.open')).not.toBe(null)
-    tab.click()
-    await settle()
-    expect(root.querySelector('.drawer.open')).toBe(null)
-    expect(root.querySelector('.drawer .inside').hasAttribute('inert')).toBe(true)
-    tab.click()
-    await settle()
-    expect(root.querySelector('.drawer.open')).not.toBe(null)
+    expect(ui.selected).toBe(null)
+    expect(root.querySelector('.card3.ship')).not.toBe(null)
+    expect(root.querySelector('.action-row .pill').textContent).toMatch(/Jump/)
     expect(problems).toEqual([])
   })
 

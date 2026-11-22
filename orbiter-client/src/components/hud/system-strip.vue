@@ -2,8 +2,8 @@
   <!-- The system's bodies on the selection card's edge (Koda, round 2, item 3): the star, then every
        planet in orbit order, so the next one is a short move from the card's buttons instead of a trip
        to the top right. ‹ › step through them (as Tab, [ ], pad L1/R1 do). The asteroid belt has its
-       place among the orbits; a planet's port and moons, and the belt's eight places, are the nearby
-       strip under this one (nearby-strip.vue), so nothing is listed twice. Each body is a small flat sphere in
+       place among the orbits; a planet's port and moons, and the belt's eight places, are the tabs
+       down the card's spine (selection-panel.vue), so nothing is listed twice. Each body is a small flat sphere in
        its class's colors: cheap, no per-frame art. -->
   <nav class="system-strip" :class="{ compact }" aria-label="This system's star and planets">
     <button type="button" class="step" title="Previous ([ or Shift+Tab)" aria-label="Previous" @click="step(-1)">

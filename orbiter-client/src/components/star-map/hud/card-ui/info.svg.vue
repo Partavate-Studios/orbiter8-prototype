@@ -2,7 +2,7 @@
   <g>
     <!-- A planet under siege: a pink frame around its card (pink needs you) -->
     <rect
-      v-if="besieged"
+      v-if="besieged && !bare"
       x="-78"
       y="-78"
       width="156"
@@ -14,9 +14,10 @@
       stroke-width="2"
       stroke-dasharray="6 4"
     />
-    <card-background />
+    <card-background v-if="!bare" />
 
     <rect
+      v-if="!bare"
       x="-65"
       y="-65"
       ry="5"
@@ -41,7 +42,7 @@
       stroke-width="0.5"
     />
 
-    <card-text v-if="objectId != null" :object-id="objectId" />
+    <card-text v-if="objectId != null" :object-id="objectId" :titled="!bare" />
     <g :transform="'rotate(' + spriteRotation + ')'">
       <sprite :object-id="objectId" />
     </g>
@@ -49,7 +50,7 @@
     <card-works :object-id="objectId" />
     <!-- yours: a yellow badge on the card's corner (Koda, 2026-11-14, row F2); never the frame, so a
          planet can be yours and under siege at once -->
-    <g v-if="mine" transform="translate(66 -70)">
+    <g v-if="mine && !bare" transform="translate(66 -70)">
       <circle r="8" :fill="YELLOW" stroke="#1b1531" stroke-width="1.5" />
       <path d="M0 -4.6L1.35 -1.4L4.4 -1.4L1.9 0.6L2.85 3.9L0 2L-2.85 3.9L-1.9 0.6L-4.4 -1.4L-1.35 -1.4Z" fill="#1b1531" />
       <title>Yours</title>
@@ -81,7 +82,9 @@ export default {
   inject: { cardTheme: { default: null } },
   props: {
     /** The selected object's key (see sdk/system.js objectKey). */
-    objectId: { type: String, default: null }
+    objectId: { type: String, default: null },
+    /** Only the face: the selection panel draws the frame, the heading, the badge and the siege frame. */
+    bare: { type: Boolean, default: false }
   },
   data() {
     return { CARD_GRAY, PINK_LIGHT, YELLOW, CARD_THEMES }

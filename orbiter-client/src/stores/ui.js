@@ -250,10 +250,13 @@ export const useUIStore = defineStore('UI', {
       this.screenSize.width = parseInt(x)
       this.screenSize.height = parseInt(y)
     },
-    /** Shows or hides the selection's card (nothing to show or hide with nothing selected). */
+    /**
+     * Once showed or hid the selection's card. The card is never put away now (Koda, 2026-11-21:
+     * "never collapsed"), so this only keeps it shown; its callers (pressing the selection again, pad
+     * R3) are left in place.
+     */
     toggleScope() {
-      if (this.selectedSprite == null) return
-      this.showScope = !this.showScope
+      this.showScope = true
     },
     /** Slides the selection's menu out from behind its card, or back behind it. */
     toggleActions(open = !this.actionsOpen) {
