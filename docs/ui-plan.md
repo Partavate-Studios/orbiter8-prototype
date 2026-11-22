@@ -635,7 +635,7 @@ and 7 on) and `node dev/mockups/icons.mjs --png` (mockup 6). The icon paths are 
 |---|---|
 | Small-icon set (mockup 6) | Done, approved by Koda as drawn |
 | The kit and screen standard (`ui-guide.md` section 11, mockup 7) | See below |
-| The card in every state, desktop and phone (mockup 8) | See below |
+| The card in every state, desktop and phone (mockup 8) | Drawn: `mockups/together/8-card-states.png` (ship, planet, moons' list, station, a blocked action, one moon, three phone sheets). Waiting for Koda |
 | The activity window in every state; the top right two ways (mockup 9) | See below |
 | The trade loop, travel measured (mockup 10) | See below |
 
@@ -654,3 +654,6 @@ and 7 on) and `node dev/mockups/icons.mjs --png` (mockup 6). The icon paths are 
 Log:
 - 2026-11-21: plan, mockups 1–4, Koda's feedback (section 10), review (11), mockup 5, the trade-loop
   measure (12), the narrower card (13), go-ahead (14), icon sheet (mockup 6).
+- 2026-11-21: `ui-guide.md` section 11 (kit and standard, proposed). Mockup 8 drawn. Tabs are rounded
+  squares and actions are round, so the two can't be confused. Widths: ship 250, planet/station/moon
+  312, moons' list 512.

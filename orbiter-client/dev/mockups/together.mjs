@@ -6,6 +6,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { ICON_GROUPS } from './small-icons.mjs'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const SRC = path.join(here, '../../src')
@@ -1224,11 +1225,189 @@ function mock5() {
   doc(1440, 1480, out, '5-revised')
 }
 
+
+// ═════════════════════════════════════════════════════════════════════════════
+// 8. The card in every state (ui-plan.md section 15): a spine of tabs and one face; one heading; one
+//    action row with the main action as a pill. Icons from the small-icon set (small-icons.mjs).
+// ═════════════════════════════════════════════════════════════════════════════
+/** Every small icon by name: its path. */
+const IC = Object.fromEntries(Object.values(ICON_GROUPS).flatMap((group) => Object.entries(group).map(([name, [, d]]) => [name, d])))
+const si = (cx, cy, name, size = 22, stroke = '#ffffff') => glyph(cx, cy, IC[name], { size, stroke })
+const SPINE = 62
+const FACE = 250
+const H3 = 440
+/** A tab (a way to somewhere): a rounded square, never a circle, so it can't be taken for an action. */
+function tab(x, y, { pic, on = false, badge = '', color = BRAND_300, size = 44 }) {
+  let out = R(x, y, size, size, { rx: 12, fill: on ? S3 : '#1a1331', stroke: on ? color : '#4a3d7a', sw: on ? 2.2 : 1.2 })
+  if (on) out += R(x + size - 1, y + 9, 5, size - 18, { rx: 2, fill: color })
+  out += pic(x + size / 2, y + size / 2)
+  if (badge) out += C(x + size - 4, y + 4, 8.5, { fill: '#230b41', stroke: '#ffffff88' }) + T(x + size - 4, y + 7.5, badge, { size: 10, fill: '#fff', anchor: 'middle' })
+  return out
+}
+/** The main action: a wide pill with its picture and its word. Dimmed, it says why. */
+function mainPill(x, y, w, icon, word, { dim = false, reason = '' } = {}) {
+  const g = id('mp')
+  defs.push(`<linearGradient id="${g}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8f6cf0"/><stop offset="1" stop-color="${BRAND_500}"/></linearGradient>`)
+  let out = G(R(x, y, w, 44, { rx: 22, fill: `url(#${g})`, stroke: BRAND_300, sw: 1.8 }) + C(x + 22, y + 22, 17, { fill: '#00000033' }) + si(x + 22, y + 22, icon, 22) + T(x + 46 + (w - 54) / 2, y + 27.5, word, { size: 15.5, weight: 700, fill: '#fff', anchor: 'middle' }), { opacity: dim ? 0.4 : 1 })
+  if (reason) out += T(x + w / 2, y + 58, reason, { size: 11, fill: LAV, anchor: 'middle' })
+  return out
+}
+const iconWell = (cx, cy, name, caption, opts = {}) => well(cx, cy, 22, { pic: si(cx, cy, name, 22, opts.dim ? '#ffffff' : '#ffffff'), caption, ...opts })
+/** The action row across the bottom of the whole card: the main pill, the other wells, Details last. */
+function actionRow3(x, y, w, color, { main = null, wells = [] } = {}) {
+  let out = R(x + 14, y, w - 28, 1.5, { fill: color, opacity: 0.55 })
+  let cx = x + 14
+  if (main) {
+    out += mainPill(cx, y + 12, 118, main.icon, main.word, main)
+    cx += 118 + 10
+  }
+  for (const [name, caption, opts] of wells) {
+    out += iconWell(cx + 22, y + 34, name, caption, opts)
+    cx += 50
+  }
+  out += iconWell(x + w - 14 - 22, y + 34, 'details', 'Details')
+  return out
+}
+/** What's built: flat marks, not buttons; the one being built has a ring for how far along. */
+function builtMarks(cx, cy, names, color, building = -1) {
+  return names.map((name, i) => {
+    const x = cx + (i - (names.length - 1) / 2) * 30
+    return si(x, cy, name, 18, i === building ? '#ffffff77' : color) + (i === building ? ring(x, cy, 13, 0.35, BRAND_300, 1.8) : '')
+  }).join('')
+}
+/** Readouts: the kind, a tag, and rows of label and value. */
+function readouts(x, y, w, h, kind, tag, rows, accent, extra = '') {
+  let out = R(x, y, w, h, { rx: 12, fill: '#150f28', stroke: '#00000066' })
+  out += T(x + 12, y + 19, kind, { size: 11, weight: 700, fill: accent, spacing: 1.2 }) + (tag.svg ?? T(x + w - 12, y + 19, tag, { size: 11, fill: TEXT_3, anchor: 'end' }))
+  out += R(x + 10, y + 26, w - 20, 1, { fill: '#ffffff', opacity: 0.14 })
+  rows.forEach(([label, value, fill = '#fff'], i) => {
+    out += T(x + 12, y + 46 + i * 20, label, { size: 11.5, fill: '#a99fc6' }) + T(x + w - 12, y + 46 + i * 20, value, { size: 12.5, weight: 700, fill, anchor: 'end' })
+  })
+  return out + extra
+}
+/** The heading: one name, or two meeting (each in its own color). */
+function heading3(x, y, w, left, right = null) {
+  if (!right) return R(x + 10, y, w - 20, 26, { rx: 13, fill: left.theme.ship ? '#7c39cd' : left.theme.base }) + T(x + w / 2, y + 18, left.name, { size: 13.5, weight: 700, anchor: 'middle', fill: left.theme.ship ? '#fff' : S1 })
+  const split = x + 10 + (w - 20) * 0.4
+  let out = R(x + 10, y, split - x - 10, 26, { rx: 13, fill: left.theme.base }) + R(split - 16, y, 16, 26, { fill: left.theme.base })
+  out += R(split, y, x + w - 10 - split, 26, { rx: 13, fill: right.theme.base }) + R(split, y, 16, 26, { fill: right.theme.base })
+  out += T((x + 10 + split) / 2, y + 18, left.name, { size: 12.5, weight: 700, anchor: 'middle', fill: S1, opacity: 0.8 }) + T((split + x + w - 10) / 2, y + 18, right.name, { size: 13.5, weight: 700, anchor: 'middle', fill: S1 })
+  if (right.step) out += glyph(split + 16, y + 13, 'M3 -5L-3 0L3 5', { size: 13, stroke: S1 }) + glyph(x + w - 26, y + 13, GLYPH.chev, { size: 13, stroke: S1 })
+  return out
+}
+const TESSERA = { theme: DESERT, name: 'Tessera' }
+const tesseraTabs = (x, y, on) =>
+  R(x + 7, y + 44, SPINE - 6, 172, { rx: 12, fill: '#150f28' }) +
+  tab(x + 11, y + 52, { pic: (cx, cy) => sphere(cx, cy, 13, PLANET.Desert), on: on === 0, color: DESERT.base }) +
+  tab(x + 11, y + 106, { pic: (cx, cy) => station(cx, cy, 26), on: on === 1, color: THEME.station.base }) +
+  tab(x + 11, y + 160, { pic: (cx, cy) => sphere(cx, cy, 11, PLANET.Moon), on: on === 2, badge: '3', color: THEME.moon.base })
+function tesseraFace(fx, y) {
+  return sphere(fx + FACE / 2, y + 104, 40, PLANET.Desert) + builtMarks(fx + FACE / 2, y + 166, ['citadel', 'colonyBuilt', 'port', 'yardsBuilt'], DESERT.accent, 3) +
+    readouts(fx + 8, y + 190, FACE - 20, 150, 'PLANET', 'Orbit 2', [['Owner', 'You', YELLOW_LIGHT], ['World', 'Desert · size 9'], ['People', '4,200 of 9,000'], ['Building', 'Yards · 2h 10m']], DESERT.accent)
+}
+const tesseraActions = (x, y, w) => actionRow3(x, y + H3 - 82, w, DESERT.base, { main: { icon: 'colony', word: 'Colony' }, wells: [['market', 'Market']] })
+function card3Ship(x, y) {
+  let out = frame(x, y, FACE, H3, THEME.ship) + heading3(x, y + 10, FACE, { theme: THEME.ship, name: 'Taconator' })
+  out += ship(x + FACE / 2, y + 108, 84, 45)
+  out += readouts(x + 10, y + 190, FACE - 20, 150, 'STARSHIP', '#3', [['Captain', 'You', YELLOW_LIGHT], ['At', 'Tessera'], ['Range', '1 of 4']], '#c9b6ff', T(x + 22, y + 316, 'Holds', { size: 11.5, fill: '#a99fc6' }) + holds(x + 150, y + 306, ['HE3', 'HE3', 'HE3', null, null], 12, 4))
+  out += actionRow3(x, y + H3 - 82, FACE, '#7c39cd', { main: { icon: 'jump', word: 'Jump' }, wells: [['market', 'Market']] })
+  return out + yoursBadge5(x + FACE - 4, y + 4)
+}
+function card3Planet(x, y) {
+  const w = SPINE + FACE
+  return frame(x, y, w, H3, DESERT) + heading3(x, y + 10, w, TESSERA) + tesseraTabs(x, y, 0) + tesseraFace(x + SPINE, y) + tesseraActions(x, y, w) + yoursBadge5(x + w - 4, y + 4)
+}
+function card3Moons(x, y) {
+  const w = SPINE + FACE + 200
+  let out = frame(x, y, w, H3, DESERT) + heading3(x, y + 10, w, TESSERA) + tesseraTabs(x, y, 2) + tesseraFace(x + SPINE, y)
+  const lx = x + SPINE + FACE
+  out += R(lx, y + 44, 192, H3 - 134, { rx: 14, fill: '#221a3d' }) + T(lx + 14, y + 66, 'MOONS', { size: 11, weight: 700, fill: THEME.moon.accent, spacing: 1.2 })
+  ;[['Arden', '4 of 6 guns', 13], ['Bly', '6 of 6 guns', 11], ['Coro', 'No guns', 9]].forEach(([name, sub, r], i) => {
+    const ry = y + 78 + i * 60
+    out += R(lx + 10, ry, 172, 52, { rx: 12, fill: '#150f28', stroke: BORDER }) + sphere(lx + 36, ry + 26, r, PLANET.Moon) + T(lx + 58, ry + 23, name, { size: 15, fill: '#fff', weight: 500 }) + T(lx + 58, ry + 40, sub, { size: 11.5, fill: TEXT_3 }) + glyph(lx + 168, ry + 26, GLYPH.chev, { size: 13 })
+  })
+  return out + tesseraActions(x, y, w) + yoursBadge5(x + w - 4, y + 4)
+}
+function card3Station(x, y, { blocked = false } = {}) {
+  const w = SPINE + FACE
+  const fx = x + SPINE
+  let out = frame(x, y, w, H3, DESERT) + heading3(x, y + 10, w, TESSERA, { theme: THEME.station, name: 'Port Tessera' }) + tesseraTabs(x, y, 1)
+  out += station(fx + FACE / 2, y + 104, 84) + ship(fx + FACE / 2 - 56, y + 82, 22, 110) + builtMarks(fx + FACE / 2, y + 166, ['port', 'yardsBuilt'], THEME.station.accent)
+  out += readouts(fx + 8, y + 190, FACE - 20, 150, 'STATION', { svg: portCode(fx + FACE - 24, y + 210, 'SB-B-BS-', 'end', 13, [3]) }, [['Owner', 'You', YELLOW_LIGHT], ['Docked', 'Taconator']], THEME.station.accent,
+    R(fx + 18, y + 284, FACE - 40, 44, { rx: 10, fill: S2 }) + art('good-he3', fx + 38, y + 306, 22) + T(fx + 56, y + 303, 'Buys your', { size: 11, fill: '#a99fc6' }) + T(fx + 56, y + 319, 'Helium-3', { size: 12.5, fill: YELLOW_LIGHT, weight: 700 }) + T(fx + FACE - 32, y + 312, '+591¢', { size: 15, weight: 700, fill: YELLOW_LIGHT, anchor: 'end' }))
+  out += actionRow3(x, y + H3 - 82, w, THEME.station.base, { main: { icon: 'trade', word: 'Trade', dim: blocked, reason: blocked ? 'One in flight' : '' }, wells: [['yards', 'Yards'], ['armory', 'Armory']] })
+  return out + yoursBadge5(x + w - 4, y + 4)
+}
+function card3Moon(x, y) {
+  const w = SPINE + FACE
+  const fx = x + SPINE
+  let out = frame(x, y, w, H3, DESERT) + heading3(x, y + 10, w, TESSERA, { theme: THEME.moon, name: 'Arden', step: true }) + tesseraTabs(x, y, 2)
+  out += sphere(fx + FACE / 2, y + 104, 34, PLANET.Moon) + builtMarks(fx + FACE / 2, y + 166, ['moonGuns'], THEME.moon.accent)
+  out += readouts(fx + 8, y + 190, FACE - 20, 150, 'MOON', '1 of 3', [['Owner', 'You', YELLOW_LIGHT], ['Guns', '4 of 6 mounts']], THEME.moon.accent, T(fx + 20, y + 300, 'No siege can take a moon\'s guns.', { size: 11, fill: TEXT_3 }))
+  out += actionRow3(x, y + H3 - 82, w, THEME.moon.base, {})
+  return out + yoursBadge5(x + w - 4, y + 4)
+}
+/** The phone's selection sheet: the tabs, the small face, and to its right the pill and wells (or the list). */
+function phoneSheet(x, y, state) {
+  let out = R(x, y, PW, 232, { rx: 14, fill: '#150f28', stroke: BORDER })
+  const tabs = [[(cx, cy) => sphere(cx, cy, 13, PLANET.Desert), DESERT.base], [(cx, cy) => station(cx, cy, 26), THEME.station.base], [(cx, cy) => sphere(cx, cy, 11, PLANET.Moon), THEME.moon.base, '3']]
+  const on = state === 'station' ? 1 : state === 'moons' ? 2 : 0
+  tabs.forEach(([pic, color, badge], i) => (out += tab(x + 10, y + 14 + i * 54, { pic, on: on === i, color, badge })))
+  const cx0 = x + 66
+  out += frame(cx0, y + 12, 128, 208, DESERT)
+  if (state === 'station') {
+    out += R(cx0 + 8, y + 20, 112, 18, { rx: 9, fill: THEME.station.base }) + T(cx0 + 64, y + 33, 'Port Tessera', { size: 10.5, weight: 700, fill: S1, anchor: 'middle' })
+    out += station(cx0 + 64, y + 88, 56) + R(cx0 + 8, y + 134, 112, 76, { rx: 8, fill: '#0f0a1e' }) + portCode(cx0 + 16, y + 154, 'SB-B-BS-', 'start', 12, [3]) + T(cx0 + 16, y + 174, 'Buys your He-3', { size: 11, fill: YELLOW_LIGHT }) + T(cx0 + 16, y + 194, '+591¢', { size: 14, weight: 700, fill: YELLOW_LIGHT })
+  } else {
+    out += R(cx0 + 8, y + 20, 112, 18, { rx: 9, fill: DESERT.base }) + T(cx0 + 64, y + 33, 'Tessera', { size: 10.5, weight: 700, fill: S1, anchor: 'middle' })
+    out += sphere(cx0 + 64, y + 88, 34, PLANET.Desert) + R(cx0 + 8, y + 134, 112, 76, { rx: 8, fill: '#0f0a1e' }) + T(cx0 + 16, y + 154, 'Yours', { size: 12, fill: YELLOW_LIGHT, weight: 700 }) + T(cx0 + 16, y + 174, 'Desert · size 9', { size: 11, fill: '#e6dcf5' }) + T(cx0 + 16, y + 194, 'Yards · 2h 10m', { size: 11, fill: '#e6dcf5' })
+  }
+  const rx = x + 206
+  const rw = PW - 206 - 12
+  if (state === 'moons') {
+    ;[['Arden', '4 of 6 guns'], ['Bly', '6 of 6 guns'], ['Coro', 'No guns']].forEach(([name, sub], i) => {
+      const ry = y + 14 + i * 56
+      out += R(rx, ry, rw, 48, { rx: 12, fill: '#1b1531', stroke: BORDER }) + sphere(rx + 24, ry + 24, 10, PLANET.Moon) + T(rx + 44, ry + 22, name, { size: 14.5, fill: '#fff', weight: 500 }) + T(rx + 44, ry + 38, sub, { size: 12, fill: TEXT_3 }) + glyph(rx + rw - 14, ry + 24, GLYPH.chev, { size: 13 })
+    })
+  } else {
+    const main = state === 'station' ? ['trade', 'Trade'] : ['colony', 'Colony']
+    out += mainPill(rx, y + 14, rw, main[0], main[1])
+    const wells = state === 'station' ? [['yards', 'Yards'], ['armory', 'Armory'], ['details', 'Details']] : [['market', 'Market'], ['details', 'Details']]
+    wells.forEach(([name, caption], i) => (out += iconWell(rx + 26 + i * 58, y + 104, name, caption)))
+    out += T(rx + 2, y + 186, 'Tap the card to hold it up', { size: 12, fill: TEXT_3 })
+  }
+  return out
+}
+function mock8() {
+  const W = 1440
+  const Hh = 1440
+  let out = R(0, 0, W, Hh, { fill: '#0b0916' })
+  out += T(30, 38, 'Mockup 8 · the card in every state', { size: 16, weight: 700, fill: '#fff' }) + T(330, 38, 'A spine of tabs and one face. One heading. One action row: the main action a pill, the rest wells, Details always last.', { size: 12.5, fill: LAV })
+  const label = (x, y, n, title, text) => pin(x + 9, y - 4, n) + T(x + 26, y, title, { size: 13.5, weight: 700, fill: '#c9b6ff' }) + T(x + 26, y + 17, text, { size: 11.5, fill: '#ffffffaa' })
+  const r1 = 108
+  out += label(30, 72, '1', 'Your ship', 'No family, so no spine. Shown when nothing is selected.') + card3Ship(30, r1)
+  out += label(330, 72, '2', 'A planet', 'Tabs down the spine: the planet, its station, its moons.') + card3Planet(330, r1)
+  out += label(692, 72, '3', 'Several moons', 'The Moons tab opens a list. The planet stays the face.') + card3Moons(692, r1)
+  const r2 = 632
+  out += label(30, r2 - 36, '4', 'The station in front', 'Same width. The tabs haven\'t moved. Headings meet.') + card3Station(30, r2)
+  out += label(392, r2 - 36, '5', 'An action that must wait', 'Dimmed, with the reason under it.') + card3Station(392, r2, { blocked: true })
+  out += label(754, r2 - 36, '6', 'One moon in front', 'Picked from the list. ‹ › step the moons.') + card3Moon(754, r2)
+  // the phone's sheets
+  const r3 = 1170
+  out += label(30, r3 - 36, '7', 'On a phone: the planet', 'Tabs, the small card, then the pill and wells.') + G(phoneSheet(0, 0, 'planet'), { transform: `translate(30 ${r3})` })
+  out += label(450, r3 - 36, '8', 'On a phone: the station', 'The same places, every time.') + G(phoneSheet(0, 0, 'station'), { transform: `translate(450 ${r3})` })
+  out += label(870, r3 - 36, '9', 'On a phone: the moons', 'The list takes the right side.') + G(phoneSheet(0, 0, 'moons'), { transform: `translate(870 ${r3})` })
+  const nx = 1130
+  ;['Widths: ship 250 · planet, station or', 'moon 312 · the moons\' list 512.', 'Today\'s card is 236; mockup 1\'s wing', 'made it 486.', '', 'Tabs are squares and actions are', 'round, so a way somewhere is never', 'taken for something to do.', '', 'The tabs and the action row keep', 'their places in every state, so nothing', 'moves under the pointer.'].forEach((line, i) => (out += T(nx, r2 + 20 + i * 17, line, { size: 12, fill: '#ffffffaa' })))
+  doc(W, Hh, out, '8-card-states')
+}
+
 mock1()
 mock2()
 mock3()
 mock4()
 mock5()
+mock8()
 
 // ── PNGs, with Chrome ────────────────────────────────────────────────────────
 if (process.argv.includes('--png')) {
