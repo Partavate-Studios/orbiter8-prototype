@@ -154,6 +154,9 @@ Koda's notes on where the HUD should go next. Not designed or built yet: each pa
 Koda approves before it's built (CLAUDE.md, "Keep the card and menu art"). The card's art and the big
 menus stay; what changes is how the pieces connect.
 
+**The plan and first mockups** (2026-11-21, for Koda's review): [`ui-plan.md`](ui-plan.md) and
+[`mockups/together/`](mockups/together/).
+
 ### What's wrong now
 
 - **The same things are reached in three ways that don't agree.** At the top right, a button per kind
