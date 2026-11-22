@@ -581,6 +581,8 @@ So the measure for a loop is **travel and stability, not the number of clicks**:
 - Nothing moves under the pointer: a control keeps its place from one step to the next and from one
   planet to the next.
 - This drops two of the fixes above as written: a "Next buyer" button that skips the trip, and a
-  best-buyer shortcut. Kept: the list remembers its filters; sliders preset to what the port buys (to
-  be confirmed); and the strip-and-card route (planet's mark, Station, Trade) becomes the one to make
-  short, since it's the one that shows where you are.
+  best-buyer shortcut. Kept: the list remembers its filters; and the strip-and-card route (planet's
+  mark, Station, Trade) becomes the one to make short, since it's the one that shows where you are.
+- **Never preset a trade slider (Koda, 2026-11-21).** Sliding and choosing what to buy and sell is one
+  of the few fun interactions the player has. And they may have come to buy for a build: something
+  else already selected would feel wrong. The trade screen always opens with every slider at rest.
