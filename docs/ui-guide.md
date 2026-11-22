@@ -147,3 +147,67 @@ yours or attention).
       goods back to a parked ship.
 - [ ] **Drone swarms in battle:** a first drawing is `assets/art/drone-swarm.svg`.
 - [ ] **Publishing builds quickly** for play-tests (waits for Koda's branch strategy).
+
+## 10. Direction: bringing the system together (Koda, 2026-11-21; not built)
+
+Koda's notes on where the HUD should go next. Not designed or built yet: each part needs a mockup that
+Koda approves before it's built (CLAUDE.md, "Keep the card and menu art"). The card's art and the big
+menus stay; what changes is how the pieces connect.
+
+### What's wrong now
+
+- **The same things are reached in three ways that don't agree.** At the top right, a button per kind
+  of object (Planets, Ports, Ships…) and one for the star; the minimap splits the system up another
+  way; at the bottom left, the planet strip on the card, where selecting a planet brings up its own
+  sub-list. Opening a menu beside the card changes context away from the thing the card shows, which
+  feels wrong.
+- **The UI doesn't follow how ownership works.** A **planet is one thing**: its moons, its station and
+  whatever orbits it belong to it. An **asteroid is one thing**. The **star** is a container, and
+  sometimes a black hole instead (or two stars: see binary stars in section 9). Whatever is at the
+  center, every system has something there. The UI should group things the same way.
+- **A station doesn't feel like its planet's.** The second card that slides over the planet's card when
+  you select its station looks good, but it doesn't read as part of the planet. The moon and station
+  buttons look good, but they're less obvious than the menu buttons beside the card.
+- **Network matters sit among game actions.** Start Session is on your ship's menu, though it's about
+  the wallet, not the ship.
+- **The galaxy map's icon** comes from an old design and no longer looks like how jumping works. Redo it.
+
+### Where it should go
+
+**One Objects menu for the system.**
+- It always shows what's at the system's center (the star, the pair, or the black hole) at the top.
+- By default it lists every object in the system, with anything a second layer deep (a planet's moons
+  and station, an asteroid's station) folded under its parent and expandable.
+- Filters along the top: Planets, Stations, Moons, Ships, and more as needed. With **Stations**, a
+  second filter, **Buying**, shows only the ports that buy what you carry.
+- Players will drill into this often, so it has to be fast to reach and quick to filter. It should
+  replace the top right's buttons by kind, and the planet strip may fold into it.
+
+**The card.**
+- **Never collapsed.** It looks great and sits out of the way in the corner. Whatever is selected shows
+  in the card.
+- **A planet's station and moons open as an extension of the planet's card** (the card grows, or a
+  section unfolds from it), not as a separate card laid over it.
+- **Icons rather than text menus**, so the text doesn't overwhelm the icons, and perhaps built into
+  the card itself instead of in a menu beside it.
+- **A Details option on most things:** a big version of the card with everything the small one can't
+  show.
+  - **A ship:** every upgrade and its whole loadout.
+  - **A planet:** every building and upgrade, weapons included; what it produces; its size and
+    nature; the star it belongs to; its owner, with a way through to the owner's profile. Its moons
+    and station read as part of it, as on the small card.
+  - **A moon or station:** a button back to its planet.
+
+**Your network connection: Minerva.** A dedicated piece of UI for "your connection to the Minerva
+network", which is your status on Polkadot: what a wallet shows (address, balance), the session (Start
+Session moves here from the ship's menu), the block number, and anything else about the network.
+
+**You, as a player.**
+- A **player-centric view**: you as an identity, not only your ship. Later it holds achievements and
+  leaderboard rankings (both on the to-do list for much later, `demo4-plan.md`).
+- **Other players' profiles:** anything owned by someone else links to its owner's profile. One day
+  that may show their corporate rank, their property, their achievements and more; for now a simple
+  profile, with room to grow.
+
+**Your ships.** When pilots can have several ships, a menu to switch which ship you control, which
+always makes clear which ship you're in.
