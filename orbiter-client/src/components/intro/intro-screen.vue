@@ -1169,6 +1169,8 @@ export default {
   display: grid;
   place-items: center;
   pointer-events: none;
+  /* small, her face reaches past its box: the screen's edge cuts it off */
+  overflow: hidden;
 }
 
 /* you */

@@ -325,6 +325,7 @@ export default {
   place-items: center;
   border-radius: 6px;
   background: #0c0a14;
+  overflow: hidden;
 }
 
 /* the glass's frame, at the edges */

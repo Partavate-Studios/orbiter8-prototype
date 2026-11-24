@@ -2,6 +2,10 @@
 // (components/assets/minerva-emblem.svg.vue) draws them as one shape; her face
 // (minerva-face.vue) moves each one. Paths are in the art's own units, offset by (-108, -108) so the
 // owl is centered on the origin: about 178 wide and 96 tall.
+//
+// Her face draws part 7 (the frame) as FRAME_PIECES, the same shape cut into five: two ear tufts, two
+// brow ridges and the beak, so they can move on their own. PARTS is unchanged and the emblem still draws
+// part 7 whole.
 
 /** Where the paths are drawn: subtract it to center the owl on the origin. */
 export const ART_ORIGIN = 108
@@ -60,5 +64,48 @@ export const PARTS = [
     cx: -0.2,
     cy: 7.8,
     d: 'M107.646,117.473c1.24,0,5.693,2.625,5.693,2.625l1.634-5.197c0,0-4.762-3.433-7.165-3.433 c-2.402,0-7.165,3.433-7.165,3.433l1.444,5.197C102.087,120.098,106.405,117.473,107.646,117.473z'
+  }
+]
+
+/**
+ * Part 7 cut into five pieces for her face: each ear tuft, each brow ridge (with the top of the leg under
+ * it) and the beak (the V the two legs join in). Drawn together, untouched, they are exactly part 7: every
+ * piece reaches past its cut (a tuft 1.2 units, a ridge and the beak 3), so neighbours overlap: no seam shows
+ * at rest, and none opens while a piece only stirs.
+ * cx, cy is the point a piece turns and scales around: a tuft's root, the beak's middle, and for a ridge its
+ * hinge, the middle of the cut where it meets the beak, so a brow lifts like an eyebrow and stays joined.
+ * The cuts: a tuft comes off along the line from the notch above the brow to the brow's outer corner; the
+ * beak comes off across each leg in a shallow chevron, like the forehead's (part 8).
+ */
+export const FRAME_PIECES = [
+  {
+    id: 'tuftL',
+    cx: -52,
+    cy: -24.5,
+    d: 'M63.27,84.39c0.18,-0.26 0.35,-0.62 0.53,-1.04v2.25l-15.02,-1.68l0.15,-1.44c-10.75,-5.25 -24.84,-17.19 -28.42,-20.06c-3.58,-2.87 1.91,-1.91 1.91,-1.91c26.99,6.69 40.84,23.88 40.84,23.88z'
+  },
+  {
+    id: 'ridgeL',
+    cx: -14.5,
+    cy: 10.8,
+    d: 'M81.18,84.87c5.63,4.22 12.07,21.33 16.79,35.46l-9.19,3.71c0.15,-1.17 0.32,-2.37 0.52,-3.59c1.75,-10.82 -0.48,-13.14 -0.48,-13.14c0,0 -28.42,-14.8 -40.12,-18.39c-0.15,-0.05 -0.29,-0.09 -0.44,-0.13l0.68,-6.32c-0.67,-0.33 -1.35,-0.68 -2.03,-1.05l2.1,-0.13l13.09,1.76c0.78,0.84 1.17,1.33 1.17,1.33c1.43,-2.15 3.1,-10.51 3.1,-10.51c0,0 6.21,4.54 14.8,10.99z'
+  },
+  {
+    id: 'beak',
+    cx: 0,
+    cy: 30,
+    d: 'M112.37,137.89c1.42,-4.27 4.14,-13.32 7.45,-22.83l6.49,2.62c0.1,0.86 0.23,1.78 0.39,2.77c2.38,14.69 1.1,25.27 -0.04,30.77c-5.84,2.13 -13.39,3.76 -18.65,4.41v0c0,0 -0.01,0 -0.01,0c0,0 -0.01,0 -0.01,0v0c-5.26,-0.65 -12.81,-2.27 -18.65,-4.41c-1.15,-5.5 -2.42,-16.08 -0.04,-30.77c0.16,-0.99 0.29,-1.92 0.39,-2.77l6.49,-2.62c3.32,9.5 6.03,18.56 7.45,22.82c1.91,5.74 3.43,8.19 4.37,9.23c0.95,-1.04 2.46,-3.49 4.38,-9.23z'
+  },
+  {
+    id: 'ridgeR',
+    cx: 14.5,
+    cy: 10.8,
+    d: 'M152.73,84.39c0,0 0.39,-0.49 1.17,-1.33l13.1,-1.76l2.1,0.13c-0.69,0.37 -1.37,0.73 -2.04,1.05l0.68,6.32c-0.15,0.04 -0.29,0.08 -0.44,0.13c-11.7,3.58 -40.12,18.39 -40.12,18.39c0,0 -2.23,2.32 -0.48,13.14c0.2,1.23 0.37,2.42 0.52,3.59l-9.2,-3.71c4.72,-14.13 11.17,-31.25 16.79,-35.46c8.6,-6.45 14.81,-10.99 14.81,-10.99c0,0 1.67,8.36 3.1,10.51z'
+  },
+  {
+    id: 'tuftR',
+    cx: 52,
+    cy: -24.5,
+    d: 'M152.73,84.39c0,0 13.85,-17.2 40.84,-23.88c0,0 5.5,-0.95 1.92,1.91c-3.59,2.87 -17.68,14.81 -28.42,20.06l0.15,1.44l-15.02,1.68v-2.24c0.18,0.42 0.36,0.77 0.53,1.03z'
   }
 ]

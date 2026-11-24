@@ -5,7 +5,7 @@
        you're signing (the session lives here now, not on your ship), and everything that's under way. -->
   <div class="k-panel minerva-panel" :class="{ narrow }">
     <header class="k-head">
-      <span class="k-title"><minerva-face :state="connectionLost ? 'offline' : 'idle'" :size="64" /><span><b>Minerva</b><small>Your link to the network</small></span></span>
+      <span class="k-title"><minerva-face :state="connectionLost ? 'offline' : 'idle'" :size="64" clip /><span><b>Minerva</b><small>Your link to the network</small></span></span>
     </header>
 
     <div class="k-tabs pages" role="tablist">

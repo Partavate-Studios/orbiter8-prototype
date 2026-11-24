@@ -1088,7 +1088,48 @@ intended first step; otherwise the card could say "Sell cargo to make room" inst
 Checked in one session (account 9: the intro, selling the starter cargo, mining, waiting) at 1440×900
 and 390×844. `npm test`, `npm run lint` and a scratch build pass.
 
-## For Koda to decide (updated 2026-11-22)
+## 19. Minerva's face, reworked by Fable (2026-11-24, `archive/briefs/minerva-face-rework.md`)
+
+Koda: "It's good, but I think it could be better." Her face and lab went to Fable as a standalone kit
+(packed from f9c2326; the brief is archived), and came back reworked. Fable's report, with the choices
+it made, is [`archive/briefs/minerva-face-rework-changes.md`](archive/briefs/minerva-face-rework-changes.md).
+In short:
+
+- part 7 is cut into five pieces (tufts, brow ridges, beak), with an unchanged outline at rest (M2);
+- new owl eyes: a hard-edged iris with a see-through pupil, and lids;
+- she's drawn closer under 80 px, so the HUD plate reads (M8);
+- each state the plate uses has its own outline, light or rhythm;
+- state changes are sprung rather than tweened;
+- 13 new one-offs, among them `noted`, `wince` and `paid` (for D111's paid-in-full notice);
+- an optional `setVoice()` for real audio.
+
+The interface and every state and one-off name the game uses are unchanged, and `PARTS` is untouched, so
+the emblem draws as before.
+
+Merged as Fable sent it: the face, poses, parts, tests and lab, and the art (`minerva-eye.svg`,
+`minerva-face.svg`, new `minerva-frame-pieces.svg`). `mockups/minerva-face.png` is Fable's new sheet.
+Calls made in the merge:
+
+- **R1. The crop needs her small frames to clip** (under 80 px she reaches past her box on purpose).
+  - **The HUD plate:** the clip is on her button, not the whole plate, because the activities' tips
+    hang below the plate and would be cut off. The button now fills the plate's height (49 px, 41
+    compact) so the cut falls at the plate's edge.
+  - **Her panel's title:** uses the new `clip` prop.
+  - **The apartment's terminal and scanner screens, and the balcony's screen:** clip at the screen's
+    edge.
+  - The notice (84 px) and everything larger aren't cropped.
+- **R2. The lab keeps its "← Title" link**, which the kit had removed, and gains Fable's voice slider.
+- **R3. The new one-offs aren't wired to anything yet** (`noted`/`wince` on a trade's profit or loss,
+  `paid` with D111). They're in the lab.
+- **R4. The kit's comparison views weren't kept** (Before / after, All at once). The old face is
+  f9c2326 in git if a side-by-side is wanted again.
+
+Checked in one session on the local chain (spare ports): the intro (scanner, lights on, console, waking),
+then the star map's plate and her panel, at 1440×900 and 390×844, with no console errors. `npm test`
+(338), `npm run lint` and a scratch build pass. Fable's notes say it never watched her move, only
+stills and filmstrips; how the motion *feels* is Koda's to judge in the lab.
+
+## For Koda to decide (updated 2026-11-24)
 
 Everything above that isn't listed here is answered, fixed or superseded, and marked where it was
 asked. Answered since the last list: P3–P5 and the product id (D101–D105, D109), N10 (fixed
@@ -1133,9 +1174,10 @@ asked. Answered since the last list: P3–P5 and the product id (D101–D105, D1
 - Body storage (section 16): F1–F4, and the scene itself; the 4–2 vape line is mine (F4).
 
 **Minerva, her voice and her music**
-- Her face (section 11): the look of her eyes and expressions (`mockups/minerva-face.png`, or the lab in
-  a dev build), M2 (split part 7 or not), and M8 (more motion at small sizes, now that she's on the
-  plate at the top of the HUD).
+- Her face, reworked by Fable (section 19): the 13 "Choices for Koda to review" in
+  `archive/briefs/minerva-face-rework-changes.md`, the first six most of all: part 7 split (M2's
+  answer), the crop at icon sizes, the new eyes, the cyan for Scanning, pink in her eyes, and Peer on
+  the plate. Judge the motion in the lab (dev build, the title's "Minerva lab"); Fable saw only stills.
 - Music (section 15): M2–M8 (M1 was yours), and her draft line on the Music page.
 - The corporation database (section 17): D1–D7, and the brief's own list
   (`archive/briefs/corp-database.md`, "For Koda to review": names, hulls, focuses, the reconciliation,

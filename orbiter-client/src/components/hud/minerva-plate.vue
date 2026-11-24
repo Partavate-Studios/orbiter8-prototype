@@ -128,11 +128,15 @@ button:focus-visible {
   display: grid;
   place-items: center;
   width: 62px;
-  height: 44px;
+  height: 49px;
   padding: 0;
   border: 0;
-  border-radius: 22px;
+  border-radius: 24px;
   background: none;
+  /* under 80 px her face is drawn closer and reaches past its box: the button cuts her tufts off
+     at the plate's inner edge (the plate itself can't clip, or the activities' tips below it would go
+     too) */
+  overflow: hidden;
 }
 .her:hover {
   background: #ffffff14;
@@ -267,7 +271,8 @@ button:focus-visible {
 }
 .compact .her {
   width: 50px;
-  height: 38px;
+  height: 41px;
+  border-radius: 20px;
 }
 .compact .activity {
   width: 34px;

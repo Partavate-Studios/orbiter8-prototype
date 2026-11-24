@@ -12,6 +12,7 @@ building are in [`../review.md`](../review.md).
 |---|---|---|---|
 | [`intro-mockup.md`](briefs/intro-mockup.md) | Mockup 2026-11-19, then built as the intro (daff848), later the zoomable diorama | `orbiter-client/src/components/intro/`, `docs/mockups/intro/`, `docs/mockups/intro-zoom/` | review.md §12–14 |
 | [`minerva-face.md`](briefs/minerva-face.md) and its parts drawing (`minerva-face-parts.svg`/`.png`) | 2026-11-19 | `orbiter-client/src/components/minerva/` | review.md §11 (M1–M9) |
+| [`minerva-face-rework.md`](briefs/minerva-face-rework.md) (the standalone kit's README) and Fable's report, [`minerva-face-rework-changes.md`](briefs/minerva-face-rework-changes.md) | 2026-11-24 | `orbiter-client/src/components/minerva/` | review.md §19 (R1–R4); Fable's own list in its report |
 | [`music.md`](briefs/music.md) | 2026-11-20 (13a96fd) | `orbiter-client/src/libs/08audio.js`, `components/playgame.vue` | review.md §15 |
 | [`corp-database.md`](briefs/corp-database.md) | 2026-11-20 (7889b7a) | `orbiter-client/src/libs/corp-database.js` (the words), `components/intro/intro-database.vue` | review.md §17 (D1–D7) |
 

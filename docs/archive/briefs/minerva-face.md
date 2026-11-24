@@ -4,6 +4,8 @@
 > says how to use it), its expressions are data in `minerva-poses.js`, and the dev-only lab opens from the
 > title screen's "Minerva lab" button or `#/minerva-lab`. Every state and one-off is pictured in
 > `docs/mockups/minerva-face.png`; the calls made while building are M1–M9 in `docs/review.md`.
+> **Reworked 2026-11-24** by Fable from a standalone kit: [`minerva-face-rework.md`](minerva-face-rework.md)
+> and its report; this brief's states and one-offs all remain.
 
 **For:** a Claude session (Fable) working in this repo, `/home/koda/dev/orbiter8-prototype`, branch
 `polkadot`. Written 2026-11-19 from Koda's direction. This file is everything you need: read it, then the

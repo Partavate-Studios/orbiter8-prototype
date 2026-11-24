@@ -1,7 +1,7 @@
 <template>
   <!-- Dev builds only (router.js): Minerva's face at three sizes, and a console to switch her states,
-       fire her one-offs and type at her. Reached from the title screen's "Minerva lab" button or
-       #/minerva-lab. -->
+       fire her one-offs, type at her and feed Talking a voice level. Reached from the title screen's
+       "Minerva lab" button or #/minerva-lab. -->
   <div class="minerva-lab">
     <header class="top">
       <router-link to="/" class="o8-button small quiet">← Title</router-link>
@@ -90,6 +90,23 @@
       </label>
 
       <div class="group">
+        <h2>Her voice: {{ voiceOn ? voice.toFixed(2) : 'made up' }}</h2>
+        <label class="check voice">
+          <input v-model="voiceOn" type="checkbox" />
+          Feed Talking this level (as the game would, from her audio)
+        </label>
+        <input
+          v-model.number="voice"
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          aria-label="Voice level"
+          :disabled="!voiceOn"
+        />
+      </div>
+
+      <div class="group">
         <h2>Speed: {{ speed.toFixed(2) }}×</h2>
         <input v-model.number="speed" type="range" min="0.1" max="2" step="0.05" aria-label="Speed" />
       </div>
@@ -136,6 +153,8 @@ export default {
       ],
       typed: '',
       listenOnFocus: true,
+      voiceOn: false,
+      voice: 0.5,
       stateBeforeTyping: null,
       lastDone: null,
       skipped: null,
@@ -150,6 +169,17 @@ export default {
         ? `Last finished: ${this.oneOffs[this.lastDone]?.label ?? this.lastDone}.`
         : 'Each plays once over the state.'
     }
+  },
+  watch: {
+    /** While the box is on, she's told the slider's level many times a second, as the game would tell her. */
+    voiceOn(on) {
+      clearInterval(this.voiceTimer)
+      if (on) this.voiceTimer = setInterval(() => this.faces.forEach((face) => face?.setVoice(this.voice)), 50)
+      else this.faces.forEach((face) => face?.setVoice(null))
+    }
+  },
+  beforeUnmount() {
+    clearInterval(this.voiceTimer)
   },
   methods: {
     /** With the box on: she listens while it has focus, then goes back to what she was doing. */
@@ -285,6 +315,9 @@ figcaption,
   font-size: 0.9em;
   color: #bdb5d4;
   margin-top: -0.6em;
+}
+.check.voice {
+  margin-top: 0;
 }
 input[type='range'] {
   width: 100%;

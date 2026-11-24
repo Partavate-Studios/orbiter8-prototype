@@ -188,7 +188,8 @@ Checked against the code and `git log` on 2026-11-22.
   - **Where repayments go:** to the corporation. Corporations aren't accounts yet, so for now the
     treasury, or burned (open).
   - **Paid in full:** `DebtChanged(pilot, 0)` triggers a one-time notice from the corporation or Minerva:
-    "Debts paid in full. Everything you buy and sell from here is your profit to keep." The trade
+    "Debts paid in full. Everything you buy and sell from here is your profit to keep." (Minerva's face has
+    a `paid` one-off for it, 2026-11-24, and `noted`/`wince` for a trade's profit or loss.) The trade
     screen shows, until then, how much of a sale goes to the debt.
   - **The game's words follow:** the intro's wake line ("You owe the pilot program N credits") and the
     job's terms ("your debt comes with you") should say the cargo is a loan from the corporation, paid
