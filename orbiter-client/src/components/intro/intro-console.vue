@@ -145,6 +145,7 @@
               aria-valuemin="0"
               aria-valuemax="100"
               aria-label="Health score"
+              @mouseenter="hover('twitch', 'meter')"
             >
               <span :style="{ width: health + '%' }"></span>
             </div>
@@ -172,7 +173,7 @@
         </template>
 
         <!-- your corporation's database: its name and voice are theirs (intro-database.vue) -->
-        <intro-database v-else-if="tab === 'Database' && corp" :corp="corp" />
+        <intro-database v-else-if="tab === 'Database' && corp" :corp="corp" @page="openDbPage" />
 
         <!-- Music: the apartment's radio, at its own volume (08audio.js) -->
         <template v-else-if="tab === 'Music'">
@@ -253,7 +254,7 @@
                   <span class="eligible">You’re eligible</span>
                 </button>
               </li>
-              <li v-for="job in OTHER_JOBS" :key="job" class="job-row other">
+              <li v-for="job in OTHER_JOBS" :key="job" class="job-row other" @mouseenter="hover('sideEye', job)">
                 <span class="from">{{ job }}</span>
                 <span class="subject">Requires citizenship</span>
               </li>
@@ -272,10 +273,23 @@
                 </template>
               </dl>
               <div class="actions">
-                <button ref="accept" type="button" class="o8-pill main big" @click="$emit('job-step', 'ship')">
+                <button
+                  ref="accept"
+                  type="button"
+                  class="o8-pill main big"
+                  @mouseenter="hover('perk', 'accept')"
+                  @click="$emit('job-step', 'ship')"
+                >
                   Accept the job
                 </button>
-                <button type="button" class="o8-pill quiet" @click="$emit('job-step', 'board')">Not yet</button>
+                <button
+                  type="button"
+                  class="o8-pill quiet"
+                  @mouseenter="hover('slowBlink', 'not yet')"
+                  @click="$emit('job-step', 'board')"
+                >
+                  Not yet
+                </button>
               </div>
               <p class="label">Accepting is the only way out (or back to the title).</p>
             </article>
@@ -369,6 +383,19 @@ const TAB_GLYPHS = {
 const NOTE = 'M2 5 a3 3 0 1 1 -6 0 a3 3 0 1 1 6 0 M2 5 V-8 l5 2'
 const BARS = 'M-6 7 V1 M-2 7 V-6 M2 7 V-2 M6 7 V-8'
 
+// Her reactions (Koda, 2026-11-24: showcase her expressions here), as one-offs and states of
+// components/minerva/minerva-poses.js. A letter's is in MAIL (libs/intro.js).
+/** Played as a tab opens, a beat after she turns to it. */
+const TAB_FACE = { Account: 'sideEye', Health: 'slowBlink', Database: 'ruffle', corp: 'blinkOne' }
+/** The database's pages: a one-off as one opens; on the classified ship page she stays skeptical. */
+const DB_FACE = { orbiter8: 'noted', how: 'perk', ship: 'sideEye', history: 'slowBlink' }
+const DB_STATE = { ship: 'skeptical' }
+/** The radio: how she takes to each track (a one-off as it starts, then a state while the Music page is open). */
+const TRACK_FACE = { murmurings: 'ruffle', funkytunz: 'tuftFlick', carrier: 'slowBlink', off: 'nod' }
+const TRACK_STATE = { murmurings: 'grooving', funkytunz: 'grooving', carrier: 'swaying' }
+/** Pointing at things: at most one reaction this often (ms), and not twice in a row for the same thing. */
+const HOVER_GAP_MS = 2500
+
 export default {
   name: 'IntroConsole',
   components: { MinervaFace, Ship, IntroDatabase },
@@ -403,6 +430,7 @@ export default {
       OTHER_JOBS,
       NAME_MAX_LENGTH,
       openMail: 2,
+      dbPage: 'orbiter8',
       shipName: this.registration?.name ?? '',
       faceSize: 230
     }
@@ -446,9 +474,9 @@ export default {
         case 'Mail':
           return { state: 'talking', say: SAY.mail }
         case 'Database':
-          return { state: 'talking', say: SAY.database }
+          return { state: DB_STATE[this.dbPage] ?? 'talking', say: SAY.database }
         case 'Music':
-          return { state: this.radio.track === 'off' ? 'idle' : 'talking', say: SAY.music }
+          return { state: TRACK_STATE[this.radio.track] ?? 'idle', say: SAY.music }
       }
       if (this.jobStep === 'ship') return { state: 'listening', say: SAY.shipName }
       if (this.jobStep === 'escort') {
@@ -472,13 +500,26 @@ export default {
     }
   },
   watch: {
-    tab() {
+    tab(name) {
       this.focusFirst()
+      if (name !== 'Database') this.dbPage = 'orbiter8'
+      this.reactSoon(TAB_FACE[name])
     },
-    jobStep() {
+    jobStep(step) {
       this.focusFirst()
+      if (step === 'job') this.reactSoon('perk')
+    },
+    openMail(i) {
+      this.react(MAIL[i].face)
+    },
+    'radio.track'(track) {
+      if (this.tab === 'Music') this.reactSoon(TRACK_FACE[track])
+    },
+    shipProblem(problem) {
+      if (problem === 'too long') this.react('no')
     },
     status(status) {
+      if (status === 'done') this.react('noted')
       if (status === 'failed') {
         this.$refs.face?.play('glitch')
         this.$nextTick(() => this.$refs.retry?.focus())
@@ -499,10 +540,33 @@ export default {
     this.focusFirst()
   },
   beforeUnmount() {
+    clearTimeout(this.reactTimer)
     window.removeEventListener('resize', this.fit)
     window.removeEventListener('keydown', this.onKey)
   },
   methods: {
+    /** Plays one of her one-offs (none if `name` is empty, or she's apart, or it's skipped for reduced motion). */
+    react(name) {
+      if (name) this.$refs.face?.play(name)
+    },
+    /** The same, a beat later: after she's turned to what just opened. */
+    reactSoon(name) {
+      clearTimeout(this.reactTimer)
+      if (name) this.reactTimer = setTimeout(() => this.react(name), 350)
+    },
+    /** A page of the database opened. */
+    openDbPage(page) {
+      this.dbPage = page
+      this.react(DB_FACE[page])
+    },
+    /** Pointing at something: a reaction, now and then. */
+    hover(name, what) {
+      const now = performance.now()
+      if (what === this.lastHover || now - (this.lastHoverAt ?? -Infinity) < HOVER_GAP_MS) return
+      this.lastHover = what
+      this.lastHoverAt = now
+      this.react(name)
+    },
     /** A tab's name: the database goes by your corporation's name for it. */
     tabLabel(name) {
       return name === 'Database' && this.corp ? corpDatabase(this.corp.key).name : name
@@ -532,6 +596,8 @@ export default {
       this.o8audio?.tuneRadio(key)
     },
     setVolume(volume) {
+      // all the way up: she winces
+      if (volume >= 1 && this.radio.volume < 1) this.react('wince')
       this.o8audio?.setRadioVolume(volume)
     },
     submitShip() {

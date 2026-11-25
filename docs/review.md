@@ -1129,6 +1129,27 @@ then the star map's plate and her panel, at 1440×900 and 390×844, with no cons
 (338), `npm run lint` and a scratch build pass. Fable's notes say it never watched her move, only
 stills and filmstrips; how the motion *feels* is Koda's to judge in the lab.
 
+## 20. Her reactions in the console (Koda, 2026-11-24: "a fun place to showcase some of these")
+
+Her console in the intro now uses the new expressions. The choices are mine. The tables are at the top of
+`intro-console.vue`, and each letter's reaction is its `face` in `libs/intro.js`.
+
+| What happens | How she reacts |
+|---|---|
+| Opening a tab | Account: a side-eye at the balance. Health: a slow blink. Database: a ruffle, settling in to read. Corporation: a one-eyed blink. Jobs: the tufts prick up (Listening's entrance), and again when you open the pilot opening. |
+| Opening a letter | Final notice: slow blink. Housing fee: side-eye. Harlan & Voss rejection: wince. "Not reviewed": deadpan "ha". NutriLoan: shakes her head. Incident report: a start. OxyPlus: "ha". |
+| The database's pages | Orbiter 8: `noted`. How it works: tufts up. Your corporation's classified ship: a side-eye, and she stays Skeptical while it's open. History: a slow blink. |
+| The radio | Two new states: **Grooving** (her head bobs, the tufts catch the off-beat; a beat every 650 ms, near Funkytunz's 92 bpm) and **Swaying** (half-lidded, a slow sway). Murmurings: a ruffle, then Grooving. Funkytunz: a tuft flick, then Grooving. Carrier of Life: a slow blink, then Swaying. Off: a nod. The volume turned all the way up: a wince. |
+| Pointing at things | A job that requires citizenship: side-eye. "Accept the job": tufts up. "Not yet": slow blink. The health meter: a twitch. At most one every 2.5 s, and never twice in a row for the same thing. |
+| The job going through | Registered: `noted` (a failure is still a glitch). A ship name that's too long: she shakes her head. |
+
+Her words don't change, only her face. Before, the radio made her Talking. The two music states are in the
+lab with the others. The bob isn't synced to the music, so it only sits near each track's tempo, which I
+measured from the files.
+
+Checked by playing the console with every reaction logged as it played, then looking at the Music and
+classified pages.
+
 ## For Koda to decide (updated 2026-11-24)
 
 Everything above that isn't listed here is answered, fixed or superseded, and marked where it was

@@ -538,6 +538,35 @@ export const STATES = {
     waves: { eyes: { b: [0.08, 3700, 0, 'noise'] } },
     blink: null,
     tics: [{ play: 'flicker', every: [2600, 7500] }]
+  },
+  // The apartment's radio (intro-console.vue): the waves aren't locked to the music, so their periods are
+  // only near the tracks' tempos (Funkytunz about 92 bpm, a beat every 650 ms; Carrier of Life about 62).
+  grooving: {
+    label: 'Grooving',
+    about: 'Music with a beat is on: her head bobs to it, eyes easy, the tufts catching the off-beat.',
+    breathe: 0.8,
+    float: 0.3,
+    pose: { eyes: { lid: -0.22, under: -0.12 }, tufts: { r: 1.5 } },
+    waves: {
+      face: { y: [3, 650, 0, 'bump'], pitch: [0.6, 650, 0, 'bump'], r: [1.6, 2600, 0] },
+      beak: { y: [0.8, 650, 0.04, 'bump'] },
+      tufts: { r: [3.5, 650, 0.5, 'bump'] }
+    },
+    blink: [2500, 5500],
+    tics: [{ play: 'tuftFlick', every: [5000, 11000] }]
+  },
+  swaying: {
+    label: 'Swaying',
+    about: 'Slow music is on: eyes half closed, a slow sway from side to side.',
+    breathe: 1.2,
+    float: 0.8,
+    pose: { eyes: { lid: -0.45, under: -0.2 }, tufts: { r: -2 }, face: { pitch: 0.4 } },
+    waves: {
+      face: { r: [3, 3900, 0], x: [2, 3900, 0.25], turn: [0.3, 3900, 0] },
+      tufts: { r: [1.5, 1950, 0] }
+    },
+    blink: [3500, 7000],
+    blinkWith: 'slowBlink'
   }
 }
 

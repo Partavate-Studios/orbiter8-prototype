@@ -189,6 +189,8 @@ export default {
     /** The subscribed corporation (libs/intro corporation()) */
     corp: { type: Object, required: true }
   },
+  /** page: the page opened, so Minerva can react to it (intro-console.vue) */
+  emits: ['page'],
   data() {
     return {
       DATABASE_PAGES,
@@ -211,6 +213,7 @@ export default {
     open(key) {
       this.o8audio?.playEffect('click')
       this.page = key
+      this.$emit('page', key)
       this.$el.closest('.content')?.scrollTo?.({ top: 0 })
     }
   }

@@ -112,11 +112,17 @@ export const CYCLE = [
 export const HEALTH = 17
 export const VAPE_HITS_BEFORE = 3
 
+/**
+ * The unit's mail. `face`: the one-off Minerva plays when you open the letter (components/minerva/
+ * minerva-poses.js): a slow blink at a final notice, a wince at a rejection, a deadpan "ha" at the absurd ones,
+ * a shake of the head at the loan.
+ */
 export const MAIL = [
   {
     from: 'Grid Utility',
     subject: 'Final notice: 3 cycles unpaid',
     tag: 'Overdue',
+    face: 'slowBlink',
     body: [
       'Unit 7-2216: three cycles unpaid. Service continues at reduced priority. Brownouts in Block 7 are scheduled, not personal.'
     ]
@@ -125,6 +131,7 @@ export const MAIL = [
     from: 'Block 7 Housing',
     subject: 'Unit fee overdue: 2 cycles',
     tag: 'Overdue',
+    face: 'sideEye',
     body: [
       'Your unit fee is two cycles overdue. Affordable housing is a privilege of continued payment. Please pay through Minerva.'
     ]
@@ -133,6 +140,7 @@ export const MAIL = [
     from: 'Harlan & Voss Logistics',
     subject: 'Re: Application 44817',
     tag: 'Rejection',
+    face: 'wince',
     body: [
       'Dear Applicant 7-2216,',
       'After careful review against 9,412 applicants, we have selected candidates whose qualifications more closely match the position.',
@@ -143,6 +151,7 @@ export const MAIL = [
     from: 'Talent Intake',
     subject: 'Your application was not reviewed',
     tag: 'Rejection',
+    face: 'ha',
     body: [
       'Your application was not reviewed. Applications from non-citizens are reviewed when capacity allows. Capacity does not allow.'
     ]
@@ -151,6 +160,7 @@ export const MAIL = [
     from: 'NutriLoan',
     subject: 'You’re pre-approved! 0% for 3 days',
     tag: '',
+    face: 'no',
     body: [
       'Hungry? NutriLoan advances up to 200¢ of nutrition against your next stipend. 0% for 3 days, then the rate applies.'
     ]
@@ -159,12 +169,14 @@ export const MAIL = [
     from: 'Block 7 Security',
     subject: 'Incident report: 3 assaults, 0 arrests',
     tag: '',
+    face: 'startle',
     body: ['Incidents tonight: 3 assaults, 1 fire, 0 arrests. Response times are limited after curfew. Stay inside.']
   },
   {
     from: 'OxyPlus',
     subject: 'Your air could be better',
     tag: '',
+    face: 'ha',
     body: ['Block 7’s air quality: poor. OxyPlus filters: better. Ask about our citizen discount.']
   }
 ]
