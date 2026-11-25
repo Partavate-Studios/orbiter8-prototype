@@ -68,14 +68,17 @@ export async function isAuthorized(wallet) {
 }
 
 /**
- * What went wrong connecting, in terms the player can act on:
+ * What went wrong with the wallet, in terms the player can act on:
  * 'rejected' (they closed or declined the request), 'pending' (a request is already open in the
- * wallet), or 'other'.
+ * wallet), 'unauthorized' (the wallet won't let this site use the account: locked, or access taken
+ * away; EIP-1193's 4100), or 'other'. Ethers wraps a code it doesn't know ("could not coalesce error"),
+ * so the wallet's own code is looked for inside too.
  */
 export function walletErrorKind(error) {
-  const code = error?.code ?? error?.info?.error?.code ?? error?.error?.code
-  if (code === 4001 || code === 'ACTION_REJECTED') return 'rejected'
-  if (code === -32002) return 'pending'
+  const codes = [error?.code, error?.info?.error?.code, error?.error?.code, error?.cause?.code]
+  if (codes.some((code) => code === 4001 || code === 'ACTION_REJECTED')) return 'rejected'
+  if (codes.includes(-32002)) return 'pending'
+  if (codes.includes(4100)) return 'unauthorized'
   return 'other'
 }
 
@@ -126,9 +129,35 @@ class WalletSigner extends AbstractSigner {
   async sendTransaction(tx) {
     // The gas limit from our own estimate (with the SDK's margin, chain/gas.js), not the wallet's.
     if (tx.gasLimit == null) tx = { ...tx, gasLimit: await this.estimateGas({ ...tx, from: this.address }) }
-    const sent = await this.wallet.sendTransaction(tx)
+    let sent
+    try {
+      sent = await this.wallet.sendTransaction(tx)
+    } catch (error) {
+      if (walletErrorKind(error) !== 'unauthorized') throw error
+      // The wallet no longer lets this site use the account: MetaMask answers 4100 once it has locked
+      // itself, or when the site's access was taken away while the page stayed open (Koda, 2026-11-24:
+      // a registration failed with "could not coalesce error"). Asking for access again opens its unlock
+      // or connect window; with the same account back, the move goes once more.
+      const accounts = await this.wallet.provider.send('eth_requestAccounts', []).catch(() => [])
+      const same = accounts.some((a) => a.toLowerCase() === this.address.toLowerCase())
+      if (!same) throw unauthorized(this.address, error)
+      sent = await this.wallet.sendTransaction(tx).catch((again) => {
+        throw walletErrorKind(again) === 'unauthorized' ? unauthorized(this.address, again) : again
+      })
+    }
     return new TransactionResponse(sent, this.provider)
   }
+}
+
+/** The wallet won't sign for `address` on this site: an error that says what to do about it. */
+function unauthorized(address, cause) {
+  const short = `${address.slice(0, 6)}…${address.slice(-4)}`
+  const message = `your wallet isn't letting this site use ${short}. Unlock it, connect that account to this site, and try again`
+  const error = new Error(message, { cause })
+  error.code = 4100
+  error.reason = message
+  error.shortMessage = message
+  return error
 }
 
 /** A direct provider for a network the game knows, or null (an unknown network stays with the wallet). */
