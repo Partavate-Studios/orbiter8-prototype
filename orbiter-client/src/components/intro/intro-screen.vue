@@ -60,7 +60,7 @@
         <minerva-face v-if="terminalOn" :state="terminalState" :size="44" assemble-on-mount />
       </div>
       <div class="screen-face" :style="planeStyle(SCANNER_SCREEN)">
-        <minerva-face :state="scannerState" :size="22" />
+        <minerva-face ref="padFace" :state="scannerState" :size="22" />
       </div>
       <!-- the dark: everything in the unit but the scanner, until the power comes on -->
       <svg
@@ -310,6 +310,8 @@ const LABELS = {
 const TV_SCREEN = [2.9, 16.98, T.zu + 2.48, 2, 1.28]
 const TERMINAL_SCREEN = [6.17, 16.88, T.zu + 2.52, 1.36, 0.84]
 const SCANNER_SCREEN = [8.17, 16.4, T.zu + 5.6 - 2.28, 0.41, 0.38]
+/** How long the pad by the door scans when it's clicked (ms): one sweep of Minerva's scan line and a bit. */
+const PAD_SCAN_MS = 2800
 /** Views the camera zooms into from the room, and how much of the screen the thing fills. */
 const ZOOMS = { tv: 0.84, terminal: 0.5, door: 0.62, scanner: 0.22, glass: 1.4, window: 1.5 }
 const VAPE_BOX = bounds([ws(0.4, 17, T.zu), ws(2.9, 17, T.zu + 2.6), ws(2.9, 20.8, T.zu), ws(0.4, 20.8, T.zu + 2.6)])
@@ -325,6 +327,7 @@ export default {
   components: { MinervaFace, IntroScanner, IntroConsole, IntroBalcony, IntroNotice, IntroWake, IntroFreeze },
   data() {
     return {
+      padScan: false,
       BALANCE,
       ROOM_REGION,
       OUTLINES,
@@ -439,6 +442,7 @@ export default {
       }
     },
     scannerState() {
+      if (this.padScan) return 'scanning'
       if (this.phase === 'name') return 'listening'
       if (this.phase === 'filing') return this.callsignRegistration?.status === 'confirm' ? 'waiting' : 'thinking'
       return 'idle'
@@ -619,6 +623,7 @@ export default {
     await this.drawWorld()
   },
   beforeUnmount() {
+    clearTimeout(this.padScanTimer)
     this.gone = true
     this.o8audio?.speaking?.pause() // her intro lines end with the room
     this.o8audio?.stopRadio()
@@ -708,6 +713,7 @@ export default {
     use(key) {
       this.click()
       this.focusKey = key
+      if (key === 'scanner') this.scanPad()
       if (this.phase === 'dark') {
         if (key === 'scanner') {
           this.notice = null
@@ -732,6 +738,16 @@ export default {
       } else if (key === 'terminal') this.openConsole()
       else if (key === 'vape') this.sitDown()
       else if (key === 'glass' || key === 'window') this.lookOut(key)
+    },
+    /** The pad by the door scans whenever it's clicked, whether or not that does anything (Koda): a sweep, then a
+     *  flash as it reads the card. */
+    scanPad() {
+      clearTimeout(this.padScanTimer)
+      this.padScan = true
+      this.padScanTimer = setTimeout(() => {
+        this.padScan = false
+        this.$refs.padFace?.play('flash')
+      }, PAD_SCAN_MS)
     },
     /** A click in the plane that isn't on a thing steps back out of a zoom. */
     worldClick(event) {

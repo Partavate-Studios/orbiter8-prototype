@@ -1150,6 +1150,10 @@ measured from the files.
 Checked by playing the console with every reaction logged as it played, then looking at the Music and
 classified pages.
 
+**The pad by the door scans on every click** (Koda, the same day), whether or not the click does anything:
+for 2.8 s she's Scanning (teal eyes, the line of light), then her eyes flash as she reads the card.
+`scanPad()` in `intro-screen.vue`.
+
 ## For Koda to decide (updated 2026-11-24)
 
 Everything above that isn't listed here is answered, fixed or superseded, and marked where it was
