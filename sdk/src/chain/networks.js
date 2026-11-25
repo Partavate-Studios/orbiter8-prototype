@@ -12,6 +12,8 @@
  * @property {string[]} rpc
  * @property {string[]} explorer   Block explorer base URLs, without a trailing slash.
  * @property {Record<string, string>} contracts  addresses by module: galaxy, pilots, market, credits, ships, planets, claims, deeds, factory, battle, repairs, armory, drones
+ * @property {number} [logChunkBlocks]  blocks per eth_getLogs call, when its node takes more than the
+ *   default 2,000 (sdk/event-log.js)
  * @property {number} [startBlock]  the block the contracts were deployed at: no game events before it, so
  *   event reads start there (0 when not given; set it for every public network, or the first read walks the chain)
  * @property {string} [sessionFunds]  native currency (decimal string) sent with a session key for gas
@@ -54,6 +56,9 @@ const deployed = [
       drones: '0x7967e3E8444324A072821C52CE0468f97D2151d3'
     },
     startBlock: 15_977_160, // a little before the deployment (its first transaction is in block 15,977,178)
+    // Its node returns a week of a contract's logs in one call in under half a second (2026-11-24, 210,000
+    // blocks); at the default 2,000 a call, connecting took a minute and a half and often failed.
+    logChunkBlocks: 100_000,
     sessionFunds: '2', // a move costs about 0.01–0.04 PAS
     funding: [{ text: 'Polkadot faucet (choose Polkadot Hub TestNet)', url: 'https://faucet.polkadot.io/' }]
   }

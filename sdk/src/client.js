@@ -347,7 +347,10 @@ export function createGameClient() {
     }
     if (stored.pending) saveKey(state.chainId, state.account, { ...stored, pending: undefined })
     keyWallet = keySigner(stored.privateKey, network.rpc[0])
-    keyGame = createGame(keyWallet, network.contracts, { startBlock: network.startBlock })
+    keyGame = createGame(keyWallet, network.contracts, {
+      startBlock: network.startBlock,
+      logChunk: network.logChunkBlocks
+    })
     state.session = { key: stored.address, expiry: onChain.expiry }
   }
 
@@ -963,7 +966,7 @@ export function createGameClient() {
       if (!network) return false
       const { signer, provider } = getSession()
       if ((await provider.getCode(network.contracts.pilots)) === '0x') return false
-      game = createGame(signer, network.contracts, { startBlock: network.startBlock })
+      game = createGame(signer, network.contracts, { startBlock: network.startBlock, logChunk: network.logChunkBlocks })
       state.contracts = { ...network.contracts }
       const startBlock = network.startBlock ?? 0
       pilotsBlock = discoveredBlock = startBlock - 1

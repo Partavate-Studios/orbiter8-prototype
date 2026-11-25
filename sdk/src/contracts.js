@@ -194,10 +194,11 @@ async function chunked(ids, size, read) {
  * The game's contracts on one network, for reading and moving.
  * @param {import('ethers').ContractRunner} runner  a signer (to move) or a provider (to read)
  * @param {Record<string, string>} addresses  the network's contract addresses
- * @param {{ startBlock?: number }} [options]  the deployment's block: no game events before it, so
- *   event reads start there (from block 0, a public chain's 16 million blocks took half an hour)
+ * @param {{ startBlock?: number, logChunk?: number }} [options]  startBlock: the deployment's block: no game
+ *   events before it, so event reads start there (from block 0, a public chain's 16 million blocks took half
+ *   an hour). logChunk: blocks per eth_getLogs call, for a node that takes long ranges (event-log.js).
  */
-export function createGame(runner, addresses, { startBlock = 0 } = {}) {
+export function createGame(runner, addresses, { startBlock = 0, logChunk } = {}) {
   runner = withGasMargin(runner)
   const galaxy = new Contract(addresses.galaxy, GalaxyAbi, runner)
   const pilots = new Contract(addresses.pilots, PilotsAbi, runner)
@@ -233,7 +234,7 @@ export function createGame(runner, addresses, { startBlock = 0 } = {}) {
     fromBlock = Math.max(fromBlock, startBlock - 1)
     const latest = await provider.getBlockNumber()
     if (latest <= fromBlock) return { logs: [], toBlock: fromBlock }
-    return { logs: await queryChunked(contract, filter, fromBlock + 1, latest), toBlock: latest }
+    return { logs: await queryChunked(contract, filter, fromBlock + 1, latest, logChunk), toBlock: latest }
   }
 
   const game = {
@@ -439,7 +440,7 @@ export function createGame(runner, addresses, { startBlock = 0 } = {}) {
 
     /** The siege feed's events in a block range, oldest first (sdk/event-log.js keeps the window). */
     async siegeEvents(fromBlock, toBlock) {
-      const logs = await queryChunked(battle, '*', fromBlock, toBlock)
+      const logs = await queryChunked(battle, '*', fromBlock, toBlock, logChunk)
       const wanted = ['SiegeStarted', 'DefenderJoined', 'WornDown', 'ClaimFiled', 'ClaimFailed', 'SiegeEnded']
       return logs
         .filter((l) => wanted.includes(l.fragment?.name))
@@ -509,7 +510,7 @@ export function createGame(runner, addresses, { startBlock = 0 } = {}) {
 
     /** Trades in a block range, oldest first: [{ sender, port, good, units, hash, block }]. */
     async trades(fromBlock, toBlock) {
-      const logs = await queryChunked(market, market.filters.Traded(), fromBlock, toBlock)
+      const logs = await queryChunked(market, market.filters.Traded(), fromBlock, toBlock, logChunk)
       return logs.map((l) => ({
         sender: l.args[0].toLowerCase(),
         port: Number(l.args[1]),
@@ -524,8 +525,8 @@ export function createGame(runner, addresses, { startBlock = 0 } = {}) {
     /** Pilots' arrivals in a system (jumps and black holes) in a block range: [{ pilot, cell, block, logIndex }]. */
     async arrivals(fromBlock, toBlock) {
       const [jumps, holes] = await Promise.all([
-        queryChunked(pilots, pilots.filters.Jumped(), fromBlock, toBlock),
-        queryChunked(pilots, pilots.filters.Traversed(), fromBlock, toBlock)
+        queryChunked(pilots, pilots.filters.Jumped(), fromBlock, toBlock, logChunk),
+        queryChunked(pilots, pilots.filters.Traversed(), fromBlock, toBlock, logChunk)
       ])
       return [...jumps, ...holes]
         .map((l) => ({ pilot: l.args[0].toLowerCase(), cell: Number(l.args[2]), block: l.blockNumber, logIndex: l.index }))
@@ -534,7 +535,7 @@ export function createGame(runner, addresses, { startBlock = 0 } = {}) {
 
     /** Galaxy chat in a block range, oldest first: [{ sender, message, hash, block }]. */
     async broadcasts(fromBlock, toBlock) {
-      const logs = await queryChunked(pilots, pilots.filters.Broadcast(), fromBlock, toBlock)
+      const logs = await queryChunked(pilots, pilots.filters.Broadcast(), fromBlock, toBlock, logChunk)
       return logs.map((l) => ({
         sender: l.args[0].toLowerCase(),
         message: l.args[1],
@@ -545,7 +546,7 @@ export function createGame(runner, addresses, { startBlock = 0 } = {}) {
 
     /** Registrations in a block range: [{ pilot, shipId, callsign, shipName, hash, block }]. */
     async registrations(fromBlock, toBlock) {
-      const logs = await queryChunked(pilots, pilots.filters.Registered(), fromBlock, toBlock)
+      const logs = await queryChunked(pilots, pilots.filters.Registered(), fromBlock, toBlock, logChunk)
       return logs.map((l) => ({
         pilot: l.args[0].toLowerCase(),
         shipId: Number(l.args[1]),

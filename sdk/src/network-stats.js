@@ -43,7 +43,7 @@ async function readStats(url, network) {
     const galaxy = new Contract(network.contracts.galaxy, GalaxyAbi, provider)
     const latest = await withTimeout(provider.getBlockNumber())
     const [count, discovered] = await withTimeout(
-      Promise.all([pilots.pilotCount(), queryChunked(galaxy, galaxy.filters.Discovered(), network.startBlock ?? 0, latest)])
+      Promise.all([pilots.pilotCount(), queryChunked(galaxy, galaxy.filters.Discovered(), network.startBlock ?? 0, latest, network.logChunkBlocks)])
     )
     return { pilots: Number(count), starSystems: discovered.length + 1 }
   } finally {

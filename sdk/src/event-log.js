@@ -1,20 +1,29 @@
 // Events read a page at a time, and from then on only what's new. Public RPC providers cap how
 // many blocks one eth_getLogs may span (Infura 10,000; some nodes 2,000), so every range is read
-// in chunks of CHUNK_BLOCKS; and a log keeps its place, so each reload reads only the blocks since.
+// in chunks; and a log keeps its place, so each reload reads only the blocks since.
 
-/** Blocks per eth_getLogs call: under every provider's cap seen so far. */
+/** Blocks per eth_getLogs call by default: under every provider's cap seen so far. */
 export const CHUNK_BLOCKS = 2000
 
 /**
- * Reads `filter`'s events from `fromBlock` to `toBlock` (inclusive), CHUNK_BLOCKS at a time.
+ * Reads `filter`'s events from `fromBlock` to `toBlock` (inclusive), `chunk` blocks at a time. A network
+ * whose node takes long ranges says so (networks.js `logChunkBlocks`): at 2,000 a call, a testnet a week
+ * old took over a hundred calls and a minute and a half to count its pilots (2026-11-24). If the node
+ * refuses a long chunk, that chunk is read again CHUNK_BLOCKS at a time.
  * @param {import('ethers').BaseContract} contract
  * @param {unknown} filter  a contract filter, or '*' for every event
+ * @param {number} [chunk]  blocks per call
  */
-export async function queryChunked(contract, filter, fromBlock, toBlock) {
+export async function queryChunked(contract, filter, fromBlock, toBlock, chunk = CHUNK_BLOCKS) {
   const logs = []
-  for (let from = fromBlock; from <= toBlock; from += CHUNK_BLOCKS) {
-    const to = Math.min(toBlock, from + CHUNK_BLOCKS - 1)
-    logs.push(...(await contract.queryFilter(filter, from, to)))
+  for (let from = fromBlock; from <= toBlock; from += chunk) {
+    const to = Math.min(toBlock, from + chunk - 1)
+    try {
+      logs.push(...(await contract.queryFilter(filter, from, to)))
+    } catch (error) {
+      if (chunk <= CHUNK_BLOCKS) throw error
+      logs.push(...(await queryChunked(contract, filter, from, to, CHUNK_BLOCKS)))
+    }
   }
   return logs
 }

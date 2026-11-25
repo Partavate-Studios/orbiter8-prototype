@@ -12,6 +12,28 @@ describe('queryChunked', () => {
       [10 + CHUNK_BLOCKS * 2, 10 + CHUNK_BLOCKS * 2 + 4]
     ])
   })
+
+  it('reads a long range in one call where the network allows it', async () => {
+    const ranges = []
+    const contract = { queryFilter: async (f, from, to) => (ranges.push([from, to]), []) }
+    await queryChunked(contract, '*', 0, 209_999, 100_000)
+    expect(ranges).toEqual([
+      [0, 99_999],
+      [100_000, 199_999],
+      [200_000, 209_999]
+    ])
+  })
+
+  it('reads a long chunk the node refuses again in default chunks, keeping every event in order', async () => {
+    const contract = {
+      queryFilter: async (f, from, to) => {
+        if (to - from + 1 > CHUNK_BLOCKS) throw new Error('block range too large')
+        return [from]
+      }
+    }
+    const logs = await queryChunked(contract, '*', 0, CHUNK_BLOCKS * 3 - 1, CHUNK_BLOCKS * 10)
+    expect(logs).toEqual([0, CHUNK_BLOCKS, CHUNK_BLOCKS * 2])
+  })
 })
 
 describe('createEventLog', () => {
